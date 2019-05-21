@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic_sny_yph_kr">
+  <title>gpfdist://协议</title>
+
+  <shortdesc><codeph>gpfdist://</codeph>协议被用在一个URI中引用一个正在运行的
+      <codeph>gpfdist</codeph>实例。</shortdesc>
+  <body>
+    <p><codeph>gpfdist</codeph>工具从一个文件主机上的目录中把外部数据文件并行提供给Greenplum数据库的所有Segment。</p>
+    <p><codeph>gpfdist</codeph>位于Greenplum数据库的Master主机以及每个Segment主机上的<codeph>$GPHOME/bin</codeph>目录。</p>
+    <p>在外部数据文件所在的主机上运行<codeph>gpfdist</codeph>。
+        <codeph>gpfdist</codeph> 会自动解压 <codeph>gzip</codeph> (<codeph>.gz</codeph>) 和
+        <codeph>bzip2</codeph> (.<codeph>bz2</codeph>)。用户可以使用通配符（*）或者其他C风格的模式匹配来表示要读取的多个文件。指定的文件都被假定是相对于启动
+        <codeph>gpfdist</codeph>实例时指定的目录。</p>
+    <p>所有的主Segment并行地访问外部文件，Segment的数量服从<codeph>gp_external_max_segments</codeph>服务器配置参数中设置的数量。
+      在<codeph>CREATE EXTERNAL TABLE</codeph>语句中使用多个<codeph>gpfdist</codeph>数据源可以放大外部表的扫描性能。</p>
+    <p><codeph>gpfdist</codeph>支持数据转换。你可以写一个转换进程将外部数据转入或转出到一个不被Greenplum数据库外部表直接支持的格式。</p>
+    <p>更多关于<codeph>gpfdist</codeph>的配置， 参考<xref
+        href="g-using-the-greenplum-parallel-file-server--gpfdist-.xml#topic13">使用Greenplum并行文件服务器(gpfdist)</xref>. </p>
+    <p>参考<codeph>gpfdist</codeph>相关文档了解更多关于使用<codeph>gpfdist</codeph>处理外部表的信息。</p>
+  </body>
+</topic>

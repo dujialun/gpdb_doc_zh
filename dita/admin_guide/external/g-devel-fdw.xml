@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic1">
+  <title id="im177965">写一个外部数据的包装器</title>
+  <body>
+    <p>本章概述了如何写一个新的外部数据包装器。</p>
+    <p>外部表上的所有操作都是通过其外部数据包装器（FDW）处理的，FDW是一个包含了Greenplum数据库服务器核心调用的一组函数组成的库。 外部数据包装器负责从远程数据存储中获取数据并将其递交给Greenplum数据库执行器。 如果外部数据支持更新，则包装器也必须能处理。</p>
+    <p>当你准备自己写一个包装器的时候，包含在Greenplum数据库在github上的开源仓库里的外部数据包装器是一个很好的参考。
+        你需要查阅一下<codeph>contrib/</codeph>目录下的
+      <codeph><xref href="https://github.com/greenplum-db/gpdb/tree/master/contrib/file_fdw" scope="external">file_fdw</xref></codeph>
+      和<codeph><xref href="https://github.com/greenplum-db/gpdb/tree/master/contrib/postgres_fdw" scope="external">postgres_fdw</xref></codeph>
+      模块。
+       <codeph><xref href="../../ref_guide/sql_commands/CREATE_FOREIGN_DATA_WRAPPER.xml#topic1"/></codeph>
+        的参考页面也提供了一些有用的信息。</p>
+    <note>注意: SQL标准里，定义了一个关于写外部数据包装器的接口。Greenplum数据库没有实现这个API，因为适配该API到Greenplum数据库里的成本太高，并且这个API还没有得到广泛的应用。</note>
+    <p>该文章包含如下章节：</p>
+    <ul>
+      <li><xref href="#reqs" type="topic" format="dita"/></li>
+      <li><xref href="#limits" type="topic" format="dita"/></li>
+      <li><xref href="#includes" type="topic" format="dita"/></li>
+      <li><xref href="#topic2" type="topic" format="dita"/></li>
+      <li><xref href="#topic3" type="topic" format="dita"/></li>
+      <li><xref href="#helper" type="topic" format="dita"/></li>
+      <li><xref href="#topic5" type="topic" format="dita"/></li>
+      <li><xref href="#pkg" type="topic" format="dita"/></li>
+      <li><xref href="#deployconsider" type="topic" format="dita"/></li>
+    </ul>
+  </body>
+  <topic id="reqs">
+    <title>需要准备的东西</title>
+    <body>
+      <p>当开发Greenplum数据库外部数据包装器API时：</p>
+      <ul>
+        <li>必须在一个与Greenplum数据库宿主机相同硬件和软件环境的机器上开发你的代码。</li>
+        <li>代码必须用version-1的接口，使用像C一样的编译式语言。想更多了解关于C语言调用规则和动态加载，请参考
+          <xref href="https://www.postgresql.org/docs/9.4/xfunc-c.html" scope="external" format="html">C语言函数文档</xref>
+          。</li>
+        <li>目标文件中的符号名称不能有冲突，也不能和Greenplum数据库里冲突。如果出现了这种错误，必须重命名函数和变量。</li>
+        <li>复习<xref href="g-foreign.xml#topic1" type="topic" format="dita">访问外部数据表</xref>中关于外部表的介绍。</li>
+      </ul>
+    </body>
+  </topic>
+  <topic id="limits">
+    <title>已知问题和限制</title>
+    <body>
+     <p>Greenplum 6 Beta版的外部数据包装器实现包括如下已知问题和限制：</p>
+     <ul>
+       <li>Greenplum 6 Beta版不会安装任何外部数据包装器。</li>
+       <li>Greenplum数据库仅对外部表扫描使用<codeph>mpp_execute</codeph>选项值。
+           当插入或更新一个外部表的时候，Greenplum不遵循<codeph>mpp_execute</codeph>设置；所有的写操作都从master进行初始化。
+           </li>
+     </ul>
+    </body>
+  </topic>
+  <topic id="includes">
+    <title>头文件</title>
+    <body>
+      <p>开发外部数据包装器过程中可能使用到的头文件在<codeph>greenplum-db/src/include/</codeph>目录里
+          （针对Greenplum数据库github开源仓库做开发时），或安装在<codeph>$GPHOME/include/postgresql/server/</codeph>目录里（针对Greenplum安装版做开发时）：
+          </p>
+      <ul>
+        <li>foreign/fdwapi.h - FDW API 相关结构体和回调函数</li>
+        <li>foreign/foreign.h - FDW帮助相关的结构体和函数</li>
+        <li>catalog/pg_foreign_table.h - 外部表定义</li>
+        <li>catalog/pg_foreign_server.h - 外部服务定义</li>
+      </ul>
+      <p>您的FDW代码也可能依赖于访问远程数据存储所需的头文件和库。</p>
+    </body>
+  </topic>
+  <topic id="topic2">
+    <title>外部数据包装器函数</title>
+    <body>
+      <p>开发者必须实现一个SQL可调用的处理函数，和一个可选的验证函数。这两个函数必须使用像C一样的编译语言，都用version-1接口。
+          </p>
+      <p>处理函数会返回一个被Greenplum数据库优化器，执行器和各个维护命令调用的函数指针结构体。
+          处理函数必须在Greenplum数据库中注册为不带参数并且返回特殊的伪类型<codeph>fdw_handler</codeph>。
+          例如：</p>
+      <codeblock>CREATE FUNCTION NEW_fdw_handler()
+  RETURNS fdw_handler
+  AS 'MODULE_PATHNAME'
+LANGUAGE C STRICT;</codeblock>
+      <p>写一个外部数据包装器的大部分工作就是实现这些回调函数。
+          对于在SQL级别不可见或不可调用的FDW API回调函数和普通的C函数在
+          <xref href="#topic3" type="topic" format="dita">Foreign Data Wrapper Callback Functions</xref>里有详细描述。
+      </p>
+      <p>验证器函数负责验证<codeph>CREATE</codeph>和<codeph>ALTER</codeph>命令中为其外部数据包装器提供的选项，
+          以及使用包装器的外部服务器， 用户映射和外部表。
+          验证器函数必须注册为带两个参数，一个包含要验证的选项的文本数组，以及一个表示与选项关联的对象类型的OID。例如：
+      </p>
+      <codeblock>CREATE FUNCTION NEW_fdw_validator( text[], oid )
+  RETURNS void
+  AS 'MODULE_PATHNAME'
+LANGUAGE C STRICT;</codeblock>
+       <p>OID参数反映了对象存储在系统catalog中的类型，其中包括
+        <codeph>ForeignDataWrapperRelationId</codeph>,
+        <codeph>ForeignServerRelationId</codeph>,
+        <codeph>UserMappingRelationId</codeph>, 或
+        <codeph>ForeignTableRelationId</codeph>. 如果外部数据包装器未提供验证器函数，则Greenplum数据库不会在对象创建时或对象更改时检查选项有效性。</p>
+    </body>
+  </topic>
+  <topic id="topic3">
+    <title>外部数据包装器回调函数</title>
+    <body>
+      <p>外部数据包装器API定义了Greenplum数据库在扫描和更新外部表时调用的回调函数。API还包括了对外部表做explain和analyze操作的回调函数。</p>
+      <p>外部数据包装器处理函数会返回一个由<codeph>palloc</codeph>申请的包含下面描述的回调函数指针的<codeph>FdwRoutine</codeph>结构体。
+          <codeph>FdwRoutine</codeph>结构体存储在头文件<codeph>foreign/fdwapi.h</codeph>中，下面是定义：
+      </p>
+       <codeblock>/*
+ * FdwRoutine is the struct returned by a foreign-data wrapper's handler
+ * function.  It provides pointers to the callback functions needed by the
+ * planner and executor.
+ *
+ * More function pointers are likely to be added in the future.  Therefore
+ * it's recommended that the handler initialize the struct with
+ * makeNode(FdwRoutine) so that all fields are set to NULL.  This will
+ * ensure that no fields are accidentally left undefined.
+ */
+typedef struct FdwRoutine
+{
+	NodeTag		type;
+
+	/* Functions for scanning foreign tables */
+	GetForeignRelSize_function GetForeignRelSize;
+	GetForeignPaths_function GetForeignPaths;
+	GetForeignPlan_function GetForeignPlan;
+	BeginForeignScan_function BeginForeignScan;
+	IterateForeignScan_function IterateForeignScan;
+	ReScanForeignScan_function ReScanForeignScan;
+	EndForeignScan_function EndForeignScan;
+
+	/*
+	 * Remaining functions are optional.  Set the pointer to NULL for any that
+	 * are not provided.
+	 */
+
+	/* Functions for updating foreign tables */
+	AddForeignUpdateTargets_function AddForeignUpdateTargets;
+	PlanForeignModify_function PlanForeignModify;
+	BeginForeignModify_function BeginForeignModify;
+	ExecForeignInsert_function ExecForeignInsert;
+	ExecForeignUpdate_function ExecForeignUpdate;
+	ExecForeignDelete_function ExecForeignDelete;
+	EndForeignModify_function EndForeignModify;
+	IsForeignRelUpdatable_function IsForeignRelUpdatable;
+
+	/* Support functions for EXPLAIN */
+	ExplainForeignScan_function ExplainForeignScan;
+	ExplainForeignModify_function ExplainForeignModify;
+
+	/* Support functions for ANALYZE */
+	AnalyzeForeignTable_function AnalyzeForeignTable;
+} FdwRoutine;
+</codeblock>
+      <p>必须在外部数据包装器中实现和扫描相关的函数，其他回调函数是可选的。</p>
+      <p>扫描相关的函数包括：</p>
+      <table id="in201681">
+        <tgroup cols="2">
+          <colspec colname="col1" colnum="1" colwidth="90*"/>
+          <colspec colname="col2" colnum="2" colwidth="163*"/>
+          <thead>
+            <row>
+              <entry colname="col1">回调签名</entry>
+              <entry colname="col2">描述</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry colname="col1"><codeblock>void
+GetForeignRelSize (PlannerInfo *root,
+                   RelOptInfo *baserel,
+                   Oid foreigntableid)</codeblock></entry>
+              <entry colname="col2">获取一个外部表大小的估算值。在对一个外部表做查询计划的开始时调用。</entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>void
+GetForeignPaths (PlannerInfo *root,
+                 RelOptInfo *baserel,
+                 Oid foreigntableid)</codeblock></entry>
+              <entry colname="col2">为一个外部表的扫描操作创建可能的访问路径。在查询计划过程中调用。
+                  <note>注意：一个与Greenplum数据库相兼容的FDW必须在它的
+                      <codeph>GetForeignPaths()</codeph>回调函数中调用
+                      <codeph>create_foreignscan_path()</codeph>。</note>
+              </entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>ForeignScan *
+GetForeignPlan (PlannerInfo *root,
+                RelOptInfo *baserel,
+                Oid foreigntableid,
+                ForeignPath *best_path,
+                List *tlist,
+                List *scan_clauses)</codeblock></entry>
+              <entry colname="col2">从已选择的外部访问路径中创建一个<codeph>ForeignScan</codeph>计划节点。
+                  在查询计划结束时调用。
+              </entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>void
+BeginForeignScan (ForeignScanState *node,
+                  int eflags)</codeblock></entry>
+              <entry colname="col2">开始执行一个外部扫描。在执行器启动时调用。</entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>TupleTableSlot *
+IterateForeignScan (ForeignScanState *node)</codeblock></entry>
+              <entry colname="col2">从外部源获取一行，并在一个元组表槽中返回；如果没有可用的行则返回NULL。</entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>void
+ReScanForeignScan (ForeignScanState *node)</codeblock></entry>
+              <entry colname="col2">从头开始重新扫描。</entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>void
+EndForeignScan (ForeignScanState *node)</codeblock></entry>
+              <entry colname="col2">结束扫描并释放资源。</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <p>关于FDW回调函数的输入输出更详细的信息，请参考PostgreSQL文档
+        <xref href="https://www.postgresql.org/docs/9.4/fdw-callbacks.html" scope="external" format="html">Foreign Data Wrapper Callback Routines</xref>。</p>
+    </body>
+  </topic>
+  <topic id="helper">
+    <title>外部数据包装器帮助函数</title>
+    <body>
+      <p>FDW API从Greenplum数据库核心服务输出了几个帮助函数，
+          所以外部数据包装器的作者可以轻松的访问FDW相关对象的属性，
+          比如当用户创建或修改外部数据包装器、服务或外部表时提供的选项。
+          要使用这些帮助函数，必须在源文件里包含<codeph>foreign.h</codeph>头文件：
+          </p>
+      <codeblock>#include "foreign/foreign.h"</codeblock>
+      <p>FDW API包括了下面表格列出的这些帮助函数。
+          想了解更多关于这些函数的信息请参考PostgreSQL文档
+        <xref href="https://www.postgresql.org/docs/9.4/fdw-helpers.html" scope="external" format="html">Foreign Data Wrapper Helper Functions</xref>。</p>
+      <table id="fdw_helper">
+        <tgroup cols="2">
+          <colspec colname="col1" colnum="1" colwidth="90*"/>
+          <colspec colname="col2" colnum="2" colwidth="163*"/>
+          <thead>
+            <row>
+              <entry colname="col1">帮着签名</entry>
+              <entry colname="col2">描述</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry colname="col1"><codeblock>ForeignDataWrapper *
+GetForeignDataWrapper(Oid fdwid);</codeblock></entry>
+              <entry colname="col2">通过给定的OID，返回外部数据包装器<codeph>ForeignDataWrapper</codeph>对象。</entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>ForeignDataWrapper *
+GetForeignDataWrapperByName(const char *name, bool missing_ok);</codeblock></entry>
+              <entry colname="col2">通过给定的名称，返回外部数据包装器<codeph>ForeignDataWrapper</codeph>对象。</entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>ForeignServer *
+GetForeignServer(Oid serverid);</codeblock></entry>
+              <entry colname="col2">通过给定的OID，返回外部服务的<codeph>ForeignServer</codeph>对象。</entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>ForeignServer *
+GetForeignServerByName(const char *name, bool missing_ok);</codeblock></entry>
+              <entry colname="col2">通过给定的名称，返回外部服务的<codeph>ForeignServer</codeph>对象。</entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>UserMapping *
+GetUserMapping(Oid userid, Oid serverid);</codeblock></entry>
+              <entry colname="col2">在给定的服务上为给定的用户返回用户映射<codeph>UserMapping</codeph>对象。</entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>ForeignTable *
+GetForeignTable(Oid relid);</codeblock></entry>
+              <entry colname="col2">根据OID返回对应外部表的<codeph>ForeignTable</codeph>对象。</entry>
+            </row>
+            <row>
+              <entry colname="col1"><codeblock>List *
+GetForeignColumnOptions(Oid relid, AttrNumber attnum);</codeblock></entry>
+              <entry colname="col2">根据OID对应的外部表和属性编号，返回列的FDW选项。</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </body>
+  </topic>
+  <topic id="topic5">
+    <title>Greenplum数据库注意事项</title>
+    <body>
+      <p>一个Greenplum数据库用户可以在创建和修改一个外部表、外部服务或外部数据包装器时指定<codeph>mpp_execute</codeph>选项。
+          一个Greenplum数据库兼容的外部数据包装器会在扫描时检查<codeph>mpp_execute</codeph>属性值并根据它决定向哪发送数据，
+          包括：向<codeph>master</codeph>（默认值），任何节点（master或任何一个节点），或所有节点。</p>
+      <note>注意： 不管<codeph>mpp_execute</codeph>如何设置，
+          使用外部数据包装器的写/更新操作总是在Greenplum数据库master节点上执行。</note>
+      <p>下面的扫描代码片段探测与外部表关联的<codeph>mpp_execute</codeph>值。</p>
+        <codeblock>ForeignTable *table = GetForeignTable(foreigntableid);
+if (table->exec_location == FTEXECLOCATION_ALL_SEGMENTS)
+{
+    ...
+}
+else if (table->exec_location == FTEXECLOCATION_ANY)
+{
+    ...
+}
+else if (table->exec_location == FTEXECLOCATION_MASTER)
+{
+    ...
+} </codeblock>
+      <p>如果外部表创建和外部服务的时候没有设置<codeph>mpp_execute</codeph>，
+          外部数据包装器会探测并决定。
+          如果没有任何一个外部数据相关的对象设置<codeph>mpp_execute</codeph>，
+          则使用默认的<codeph>master</codeph>。
+      </p>
+      <p>如果外部数据包装器支持<codeph>mpp_execute</codeph>设置成<codeph>'all'</codeph>，
+          它会实现一个Greenplum节点与数据匹配的策略。
+          为了不重复的从远处取数据，每个节点上的FDW必须能决定哪部分数据归它负责。
+          一个FDW会使用节点标识和节点数量去帮助做这个决定。
+          这面这段代码演示了一个外部数据包装器是怎样获取节点编号和节点数量的：
+      </p>
+      <codeblock>int segmentNumber = GpIdentity.segindex;
+int totalNumberOfSegments = getgpsegmentCount();</codeblock>
+    </body>
+  </topic>
+  <topic id="pkg">
+    <title>使用PGXS建立一个外部数据包装器扩展</title>
+    <body>
+      <p>将你用FDW API写的外部数据包装器函数编译成Greenplum数据库按需加载的一个或多个共享库。</p>
+      <p>你可以使用PostgreSQL扩展基础库(PGXS)为Greenplum数据库安装构建外部数据包装器的源代码。该框架自动化了简单模块的常用构建规则。如果你需要构建一个更复杂的用例，你必须写自己的构建系统。</p>
+      <p>使用PGXS基础库为你的FDW生成一个共享库，创建一个设置好PGXS相关变量的简单的<codeph>Makefile</codeph>。</p>
+      <note>注意： 请参考<xref href="https://www.postgresql.org/docs/9.4/extend-pgxs.html" format="html" scope="external">Extension Building Infrastructure</xref>
+          文档中关于PGXS支持的<codeph>Makefile</codeph>变量。</note>
+	  <p>例如：下面<codeph>Makefile</codeph>根据base_fdw_1.c和base_fdw_2.c这两个C的源文件在当前工作目录生成了一个名字叫<codeph>base_fdw.so</codeph>的共享库：
+      </p>
+      <codeblock>MODULE_big = base_fdw
+OBJS = base_fdw_1.o base_fdw_2.o
+
+PG_CONFIG = pg_config
+PGXS := $(shell $(PG_CONFIG) --pgxs)
+
+PG_CPPFLAGS = -I$(shell $(PG_CONFIG) --includedir)
+SHLIB_LINK = -L$(shell $(PG_CONFIG) --libdir)
+include $(PGXS)
+</codeblock>
+      <p>下面是<codeph>Makefile</codeph>中用到的指令的描述：</p>
+      <ul>
+        <li><codeph>MODULE_big</codeph> - 标识<codeph>Makefile</codeph>生成的共享库的基本名称。</li>
+        <li><codeph>PG_CPPFLAGS</codeph> - 将Greenplum数据库安装中的<codeph>include/</codeph>目录加到到编译器头文件的查找路径里。</li>
+        <li><codeph>SHLIB_LINK</codeph> 将Greenplum数据库安装中的库目录(<codeph>$GPHOME/lib/</codeph>)加到链接查找路径里。</li>
+        <li><codeph>PG_CONFIG</codeph>和<codeph>PGXS</codeph>变量设置和<codeph>include</codeph>语句是必需的，
+            通常位于<codeph>Makefile</codeph>的最后三行。</li>
+      </ul>
+      <p>要将外部数据包装器打包为Greenplum数据库扩展，可以创建脚本
+          （<codeph><varname>newfdw - version</varname>.sql</codeph>）和控制
+          （<codeph><varname>newfdw</varname>.control</codeph>）文件，这些文件注册FDW句柄和验证器函数，创建外部数据包装器并识别FDW共享库文件的特征。
+      </p>
+      <note>注意： PostgreSQL文档<xref href="https://www.postgresql.org/docs/9.4/extend-extensions.html" format="html" scope="external">Packaging Related Objects into an Extension</xref>
+        描述了如何打包一个扩展。</note>
+      <p>示例名为<codeph>base_fdw--1.0.sql</codeph>的外部数据包装器扩展脚本样例：</p>
+      <codeblock>CREATE FUNCTION base_fdw_handler()
+  RETURNS fdw_handler
+  AS 'MODULE_PATHNAME'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION base_fdw_validator(text[], oid)
+  RETURNS void
+  AS 'MODULE_PATHNAME'
+LANGUAGE C STRICT;
+
+CREATE FOREIGN DATA WRAPPER base_fdw
+  HANDLER base_fdw_handler
+  VALIDATOR base_fdw_validator;</codeblock>
+      <p>示例名为<codeph>base_fdw.control</codeph>的FDW控制文件：</p><codeblock># base_fdw FDW extension
+comment = 'base foreign-data wrapper implementation; does not do much'
+default_version = '1.0'
+module_pathname = '$libdir/base_fdw'
+relocatable = true</codeblock>
+      <p>把下面这些指令加到<codeph>Makefile</codeph>里，
+          可以指定FDW扩展控制文件的基本名称（<codeph>EXTENSION</codeph>）
+          和SQL脚本（<codeph>DATA</codeph>）：
+      </p>
+        <codeblock>EXTENSION = base_fdw
+DATA = base_fdw--1.0.sql</codeblock>
+      <p>在包含有这些命令的<codeph>Makefile</codeph>文件目录里运行<codeph>make install</codeph>
+          会将共享库、FDW SQL和控制文件拷贝到Greenplum数据库安装目录中（<codeph>$GPHOME</codeph>）特定的或默认的位置。
+      </p>
+    </body>
+  </topic>
+  <topic id="deployconsider">
+    <title>部署注意事项</title>
+    <body>
+      <p>您必须以适合在Greenplum数据库群集中部署的形式打包FDW共享库和扩展文件。当你创建和部署安装包时，考虑一下因素：</p>
+      <ul>
+        <li>FDW共享库必须安装到集群中master节点和每个segment节点的相同位置。
+            在<codeph>.control</codeph>文件里指定这个路径。这个路径通常是<codeph>$GPHOME/lib/postgresql/</codeph>。
+        </li>
+        <li>FDW的<codeph>.sql</codeph>和<codeph>.control</codeph>文件必须安装到集群中
+            master节点和每个segment节点的<codeph>$GPHOME/share/postgresql/extension/</codeph>路径。
+        </li>
+        <li><codeph>gpadmin</codeph>用户必须拥有访问整个FDW共享库和扩展文件的权限。
+        </li>
+      </ul>
+    </body>
+  </topic>
+</topic>

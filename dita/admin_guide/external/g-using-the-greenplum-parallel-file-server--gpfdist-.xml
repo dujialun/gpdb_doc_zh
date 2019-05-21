@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic13">
+   <title>使用Greenplum的并行文件服务器（gpfdist）</title>
+   <shortdesc>
+      <cmdname>gpfdist</cmdname>协议用于<codeph>CREATE EXTERNAL TABLE</codeph> SQL命令，以访问Greenplum Database <codeph>gpfdist</codeph>文件服务器实用程序提供的外部数据。
+      当外部数据由<cmdname>gpfdist</cmdname>提供时，Greenplum数据库系统中的所有节点都可以并行读取或写入外部表数据。
+      </shortdesc>
+   <body>
+      <p>本主题介绍将<cmdname>gpfdist</cmdname>与外部表一起使用的设置和管理任务。
+         </p>
+      <ul id="ul_krw_tmg_bbb">
+         <li><xref href="#topic_xkt_vjy_4bb" format="dita"/></li>
+         <li><xref href="#topic14" format="dita"/></li>
+         <li><xref href="#topic15" format="dita"/></li>
+         <li><xref href="#topic16" format="dita"/></li>
+         <li><xref href="#topic17" format="dita"/></li>
+         <li><xref href="#topic18" format="dita"/></li>
+      </ul>
+   </body>
+   <topic id="topic_xkt_vjy_4bb">
+      <title>关于gpfdist和外部表</title>
+      <body>
+         <p><codeph>gpfdist</codeph>文件服务器实用程序位于Greenplum数据库主节点和每个节点上的<codeph>$GPHOME/bin</codeph>目录中。
+            启动<codeph>gpfdist</codeph>实例时，您指定一个侦听端口以及一个包含要读取的文件或要写入文件的目录的路径。
+            例如，此命令在后台运行<codeph>gpfdist</codeph>，侦听端口8801，并在<codeph>/home/gpadmin/external_files</codeph>目录中提供文件：
+         </p>
+         <codeblock>$ gpfdist -p 8801 -d /home/gpadmin/external_files &amp;</codeblock>
+         <p><codeph>CREATE EXTERNAL TABLE</codeph>命令<codeph>LOCATION</codeph>子句将外部表定义连接到一个或多个<codeph>gpfdist</codeph>实例。
+            如果外部表是可读的，则<codeph>gpfdist</codeph>服务器从指定目录中的文件读取数据记录，
+            将它们打包到块中，并在响应Greenplum数据库节点的请求时发送该块。
+            这些节点解压缩它们接收的行并根据外部表的分发策略分发它们。
+            如果外部表是可写表，则节点将请求中的行块发送到gpfdist，gpfdist将它们写入外部文件。
+         </p>
+         <p>外部数据文件可以包含CSV格式的行或<codeph>CREATE EXTERNAL TABLE</codeph>命令的<codeph>FORMAT</codeph>子句支持的任何分隔文本格式。
+            此外，<codeph>gpfdist</codeph>可以配置YAML格式的文件，以在支持的文本格式和另一种格式（例如XML或JSON）之间转换外部数据文件。
+            有关如何使用<codeph>gpfdist</codeph>将外部XML文件读入Greenplum数据库可读外部表的示例，请参阅&lt;ref&gt;。
+            </p>
+         <p>对于可读的外部表，<codeph>gpfdist</codeph>会自动解压缩<codeph>gzip</codeph>（<codeph>.gz</codeph>）和<codeph>bzip2</codeph>（<codeph>.bz2</codeph>）文件。
+            您可以使用通配符（*）或其他C样式模式匹配来表示要读取的多个文件。
+            外部文件路径都假定相对于启动<codeph>gpfdist</codeph>实例时指定的路径。
+            </p>
+      </body>
+   </topic>
+   <topic id="topic14">
+      <title>关于gpfdist设置和性能</title>
+      <body>
+         <p>您可以在多个主机上运行<codeph>gpfdist</codeph>实例，也可以在每个主机上运行多个<codeph>gpfdist</codeph>实例。
+            这允许您策略性地部署<codeph>gpfdist</codeph>服务器，以便通过利用所有可用的网络带宽和Greenplum数据库的并行性来获得快速的数据加载和卸载速率。
+            </p>
+         <ul id="ul_rkb_plg_bbb">
+            <li id="du165860">
+               允许网络流量同时使用所有的ETL主机网络接口卡（NIC）。
+               在ETL主机上运行一个<cmdname>gpfdist</cmdname>实例，
+               然后在 on the ETL host, then declare the host name of each NIC in the 用户的外部表定义（见<xref
+                    href="g-creating-external-tables---examples.xml#topic44"/>。）的<codeph>LOCATION</codeph>子句中声明每一个NIC的主机名。
+               </li>
+         </ul>
+         <fig id="du165872">
+            <title>使用带多个NIC的单一gpfdist实例的外部表</title>
+            <image href="../graphics/ext_tables_multinic.jpg" placement="break" width="472px"
+               height="271px" id="image_skb_plg_bbb"/>
+         </fig>
+         <ul id="ul_tkb_plg_bbb">
+            <li id="du212280">
+               在ETL主机上的多个<cmdname>gpfdist</cmdname>实例之间平均划分外部表数据。
+               例如，在一个有两个NIC的ETL系统上，运行两个<cmdname>gpfdist</cmdname>实例（每个NIC上一个）来优化数据装载性能并且在这两个<cmdname>gpfdist</cmdname>之间平均划分外部表数据文件。
+               </li>
+         </ul>
+         <fig id="du165882">
+            <title>使用带多个NIC的多个gpfdist实例的外部表</title>
+            <image href="../graphics/ext_tables.jpg" placement="break" width="467px" height="282px"
+               id="image_ukb_plg_bbb"/>
+         </fig>
+         <note type="note">
+            当用户提交文件给<cmdname>gpfdist</cmdname>时，用竖线（|）来分隔格式化好的文本。
+            Greenplum数据库将逗号分隔的文本字符串包括在单引号或者双引号中。
+            <cmdname>gpfdist</cmdname>必须移除这些引号来解析字符串。
+            使用竖线分隔格式化好的文本避免了这种额外的步骤并且可以改进性能。
+            </note>
+      </body>
+   </topic>
+   <topic id="topic15">
+      <title>控制Segment并行</title>
+      <body>
+         <p><codeph>gp_external_max_segs</codeph>服务器配置参数控制能同时访问单一<cmdname>gpfdist</cmdname>实例的Segment实例数量。
+            64是默认值。用户可以设置Segment的数目为一些Segment处理外部数据文件并且一些执行其他数据库处理。
+            在用户的Master实例的<codeph>postgresql.conf</codeph>文件中设置这个参数。
+         </p>
+      </body>
+   </topic>
+   <topic id="topic16">
+      <title>安装gpfdist</title>
+      <body>
+         <p><cmdname>gpfdist</cmdname>被装载用户的Greenplum数据库Master主机安装的<codeph>$GPHOME/bin</codeph>中。
+            在一个不同于Greenplum数据库Master或者后备Master的机器上运行<cmdname>gpfdist</cmdname>，例如在专用于ETL处理的机器。
+            在Master或者后备Master上运行<cmdname>gpfdist</cmdname>可能会对查询执行造成性能影响。
+            要在用户的ETL服务器上安装<cmdname>gpfdist</cmdname>，请从<i>Greenplum Load Tools</i>包中得到它并且按照它的安装指导。
+         </p>
+      </body>
+   </topic>
+   <topic id="topic17">
+      <title>启动和停止gpfdist</title>
+      <body>
+         <p>用户可以在用户的当前目录中或者其他指定的任何目录中启动<cmdname>gpfdist</cmdname>。默认端口是<codeph>8080</codeph>。</p>
+         <p>从用户的当前目录中运行，输入：</p>
+         <p>
+            <codeblock>gpfdist &amp;</codeblock>
+         </p>
+         <p>要从一个不同的目录启动，应指定提供文件的目录，还可以有选择地指定运行的HTTP端口。</p>
+         <p>要在后台启动<cmdname>gpfdist</cmdname> 并且把输出的消息和错误记录在一个日志文件中：</p>
+         <p>
+            <codeblock>$ gpfdist -d /var/load_files -p 8081 -l /home/<codeph>gpadmin</codeph>/log &amp;
+</codeblock>
+         </p>
+         <p>对于同一个ETL主机上的多个<cmdname>gpfdist</cmdname>实例（见<xref
+                 href="#topic14/du165872" format="dita"/>），为每一个实例使用一个不同的基础目录和端口。例如：
+         </p>
+         <p>
+            <codeblock>$ gpfdist -d /var/load_files1 -p 8081 -l /home/<codeph>gpadmin</codeph>/log1 &amp;
+$ gpfdist -d /var/load_files2 -p 8082 -l /home/<codeph>gpadmin</codeph>/log2 &amp;
+</codeblock>
+         </p>
+         <p>在<cmdname>gpfdist</cmdname>运行在后台时停止它：</p>
+         <p>首先找到它的进程ID：</p>
+         <p>
+            <codeblock>$ ps -ef | grep gpfdist</codeblock>
+         </p>
+         <p>然后杀死进程，例如（这个例子中的进程ID是3456）：</p>
+         <p>
+            <codeblock>$ kill 3456
+</codeblock>
+         </p>
+      </body>
+   </topic>
+   <topic id="topic18">
+      <title>解决gpfdist的问题</title>
+      <body>
+         <p>Segment在运行时访问<cmdname>gpfdist</cmdname>。
+            确保Greenplum的Segment主机具有到<cmdname>gpfdist</cmdname>的网络访问。
+            <cmdname>gpfdist</cmdname>是一个Web服务器：可以通过从Greenplum阵列的每一个主机（Segment和Master）运行下列命令来测试连接：
+         </p>
+         <p>
+            <codeblock>$ wget http://<i>gpfdist_hostname</i>:<i>port</i>/<i>filename</i>
+         </codeblock>
+         </p>
+         <p><codeph>CREATE EXTERNAL TABLE</codeph>定义必须有用于<cmdname>gpfdist</cmdname>的正确的主机名、端口以及文件名、
+            以及相对于<cmdname>gpfdist</cmdname>提供文件的目录（<cmdname>gpfdist</cmdname>启动时指定的目录路径）的方式指定文件和路径。
+            请见<xref
+                    href="g-creating-external-tables---examples.xml#topic44"/>。
+         </p>
+         <p>如果用户在其系统上启动<cmdname>gpfdist</cmdname>且IPv6网络被禁用，测试一个IPv6端口时，<cmdname>gpfdist</cmdname>会显示下列警告消息。
+         </p>
+         <codeblock>[WRN gpfdist.c:2050] Creating the socket failed
+</codeblock>
+         <p>如果对应的IPv4端口可用，<cmdname>gpfdist</cmdname>会使用该端口并且忽略对于IPv6端口的警告。
+            要查看<cmdname>gpfdist</cmdname>测试的端口的信息，使用<codeph>-V</codeph>选项。
+         </p>
+         <p>有关IPv6和IPv4网络的信息，请见操作系统的文档。</p>
+         <p>当用<codeph>gpfdist</codeph>或者<codeph>gfdists</codeph>协议读写数据时，
+            <codeph>gpfdist</codeph>工具拒绝头部不包括<codeph>X-GP-PROTO</codeph>的HTTP请求。
+            如果在头部没有检测到<codeph>X-GP-PROTO</codeph>，<codeph>gpfist</codeph>会在HTTP响应头部的状态行中返回一个400错误：
+            <codeph>400 invalid request (no gp-proto)</codeph>。
+         </p>
+         <p>Greenplum数据库会在HTTP请求头部包括<codeph>X-GP-PROTO</codeph>以表示该请求是来自于Greenplum数据库。
+         </p>
+         <p>如果<codeph>gpfdist</codeph>实用程序挂起而没有发生读取或写入活动，则可以在下次发生挂起时生成core文件以帮助调试问题。
+            将环境变量<codeph>GPFDIST_WATCHDOG_TIMER</codeph>设置为<codeph>gpfdist</codeph>无活动等待多少秒后强制退出。
+            设置环境变量并且<codeph>gpfdist</codeph>挂起后，实用程序将在指定的秒数后中止，创建core文件，并将中止信息发送到日志文件。
+         </p>
+         <p>此示例在Linux系统上设置环境变量，以便<codeph>gpfdist</codeph>在300秒（5分钟）无活动后退出。
+            <codeblock>export GPFDIST_WATCHDOG_TIMER=300</codeblock></p>
+      </body>
+   </topic>
+</topic>

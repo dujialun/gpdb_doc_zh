@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic31">
+   <title>创建和使用外部Web表</title>
+   <shortdesc>外部Web表允许Greenplum Database像处理常规数据表一样处理动态数据源。由于Web表数据可以在查询运行时更改，因此数据无法重新扫描。</shortdesc>
+   <body>
+      <p>
+         <codeph>CREATE EXTERNAL WEB TABLE</codeph>建立一个外部表的定义。你可以定义基于命令或基于URL的外部Web表。定义形式是不同的: 不能将基于命令的和基于URL的定义混在一起。</p>
+   </body>
+   <topic id="topic32">
+      <title>基于命令的外部Web表</title>
+      <body>
+         <p>一个shell命令或者脚本的输出可定义基于命令的Web表数据。将
+            命令放在<codeph>CREATE EXTERNAL WEB TABLE</codeph>的<codeph>EXECUTE</codeph>子句里。数据是命令运行时的最新数据。
+            子句<codeph>EXECUTE</codeph>在指定的master或segment节点上运行shell命令或脚本。命令和脚本必须存在于<codeph>EXECUTE</codeph>子句中定义的host上。
+         </p>
+         <p>默认，命令会在当活跃节点上有输出的行要处理时，运行在节点上。
+            例如，如果每个宿主机器上运行4个有输出行待处理的节点实例，
+            命令会在每个宿主机器上运行4次。
+            可以限制运行web表命令的节点实例数量。
+            所有在web表定义<codeph>ON</codeph>子句中的节点会并行运行命令。
+            </p>
+         <p>指定在外部表定义中的命令会从数据库运行，但不会从<codeph>.bashrc</codeph>或<codeph>.profile</codeph>
+         中加载环境变量。
+         在<codeph>EXECUTE</codeph>子句中设置环境变量。例如：</p>
+         <p>
+            <codeblock>=# CREATE EXTERNAL WEB TABLE output (output text)
+    EXECUTE 'PATH=/home/gpadmin/programs; export PATH; myprogram.sh' 
+    FORMAT 'TEXT';
+</codeblock>
+         </p>
+         <p>脚本必须对于<codeph>gpadmin</codeph>用户是可执行的，并且在master和segment节点上路径相同。
+         </p>
+         <p>下面命令定义了一个运行脚本的web表。
+         脚本运行在有数据需要处理的节点上。</p>
+         <p>
+            <codeblock>=# CREATE EXTERNAL WEB TABLE log_output 
+    (linenum int, message text) 
+    EXECUTE '/var/load_scripts/get_log_data.sh' ON HOST 
+    FORMAT 'TEXT' (DELIMITER '|');
+</codeblock>
+         </p>
+      </body>
+   </topic>
+   <topic id="topic33">
+      <title>基于URL的外部Web表</title>
+      <body>
+         <p>基于URL的web表从HTTP协议的服务器访问数据。
+         Web表数据是动态的，不可重新扫描的。
+         </p>
+         <p>在<codeph>LOCATION</codeph>里定义基于<codeph>http://</codeph>协议的web服务文件路径。
+         web数据文件必须存在于Greenplum节点可访问的web服务器上。
+         指定的URL数量与并行访问web表的节点实例数量相关。
+         例如，如果为一个有8个节点的Greenplum数据库指定两个外部文件，
+         8个节点中的两个会在查询运行时并行访问web表。
+         </p>
+         <p>下面的例子定义了一个从多个URL获取数据的web表。</p>
+         <p>
+            <codeblock>=# CREATE EXTERNAL WEB TABLE ext_expenses (name text, 
+  date date, amount float4, category text, description text) 
+  LOCATION ( 
+
+  'http://intranet.company.com/expenses/sales/file.csv',
+  'http://intranet.company.com/expenses/exec/file.csv',
+  'http://intranet.company.com/expenses/finance/file.csv',
+  'http://intranet.company.com/expenses/ops/file.csv',
+  'http://intranet.company.com/expenses/marketing/file.csv',
+  'http://intranet.company.com/expenses/eng/file.csv' 
+
+   )
+  FORMAT 'CSV' ( HEADER );
+</codeblock>
+         </p>
+      </body>
+   </topic>
+</topic>

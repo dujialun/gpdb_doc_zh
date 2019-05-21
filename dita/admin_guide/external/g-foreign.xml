@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic1">
+  <title id="im177965">使用外部表访问外部数据</title>
+  <body>
+    <p>Greenplum数据库实现了SQL / MED规范的一部分，允许您使用常规SQL查询访问驻留在Greenplum之外的数据。 这些数据称为外部数据。</p>
+    <p>您可以在外部数据包装器的帮助下访问外部数据。 
+      外部数据包装器是与远程数据源通信的库。 该库隐藏了特定源的连接和数据访问详细信息。
+      一些外部数据包装器将作为Greenplum Database contrib模块提供，
+      包括<codeph>file_fdw</codeph>和<codeph>postgres_fdw</codeph>。 
+      如果现有的外部数据包装器都不适合您的需求，您可以编写如编写外部数据包装器中所述的自己的外部数据包装器。
+      <xref href="g-devel-fdw.xml#topic1"/>.</p>
+    <p>要访问外部数据，请创建外部服务器对象，该对象根据其支持的外部数据包装器使用的选项集定义如何连接到特定的远程数据源。 然后创建一个或多个外部表，这些表定义远程数据的结构。外表可以像普通表一样在查询中使用，但外部表在Greenplum数据库服务器中没有存储任何数据。每当访问外部表时，Greenplum数据库都会要求外部数据包装器从远程源中获取数据或更新数据（如果包装器支持）。</p>
+    <p>访问远程数据可能需要对远程数据源进行身份验证。 该信息可以由用户映射提供，该映射可以基于当前的Greenplum数据库角色提供诸如用户名和密码之类的附加数据。</p>
+    <p>有关其他信息，请参阅
+       <codeph><xref href="../../ref_guide/sql_commands/CREATE_FOREIGN_DATA_WRAPPER.xml#topic1"/></codeph>,
+       <codeph><xref href="../../ref_guide/sql_commands/CREATE_SERVER.xml#topic1"/></codeph>,
+       <codeph><xref href="../../ref_guide/sql_commands/CREATE_USER_MAPPING.xml#topic1"/></codeph>，        和 <codeph><xref href="../../ref_guide/sql_commands/CREATE_FOREIGN_TABLE.xml#topic1"/></codeph>.</p>
+  </body>
+</topic>

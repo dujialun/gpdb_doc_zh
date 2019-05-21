@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic_qbh_pwh_kr">
+  <title>file://协议</title>
+  <shortdesc><codeph>file://</codeph>协议被用在一个指定操作系统文件的URI中。</shortdesc>
+  <body>
+    <p>该URI包括主机名、端口和该文件的路径。每个文件都必须位于一个Segment主机上由Greenplum超级用户
+        (<codeph>gpadmin</codeph>)可访问的位置。该URI中使用的主机名必须匹配<codeph>gp_segment_configuration</codeph>系统目录表中注册的一个Segment主机名。</p>
+    <p>如例子中所示，<codeph>LOCATION</codeph>子句可以有多个URI：
+      <codeblock>CREATE EXTERNAL TABLE ext_expenses (
+   name text, date date, amount float4, category text, desc1 text ) 
+LOCATION ('file://host1:5432/data/expense/*.csv', 
+          'file://host2:5432/data/expense/*.csv', 
+          'file://host3:5432/data/expense/*.csv') 
+FORMAT 'CSV' (HEADER); </codeblock>
+      用户在<codeph>LOCATION</codeph>子句中指定的URI的数量就是将并行工作访问外部表的Segment实例的数量。
+      对于每一个URI，Greenplum为该文件指派一个指定主机上的主Segment。
+      为了装载数据时的最大并行化，可将数据与主Segment数量相同的大小均等的文件。
+      这会保证所有的Segment都参与到装载中。每个Segment主机上的外部文件不能超过该主机上主Segment实例的数量。
+      例如，如果用户的阵列的每个Segment主机上有四个主Segment实例，用户可以在每个Segment主机上放置四个外部文件。
+      基于<codeph>file://</codeph>协议的表只能是可读表。</p>
+    <p>系统视图<codeph>pg_max_external_files</codeph>显示每个外部表允许多少个外部表文件。
+    这个视图列出了使用<codeph>file://协议</codeph>协议时每个Segment主机上可用的文件槽。
+    该视图只适用于<codeph>file://协议</codeph>。
+    例如：
+      <codeblock>SELECT * FROM pg_max_external_files;</codeblock></p>
+  </body>
+</topic>

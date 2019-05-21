@@ -1,0 +1,64 @@
+book_repo: greenplum-db/gpdb-docs/book
+
+public_host: localhost:9292
+
+sections:
+- repository:
+    name: markdown
+    at_path: common
+  directory: 6-0/common
+  subnav_template: gpdb-landing-subnav
+
+- repository:
+    name: markdown
+    at_path: pxf
+  directory: 6-0/pxf
+  subnav_template: pxf-subnav
+
+dita_sections:
+- repository:
+    name: dita
+    at_path: admin_guide
+  directory: 6-0/admin_guide
+  ditamap_location: admin_guide.ditamap
+  ditaval_location: ../gpdb-webhelp.ditaval
+
+- repository:
+    name: dita
+    at_path: security-guide
+  directory: 6-0/security-guide
+  ditamap_location: security-guide.ditamap
+  ditaval_location: ../gpdb-webhelp.ditaval
+
+- repository:
+    name: dita
+    at_path: best_practices
+  directory: 6-0/best_practices
+  ditamap_location: best-practices.ditamap
+  ditaval_location: ../gpdb-webhelp.ditaval
+
+- repository:
+    name: dita
+    at_path: utility_guide
+  directory: 6-0/utility_guide
+  ditamap_location: utility_guide.ditamap
+  ditaval_location: ../gpdb-webhelp.ditaval
+
+- repository:
+    name: dita
+    at_path: ref_guide
+  directory: 6-0/ref_guide
+  ditamap_location: ref_guide.ditamap
+  ditaval_location: ../gpdb-webhelp.ditaval
+
+template_variables:
+  book_title: Greenplum Database Documentation
+  book_title_short:  Greenplum Database Docs
+  domain_name: greenplum.org
+  product_link: <div class="header-item"><a href="https://greenplum.org">Back to Greenplum Database</a></div>
+  product_url: https://greenplum.org
+  support_call_to_action: <a href="https://greenplum.org/community/" target="_blank">Need Support?</a>
+  support_link: <a href="https://github.com/greenplum-db/gpdb/wiki">Wiki</a>
+  support_url: https://greenplum.org
+
+broken_link_exclusions: iefix|arrowhead

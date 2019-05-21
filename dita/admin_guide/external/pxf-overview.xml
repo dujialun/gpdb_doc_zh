@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic_u14_wtd_dbb">
+  <title>使用PXF访问外部数据</title>
+  <shortdesc>您组织管理的数据可能已存在于外部源中，例如Hadoop，对象存储库和其他SQL数据库。 Greenplum平台扩展框架（PXF）通过内置连接器提供对此外部数据的访问，该连接器将外部数据源映射到Greenplum数据库表定义。</shortdesc>
+  <body>
+    <p>PXF随Hadoop和对象存储连接器一起安装。 这些连接器使您能够读取以文本，Avro，JSON，RCFile，Parquet，SequenceFile和ORC格式存储的外部数据。 您可以使用JDBC连接器访问外部SQL数据库。</p>
+    <note>在以前版本的Greenplum Database中，您可能已使用
+      <codeph>gphdfs</codeph>外部表协议来访问存储在Hadoop中的数据。
+      Greenplum 数据库6.0.0版删除了<codeph>gphdfs</codeph>协议。
+      使用PXF和<codeph>pxf</codeph>外部表协议访问Greenplum数据库版本6.x中的Hadoop。</note>
+    <p>Greenplum平台扩展框架包括协议C库和Java服务。 配置并初始化PXF后，在每个Greenplum数据库段主机上启动单个PXF JVM进程。 这个长时间运行的进程同时提供多个查询请求。</p>
+    <p>有关PXF的体系结构和使用PXF的详细信息，请参阅<xref href="../../pxf/overview_pxf.html" type="topic" format="html">Greenplum Platform Extension Framework (PXF)</xref>文档。</p>
+  </body>
+</topic>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic_f5l_qnh_kr">
+  <title>使用外部数据</title>
+  <shortdesc>外部表和外表都可以访问存储在Greenplum数据库之外的数据源中的数据，就好像数据存储在常规数据库表中一样。 您可以从外部表和外表读取和写入数据。</shortdesc>
+  <body>
+    <p>外部表是Greenplum数据库可以支持存储在数据库之外的数据的表。
+      您可以创建一个可读的外部表来从外部数据源读取数据，也可以创建一个可写的外部表以将数据写入外部数据源。
+      您可以像在常规数据库表中一样在SQL命令中使用外部表。
+      例如，您可以使用<codeph>SELECT</codeph>（可读外部表），<codeph>INSERT</codeph>（可写外部表）以及将外部表与其他Greenplum表连接。
+      外部表通常用于加载和卸载数据库数据。
+      有关使用外部表访问外部数据的更多信息，请参阅定义外部表<xref href="g-external-tables.xml#topic3"/>。
+      </p>
+    <p><xref href="pxf-overview.xml" type="topic">使用PXF访问外部数据</xref>
+      描述了使用PXF和外部表来访问外部数据源。</p>
+    <p>外表是Greenplum数据库可以支持存储在数据库之外的数据的表。
+      您既可以读取也可以写入同一个外表。
+      您可以类似如上所述的外部表一样，地在SQL命令中使用外表。
+      有关使用外部访问外部数据的更多信息，请参阅
+      <xref href="g-foreign.xml#topic1"/>。</p>
+    <p>基于Web的外部表提供对HTTP服务器或操作系统进程所服务的数据的访问。
+      有关基于Web的表的更多信息，请参阅
+      <xref href="g-creating-and-using-web-external-tables.xml#topic31"/>。</p>
+  </body>
+</topic>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic_h3b_rxh_kr">
+  <title>处理外部表数据中的错误</title>
+  <shortdesc>默认情况下，如果外部表数据中包含有一个错误，命令就会失败并且不会有数据被载入到目标数据库表中。</shortdesc>
+  <body>
+    <p>定义带有单行错误处理的外部表能够装载正确格式化的行并且隔离外部表数据中的错误。参考 <xref
+        href="../load/topics/g-handling-load-errors.xml#topic55">处理加载错误</xref>。 </p>
+    <p><codeph>gpfdist</codeph>文件服务器使用<codeph>HTTP</codeph> 协议。使用
+    <codeph>LIMIT</codeph>的外部表查询会在检索到所需的行后结束连接，导致一个HTTP套接字错误。
+    如果用户对使用<codeph>gpfdist://</codeph> 或 <codeph>http:// 协议</codeph>的外部表使用带
+    <codeph>LIMIT</codeph>的查询，请忽略这些错误 - 数据已经被按照预期返回给数据库。
+     </p>
+  </body>
+</topic>

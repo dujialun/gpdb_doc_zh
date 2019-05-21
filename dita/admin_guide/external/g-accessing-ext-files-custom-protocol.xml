@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic_zkk_gxh_kr">
+  <title>使用自定义协议</title>
+  <shortdesc>一种自定义协议允许用户连接到一个不能用<codeph>file://</codeph>, <codeph>gpfdist://</codeph>，或者
+      <codeph>pxf://</codeph> 协议的Greenplum数据库。</shortdesc>
+  <body>
+    <p>创建一种自定义协议要求用户用指定的接口实现一组C函数，在Greenplum数据库中声明函数，然后使用<codeph>CREATE TRUSTED PROTOCOL</codeph>命令在数据库中启用该协议。</p>
+    <p>参考<xref href="../load/topics/g-example-custom-data-access-protocol.xml#topic103"/>样例</p>
+  </body>
+</topic>

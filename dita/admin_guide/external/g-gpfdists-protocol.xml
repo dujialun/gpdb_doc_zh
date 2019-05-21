@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic_sny_yph_kr">
+  <title>gpfdists:// 协议</title>
+  <shortdesc> <codeph>gpfdists://</codeph> 协议是<codeph>gpfdist://
+      协议</codeph>的一个安全版本。</shortdesc>
+  <body>
+    <p>要使用它，用户需要以<codeph>--ssl</codeph>选项运行<codeph>gpfdist</codeph>工具。
+    当在一个URI中指定<codeph>gpfdists://</codeph>协议时，它启用文件服务器和Greenplum数据库的加密通信以及安全鉴定以保护其不受窃听和中间人等攻击。</p>
+    <p><codeph>gpfdists</codeph>以客户端/服务器形式实现了SSL安全性，并且有下列属性和限制：<ul id="ul_z3p_mrh_kr">
+        <li>客户端证书是必需的。</li>
+        <li>不支持多语言证书。</li>
+        <li>不支持证书撤销列表（CRL）。</li>
+        <li> <codeph>TLSv1</codeph>协议被用于<codeph>TLS_RSA_WITH_AES_128_CBC_SHA</codeph>加密算法。</li>
+        <li>SSL参数不能被更改。</li>
+        <li>支持SSL重新协商。</li>
+        <li>SSL忽略被设置为<codeph>false</codeph>的主机失配参数。</li>
+        <li>对于<codeph>gpfdist</codeph>文件服务器（server.key）和Greenplum数据库（client.key）不支持包含密码的私钥。</li>
+        <li>为操作系统发行合适的证书是用户的责任。通常，支持转换<xref
+            href="https://www.sslshopper.com/ssl-converter.html" scope="external" type=""
+            format="html">https://www.sslshopper.com/ssl-converter.html</xref>中所示的证书。<note>
+            一个用<codeph>gpfdist --ssl</codeph>选项启动的服务器只能与<codeph>gpfdists</codeph>协议通讯。一个不带<codeph>--ssl</codeph>选项启动的<codeph>gpfdists</codeph>服务器只能与<codeph>gpfdists</codeph>协议通讯。</note></li>
+        <li>客户端证书文件是client.crt</li>
+        <li>客户端私钥文件是client.key</li>
+      </ul></p>
+    <p>使用下列方法之一来调用<codeph>gpfdists</codeph>协议。
+      <ul
+        id="ul_nb2_ksh_kr">
+        <li>用<codeph>--ssl</codeph>选项运行<codeph>gpfdist</codeph>，
+        然后在<codeph>CREATE EXTERNAL TABLE</codeph>语句的<codeph>LOCATION</codeph>子句中使用
+        <codeph>gpfdists</codeph>协议。</li>
+        <li>使用一个<codeph>SSL</codeph>选项设置为真的<codeph>gpload</codeph> YAML控制文件。
+        运行<codeph>gpload</codeph>，它会用<codeph>--ssl</codeph>选项启动<codeph>gpfdist</codeph>服务器，
+        然后使用<codeph>gpfdists</codeph>协议。</li>
+      </ul></p>
+    <p>使用<codeph>gpfdists</codeph>要求下列客户端证书存在于每个Segment的<codeph>$PGDATA/gpfdists</codeph>目录中。</p>
+    <ul id="ul_bjb_2kj_kr">
+      <li>客户端证书文件是<codeph>client.crt</codeph></li>
+      <li>客户端私钥文件是<codeph>client.key</codeph></li>
+      <li>受信证书发行机构<codeph>root.crt</codeph></li>
+    </ul>
+    <p>一个装载数据到具有安全性的外部表中的例子可见<xref
+        href="g-example-3-multiple-gpfdists-instances.xml#topic47"/>。</p>
+    <p>服务器配置参数<codeph><xref
+          href="../../ref_guide/config_params/guc-list.xml#verify_gpfdists_cert"
+          >verify_gpfdists_cert</xref></codeph> 控制当Greenplum数据库与<codeph>gpfdist</codeph>实用程序通信以从外部数据源读取数据或将数据写入外部数据源时是否启用SSL证书认证。
+          在测试Greenplum数据库外部表与提供外部数据的<codeph>gpfdist</codeph>实用程序之间的通信时，
+          可以将参数值设置为<codeph>false</codeph>，以禁用身份验证。
+          如果值为<codeph>false</codeph>，这些SSL异常将被忽略：
+          <ul id="ul_vvb_5lj_mdb">
+        <li><codeph>gpfdist</codeph>使用的自签名SSL证书不被Greenplum数据库信任。</li>
+        <li>SSL证书中包含的主机名与运行<codeph>gpfdist</codeph>的主机名不匹配。</li>
+      </ul><note type="warning">禁用SSL证书身份验证会暴露安全风险，因为不会去验证<codeph>gpfdists</codeph> SSL证书。</note></p>
+  </body>
+</topic>

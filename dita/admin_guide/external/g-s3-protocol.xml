@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="amazon-emr">
+   <title>s3:// 协议</title>
+   <shortdesc><codeph>s3</codeph>协议使用一个URL指定Amazon S3桶的位置和一个用来在桶里读写文件的前缀。</shortdesc>
+   <body>
+      <p>Amazon简单存储服务（Amazon S3）提供了安全、持久、高可扩展的对象存储。有关Amazon S3的信息请见
+      <xref href="https://aws.amazon.com/s3/"
+            format="html" scope="external">Amazon S3</xref>。 </p>
+      <p>用户可以定义只读外部表使用S3桶中现有的数据文件作为表数据，或者创建可写外部表将来自于INSERT操作的数据存储到S3桶中的文件。Greenplum数据库使用协议URL中指定的S3 URL以及前缀来为一个只读表选择一个或更多文件，还可以在为
+      <codeph>INSERT</codeph>操作上传S3文件到可写表中时定义文件位置和文件名格式。</p>
+      <p><codeph>s3</codeph>协议也支持<xref
+            href="https://www.emc.com/en-us/storage/ecs/index.htm" format="html" scope="external"
+            >Dell EMC Elastic Cloud Storage</xref>（ECS），这是一种与Amazon S3兼容的服务。</p>
+      <p>这一主题包含下列小节：<ul id="ul_o15_22r_kx">
+            <li><xref href="#amazon-emr/s3_prereq" format="dita"/></li>
+            <li><xref href="#amazon-emr/section_stk_c2r_kx" format="dita"/></li>
+            <li><xref href="#amazon-emr/section_c2f_zvs_3x" format="dita"/></li>
+            <li><xref href="#amazon-emr/s3_serversideencrypt" format="dita"/></li>
+            <li><xref href="#amazon-emr/s3_proxy" format="dita"/></li>
+            <li><xref href="#amazon-emr/s3_config_param" format="dita"/></li>
+            <li><xref href="#amazon-emr/s3_config_file" format="dita"/></li>
+            <li><xref href="#amazon-emr/section_tsq_n3t_3x" format="dita"/></li>
+            <li><xref href="#amazon-emr/s3chkcfg_utility" format="dita"/></li>
+         </ul></p>
+      <section id="s3_prereq">
+         <title>配置和使用S3外部表</title>
+         <p>按照下面这些基本步骤来配置S3协议和使用S3外部表，更多的信息请使用相应的链接。另见<xref
+               href="#amazon-emr/section_tsq_n3t_3x" format="dita"/>来更好地理解S3外部表的能力和限制：<ol id="ol_pbb_rmq_kx">
+               <li>配置每一个数据库支持<codeph>s3</codeph>协议：<ol
+                     id="ol_w3z_dpq_kx">
+                     <li>在每一个将通过<codeph>s3</codeph>协议访问S3桶的数据库中，为
+                        <codeph>s3</codeph>协议库创建读写函数：
+                        <codeblock>CREATE OR REPLACE FUNCTION write_to_s3() RETURNS integer AS
+   '$libdir/gps3ext.so', 's3_export' LANGUAGE C STABLE;</codeblock><codeblock>CREATE OR REPLACE FUNCTION read_from_s3() RETURNS integer AS
+   '$libdir/gps3ext.so', 's3_import' LANGUAGE C STABLE;</codeblock></li>
+                     <li>在每一个将要访问S3桶的数据库中，声明
+                           <codeph>s3</codeph>协议并且指定前一步中创建的读写函数：<codeblock>CREATE PROTOCOL s3 (writefunc = write_to_s3, readfunc = read_from_s3);</codeblock><note>协议名称<codeph>s3</codeph>必须和创建用来访问S3资源的外部表中指定的协议一样。
+                              <p>相应的函数会被Greenplum数据库的每一个Segment实例调用。所有的Segment主机必须能够访问该S3桶。</p></note></li>
+                  </ol></li>
+               <li>在每一个Greenplum数据库的Segment上，创建并且安装<codeph>s3</codeph>
+                  协议的配置文件：<ol id="ol_mnq_rnq_kx">
+                     <li>使用<codeph>gpcheckcloud</codeph>工具创建一个s3协议配置文件的模板：
+                     <codeblock>gpcheckcloud -t > ./mytest_s3.config</codeblock></li>
+                     <li>编辑该模板文件以指定连接S3位置所需的<codeph>accessid</codeph> 和
+                           <codeph>secret</codeph>。有关其他协议参数的配置请见<xref
+                           href="#amazon-emr/s3_config_file" format="dita"/><codeph>s3</codeph>协议的配置文件。</li>
+                     <li>为Greenplum数据库的所有Segment把该文件复制到所有主机上的相同位置。默认的文件位置是
+                              <codeph><varname>gpseg_data_dir</varname>/<varname>gpseg_prefix</varname><varname>N</varname>/s3/s3.conf</codeph>.
+                           <varname>gpseg_data_dir</varname>是Greenplum数据库的Segment的数据目录路径， <varname>gpseg_prefix</varname> 是Segment前缀，而<varname>N</varname>是Segment的ID。当用户初始化一个Greenplum数据库系统时，Segment的数据目录、前缀和ID就已经被设置好了。<p>如果用户复制该文件到一个不同的位置或者文件名，那么用户必须用<codeph>s3</codeph>协议URL的<codeph>config</codeph>参数指定该位置。见<xref
+                              href="#amazon-emr/s3_config_param" format="dita"/>.</p></li>
+                     <li>使用<codeph>gpcheckcloud</codeph>工具验证到该S3桶的连接性：<codeblock>gpcheckcloud -c "s3://&lt;s3-endpoint>/&lt;s3-bucket> config=./mytest_s3.config"</codeblock><p>为用户的系统的配置文件指定正确的路径，还有用户想要检查的S3端点名和桶。
+                              <codeph>gpcheckcloud</codeph>会尝试连接到该S3端点并且列出S3桶中的任何文件（如果可用）。一次成功的连接将以这样的消息结束：<codeblock>Your configuration works well.</codeblock>用户可以有选择地使用<codeph>gpcheckcloud</codeph>来验证对该S3桶进行上传和下载。 正如<xref
+                              href="#amazon-emr/s3chkcfg_utility" format="dita"/>中所描述的。</p></li>
+                  </ol></li>
+               <li>在完成前几个创建和配置<codeph>s3</codeph>协议的步骤后，用户可以在<codeph>CREATE EXTERNAL TABLE</codeph>命令中指定一个<codeph>s3</codeph>协议URL来定义S3外部表。
+               对于只读的S3表，该URL定义组成该S3表的现有数据文件的位置和前缀。例如：
+                     <codeblock>CREATE READABLE EXTERNAL TABLE S3TBL (date text, time text, amt int)
+   LOCATION('s3://s3-us-west-2.amazonaws.com/s3test.example.com/dataset1/normal/ config=/home/gpadmin/aws_s3/s3.conf')
+   FORMAT 'csv';</codeblock><p>对于可写的S3表，协议URL定义S3位置，Greenplum数据库会把该表的数据文件存储在其中，
+   该URL还定义了一个对表做<codeph>INSERT</codeph>操作创建文件时使用的前缀。
+   例如：<codeblock>CREATE WRITABLE EXTERNAL TABLE S3WRIT (LIKE S3TBL)
+   LOCATION('s3://s3-us-west-2.amazonaws.com/s3test.example.com/dataset1/normal/ config=/home/gpadmin/aws_s3/s3.conf')
+   FORMAT 'csv';</codeblock></p><p>参考
+                        <xref href="#amazon-emr/section_stk_c2r_kx" format="dita"/>获取更多信息。</p></li>
+            </ol></p>
+      </section>
+      <section id="section_stk_c2r_kx">
+         <title>关于S3协议URL</title>
+         <p>对于<codeph>s3</codeph>协议，用户需要在<codeph>CREATE EXTERNAL TABLE</codeph>命令的<codeph>LOCATION</codeph>子句中指定文件的位置以及一个可选的配置文件位置。下面是语法：</p>
+         <codeblock>'s3://<varname>S3_endpoint</varname>[:<varname>port</varname>]/<varname>bucket_name</varname>/[<varname>S3_prefix</varname>] [region=<varname>S3_region</varname>] [config=<varname>config_file_location</varname>]'</codeblock>
+         <p><codeph>s3</codeph>协议要求指定S3端点和S3桶名。Greenplum数据库的每一个Segment实例必须能够访问该S3位置。可选的<varname>S3_prefix</varname>值被用来选择只读S3表的文件，或者被用作向S3可写表上传数据时的文件名前缀。</p>
+         <note>Greenplum数据库的<codeph>s3</codeph>协议的URL必须包括S3的端点主机名。</note>
+         <p>要在<codeph>LOCATION</codeph>子句中指定一个ECS端点（一种Amazon S3的兼容服务），用户必须把<codeph>s3</codeph> 配置文件参数<codeph>version</codeph>设置为2。<codeph>version</codeph> 参数控制
+         <codeph>region</codeph>参数是否被用在
+               <codeph>LOCATION</codeph>子句中。当<codeph>version</codeph>参数是2的时候，用户还可以指定一个Amazon S3位置。有关
+               <codeph>version</codeph>参数更多信息, 参考<xref href="#amazon-emr/s3_config_file"
+               format="dita"/>。</p>
+         <note id="s3-prefix-note">尽管<varname>S3_prefix</varname>是这种语法中一个可选的部分，用户应该总是为可写和只读S3表包括一个S3前缀，它被用来分隔作为<codeph><xref
+                  href="../../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.xml#topic1">CREATE
+                  EXTERNAL TABLE</xref></codeph>语法一部分的数据集。</note>
+         <p>对于可写的S3表，<codeph>s3</codeph>协议的URL指定Greenplum数据库为该表上传数据文件的端点和桶名。对于上传文件的S3用户ID，该S3桶的权限必须是<codeph>Upload/Delete</codeph>。对于每一个由于向表中插入数据形成的新的上传文件，都会使用这个S3文件前缀。见<xref href="#amazon-emr/section_c2f_zvs_3x"
+               format="dita"/>。</p>
+         <p>对于只读的S3表，S3文件前缀是可选的。如果用户指定了一个
+               <varname>S3_prefix</varname>，那么<codeph>s3</codeph>协议会选择所有以该前缀开始的文件作为该外部表的数据文件。
+               <codeph>s3</codeph>协议不使用斜线字符 (<codeph>/</codeph>) 作为定界符，因此跟在前缀后面的一个斜线字符会被当做该前缀本身的一部分。</p>
+         <p>例如，考虑下面的5个文件，其中的每一个都有名为<codeph>s3-us-west-2.amazonaws.com</codeph>的
+               <varname>S3_endpoint</varname>以及<varname>bucket_name</varname>。
+            <codeph>test1</codeph>:</p>
+         <codeblock>s3://s3-us-west-2.amazonaws.com/test1/abc
+s3://s3-us-west-2.amazonaws.com/test1/abc/
+s3://s3-us-west-2.amazonaws.com/test1/abc/xx
+s3://s3-us-west-2.amazonaws.com/test1/abcdef
+s3://s3-us-west-2.amazonaws.com/test1/abcdefff</codeblock>
+         <ul id="ul_yll_xjm_qv">
+            <li>如果提供的S3 URL是
+                  <codeph>s3://s3-us-west-2.amazonaws.com/test1/abc</codeph>，那么
+                  <codeph>abc</codeph>前缀会选择全部的5个文件。</li>
+            <li>如果提供的S3 URL是
+                  <codeph>s3://s3-us-west-2.amazonaws.com/test1/abc/</codeph>，那么
+                  <codeph>abc/</codeph>前缀选择文件
+                  <codeph>s3://s3-us-west-2.amazonaws.com/test1/abc/</codeph> 以及
+                  <codeph>s3://s3-us-west-2.amazonaws.com/test1/abc/xx</codeph>。</li>
+            <li>如果提供的S3 URL是
+                  <codeph>s3://s3-us-west-2.amazonaws.com/test1/abcd</codeph>，那么
+                  <codeph>abcd</codeph>前缀选择文件
+                  <codeph>s3://s3-us-west-2.amazonaws.com/test1/abcdef</codeph> 以及
+                  <codeph>s3://s3-us-west-2.amazonaws.com/test1/abcdefff</codeph></li>
+         </ul>
+         <p><varname>S3_prefix</varname>中不支持通配符字符。不过，S3前缀本来的功能就好像其后有一个通配符一样。</p>
+         <p>被S3 URL
+               (<varname>S3_endpoint</varname>/<varname>bucket_name</varname>/<varname>S3_prefix</varname>)选中的所有文件都会被用作外部表的来源，因此它们必须有同样的格式。每个文件还必须包含有完整的数据行。一个数据行不能跨文件存在。对于访问这些S3文件的S3用户ID，文件的权限必须是
+            <codeph>Open/Download</codeph>和<codeph>View</codeph>。</p>
+         <p>有关Amazon S3端点的信息请见<xref
+               href="http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region"
+               format="html" scope="external"
+               >http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region</xref>。有关S3桶和文件夹的信息请见Amazon S3的文档<xref
+               href="https://aws.amazon.com/documentation/s3/" format="html" scope="external"
+               >https://aws.amazon.com/documentation/s3/</xref>。有关S3文件前缀的信息请见Amazon S3的文档<xref
+               href="http://docs.aws.amazon.com/AmazonS3/latest/dev/ListingKeysHierarchy.html"
+               format="html" scope="external">Listing Keys Hierarchically Using a Prefix and
+               Delimiter</xref>.</p>
+         <p><codeph>config</codeph>参数指定所需的
+               <codeph>s3</codeph>协议配置文件的位置，该文件包含AWS连接证书和通信参数。见 <xref href="#amazon-emr/s3_config_param"
+               format="dita"/>.</p>
+      </section>
+      <section id="section_c2f_zvs_3x">
+         <title>关于S3数据文件</title>
+         <p>对于可写S3表上的每个<codeph>INSERT</codeph>操作，Greenplum数据库的每个Segment会使用文件名格式
+          <codeph> &lt;prefix>&lt;segment_id>&lt;random>.&lt;extension>[.gz]</codeph>
+               其中：<ul id="ul_sw1_qvs_3x">
+               <li><codeph>&lt;prefix></codeph>是在S3 URL中指定的前缀。</li>
+               <li><codeph>&lt;segment_id></codeph>是Greenplum数据库的Segment的ID。</li>
+               <li><codeph>&lt;random></codeph>是一个用来确保文件名唯一的随机数。</li>
+               <li><codeph>&lt;extension></codeph>描述文件类型（<codeph>.txt</codeph> 或
+                     <filepath>.csv</filepath>，取决于用户在<codeph>CREATE WRITABLE EXTERNAL
+                     TABLE</codeph>的<codeph>FORMAT</codeph>子句中提供的值）。
+                     <codeph>gpcheckcloud</codeph>工具创建的文件总是使用扩展名<filepath>.data</filepath>。</li>
+               <li>如果为S3可写表启用了压缩（默认启用），会在文件名后追加<filepath>.gz</filepath>。</li>
+            </ul></p>
+         <p>对于可写的S3表，用户可以配置Segment上传文件用的缓冲区尺寸以及线程数量。见<xref href="#amazon-emr/s3_config_file"
+               format="dita"/>。</p>
+         <p>对于只读的S3表，所有通过S3的文件位置（<varname>S3_endpoint</varname>/<varname>bucket_name</varname>/<varname>S3_prefix</varname>）指定的文件都被用作该外部表的来源并且都必须具有相同的格式。每个文件还必须包含有完整的数据行。如果这些文件含有一个可选的头部行，头部行中的列名不能包含新行字符（<codeph>\n</codeph>)
+            以及回车（<codeph>\r</codeph>)。 另外，列定界符也不能是新行字符(<codeph>\n</codeph>) 或回车
+               (<codeph>\r</codeph>)。 </p>
+         <p><codeph>s3</codeph>协议可以识别gzip格式并且解压这类文件。只支持gzip压缩格式。</p>
+         <p>对于访问这些S3文件的S3用户ID，文件的权限必须是<codeph>Open/Download</codeph>和<codeph>View</codeph>
+            。可写的S3表要求该S3用户ID具有<codeph>Upload/Delete</codeph>权限。</p>
+         <p>对于只读的S3表，每一个Segment一次可以从S3位置使用几个线程下载一个文件。为了利用Greenplum数据库的Segment所执行的并行处理，S3位置中的文件应该在尺寸上相似并且文件的数量应该允许多个Segment从S3位置下载数据。例如，如果Greenplum数据库系统由16个Segment组成并且有充足的网络带宽，在S3位置中创建16个文件允许每个Segment从该S3位置下载一个文件。相反，如果如果该位置只包含1个或者2个文件，就只有1个或者2个Segment能下载数据。</p>
+      </section>
+      <section id="s3_serversideencrypt">
+         <title>s3协议的AWS服务端加密支持</title>
+         <p>Greenplum数据库支持用可读和可写外部表（用<codeph>s3</codeph>协议创建）访问的AWS S3文件进行服务端加密，服务端加密使用Amazon的S3-managed密钥（SSE-S3）。SSE-S3在用户的对象数据被写入到磁盘时对它们加密，并且在用户访问它们时透明地解密。</p>
+         <note><codeph>s3</codeph>协议只对Amazon Web Services的S3文件支持SSE-S3。在访问S3兼容服务上的文件时不支持SSE-S3。</note>
+         <p>用户的S3 <codeph>accessid</codeph> 和 <codeph>secret</codeph>权限掌管着用户对所有S3桶对象的访问，不管该数据是否被加密。但是，为了访问加密数据，用户必须配置用户的客户端使用S3-managed密钥。</p>
+         <p>有关AWS服务端加密的额外信息，请参考AWS文档中的<xref
+               href="http://docs.aws.amazon.com/AmazonS3/latest/dev/serv-side-encryption.html"
+               format="html" scope="external">使用服务端加密保护数据</xref>。</p>
+         <sectiondiv>
+            <p><b>配置S3服务端加密</b></p>
+            <p><codeph>s3</codeph>协议的服务端加密默认被禁用。要在使用Greenplum数据库的<codeph>s3</codeph> 协议写入的AWS S3对象上利用服务端加密，用户必须在用户的<codeph>s3</codeph>配置文件中把配置参数<codeph>server_side_encryption</codeph>设置为值<codeph>sse-s3</codeph>：</p>
+            <p>
+               <codeblock>
+server_side_encryption = sse-s3
+</codeblock>
+            </p>
+            <p>当用户把一个包括了<codeph>server_side_encryption = sse-s3</codeph>
+            设置的配置文件提供给使用<codeph>s3</codeph>的<codeph>CREATE WRITABLE EXTERNAL
+                  TABLE</codeph>调用时，Greenplum数据库会在该外部表上进行<codeph>INSERT</codeph>
+            操作时应用加密头部。然后S3会在写<codeph>LOCATION</codeph>子句中提供的URI所标识的对象时进行加密。
+            </p>
+            <p>在通过用<codeph>s3</codeph>协议创建的可读外部表访问加密文件时，S3会透明地解密数据。不需要做额外的配置。</p>
+            <p>对于更细粒度的加密配置，用户可以考虑创建Amazon
+                    Web Services S3的<i>桶策略</i>，按照AWS文档的<xref
+                  href="http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html"
+                  format="html" scope="external">Protecting Data Using Server-Side Encryption with
+                  Amazon S3-Managed Encryption Keys (SSE-S3)</xref>部分标识用户想要加密的对象以及在那些对象上的写动作。</p>
+         </sectiondiv>
+      </section>
+      <section id="s3_proxy">
+         <title>s3协议代理支持</title>
+         <p>您可以指定一个URL，该URL是S3用于连接数据源的代理。 S3支持以下协议：HTTP和HTTPS。
+         您可以使用<codeph>s3</codeph>协议配置参数代理或环境变量指定代理。 如果设置了配置参数，则忽略环境变量。
+        </p>
+         <p>要使用环境变量指定代理，请根据协议设置环境变量：<codeph>http_proxy</codeph>或<codeph>https_proxy</codeph>。 您可以通过设置适当的环境变量为每个协议指定不同的URL。 S3支持这些环境变量。
+         <ul id="ul_cy3_km2_r1b">
+               <li><codeph>all_proxy</codeph>指定了当特定协议的环境变量没有被设置时的代理URL。</li>
+               <li><codeph>no_proxy</codeph>指定了一个通过环境变量设定的，不使用代理的逗号分割的机器名列表。</li>
+            </ul></p>
+         <p>必须设置环境变量，并且必须可以在所有Greenplum数据库主机上访问Greenplum数据库。</p>
+         <p>有关配置参数<codeph>proxy</codeph>的更多信息，请参考s3协议配置文件<xref
+               href="#amazon-emr/s3_config_file" format="dita"/>。</p>
+      </section>
+      <section id="s3_config_param">
+         <title>关于S3协议的配置参数</title>
+         <p>可选的<codeph>config</codeph>参数指定所需的
+               <codeph>s3</codeph>协议配置文件的位置。该文件包含Amazon Web Services (AWS) 的连接证书和通信参数。有关该文件的信息请见<xref href="#amazon-emr/s3_config_file" format="dita"/>。</p>
+         <p>在Greenplum数据库的所有Segment主机上都要求这个配置文件。其默认位置是Greenplum数据库每一个Segment实例的数据目录下的一个位置。<codeblock><varname>gpseg_data_dir</varname>/<varname>gpseg_prefix</varname><varname>N</varname>/s3/s3.conf</codeblock></p>
+         <p><varname>gpseg_data_dir</varname>是该Greenplum数据库Segment的数据目录路径，<varname>gpseg_prefix</varname>是该Segment的前缀，而
+               <varname>N</varname>是该Segment的ID。Segment的数据目录、前缀还有ID都是在初始化一个Greenplum数据库系统时被设置好的。</p>
+         <p>如果在Segment主机上有多个Segment实例，用户可以通过在每个Segment主机上创建一个位置来简化配置。
+         然后用户可以在<codeph>s3</codeph>协议的<codeph>LOCATION</codeph>子句中的<codeph>config</codeph>参数中指定该位置的绝对路径。这个例子指定了一个位于<codeph>gpadmin</codeph>主目录中的位置。</p>
+         <codeblock>LOCATION ('s3://s3-us-west-2.amazonaws.com/test/my_data config=/home/gpadmin/s3.conf')</codeblock>
+         <p>该主机上的所有Segment实例都会使用文件
+            <codeph>/home/gpadmin/s3.conf</codeph>。</p>
+      </section>
+      <section id="s3_config_file">
+         <title>S3协议的配置文件</title>
+         <p>当使用<codeph>s3</codeph>协议时，Greenplum数据库的所有Segment都要求一个<codeph>s3</codeph>协议配置文件。默认位置是：<codeblock><varname>gpseg_data_dir</varname>/<varname>gpseg-prefix</varname><varname>N</varname>/s3/s3.conf</codeblock></p>
+         <p><varname>gpseg_data_dir</varname>是该Greenplum数据库Segment的数据目录路径，<varname>gpseg-prefix</varname> 是该Segment的前缀，而
+               <varname>N</varname>是该Segment的ID。Segment的数据目录、前缀还有ID都是在初始化一个Greenplum数据库系统时被设置好的。</p>
+         <p>如果在Segment主机上有多个Segment实例，用户可以通过在每个Segment主机上创建一个位置来简化配置。
+         然后用户可以在<codeph>s3</codeph>协议的<codeph>LOCATION</codeph>子句中的<codeph>config</codeph>
+         参数中指定该位置的绝对路径。不过，注意只读和可写S3外部表使用相同的参数进行连接。如果用户想为只读和可写S3表配置不同的协议参数，那么用户必须使用两个不同的<codeph>s3</codeph>协议配置文件并且在创建每个表时在<codeph>CREATE EXTERNAL TABLE</codeph>语句中指定正确的文件。</p>
+         <p>这个例子指定一个单一文件位置，它位于<codeph>gpadmin</codeph>主目录的的<codeph>s3</codeph> 目录中：</p>
+         <codeblock>config=/home/gpadmin/s3/s3.conf</codeblock>
+         <p>主机上的所有Segment实例都使用文件
+               <codeph>/home/gpadmin/s3/s3.conf</codeph>。</p>
+         <p><codeph>s3</codeph>协议配置文件是一个文本文件，它由一个
+               <codeph>[default]</codeph>小节和参数构成。这里是一个配置文件的例子：<codeblock>[default]
+secret = "secret"
+accessid = "user access id"
+threadnum = 3
+chunksize = 67108864</codeblock></p>
+         <p>可以使用Greenplum数据库的<codeph>gpcheckcloud</codeph>工具来测试S3配置文件。见<xref href="#amazon-emr/s3chkcfg_utility" format="dita"/>.</p>
+         <sectiondiv>
+            <p><b>s3配置文件参数</b></p>
+            <parml>
+               <plentry>
+                  <pt>accessid</pt>
+                  <pd>必需。访问S3桶的AWS S3 ID。</pd>
+               </plentry>
+               <plentry>
+                  <pt>secret</pt>
+                  <pd>必需。访问S3桶的AWS S3 ID的密码。</pd>
+               </plentry>
+               <plentry>
+                  <pt>autocompress</pt>
+                  <pd>对于可写的S3外部表，这个参数指定是否在上传到S3之前（使用gzip）压缩文件。如果没有指定这个参数，文件会默认被压缩。</pd>
+               </plentry>
+               <plentry>
+                  <pt>chunksize</pt>
+                  <pd>每个Segment线程用来读写S3服务器的缓冲区尺寸。默认是64MB。最小是8MB而最大是128MB。
+                  <p>在插入数据到可写S3表时，Greenplum数据库的每个Segment把数据写入到其缓冲区（使用最多<codeph>threadnum</codeph>个线程）中直到缓冲区被填满，之后它会把该缓冲区写入到S3桶中的一个文件里。根据需要这一处理会在每个Segment上反复执行直到插入操作完成。</p>
+                  <p>因为Amazon S3允许最多10,000个部分的多部分上传，最小8MB的<codeph>chunksize</codeph> 值就支持在Greenplum数据库的每个Segment上最大80GB的插入量。最大128MB的<codeph>chunksize</codeph> 值支持每个Segment最大1.28TB的插入量。对于可写的S3表，用户必须确保<codeph>chunksize</codeph> 的设置能支持表预期的大小。更多有关上传到S3的信息请见S3文档中的<xref
+                           href="http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html"
+                           format="html" scope="external">Multipart Upload Overview</xref>。</p></pd>
+               </plentry>
+               <plentry>
+                  <pt>encryption</pt>
+                  <pd>使用被安全套接字层（SSL）保护的连接。默认值是<codeph>true</codeph>。值<codeph>true</codeph>，
+                        <codeph>t</codeph>，<codeph>on</codeph>， <codeph>yes</codeph>， 以及
+                        <codeph>y</codeph> (大小写无关)都被当作是 <codeph>true</codeph>。
+                     任何其他值都被当成是<codeph>false</codeph>。<p>如果在<codeph>CREATE EXTERNAL TABLE</codeph>命令的<codeph>LOCATION</codeph>子句中的URL没有指定端口，配置文件的
+                     <codeph>encryption</codeph>参数会影响<codeph>s3</codeph>协议使用的端口（HTTP是端口80，HTTPS是端口443）。如果指定了端口，不管encryption设置是什么都会使用那个端口。</p></pd>
+               </plentry>
+               <plentry>
+                  <pt>gpcheckcloud_newline</pt>
+                  <pd>从S3位置下载文件时，如果文件的最后一行没有EOL（行尾）字符，则<codeph>gpcheckcloud</codeph>实用程序会将新行字符附加到文件的最后一行。 默认字符是<codeph>\ n</codeph>（换行符）。 值可以是<codeph>\ n</codeph>，<codeph>\ r</codeph> <codeph>\ n</codeph>（回车）或<codeph>\ n \ r</codeph>（换行符/回车符）。
+                  <p>添加EOL字符可防止一个文件的最后一行与下一个文件的第一行连在一起。</p></pd>
+               </plentry>
+               <plentry>
+                  <pt>low_speed_limit</pt>
+                  <pd>上传/下载速度下限，以字节每秒为单位。默认速度是10240（10K）。
+                  如果上传或者下载速度低于该限制超过<codeph>low_speed_time</codeph>所指定的时间，
+                  那么该连接会被中止并且重试。在3次重试后，<codeph>s3</codeph>协议会返回一个错误。指定值为0表示没有下限。</pd>
+               </plentry>
+               <plentry>
+                  <pt>low_speed_time</pt>
+                  <pd>当连接速度低于<codeph>low_speed_limit</codeph>时，这个参数指定在中止对S3桶上传或者下载之前应等待的总时间（以秒为单位）。默认值是60秒。指定值为0表示没有时间限制。</pd>
+               </plentry>
+               <plentry>
+                  <pt>proxy</pt>
+                  <pd>指定一个URL，该URL是S3用于连接数据源的代理。 S3支持以下协议：HTTP和HTTPS。 这是参数的格式。<codeblock>proxy = <varname>protocol</varname>://[<varname>user</varname>:<varname>password</varname>@]<varname>proxyhost</varname>[:<varname>port</varname>]</codeblock></pd>
+                  <pd>如果未设置此参数或为空字符串（<codeph>proxy =“”</codeph>），则S3使用由环境变量<codeph>http_proxy</codeph>或<codeph>https_proxy</codeph>（以及环境变量<codeph>all_proxy</codeph>和<codeph>no_proxy</codeph>）指定的代理。 S3使用的环境变量取决于协议。 有关环境变量的信息，请参阅<cite>Greenplum数据库管理向导</cite>的
+                  <xref href="g-s3-protocol.xml#amazon-emr/s3_proxy"
+                        format="dita" scope="peer">s3协议代理支持</xref><ph
+                        otherprops="op-print"></ph>。</pd>
+                  <pd>配置文件中最多只能有一个<codeph>proxy</codeph>参数。参数指定的URL是所有支持的协议的代理。</pd>
+               </plentry>
+               <plentry>
+                  <pt>server_side_encryption</pt>
+                  <pd>为桶配置的S3服务端加密方法。
+                     Greenplum数据库只支持使用Amazon S3-managed密钥的服务端加密，
+                     由配置参数值<codeph>sse-s3</codeph>表示。
+                     默认情况下服务端加密被禁用（值为<codeph>none</codeph>)。</pd>
+               </plentry>
+               <plentry>
+                  <pt>threadnum</pt>
+                  <pd>对S3桶上传或者下载数据时，一个Segment能够创建的并发线程的最大数量。默认值是4。最小值是1且最大值是8。</pd>
+               </plentry>
+               <plentry>
+                  <pt>verifycert</pt>
+                  <pd>控制在HTTPS上建立客户端和S3数据源之间加密通信时<codeph>s3</codeph>协议如何处理认证。
+                  其值可以是<codeph>true</codeph>或者<codeph>false</codeph>。
+                  默认值是<codeph>true</codeph>。
+                  <ul
+                        id="ul_hxt_gkl_wy">
+                        <li><codeph>verifycert=false</codeph> - 忽略认证错误并且允许HTTPS之上的加密通信。</li>
+                        <li><codeph>verifycert=true</codeph> - 要求合法的认证（一个正确的证书）用于HTTPS之上的加密通信。</li>
+                     </ul></pd>
+                  <pd>在测试和开发环境中设置这个值为<codeph>false</codeph>有助于允许无需更改证书的通信。<note type="warning">设置这个值为
+                           <codeph>false</codeph>会在建立客户端和S3数据存储之间的通信时忽略证书，这会暴露出安全性风险。</note></pd>
+               </plentry>
+               <plentry>
+                  <pt>version</pt>
+                  <pd>指定在<codeph>CREATE EXTERNAL
+                        TABLE</codeph>命令的<codeph>LOCATION</codeph>子句中指定的信息的版本。值可以是
+                        <codeph>1</codeph>或<codeph>2</codeph>。默认值是<codeph>1</codeph>。
+                  </pd>
+                  <pd>如果值是<codeph>1</codeph>，则<codeph>LOCATION</codeph>子句支持Amazon S3 URL并且不含<codeph>region</codeph>
+                     参数。如果值是<codeph>2</codeph>，则<codeph>LOCATION</codeph>
+                     支持S3兼容服务并且必须包括<codeph>region</codeph>参数。<codeph>region</codeph> 参数指定S3数据源的地区。对于下面这个S3 URL 
+                        <codeph>s3://s3-us-west-2.amazonaws.com/s3test.example.com/dataset1/normal/</codeph>，其AWS S3地区是<codeph>us-west-2</codeph>。 </pd>
+                  <pd>如果<codeph>version</codeph>是1或者没有指定，下面的<codeph>CREATE EXTERNAL
+                        TABLE</codeph>中的<codeph>LOCATION</codeph>子句例子指定了一个Amazon S3端点。<codeblock>LOCATION ('s3://s3-us-west-2.amazonaws.com/s3test.example.com/dataset1/normal/ config=/home/gpadmin/aws_s3/s3.conf')</codeblock></pd>
+                  <pd>如果<codeph>version</codeph>是2，下面的带<codeph>region</codeph>参数的
+                  <codeph>LOCATION</codeph>(<codeph>CREATE EXTERNAL TABLE</codeph>命令的子句）例子指定了一个AWS S3兼容服务。
+                  <codeblock>LOCATION ('s3://test.company.com/s3test.company/test1/normal/ region=local-test config=/home/gpadmin/aws_s3/s3.conf') </codeblock></pd>
+                  <pd>如果<codeph>version</codeph>是2，<codeph>LOCATION</codeph>子句还能指定一个Amazon S3端点。
+                  这个例子指定了一个使用<codeph>region</codeph>参数的Amazon S3端点。
+                  <codeblock>LOCATION ('s3://s3-us-west-2.amazonaws.com/s3test.example.com/dataset1/normal/ region=us-west-2 config=/home/gpadmin/aws_s3/s3.conf') </codeblock></pd>
+               </plentry>
+            </parml>
+            <note><ph id="memory-phrase">在上传或者下载S3文件时，Greenplum数据库在每个Segment主机上可能要求最多<codeph>threadnum *
+                     chunksize</codeph>的内存。在配置Greenplum数据库的总内存时，请考虑这种<codeph>s3</codeph> 协议的内存需求。</ph>
+            </note>
+         </sectiondiv>
+      </section>
+      <section id="section_tsq_n3t_3x">
+         <title>S3协议的限制</title>
+         <p><codeph>s3</codeph>协议有一些限制：<ul id="ul_qqg_qcz_55">
+               <li>只支持S3路径风格的URL。<codeblock>s3://<varname>S3_endpoint</varname>/<varname>bucketname</varname>/[<varname>S3_prefix</varname>]</codeblock></li>
+               <li>只支持S3端点。该协议不支持S3桶的虚拟主机（绑定一个域名给一个S3桶）。</li>
+               <li>支持版本4的AWS签名的签名处理。 <p>有关每种签名处理支持的S3端点的信息，请见<xref
+                        href="http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region"
+                        format="html" scope="external"
+                        >http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region</xref>。</p></li>
+               <li>在<codeph>CREATE EXTERNAL TABLE</codeph>命令的<codeph>LOCATION</codeph>
+               子句中只支持一个单一URL和可选的配置文件。
+               </li>
+               <li>如果在<codeph>CREATE EXTERNAL TABLE</codeph>命令中没有指定<codeph>NEWLINE</codeph>参数，
+               新行字符在特定前缀的所有数据文件中都必须一样。如果在同一个前缀的某些数据文件中有不一样的新行字符，在这些文件上的读操作可能会失败。
+               </li>
+               <li>对于可写的S3外部表，只支持<codeph>INSERT</codeph>操作。不支持<codeph>UPDATE</codeph>, <codeph>DELETE</codeph>，和
+                     <codeph>TRUNCATE</codeph>操作。</li>
+               <li>因为Amazon S3允许做多10,000个部分的多部分上传，最大128MB的<codeph>chunksize</codeph> 值在Greenplum数据库的每个Segment上支持对可写S3表最大1.28TB的插入量。用户必须确保<codeph>chunksize</codeph>的设置能支持表预期的大小。更多有关上传到S3的信息请见S3文档中的<xref
+                     href="http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html"
+                     format="html" scope="external">Multipart Upload Overview</xref>。</li>
+               <li>为了利用Greenplum数据库的Segment所执行的并行处理，S3位置中的文件应该在尺寸上相似并且文件的数量应该允许多个Segment从S3位置下载数据。例如，如果Greenplum数据库系统由16个Segment组成并且有充足的网络带宽，在S3位置中创建16个文件允许每个Segment从该S3位置下载一个文件。相反，如果如果该位置只包含1个或者2个文件，就只有1个或者2个Segment能下载数据。</li>
+            </ul></p>
+      </section>
+      <section id="s3chkcfg_utility"><title>使用gpcheckcloud工具</title><p>Greenplum数据库的工具<codeph>gpcheckcloud</codeph>帮助用户创建一个<codeph>s3</codeph>
+            协议配置文件并且测试一个配置文件。用户可以用指定选项来测试用一个配置文件访问S3桶的能力，并且可以选择对该桶中的文件上传或者下载数据。</p>
+            <p>如果不用任何选项运行该工具，它会发送一个模板配置文件到<codeph>STDOUT</codeph>。用户可以捕捉该输出并且创建一个连接到Amazon S3的<codeph>s3</codeph>配置文件。</p>
+            <p>该工具被安装在Greenplum数据库的
+               <codeph>$GPHOME/bin</codeph>目录中。</p><b>语法</b>
+         <codeblock>gpcheckcloud {<b>-c</b> | <b>-d</b>} "<b>s3://</b><varname>S3_endpoint</varname>/<varname>bucketname</varname>/[<varname>S3_prefix</varname>] [config=<varname>path_to_config_file</varname>]"
+
+gpcheckcloud <b>-u</b> &lt;file_to_upload> "<b>s3://</b><varname>S3_endpoint</varname>/<varname>bucketname</varname>/[<varname>S3_prefix</varname>] [config=<varname>path_to_config_file</varname>]"
+gpcheckcloud <b>-t</b>
+
+gpcheckcloud <b>-h</b></codeblock>
+         <b>选项</b>
+         <parml>
+            <plentry>
+               <pt>-c</pt>
+               <pd><codeph>s3</codeph>协议URL中指定的配置连接到指定的S3位置并且返回其中的文件信息。</pd>
+               <pd>如果连接失败，该工具显示关于失败的信息，例如非法的证书、前缀或者服务器地址（DNS错误）或服务器不可用。</pd>
+            </plentry>
+            <plentry>
+               <pt>-d</pt>
+               <pd>用<codeph>s3</codeph>协议URL中指定的配置从指定的S3位置下载数据并且把输出发送到
+                     <codeph>STDOUT</codeph>。</pd>
+               <pd>如果文件被gzip压缩过，解压后的数据会被发送到
+                     <codeph>STDOUT</codeph>。</pd>
+            </plentry>
+            <plentry>
+               <pt>-u</pt>
+               <pd>使用指定的配置文件（如果有）上传一个文件到<codeph>s3</codeph>协议URL中指定的S3桶中。使用这个选项可以测试压缩和配置中的<codeph>chunksize</codeph> 和 <codeph>autocompress</codeph>
+                  设置。</pd>
+            </plentry>
+            <plentry>
+               <pt>-t</pt>
+               <pd>发送一个模板配置文件到<codeph>STDOUT</codeph>。用户可以捕捉该输出并且创建一个连接到Amazon S3的<codeph>s3</codeph>配置文件。</pd>
+            </plentry>
+            <plentry>
+               <pt>-h</pt>
+               <pd>显示<codeph>gpcheckcloud</codeph>帮助。</pd>
+            </plentry>
+         </parml><p><b>例子</b>
+         </p><p>这个例子运行不带选项的工具在当前目录下创建一个模板
+               <codeph>s3</codeph>配置文件<codeph>mytest_s3.config</codeph>。
+               <codeblock>gpcheckcloud -t > ./mytest_s3.config</codeblock></p>
+               <p>这个例子尝试使用<codeph>s3</codeph>配置文件<codeph>s3.mytestconf</codeph>
+               上传一个本地文件<filepath>test-data.csv</filepath>到一个S3桶位置：
+               :<codeblock>gpcheckcloud -u ./test-data.csv "s3://s3-us-west-2.amazonaws.com/test1/abc config=s3.mytestconf"</codeblock></p>
+               <p>一次成功的上传会导致在S3桶中出现一个或者更多个以文件名格式
+               <codeph> abc&lt;segment_id>&lt;random>.data[.gz]</codeph>命名的文件。见<xref
+               href="#amazon-emr/section_c2f_zvs_3x" format="dita"/>。</p>
+               <p>这个例子尝试使用<codeph>s3</codeph>配置文件
+               <codeph>s3.mytestconf</codeph>连接到一个S3桶位置。<codeblock>gpcheckcloud -c "s3://s3-us-west-2.amazonaws.com/test1/abc config=s3.mytestconf"</codeblock></p>
+               <p>从该S3桶位置下载所有文件并且发送输出到<codeph>STDOUT</codeph>。
+            <codeblock>gpcheckcloud -d "s3://s3-us-west-2.amazonaws.com/test1/abc config=s3.mytestconf"</codeblock></p></section>
+   </body>
+</topic>

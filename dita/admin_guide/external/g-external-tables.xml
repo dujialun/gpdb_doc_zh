@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic3">
+   <title>定义外部表</title>
+   <shortdesc>E外部表允许把外部文件当作常规数据库表来访问。它们常常被用来把数据移进或者移出Greenplum数据库。</shortdesc>
+   <body>
+      <p>要创建一个外部表定义，用户需要指定输入文件的格式以及外部数据源的位置。有关输入文件格式的信息, 请参考 <xref
+            href="../load/topics/g-formatting-data-files.xml#topic95"/>。</p>
+      <p>使用下列协议之一来访问外部表数据源。用户不能在<codeph>CREATE EXTERNAL TABLE</codeph>语句中混用协议：<ul id="ul_zj5_prj_kr">
+            <li><codeph>file://</codeph> 访问Segment主机上Greenplum数据超级用户 (<codeph>gpadmin</codeph>)能访问的外部数据文件。
+            见 <xref
+                  href="g-file-protocol.xml#topic_qbh_pwh_kr"/>。</li>
+            <li><codeph>gpfdist://</codeph> 指向一个位于文件主机上的目录并且向Greenplum数据库所有的Segment并行提供外部数据文件。见 <xref
+                  href="g-gpfdist-protocol.xml#topic_sny_yph_kr"/>。</li>
+            <li><codeph>gpfdists://</codeph> 是<codeph>gpfdist</codeph>的一个安全版本。见
+                  <xref href="g-gpfdists-protocol.xml#topic_sny_yph_kr"/>。</li>
+            <li><codeph>s3://</codeph>访问Amazon S3桶中的文件。见<xref
+                  href="g-s3-protocol.xml#amazon-emr"/>。</li>
+
+            <li>The <codeph>pxf://</codeph>协议使用Greenplum平台扩展框架（PXF）访问外部HDFS文件和HBase和Hive表。见<xref href="g-pxf-protocol.xml"></xref>。</li>
+         </ul></p>
+      <note>
+         <p><codeph>s3://</codeph> 和 <codeph>pxf://</codeph>
+            协议是自定义数据访问协议，<codeph>file://</codeph>,
+               <codeph>gpfdist://</codeph>, 和 <codeph>gpfdists://</codeph>协议是实现在Greenplum数据库内部的。自定义和内部协议有以下不同：</p>
+         <ul id="ul_ifb_crh_qfb">
+            <li>自定义协议必须使用<codeph>CREATE PROTOCOL</codeph>
+               命令注册。 在数据库中注册PXF扩展会创建
+                  <codeph>pxf://</codeph> 协议。(见 <xref
+                  href="pxf-overview.xml#topic_u14_wtd_dbb"/>。)您可以选择性地注册
+                  <codeph>s3://</codeph> 协议。(见 <xref
+                  href="g-s3-protocol.xml#amazon-emr/s3_prereq"/>。) 内部协议始终存在且无法取消注册。</li>
+            <li>注册自定义协议时，会在<codeph>pg_extprotocol</codeph> catalog表中添加一行，以指定实现该协议的处理函数。
+            协议的共享库必须安装在所有Greenplum数据库主机上。 内部协议在<codeph>pg_extprotocol</codeph>表中没有记录，并且没有其他库需要安装。</li>
+            <li>要授予用户对自定义协议的权限，请使用<codeph>GRANT [SELECT |
+                  INSERT | ALL] ON PROTOCOL</codeph>。要允许（或拒绝）内部协议的用户权限，需要使用<codeph>CREATE ROLE</codeph> 或 <codeph>ALTER
+                  ROLE</codeph>将<codeph>CREATEEXTTABLE</codeph>（或<codeph>NOCREATEEXTTABLE</codeph>）属性添加到每个用户的角色。</li>
+         </ul>
+      </note>
+      <p>外部表从数据库内访问外部文件，就好像它们是常规的数据库表一样。用
+            <codeph>gpfdist</codeph>/<codeph>gpfdists</codeph>, <codeph>pxf</codeph>, 和
+            <codeph>s3</codeph>协议定义的外部表通过使用所有Greenplum数据库的Segment资源装载或卸载数据来利用Greenplum的并行机制。
+            <codeph>pxf</codeph>协议利用Hadoop分布式文件系统的并行体系结构来访问该系统上的文件。
+            <codeph>s3</codeph>协议利用了Amazon Web服务（AWS）的功能。</p>
+      <p>用户可以使用<codeph>SELECT</codeph>、<codeph>JOIN</codeph>或<codeph>SORT EXTERNAL TABLE DATA</codeph>等SQL命令直接并行地查询外部表数据，
+      并且用户可以为外部表创建视图。</p>
+      <p>使用外部表的步骤是：</p>
+      <ol>
+         <li id="du215913">定义外部表。<p>使用<codeph>s3</codeph> 协议，
+               用户还必须配置Greenplum数据库并且启用该协议。见 <xref
+                  href="g-s3-protocol.xml#amazon-emr"/>。</p></li>
+         <li id="du220314">做下面的事情之一：<ul id="ul_nd1_gd5_h4">
+               <li id="du220318">在使用<codeph>gpfdist</codeph>或者<codeph>gpdists</codeph>协议时，启动Greenplum数据库文件服务器。
+               </li>
+               <li>验证为<codeph>s3</codeph>协议做好了所需的一次性配置。
+               </li>
+            </ul></li>
+         <li id="du215986">把数据文件放置在正确位置。</li>
+         <li id="du216021">用SQL命令查询外部表。</li>
+      </ol>
+      <p>Greenplum数据库提供可读和可写的外部表：</p>
+      <ul>
+         <li id="du210036">用于数据加载的可读外部表。 可读外部表支持：<ul>
+               <li id="du210101">数据仓库中常见的基本提取，转换和加载（ETL）任务。</li>
+               <li id="du210102">从多个Greenplum数据库段实例并行读取外部表数据，以优化大型加载操作。</li>
+               <li id="du210103">过滤下推。 如果查询包含<codeph>WHERE</codeph>子句，则可以将其传递给外部数据源。
+                  有关更多信息，请参考<xref
+                     href="../../ref_guide/config_params/guc-list.xml#gp_external_enable_filter_pushdown"
+                  />服务器配置参数讨论。 
+                  请注意，此功能目前仅支持<codeph>pxf</codeph>协议(参阅 <xref href="g-pxf-protocol.xml"/>)。</li>
+            </ul><p>可读外部表仅允许<codeph>SELECT</codeph>操作。</p>
+         </li>
+         <li id="du220433">用于数据卸载的可写外部表。 可写外部表支持：<ul>
+               <li id="du220434">从数据库表中选择数据以插入可写外部表。</li>
+               <li id="du220435">将数据以数据流形式发送到应用程序。 
+               例如，从Greenplum数据库卸载数据并将其发送到连接到另一个数据库或ETL工具的应用程序以在其他地方加载数据。</li>
+               <li id="du210321">从Greenplum并行MapReduce计算接收输出。</li>
+            </ul><p>可写外部表仅允许<codeph>INSERT</codeph>操作。</p>
+         </li>
+      </ul>
+      <p>外部表可以是基于文件的或者是基于Web的。使用<codeph>file://</codeph>协议的外部表示只读表。</p>
+      <ul>
+         <li id="du209906">普通（基于文件的）外部表访问静态平面文件。普通外部表是可以重新扫描的：在查询运行时数据是静态的。</li>
+         <li id="du209907">Web（基于Web的）外部表访问动态数据源，
+         或者在一个用<codeph>http://</codeph>协议的Web服务器上，或者通过执行OS命令或脚本得到。外部Web表不是可以重新扫描的：在查询运行时数据可以改变。</li>
+      </ul>
+      <p>转储和操作只针对外部表和外部Web表的定义而非数据源。</p>
+   </body>
+</topic>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="topic_z5g_l5h_kr1313">
+  <title>pxf:// 协议</title>
+  <shortdesc>您可以使用Greenplum平台扩展框架（PXF）<codeph>pxf://</codeph>协议访问驻留在外部Hadoop系统（HDFS，Hive，HBase），对象存储系统（Azure，Google云端存储，Minio，S3）和SQL数据库上的数据。</shortdesc>
+  <body>
+    <p>PXF协议打包为Greenplum数据库扩展。 <codeph>pxf</codeph>协议支持从外部数据存储读取数据。 
+    您还可以使用<codeph>pxf</codeph>协议编写文本，二进制和parquet-format的数据。</p>
+    <p>使用<codeph>pxf</codeph>协议查询外部数据存储时，要指定访问的目录，文件或表。 
+    PXF从数据存储请求数据，并将相关部分的数据并行传递给为查询提供服务的每个Greenplum数据库segment实例。</p>
+    <p>使用<codeph>pxf</codeph>协议读取或写入外部数据之前，必须先显式初始化并启动PXF。 
+    您还必须在每个允许用户创建外部表以访问外部数据的数据库中启用PXF，并将<codeph>pxf</codeph>协议的权限授予这些Greenplum数据库用户。</p>
+    <p>有关配置和使用PXF和<codeph>pxf</codeph>协议的更详细的信息，请参考
+    <xref href="pxf-overview.xml" type="topic">使用PXF访问外部数据</xref>。</p>
+  </body>
+</topic>
