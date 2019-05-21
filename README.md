@@ -14,3 +14,12 @@
 ## 文档发布
 最终翻译好的文档会发布到我们的中文社区中，所有贡献者的名字都会展示在对应的章节。
 可以参考目前Greenplum4和5的文档翻译，[https://greenplum.cn/docs/](https://greenplum.cn/docs/)。
+
+## 翻译进展
+- Administrator Guide 进行中
+	- [http://47.92.231.67:8080/6-0/admin_guide/](http://47.92.231.67:8080/6-0/admin_guide/)
+- Security Configuration Guide 未开始
+- Best Practices Guide 未开始
+- Utility Guide 未开始
+- Reference Guide 未开始
+- Platform Extension Framework (PXF) 未开始
