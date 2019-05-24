@@ -1,44 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="about_monitoring">
-  <title>About Management and Monitoring Utilities</title>
-  <shortdesc>Greenplum Database provides standard command-line utilities for performing common
-    monitoring and administration tasks. </shortdesc>
+  <title>关于管理和监控工具</title>
+  <shortdesc>Greenplum数据库提供了标准的命令行工具来执行通常的监控和管理任务。</shortdesc>
   <body>
-    <p>Greenplum command-line utilities are located in the
-        <filepath><varname>$GPHOME</varname>/bin</filepath> directory and are executed on the master
-      host. Greenplum provides utilities for the following administration tasks:</p>
+    <p>Greenplum的命令行工具位于 <filepath><varname>$GPHOME</varname>/bin</filepath>目录中并且在Master主机上执行。Greenplum为下列管理任务提供了实用工具：
+      </p>
     <ul id="ul_mtm_tsv_fp">
-      <li>Installing Greenplum Database on an array</li>
-      <li>Initializing a Greenplum Database System</li>
-      <li>Starting and stopping Greenplum Database</li>
-      <li>Adding or removing a host</li>
-      <li>Expanding the array and redistributing tables among new segments</li>
-      <li>Managing recovery for failed segment instances</li>
-      <li>Managing failover and recovery for a failed master instance</li>
-      <li>Backing up and restoring a database (in parallel)</li>
-      <li>Loading data in parallel</li>
-      <li>Transferring data between Greenplum databases</li>
-      <li>System state reporting</li>
+      <li>在一个阵列上安装Greenplum数据库</li>
+      <li>初始化一个Greenplum数据库系统</li>
+      <li>开始和停止Greenplum数据库</li>
+      <li>增加或者移除一个主机</li>
+      <li>扩展阵列并且在新的Segment上重新分布表</li>
+      <li>恢复失效的Segment实例</li>
+      <li>管理失效Master实例的故障切换和恢复</li>
+      <li>备份和恢复一个数据库（并行）</li>
+      <li>并行装载数据</li>
+      <li>在Greenplum数据库之间转移数据</li>
+      <li>系统状态报告</li>
     </ul>
-    <p>Greenplum Database includes an optional performance management database that contains query
-      status information and system metrics. The <codeph>gpperfmon_install</codeph> management
-      utility creates the database, named <codeph>gpperfmon</codeph>, and enables data collection
-      agents that execute on the Greenplum Database master and segment hosts. Data collection agents on the
-      segment hosts collect query status from the segments, as well as system metrics such as CPU
-      and memory utilization. An agent on the master host periodically (typically every 15 seconds)
-      retrieves the data from the segment host agents and updates the <codeph>gpperfmon</codeph>
-      database. Users can query the <codeph>gpperfmon</codeph> database to see the query and system
-      metrics. </p>
-    <p otherprops="pivotal">Pivotal provides an optional system monitoring and management tool,
-      Greenplum Command Center, which administrators can install and enable with Greenplum Database.
-      Greenplum Command Center, which depends upon the <codeph>gpperfmon</codeph> database, provides
-      a web-based user interface for viewing the system metrics and allows administrators to perform
-      additional system management tasks. For more information about Greenplum Command Center, see
-      the <xref href="https://gpcc.docs.pivotal.io" format="html" scope="external">Greenplum Command
-        Center documentation</xref>.</p>
+    <p>
+      Greenplum数据库包括一个包含查询状态和系统指标的可选的性能管理数据库。
+      <codeph>gpperfmon_install</codeph>管理工具创建名为<codeph>gpperfmon</codeph>的数据库，
+      并启用运行在Greenplum数据库Master和Segment节点上的数据收集代理。
+      运行在节点上的数据收集代理会从节点上收集查询状态，还包括诸如CPU和内存使用量等系统指标。
+      Master节点上的代理周期性的（通常15秒）从节点代理上收集数据并更新<codeph>gpperfmon</codeph>数据库。
+      用户可以查询<codeph>gpperfmon</codeph>数据库来查看查询和系统指标。
+      </p>
+    <p otherprops="pivotal">
+      Pivotal提供了一个可选的系统监控和管理工具。
+      Greenplum Command Center，可以让管理员随数据库一起安装并启动，它依赖<codeph>gpperfmon</codeph>数据库，
+      提供基于web的用户接口去查看系统指标并允许管理员执行额外的系统管理任务。更多关于Greenplum Command Center的信息，
+      参考
+      <xref href="https://gpcc.docs.pivotal.io" format="html" scope="external">Greenplum Command
+        Center 文档</xref>.</p>
     <fig id="kf145043" otherprops="pivotal">
-      <title>Greenplum Command Center Architecture</title>
+      <title>Greenplum Command Center 架构</title>
       <image href="../graphics/cc_arch_gpdb.png" placement="break" width="299px" height="304px"
         id="image_uyw_k2k_r1b"/>
     </fig>

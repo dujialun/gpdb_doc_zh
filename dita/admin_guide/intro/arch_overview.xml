@@ -2,70 +2,44 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic2" xml:lang="en">
-  <title id="iw157419">About the Greenplum Architecture</title>
-  <shortdesc>Greenplum Database is a massively parallel processing (MPP) database server with an
-    architecture specially designed to manage large-scale analytic data warehouses and business
-    intelligence workloads. </shortdesc>
+  <title id="iw157419">关于Greenplum的架构</title>
+  <shortdesc>Greenplum数据库是一种大规模并行处理（MPP）数据库服务器，其架构特别针对管理大规模分析型数据仓库以及商业智能工作负载而设计。</shortdesc>
   <body>
-    <p id="iw157381">MPP (also known as a <i>shared nothing</i> architecture) refers to systems with
-      two or more processors that cooperate to carry out an operation, each processor with its own
-      memory, operating system and disks. Greenplum uses this high-performance system architecture
-      to distribute the load of multi-terabyte data warehouses, and can use all of a system's
-      resources in parallel to process a query.</p>
-    <p>Greenplum Database is based on PostgreSQL open-source technology. It is essentially several
-      PostgreSQL disk-oriented database instances acting together as one cohesive database
-      management system (DBMS). It is based on PostgreSQL 9.4, and in most cases is very similar
-      to PostgreSQL with regard to SQL support, features, configuration options, and end-user
-      functionality. Database users interact with Greenplum Database as they would with a regular
-      PostgreSQL DBMS. </p>
-    <p>Greenplum Database can use the append-optimized (AO) storage format for bulk loading and
-      reading of data, and provides performance advantages over HEAP tables. Append-optimized
-      storage provides checksums for data protection, compression and row/column orientation. Both
-      row-oriented or column-oriented append-optimized tables can be compressed. </p>
-    <p>The main differences between Greenplum Database and PostgreSQL are as follows:<ul
+    <p id="iw157381">MPP（也被称为<i>shared nothing</i>架构）指有两个或者更多个处理器协同执行一个操作的系统，每一个处理器都有其自己的内存、操作系统和磁盘。
+      Greenplum使用这种高性能系统架构来分布数T字节数据仓库的负载并且能够使用系统的所有资源并行处理一个查询。
+      </p>
+    <p>Greenplum数据库是基于PostgreSQL开源技术的。它本质上是多个PostgreSQL面向磁盘的数据库实例一起工作形成的一个紧密结合的数据库管理系统（DBMS）。
+      它基于PostgreSQL 8.3.23开发，其SQL支持、特性、配置选项和最终用户功能在大部分情况下和PostgreSQL非常相似。
+      与Greenplum数据库交互的数据库用户会感觉在使用一个常规的PostgreSQL DBMS。</p>
+    <p>Greenplum数据库可以使用追加优化（append-optimized，AO）的存储个事来批量装载和读取数据，并且能提供HEAP表上的性能优势。
+      追加优化的存储为数据保护、压缩和行/列方向提供了校验和。行式或者列式追加优化的表都可以被压缩。</p>
+    <p>Greenplum数据库和PostgreSQL的主要区别在于：<ul
         id="ul_tnk_ymb_c1b">
-        <li>GPORCA is leveraged for query planning, in addition to the Postgres query planner, which
-          is based on the Postgres query planner.</li>
-        <li>Greenplum Database can use append-optimized storage.</li>
-        <li>Greenplum Database has the option to use column storage, data that is logically
-          organized as a table, using rows and columns that are physically stored in a
-          column-oriented format, rather than as rows. Column storage can only be used with
-          append-optimized tables. Column storage is compressible. It also can provide performance
-          improvements as you only need to return the columns of interest to you. All compression
-          algorithms can be used with either row or column-oriented tables, but Run-Length Encoded
-          (RLE) compression can only be used with column-oriented tables. Greenplum Database
-          provides compression on all Append-Optimized tables that use column storage.</li>
+        <li>在基于Postgres查询规划器的常规查询规划器之外，可以利用GPORCA进行查询规划。</li>
+        <li>Greenplum数据库可以使用追加优化的存储。</li>
+        <li>Greenplum数据库可以选用列式存储，数据在逻辑上还是组织成一个表，但其中的行和列在物理上是存储在一种面向列的格式中，而不是存储成行。
+          列式存储只能和追加优化表一起使用。列式存储是可压缩的。当用户只需要返回感兴趣的列时，列式存储可以提供更好的性能。
+          所有的压缩算法都可以用在行式或者列式存储的表上，但是行程编码（RLE）压缩只能用于列式存储的表。Greenplum数据库在所有使用列式存储的追加优化表上都提供了压缩。</li>
       </ul></p>
-    <p>The internals of PostgreSQL have been modified or supplemented to support the parallel
-      structure of Greenplum Database. For example, the system catalog, optimizer, query executor,
-      and transaction manager components have been modified and enhanced to be able to execute
-      queries simultaneously across all of the parallel PostgreSQL database instances. The Greenplum
-        <i>interconnect</i> (the networking layer) enables communication between the distinct
-      PostgreSQL instances and allows the system to behave as one logical database. </p>
-    <p>Greenplum Database also can use declarative partitions and sub-partitions to implicitly
-      generate partition constraints.</p>
-    <p>Greenplum Database also includes features designed to optimize PostgreSQL for business
-      intelligence (BI) workloads. For example, Greenplum has added parallel data loading (external
-      tables), resource management, query optimizations, and storage enhancements, which are not
-      found in standard PostgreSQL. Many features and optimizations developed by Greenplum make
-      their way into the PostgreSQL community. For example, table partitioning is a feature first
-      developed by Greenplum, and it is now in standard PostgreSQL.</p>
-    <p>Greenplum Database queries use a Volcano-style query engine model, where the execution engine
-      takes an execution plan and uses it to generate a tree of physical operators, evaluates tables
-      through physical operators, and delivers results in a query response.</p>
-    <p>Greenplum Database stores and processes large amounts of data by distributing the data and
-      processing workload across several servers or <i>hosts</i>. Greenplum Database is an
-        <i>array</i> of individual databases based upon PostgreSQL 9.4 working together to present a
-      single database image. The <i>master</i> is the entry point to the Greenplum Database system.
-      It is the database instance to which clients connect and submit SQL statements. The master
-      coordinates its work with the other database instances in the system, called <i>segments</i>,
-      which store and process the data.</p>
+    <p>为了支持Greenplum数据库的并行结构，PostgreSQL的内部已经被修改或者增补。
+      例如，系统目录、优化器、查询执行器以及事务管理器组件都已经被修改或者增强，以便能够在所有的并行PostgreSQL数据库实例之上同时执行查询。
+      Greenplum的<i>interconnect</i>（网络层）允许在不同的PostgreSQL实例之间通讯，让系统表现为一个逻辑数据库。
+      </p>
+    <p>Greenplum数据库也可以使用声明式分区和子分区来隐式地生成分区约束。</p>
+    <p>Greenplum数据库也包括为针对商业智能（BI）负载优化PostgreSQL而设计的特性。
+      例如，Greenplum增加了并行数据装载（外部表）、资源管理、查询优化以及存储增强，这些在PostgreSQL中都是无法找到的。
+      很多Greenplum开发的特性和优化都在PostgreSQL社区中找到了一席之地。例如，表分区最初是由Greenplum开发的一个特性，现在已经出现在了标准的PostgreSQL中。</p>
+    <p>Greenplum数据库的查询使用一种火山式查询引擎模型，其中的执行引擎拿到一个执行计划并且用它产生一棵物理操作符树，然后通过物理操作符计算表，最后返回结果作为查询响应。</p>
+    <p>Greenplum数据库通过将数据和处理负载分布在多个服务器或者主机上来存储和处理大量的数据。
+      Greenplum数据库是一个由基于PostgreSQL 8.3的数据库组成的阵列，阵列中的数据库工作在一起呈现了一个单一数据库的景象。
+      Master是Greenplum数据库系统的入口。客户端会连接到这个数据库实例并且提交SQL语句。
+      Master会协调与系统中其他称为Segment的数据库实例一起工作，Segment负责存储和处理数据。
+      </p>
     <fig id="iw157440">
-      <title>High-Level Greenplum Database Architecture</title>
+      <title>高层的Greenplum数据库架构</title>
       <image height="316px" href="../graphics/highlevel_arch.jpg" placement="break" width="397px"/>
     </fig>
-    <p>The following topics describe the components that make up a Greenplum Database system and how
-      they work together. <ul id="ul_cz4_xhy_dq" otherprops="op-help">
+    <p>下面的主题描述了组成一个Greenplum数据库系统的组件以及它们如何一起工作。<ul id="ul_cz4_xhy_dq" otherprops="op-help">
         <!-- hack for HTML/PDF -->
         <li><xref href="#arch_master" format="dita"/></li>
         <li><xref href="#arch_segments" format="dita"/></li>
@@ -73,65 +47,50 @@
       </ul></p>
   </body>
   <topic id="arch_master" xml:lang="en">
-    <title id="iw157474">About the Greenplum Master</title>
-    <shortdesc>The Greenplum Database master is the entry to the Greenplum Database system,
-      accepting client connections and SQL queries, and distributing work to the segment instances. </shortdesc>
+    <title id="iw157474">关于Greenplum的Master</title>
+    <shortdesc>Greenplum数据库的Master是整个Greenplum数据库系统的入口，它接受连接和SQL查询并且把工作分布到Segment实例上。</shortdesc>
     <body>
-      <p>Greenplum Database end-users interact with Greenplum Database (through the master) as they
-        would with a typical PostgreSQL database. They connect to the database using client programs
-        such as <codeph>psql</codeph> or application programming interfaces (APIs) such as JDBC,
-        ODBC or <xref href="https://www.postgresql.org/docs/9.4/libpq.html" format="html"
-          scope="external">libpq</xref> (the PostgreSQL C API).</p>
-      <p>The master is where the <i>global system catalog</i> resides. The global system catalog is
-        the set of system tables that contain metadata about the Greenplum Database system itself.
-        The master does not contain any user data; data resides only on the <i>segments</i>. The
-        master authenticates client connections, processes incoming SQL commands, distributes
-        workloads among segments, coordinates the results returned by each segment, and presents the
-        final results to the client program.</p>
-      <p>Greenplum Database uses Write-Ahead Logging (WAL) for master/standby master mirroring. In
-        WAL-based logging, all modifications are written to the log before being applied, to ensure
-        data integrity for any in-process operations.<note>WAL logging is not yet available for
-          segment mirroring.</note>
+      <p>Greenplum数据库的最终用户与Greenplum数据库（通过Master）交互时，会觉得他们是在与一个典型的PostgreSQL数据库交互。
+        他们使用诸如<codeph>psql</codeph>之类的客户端或者JDBC、ODBC、
+        <xref href="https://www.postgresql.org/docs/9.4/libpq.html" format="html" scope="external">libpq</xref>（PostgreSQL的C语言API）等应用编程接口（API）连接到数据库。
+        </p>
+      <p>Master是全局系统目录的所在地。全局系统目录是一组包含了有关Greenplum数据库系统本身的元数据的系统表。
+        Master上不包含任何用户数据，数据只存在于Segment之上。
+        Master会认证客户端连接、处理到来的SQL命令、在Segment之间分布工作负载、协调每一个Segment返回的结果以及把最终结果呈现给客户端程序。
+        </p>
+      <p>Greenplum数据库使用预写式日志（WAL）来实现主/备镜像。
+        在基于WAL的日志中，所有的修改都会在应用之前被写入日志，以确保对于任何正在处理的操作的数据完整性。<note>Segment镜像还不能使用WAL日志。</note>
       </p>
     </body>
   </topic>
   <topic id="arch_segments" xml:lang="en">
-    <title id="iw157496">About the Greenplum Segments</title>
-    <shortdesc>Greenplum Database segment instances are independent PostgreSQL databases that each
-      store a portion of the data and perform the majority of query processing. </shortdesc>
+    <title id="iw157496">关于Greenplum的Segment</title>
+    <shortdesc>Greenplum数据库的Segment实例是独立的PostgreSQL数据库，每一个都存储了数据的一部分并且执行查询处理的主要部分。</shortdesc>
     <body>
-      <p>When a user connects to the database via the Greenplum master and issues a query, processes
-        are created in each segment database to handle the work of that query. For more information
-        about query processes, see <xref href="../query/topics/parallel-proc.xml#topic1"/>.</p>
-      <p>User-defined tables and their indexes are distributed across the available segments in a
-        Greenplum Database system; each segment contains a distinct portion of data. The database
-        server processes that serve segment data run under the corresponding segment instances.
-        Users interact with segments in a Greenplum Database system through the master.</p>
-      <p>Segments run on a servers called <i>segment hosts</i>. A segment host typically executes
-        from two to eight Greenplum segments, depending on the CPU cores, RAM, storage, network
-        interfaces, and workloads. Segment hosts are expected to be identically configured. The key
-        to obtaining the best performance from Greenplum Database is to distribute data and
-        workloads <i>evenly</i> across a large number of equally capable segments so that all
-        segments begin working on a task simultaneously and complete their work at the same time.
+      <p>当一个用户通过Greenplum的Master连接到数据库并且发出一个查询时，在每一个Segment数据库上都会创建一些进程来处理该查询的工作。
+        更多有关查询处理的内容，请见<xref href="../query/topics/parallel-proc.xml#topic1"/>。
+        </p>
+      <p>用户定义的表及其索引会分布在Greenplum数据库系统中可用的Segment上，每一个Segment都包含数据的不同部分。
+        服务于Segment数据的数据库服务器进程运行在相应的Segment实例之下。
+        用户通过Master与一个Greenplum数据库系统中的Segment交互。</p>
+      <p>Segment运行在被称作Segment主机的服务器上。
+        一台Segment主机通常运行2至8个Greenplum的Segment，这取决于CPU核数、RAM、存储、网络接口和工作负载。
+        Segment主机预期都以相同的方式配置。
+        从Greenplum数据库获得最佳性能的关键在于在大量能力相同的Segment之间平均地分布数据和工作负载，这样所有的Segment可以同时开始为一个任务工作并且同时完成它们的工作。
       </p>
     </body>
   </topic>
   <topic id="arch_interconnect" xml:lang="en">
-    <title id="iw157520">About the Greenplum Interconnect</title>
-    <shortdesc>The interconnect is the networking layer of the Greenplum Database
-      architecture.</shortdesc>
+    <title id="iw157520">关于Greenplum的Interconnect
+    </title>
+    <shortdesc>Interconect是Greenplum数据库架构中的网络层。</shortdesc>
     <body>
-      <p>The <i>interconnect</i> refers to the inter-process communication between segments and the
-        network infrastructure on which this communication relies. The Greenplum interconnect uses a
-        standard Ethernet switching fabric. For performance reasons, a 10-Gigabit system, or faster,
-        is recommended.</p>
-      <p>By default, the interconnect uses User Datagram Protocol with flow control (UDPIFC) for
-        interconnect traffic to send messages over the network. The Greenplum software performs
-        packet verification beyond what is provided by UDP. This means the reliability is equivalent
-        to Transmission Control Protocol (TCP), and the performance and scalability exceeds TCP. If
-        the interconnect is changed to TCP, Greenplum Database has a scalability limit of 1000
-        segment instances. With UDPIFC as the default protocol for the interconnect, this limit is
-        not applicable.</p>
+      <p>Interconnect指的是Segment之间的进程间通信以及这种通信所依赖的网络基础设施。
+        Greenplum的Interconnect采用了一种标准的以太交换网络。出于性能原因，推荐使用万兆网或者更快的系统。
+      </p>
+      <p>B默认情况下，Interconnect使用带流控制的用户数据包协议（UDPIFC）在网络上发送消息。
+        Greenplum软件在UDP之上执行包验证。这意味着其可靠性等效于传输控制协议（TCP）且性能和可扩展性要超过TCP。
+        如果Interconnect被改为TCP，Greenplum数据库会有1000个Segment实例的可扩展性限制。对于Interconnect的默认协议UDPIFC则不存在这种限制。</p>
     </body>
   </topic>
 </topic>
