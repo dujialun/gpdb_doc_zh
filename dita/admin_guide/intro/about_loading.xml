@@ -2,30 +2,23 @@
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN"
 "ditabase.dtd">
 <topic id="data_loading" xml:lang="en">
-  <title id="iw157616">About Parallel Data Loading</title>
-  <shortdesc>This topic provides a short introduction to Greenplum Database data loading
-    features.</shortdesc>
+  <title id="iw157616">关于并行数据装载</title>
+  <shortdesc>这一主题给出了对于Greenplum数据库数据装载特性的简短介绍。</shortdesc>
   <body>
-    <p>In a large scale, multi-terabyte data warehouse, large amounts of data must be loaded within
-      a relatively small maintenance window. Greenplum supports fast, parallel data loading with its
-      external tables feature. Administrators can also load external tables in single row error
-      isolation mode to filter bad rows into a separate error log while continuing to load
-      properly formatted rows. Administrators can specify an error threshold for a load operation to
-      control how many improperly formatted rows cause Greenplum to abort the load operation.</p>
+    <p>在一个大型的、具有数T字节的数据仓库中，必须在一个相对较小的维护窗口内完成对大量数据的装载。
+      Greenplum支持使用其外部表特性的快速、并行数据装载。
+      管理员也可以用单行错误隔离模式装载外部表，这样可以把有问题的行过滤到一个单独的错误表而继续装载正确格式的行。
+      对于一次装载操作，管理员可以指定一个错误阈值以控制Greenplum在碰到多少不正确的行后中止装载操作。</p>
 
-    <p>By using external tables in conjunction with Greenplum Database's parallel file server
-        (<codeph>gpfdist</codeph>), administrators can achieve maximum parallelism and load
-      bandwidth from their Greenplum Database system.</p>
+    <p>通过结合外部表以及Greenplum数据库的并行文件服务器（gpfdist），管理员可以在他们的Greenplum数据库系统上达到最大的并行度和装载带宽。</p>
 
     <fig id="iw157638">
-      <title>External Tables Using Greenplum Parallel File Server (gpfdist)</title>
+      <title>外部表使用Greenplum并行文件服务器（gpfdist） </title>
 
       <image height="275px" href="../graphics/ext_tables.jpg" placement="break" width="454px"/>
     </fig>
-    <p>Another Greenplum utility, <codeph>gpload</codeph>, runs a load task that you specify in a
-      YAML-formatted control file. You describe the source data locations, format, transformations
-      required, participating hosts, database destinations, and other particulars in the control
-      file and <codeph>gpload</codeph> executes the load. This allows you to describe a complex task
-      and execute it in a controlled,  repeatable fashion. </p>
+    <p>另一个Greenplum工具gpload能运行定义在一个YAML格式控制文件中的装载任务。
+      在控制文件中描述了源数据位置、格式、转换要求、参与的主机、数据库目标以及其他说明，而gpload会执行装载。
+      这允许用户描述一个复杂的任务，并且以可控、可重复的方式来执行它。</p>
   </body>
 </topic>
