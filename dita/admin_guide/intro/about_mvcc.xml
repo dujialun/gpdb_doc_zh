@@ -1,128 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_kl4_pl2_2s">
-  <title>About Concurrency Control in Greenplum Database</title>
-  <shortdesc>Greenplum Database uses the PostgreSQL Multiversion Concurrency Control (MVCC) model to
-    manage concurrent transactions for heap tables. </shortdesc>
+  <title>关于Greenplum数据库中的并发控制</title>
+  <shortdesc>Greenplum数据库使用了PostgreSQL的多版本并发控制（MVCC）模型来管理对于堆表的并发事务。</shortdesc>
   <body>
-    <p>Concurrency control in a database management system allows concurrent queries to complete
-      with correct results while ensuring the integrity of the database. Traditional databases use a
-      two-phase locking protocol that prevents a transaction from modifying data that has been read
-      by another concurrent transaction and prevents any concurrent transaction from reading or
-      writing data that another transaction has updated. The locks required to coordinate
-      transactions add contention to the database, reducing overall transaction throughput. </p>
-    <p>Greenplum Database uses the PostgreSQL Multiversion Concurrency Control (MVCC) model to
-      manage concurrency for heap tables. With MVCC, each query operates on a snapshot of the
-      database when the query starts. While it executes, a query cannot see changes made by other
-      concurrent transactions. This ensures that a query sees a consistent view of the database.
-      Queries that read rows can never block waiting for transactions that write rows. Conversely,
-      queries that write rows cannot be blocked by transactions that read rows. This allows much
-      greater concurrency than traditional database systems that employ locks to coordinate access
-      between transactions that read and write data.</p>
-    <note>Append-optimized tables are managed with a different concurrency control model than the
-      MVCC model discussed in this topic. They are intended for "write-once, read-many" applications
-      that never, or only very rarely, perform row-level updates.</note>
+    <p>数据库管理系统中的并发控制允许在确保数据库的完整性的前提下，并发查询能够完成并且得到正确的结果。
+      传统的数据库使用两阶段锁协议来阻止一个事务修改已经被另一个并发事务读取的数据并且阻止任何并发事务读取或者写入另一个事务已经更新的数据。
+      协调事务所需的锁增加了数据库中的竞争，降低了总体事务吞吐量。</p>
+    <p>Greenplum数据库使用PostgreSQL的多版本并发控制（MVCC）模型来管理堆表的并发。
+      通过MVCC，每一个查询都在它开始时的一个数据库快照上操作。
+      在执行时，一个查询不能看到其他并发事务所作出的更改。
+      这确保了一个查询看到的是数据库的一个一致的视图。
+      读取行的查询不会被写入行的事务所阻塞。
+      反过来，写入行的查询也不会被读取行的事务所阻塞。
+      这使得Greenplum可以达到比使用锁来协调读写事务的传统数据库系统更高的并发度。</p>
+    <note>追加优化表使用一种不同于MVCC的并发控制模型管理。它们是为了“一次写，多次读”的应用而设计，这些应用从不或者很少会进行行级更新。</note>
     <section>
-      <title>Snapshots</title>
-      <p>The MVCC model depends on the system's ability to manage multiple versions of data rows. A
-        query operates on a snapshot of the database at the start of the query. A snapshot is the
-        set of rows that are visible at the beginning of a statement or transaction. The snapshot
-        ensures the query has a consistent and valid view of the database for the duration of its
-        execution. </p>
-      <p>Each transaction is assigned a unique <i>transaction ID</i> (XID), an incrementing 32-bit
-        value. When a new transaction starts, it is assigned the next XID. An SQL statement that is
-        not enclosed in a transaction is treated as a single-statement transaction—the
-          <codeph>BEGIN</codeph> and <codeph>COMMIT</codeph> are added implicitly. This is similar
-        to autocommit in some database systems. </p>
-      <note>Greenplum Database assigns XID values only to transactions that involve DDL or DML
-        operations, which are typically the only transactions that require an XID.</note>
-      <p>When a transaction inserts a row, the XID is saved with the row in the
-          <codeph>xmin</codeph> system column. When a transaction deletes a row, the XID is saved in
-        the <codeph>xmax</codeph> system column. Updating a row is treated as a delete and an
-        insert, so the XID is saved to the <codeph>xmax</codeph> of the current row and the
-          <codeph>xmin</codeph> of the newly inserted row. The <codeph>xmin</codeph> and
-          <codeph>xmax</codeph> columns, together with the transaction completion status, specify a
-        range of transactions for which the version of the row is visible. A transaction can see the
-        effects of all transactions less than <codeph>xmin</codeph>, which are guaranteed to be
-        committed, but it cannot see the effects of any transaction greater than or equal to
-          <codeph>xmax</codeph>. </p>
-      <p>Multi-statement transactions must also record which command within a transaction inserted a
-        row (<codeph>cmin</codeph>) or deleted a row (<codeph>cmax</codeph>) so that the transaction
-        can see changes made by previous commands in the transaction. The command sequence is only
-        relevant during the transaction, so the sequence is reset to 0 at the beginning of a
-        transaction. </p>
-      <p>XID is a property of the database. Each segment database has its own XID sequence that
-        cannot be compared to the XIDs of other segment databases. The master coordinates
-        distributed transactions with the segments using a cluster-wide <i>session ID number</i>,
-        called <codeph>gp_session_id</codeph>. The segments maintain a mapping of distributed
-        transaction IDs with their local XIDs. The master coordinates distributed transactions
-        across all of the segment with the two-phase commit protocol. If a transaction fails on any
-        one segment, it is rolled back on all segments. </p>
-      <p>You can see the <codeph>xmin</codeph>, <codeph>xmax</codeph>, <codeph>cmin</codeph>, and
-          <codeph>cmax</codeph> columns for any row with a <codeph>SELECT</codeph>
-        statement:<codeblock>SELECT xmin, xmax, cmin, cmax, * FROM <varname>tablename</varname>;</codeblock></p>
-      <p>Because you run the <codeph>SELECT</codeph> command on the master, the XIDs are the
-        distributed transactions IDs. If you could execute the command in an individual segment
-        database, the <codeph>xmin</codeph> and <codeph>xmax</codeph> values would be the segment's
-        local XIDs.</p>
-      <note>Greenplum Database distributes all of a replicated table's rows to every segment, so
-        each row is duplicated on every segment. Each segment instance maintains its own values for
-        the system columns <codeph>xmin</codeph>, <codeph>xmax</codeph>, <codeph>cmin</codeph>, and
-          <codeph>cmax</codeph>, as well as for the <codeph>gp_segment_id</codeph> and
-          <codeph>ctid</codeph>system columns. Greenplum Database does not permit user queries to
-        access these system columns for replicated tables because they have no single, unambiguous
-        value to evaluate in a query.</note>
+      <title>快照</title>
+      <p>MVCC模型依赖于系统能够管理数据行的多个版本的能力。一个查询其实是在该查询开始时的数据库快照上操作。
+        快照就是在一个语句或者事务开始时可见的行的集合。快照保证查询在其执行期间看到的是数据库的一个一致且合法的视图。</p>
+      <p>每一个事务都会被分配一个唯一的事务ID（XID），它是一个增量式的32位值。
+        当一个新事务开始时，它被分配下一个XID。没有被包裹在一个事务中的一个SQL语句会被当做一个单语句事务，即会给它隐式地加上BEGIN和COMMIT。
+        这和一些数据库系统中的自动提交概念类似。</p>
+      <note>Greenplum数据库只为涉及DDL或者DML操作的事务分配XID值，它们通常是唯一需要XID的事务。</note>
+      <p>当一个事务插入一行时，其XID会被保存在该行的 xmin系统列中。
+        当一个事务删除一行时，其XID会被保存在xmax系统列中。
+        更新一行被视为一次删除加上一次插入，因此XID会被保存在当前行的xmax中以及新插入行的xmin中。
+        xmin和 xmax列再加上事务完成状态就指定了一个事务的范围，行的这个版本对于其中的事务可见。
+        一个事务可以看到所有小于xmin的事务的效果，这些事务确保已经被提交，但它无法看到任何大于等于xmax的事务的效果。</p>
+      <p>多语句事务还必须记录一个事务中哪个命令插入了一行（cmin）或者删除了一行（cmax），这样事务能够看到事务中先前的命令所作的更改。
+        命令序列只在事务期间有意义，因此在一个事务开始时该序列被重置为0。</p>
+      <p>XID是数据库的一个性质。每一个Segment数据库都有其自己的XID序列，因此不能拿它和其他Segment数据库的XID进行比较。
+        Master会使用一个集群范围的会话ID号来与Segment协调分布式事务，会话ID号被称为gp_session_id。
+        Segment会会维护一个分布式事务ID到其本地XID的映射。
+        Master用两阶段提交协议在所有Segment之间协调分布式事务。
+        如果一个事务在任一一个Segment上失败，它将会在所有Segment上回滚。</p>
+      <p>用户可以用一个SELECT语句查看任意行的xmin、xmax、cmin和 cmax列：<codeblock>SELECT xmin, xmax, cmin, cmax, * FROM <varname>tablename</varname>;</codeblock></p>
+      <p>因为用户是在Master上运行该SELECT命令，看到的XID都是分布式事务ID。如果用户能在一个Segment数据库上执行该命令，xmin和xmax值将是该Segment的本地XID。</p>
+      <note>Greenplum数据库会将复制表的每行分发到所有节点上，所以每一行在所有节点上都是重复的。
+        每个segment节点维护自己的<codeph>xmin</codeph>，<codeph>xmax</codeph>，<codeph>cmin</codeph>和
+        <codeph>cmax</codeph>，和<codeph>gp_segment_id</codeph>与<codeph>ctid</codeph>系统列一样。
+        Greenplum数据库不允许用户访问复制表的这些列，因为他们在查询中没有单一、明确的值。
+        </note>
     </section>
     <section>
-      <title>Transaction ID Wraparound</title>
-      <p>The MVCC model uses transaction IDs (XIDs) to determine which rows are visible at the
-        beginning of a query or transaction. The XID is a 32-bit value, so a database could
-        theoretically execute over four billion transactions before the value overflows and wraps to
-        zero. However, Greenplum Database uses <i>modulo 2<sup>32</sup></i> arithmetic with XIDs,
-        which allows the transaction IDs to wrap around, much as a clock wraps at twelve o'clock.
-        For any given XID, there could be about two billion past XIDs and two billion future XIDs.
-        This works until a version of a row persists through about two billion transactions, when it
-        suddenly appears to be a new row. To prevent this, Greenplum has a special XID, called
-          <codeph>FrozenXID</codeph>, which is always considered older than any regular XID it is
-        compared with. The <codeph>xmin</codeph> of a row must be replaced with
-          <codeph>FrozenXID</codeph> within two billion transactions, and this is one of the
-        functions the <codeph>VACUUM</codeph> command performs. </p>
-      <p>Vacuuming the database at least every two billion transactions prevents XID wraparound.
-        Greenplum Database monitors the transaction ID and warns if a <codeph>VACUUM</codeph>
-        operation is required. </p>
-      <p>A warning is issued when a significant portion of the transaction IDs are no longer
-        available and before transaction ID wraparound
-        occurs:<codeblock>WARNING: database "<varname>database_name</varname>" must be vacuumed within <varname>number_of_transactions</varname> transactions</codeblock></p>
-      <p>When the warning is issued, a <codeph>VACUUM</codeph> operation is required. If a
-          <codeph>VACUUM</codeph> operation is not performed, Greenplum Database stops creating
-        transactions to avoid possible data loss when it reaches a limit prior to when transaction
-        ID wraparound occurs and issues this error:</p>
+      <title>事务ID</title>
+      <p>MVCC模型使用事务ID（XID）来判断哪些行在一个查询或者事务开始时是可见的。
+        XID是一个32位值，因此在该值溢出并且回卷到零之前，一个数据库理论上可以执行超过四十亿个事务。
+        不过，Greenplum数据库使用模 232的计算方式来使用XID，这允许事务ID回卷，就像时钟会在十二点回卷一样。
+        对于任何给定的XID，有大约二十亿个过去的XID和二十亿个未来的XID。
+        直到一行的一个版本存在大约二十亿个事务之前，这一套机制都有效，当这种情况发生时那个版本就会突然变成一个新行。
+        为了阻止这种情况的发生，Greenplum有一个被称为 FrozenXID的特殊XID，当把它和任何其他常规XID比较时它都是较老的哪一个。
+        如果行中的xmin位于那二十亿个事务之中，就必须被替换为FrozenXID，这也是VACUUM命令执行的功能之一。</p>
+      <p>至少在每二十亿个事务时清理数据库可以阻止XID回卷。Greenplum数据库会监控事务ID并且在需要一次VACUUM操作时做出告警。</p>
+      <p>当不再可用的事务ID达到可观的比例并且事务ID回卷还没发生时，将会发出一个警告：
+        <codeblock>WARNING: database "<varname>database_name</varname>" must be vacuumed within <varname>number_of_transactions</varname> transactions</codeblock></p>
+      <p>当该警告被发出时，就需要一次VACUUM操作。如果没有执行所需的VACUUM操作，当Greenplum数据库达到事务ID回卷发生之前的一个限制点时，它将会停止创建新事务来避免可能的数据丢失并且发出这样的错误：</p>
       <codeblock>FATAL: database is not accepting commands to avoid wraparound data loss in database "<varname>database_name</varname>"</codeblock>
-      <p>See <xref href="../managing/maintain.xml#topic3/np160654"/> for the procedure to recover
-        from this error.</p>
-      <p>The server configuration parameters <codeph>xid_warn_limit</codeph> and
-          <codeph>xid_stop_limit</codeph> control when the warning and error are displayed. The
-          <codeph>xid_warn_limit</codeph> parameter specifies the number of transaction IDs before
-        the <codeph>xid_stop_limit</codeph> when the warning is issued. The
-          <codeph>xid_stop_limit</codeph> parameter specifies the number of transaction IDs before
-        wraparound would occur when the error is issued and new transactions cannot be created.</p>
+      <p>关于从这种错误恢复的过程请见<xref href="../managing/maintain.xml#topic3/np160654"/>。</p>
+      <p>服务器配置参数xid_warn_limit和 xid_stop_limit控制何时显示这些警告和错误。
+        xid_warn_limit参数指定在xid_stop_limit之前多少个事务ID时发出警告。
+        xid_stop_limit参数指定在回卷发生之前多少个事务ID时发出错误并且不允许创建新的事务。</p>
     </section>
     <section id="section_f4m_n5n_fs">
-      <title>Transaction Isolation Modes</title>
-      <p>The SQL standard describes three phenomena that can occur when database transactions run
-          concurrently:<ul id="ul_up2_tq3_pt">
-          <li><i>Dirty read</i> – a transaction can read uncommitted data from another concurrent
-            transaction. </li>
-          <li><i>Non-repeatable read</i> – a row read twice in a transaction can change because
-            another concurrent transaction committed changes after the transaction began. </li>
-          <li><i>Phantom read</i> – a query executed twice in the same transaction can return two
-            different sets of rows because another concurrent transaction added rows.</li>
+      <title>事务隔离模式</title>
+      <p>SQL标准描述了数据库事务并发运行时可能发生的三种现象：<ul id="ul_up2_tq3_pt">
+          <li><i>脏读 </i> – 一个事务可能读到来自另一个并发事务的未提交数据。</li>
+          <li><i>不可重复读</i> – 在一个事务中两次读取同一行得到不同的结果，因为另一个并发事务在这个事务开始后提交了更改。</li>
+          <li><i>幻读</i> – 在同一个事务中两次执行同一个查询可能返回不同的行集合，因为另一个并发事务增加了行。</li>
         </ul></p>
-      <p>The SQL standard defines four transaction isolation levels that database systems can
-        support, with the phenomena that are allowed when transactions execute concurrently for each
-        level. </p>
+      <p>SQL标准定义了数据库系统需要支持的四种事务隔离模式，以及在事务并发执行时可以出现的现象。
+        </p>
       <table frame="all" id="table_gxb_qsz_nt">
-        <title>SQL Transaction Isolation Modes</title>
+        <title>SQL事务隔离模式</title>
         <tgroup cols="4">
           <colspec colname="c1" colnum="1" colwidth="1*"/>
           <colspec colname="c2" colnum="2" colwidth="1*"/>
@@ -130,140 +80,102 @@
           <colspec colname="c4" colnum="4" colwidth="1*"/>
           <thead>
             <row>
-              <entry>Level</entry>
-              <entry>Dirty Read</entry>
-              <entry>Non-Repeatable</entry>
-              <entry>Phantom Read</entry>
+              <entry>级别</entry>
+              <entry>脏读</entry>
+              <entry>不可重复读</entry>
+              <entry>幻读</entry>
             </row>
           </thead>
           <tbody>
             <row>
-              <entry>Read Uncommitted</entry>
-              <entry>Possible</entry>
-              <entry>Possible</entry>
-              <entry>Possible</entry>
+              <entry>未提交读</entry>
+              <entry>可能</entry>
+              <entry>可能</entry>
+              <entry>可能</entry>
             </row>
             <row>
-              <entry>Read Committed</entry>
-              <entry>Impossible</entry>
-              <entry>Possible</entry>
-              <entry>Possible</entry>
+              <entry>已提交读</entry>
+              <entry>不可能</entry>
+              <entry>可能</entry>
+              <entry>可能</entry>
             </row>
             <row>
-              <entry>Repeatable Read</entry>
-              <entry>Impossible</entry>
-              <entry>Impossible</entry>
-              <entry>Possible</entry>
+              <entry>可重复读</entry>
+              <entry>不可能</entry>
+              <entry>不可能</entry>
+              <entry>可能</entry>
             </row>
             <row>
-              <entry>Serializable</entry>
-              <entry>Impossible</entry>
-              <entry>Impossible</entry>
-              <entry>Impossible</entry>
+              <entry>可串行化</entry>
+              <entry>不可能</entry>
+              <entry>不可能</entry>
+              <entry>不可能</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
-      <p>Greenplum Database <codeph>READ UNCOMMITTED</codeph> and <codeph>READ COMMITTED</codeph>
-        isolation modes behave like the SQL standard <codeph>READ COMMITTED</codeph> mode. Greenplum
-        Database <codeph>SERIALIZABLE</codeph> and <codeph>REPEATABLE READ</codeph> isolation modes
-        behave like the SQL standard <codeph>READ COMMITTED</codeph> mode, except that Greenplum
-        Database also prevents phantom reads.</p>
-      <p>The difference between <codeph>READ COMMITTED</codeph> and <codeph>REPEATABLE READ</codeph>
-        is that with <codeph>READ COMMITTED</codeph>, each statement in a transaction sees only rows
-        committed before the <i>statement</i> started, while in <codeph>READ COMMITTED</codeph>
-        mode, statements in a transaction see only rows committed before the <i>transaction</i>
-        started.</p>
-      <p>With <codeph>READ COMMITTED</codeph> isolation mode the values in a row retrieved twice in
-        a transaction can differ if another concurrent transaction has committed changes since the
-        transaction began. <codeph>READ COMMITTED</codeph> mode also permits <i>phantom reads</i>,
-        where a query executed twice in the same transaction can return two different sets of
-        rows.</p>
-      <p>The <codeph>REPEATABLE READ</codeph> isolation mode prevents non-repeatable reads and
-        phantom reads, although the latter is not required by the standard. A transaction that
-        attempts to modify data modified by another concurrent transaction is rolled back.
-        Applications that execute transactions in <codeph>REPEATABLE READ</codeph> mode must be
-        prepared to handle transactions that fail due to serialization errors. If <codeph>REPEATABLE
-          READ</codeph> isolation mode is not required by the application, it is better to use
-          <codeph>READ COMMITTED</codeph> mode. </p>
-      <p><codeph>SERIALIZABLE</codeph> mode, which Greenplum Database does not fully support,
-        guarantees that a set of transactions executed concurrently produces the same result as if
-        the transactions executed sequentially one after the other. If <codeph>SERIALIZABLE</codeph>
-        is specified, Greenplum Database falls back to <codeph>REPEATABLE READ</codeph>. The MVCC
-        Snapshot Isolation (SI) model prevents dirty reads, non-repeatable reads, and phantom reads
-        without expensive locking, but there are other interactions that can occur between some
-          <codeph>SERIALIZABLE</codeph> transactions in Greenplum Database that prevent them from
-        being truly serializable. These anomalies can often be attributed to the fact that Greenplum
-        Database does not perform <i>predicate locking</i>, which means that a write in one
-        transaction can affect the result of a previous read in another concurrent transaction.</p>
-      <note>The PostgreSQL 9.1 <codeph>SERIALIZABLE</codeph> isolation level introduces a new
-        Serializable Snapshot Isolation (SSI) model, which is fully compliant with the SQL standard
-        definition of serializable transactions. This model is not available in Greenplum Database.
-        SSI monitors concurrent transactions for conditions that could cause serialization
-        anomalies. When potential serialization problems are found, one transaction is allowed to
-        commit and others are rolled back and must be retried. </note>
-      <p>Greenplum Database transactions that run concurrently should be examined to identify
-        interactions that may update the same data concurrently.
-        Problems identified can be prevented by using explicit table locks or by requiring the
-        conflicting transactions to update a dummy row introduced to represent the conflict. </p>
-      <p>The SQL <codeph>SET TRANSACTION ISOLATION LEVEL</codeph> statement sets the isolation mode
-        for the current transaction. The mode must be set before any <codeph>SELECT</codeph>,
+      <p>Greenplum数据库中未提交读和已提交读行为与SQL标准的已提交读一致。
+        Greenplum数据库中可串行化与可重复读隔离级别除了避免了幻读外，行为与SQL标准的已提交读一样。</p>
+      <p>已提交读和可重复读的区别是：在已提交读模式下，每个语句可以看到该语句执行前已提交的行；
+        在可重复读模式下，语句只能看到该事务启动前提交的行。</p>
+      <p>在已提交读模式下，如果另一个并发执行的事务修改了行的值并提交，该行的值读两遍结果可能不同。
+        已提交读允许幻读，一个查询执行两次拿到的结果集可能不同。</p>
+      <p>可重复读模式避免了非可重复读和幻读，虽然后者并不是标准中所必须的。
+        一个尝试着修改其他并发事务修改过的数据的事务将被回滚。
+        在可重复读隔离级别下执行事务的应用必须做好处理因为可串行化错误失败的事务。
+        如果可重复读对于应用并不是必须的，建议使用已提交读模式。</p>
+      <p>可串行化模式，Greenplum数据库并不完全支持，可以保证一组事务在并行执行时得到的结果与串行执行的结果相同。
+        在Greenplum数据库里指定可串行化的方式会退化到可重复读模式。
+        MVCC 快照隔离(SI)模式在没有昂贵的锁开销的前提下避免了脏读、不可重复读和幻读，
+        但是仍然会存在在Greenplum数据库可串行化模式下的事务，无法做到真正的串行化。
+        这些异常通常归咎于Greenplum数据库没有执行谓词锁定，即一个事务里的写会影响另一个并行事务里之前读的结果。</p>
+      <note>PostgreSQL 9.1 可串行化隔离级别引入了一种新的可串行化快照隔离(SSI)模式，可以与SQL标准定义的可串行化隔离级别完全兼容。
+        这个模式在Greenplum数据库中不可用。
+        SSI监视可能导致序列化异常的条件的并发事务。
+        当发现了潜在的串行化错误，一个事务被提交，其余的被回滚，并且必须重试。</note>
+      <p>Greenplum数据库并行运行的事务需要检查并识别可能并行更新相同数据的交互。
+        通过使用显式表锁或要求冲突事务更新以表示冲突的虚拟行，可以防止发现的问题。</p>
+      <p>SQL语句<codeph>SET TRANSACTION ISOLATION LEVEL</codeph>可以设置当前事务的隔离级别。
+        必须要在执行
+        <codeph>SELECT</codeph>,
           <codeph>INSERT</codeph>, <codeph>DELETE</codeph>, <codeph>UPDATE</codeph>, or
           <codeph>COPY</codeph>
-        statements:<codeblock>BEGIN;
+        语句前设置:<codeblock>BEGIN;
 SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 ...
 COMMIT;
 </codeblock></p>
-      <p>The isolation mode can also be specified as part of the <codeph>BEGIN</codeph>
-        statement:<codeblock>BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;</codeblock></p>
-      <p>The default transaction isolation mode can be changed for a session by setting the
-          <varname>default_transaction_isolation</varname> configuration property.</p>
+      <p>隔离模式也可以在BEGIN语句里指定：
+        <codeblock>BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;</codeblock></p>
+      <p>可以通过设置<varname>default_transaction_isolation</varname>配置项来改变会话的默认隔离级别。</p>
     </section>
     <section>
-      <title>Removing Dead Rows from Tables</title>
-      <p>Updating or deleting a row leaves an expired version of the row in the table. When an
-        expired row is no longer referenced by any active transactions, it can be removed and the
-        space it occupied can be reused. The <codeph>VACUUM</codeph> command marks the space
-        used by expired rows for reuse.</p>
-      <p>When expired rows accumulate in a table, the disk files must be extended to accommodate new
-        rows. Performance suffers due to the increased disk I/O required to execute queries. This
-        condition is called <i>bloat</i> and it should be managed by regularly vacuuming tables. </p>
-      <p>The <codeph>VACUUM</codeph> command (without <codeph>FULL</codeph>) can run concurrently
-        with other queries. It marks the space previously used by the expired rows as free,
-        and updates the free space map. 
-        When Greenplum Database later needs space for new rows, it first consults the table's
-        free space map to find pages with available space. If none are found, new pages will be
-        appended to the file. </p>
-      <p><codeph>VACUUM</codeph> (without <codeph>FULL</codeph>) does not consolidate pages or
-        reduce the size of the table on disk. The space it recovers is only available through the
-        free space map. To prevent disk files from growing, it is important to run
-          <codeph>VACUUM</codeph> often enough. The frequency of required <codeph>VACUUM</codeph>
-        runs depends on the frequency of updates and deletes in the table (inserts only ever add
-        new rows). Heavily updated tables might require several <codeph>VACUUM</codeph> runs per
-        day, to ensure that the available free space can be found through the free space map. It
-        is also important to run <codeph>VACUUM</codeph> after running a transaction that updates
-        or deletes a large number of rows. </p>
-      <p>The <codeph>VACUUM FULL</codeph> command rewrites the table without expired rows, reducing
-        the table to its minimum size. Every page in the table is checked, and visible rows are
-        moved up into pages which are not yet fully packed. Empty pages are discarded. The table
-        is locked until <codeph>VACUUM FULL</codeph> completes. This is very expensive
-        compared to the regular <codeph>VACUUM</codeph> command, and can be avoided or postponed by
-        vacuuming regularly. It is best to run <codeph>VACUUM FULL</codeph> during a maintenance
-        period. An alternative to <codeph>VACUUM FULL</codeph> is to recreate the table with a
-          <codeph>CREATE TABLE AS</codeph> statement and then drop the old table. </p>
-      <p>You can run <codeph>VACUUM VERBOSE <varname>tablename</varname></codeph> to get a report,
-        by segment, of the number of dead rows removed, the number of pages affected, and the number
-        of pages with usable free space. </p>
-      <p>Query the <codeph>pg_class</codeph> system table to find out how many pages a table is
-        using across all segments. Be sure to <codeph>ANALYZE</codeph> the table first to get
-        accurate data.
+      <title>从表中移除过期的行</title>
+      <p>更新或者删除一行会在表中留下该行的一个过期版本。
+        当一个过期的行不在被任何活跃事务引用时，它可以被移除从而腾出其所占用的空间进行重用。
+        VACUUM命令会标记过期行所使用的空间可以被重用。</p>
+      <p>当表中的过期行累积后，为了容纳新的行就必须扩展磁盘文件。
+        这样执行查询所需的磁盘I/O就会增加，从而性能受到影响。
+        这种情况被称为膨胀，并且应该通过定期清理表来解决。</p>
+      <p>VACUUM命令（不带FULL）可以与其他查询并行运行。
+        它会标记之前被过期行所占用的空间为空闲可用。如果剩余的空闲空间数量可观，它会把该页面加到该表的空闲空间映射中。
+        当Greenplum数据库之后需要空间分配给新行时，它首先会参考该表的空闲空间映射以寻找有可用空间的页面。
+        如果没有找到这样的页面，它会为该文件追加新的页面。</p>
+      <p>VACUUM（不带FULL）不会合并页面或者减小表在磁盘上的尺寸。
+        它回收的空间只是放在空闲空间映射中表示可用。为了阻止磁盘文件大小增长，重要的是足够频繁地运行VACUUM。
+        运行VACUUM的频率取决于表中更新和删除（插入只会增加新行）的频率。
+        重度更新的表可能每天需要运行几次VACUUM来确保通过空闲空间映射能找到可用的空闲空间。
+        在运行了一个更新或者删除大量行的事务之后运行VACUUM也非常重要。</p>
+      <p>VACUUM FULL命令会把表重写为没有过期行，并且将表减小到其最小尺寸。
+        表中的每一页都会被检查，其中的可见行被移动到前面还没有完全填满的页面中。
+        空页面会被丢弃。该表会被一直锁住直到VACUUM FULL完成。
+        相对于常规的VACUUM命令来说，它是一种非常昂贵的操作，可以用定期的清理来避免或者推迟这种操作。
+        最好是在一个维护期来运行VACUUM FULL。VACUUM FULL的一种替代方案是用一个CREATE TABLE AS语句重新创建该表并且删除掉旧表。</p>
+      <p>用户可以运行VACUUM VERBOSE tablename来得到一份Segment上已移除的死亡行数量、受影响页面数以及有可用空闲空间页面数的报告。</p>
+      <p>查询pg_class系统表可以找出一个表在所有Segment上使用了多少页面。注意首先对该表执行ANALYZE确保得到的是准确的数据。
         <codeblock>SELECT relname, relpages, reltuples FROM pg_class WHERE relname='<varname>tablename</varname>';</codeblock></p>
-      <p>Another useful tool is the <codeph>gp_bloat_diag</codeph> view in the
-          <codeph>gp_toolkit</codeph> schema, which identifies bloat in tables by comparing the
-        actual number of pages used by a table to the expected number. See "The gp_toolkit
-        Administrative Schema" in the <i>Greenplum Database Reference Guide</i> for more about
-          <codeph>gp_bloat_diag</codeph>. </p>
+      <p>另一个有用的工具是gp_toolkit方案中的gp_bloat_diag视图，它通过比较一个表使用的实际页数和预期的页数来确定表膨胀。
+        更多有关gp_bloat_diag的内容请见Greenplum数据库参考指南中的“gp_toolkit管理方案”。</p>
     </section>
   </body>
 </topic>
