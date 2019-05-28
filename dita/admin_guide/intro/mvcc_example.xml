@@ -2,72 +2,52 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="mvcc-overview">
-   <title>Example of Managing Transaction IDs</title>
+   <title>管理事务ID的例子</title>
    <body>
-      <p>For Greenplum Database, the transaction ID (XID) value an incrementing 32-bit
-            (2<sup>32</sup>) value. The maximum unsigned 32-bit value is 4,294,967,295, or about
-         four billion. The XID values restart at 3 after the maximum is reached. Greenplum Database
-         handles the limit of XID values with two features:<ul id="ul_nlb_ks5_vv">
-            <li>Calculations on XID values using modulo-2<sup>32</sup> arithmetic that allow
-               Greenplum Database to reuse XID values. The modulo calculations determine the order
-               of transactions, whether one transaction has occurred before or after another, based
-               on the XID. <p>Every XID value can have up to two billion (2<sup>31</sup>) XID values
-                  that are considered previous transactions and two billion (2<sup>31</sup> -1 ) XID
-                  values that are considered newer transactions. The XID values can be considered a
-                  circular set of values with no endpoint similar to a 24 hour clock.</p><p>Using
-                  the Greenplum Database modulo calculations, as long as two XIDs are within
-                     2<sup>31</sup> transactions of each other, comparing them yields the correct
-                  result.</p></li>
-            <li>A frozen XID value that Greenplum Database uses as the XID for current (visible)
-               data rows. Setting a row's XID to the frozen XID performs two functions. <ul
+      <p>对于Greenplum数据库来说，事务ID（XID）值是一个自增的32位（2<sup>32</sup>）值。
+         最大的无符号32位置是4,294,967,295，或者说大约40亿。
+         当达到最大值后，XID值会重新从0开始。
+         Greenplum数据库以两种特性来处理XID值的限制：<ul id="ul_nlb_ks5_vv">
+            <li>使用模2<sup>32</sup>的算法来计算XID值，这允许Greenplum数据库重用XID值。
+               取模计算基于XID决定事务的顺序，即一个事务是在另一个之前还是之后发生。
+               <p>每一个XID值可以有最多二十亿（2<sup>31</sup>）个XID值表示在它之前的事务，还有二十亿（2<sup>31</sup> -1 ）个XID值表示在它之后更新的事务。
+                  XID值可以被认为是一组循环没有终点的值，就像24小时的时钟一样。</p>
+               <p>使用Greenplum数据库的取模计算，只要两个XID都在彼此的2<sup>31</sup>个事务范围之内，比较它们能够得到正确的结果。</p>
+            </li>
+            <li>Greenplum数据库用一个冻结XID值作为当前（可见）数据行的XID。设置一行的XID为冻结XID完成了两个功能。<ul
                   id="ul_osq_cgj_wv">
-                  <li>When Greenplum Database compares XIDs using the modulo calculations, the
-                     frozen XID is always smaller, earlier, when compared to any other XID. If a
-                     row's XID is not set to the frozen XID and 2<sup>31</sup> new transactions are
-                     executed, the row appears to be executed in the future based on the modulo
-                     calculation. </li>
-                  <li>When the row's XID is set to the frozen XID, the original XID can be used,
-                     without duplicating the XID. This keeps the number of data rows on disk with
-                     assigned XIDs below (2<sup>32</sup>).</li>
+                  <li>当Greenplum数据库使用取模计算比较XID时，比起任何其他XID来，冻结XID总是较小的一个、较早的一个。
+                     如果一行的XID没有被设置为冻结XID并且执行了2<sup>31</sup>个新的事务，从取模计算的角度来看，该行就像是一个在未来出现的行。</li>
+                  <li>当该行的XID被设置为冻结XID时，原来的XID可以被使用而不会出现重复的XID。
+                     这将会保持磁盘上分配了XID的数据行数低于（2<sup>32</sup>）。</li>
                </ul></li>
          </ul></p>
-      <note>Greenplum Database assigns XID values only to transactions that involve DDL or DML
-         operations, which are typically the only transactions that require an XID.</note>
+      <note>Greenplum数据库只给涉及DDL或者DML操作的事务分配XID值，它们通常是唯一需要XID的事务。</note>
    </body>
    <topic id="topic_zsw_yck_wv">
-      <title>Simple MVCC Example</title>
+      <title>简单的MVCC例子</title>
       <body>
-         <p>This is a simple example of the concepts of a MVCC database and how it manages data and
-            transactions with transaction IDs. This simple MVCC database example consists of a
-            single table:<ul id="ul_btw_yck_wv">
-               <li>The table is a simple table with 2 columns and 4 rows of data.</li>
-               <li>The valid transaction ID (XID) values are from 0 up to 9, after 9 the XID
-                  restarts at 0.</li>
-               <li>The frozen XID is -2. This is different than the Greenplum Database frozen
-                  XID.</li>
-               <li>Transactions are performed on a single row. </li>
-               <li>Only insert and update operations are performed.</li>
-               <li>All updated rows remain on disk, no operations are performed to remove obsolete
-                  rows.</li>
+         <p>这是一个简单例子，它展示了MVCC数据库中的概念以及如何用事务ID管理数据和事务。这个简单的MVCC数据库例子有一个单一表构成：<ul id="ul_btw_yck_wv">
+               <li>该表是一个具有2列4行数据的简单表。</li>
+               <li>合法的事务ID（XID）值从0到9，在9之后XID会重新从0开始。</li>
+               <li>冻结XID是-2。这和Greenplum数据库的冻结XID不同。</li>
+               <li>事务都在单一行上执行。</li>
+               <li>只允许插入和更新操作执行。</li>
+               <li>所有被更新的行都保留在磁盘上，不允许移除废弃的操作。</li>
             </ul></p>
-         <p>The example only updates the amount values. No other changes to the table. </p>
-         <p>The example shows these concepts.<ul id="ul_tt1_tj1_cw">
-               <li><xref href="#topic_zsw_yck_wv/transactions" format="dita">How transaction IDs are
-                     used to manage multiple, simultaneous transactions on a table.</xref></li>
-               <li><xref href="#topic_zsw_yck_wv/managin_xid" format="dita">How transaction IDs are
-                     managed with the frozen XID</xref></li>
-               <li><xref href="#topic_zsw_yck_wv/table_itw_yck_wv" format="dita">How the modulo
-                     calculation determines the order of transactions based on transaction
-                     IDs</xref></li>
+         <p>该例子只更新amount值。不对表做其他更改。</p>
+         <p>这个例子展示了这些概念。<ul id="ul_tt1_tj1_cw">
+               <li><xref href="#topic_zsw_yck_wv/transactions" format="dita">如何用事务ID来管理一个表上的多个同时发生的事务。</xref></li>
+               <li><xref href="#topic_zsw_yck_wv/managin_xid" format="dita">如何用冻结XID来管理事务ID</xref></li>
+               <li><xref href="#topic_zsw_yck_wv/table_itw_yck_wv" format="dita">取模计算怎样基于事务ID决定事务的顺序</xref></li>
             </ul></p>
          <section id="transactions">
-            <title>Managing Simultaneous Transactions</title>
-            <p>This table is the initial table data on disk with no updates. The table contains two
-               database columns for transaction IDs, <codeph>xmin</codeph> (transaction that created
-               the row) and <codeph>xmax</codeph> (transaction that updated the row). In the table,
-               changes are added, in order, to the bottom of the table.</p>
+            <title>管理同时发生的事务</title>
+            <p>这个表是磁盘上没有更新过的初始表数据。
+               该表包含两个用于事务ID的数据库列xmin（创建该行的事务）和xmax（更新该行的事务）。
+               在这个表中，更改会按照顺序增加到表的底端。</p>
             <table frame="all" rowsep="1" colsep="1" id="table_ctw_yck_wv">
-               <title>Example Table</title>
+               <title>示例表</title>
                <tgroup cols="4">
                   <colspec colname="c1" colnum="1" colwidth="1.0*"/>
                   <colspec colname="c2" colnum="2" colwidth="1.0*"/>
@@ -109,8 +89,7 @@
                   </tbody>
                </tgroup>
             </table>
-            <p>The next table shows the table data on disk after some updates on the amount values
-               have been performed.<sl>
+            <p>下一个表展示了执行了对amount值的一些更新后的表数据。<sl>
                   <sli>xid = 4: <codeph>update tbl set amount=208 where item =
                      'widget'</codeph></sli>
                   <sli>xid = 5: <codeph>update tbl set amount=133 where item =
@@ -118,13 +97,11 @@
                   <sli>xid = 6: <codeph>update tbl set amount=16 where item =
                      'widget'</codeph></sli>
                </sl></p>
-            <p>In the next table, the bold items are the current rows for the table. The other rows
-               are obsolete rows, table data that on disk but is no longer current. Using the xmax
-               value, you can determine the current rows of the table by selecting the rows with
-                  <codeph>null</codeph> value. Greenplum Database uses a slightly different method
-               to determine current table rows.</p>
+            <p>在下一个表中，粗体项是该表的当前行。其他行是废弃行，即磁盘上不是当前数据的表数据。
+               使用xmax值，用户可以通过选择其值为null值的行来判断哪些是当前行。
+               Greenplum数据库使用了一种有点不同的方法来决定当前的表行。</p>
             <table frame="all" rowsep="1" colsep="1" id="table_dtw_yck_wv">
-               <title>Example Table with Updates</title>
+               <title>带更新的示例表</title>
                <tgroup cols="4">
                   <colspec colname="c1" colnum="1" colwidth="1.0*"/>
                   <colspec colname="c2" colnum="2" colwidth="1.0*"/>
@@ -184,56 +161,39 @@
                   </tbody>
                </tgroup>
             </table>
-            <p>The simple MVCC database works with XID values to determine the state of the table.
-               For example, both these independent transactions execute concurrently.<ul
+            <p>这个简单的MVCC数据库用XID值来判断该表的状态。例如，所有这些独立的事务并发执行。<ul
                   id="ul_etw_yck_wv">
-                  <li><codeph>UPDATE</codeph> command changes the sprocket amount value to
-                        <codeph>133</codeph> (xmin value <codeph>5</codeph>)</li>
-                  <li><codeph>SELECT</codeph> command returns the value of sprocket.</li>
+                  <li>更改sprocket的amount值为133的UPDATE命令（xmin值5）</li>
+                  <li>返回sprocket的值的SELECT命令。</li>
                </ul></p>
-            <p>During the <codeph>UPDATE</codeph> transaction, the database returns the value of
-               sprocket <codeph>300</codeph>, until the <codeph>UPDATE</codeph> transaction
-               completes. </p>
+            <p>在UPDATE事务期间，数据库会返回sprocket的值是300，直到UPDATE事务完成。</p>
          </section>
          <section id="managin_xid">
-            <title>Managing XIDs and the Frozen XID</title>
-            <p>For this simple example, the database is close to running out of available XID
-               values. When Greenplum Database is close to running out of available XID values,
-               Greenplum Database takes these actions.<ul id="ul_ftw_yck_wv">
-                  <li>Greenplum Database issues a warning stating that the database is running out
-                     of XID
-                     values.<codeblock>WARNING: database "<varname>database_name</varname>" must be vacuumed within <varname>number_of_transactions</varname> transactions</codeblock></li>
-                  <li>Before the last XID is assigned, Greenplum Database stops accepting
-                     transactions to prevent assigning an XID value twice and issues this
-                     message.<codeblock>FATAL: database is not accepting commands to avoid wraparound data loss in database "<varname>database_name</varname>" </codeblock></li>
+            <title>管理XID和冻结XID</title>
+            <p>对于这个简单的例子，该数据库接近于耗尽可用的XID值。
+               当Greenplum数据库接近于耗尽可用XID值时，Greenplum数据库会采取这些行动。<ul id="ul_ftw_yck_wv">
+                  <li>Greenplum数据库发出一个警告提示数据库快要耗尽XID值。
+                     <codeblock>WARNING: database "<varname>database_name</varname>" must be vacuumed within <varname>number_of_transactions</varname> transactions</codeblock></li>
+                  <li>在最后一个XID被分配前，Greenplum停止接受事务以防止把一个XID分配两次，并且发出下面的消息。
+                     <codeblock>FATAL: database is not accepting commands to avoid wraparound data loss in database "<varname>database_name</varname>" </codeblock></li>
                </ul></p>
-            <p>To manage transaction IDs and table data that is stored on disk, Greenplum Database
-               provides the <codeph>VACUUM</codeph> command. <ul id="ul_fdf_k5q_wv">
-                  <li> A <codeph>VACUUM</codeph> operation frees up XID values so that a table can
-                     have more than 10 rows by changing the xmin values to the frozen XID.</li>
-                  <li> A <codeph>VACUUM</codeph> operation manages obsolete or deleted table rows on
-                     disk. This database's <codeph>VACUUM</codeph> command changes the XID values
-                        <codeph>obsolete</codeph> to indicate obsolete rows. A Greenplum Database
-                        <codeph>VACUUM</codeph> operation, without the <codeph>FULL</codeph> option,
-                     deletes the data opportunistically to remove rows on disk with minimal impact
-                     to performance and data availability.</li>
+            <p>为了管理事务ID以及存储在磁盘上的表数据，Greenplum数据库提供了VACUUM命令。<ul id="ul_fdf_k5q_wv">
+                  <li>一次VACUUM操作会空出XID值，这样一个表可能有超过10行被修改xmin值为冻结XID。</li>
+                  <li>一次VACUUM操作会处理磁盘上废弃的或者被删除的表行。
+                     这个数据库的VACUUM命令将XID值改为obsolete以表示废弃行。
+                     一次Greenplum数据库的VACUUM操作（不带FULL选项），会适时地以对性能和数据可用性最小的影响移除磁盘上的行。</li>
                </ul></p>
-            <p>For the example table, a <codeph>VACUUM</codeph> operation has been performed on the
-               table. The command updated table data on disk. This version of the
-                  <codeph>VACUUM</codeph> command performs slightly differently than the Greenplum
-               Database command, but the concepts are the same.<ul id="ul_gtw_yck_wv">
-                  <li>For the widget and sprocket rows on disk that are no longer current, the rows
-                     have been marked as <codeph>obsolete</codeph>. </li>
-                  <li>For the giblet and gizmo rows that are current, the xmin has been changed to
-                     the frozen XID.<p>The values are still current table values (the row's xmax
-                        value is <codeph>null</codeph>). However, the table row is visible to all
-                        transactions because the xmin value is frozen XID value that is older than
-                        all other XID values when modulo calculations are performed. </p></li>
+            <p>对于该示例表，一次VACUUM操作已经在该表上执行。
+               该命令更新了磁盘上的表数据。
+               这个版本的VACUUM命令与Greenplum数据库的命令有点不同，但是概念是相同的。<ul id="ul_gtw_yck_wv">
+                  <li>对于磁盘上不再是当前行的widget和sprocket行，这些行会被标记为obsolete。</li>
+                  <li>对于当前版本的giblet和gizmo行，其xmin已经被改为冻结XID。
+                     <p>其值仍然是当前的表值（该行的xmax值为null）。
+                        不过，该表行对于所有事务是可见的，因为在执行取模计算时，其xmin值为比所有其他XID值更老的冻结XID。</p></li>
                </ul></p>
-            <p>After the <codeph>VACUUM</codeph> operation, the XID values <codeph>0</codeph>,
-                  <codeph>1</codeph>, <codeph>2</codeph>, and <codeph>3</codeph> available for use. </p>
+            <p>在VACUUM操作之后，XID值0、 1、2和3可以被使用。</p>
             <table frame="all" rowsep="1" colsep="1" id="table_htw_yck_wv">
-               <title>Example Table after VACUUM</title>
+               <title>VACUUM后的示例表</title>
                <tgroup cols="4">
                   <colspec colname="c1" colnum="1" colwidth="1.0*"/>
                   <colspec colname="c2" colnum="2" colwidth="1.0*"/>
@@ -293,20 +253,14 @@
                   </tbody>
                </tgroup>
             </table>
-            <p>When a row disk with the xmin value of <codeph>-2</codeph> is updated, the xmax value
-               is replaced with the transaction XID as usual, and the row on disk is considered
-               obsolete after any concurrent transactions that access the row have completed.</p>
-            <p>Obsolete rows can be deleted from disk. For Greenplum Database, the
-                  <codeph>VACUUM</codeph> command, with <codeph>FULL</codeph> option, does more
-               extensive processing to reclaim disk space.</p>
+            <p>当一个具有xmin值为-2的行被更新后，其xmax值照例被替换为该事务的XID，在任何访问该行的并发事务结束之后这个位于磁盘上的行会被认为是被废弃。</p>
+            <p>废弃的行可以被从磁盘删除。对于Greenplum数据库，带有FULL选项的 VACUUM命令会做更深入的处理来回收磁盘空间。</p>
          </section>
          <section id="modulo_calc">
-            <title>Example of XID Modulo Calculations</title>
-            <p>The next table shows the table data on disk after more <codeph>UPDATE</codeph>
-               transactions. The XID values have rolled over and start over at <codeph>0</codeph>.
-               No additional <codeph>VACUUM</codeph> operations have been performed.</p>
+            <title>XID取模计算实例</title>
+            <p>下一个表展示了在经过了更多UPDATE事务后磁盘上的表数据。XID值已经回卷并且重新从0开始。此时并没有执行额外的VACUUM操作。</p>
             <table frame="all" rowsep="1" colsep="1" id="table_itw_yck_wv">
-               <title>Example Table with Wrapping XID</title>
+               <title>带有回卷XID的示例表</title>
                <tgroup cols="4">
                   <colspec colname="c1" colnum="1" colwidth="1.0*"/>
                   <colspec colname="c2" colnum="2" colwidth="1.0*"/>
@@ -396,15 +350,9 @@
                   </tbody>
                </tgroup>
             </table>
-            <p>When performing the modulo calculations that compare XIDs, Greenplum Database,
-               considers the XIDs of the rows and the current range of available XIDs to determine
-               if XID wrapping has occurred between row XIDs.</p>
-            <p>For the example table XID wrapping has occurred. The XID <codeph>1</codeph> for
-               giblet row is a later transaction than the XID <codeph>7</codeph> for widget row
-               based on the modulo calculations for XID values even though the XID value
-                  <codeph>7</codeph> is larger than <codeph>1</codeph>. </p>
-            <p>For the widget and sprocket rows, XID wrapping has not occurred and XID
-                  <codeph>7</codeph> is a later transaction than XID <codeph>5</codeph>.</p>
+            <p>在执行比较XID的取模计算时，Greenplum数据库会考虑行的XID和当前可用的XID范围来判断行的XID是否已经发生了XID回卷。</p>
+            <p>对于示例表来说XID回卷已经发生。按照XID的取模计算，giblet行的XID 1是一个比widget行的XID 7更晚出现的事务，虽然XID值7大于1。</p>
+            <p>对于widget和sprocket行，XID回卷并没有发生并且XID 7是一个比XID 5更晚出现的事务。</p>
          </section>
       </body>
    </topic>
