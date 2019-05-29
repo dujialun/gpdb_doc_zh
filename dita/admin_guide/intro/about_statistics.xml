@@ -2,10 +2,10 @@
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_gwc_jkd_3s">
   <title>关于Greenplum数据库中的数据库统计信息</title>
-  <shortdesc>Greenplum数据库中通过<xref
-          href="../../ref_guide/sql_commands/ANALYZE.xml#topic1">ANALYZE</xref>命令收集的统计信息的概述。
-    </shortdesc>
   <body>
+  <p>Greenplum数据库中通过<xref
+          href="../../ref_guide/sql_commands/ANALYZE.xml#topic1">ANALYZE</xref>命令收集的统计信息的概述。
+    </p>
     <p>统计信息是描述数据库中数据的元数据。
       查询优化器需要最新的统计信息以便为查询选择最好的执行计划。
       例如，如果一个查询连接两个表并且其中的一个必须被广播到所有的Segment，优化器可以选择两个表中较小的那一个来最小化网络流量。</p>
