@@ -16,10 +16,20 @@
 可以参考目前Greenplum4和5的文档翻译，[https://greenplum.cn/docs/](https://greenplum.cn/docs/)。
 
 ## 翻译进展
-- Administrator Guide 进行中
-	- [http://47.92.231.67:8080/6-0/admin_guide/](http://47.92.231.67:8080/6-0/admin_guide/)
-- Security Configuration Guide 未开始
-- Best Practices Guide 未开始
-- Utility Guide 未开始
-- Reference Guide 未开始
-- Platform Extension Framework (PXF) 未开始
+- Administrator Guide 进行中（参与者：杜佳伦）
+    - Demo: [http://47.92.231.67:8080/6-0/admin_guide/](http://47.92.231.67:8080/6-0/admin_guide/)
+	- Greenplum数据库概念 （完成：杜佳伦）
+	- Managing a Greenplum System （待认领）
+	- Managing Greenplum Database Access （待认领）
+	- Defining Database Objects （待认领）
+	- Distribution and Skew （待认领）
+	- Inserting, Updating, and Deleting Data （待认领）
+	- Querying Data （待认领）
+	- 使用外部数据 （完成：杜佳伦）
+	- Loading and Unloading Data （待认领）
+	- Managing Performance （待认领）
+- Security Configuration Guide （待认领）
+- Best Practices Guide （待认领）
+- Utility Guide （待认领）
+- Reference Guide （待认领）
+- Platform Extension Framework (PXF) （待认领）
