@@ -21,7 +21,7 @@
 	- Greenplum数据库概念 （完成：杜佳伦）
 	- Managing a Greenplum System （翻译中：苑泽福）
 	- Managing Greenplum Database Access （翻译中：亓晓帅）
-	- Defining Database Objects （待认领）
+	- Defining Database Objects （翻译中：杜佳伦）
 	- Distribution and Skew （待认领）
 	- Inserting, Updating, and Deleting Data （待认领）
 	- Querying Data （待认领）
