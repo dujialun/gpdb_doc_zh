@@ -16,7 +16,7 @@
 可以参考目前Greenplum4和5的文档翻译，[https://greenplum.cn/docs/](https://greenplum.cn/docs/)。
 
 ## 翻译进展
-- Administrator Guide 进行中（参与者：杜佳伦，苑泽福，亓晓帅）
+- Administrator Guide 进行中（参与者：杜佳伦，苑泽福，亓晓帅，钱晨）
     - Demo: [http://47.92.231.67:8080/6-0/admin_guide/](http://47.92.231.67:8080/6-0/admin_guide/)
 	- Greenplum数据库概念 （完成：杜佳伦）
 	- Managing a Greenplum System （翻译中：苑泽福）
@@ -27,7 +27,7 @@
 	- Querying Data （待认领）
 	- 使用外部数据 （完成：杜佳伦）
 	- Loading and Unloading Data （待认领）
-	- Managing Performance （待认领）
+	- Managing Performance （翻译中：钱晨）
 - Security Configuration Guide （待认领）
 - Best Practices Guide （待认领）
 - Utility Guide （待认领）
