@@ -2,7 +2,7 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="iq110126">Managing Roles and Privileges</title>
+  <title id="iq110126">管理角色与特权</title>
   <shortdesc>The Greenplum Database authorization mechanism stores roles and
     permissions to access database objects in the database and is administered using SQL statements
     or command-line utilities.</shortdesc>

@@ -2,7 +2,7 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="nr110126">Using Kerberos Authentication</title>
+  <title id="nr110126">使用Kerberos认证</title>
   <shortdesc>You can control access to Greenplum Database with a Kerberos authentication server. </shortdesc>
   <body>
     <p>Greenplum Database supports the Generic Security Service Application

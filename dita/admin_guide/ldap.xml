@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_z4g_32q_54">
-  <title>Using LDAP Authentication with TLS/SSL </title>
+  <title>使用带TLS/SSL的LDAP认证</title>
   <shortdesc>You can control access to Greenplum Database with an LDAP server and, optionally,
     secure the connection with encryption by adding parameters to <filepath>pg_hba.conf</filepath>
     file entries.</shortdesc>

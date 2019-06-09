@@ -2,7 +2,7 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title>Configuring Kerberos For Windows Clients</title>
+  <title>为Windows客户端进行Kerberos配置</title>
   <shortdesc>You can configure Microsoft Windows client applications to connect to a Greenplum
     Database system that is configured to authenticate with Kerberos.</shortdesc>
   <body>

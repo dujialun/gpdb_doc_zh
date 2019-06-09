@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_j1d_4qz_rz">
-  <title>Configuring Kerberos for Linux Clients</title>
+  <title>为Linux客户端进行Kerberos配置</title>
   <shortdesc>You can configure Linux client applications to connect to a Greenplum Database system
     that is configured to authenticate with Kerberos.</shortdesc>
   <body>
