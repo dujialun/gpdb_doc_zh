@@ -1,30 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic9" xml:lang="en">
-  <title id="im140259">Creating and Managing Tablespaces</title>
+  <title id="im140259">创建和管理表空间</title>
   <body>
-    <p>Tablespaces allow database administrators to have multiple file systems per machine and
-      decide how to best use physical storage to store database objects. Tablespaces allow you to
-      assign different storage for frequently and infrequently used database objects or to control
-      the I/O performance on certain database objects. For example, place frequently-used tables on
-      file systems that use high performance solid-state drives (SSD), and place other tables on
-      standard hard drives.</p>
-    <p>A tablespace requires a host file system location to store its database files. In Greenplum
-      Database, the file system location must exist on all hosts including the hosts running the
-      master, standby master, each primary segment, and each mirror segment. </p>
-    <p>A tablespace is Greenplum Database system object (a global object), you can use a tablespace
-      from any database if you have appropriate privileges.</p>
+    <p>表空间允许数据库管理员在每台机器上拥有多个文件系统并且决定如何最好地使用物理存储来存放数据库对象。
+        表空间允许用户为频繁使用和不频繁使用的数据库对象分配不同的存储，或者在特定的数据库对象上控制I/O性能。
+        例如，把频繁使用的表放在使用高性能固态驱动器（SSD）的文件系统上，而把其他表放在标准的磁盘驱动器上。</p>
+    <p>表空间需要一个主机文件系统位置来存储其数据库文件。
+        在Greenplum数据库中，文件系统位置必须存在于包括运行master,standby master和每个primary和mirror的所有主机上。
+        </p>
+    <p>表空间是Greenplum数据库系统对象（全局对象），如果有权限的话，可以使用任何数据库中的表空间。
+        </p>
   </body>
   <topic id="topic13" xml:lang="en">
-    <title>Creating a Tablespace</title>
+    <title>创建表空间</title>
     <body>
-      <p>The <codeph>CREATE TABLESPACE</codeph> command defines a tablespace. For example:</p>
+      <p><codeph>CREATE TABLESPACE</codeph>命令创建一个表空间。例如：</p>
       <p>
         <codeblock>CREATE TABLESPACE fastspace LOCATION '/fastdisk/gpdb';
 </codeblock>
       </p>
-      <p>Database superusers define tablespaces and grant access to database users with the
-          <codeph>GRANT</codeph><codeph>CREATE </codeph><ph>command</ph>. For example:</p>
+      <p>数据库超级用户定义表空间并通过<codeph>GRANT</codeph><codeph>CREATE </codeph>命令赋予数据库用户访问权限。
+          例如：</p>
       <p>
         <codeblock>GRANT CREATE ON TABLESPACE fastspace TO admin;
 </codeblock>
@@ -32,52 +29,50 @@
     </body>
   </topic>
   <topic id="topic14" xml:lang="en">
-    <title>Using a Tablespace to Store Database Objects</title>
+    <title>使用表空间来存储数据库对象</title>
     <body>
-      <p>Users with the <codeph>CREATE</codeph> privilege on a tablespace can create database
-        objects in that tablespace, such as tables, indexes, and databases. The command is:</p>
+      <p>在一个表空间上拥有<codeph>CREATE</codeph>特权的用户可以在其中创建数据库对象，例如表、索引和数据库。命令是：
+          </p>
       <p>
         <codeblock>CREATE TABLE tablename(options) TABLESPACE spacename
 </codeblock>
       </p>
-      <p>For example, the following command creates a table in the tablespace <i>space1</i>:</p>
+      <p>例如，下列命令在表空间<i>space1</i>中创建一个表：</p>
       <p>
         <codeblock>CREATE TABLE foo(i int) TABLESPACE space1;
 </codeblock>
       </p>
-      <p>You can also use the <codeph>default_tablespace</codeph> parameter to specify the default
-        tablespace for <codeph>CREATE TABLE</codeph> and <codeph>CREATE INDEX</codeph> commands that
-        do not specify a tablespace:</p>
+      <p>用户也可以使用<codeph>default_tablespace</codeph>参数为没有指定表空间的
+          <codeph>CREATE TABLE</codeph>和<codeph>CREATE INDEX</codeph>命令指定默认表空间：
+          </p>
       <p>
         <codeblock>SET default_tablespace = space1;
 CREATE TABLE foo(i int);
 </codeblock>
       </p>
-      <p>The tablespace associated with a database stores that database's system catalogs, temporary
+      <p>如果在创建对象时没有指定<codeph>TABLESPACE</codeph>，
+          The tablespace associated with a database stores that database's system catalogs, temporary
         files created by server processes using that database, and is the default tablespace
         selected for tables and indexes created within the database, if no
-          <codeph>TABLESPACE</codeph> is specified when the objects are created. If you do not
-        specify a tablespace when you create a database, the database uses the same tablespace used
-        by its template database.</p>
-      <p>You can use a tablespace from any database in the Greenplum Database system if you have
-        appropriate privileges.</p>
+          <codeph>TABLESPACE</codeph> is specified when the objects are created.
+          如果在创建数据库时没有指定表空间，则使用与该数据库模板库一样的表空间。
+          </p>
+      <p>如果有足够的权限的话，可以使用任何数据库的表空间。</p>
     </body>
   </topic>
   <topic id="topic15" xml:lang="en">
-    <title>Viewing Existing Tablespaces</title>
+    <title>查看已有的表空间</title>
     <body>
-      <p>Every Greenplum Database system has the following default tablespaces.</p>
+      <p>每个Greenplum数据库系统有如下默认表空间。</p>
       <ul id="ul_mml_hvy_sp">
-        <li id="im200050"><codeph>pg_global</codeph> for shared system catalogs.</li>
-        <li id="im200067"><codeph>pg_default</codeph>, the default tablespace. Used by the
-            <i>template1</i> and <i>template0</i> databases. </li>
+        <li id="im200050"><codeph>pg_global</codeph> 用于共享系统的catalogs。</li>
+        <li id="im200067"><codeph>pg_default</codeph>，默认表空间。由<i>template1</i>和<i>template0</i>数据库使用。</li>
       </ul>
-      <p>These tablespaces use the default system location, the data directory locations created at
-        system initialization.</p>
-      <p>To see tablespace information, use the <codeph>pg_tablespace</codeph> catalog table to get
-        the objecct ID (OID) of the tablespace and then use
-          <codeph>gp_tablespace_location()</codeph> function to display the tablespace directories.
-        This is an example that lists one user-defined tablespace, <codeph>myspace</codeph>:</p>
+      <p>这些表空间使用系统的默认文件空间，其数据目录位置在系统初始化时被创建。</p>
+      <p>要查看表空间信息，请从<codeph>pg_tablespace</codeph>catalog表获取表空间的对象ID(OID)，
+          然后使用<codeph>gp_tablespace_location()</codeph>函数显示表空间路径。
+        下面是一个包含有一个用户定义的表空间<codeph>myspace</codeph>的例子：
+          </p>
       <p>
         <codeblock>SELECT oid, * FROM pg_tablespace ;
 
@@ -89,9 +84,8 @@ CREATE TABLE foo(i int);
 (3 rows)
 </codeblock>
       </p>
-      <p>The OID for the tablespace <codeph>myspace</codeph> is <codeph>16391</codeph>. Run
-          <codeph>gp_tablespace_location()</codeph> to display the tablespace locations for a system
-        that consists of two segment instances and the master.
+      <p><codeph>myspace</codeph>表空间的OID是<codeph>16391</codeph>。
+          运行<codeph>gp_tablespace_location()</codeph>显示了系统中包含两个节点和master的表空间位置。
         <codeblock># SELECT * FROM gp_tablespace_location(16391);
  gp_segment_id |    tblspc_loc
 ---------------+------------------
@@ -100,16 +94,15 @@ CREATE TABLE foo(i int);
             -1 | /data/mytblspace
 (3 rows)
 </codeblock></p>
-      <p>This query uses <codeph>gp_tablespace_location()</codeph> the
-          <codeph>gp_segment_configuration</codeph> catalog table to display segment instance
-        information with the file system location for the <codeph>myspace</codeph>
-        tablespace.<codeblock>WITH spc AS (SELECT * FROM  gp_tablespace_location(16391))
+      <p>这个查询使用<codeph>gp_tablespace_location()</codeph>和catalog表<codeph>gp_segment_configuration</codeph>
+          显示包含<codeph>myspace</codeph>表空间文件系统路径的节点实例信息。
+          <codeblock>WITH spc AS (SELECT * FROM  gp_tablespace_location(16391))
   SELECT seg.role, spc.gp_segment_id as seg_id, seg.hostname, seg.datadir, tblspc_loc 
     FROM spc, gp_segment_configuration AS seg 
     WHERE spc.gp_segment_id = seg.content ORDER BY seg_id;
 </codeblock></p>
-      <p>This is information for a test system that consists of two segment instances and the master
-        on a single host. </p>
+      <p>这是一个在单一宿主机上包含两个节点和master的测试系统的信息。
+          </p>
       <p>
         <codeblock> role | seg_id | hostname |       datadir        |    tblspc_loc
 ------+--------+----------+----------------------+------------------
@@ -121,33 +114,28 @@ CREATE TABLE foo(i int);
     </body>
   </topic>
   <topic id="topic16" xml:lang="en">
-    <title>Dropping Tablespaces</title>
+    <title>删除表空间</title>
     <body>
-      <p>To drop a tablespace, you must be the tablespace owner or a superuser. You cannot drop a
-        tablespace until all objects in all databases using the tablespace are removed.</p>
-      <p>The <codeph>DROP TABLESPACE</codeph> command removes an empty tablespace.</p>
-      <note type="note">You cannot drop a tablespace if it is not empty or if it stores temporary or
-        transaction files.</note>
+      <p>要删除表空间，必须是表空间的所有者或者超级用户。直到所有依赖该表空间的对象都被删除才可以删除该表空间。
+          </p>
+      <p><codeph>DROP TABLESPACE</codeph>命令删除一个空的表空间。</p>
+      <note type="note">无法删除一个非空或存储了临时或事务文件的表空间。</note>
     </body>
   </topic>
   <topic id="topic11" xml:lang="en">
-    <title>Moving the Location of Temporary or Transaction Files</title>
+    <title>移动临时或事务文件的位置</title>
     <body>
-      <p>You can move temporary or transaction files to a specific tablespace to improve database
-        performance when running queries, creating backups, and to store data more sequentially. </p>
-      <p>The Greenplum Database server configuration parameter <codeph>temp_tablespaces</codeph>
-        controls the location for both temporary tables and temporary spill files for hash aggregate
-        and hash join queries. (Temporary files for purposes such as sorting large data sets are
-        stored with general segment data in
-            <codeph>&lt;<varname>data_dir</varname>>/&lt;<varname>seg_ID</varname>>/base/pgsql_tmp</codeph>.)</p>
-      <p><codeph>temp_tablespaces</codeph> specifies tablespaces in which to create temporary
-        objects (temp tables and indexes on temp tables) when a <codeph>CREATE</codeph> command does
-        not explicitly specify a tablespace.</p>
-      <p>Also note the following information about temporary or transaction files:</p>
+      <p>您可以将临时文件或事务文件移动到特定的表空间，以在运行查询，创建备份和更顺序地存储数据时提高数据库性能。
+          </p>
+      <p>Greenplum数据库服务器配置参数<codeph> temp_tablespaces </ codeph>控制哈希聚合和哈希连接查询的临时表和临时溢出文件的位置。
+          （用于排序大型数据集等目的的临时文件与<codeph>&lt;<varname>data_dir</varname>>/&lt;<varname>seg_ID</varname>>/base/pgsql_tmp</codeph>中的常规段数据一起存储。）
+        </p>
+      <p>当<codeph>CREATE</codeph>命令没有显式指定表空间时，
+          <codeph>temp_tablespaces</codeph>指定了创建临时对象时使用的表空间（临时表和临时表上的index）。</p>
+      <p>另请注意有关临时文件或事务文件的以下信息：</p>
       <ul id="ul_z3v_51j_lfb">
-        <li>You can dedicate only one tablespace for temporary or transaction files, although you
-          can use the same tablespace to store other types of files.</li>
-        <li>You cannot drop a tablespace if it used by temporary files.</li>
+        <li>尽管您可以使用相同的表空间来存储其他类型的文件，但只能将一个表空间专用于临时文件或事务文件。</li>
+        <li>无法删除一个被临时文件使用的表空间。</li>
       </ul>
     </body>
   </topic>
