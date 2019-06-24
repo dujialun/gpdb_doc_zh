@@ -136,8 +136,8 @@
     (3, 'Milk', 2.99);
 </codeblock>
       </p>
-      <p>要插入数据到一个分区表，应指定根分区表，即用 <codeph>CREATE TABLE</codeph> 命令创建的表。 也可以在一个
-        <codeph>INSERT</codeph> 命令中指定该分区表的一个叶子子表。如果数据对于指定的叶子子表无效，会返回一个错误。
+      <p>要插入数据到一个分区表，应指定根分区表，即用 <codeph>CREATE TABLE</codeph> 命令创建的表。
+        也可以在一个<codeph>INSERT</codeph> 命令中指定该分区表的一个叶子子表。如果数据对于指定的叶子子表无效，会返回一个错误。
          不支持在<codeph>INSERT</codeph> 命令中指定一个不是叶子子表的子表。</p>
       <p>要插入大量数据，使用外部表或者<codeph>COPY</codeph> 命令。对于插入大量行，这些装载机制比<codeph>INSERT</codeph> 更加有效。 
           更多有关批量数据装载的信息请见装载和卸载数据。<xref href="load/topics/g-loading-and-unloading-data.xml#topic1"/>
@@ -174,8 +174,9 @@
   <topic id="topic5" xml:lang="en">
     <title id="ix140451">删除行</title>
     <body>
-      <p><codeph>DELETE</codeph>命令从一个表中删除行。指定一个<codeph>WHERE</codeph>子句可以删除满足特定条件的行。如果不指定<codeph>WHERE</codeph> 子句，该表中所有的
-        行都会被删除。其结果是一个合法的但为空的表。例如，从产品表中删除所有价格为<i>10</i>的行：</p>
+      <p><codeph>DELETE</codeph>命令从一个表中删除行。指定一个<codeph>WHERE</codeph>子句可以删除满足特定条件的行。
+        如果不指定<codeph>WHERE</codeph> 子句，该表中所有的行都会被删除。
+        其结果是一个合法的但为空的表。例如，从产品表中删除所有价格为<i>10</i>的行：</p>
       <p>
         <codeblock>DELETE FROM products WHERE price = 10;
 </codeblock>
@@ -212,8 +213,7 @@
         <li id="ix140816"><codeph>BEGIN</codeph> 或者 <codeph>START TRANSACTION </codeph>开始一个事务块。 </li>
         <li id="ix140821"><codeph>END</codeph> 或者 <codeph>COMMIT</codeph> 提交一个事务的结果。</li>
         <li id="ix140822"><codeph>ROLLBACK</codeph> 放弃一个事务而不做任何更改。 </li>
-        <li id="ix155584"><codeph>SAVEPOINT</codeph> 在一个事务中标记一个位置并且允许做部分回滚。用户可以回滚在
-          一个保存点之后执行的命令但保留该保存点之前执行的命令。 </li>
+        <li id="ix155584"><codeph>SAVEPOINT</codeph> 在一个事务中标记一个位置并且允许做部分回滚。用户可以回滚在一个保存点之后执行的命令但保留该保存点之前执行的命令。 </li>
         <li id="ix155585"><codeph>ROLLBACK TO SAVEPOINT</codeph> 回滚一个事务到一个保存点。 </li>
         <li id="ix155589"><codeph>RELEASE SAVEPOINT</codeph> 销毁一个事务内的保存点。</li>
       </ul>
@@ -246,16 +246,18 @@
              <codeph>UPDATE</codeph> 和 <codeph>DELETE</codeph> 命令只找在该命令开始前提交的行。
               </p>
           <p><codeph> 读已提交</codeph>事务隔离允许并发事务在<codeph>UPDATE</codeph> 或 <codeph>DELETE</codeph>找到行之前修改或者锁定该行。
-          读已提交或读未提交事务隔离可能不适合执行复杂查询和更新并且要求该数据库的一致性视图的应用。<codeph>读已提交</codeph> 事务隔离可能不适合执行
+          读已提交或读未提交事务隔离可能不适合执行复杂查询和更新并且要求该数据库的一致性视图的应用。
+            <codeph>读已提交</codeph> 事务隔离可能不适合执行
           复杂查询和更新并且要求该数据库的一致性视图的应用。</p>
         </section>
         <section>
           <title>可重复读和可序列化</title>
           <p>根据SQL标准规定，<codeph>可序列化</codeph> 事务隔离确保在其中事务的并行化执行结果就像一个接一个执行一样。 
-           如果指定 <codeph>可序化</codeph>时， Greenplum数据库会退而采用<codeph>可重复读</codeph>. <codeph>可重复读</codeph>事务
-            能防止脏读、不可重复读和幻读，而且不需要昂贵的锁定,但是在Greenplum数据库的一些SERIALIZABLE事务之间可能发生其他的相互影响而阻止
-            它们变成真正地可序列化。 并发运行的事务应该被检查来识别出不会因为不允许对同一数据的并发更新而被阻止的相互影响。通过使用显式表锁或者
-            要求冲突事务更新一个被引入来表示该冲突的虚拟行可以阻止所发现的问题。 </p>
+           如果指定 <codeph>可序化</codeph>时， Greenplum数据库会退而采用<codeph>可重复读</codeph>.
+            <codeph>可重复读</codeph>事务能防止脏读、不可重复读和幻读，而且不需要昂贵的锁定，
+            但是在Greenplum数据库的一些SERIALIZABLE事务之间可能发生其他的相互影响而阻止它们变成真正地可序列化。
+            并发运行的事务应该被检查来识别出不会因为不允许对同一数据的并发更新而被阻止的相互影响。
+            通过使用显式表锁或者要求冲突事务更新一个被引入来表示该冲突的虚拟行可以阻止所发现的问题。 </p>
           <p>对于 <codeph>可重复读</codeph> 事务, 一个 <codeph>SELECT</codeph>查询:</p>
           <ul id="ul_mpy_55p_lgb">
             <li id="ix154139">看得到一个事务开始时（不是该事务中当前查询开始时）的数据快照。</li>
@@ -271,27 +273,28 @@
              那么可序列化或者可重复读事务执行变化。 </li>
           </ul>
         </section>
-        <p id="ix141505">Greenplum数据库中的默认事务隔离级别是<codeph>读已提交</codeph>。要为一个事务更改隔离级别，在<codeph>BEGIN</codeph> 该事务时
-          声明隔离级别或者在事务开始后使用<codeph>SET TRANSACTION</codeph>命令设置隔离级别。 </p>
+        <p id="ix141505">Greenplum数据库中的默认事务隔离级别是<codeph>读已提交</codeph>。
+          要为一个事务更改隔离级别，在<codeph>BEGIN</codeph> 该事务时声明隔离级别或者在事务开始后使用<codeph>SET TRANSACTION</codeph>命令设置隔离级别。 </p>
       </body>
     </topic>
   </topic>
   <topic id="topic_gdd" xml:lang="en">
     <title>全局死锁检测</title>
     <body>
-      <p> Greenplum数据库全局死锁检测器后端进程会收集所有segment上的锁信息，并使用有向算法来检测本地死锁和全局死锁是否存在。该算法
-        使Greenplum数据库放宽对堆表的并发更新和删除限制。 （Greenplum数据库仍然在AO / CO表上使用表级锁定，对<codeph>UPDATE</codeph>,
+      <p> Greenplum数据库全局死锁检测器后端进程会收集所有segment上的锁信息，并使用有向算法来检测本地死锁和全局死锁是否存在。
+        该算法使Greenplum数据库放宽对堆表的并发更新和删除限制。 （Greenplum数据库仍然在AO / CO表上使用表级锁定，对<codeph>UPDATE</codeph>,
          <codeph>DELETE</codeph>, 和 <codeph>SELECT...FOR UPDATE</codeph>的并发操作进行限制。）  </p>
-      <p> 默认情况下，全局死锁检测器是被禁用的，Greenplum数据库以串行方式对堆表执行并发更新和删除操作。这些并发更新可以被启用，
-        并让全局死锁检测程序通过设置服务器配置参数来确定何时存在死锁。  <xref
-          href="../ref_guide/config_params/guc-list.xml#gp_enable_global_deadlock_detector"
-            ><codeph>gp_enable_global_deadlock_detector</codeph></xref>. </p>
+      <p> 默认情况下，全局死锁检测器是被禁用的，Greenplum数据库以串行方式对堆表执行并发更新和删除操作。
+        可以通过设置配置参数<xref
+                href="../ref_guide/config_params/guc-list.xml#gp_enable_global_deadlock_detector"
+        ><codeph>gp_enable_global_deadlock_detector</codeph></xref>，开启并发更新并让全局死锁检测器检测死锁是否存在。
+        </p>
       <p>
             启用全局死锁检测器后，当启动Greenplum数据库时，master 主机上会自动启动一个后端进程。可以通过
             <codeph><xref
             href="../ref_guide/config_params/guc-list.xml#gp_global_deadlock_detector_period"
-            type="section">gp_global_deadlock_detector_period</xref></codeph>配置参数，来采集和分析锁等待数据的时间间隔。</p>
-      <p>如果全局死锁检测器发现了死锁，它会通过取消最新的事务所关联的一个或多个后端进程来打破死锁。  </p>
+            type="section">gp_global_deadlock_detector_period</xref></codeph>配置参数，来设置采集和分析锁等待数据的时间间隔。</p>
+      <p>如果全局死锁检测器发现了死锁，它会通过取消最新的事务所关联的一个或多个后端进程来避免死锁。  </p>
       <p>当全局死锁检测器发现了以下事物类型的死锁时，只有一个事务将成功。其他事务将失败，并打印错误指出不允许对同一行进行并发更新。<ul
           id="ul_bxf_mpp_5gb">
           <li>在同一行堆表的并发事务中，第一个事务是更新操作，下一个事务执行更新或删除，并且查询计划包含一个动作操作符。</li>
@@ -333,8 +336,8 @@
       <p><codeph>VACUUM</codeph> 命令会收集表级别的统计信息，例如行数和页数。在装载数据后清理所有的表，包括追加优化表。有关推荐的例行清理操作的信息，
       请见 <xref
           href="managing/maintain.xml#topic2" type="topic" format="dita"/>.</p>
-         <note type="important">如果在数据库数据上频繁地执行更新和删除，<codeph>VACUUM</codeph>, <codeph>VACUUM FULL</codeph>, and
-          <codeph>VACUUM ANALYZE</codeph>  命令应该被用来维护Greenplum数据库中的数据。有关使用 <codeph>VACUUM</codeph> 命令的信息请见<cite>Greenplum数据库参考指南</cite> 。
+         <note type="important">如果在数据库数据上频繁地执行更新和删除，<codeph>VACUUM</codeph>, <codeph>VACUUM FULL</codeph>, 和
+          <codeph>VACUUM ANALYZE</codeph>命令应该被用来维护Greenplum数据库中的数据。有关使用 <codeph>VACUUM</codeph> 命令的信息请见<cite>Greenplum数据库参考指南</cite> 。
       </note>
     </body>
   </topic>
