@@ -1,132 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_eys_3wy_sp">
-  <title id="im148803">Creating and Using Sequences</title>
+  <title id="im148803">创建和使用序列</title>
   <body>
-    <p>A Greenplum Database sequence object is a special single row table that functions as a
-      number generator. You can use a sequence to generate unique integer identifiers for a row
-      that you add to a table.  Declaring a column of type <codeph>SERIAL</codeph> implicitly
-      creates a sequence counter for use in that table column.
+    <p>Greenplum数据库序列对象是一个特殊的单行表，用作数字生成器。
+        您可以使用序列为添加到表中的行生成唯一的整数标识符。
+        声明<codeph>SERIAL</codeph>类型的列会隐式创建一个序列计数器，以便在该表列中使用。
     </p>
-    <p>Greenplum Database provides commands to create, alter, and drop a sequence. Greenplum Database
-       also provides built-in functions to return the next value in the
-       sequence (<codeph>nextval()</codeph>) or to set the sequence to a specific start
-       value (<codeph>setval()</codeph>).</p>
-    <note>The PostgreSQL <codeph>currval()</codeph> and <codeph>lastval()</codeph> sequence
-       functions are not supported in Greenplum Database.</note>
-   <p>Attributes of a sequence object include the name of the sequence, its increment value, and the last, minimum, and
-     maximum values of the sequence counter. Sequences also have a special boolean attribute
-     named <codeph>is_called</codeph> that governs the auto-increment behavior of
-     a <codeph>nextval()</codeph> operation on the sequence counter. When a sequence's 
-     <codeph>is_called</codeph> attribute is <codeph>true</codeph>, <codeph>nextval()</codeph>
-     increments the sequence counter before returning the value. When the
-     <codeph>is_called</codeph> attribute value of a sequence is <codeph>false</codeph>,
-      <codeph>nextval()</codeph> does not increment the counter before returning the value.</p>
+    <p>Greenplum数据库提供了创建，更改和删除序列的命令。
+        Greenplum数据库还提供内置函数来返回序列中的下一个值（<codeph>nextval()</codeph>）或将序列设置为特定的起始值（<codeph>setval()</codeph>）。
+        </p>
+    <note>Greenplum数据库不支持PostgreSQL<codeph>currval()</codeph>和<codeph>lastval()</codeph>序列函数。
+       </note>
+   <p>序列对象的属性包括序列的名称，其增量值以及序列计数器的最后，最小和最大值。
+       序列还有一个名为<codeph>is_called</codeph>的特殊布尔属性，用于控制序列计数器上<codeph>nextval()</codeph>操作的自动递增行为。
+       当序列的<codeph>is_called</codeph>属性为<codeph>true</codeph>时，<codeph>nextval()</codeph>会在返回值之前递增序列计数器。
+       当序列的<codeph>is_called</codeph>属性值为<codeph>false</codeph>时，<codeph>nextval()</codeph>在返回值之前不会递增计数器。
+       </p>
   </body>
   <topic id="topic87" xml:lang="en">
-    <title>Creating a Sequence</title>
+    <title>创建一个序列</title>
     <body>
-      <p>The <codeph><xref href="../../ref_guide/sql_commands/CREATE_SEQUENCE.xml#topic1"/></codeph>
-        command creates and initializes a sequence with the given sequence name
-        and optional start value. The sequence name must be distinct
-        from the name of any other sequence, table, index, or view in the same schema. For
-        example:</p>
+      <p><codeph><xref href="../../ref_guide/sql_commands/CREATE_SEQUENCE.xml#topic1"/></codeph>命令使用给定的序列名称和可选的起始值创建和初始化序列。
+          序列名称必须与同一Schema中任何其他序列，表，索引或视图的名称不同。 例如：
+          </p>
       <p>
         <codeblock>CREATE SEQUENCE myserial START 101;
 </codeblock>
       </p>
-      <p>When you create a new sequence, Greenplum Database sets the sequence
-         <codeph>is_called</codeph> attribute to <codeph>false</codeph>.
-         Invoking <codeph>nextval()</codeph> on a newly-created sequence does not increment
-         the sequence counter, but returns the sequence start value and sets
-         <codeph>is_called</codeph> to <codeph>true</codeph>.</p>
+      <p>创建新序列时，Greenplum数据库将序列<codeph>is_called</codeph>属性设置为<codeph>false</codeph>。
+          在新创建的序列上调用<codeph>nextval()</codeph>不会递增序列计数器，但会返回序列起始值并将<codeph>is_called</codeph>设置为<codeph>true</codeph>。
+          </p>
     </body>
   </topic>
   <topic id="topic88" xml:lang="en">
-    <title>Using a Sequence</title>
+    <title>使用一个序列</title>
     <body>
-      <p>After you create a sequence with the <codeph>CREATE SEQUENCE</codeph> command, you can
-        examine the sequence and use the sequence built-in functions. </p>
+      <p>使用<codeph>CREATE SEQUENCE</codeph>命令创建序列后，可以检查序列并使用序列内置函数。
+          </p>
      <section>
-       <title>Examining Sequence Attributes</title>
-      <p>To examine the current attributes of a sequence, query the sequence directly. For example, to examine a sequence named <codeph>myserial</codeph>:</p>
+       <title>检查序列属性</title>
+      <p>要检查序列的当前属性，请直接查询序列。
+          例如，要检查名为<codeph>myserial</codeph>的序列：
+          </p>
       <p>
         <codeblock>SELECT * FROM myserial;
 </codeblock>
       </p>
      </section>
      <section>
-       <title>Returning the Next Sequence Counter Value</title>
-      <p>You can invoke the <codeph>nextval()</codeph> built-in function to return and use
-        the next value in a sequence. The following command inserts the next value of the sequence
-         named <codeph>myserial</codeph>
-         into the first column of a table named <codeph>vendors</codeph>: </p>
+       <title>返回下一个序列计数器值</title>
+      <p>您可以调用<codeph>nextval()</codeph>内置函数来返回并使用序列中的下一个值。
+          以下命令将名为<codeph>myserial</codeph>的序列的下一个值插入名为<codeph>vendors</codeph>的表的第一列：
+          </p>
       <p>
         <codeblock>INSERT INTO vendors VALUES (nextval('myserial'), 'acme');
 </codeblock>
       </p>
-      <p> <codeph>nextval()</codeph> uses the sequence's
-        <codeph>is_called</codeph> attribute value to determine whether or not to increment
-        the sequence counter before returning the value. <codeph>nextval()</codeph> advances
-        the counter when <codeph>is_called</codeph> is <codeph>true</codeph>.
-        <codeph>nextval()</codeph> sets the sequence <codeph>is_called</codeph> attribute to
-        <codeph>true</codeph> before returning.</p>
-      <p>A <codeph>nextval()</codeph> operation is never rolled back. A fetched value is considered
-        used, even if the transaction that performed the <codeph>nextval()</codeph> fails. This means
-        that failed transactions can leave unused holes in the sequence of assigned values.</p>
-      <note>You cannot use the <codeph>nextval()</codeph> function in <codeph>UPDATE</codeph>
-        or <codeph>DELETE</codeph> statements if mirroring is enabled in
-        Greenplum Database.</note>
+      <p><codeph>nextval()</codeph>使用序列的<codeph>is_called</codeph>属性值来确定在返回值之前是否递增序列计数器。
+          当<codeph>is_called</codeph>为<codeph>true</codeph>时，<codeph>nextval()</codeph>使计数器前进。
+          <codeph>nextval()</codeph>在返回之前将序列<codeph>is_called</codeph>属性设置为<codeph>true</codeph>。
+          </p>
+      <p><codeph>nextval()</codeph>操作永远不会回滚。
+          即使执行<codeph>nextval()</codeph>的事务失败，获取的值也会被使用。
+          这意味着失败的事务可能会在指定值的序列中留下未使用的漏洞。
+          </p>
+      <note>如果在Greenplum数据库中启用了镜像，则不能在<codeph>UPDATE</codeph>或<codeph>DELETE</codeph>语句中使用<codeph>nextval()</codeph>函数。
+          </note>
      </section>
      <section>
-       <title>Setting the Sequence Counter Value</title>
-      <p>You can use the Greenplum Database <codeph>setval()</codeph> built-in function to 
-        set the counter value for a sequence. For example, the following command sets the counter value of the sequence named <codeph>myserial</codeph> to <codeph>201</codeph>:</p>
+       <title>设置序列计数器值</title>
+      <p>您可以使用Greenplum数据库<codeph>setval()</codeph>内置函数来设置序列的计数器值。
+          例如，以下命令将名为<codeph>myserial</codeph>的序列的计数器值设置为<codeph>201</codeph>：
+          </p>
       <p>
         <codeblock>SELECT setval('myserial', 201);
 </codeblock>
       </p>
-      <p><codeph>setval()</codeph> has two function signatures: <codeph>setval(sequence,
-            start_val)</codeph> and <codeph>setval(sequence, start_val, is_called)</codeph>. The
-          default behaviour of <codeph>setval(sequence, start_val)</codeph> sets the sequence
-            <codeph>is_called</codeph> attribute value to <codeph>true</codeph>. </p>
-      <p>If you do not want the sequence counter advanced on the next <codeph>nextval()</codeph>
-          call, use the <codeph>setval(sequence, start_val, is_called)</codeph> function signature,
-          passing a <codeph>false</codeph> argument:</p>
+      <p><codeph>setval()</codeph>有两个函数签名：<codeph>setval(sequence,
+            start_val)</codeph>和<codeph>setval(sequence, start_val, is_called)</codeph>。
+          <codeph>setval(sequence, start_val)</codeph>的默认行为设置序列<codeph>is_called</codeph>属性值为<codeph>true</codeph>。
+          </p>
+      <p>如果您不希望序列计数器在下一个<codeph>nextval()</codeph>调用时递增，
+          请使用<codeph>setval(sequence, start_val, is_called)</codeph>函数签名，传递<codeph>false</codeph>参数：
+          </p>
       <p>
         <codeblock>SELECT setval('myserial', 201, false);
 </codeblock>
       </p>
-      <p><codeph>setval()</codeph> operations are never rolled back.</p>
+      <p><codeph>setval()</codeph>操作永远不会回滚。</p>
      </section>
     </body>
   </topic>
   <topic id="topic89" xml:lang="en">
-    <title>Altering a Sequence</title>
+    <title>修改一个序列</title>
     <body>
-      <p>The <codeph><xref href="../../ref_guide/sql_commands/ALTER_SEQUENCE.xml#topic1"/></codeph>
-        command changes the attributes of an existing sequence. You can alter the sequence start,
-        minimum, maximum, and increment values. You can also restart the sequence at the start value
-        or at a specified value.</p>
-      <p>Any parameters not set in the <codeph>ALTER SEQUENCE</codeph> command retain their prior
-        settings.</p>
+      <p><codeph><xref href="../../ref_guide/sql_commands/ALTER_SEQUENCE.xml#topic1"/></codeph>命令更改现有序列的属性。
+          您可以更改序列的开始，最小，最大和增量值。
+          您也可以在起始值或指定值处重新启动序列。
+          </p>
+      <p>未在<codeph>ALTER SEQUENCE</codeph>命令中设置的任何参数都保留其先前的设置。
+          </p>
       <p><codeph>ALTER SEQUENCE <varname>sequence</varname> START WITH
-            <varname>start_value</varname></codeph> sets the sequence's <codeph>start_value</codeph>
-        attribute to the new starting value. It has no effect on the <codeph>last_value</codeph>
-        attribute or the value returned by the <codeph>nextval(sequence)</codeph> function.</p>
-      <p><codeph>ALTER SEQUENCE <varname>sequence</varname> RESTART</codeph> resets the sequence's
-          <codeph>last_value</codeph> attribute to the current value of the
-          <codeph>start_value</codeph> attribute and the <codeph>is_called</codeph> attribute to
-          <codeph>false</codeph>. The next call to the <codeph>nextval(sequence)</codeph>  function
-        returns <varname>start_value</varname>.</p>
+          <varname>start_value</varname></codeph>将序列的start_value属性设置为新的起始值。
+          它对<codeph>last_value</codeph>属性或<codeph>nextval(sequence)</codeph>函数返回的值没有影响。
+          </p>
+      <p><codeph>ALTER SEQUENCE <varname>sequence</varname> RESTART</codeph>
+          将序列的<codeph>last_value</codeph>属性重置为<codeph>start_value</codeph>属性的当前值，并将<codeph>is_called</codeph>属性重置为<codeph>false</codeph>。
+          对<codeph>nextval(sequence)</codeph>函数的下一次调用将返回<varname>start_value</varname>。
+          </p>
       <p><codeph>ALTER SEQUENCE <varname>sequence</varname> RESTART WITH
-            <varname>restart_value</varname></codeph> sets the sequence's
-          <varname>last_value</varname> attribute to the new value and the
-          <codeph>is_called</codeph> attribute to <codeph>false</codeph>. The next call to the
-          <codeph>nextval(sequence)</codeph>  returns <varname>restart_value</varname>. This is the
-        equivalent of calling <codeph>setval(sequence, restart_value, false)</codeph>.</p>
-      <p>The following command restarts the sequence named <codeph>myserial</codeph> at value
-          <codeph>105</codeph>:</p>
+            <varname>restart_value</varname></codeph>
+          将序列的<varname>last_value</varname>属性设置为新值，将<codeph>is_called</codeph>属性设置为<codeph>false</codeph>。
+          下一次调用<codeph>nextval(sequence)</codeph>会返回<varname>restart_value</varname>。
+          这等效于调用<codeph>setval(sequence, restart_value, false)</codeph>。
+          </p>
+      <p>以下命令在值<codeph>105</codeph>处重新启动名为<codeph>myserial</codeph>的序列：
+          </p>
       <p>
         <codeblock>ALTER SEQUENCE myserial RESTART WITH 105;
 </codeblock>
@@ -134,10 +124,11 @@
     </body>
   </topic>
   <topic id="topic90" xml:lang="en">
-    <title>Dropping a Sequence</title>
+    <title>删除一个序列</title>
     <body>
-      <p>The <codeph><xref href="../../ref_guide/sql_commands/DROP_SEQUENCE.xml#topic1"/></codeph>
-        command removes a sequence. For example, the following command removes the sequence named <codeph>myserial</codeph>:</p>
+      <p><codeph><xref href="../../ref_guide/sql_commands/DROP_SEQUENCE.xml#topic1"/></codeph>命令可以删除序列。
+          例如，以下命令将删除名为<codeph>myserial</codeph>的序列：
+          </p>
       <p>
         <codeblock>DROP SEQUENCE myserial;
 </codeblock>
@@ -145,32 +136,35 @@
     </body>
   </topic>
   <topic id="topic91" xml:lang="en">
-    <title>Specifying a Sequence as the Default Value for a Column</title>
+    <title>将序列指定为列的默认值</title>
     <body>
-      <p>You can reference a sequence directly in the
-        <codeph><xref href="../../ref_guide/sql_commands/CREATE_TABLE.xml#topic1"/></codeph>
-        command in addition to using the <codeph>SERIAL</codeph> or <codeph>BIGSERIAL</codeph> types. For example:</p>
+      <p>除了使用<codeph>SERIAL</codeph>或<codeph>BIGSERIAL</codeph>类型之外，
+          您还可以直接在<codeph><xref href="../../ref_guide/sql_commands/CREATE_TABLE.xml#topic1"/></codeph>命令中引用序列。例如：
+          </p>
       <p>
         <codeblock>CREATE TABLE tablename ( id INT4 DEFAULT nextval('myserial'), name text );
 </codeblock>
       </p>
-      <p>You can also alter a table column to set its default value to a sequence counter:</p>
+      <p>您还可以更改表列以将其默认值设置为序列计数器：</p>
         <codeblock>ALTER TABLE tablename ALTER COLUMN id SET DEFAULT nextval('myserial');
 </codeblock>
     </body>
   </topic>
   <topic id="topic92" xml:lang="en">
-    <title>Sequence Wraparound</title>
+    <title>序列回绕</title>
     <body>
-      <p>By default, a sequence does not wrap around. That is, when a sequence reaches the max value
-          (<codeph>+32767</codeph> for <codeph>SMALLSERIAL</codeph>, <codeph>+2147483647</codeph>
-          for <codeph>SERIAL</codeph>, <codeph>+9223372036854775807</codeph> for
-          <codeph>BIGSERIAL</codeph>), every subsequent <codeph>nextval()</codeph> call produces an error.
-          You can alter a sequence to make it cycle around and start at <codeph>1</codeph> again:</p>
+      <p>默认情况下，序列不会回绕。
+          这意味着当一个序列到达了最大值
+          （<codeph>SMALLSERIAL</codeph>的<codeph>+32767</codeph>，
+          <codeph>SERIAL</codeph>的<codeph>+2147483647</codeph>，
+          <codeph>BIGSERIAL</codeph>的<codeph>+9223372036854775807</codeph>），
+          再调用<codeph>nextval()</codeph>会失败。
+          可以修改一个序列让它从<codeph>1</codeph>开始回绕：
+          </p>
       <p>
         <codeblock>ALTER SEQUENCE myserial CYCLE;</codeblock>
       </p>
-      <p>You can also specify the wraparound behaviour when you create the sequence:</p>
+      <p>也可以在创建序列时指定回绕行为：</p>
       <p>
         <codeblock>CREATE SEQUENCE myserial CYCLE;</codeblock>
       </p>
