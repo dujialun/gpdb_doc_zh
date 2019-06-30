@@ -52,119 +52,71 @@
             </row>
             <row>
               <entry colname="col1">role</entry>
-              <entry colname="col2">Specifies which database role names this record matches. The
-                value <codeph>all</codeph> specifies that it matches all roles. If the specified
-                role is a group and you want all members of that group to be included, precede the
-                role name with a <codeph>+</codeph>. Multiple role names can be supplied by
-                separating them with commas. A separate file containing role names can be specified
-                by preceding the file name with a <codeph>@</codeph>.</entry>
+              <entry colname="col2">指定该记录匹配的数据库角色名称。
+                取值为<codeph>all</codeph>指定匹配所有角色。如果指定角色是一个分组，在角色名前加<codeph>+</codeph>前缀，
+                可以匹配该组内所有成员。多个角色名称可以用逗号分隔。在文件名前加入<codeph>@</codeph>前缀，指定匹配文件内的
+                包含的所有角色名。
+              </entry>
             </row>
             <row>
               <entry colname="col1">address</entry>
-              <entry colname="col2">Specifies the client machine addresses that this record matches.
-                This field can contain an IP address, an IP address range, or a host name. <p>An IP
-                  address range is specified using standard numeric notation for the range's
-                  starting address, then a slash (<codeph>/</codeph>) and a CIDR mask length. The
-                  mask length indicates the number of high-order bits of the client IP address that
-                  must match. Bits to the right of this should be zero in the given IP address.
-                  There must not be any white space between the IP address, the <codeph>/</codeph>,
-                  and the CIDR mask length.</p><p>Typical examples of an IPv4 address range
-                  specified this way are <codeph>172.20.143.89/32</codeph> for a single host, or
-                    <codeph>172.20.143.0/24</codeph> for a small network, or
-                    <codeph>10.6.0.0/16</codeph> for a larger one. An IPv6 address range might look
-                  like <codeph>::1/128</codeph> for a single host (in this case the IPv6 loopback
-                  address) or <codeph>fe80::7a31:c1ff:0000:0000/96</codeph> for a small network.
-                    <codeph>0.0.0.0/0</codeph> represents all IPv4 addresses, and
-                    <codeph>::0/0</codeph> represents all IPv6 addresses. To specify a single host,
-                  use a mask length of 32 for IPv4 or 128 for IPv6. In a network address, do not
-                  omit trailing zeroes.</p><p>An entry given in IPv4 format will match only IPv4
-                  connections, and an entry given in IPv6 format will match only IPv6 connections,
-                  even if the represented address is in the IPv4-in-IPv6 range.
-                  <note>Entries in IPv6 format will be rejected if the host system C library does
-                    not have support for IPv6 addresses.</note></p><p>If a host name is specified
-                  (an address that is not an IP address or IP range is treated as a host name), that
-                  name is compared with the result of a reverse name resolution of the client IP
-                  address (for example, reverse DNS lookup, if DNS is used). Host name comparisons
-                  are case insensitive. If there is a match, then a forward name resolution (for
-                  example, forward DNS lookup) is performed on the host name to check whether any of
-                  the addresses it resolves to are equal to the client IP address. If both
-                  directions match, then the entry is considered to match. </p><p>Some host name
-                  databases allow associating an IP address with multiple host names, but the
-                  operating system only returns one host name when asked to resolve an IP address.
-                  The host name that is used in <codeph>pg_hba.conf</codeph> must be the one that
-                  the address-to-name resolution of the client IP address returns, otherwise the
-                  line will not be considered a match. </p><p>When host names are specified in
-                    <codeph>pg_hba.conf</codeph>, you should ensure that name resolution is
-                  reasonably fast. It can be of advantage to set up a local name resolution cache
-                  such as <codeph>nscd</codeph>. Also, you can enable the server configuration
-                  parameter <codeph>log_hostname</codeph> to see the client host name instead of the
-                  IP address in the log. </p></entry>
+              <entry colname="col2">
+              指定该记录匹配的客户端机器地址。该字段包含IP地址、IP地址范围或主机名<p>
+              指定IP地址范围，使用标准数组标识范围的其实地址，紧跟着一个斜线(<codeph>/</codeph>)，在跟上CIDR掩码长度。掩码长度表示必须匹配的客户端IP地址的高比特位。给定的IP地址中，右边的位应为零。在IP地址、斜线<codeph>/</codeph>和CIDR掩码长度三者之间不能有空格。</p>
+              <p>以这种方式指定的IPv4地址范围的典型示例是，<codeph>172.20.143.89/32</codeph>代表单个主机，<codeph>172.20.143.0/24</codeph>代表小型网络，<codeph>10.6.0.0/16</codeph>代表更大网络。
+              相应的IPv6地址范围典型案例是，<codeph>::1/128</codeph>代表单个主机(在这种情况下是IPv6环回地址)，<codeph>fe80::7a31:c1ff:0000:0000/96</codeph>代表小型网络。
+              <codeph>0.0.0.0/0</codeph>代表全部IPv4地址，并且<codeph>::0/0</codeph>代表全部IPv6地址。要指定单个主机，对于IPv4使用32位掩码长度，对于IPv6使用128位掩码长度。在网络地址中，不要省略拖尾的0数字。</p>
+              <p>使用IPv4格式给出的记录只匹配IPv4连接，使用IPv6格式给出的记录只匹配IPv6连接，即使所表示的地址在IPv4-in-IPv6范围内。
+              <note>如果主机系统C库文件不支持IPv6地址，建拒绝所有IPv6格式记录。</note></p>
+              <p>如果指定了主机名(不是IP地址或IP范围的地址被当做主机名)，则将该名称与客户端IP地址的反向名称解析结果进行比较（如反向DNS查找）。主机名比较不区分大小写。如果存在匹配，如果存在匹配主机名，则对主机名执行转发名称解析（如转发DNS查找），已检查主机名解析的任何地址是否是否等于客户端IP地址。如果双向都匹配，则认为该记录匹配。</p>
+              <p>某些主机名数据库允许将IP地址与多个主机名关联，但解析IP地址是，操作系统只返回其中一个主机名。位于文件<codeph>pg_hba.conf</codeph>中的主机名必须是客户端IP地址，必须是客户端IP地址返回address-to-name解析结果，否则该行不会被视为匹配。</p>
+              <p>当指定在<codeph>pg_hba.conf</codeph>文件中的主机名，应该确保名称解析足够快。设置如<codeph>nscd</codeph>本地名称解析缓存是有效的。而且可以启用服务器设置参数<codeph>log_hostname</codeph>客户端主机名而不是日志中的IP地址。</p></entry>
             </row>
             <row>
               <entry colname="col1">IP-address<p>IP-mask</p></entry>
-              <entry colname="col2">These fields can be used as an alternative to the CIDR address
-                notation. Instead of specifying the mask length, the actual mask is specified in a
-                separate column. For example, <codeph>255.0.0.0</codeph> represents an IPv4 CIDR
-                mask length of 8, and <codeph>255.255.255.255</codeph> represents a CIDR mask length
-                of 32.</entry>
+              <entry colname="col2">该字段可以被用作CIDR地址记号的替代。
+                不是指定掩码长度，而是在单独的列中指定实际掩码。
+                例如，<codeph>255.0.0.0</codeph>表示IPv4的CIDR的掩码长度为8，
+                而<codeph>255.255.255.255</codeph>表示CIDR的掩码长度为32。</entry>
             </row>
             <row>
               <entry colname="col1">authentication-method</entry>
-              <entry colname="col2">Specifies the authentication method to use when connecting.
-                Greenplum supports the <xref
-                  href="https://www.postgresql.org/docs/9.0/auth-methods.html"
-                  scope="external" format="html">authentication methods</xref> supported by
-                PostgreSQL 9.0.</entry>
+              <entry colname="col2">指定建立连接时使用的认证方法。
+                PostgreSQL 9.0支持的<xref href="https://www.postgresql.org/docs/9.0/auth-methods.html"
+                  scope="external" format="html">认证方法</xref>Greenplum均支持。</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
-      <note type="caution">For a more secure system, consider removing records for remote
-        connections that use trust authentication from the <codeph>pg_hba.conf</codeph> file. Trust
-        authentication grants any user who can connect to the server access to the database using
-        any role they specify. You can safely replace trust authentication with ident authentication
-        for local UNIX-socket connections. You can also use ident authentication for local and
-        remote TCP clients, but the client host must be running an ident service and you must trust
-        the integrity of that machine.</note>
+      <note type="caution">针对更安全系统，记得移除<codeph>pg_hba.conf</codeph>文件中使用trust认证
+        远程连接的配置记录。因trust认证授权能连接到服务器的任何用户，使用任何他们指定的任何角色访问数据库。
+        针对本地UNIX-socket连接，可以使用ident认证，安全的替代trust认证。
+        针对本地及远程TCP客户端，仍然可以使用ident认证，但是客户机主机必须运行ident服务，
+        并且您必须信任该机器的完整性。</note>
     </body>
     <topic id="topic3" xml:lang="en">
-      <title id="ip141322">Editing the pg_hba.conf File</title>
+      <title id="ip141322">编辑pg_hba.conf文件</title>
       <body>
-        <p>Initially, the <codeph>pg_hba.conf</codeph> file is set up with generous permissions for
-          the gpadmin user and no database access for other Greenplum数据库 roles. You will need
-          to edit the <codeph>pg_hba.conf</codeph> file to enable users' access to databases and to
-          secure the gpadmin user. Consider removing entries that have trust authentication, since
-          they allow anyone with access to the server to connect with any role they choose. For
-          local (UNIX socket) connections, use ident authentication, which requires the operating
-          system user to match the role specified. For local and remote TCP connections, ident
-          authentication requires the client's host to run an indent service. You can install an
-          ident service on the master host and then use ident authentication for local TCP
-          connections, for example <codeph>127.0.0.1/28</codeph>. Using ident authentication for
-          remote TCP connections is less secure because it requires you to trust the integrity of
-          the ident service on the client's host.</p>
-        <p>This example shows how to edit the <filepath>pg_hba.conf</filepath> file of the master to
-          allow remote client access to all databases from all roles using encrypted password
-          authentication.</p>
+        <p>首先，设置<codeph>pg_hba.conf</codeph>文件，需要具有gpadmin用户权限，并且没有其他Greenplum数据库访问角色。需要编辑<codeph>pg_hba.conf</codeph>以使用户能够访问数据库并保护gpadmin用户。可以考虑删除具有trust身份验证的记录，因为它们允许任何有服务器访问权限的人，使用其选择的任何角色建立连接。对于本地UNIX套接字连接，请使用ident身份验证，需要操作系统用户匹配特定角色。对于本地TCP和远程TCP链接，ident认证需要客户端主机运行ident服务。针对本地连接，如<codeph>127.0.0.1/28</codeph>可以安装ident服务到master主机上。
+        针对远程TCP连接，使用ident认证其安全性极低，因为需要您信任master主机上ident服务的公正性。</p>
+        <p>此示例显示了如何编辑master主机上的<filepath>pg_hba.conf</filepath>文件，通过加密密码认证，允许远程主机使用所有角色，访问所有数据库</p>
         <section id="ip144328">
-          <title>Editing pg_hba.conf</title>
+          <title>编辑pg_hba.conf</title>
           <ol id="ol_xz4_x15_jp">
-            <li id="ip142837">Open the file <filepath>$MASTER_DATA_DIRECTORY/pg_hba.conf</filepath>
-              in a text editor.</li>
+            <li id="ip142837">使用文本编辑器，打开<filepath>$MASTER_DATA_DIRECTORY/pg_hba.conf</filepath>
+            文件。</li>
             <li id="ip141930">Add a line to the file for each type of connection you want to allow.
               Records are read sequentially, so the order of the records is significant. Typically,
               earlier records will have tight connection match parameters and weaker authentication
               methods, while later records will have looser match parameters and stronger
               authentication methods. For
-              example:<codeblock># allow the gpadmin user local access to all databases
-# using ident authentication
+              example:<codeblock># 允许gpadmin用户本地访问所有数据库
+# 使用ident认证
 local   all   gpadmin   ident         sameuser
 host    all   gpadmin   127.0.0.1/32  ident
 host    all   gpadmin   ::1/128       ident
-# allow the 'dba' role access to any database from any
-# host with IP address 192.168.x.x and use md5 encrypted
-# passwords to authenticate the user
-# Note that to use SHA-256 encryption, replace <i>md5</i> with
-# password in the line below
+# 允许'dba'角色，通过192.168.x.xIP地址，使用md5加密密码，授权用户访问任意数据库。
+# 注意使用SHA-256加密，替换如下行记录中<i>md5</i>密码。
 host    all   dba   192.168.0.0/32  md5
 # allow all roles access to any database from any
 # host and use ldap to authenticate the user. Greenplum role
