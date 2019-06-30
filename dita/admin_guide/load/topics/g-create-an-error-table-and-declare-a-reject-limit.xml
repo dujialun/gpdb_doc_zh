@@ -2,12 +2,10 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic57">
-   <title>Capture Row Formatting Errors and Declare a Reject Limit </title>
+   <title>捕捉行格式化错误并且声明拒绝极限 </title>
    <body>
-      <p>The following SQL fragment captures formatting errors internally in Greenplum Database and declares a reject limit of 10 rows.</p>
+      <p>下面的SQL片段会捕捉Greenplum数据库内部的格式化错误并且声明一个拒绝极限为10行。</p>
       <codeblock>LOG ERRORS SEGMENT REJECT LIMIT 10 ROWS</codeblock>
-      <p>Use the built-in SQL function <codeph>gp_read_error_log()</codeph> to read the error log
-         data. For information about viewing log errors, see <xref
-            href="g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58"/>.</p>
+      <p>使用内建的SQL函数<codeph>gp_read_error_log()</codeph>可以读取错误日志数据。有关查看日志错误的信息，可见<a xref href="g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58">在错误日志中查看不正确的行。</a></p>
    </body>
 </topic>

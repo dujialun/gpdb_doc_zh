@@ -7,10 +7,11 @@
       <p>Greenplum提供了诸如<cmdname>gpfdist</cmdname>、<codeph>http</codeph>以及<codeph>file</codeph>等协议来通过网络访问数据，或者用户可以创作一个自定义协议。用户可以为自定义协议使用标准的数据格式<codeph>TEXT</codeph>和<codeph>CSV</codeph>，或者使用一种自定义数据格式。</p>
       <p>只要可用的内建协议无法满足一种特定需要，用户就可以创建一种自定义的协议。例如，如果用户需要并行地把Greenplum数据库直接连接到另一个系统，并且在两者之间发送数据流而无需在磁盘上物化系统数据或者使用<cmdname>gpfdist</cmdname>这样的中间进程。用户必须是超级用户才能创建和注册自定义协议。</p>
       <ol>
-         <li id="du226058">用C语言和预定义的API创作发送、接受以及（可选的）验证器函数。这些函数会被编译并且注册在Greenplum数据库中。自定义协议的例子可见 <a><xref
-               href="g-example-custom-data-access-protocol.xml#topic103"/>自定义数据访问协议实例</a> </li>
-         <li id="du226065">在编写并且编译读写函数到一个共享对象（.so）中之后，声明一个数据库函数指向该.so文件和函数名。 <p>下面的例子使用了编译好的导入和导出代码。
-               </p><codeblock>CREATE FUNCTION myread() RETURNS integer
+         <li id="du226058">用C语言和预定义的API创作发送、接受以及（可选的）验证器函数。这些函数会被编译并且注册在Greenplum数据库中。自定义协议的例子可见<a xref
+               href="g-example-custom-data-access-protocol.xml#topic103">自定义数据访问协议实例</a></li>
+         <li id="du226065">在编写并且编译读写函数到一个共享对象（.so）中之后，声明一个数据库函数指向该.so文件和函数名。 
+        <p>下面的例子使用了编译好的导入和导出代码。</p>
+             <codeblock>CREATE FUNCTION myread() RETURNS integer
 as '$libdir/gpextprotocol.so', 'myprot_import'
 LANGUAGE C STABLE;
 CREATE FUNCTION mywrite() RETURNS integer
