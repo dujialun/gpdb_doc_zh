@@ -2,165 +2,136 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="kh138244">Configuring the Greenplum System</title>
-  <shortdesc>Greenplum Database can be configured using server configuration parameters.</shortdesc>
+  <title id="kh138244">配置Greenplum数据库系统</title>
+  <shortdesc>Greenplum数据库可以使用服务器配置参数进行配置。</shortdesc>
   <body>
-    <p>Server configuration parameters affect the behavior of Greenplum Database. They are part of
-      the PostgreSQL "Grand Unified Configuration" system, so they are sometimes called "GUCs." Most
-      of the Greenplum server configuration parameters are the same as the PostgreSQL configuration
-      parameters, but some are Greenplum-specific.</p>
+    <p>服务器配置参数会影响Greenplum数据库的行为。它们是PostgreSQL的“大统一配置”系统的一部分，因此它们有时
+      也被称为“GUC”。大部分的Greenplum数据库服务器配置参数和PostgreSQL的配置参数相同，但是也有一些是
+      Greenplum所特有的。</p>
   </body>
   <topic id="topic2" xml:lang="en">
-    <title id="kh155018">About Greenplum Master and Local Parameters</title>
-    <shortdesc>Server configuration parameters can affect the master, the segments, or
-      both.</shortdesc>
+    <title id="kh155018">关于Greenplum数据库的Master参数和本地参数</title>
+    <shortdesc>服务器配置参数可能单独影响Master或者Segment，也可能二者都影响到。</shortdesc>
     <body>
-      <p>Server configuration files contain parameters that configure server behavior. The Greenplum
-        Database configuration file, <filepath>postgresql.conf</filepath>, resides in the data
-        directory of the database instance.</p>
-      <p>The master and each segment instance have their own <filepath>postgresql.conf</filepath>
-        file. Some parameters are <i>local</i>: each segment instance examines its
-          <filepath>postgresql.conf</filepath> file to get the value of that parameter. Set local
-        parameters on the master and on each segment instance.</p>
-      <p>Other parameters are <i>master</i> parameters that you set on the master instance. The
-        value is passed down to (or in some cases ignored by) the segment instances at query run
-        time.</p>
-      <p>See the <cite>Greenplum Database Reference Guide</cite> for information about <i>local</i>
-        and <i>master</i> server configuration parameters.</p>
+      <p>服务器配置文件包含着配置服务器行为的参数。Greenplum数据库的配置文件<filepath>postgresql.conf</filepath>
+        位于数据库实例的数据目录之下。</p>
+      <p>Master和每一个Segment实例都有自己的<filepath>postgresql.conf</filepath>文件。
+        一些参数是<i>本地</i>的：每个Segment实例检查它的<filepath>postgresql.conf</filepath>文件来得到这类
+        参数的值。在Master和每一个Segment实例上都要设置本地参数。</p>
+      <p>其他参数是用户要在Master实例上设置的<i>master</i>参数。其值会在查询运行时被向下传递到Segment实例
+        （或者在某些情况中会被忽略）。</p>
+      <p>有关<i>本地</i>以及<i>master</i>服务器配置参数的信息请见<cite>Greenplum Database Reference Guide</cite>。</p>
     </body>
   </topic>
   <topic id="topic3" xml:lang="en">
-    <title id="kh155020">Setting Configuration Parameters</title>
-    <shortdesc>Server configuration parameters may be set at several different levels so that you
-      can manage the system behavior overall and in specific situations.</shortdesc>
+    <title id="kh155020">设置配置参数</title>
+    <shortdesc>服务器配置参数可以在几个不同的级别上进行设置，这就使我们可以整体管理系统行为，也可以控制在某些情形下调整参数以
+      调整系统行为。</shortdesc>
     <body>
-      <p>Many configuration parameters limit who can change them and where or when they can be set.
-        For example, to change certain parameters, you must be a Greenplum Database superuser. Other
-        parameters can be set only at the system level in the <filepath>postgresql.conf</filepath>
-        file or require a system restart to take effect. </p>
-      <p>Many configuration parameters are <i>session</i> parameters. You can set session parameters
-        at the system level, the database level, the role level or the session level. Database users
-        can change most session parameters within their session, but some require superuser
-        permissions. See the <cite>Greenplum Database Reference Guide</cite> for information about
-        setting server configuration parameters.</p>
+      <p>很多配置参数限制了谁能改变它们以及何时何处它们可以被设置。例如，要改变特定的参数，用户必须是一个Greenplum数据库超级用户。
+        其他参数只能从<filepath>postgresql.conf</filepath>文件中在系统级别上被设置，或者还要求系统重启让设置生效。</p>
+      <p>很多配置参数是<i>会话</i>参数。用户可以在系统级别、数据库级别、角色级别或者会话级别设置会话参数。数据库用户可以在他们的
+        会话中改变大部分会话参数，但是某些要求超级用户权限。关于设置服务器配置参数的信息请见
+        <cite>Greenplum Database Reference Guide</cite>。</p>
     </body>
     <topic id="topic4" xml:lang="en">
-      <title id="kh171457">Setting a Local Configuration Parameter</title>
+      <title id="kh171457">设置本地配置参数</title>
       <body>
-        <p>To change a local configuration parameter across multiple segments, update the parameter
-          in the <codeph>postgresql.conf</codeph> file of each targeted segment, both primary and
-          mirror. Use the <codeph>gpconfig</codeph> utility to set a parameter in all Greenplum
-            <codeph>postgresql.conf</codeph> files. For example:</p>
+        <p>要在多个Segment中改变一个本地配置参数，在每一个目标Segment的<codeph>postgresql.conf</codeph>文件中更新该参数，
+          包括主要的和镜像的Segment。使用<codeph>gpconfig</codeph>工具可以在所有的Greenplum <codeph>postgresql.conf</codeph>
+          文件中设置一个参数。例如：</p>
         <p>
           <codeblock>$ gpconfig -c gp_vmem_protect_limit -v 4096MB</codeblock>
         </p>
-        <p>Restart Greenplum Database to make the configuration changes effective:</p>
+        <p>重启Greenplum数据库让配置改变生效：</p>
         <p>
           <codeblock>$ gpstop -r</codeblock>
         </p>
       </body>
     </topic>
     <topic id="topic5" xml:lang="en">
-      <title id="kh156891">Setting a Master Configuration Parameter</title>
+      <title id="kh156891">设置Master配置参数</title>
       <body>
-        <p>To set a master configuration parameter, set it at the Greenplum master instance. If it
-          is also a <i>session</i> parameter, you can set the parameter for a particular database,
-          role or session. If a parameter is set at multiple levels, the most granular level takes
-          precedence. For example, session overrides role, role overrides database, and database
-          overrides system.</p>
+        <p>要设置Master配置参数，请在Greenplum数据库的Master实例上设置它。如果它也是一个<i>会话</i>参数，用户可以为一个特定数据库、
+          角色或者会话设置该桉树。如果一个参数在多个级别上都被设置，最细粒度级别上的设置会优先。例如，会话覆盖角色，角色覆盖
+          数据库，而数据库覆盖系统。</p>
       </body>
       <topic id="topic6" xml:lang="en">
-        <title id="kh156892">Setting Parameters at the System Level</title>
+        <title id="kh156892">设置系统级别参数</title>
         <body>
-          <p>Master parameter settings in the master <codeph>postgresql.conf </codeph>file are the
-            system-wide default. To set a master parameter:</p>
+          <p>Master的<codeph>postgresql.conf</codeph>文件中的Master参数设置是系统范围默认的。要设置一个Master参数：</p>
           <ol>
-            <li id="kh160766">Edit the <codeph>$MASTER_DATA_DIRECTORY/postgresql.conf</codeph>
-              file.</li>
-            <li id="kh160741">Find the parameter to set, uncomment it (remove the preceding
-                <codeph>#</codeph> character), and type the desired value.</li>
-            <li id="kh160753">Save and close the file.</li>
-            <li id="kh160780">For <i>session</i> parameters that do not require a server restart,
-              upload the <codeph>postgresql.conf</codeph> changes as follows:<p>
+            <li id="kh160766">编辑<codeph>$MASTER_DATA_DIRECTORY/postgresql.conf</codeph>文件</li>
+            <li id="kh160741">找到要设置的参数，取消它的注释（移除前面的<codeph>#</codeph>字符），并且输入想要的值。</li>
+            <li id="kh160753">保存并且关闭该文件。</li>
+            <li id="kh160780">对于不需要重新启动服务器的<i>session</i>参数，按如下上传<codeph>postgresql.conf</codeph>的改变：<p>
                 <codeblock>$ gpstop -u</codeblock>
               </p></li>
-            <li id="kh160789">For parameter changes that require a server restart, restart Greenplum
-              Database as follows:<p>
+            <li id="kh160789">对于要求服务器重启的参数更改，按如下重启Greenplum数据库：<p>
                 <codeblock>$ gpstop -r</codeblock>
               </p></li>
           </ol>
-          <p>For details about the server configuration parameters, see the <cite>Greenplum Database
-              Reference Guide</cite>.</p>
+          <p>关于服务器配置参数的细节，请见<cite>Greenplum Database Reference Guide</cite>。</p>
         </body>
       </topic>
       <topic id="topic7" xml:lang="en">
-        <title>Setting Parameters at the Database Level</title>
+        <title>设置数据库级别参数</title>
         <body>
-          <p>Use <codeph>ALTER DATABASE</codeph> to set parameters at the database level. For
-            example:</p>
+          <p>使用<codeph>ALTER DATABASE</codeph>在数据库级别设置参数。例如：</p>
           <p>
             <codeblock>=# ALTER DATABASE mydatabase SET search_path TO myschema;</codeblock>
           </p>
-          <p>When you set a session parameter at the database level, every session that connects to
-            that database uses that parameter setting. Settings at the database level override
-            settings at the system level.</p>
+          <p>当用户在数据库级别设置一个会话参数时，每一个连接到该数据库的会话都使用该参数设置。
+            数据库级别的设置覆盖系统级别的设置。</p>
         </body>
       </topic>
       <topic id="topic8" xml:lang="en">
-        <title>Setting Parameters at the Role Level</title>
+        <title>设置角色级别参数</title>
         <body>
-          <p>Use <codeph>ALTER ROLE</codeph> to set a parameter at the role level. For example:</p>
+          <p>使用<codeph>ALTER ROLE</codeph>在角色级别设置参数。例如：</p>
           <p>
             <codeblock>=# ALTER ROLE bob SET search_path TO bobschema;</codeblock>
           </p>
-          <p>When you set a session parameter at the role level, every session initiated by that
-            role uses that parameter setting. Settings at the role level override settings at the
-            database level.</p>
+          <p>W当用户在角色级别设置一个会话参数时，每一个由该角色启动的会话都使用该参数设置。
+            角色级别的设置覆盖数据库级别的设置。</p>
         </body>
       </topic>
       <topic id="topic9" xml:lang="en">
-        <title>Setting Parameters in a Session</title>
+        <title>设置会话级别参数</title>
         <body>
-          <p>Any session parameter can be set in an active database session using the
-              <codeph>SET</codeph> command. For example:</p>
+          <p>任何会话参数都可以在一个活动数据库会话中用<codeph>SET</codeph>命令设置。例如：</p>
           <p>
             <codeblock>=# SET statement_mem TO '200MB';</codeblock>
           </p>
-          <p>The parameter setting is valid for the rest of that session or until you issue a
-              <codeph>RESET</codeph> command. For example:</p>
+          <p>该参数设置对于这个会话的剩余时间都有效，直到发出一个<codeph>RESET</codeph>命令。例如：</p>
           <p>
             <codeblock>=# RESET statement_mem;</codeblock>
           </p>
-          <p>Settings at the session level override those at the role level.</p>
+          <p>会话级别的设置覆盖角色级别的设置。</p>
         </body>
       </topic>
     </topic>
   </topic>
   <topic id="topic10" xml:lang="en">
-    <title id="kh170981">Viewing Server Configuration Parameter Settings</title>
+    <title id="kh170981">查看服务器配置参数设置</title>
     <body>
-      <p>The SQL command <codeph>SHOW</codeph> allows you to see the current server configuration
-        parameter settings. For example, to see the settings for all parameters: </p>
+      <p>SQL命令<codeph>SHOW</codeph>允许用户查看当前的服务器配置参数设置。例如，要查看所有参数的设置：</p>
       <p>
         <codeblock>$ psql -c 'SHOW ALL;'</codeblock>
       </p>
-      <p><codeph>SHOW</codeph> lists the settings for the master instance only. To see the value of
-        a particular parameter across the entire system (master and all segments), use the
-          <codeph>gpconfig</codeph> utility. For example:</p>
+      <p><codeph>SHOW</codeph>只列出Master实例的设置。要查看整个系统（Master和所有的Segment）
+        中一个特定参数的值，使用<codeph>gpconfig</codeph>工具。例如：</p>
       <p>
         <codeblock>$ gpconfig --show max_connections</codeblock>
       </p>
     </body>
   </topic>
   <topic id="topic11" xml:lang="en">
-    <title id="kh155019">Configuration Parameter Categories</title>
-    <shortdesc>Server configuration parameters that work together to configure a behavior are
-      presented together in categories. </shortdesc>
+    <title id="kh155019">配置参数种类</title>
+    <shortdesc>配置某一行为的服务器配置参数会按种类分配在一起。</shortdesc>
     <body>
-      <p>Configuration parameters affect categories of server behaviors, such as resource
-        consumption, query tuning, and authentication. The following topics describe Greenplum
-        configuration parameter categories. For details about configuration parameter categories,
-        see the <cite>Greenplum Database Reference Guide</cite>.</p>
+      <p>配置参数影响着多种服务器行为，例如资源消耗、查询调节以及认证。下列主题描述了
+        Greenplum数据库配置参数的种类。有关配置参数种类的细节，请见<cite>Greenplum Database Reference Guide</cite>.</p>
       <ul>
         <li id="kh158485">
           <xref href="#topic12" type="topic" format="dita"/>
@@ -207,14 +178,13 @@
       </ul>
     </body>
     <topic id="topic12" xml:lang="en">
-      <title id="kh155037">Connection and Authentication Parameters</title>
+      <title id="kh155037">连接和认证参数</title>
       <body>
-        <p>These parameters control how clients connect and authenticate to Greenplum Database. See
-            <xref href="../partIII.xml#topic1" type="topic" format="dita"/> for information about
-          configuring client authentication.</p>
+        <p>这些参数控制着客户端如何连接到Greenplum数据库以及如何被认证。有关配置客户端认证的信息请见
+            <xref href="../partIII.xml#topic1" type="topic" format="dita"/>。</p>
       </body>
       <topic id="topic13" xml:lang="en">
-        <title>Connection Parameters</title>
+        <title>连接参数</title>
         <body>
           <simpletable id="kh159468">
             <strow>
@@ -260,7 +230,7 @@
         </body>
       </topic>
       <topic id="topic14" xml:lang="en">
-        <title>Security and Authentication Parameters</title>
+        <title>安全性和认证参数</title>
         <body>
           <simpletable id="kh159695">
             <strow>
@@ -298,13 +268,12 @@
       </topic>
     </topic>
     <topic id="topic15" xml:lang="en">
-      <title id="kh155038">System Resource Consumption Parameters</title>
+      <title id="kh155038">系统资源消耗参数</title>
       <topic id="topic16" xml:lang="en">
-        <title>Memory Consumption Parameters</title>
+        <title>内存消耗参数</title>
         <body>
-          <p>These parameters control system memory usage. You can adjust
-              <codeph>gp_vmem_protect_limit</codeph> to avoid running out of memory at the segment
-            hosts during query processing.</p>
+          <p>这些参数控制着系统的内存使用。用户可以调整<codeph>gp_vmem_protect_limit</codeph>来避免
+            查询处理期间在Segment上耗尽内存。</p>
           <simpletable id="kh160388">
             <strow>
               <stentry>
@@ -349,7 +318,7 @@
         </body>
       </topic>
       <topic id="topic18" xml:lang="en">
-        <title>OS Resource Parameters</title>
+        <title>操作系统资源参数</title>
         <body>
           <ul>
             <li id="kh161068">
@@ -362,17 +331,12 @@
         </body>
       </topic>
       <topic id="topic19" xml:lang="en">
-        <title>Cost-Based Vacuum Delay Parameters</title>
+        <title>基于代价的清理延迟参数</title>
         <body>
-          <note type="warning">Pivotal does not recommend cost-based vacuum delay because it runs
-            asynchronously among the segment instances. The vacuum cost limit and delay is invoked
-            at the segment level without taking into account the state of the entire Greenplum
-            array.</note>
-          <p>You can configure the execution cost of <codeph>VACUUM</codeph> and
-              <codeph>ANALYZE</codeph> commands to reduce the I/O impact on concurrent database
-            activity. When the accumulated cost of I/O operations reaches the limit, the process
-            performing the operation sleeps for a while, then resets the counter and continues
-            execution.</p>
+          <note type="warning">Pivotal不鼓励使用基于代价的清理延迟，因为它会在Segment实例之间异步运行。
+            在Segment级别调用的清理代价限制和延迟没有考虑整个Greenplum阵列的状态。</note>
+          <p>用户可以配置<codeph>VACUUM</codeph>以及<codeph>ANALYZE</codeph>命令的执行代价以降低对并发数据库活动的
+            I/O影响。当累计的I/O操作代价达到了限制，执行该操作的进程会睡眠一会儿，然后重置计数器并且继续执行。</p>
           <simpletable id="kh161372">
             <strow>
               <stentry>
@@ -399,7 +363,7 @@
         </body>
       </topic>
       <topic id="topic20" xml:lang="en">
-        <title>Transaction ID Management Parameters</title>
+        <title>事务ID管理参数</title>
         <body>
           <ul>
             <li id="kh183815">
@@ -413,14 +377,12 @@
       </topic>
     </topic>
     <topic id="topic21" xml:lang="en">
-      <title id="kh183779">Query Tuning Parameters</title>
+      <title id="kh183779">查询调节参数</title>
       <topic id="topic22" xml:lang="en">
-        <title>Query Plan Operator Control Parameters</title>
+        <title>查询计划操作符控制参数</title>
         <body>
-          <p>The following parameters control the types of plan operations the query planner can
-            use. Enable or disable plan operations to force the planner to choose a different plan.
-            This is useful for testing and comparing query performance using different plan
-            types.</p>
+          <p>下列参数控制传统查询优化器能使用的计划操作的类型。启用或者禁用计划操作能强制传统查询
+            优化器选择一种不同的计划。这对于测试和比较使用不同计划类型的查询性能非常有用。</p>
           <simpletable id="kh158625">
             <strow>
               <stentry>
@@ -498,12 +460,10 @@
         </body>
       </topic>
       <topic id="topic23" xml:lang="en">
-        <title>Query Planner Costing Parameters</title>
+        <title>查询优化器代价参数</title>
         <body>
-          <note type="warning">Greenplum recommends that you do not adjust these query costing
-            parameters. They are tuned to reflect Greenplum Database hardware configurations and
-            typical workloads. All of these parameters are related. Changing one without changing
-            the others can have adverse effects on performance.<simpletable id="kh181234">
+          <note type="warning">不要调整这些代价参数。它们已经被调整为反映Greenplum数据库的硬件配置
+            以及典型的负载。所有这些参数都是相关的。只改其中一个可能会对性能产生反效果。<simpletable id="kh181234">
               <strow>
                 <stentry>
                   <p>
@@ -541,12 +501,11 @@
         </body>
       </topic>
       <topic id="topic24" xml:lang="en">
-        <title>Database Statistics Sampling Parameters</title>
+        <title>数据库统计信息采样参数</title>
         <body>
-          <p>These parameters adjust the amount of data sampled by an <codeph>ANALYZE</codeph>
-            operation. Adjusting these parameters affects statistics collection system-wide. You can
-            configure statistics collection on particular tables and columns by using the
-              <codeph>ALTER TABLE</codeph><codeph>SET STATISTICS</codeph> clause.</p>
+          <p>这些参数调整被一次<codeph>ANALYZE</codeph>操作采样的数据量。调整这些参数会影响
+            系统范围的统计信息收集。用户可以通过使用<codeph>ALTER TABLE</codeph>的
+            <codeph>SET STATISTICS</codeph>子句在特定表上配置统计信息收集。</p>
           <ul>
             <li id="kh158362">
               <codeph>default_statistics_target </codeph>
@@ -555,7 +514,7 @@
         </body>
       </topic>
       <topic id="topic25" xml:lang="en">
-        <title>Sort Operator Configuration Parameters</title>
+        <title>排序操作符配置参数</title>
         <body>
           <ul>
             <li id="kh158154">
@@ -568,7 +527,7 @@
         </body>
       </topic>
       <topic id="topic26" xml:lang="en">
-        <title>Aggregate Operator Configuration Parameters</title>
+        <title>聚集操作符配置参数</title>
         <body>
           <simpletable id="kh162730">
             <strow>
@@ -602,7 +561,7 @@
         </body>
       </topic>
       <topic id="topic27" xml:lang="en">
-        <title>Join Operator Configuration Parameters</title>
+        <title>连接操作符配置参数</title>
         <body>
           <simpletable id="kh162782">
             <strow>
@@ -630,7 +589,7 @@
         </body>
       </topic>
       <topic id="topic28" xml:lang="en">
-        <title>Other Query Planner Configuration Parameters</title>
+        <title>其他传统查询优化器配置参数</title>
         <body>
           <ul>
             <li id="kh175850">
@@ -650,9 +609,9 @@
       </topic>
     </topic>
     <topic id="topic29" xml:lang="en">
-      <title id="kh155046">Error Reporting and Logging Parameters</title>
+      <title id="kh155046">错误报告和日志参数</title>
       <topic id="topic30" xml:lang="en">
-        <title>Log Rotation</title>
+        <title>日志轮转</title>
         <body>
           <simpletable id="kh163344">
             <strow>
@@ -674,7 +633,7 @@
         </body>
       </topic>
       <topic id="topic31" xml:lang="en">
-        <title>When to Log</title>
+        <title>什么时候记录日志</title>
         <body>
           <simpletable id="kh163424">
             <strow>
@@ -702,7 +661,7 @@
         </body>
       </topic>
       <topic id="topic32" xml:lang="en">
-        <title>What to Log</title>
+        <title>记录什么</title>
         <body>
           <simpletable id="kh171216">
             <strow>
@@ -779,12 +738,11 @@
       </topic>
     </topic>
     <topic id="topic33" xml:lang="en">
-      <title id="kh171299">System Monitoring Parameters</title>
+      <title id="kh171299">系统监控参数</title>
       <topic id="topic36" xml:lang="en">
-        <title>Greenplum Performance Monitoring Data Collection Agents</title>
+        <title>Greenplum性能监控数据收集代理</title>
         <body>
-          <p>The following parameters configure the data collection agents for the
-              (<codeph>gpperfmon</codeph>) database.</p>
+          <p>下列命令针对数据库(<codeph>gpperfmon</codeph>)设置数据收集代理。</p>
           <simpletable id="kh171891">
             <strow>
               <stentry>
@@ -809,11 +767,10 @@
       </topic>
     </topic>
     <topic id="topic37" xml:lang="en">
-      <title id="kh171364">Runtime Statistics Collection Parameters</title>
+      <title id="kh171364">运行时统计信息收集参数</title>
       <body>
-        <p>These parameters control the server statistics collection feature. When statistics
-          collection is enabled, you can access system catalog statistics data using the
-            <i>pg_stat</i> and <i>pg_statio</i> family of system catalog views.</p>
+        <p>这些参数控制服务器统计信息收集特性。当统计信息收集被启用时，用户可以使用
+          <i>pg_stat</i>以及<i>pg_statio</i>家族的系统目录视图来访问统计信息数据。</p>
         <simpletable id="kh171301">
           <strow>
             <stentry>
@@ -831,16 +788,13 @@
       </body>
     </topic>
     <topic id="topic38" xml:lang="en">
-      <title id="kh155054">Automatic Statistics Collection Parameters</title>
+      <title id="kh155054">自动统计信息收集参数</title>
       <body>
-        <p>When automatic statistics collection is enabled, you can run <codeph>ANALYZE</codeph>
-          automatically in the same transaction as an <codeph>INSERT</codeph>,
-            <codeph>UPDATE</codeph>, <codeph>DELETE</codeph>, <codeph>COPY</codeph> or
-            <codeph>CREATE TABLE...AS SELECT</codeph> statement when a certain threshold of rows is
-          affected (<codeph>on_change</codeph>), or when a newly generated table has no statistics
-            (<codeph>on_no_stats</codeph>). To enable this feature, set the following server
-          configuration parameters in your Greenplum master <codeph>postgresql.conf</codeph> file
-          and restart Greenplum Database: </p>
+        <p>当自动统计信息收集被启用时，在某个阈值的行被影响(<codeph>on_change</codeph>)时或者一个新产生的表没有统计信息
+          (<codeph>on_no_stats</codeph>)时，用户可以自动地在<codeph>INSERT</codeph>、<codeph>UPDATE</codeph>、 
+          <codeph>DELETE</codeph>、<codeph>COPY</codeph>或者<codeph>CREATE TABLE...AS SELECT</codeph>
+          语句的同一个事务中自动运行<codeph>ANALYZE</codeph>。要启用这一特性，在用户的Greenplum Master的
+          <codeph>postgresql.conf</codeph>文件中设置下列服务器配置参数并且重启数据库：</p>
         <ul>
           <li id="kh166083">
             <codeph>gp_autostats_mode</codeph>
@@ -849,15 +803,14 @@
             <codeph>log_autostats</codeph>
           </li>
         </ul>
-        <note type="warning">Depending on the specific nature of your database operations, automatic
-          statistics collection can have a negative performance impact. Carefully evaluate whether
-          the default setting of <codeph>on_no_stats</codeph> is appropriate for your system.</note>
+        <note type="warning">取决于用户的数据库操作的特质，自动统计信息收集可能会带来负面的性能影响。
+          请仔细评估<codeph>on_no_stats</codeph>的默认设置是否适合用户的系统。</note>
       </body>
     </topic>
     <topic id="topic39" xml:lang="en">
-      <title id="kh181507">Client Connection Default Parameters</title>
+      <title id="kh181507">客户端连接默认参数</title>
       <topic id="topic40" xml:lang="en">
-        <title>Statement Behavior Parameters</title>
+        <title>语句行为参数</title>
         <body>
           <simpletable id="kh163609">
             <strow>
@@ -891,7 +844,7 @@
         </body>
       </topic>
       <topic id="topic41" xml:lang="en">
-        <title>Locale and Formatting Parameters</title>
+        <title>区域和格式化参数</title>
         <body>
           <simpletable id="kh163748">
             <strow>
@@ -937,7 +890,7 @@
         </body>
       </topic>
       <topic id="topic42" xml:lang="en">
-        <title>Other Client Default Parameters</title>
+        <title>其他客户端默认参数</title>
         <body>
           <simpletable id="kh164407">
             <strow>
@@ -960,7 +913,7 @@
       </topic>
     </topic>
     <topic id="topic43" xml:lang="en">
-      <title id="kh163788">Lock Management Parameters</title>
+      <title id="kh163788">锁管理参数</title>
       <body>
         <ul>
           <li id="kh164628">
@@ -973,11 +926,9 @@
       </body>
     </topic>
     <topic id="topic44" xml:lang="en">
-      <title id="kh155069">Workload Management Parameters</title>
+      <title id="kh155069">负载管理参数</title>
       <body>
-        <p>The following configuration parameters configure the Greenplum Database workload
-          management feature (resource queues), query prioritization, memory utilization and
-          concurrency control. </p>
+        <p>下列配置参数配置Greenplum数据库负载管理特性（资源队列）、查询优先、内存利用和并发控制。</p>
         <simpletable id="kh157161">
           <strow>
             <stentry>
@@ -1022,11 +973,10 @@
       </body>
     </topic>
     <topic id="topic45" xml:lang="en">
-      <title id="kh155070">External Table Parameters</title>
+      <title id="kh155070">外部表参数</title>
       <body>
-        <p>The following parameters configure the external tables feature of Greenplum Database. See
-            <xref href="../load/topics/g-external-tables.xml#topic3"/> for more information about
-          external tables.</p>
+        <p>下面的参数配置Greenplum数据库的外部表特性。有关外部表的信息请见
+            <xref href="../load/topics/g-external-tables.xml#topic3"/>。</p>
         <simpletable id="kh164454">
           <strow>
             <stentry>
@@ -1053,11 +1003,10 @@
       </body>
     </topic>
     <topic id="topic46" xml:lang="en">
-      <title id="kh155071">Append-Optimized Table Parameters</title>
+      <title id="kh155071">追加优化表参数</title>
       <body>
-        <p>The following parameters configure the append-optimized tables feature of Greenplum
-          Database. See <xref href="../ddl/ddl-storage.xml#topic38"/> for more information about
-          append-optimized tables.</p>
+        <p>下列参数配置Greenplum数据库的追加优化表的特性。更多有关追加优化表的信息请见
+          <xref href="../ddl/ddl-storage.xml#topic38"/>。</p>
         <ul>
           <li id="kh164980">
             <codeph>max_appendonly_tables</codeph>
@@ -1072,10 +1021,9 @@
       </body>
     </topic>
     <topic id="topic48" xml:lang="en">
-      <title id="kh178569">Past PostgreSQL Version Compatibility Parameters</title>
+      <title id="kh178569">以往的PostgreSQL版本兼容参数</title>
       <body>
-        <p>The following parameters provide compatibility with older PostgreSQL versions. You do not
-          need to change these parameters in Greenplum Database.</p>
+        <p>下列参数提供对旧版本PostgreSQL的兼容性。在Greenplum数据库中用户不需要改变这些参数。</p>
         <simpletable id="kh162083">
           <strow>
             <stentry>
@@ -1105,14 +1053,12 @@
       </body>
     </topic>
     <topic id="topic49" xml:lang="en">
-      <title id="kh182770">Greenplum Array Configuration Parameters</title>
+      <title id="kh182770">Greenplum阵列配置参数</title>
       <body>
-        <p>The parameters in this topic control the configuration of the Greenplum Database array
-          and its components: segments, master, distributed transaction manager, master mirror, and
-          interconnect.</p>
+        <p>这个主题中的参数控制着Greenplum数据库阵列及其组件（Segment、Master、分布式事务管理器、Master镜像和Interconnect）的配置。</p>
       </body>
       <topic id="topic50" xml:lang="en">
-        <title>Interconnect Configuration Parameters</title>
+        <title>Interconnect配置参数</title>
         <body>
           <simpletable id="kh162132">
             <strow>
@@ -1146,7 +1092,7 @@
         </body>
       </topic>
       <topic id="topic51" xml:lang="en">
-        <title>Dispatch Configuration Parameters</title>
+        <title>分派配置参数</title>
         <body>
           <simpletable id="kh162158">
             <strow>
@@ -1171,7 +1117,7 @@
         </body>
       </topic>
       <topic id="topic52" xml:lang="en">
-        <title>Fault Operation Parameters</title>
+        <title>错误操作参数</title>
         <body>
           <simpletable id="kh165991">
             <strow>
@@ -1193,7 +1139,7 @@
         </body>
       </topic>
       <topic id="topic53" xml:lang="en">
-        <title>Distributed Transaction Management Parameters</title>
+        <title>分布式事务管理参数</title>
         <body>
           <ul>
             <li id="kh165869">
@@ -1203,7 +1149,7 @@
         </body>
       </topic>
       <topic id="topic54" xml:lang="en">
-        <title>Read-Only Parameters</title>
+        <title>只读参数</title>
         <body>
           <ul>
             <li id="kh164510">
@@ -1226,10 +1172,9 @@
       </topic>
     </topic>
     <topic id="topic55" xml:lang="en">
-      <title id="kh184289">Greenplum Master Mirroring Parameters</title>
+      <title id="kh184289">Greenplum的Master镜像参数</title>
       <body>
-        <p>The parameters in this topic control the configuration of the replication between
-          Greenplum Database primary master and standby master.</p>
+        <p>这些参数控制Greenplum数据的主Master和备Master之间的复制配置</p>
         <ul>
           <li id="kh184294">
             <codeph>keep_wal_segments</codeph>

@@ -2,12 +2,11 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="nn173529">Managing a Greenplum System</title>
-  <shortdesc>This section describes basic system administration tasks performed by a Greenplum
-    Database system administrator. </shortdesc>
+  <title id="nn173529">管理一个Greenplum系统</title>
+  <shortdesc>这一节描述了一个Greenplum数据库系统管理员所执行的基本系统管理任务。</shortdesc>
   <body>
     <section otherprops="op-print">
-      <p>This section contains the following topics:<ul id="ul_dgc_f4q_lp" otherprops="op-print">
+      <p>这一节包含以下主题:<ul id="ul_dgc_f4q_lp" otherprops="op-print">
           <li><xref href="versioning.xml#topic1"/></li>
           <li><xref href="startstop.xml#topic1"/></li>
           <li><xref href="../access_db/topics/g-accessing-the-database.xml"/></li>

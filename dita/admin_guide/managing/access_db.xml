@@ -2,75 +2,64 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="io138244">Accessing the Database</title>
-  <shortdesc>This topic describes the various client tools you can use to connect to Greenplum
-    Database, and how to establish a database session.</shortdesc>
+  <title id="io138244">访问数据库</title>
+  <shortdesc>这个主题描述了几种可用来连接Greenplum数据库的客户端工具以及如何建立一个数据库会话。</shortdesc>
   <topic id="topic2" xml:lang="en">
-    <title id="io140159">Establishing a Database Session</title>
-    <shortdesc>Greenplum Database supports interactive client programs and connections from
-      applications through PostgreSQL-compatible database connectivity libraries.</shortdesc>
+    <title id="io140159">建立一个数据库会话</title>
+    <shortdesc>Greenplum数据库支持交互式客户端连接程序，也支持应用通过兼容PostgreSQL数据库的客户端库连接进来。</shortdesc>
     <body>
-      <p>Users can connect to Greenplum Database using a PostgreSQL-compatible client program, such
-        as <codeph>psql</codeph>. Users and administrators <i>always</i> connect to Greenplum
-        Database through the <i>master</i>; the segments cannot accept client connections.</p>
-      <p>In order to establish a connection to the Greenplum Database master, you will need to know
-        the following connection information and configure your client program accordingly.</p>
+      <p>用户可以通过使用一种PostgreSQL兼容的客户端程序连接到Greenplum数据库，例如<codeph>psql</codeph>。
+        用户和管理员<i>总是</i>通过Master连接到Greenplum数据库，Segment不能接受客户端连接。</p>
+      <p>为了建立一个到Greenplum数据库Master的连接，用户将需要知道下列连接信息并且相应地配置用户的客户端程序。</p>
       <table id="io140729">
-        <title>Connection Parameters</title>
+        <title>连接参数</title>
         <tgroup cols="3">
           <colspec colnum="1" colname="col1" colwidth="1*"/>
           <colspec colnum="2" colname="col2" colwidth="2*"/>
           <colspec colnum="3" colname="col3" colwidth="1*"/>
           <thead>
             <row>
-              <entry colname="col1">Connection Parameter</entry>
-              <entry colname="col2">Description</entry>
-              <entry colname="col3">Environment Variable</entry>
+              <entry colname="col1">连接参数</entry>
+              <entry colname="col2">描述</entry>
+              <entry colname="col3">环境变量</entry>
             </row>
           </thead>
           <tbody>
             <row>
-              <entry colname="col1">Application name</entry>
-              <entry colname="col2">The application name that is connecting to the database. The
-                default value, held in the <codeph>application_name</codeph> connection parameter is
-                  <i>psql</i>.</entry>
+              <entry colname="col1">应用名称</entry>
+              <entry colname="col2">连接到数据库的应用名称，保存在<codeph>application_name</codeph>连接参数中。默认值是
+                  <i>psql</i>。</entry>
               <entry colname="col3">
                 <codeph>$PGAPPNAME</codeph>
               </entry>
             </row>
             <row>
-              <entry colname="col1">Database name</entry>
-              <entry colname="col2">The name of the database to which you want to connect. For a
-                newly initialized system, use the <codeph>postgres</codeph> database to connect for
-                the first time.</entry>
+              <entry colname="col1">数据库名</entry>
+              <entry colname="col2">用户想要连接的数据库名称。对于一个刚初始化的系统，第一次可使用<codeph>postgres</codeph>数据库来连接。</entry>
               <entry colname="col3">
                 <codeph>$PGDATABASE</codeph>
               </entry>
             </row>
             <row>
-              <entry colname="col1">Host name</entry>
-              <entry colname="col2">The host name of the Greenplum Database master. The default host
-                is the local host. </entry>
+              <entry colname="col1">主机名</entry>
+              <entry colname="col2">Greenplum数据库的Master的主机名。默认主机是本地主机。</entry>
               <entry colname="col3">
                 <codeph>$PGHOST</codeph>
               </entry>
             </row>
             <row>
-              <entry colname="col1">Port</entry>
-              <entry colname="col2">The port number that the Greenplum Database master instance is
-                running on. The default is 5432.</entry>
+              <entry colname="col1">端口</entry>
+              <entry colname="col2">Greenplum数据库的Master实例所运行的端口号。默认为5432。</entry>
               <entry colname="col3">
                 <codeph>$PGPORT</codeph>
               </entry>
             </row>
             <row>
-              <entry colname="col1">User name</entry>
-              <entry colname="col2">The database user (role) name to connect as. This is not
-                necessarily the same as your OS user name. Check with your Greenplum administrator
-                if you are not sure what you database user name is. Note that every Greenplum
-                Database system has one superuser account that is created automatically at
-                initialization time. This account has the same name as the OS name of the user who
-                initialized the Greenplum system (typically <codeph>gpadmin</codeph>).</entry>
+              <entry colname="col1">用户名</entry>
+              <entry colname="col2">要以其身份连接的数据库用户（角色）名。这不需要和用户的操作系统用户名一样。
+                如果用户不确定用户的数据库用户名是什么，请咨询用户的Greenplum管理员。注意每一个Greenplum数据库
+                系统都有一个在初始化时自动创建的超级用户账号。这个账号的名称和初始化Greenplum系统的用户
+                的操作系统用户名相同。 (最有代表性的是 <codeph>gpadmin</codeph>)。</entry>
               <entry colname="col3">
                 <codeph>$PGUSER</codeph>
               </entry>
@@ -81,45 +70,37 @@
     </body>
   </topic>
   <topic id="topic3" xml:lang="en">
-    <title id="io140721">Supported Client Applications</title>
-    <shortdesc>The PostgreSQL<codeph>psql</codeph> interactive client is included with Greenplum
-      Database. Third party clients are also available.</shortdesc>
+    <title id="io140721">支持的客户端应用</title>
+    <shortdesc>PostgreSQL的交互式客户端<codeph>psql</codeph>可以连接到Greenplum
+      数据库。另外一些三方客户端也可以连接到Greenplum数据库。</shortdesc>
     <body>
-      <p>Users can connect to Greenplum Database using various client applications:</p>
+      <p>用户可以使用多种客户端应用连接到Greenplum数据库：</p>
       <ul>
-        <li id="io141965">A number of <xref href="#topic4" type="topic" format="dita"/> are provided
-          with your Greenplum installation. The <codeph>psql</codeph> client application provides an
-          interactive command-line interface to Greenplum Database. </li>
-        <li id="io155276"><xref href="#topic6" type="topic" format="dita"/> is an  updated version
-          of the popular management tool pgAdmin. Since version 1.10.0, the pgAdmin client available
-          from PostgreSQL Tools includes support for  some Greenplum-specific features. Installation
-          packages are available for download from the <xref
-            href="https://www.pgadmin.org/download/" scope="external" format="html"><ph>pgAdmin
-              download site</ph></xref>.</li>
-        <li id="io141985">Using standard <xref href="#topic12" type="topic" format="dita"/>, such as
-          ODBC and JDBC, users can create their own client applications that interface to Greenplum
-          Database. Because Greenplum Database is based on PostgreSQL, it uses the standard
-          PostgreSQL database drivers.</li>
-        <li id="io141996">Most <xref href="#topic13" type="topic" format="dita"/> that use standard
-          database interfaces, such as ODBC and JDBC, can be configured to connect to Greenplum
-          Database.</li>
+        <li id="io141965">用户的Greenplum安装中已经提供了一些<xref href="#topic4" type="topic" format="dita"/>
+          <codeph>psql</codeph>客户端应用提供了一种对Greenplum数据库的交互式命令行接口。</li>
+        <li id="io155276"><xref href="#topic6" type="topic" format="dita"/> 是流行的管理工具pgAdmin的最新版本。
+          从1.10.0版本开始，pgAdmin就开始支持部分Greenplum的特性。安装包下载地址<xref
+            href="https://www.pgadmin.org/download/" scope="external" format="html"><ph>pgAdmin下载地址</ph></xref>.</li>
+        <li id="io141985">使用标准的<xref href="#topic12" type="topic" format="dita"/>，如ODBC和JDBC，
+          用户可以创建他们自己的客户端应用来接入到Greenplum数据库。因为Greenplum数据库基于PostgreSQL开发，所以它使用标准的PostgreSQL数据库驱动。</li>
+        <li id="io141996">大部分使用ODBC和JDBC等标准数据库接口的<xref href="#topic13" type="topic" format="dita"/>
+          都可以被配置来连接到 Greenplum数据库。</li>
       </ul>
     </body>
     <topic id="topic4" xml:lang="en">
-      <title id="io140725">Greenplum Database Client Applications</title>
+      <title id="io140725">Greenplum数据库客户端应用</title>
       <body>
-        <p>Greenplum Database comes installed with a number of client applications located in
-            <codeph>$GPHOME/bin</codeph> of your Greenplum Database master host installation. The
-          following are the most commonly used client applications:</p>
+        <p>Greenplum数据库安装后就会带有一些客户端工具应用，它们位于用户的Greenplum数据库Master主机安装的
+          <codeph>$GPHOME/bin</codeph>目录中。下列是最常用的客户端工具应用：</p>
         <table id="io142026">
-          <title>Commonly used client applications</title>
+          <title>最常用的客户端应用</title>
           <tgroup cols="2">
             <colspec colnum="1" colname="col1" colwidth="110pt"/>
             <colspec colnum="2" colname="col2" colwidth="266pt"/>
             <thead>
               <row>
-                <entry colname="col1">Name</entry>
-                <entry colname="col2">Usage</entry>
+                <entry colname="col1">名称</entry>
+                <entry colname="col2">用法</entry>
               </row>
             </thead>
             <tbody>
@@ -127,159 +108,137 @@
                 <entry colname="col1">
                   <codeph>createdb</codeph>
                 </entry>
-                <entry colname="col2">create a new database</entry>
+                <entry colname="col2">创建一个新数据库</entry>
               </row>
               <row>
                 <entry colname="col1">
                   <codeph>createlang</codeph>
                 </entry>
-                <entry colname="col2">define a new procedural language</entry>
+                <entry colname="col2">定义一种新的过程语言</entry>
               </row>
               <row>
                 <entry colname="col1">
                   <codeph>createuser</codeph>
                 </entry>
-                <entry colname="col2">define a new database role</entry>
+                <entry colname="col2">定义一个新的数据库角色</entry>
               </row>
               <row>
                 <entry colname="col1">
                   <codeph>dropdb</codeph>
                 </entry>
-                <entry colname="col2">remove a database</entry>
+                <entry colname="col2">移除一个数据库</entry>
               </row>
               <row>
                 <entry colname="col1">
                   <codeph>droplang</codeph>
                 </entry>
-                <entry colname="col2">remove a procedural language</entry>
+                <entry colname="col2">移除一种过程语言</entry>
               </row>
               <row>
                 <entry colname="col1">
                   <codeph>dropuser</codeph>
                 </entry>
-                <entry colname="col2">remove a role</entry>
+                <entry colname="col2">移除一个角色</entry>
               </row>
               <row>
                 <entry colname="col1">
                   <codeph>psql</codeph>
                 </entry>
-                <entry colname="col2">PostgreSQL interactive terminal</entry>
+                <entry colname="col2">PostgreSQL交互式终端</entry>
               </row>
               <row>
                 <entry colname="col1">
                   <codeph>reindexdb</codeph>
                 </entry>
-                <entry colname="col2">reindex a database</entry>
+                <entry colname="col2">对一个数据库重建索引</entry>
               </row>
               <row>
                 <entry colname="col1">
                   <codeph>vacuumdb</codeph>
                 </entry>
-                <entry colname="col2">garbage-collect and analyze a database</entry>
+                <entry colname="col2">对一个数据库进行垃圾收集和分析</entry>
               </row>
             </tbody>
           </tgroup>
         </table>
-        <p>When using these client applications, you must connect to a database through the
-          Greenplum master instance. You will need to know the name of your target database, the
-          host name and port number of the master, and what database user name to connect as. This
-          information can be provided on the command-line using the options <codeph>-d</codeph>,
-            <codeph>-h</codeph>, <codeph>-p</codeph>, and <codeph>-U</codeph> respectively. If an
-          argument is found that does not belong to any option, it will be interpreted as the
-          database name first.</p>
-        <p>All of these options have default values which will be used if the option is not
-          specified. The default host is the local host. The default port number is 5432. The
-          default user name is your OS system user name, as is the default database name. Note that
-          OS user names and Greenplum Database user names are not necessarily the same. </p>
-        <p id="io141912">If the default values are not correct, you can set the environment
-          variables <codeph>PGDATABASE</codeph>, <codeph>PGHOST</codeph>, <codeph>PGPORT</codeph>,
-          and <codeph>PGUSER</codeph> to the appropriate values, or use a
-            <codeph>psql</codeph><codeph>~/.pgpass</codeph> file to contain frequently-used
-          passwords. For information about Greenplum Database environment variables, see the
-            <i>Greenplum Database Reference Guide</i>. For information about psql, see the
-            <i>Greenplum Database Utility Guide</i>.</p>
+        <p>在使用这些客户端应用时，用户必须通过Greenplum的Master实例连接到一个数据库。
+          用户将需要知道目标数据库的名称、Master的主机名和端口号，还有用于连接的数据库用户名。
+          这些信息可以在命令行上分别用选项<codeph>-d</codeph>、<codeph>-h</codeph>、
+          <codeph>-p</codeph>和<codeph>-U</codeph>来提供。如果找到不属于任何一个选项的参数，
+          它将被首先解释为数据库名。</p>
+        <p>所有这些选项都有默认值，如果该选项没有被指定就会使用其默认值。默认主机是本地主机。默认端口号是5432。
+          默认用户名是用户的操作系统用户名，同时也是默认的数据库名。注意操作系统用户名和Greenplum数据库用户名并不需要一样。</p>
+        <p id="io141912">如果默认值和实际情况不同，用户可以设置环境变量<codeph>PGDATABASE</codeph>、<codeph>PGHOST</codeph>、
+          <codeph>PGPORT</codeph>和<codeph>PGUSER</codeph>为合适的值，或者使用一个<codeph>psql</codeph><codeph>~/.pgpass</codeph>文件来包含常用的口令。
+          更多有关Greenplum数据库环境变量的信息，请见<i>Greenplum Database Reference Guide</i>。有关psql的信息请见，
+            <i>Greenplum Database Utility Guide</i>。</p>
       </body>
       <topic id="topic5" xml:lang="en">
-        <title id="io141913">Connecting with psql</title>
+        <title id="io141913">用psql连接</title>
         <body>
-          <p>Depending on the default values used or the environment variables you have set, the
-            following examples show how to access a database via <codeph>psql</codeph>:</p>
+          <p>依靠用户使用的默认值或者已经设置的环境变量，下面的例子展示了如何通过<codeph>psql</codeph>来访问数据库：</p>
           <p>
             <codeblock>$ psql -d gpdatabase -h master_host -p 5432 -U <codeph>gpadmin</codeph></codeblock>
             <codeblock>$ psql gpdatabase</codeblock>
             <codeblock>$ psql</codeblock>
           </p>
-          <p>If a user-defined database has not yet been created, you can access the system by
-            connecting to the <codeph>postgres</codeph> database. For
-            example:<codeblock>$ psql postgres</codeblock></p>
-          <p>After connecting to a database, <codeph>psql</codeph> provides a prompt with the name
-            of the database to which <codeph>psql</codeph> is currently connected, followed by the
-            string <codeph>=&gt;</codeph> (or <codeph>=#</codeph> if you are the database
-            superuser). For example:</p>
+          <p>如果还没有创建一个用户定义的数据库，用户可以通过连接到<codeph>postgres</codeph>数据库来访问系统。例如：
+            <codeblock>$ psql postgres</codeblock></p>
+          <p>在连接到一个数据库后，<codeph>psql</codeph>psql提供了一个提示符，提示符由<codeph>psql</codeph>
+            psql当前连接的数据库名后面加上=><codeph>=&gt;</codeph> (如果用户是数据库超级用户则会是<codeph>=#</codeph>)构成。例如：</p>
           <p>
             <codeblock>gpdatabase=&gt;</codeblock>
           </p>
-          <p>At the prompt, you may type in SQL commands. A SQL command must end with a
-              <codeph>;</codeph> (semicolon) in order to be sent to the server and executed. For
-            example:</p>
+          <p>在提示符处，用户可以输入SQL命令。为了能把一个SQL命令发送到服务器并且执行，SQL命令必须以一个
+            <codeph>;</codeph>（分号）结束。例如：</p>
           <p>
             <codeblock>=&gt; SELECT * FROM mytable;</codeblock>
           </p>
-          <p>See the <i>Greenplum Reference Guide</i> for information about using the
-              <codeph>psql</codeph> client application and SQL commands and syntax.</p>
+          <p>有关使用<codeph>psql</codeph>客户端应用以及SQL命令及语法的信息请见<i>Greenplum Reference Guide</i></p>
         </body>
       </topic>
     </topic>
     <topic id="topic6" xml:lang="en">
       <title id="io140208">pgAdmin 4</title>
       <body>
-        <p>If you prefer a graphic interface, use pgAdmin 4. This GUI client supports PostgreSQL
-          databases with all standard pgAdmin 4 features, while adding support for some
-          Greenplum-specific features. </p>
-        <p>pgAdmin 4 supports the following Greenplum-specific features:</p>
+        <p>如果喜欢图形化用户接口，可以使用pgAdmin 4工具。该GUI客户端支持所有的PostgreSQL数据库特征，
+          并且增加了对部分Greenplum数据库特征的支持。</p>
+        <p>pgAdmin 4支持Greenplum数据库的以下特征:</p>
         <ul id="ul_dc4_g15_3bb">
-          <li>Viewing Greenplum table DDL.</li>
-          <li id="io147522">Append-optimized tables, including compressed append-optimized tables.
-              <note>Only limited functionality for Greenplum partitioned tables is available with
-              pgAdmin 4.</note></li>
+          <li>查看Greenplum数据库表的DDL语句。</li>
+          <li id="io147522">追加优化表，也包括压缩追加优化表。
+              <note>仅对Greenplum分区表提供有限的功能支持。</note></li>
         </ul>
       </body>
       <topic id="topic7" xml:lang="en">
-        <title>Installing pgAdmin 4</title>
+        <title>安装pgAdmin 4</title>
         <body>
-          <p>The installation package for pgAdmin 4 is available for download from the official
-            pgAdmin 4 download site (<xref href="https://www.pgadmin.org" scope="external"
-              format="html"/>). Installation instructions are included in the installation
-            package.</p>
+          <p>pgAdmin 4的安装包可以从其官方网站下载(<xref href="https://www.pgadmin.org" scope="external"
+              format="html"/>)。安装步骤包含在安装包内。</p>
         </body>
       </topic>
       <topic id="topic8" xml:lang="en">
-        <title>Documentation for pgAdmin 4</title>
+        <title>pgAdmin 4的文档</title>
         <body>
-          <p>For general help on the features of the pgAdmin graphical interface or PostgreSQL,
-            select one of the entries from the <b>Help</b> dropdown menu.</p>
+          <p>如果要了解pgAdmin图形化客户端或PostgreSQL的帮助信息，可以从该下拉菜单中选择<b>Help</b>。</p>
         </body>
       </topic>
       <topic id="topic9" xml:lang="en">
-        <title>Viewing DDL Data with pgAdmin 4</title>
+        <title>通过pgAdmin 4查看DDL信息</title>
         <body>
-          <p>This topic highlights a Greenplum Database task you can perform with pgAdmin 4: viewing
-            Greenplum Database table DDL.</p>
+          <p>本话题展示了一个采用pgAdmin 4客户端可以执行的Greenplum数据库任务：查看Greenplum数据库表DDL信息。</p>
         </body>
       </topic>
     </topic>
     <topic id="topic12" xml:lang="en">
-      <title id="io149542">Database Application Interfaces</title>
+      <title id="io149542">数据库应用接口</title>
       <body>
-        <p>You may want to develop your own client applications that interface to Greenplum
-          Database. PostgreSQL provides a number of database drivers for the most commonly used
-          database application programming interfaces (APIs), which can also be used with Greenplum
-          Database. These drivers are not packaged with the Greenplum Database base distribution.
-          Each driver is an independent PostgreSQL development project and must be downloaded,
-          installed and configured to connect to Greenplum Database. The following drivers are
-          available:</p>
+        <p>用户可能想要开发用户自己的客户端应用接入到Greenplum数据库。PostgreSQL为最常用的数据库应用编程接口（API）
+          提供了数种数据库驱动，这些同样也能在Greenplum数据库中使用。这些驱动作为一个独立的下载提供。每一种驱动
+          （除了随PostgreSQL提供的libpq）都是一个独立的PostgreSQL开发项目并且必须被下载、安装并且配置以连接到
+          Greenplum数据库。可用的驱动如下：</p>
         <table id="io140349">
-          <title>Greenplum Database Interfaces</title>
+          <title>Greenplum数据库接口</title>
           <tgroup cols="3">
             <colspec colnum="1" colname="col1" colwidth="1*"/>
             <colspec colnum="2" colname="col2" colwidth="1*"/>
@@ -287,25 +246,24 @@
             <thead>
               <row>
                 <entry colname="col1">API</entry>
-                <entry colname="col2">PostgreSQL Driver</entry>
-                <entry colname="col3">Download Link</entry>
+                <entry colname="col2">PostgreSQL驱动</entry>
+                <entry colname="col3">下载链接</entry>
               </row>
             </thead>
             <tbody>
               <row>
                 <entry colname="col1">ODBC</entry>
                 <entry colname="col2">pgodbc</entry>
-                <entry colname="col3">Available in the Greenplum Database Connectivity package,
-                  which can be downloaded from <xref href="https://network.pivotal.io/products/pivotal-gpdb"
-                    scope="external" format="html"><ph>Pivotal Network</ph></xref>.</entry>
+                <entry colname="col3">可用的<i>Greenplum数据库连接</i>包，可以从
+                  <xref href="https://network.pivotal.io/products/pivotal-gpdb"
+                    scope="external" format="html"><ph>Pivotal Network</ph></xref>下载。</entry>
               </row>
               <row>
                 <entry colname="col1">JDBC</entry>
                 <entry colname="col2">pgjdbc</entry>
-                <entry colname="col3">Available in the <i>Greenplum Database Connectivity</i>
-                  package, which can be downloaded from <xref
+                <entry colname="col3">可用的<i>Greenplum数据库连接</i>包，可以从<xref
                     href="https://network.pivotal.io/products/pivotal-gpdb" scope="external" format="html"
-                      ><ph>Pivotal Network</ph></xref>.</entry>
+                      ><ph>Pivotal Network</ph></xref>下载。</entry>
               </row>
               <row>
                 <entry colname="col1">Perl DBI</entry>
@@ -326,32 +284,28 @@
             </tbody>
           </tgroup>
         </table>
-        <p>General instructions for accessing a Greenplum Database with an API are:</p>
+        <p>用API访问Greenplum数据库的一般步骤是：</p>
         <ol>
-          <li id="io140287">Download your programming language platform and respective API from the
-            appropriate source. For example, you can get the Java development kit (JDK) and JDBC API
-            from Sun.</li>
-          <li id="io140288">Write your client application according to the API specifications. When
-            programming your application, be aware of the SQL support in Greenplum Database so you
-            do not include any unsupported SQL syntax. See the <i>Greenplum Database Reference
-              Guide</i> for more information.</li>
+          <li id="io140287">从合适的来源下载用户的编程语言平台以及相应的API。例如，用户可以从
+            Oracle得到Java开发工具包（JDK）和JDBC API。</li>
+          <li id="io140288">根据API规范编写用户的客户端应用。在编程时，注意Greenplum数据库中的
+            SQL支持这样用户才不会使用不被支持的SQL语法。 更多信息请见<i>Greenplum Database Reference
+              Guide</i>。</li>
         </ol>
-        <p>Download the appropriate PostgreSQL driver and configure connectivity to your Greenplum
-          Database master instance. Greenplum provides a client tools package that contains the
-          supported database drivers for Greenplum Database. Download the client tools package from
+        <p>下载合适的驱动并且配置到Greenplum数据库Master实例的连接。Greenplum为其数据库提供了一个客户端工具包，
+          它包含了一系列支持的驱动。该驱动包可以从
             <xref href="https://network.pivotal.io/products/pivotal-gpdb" scope="external" format="html"
-              ><ph>Pivotal Network </ph></xref>and documentation from <xref
+              ><ph>Pivotal Network </ph></xref>下载，文档可以从<xref
             href="http://gpdb.docs.pivotal.io" scope="external" format="html"><ph>Pivotal
-              Documentation</ph></xref>. </p>
+              Documentation</ph></xref>获取。</p>
       </body>
     </topic>
     <topic id="topic13" xml:lang="en">
-      <title id="io140178">Third-Party Client Tools</title>
+      <title id="io140178">三方客户端工具</title>
       <body>
-        <p id="io140183">Most third-party extract-transform-load (ETL) and business intelligence
-          (BI) tools use standard database interfaces, such as ODBC and JDBC, and can be configured
-          to connect to Greenplum Database. Greenplum has worked with the following tools on
-          previous customer engagements and is in the process of becoming officially certified</p>
+        <p id="io140183">大部分三方抽取转换加载（ETL）和商业智能（BI）工具都使用标准的数据库接口与
+          Greenplum数据库进行连接，例如ODBC和JDBC。Greenplum在之前的客户履约过程中适配过以下多种
+          工具，并且正在进行官方认证。</p>
         <ul>
           <li id="io142400">Business Objects</li>
           <li id="io142404">Microstrategy</li>
@@ -362,73 +316,59 @@
           <li id="io142423">SAS</li>
           <li id="io142432">Cognos</li>
         </ul>
-        <p>Greenplum Professional Services can assist users in configuring their chosen third-party
-          tool for use with Greenplum Database.</p>
+        <p>Greenplum提供的专业服务可以协助用户适配其选择的三方工具，使其在Greenplum数据库上流畅运行。</p>
       </body>
     </topic>
   </topic>
   <topic id="topic14" xml:lang="en">
-    <title id="io140185">Troubleshooting Connection Problems</title>
+    <title id="io140185">连接问题的发现及解决</title>
     <body>
-      <p id="io140978">A number of things can prevent a client application from successfully
-        connecting to Greenplum Database. This topic explains some of the common causes of
-        connection problems and how to correct them.</p>
+      <p id="io140978">很多事情都可能阻止客户端应用成功地连接到Greenplum数据库。这个主题解释了一些常见的连接问题
+        的原因以及如何改正它们。</p>
       <table id="io140982">
-        <title>Common connection problems</title>
+        <title>常见连接问题</title>
         <tgroup cols="2">
           <colspec colnum="1" colname="col1" colwidth="1*"/>
           <colspec colnum="2" colname="col2" colwidth="4*"/>
           <thead>
             <row>
-              <entry colname="col1">Problem</entry>
-              <entry colname="col2">Solution</entry>
+              <entry colname="col1">问题</entry>
+              <entry colname="col2">解决方案</entry>
             </row>
           </thead>
           <tbody>
             <row>
-              <entry colname="col1">No <filepath>pg_hba.conf</filepath> entry for host or
-                user</entry>
-              <entry colname="col2">To enable Greenplum Database to accept remote client
-                connections, you must configure your Greenplum Database master instance so that
-                connections are allowed from the client hosts and database users that will be
-                connecting to Greenplum Database. This is done by adding the appropriate entries to
-                the <filepath>pg_hba.conf</filepath> configuration file (located in the master
-                instance's data directory). For more detailed information, see <xref
-                  href="../client_auth.xml#topic2" type="topic" format="dita"/>.</entry>
+              <entry colname="col1">没有用于主机或者用户的<filepath>pg_hba.conf</filepath>条目</entry>
+              <entry colname="col2">要允许Greenplum数据库接受远程客户端连接，用户必须配置用户的Greenplum
+                数据库的Master实例，这样来自于客户端主机和数据库用户的连接才会被允许连接到Greenplum数据库。
+                这可以通过在<filepath>pg_hba.conf</filepath>配置文件（位于Master实例的数据目录中）中增加
+                合适的条目就能做到。更多详细的信息请见<xref
+                  href="../client_auth.xml#topic2" type="topic" format="dita"/>。</entry>
             </row>
             <row>
-              <entry colname="col1">Greenplum Database is not running</entry>
-              <entry colname="col2">If the Greenplum Database master instance is down, users will
-                not be able to connect. You can verify that the Greenplum Database system is up by
-                running the <codeph>gpstate</codeph> utility on the Greenplum master host.</entry>
+              <entry colname="col1">Greenplum数据库没有运行</entry>
+              <entry colname="col2">Greenplum数据库的Master实例没有运行，用户将无法连接。
+                用户可以通过在Greenplum的Master主机上运行<codeph>gpstate</codeph>工具来
+                验证Greenplum数据库系统是否正常运行。</entry>
             </row>
             <row>
-              <entry colname="col1">Network problems<p>Interconnect timeouts</p></entry>
-              <entry colname="col2">If users connect to the Greenplum master host from a remote
-                client, network problems can prevent a connection (for example, DNS host name
-                resolution problems, the host system is down, and so on.). To ensure that network
-                problems are not the cause, connect to the Greenplum master host from the remote
-                client host. For example: <codeph>ping <i>hostname</i></codeph>. <p id="io141723">If
-                  the system cannot resolve the host names and IP addresses of the hosts involved in
-                  Greenplum Database, queries and connections will fail. For some operations,
-                  connections to the Greenplum Database master use <codeph>localhost</codeph> and
-                  others use the actual host name, so you must be able to resolve both. If you
-                  encounter this error, first make sure you can connect to each host in your
-                  Greenplum Database array from the master host over the network. In the
-                    <codeph>/etc/hosts</codeph> file of the master and all segments, make sure you
-                  have the correct host names and IP addresses for all hosts involved in the
-                  Greenplum Database array. The <codeph>127.0.0.1</codeph> IP must resolve to
-                    <codeph>localhost</codeph>.</p></entry>
+              <entry colname="col1">网络问题<p>Interconnect 超时</p></entry>
+              <entry colname="col2">如果用户从一个远程客户端连接到Greenplum的Master主机，网络问题
+                可能阻止连接（例如，DNS主机名解析问题、主机系统没有运行等等）。为了确认网络问题不是原因，
+                可尝试从远程客户端主机连接到Greenplum的Master主机。例如：<codeph>ping <i>hostname</i></codeph>。
+                <p id="io141723">如果系统不能解析主机名和Greenplum数据库所涉及的主机的IP地址，查询和连接将会失败。
+                  对于某些操作，到Greenplum数据库Master的连接会使用<codeph>localhost</codeph>而其他连接使用真实
+                  的主机名，因此用户必须能解析两者。如果用户遇到这种错误，首先确认用户能够从Master主机通过网络连接到
+                  Greenplum数据库阵列中的每一台主机。在Master和所有Segment的<codeph>/etc/hosts</codeph>文件中，
+                  确认有Greenplum数据库阵列所涉及所有主机的正确的主机名和IP地址。IP <codeph>127.0.0.1</codeph>
+                  必须解析为<codeph>localhost</codeph>。</p></entry>
             </row>
             <row>
-              <entry colname="col1">Too many clients already</entry>
-              <entry colname="col2">By default, Greenplum Database is configured to allow a maximum
-                of 250 concurrent user connections on the master and 750 on a segment. A connection
-                attempt that causes that limit to be exceeded will be refused. This limit is
-                controlled by the <codeph>max_connections</codeph> parameter in the
-                  <codeph>postgresql.conf</codeph> configuration file of the Greenplum Database
-                master. If you change this setting for the master, you must also make appropriate
-                changes at the segments.</entry>
+              <entry colname="col1">已有太多客户端</entry>
+              <entry colname="col2">默认情况下，Greenplum数据库被配置为在Master和每个Segment上分别允许最多250和
+                750个并发用户连接。导致该限制会被超过的连接尝试将被拒绝。这个限制由Greenplum数据库Master的
+                <codeph>postgresql.conf</codeph>配置文件中的<codeph>max_connections</codeph>参数控制。
+                如果用户为Master更改了这个设置，用户还必须在Segment上做出适当的更改。</entry>
             </row>
           </tbody>
         </tgroup>
