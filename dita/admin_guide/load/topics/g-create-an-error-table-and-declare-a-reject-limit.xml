@@ -6,6 +6,6 @@
    <body>
       <p>下面的SQL片段会捕捉Greenplum数据库内部的格式化错误并且声明一个拒绝极限为10行。</p>
       <codeblock>LOG ERRORS SEGMENT REJECT LIMIT 10 ROWS</codeblock>
-      <p>使用内建的SQL函数<codeph>gp_read_error_log()</codeph>可以读取错误日志数据。有关查看日志错误的信息，可见<a xref href="g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58">在错误日志中查看不正确的行。</a></p>
+      <p>使用内建的SQL函数<codeph>gp_read_error_log()</codeph>可以读取错误日志数据。有关查看日志错误的信息，可见<xref href="g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58"/></p>
    </body>
 </topic>

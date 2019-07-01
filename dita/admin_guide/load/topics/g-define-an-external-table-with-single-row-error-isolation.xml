@@ -18,8 +18,8 @@
       <p>
          <codeblock>SELECT gp_read_error_log('ext_expenses');</codeblock>
       </p>
-      <p>有关错误日志格式的信息，请见<a xref
-            href="g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58">在错误日志中查看不正确的行。</a></p>
+      <p>有关错误日志格式的信息，请见<xref
+            href="g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58"/></p>
       <p>内建SQL函数<codeph>gp_truncate_error_log('<varname>external_table</varname>')</codeph>删除错误数据。这个例子删除从上前一个外部表例子创建的错误日志数据：</p>
       <p>
          <codeblock>SELECT gp_truncate_error_log('ext_expenses'); </codeblock>
