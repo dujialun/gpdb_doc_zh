@@ -127,7 +127,7 @@ CREATE TABLE foo(i int);
     <body>
       <p>您可以将临时文件或事务文件移动到特定的表空间，以在运行查询，创建备份和更顺序地存储数据时提高数据库性能。
           </p>
-      <p>Greenplum数据库服务器配置参数<codeph> temp_tablespaces </ codeph>控制哈希聚合和哈希连接查询的临时表和临时溢出文件的位置。
+      <p>Greenplum数据库服务器配置参数<codeph> temp_tablespaces </codeph>控制哈希聚合和哈希连接查询的临时表和临时溢出文件的位置。
           （用于排序大型数据集等目的的临时文件与<codeph>&lt;<varname>data_dir</varname>>/&lt;<varname>seg_ID</varname>>/base/pgsql_tmp</codeph>中的常规段数据一起存储。）
         </p>
       <p>当<codeph>CREATE</codeph>命令没有显式指定表空间时，

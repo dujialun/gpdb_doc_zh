@@ -235,7 +235,7 @@ SUBPARTITION TEMPLATE
 </codeblock>
         </p>
         <p>下面的例子展示了一个三级分区设计，其中<codeph>sales</codeph>表被按照<codeph>year</codeph>分区，然后按照<codeph>month</codeph>分区，再然后按照<codeph>region</codeph>分区。
-          <scodeph>SUBPARTITION TEMPLATE</scodeph>子句保证每一个年度的分区都有相同的子分区结构。
+          <codeph>SUBPARTITION TEMPLATE</codeph>子句保证每一个年度的分区都有相同的子分区结构。
           这个例子在该层次的每一个级别上都声明了一个<codeph>DEFAULT</codeph>分区。
           </p>
         <p>
