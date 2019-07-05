@@ -1,38 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_i3c_qwy_sp">
-  <title id="im140342">Creating and Managing Views</title>
+  <title id="im140342">创建和管理视图</title>
   <body>
-    <p>Views enable you to save frequently used or complex queries, then access them in a
-        <codeph>SELECT</codeph> statement as if they were a table. A view is not physically
-      materialized on disk: the query runs as a subquery when you access the view.</p>
-    <p>If a subquery is associated with a single query, consider using the <codeph>WITH</codeph>
-      clause of the <codeph>SELECT</codeph> command instead of creating a seldom-used view.</p>
+    <p>视图允许用户保存常用的或者复杂的查询，然后在一个<codeph>SELECT</codeph>语句中把它们当作表来访问。
+        视图在磁盘上并没有被物理存储：当用户访问视图时查询会作为一个子查询运行。</p>
+    <p>如果一个子查询与一个单一查询相关联，考虑使用<codeph>SELECT</codeph>命令的<codeph>WITH</codeph>子句而不是创建一个很少使用的视图。</p>
   </body>
   <topic id="topic101" xml:lang="en">
-    <title>Creating Views</title>
+    <title>创建视图</title>
     <body>
-      <p>The <codeph>CREATE VIEW </codeph>command defines a view of a query. For example:</p>
+      <p><codeph>CREATE VIEW</codeph>命令定义一个查询的视图。例如：</p>
       <p>
         <codeblock>CREATE VIEW comedies AS SELECT * FROM films WHERE kind = 'comedy';
 </codeblock>
       </p>
-      <p>Views ignore <codeph>ORDER BY</codeph> and <codeph>SORT</codeph> operations stored in the
-        view.</p>
+      <p>视图会忽略存储在视图中的<codeph>ORDER BY</codeph>以及<codeph>SORT</codeph>操作。</p>
     </body>
   </topic>
   <topic id="topic102" xml:lang="en">
-    <title>Dropping Views</title>
+    <title>删除视图</title>
     <body>
-      <p>The <codeph>DROP VIEW</codeph> command removes a view. For example:</p>
+      <p><codeph>DROP VIEW</codeph>命令删除一个视图。例如：</p>
       <p>
         <codeblock>DROP VIEW topten;
 </codeblock>
       </p>
-      <p>The <codeph>DROP VIEW ... CASCADE</codeph> command also removes all dependent objects. As
-      example, if another view depends on the view which is about to be dropped, the other view
-      will be dropped as well. Without the <codeph>CASCADE</codeph> option, the
-      <codeph>DROP VIEW</codeph> command will fail.</p>
+      <p><codeph>DROP VIEW ... CASCADE</codeph>命令也可以移除所有依赖的对象。
+      例如，如果另一个视图依赖于将要被删除的视图，这个其他的视图也将被删除。
+      如果没有<codeph>CASCADE</codeph>选项，这个<codeph>DROP VIEW</codeph>命令将会失败。
+      </p>
     </body>
   </topic>
 </topic>
