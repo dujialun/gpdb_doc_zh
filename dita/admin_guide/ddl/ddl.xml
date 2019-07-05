@@ -2,15 +2,11 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="im138244">Defining Database Objects</title>
-  <shortdesc>This section covers data definition language (DDL) in Greenplum Database
-    and how to create and manage database objects.</shortdesc>
+  <title id="im138244">定义数据库对象</title>
+  <shortdesc>这一节包括Greenplum数据库中的数据定义语言（DDL）以及如何创建和管理数据库对象。</shortdesc>
   <body>
-    <p>Creating objects in a Greenplum Database includes making up-front choices about
-      data distribution, storage options, data loading, and other Greenplum features that will affect the ongoing performance of your
-      database system. Understanding the options that are available and how the database will be
-      used will help you make the right decisions. </p>
-    <p>Most of the advanced Greenplum features are enabled with extensions to the SQL
-        <codeph>CREATE</codeph> DDL statements. </p>
+    <p>在Greenplum数据库中创建对象包括为数据分布、存储选项、数据装载以及其他影响数据库系统性能的其他Greenplum特征做出预先的选择。
+      理解可用的选项以及如何使用数据库将有助于用户做出正确的决定。</p>
+    <p>大部分的Greenplum高级特性都是SQL <codeph>CREATE</codeph> DDL语句的扩展。</p>
   </body>
 </topic>

@@ -1,81 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_gk2_nwy_sp">
-  <title id="im143866">Using Indexes in Greenplum Database</title>
+  <title id="im143866">在Greenplum数据库中使用索引</title>
   <body>
-    <p>In most traditional databases, indexes can greatly improve data access times. However, in a
-      distributed database such as Greenplum, indexes should be used more sparingly. Greenplum
-      Database performs very fast sequential scans; indexes use a random seek pattern to locate
-      records on disk. Greenplum data is distributed across the segments, so each segment scans a
-      smaller portion of the overall data to get the result. With table partitioning, the total data
-      to scan may be even smaller. Because business intelligence (BI) query workloads generally
-      return very large data sets, using indexes is not efficient.</p>
-    <p>First try your query workload without adding indexes. Indexes are more likely to improve
-      performance for OLTP workloads, where the query is returning a single record or a small subset
-      of data. Indexes can also improve performance on compressed append-optimized tables for
-      queries that return a targeted set of rows, as the optimizer can use an index access method
-      rather than a full table scan when appropriate. For compressed data, an index access method
-      means only the necessary rows are uncompressed. </p>
-    <p>Greenplum Database automatically creates <codeph>PRIMARY KEY</codeph> constraints for tables
-      with primary keys. To create an index on a partitioned table, create an index on the
-      partitioned table that you created. The index is propagated to all the child tables created by
-      Greenplum Database. Creating an index on a table that is created by Greenplum Database for use
-      by a partitioned table is not supported. </p>
-    <p>Note that a <codeph>UNIQUE CONSTRAINT</codeph> (such as a <codeph>PRIMARY KEY
-        CONSTRAINT</codeph>) implicitly creates a <codeph>UNIQUE INDEX</codeph> that must include
-      all the columns of the distribution key and any partitioning key. The <codeph>UNIQUE
-        CONSTRAINT</codeph> is enforced across the entire table, including all table partitions (if
-      any).</p>
-    <p>Indexes add some database overhead — they use storage space and must be maintained when the
-      table is updated. Ensure that the query workload uses the indexes that you create, and check
-      that the indexes you add improve query performance (as compared to a sequential scan of the
-      table). To determine whether indexes are being used, examine the query
-        <codeph>EXPLAIN</codeph> plans. See <xref href="../query/topics/query-profiling.xml#topic39"
-      />.</p>
-    <p>Consider the following points when you create indexes.</p>
+    <p>在大部分传统数据库中，索引能够极大地改善数据访问时间。
+      不过，在一个Greenplum之类的分布式数据库中，索引应该被更保守地使用。
+      Greenplum数据库会执行非常快的顺序扫描，索引则使用一种随机搜索的模式在磁盘上定位记录。
+      Greenplum的数据分布在Segment上，因此每个Segment会扫描全体数据的一小部分来得到结果。
+      通过表分区，要扫描的数据量可能会更少。
+      因为商业智能（BI）查询负载通常会返回非常大的数据集，使用索引并不是很有效。
+      </p>
+    <p>首先在不加索引时尝试用户的查询负载。
+      索引更有可能为OLTP负载改进性能，在那种场景中查询会返回一个单一记录或者数据的一个小的子集。
+      在被压缩过的追加优化表上，索引也可以提高返回一个目标行集合的查询的性能，因为优化器在适当的时候可以使用一种索引访问方法而不是全表扫描。
+      对于压缩过的数据，使用一种索引访问方法意味着只有必要的行会被解压。
+      </p>
+    <p>Greenplum数据库会自动为带有主键的表创建<codeph>PRIMARY KEY</codeph>约束。
+      要在一个被分区的表上创建索引，就在用户创建的分区表上创建一个索引。
+      该索引会被传播到Greenplum数据库所创建的所有子表上。不支持在Greenplum数据库为分区表创建的子表上创建索引。
+      </p>
+    <p>注意一个<codeph>UNIQUE CONSTRAINT</codeph>（例如<codeph>PRIMARY KEY CONSTRAINT</codeph>）会隐式地创建一个<codeph>UNIQUE INDEX</codeph>，它必须包括分布键中所有的列以及任何分区键。
+      <codeph>UNIQUE CONSTRAINT</codeph>会在整个表上被强制要求，包括所有的表分区（如果有）。
+      </p>
+    <p>索引会增加一些数据库负担，它们使用存储空间并且在表被更新时需要被维护。
+      要确保查询负载会用到用户创建的索引，并且检查用户增加的索引是否改进了查询性能（与表的顺序扫描相比）。
+      要确定是否使用了索引，检查查询的<codeph>EXPLAIN</codeph>计划。参见<xref href="../query/topics/query-profiling.xml#topic39"
+      />。
+      </p>
+    <p>在创建索引时请考虑以下几点。</p>
     <ul id="ul_cgn_nwy_sp">
-      <li id="im151751"><b>Your Query Workload.</b> Indexes improve performance for workloads where
-        queries return a single record or a very small data set, such as OLTP workloads.</li>
-      <li id="im174599">Compressed Tables. Indexes can improve performance on compressed
-        append-optimized tables for queries that return a targeted set of rows. For compressed data,
-        an index access method means only the necessary rows are uncompressed.</li>
-      <li id="im151752"><b>Avoid indexes on frequently updated columns.</b> Creating an index on a
-        column that is frequently updated increases the number of writes required when the column is
-        updated.</li>
-      <li id="im151753"><b>Create selective B-tree indexes.</b> Index selectivity is a ratio of the
-        number of distinct values a column has divided by the number of rows in a table. For
-        example, if a table has 1000 rows and a column has 800 distinct values, the selectivity of
-        the index is 0.8, which is considered good. Unique indexes always have a selectivity ratio
-        of 1.0, which is the best possible. Greenplum Database allows unique indexes only on
-        distribution key columns.</li>
-      <li id="im151760"><b>Use Bitmap indexes for low selectivity columns. </b>The Greenplum
-        Database Bitmap index type is not available in regular PostgreSQL. See <xref href="#topic93"
-          type="topic" format="dita"/>.</li>
-      <li id="im151764"><b>Index columns used in joins.</b> An index on a column used for frequent
-        joins (such as a foreign key column) can improve join performance by enabling more join
-        methods for the query optimizer to use.</li>
-      <li id="im151765"><b>Index columns frequently used in predicates.</b> Columns that are
-        frequently referenced in <codeph>WHERE</codeph> clauses are good candidates for
-        indexes.</li>
-      <li id="im151766"><b>Avoid overlapping indexes.</b> Indexes that have the same leading column
-        are redundant.</li>
-      <li id="im151767"><b>Drop indexes for bulk loads.</b> For mass loads of data into a table,
-        consider dropping the indexes and re-creating them after the load completes. This is often
-        faster than updating the indexes. </li>
-      <li id="im151768"><b>Consider a clustered index.</b> Clustering an index means that the
-        records are physically ordered on disk according to the index. If the records you need are
-        distributed randomly on disk, the database has to seek across the disk to fetch the records
-        requested. If the records are stored close together, the fetching operation is more
-        efficient. For example, a clustered index on a date column where the data is ordered
-        sequentially by date. A query against a specific date range results in an ordered fetch from
-        the disk, which leverages fast sequential access.</li>
+      <li id="im151751"><b>用户的查询负载。</b> 索引能改进查询返回单一记录或者非常小的数据集的性能，例如OLTP负载。</li>
+      <li id="im174599">压缩表。在被压缩过的追加优化表上，索引也可以提高返回一个目标行集合的查询的性能。对于压缩过的数据，一种索引访问方法意味着只有必要的行会被解压。</li>
+      <li id="im151752"><b>避免在频繁更新的列上建立索引。</b>在一个被频繁更新的列上建立索引会增加该列被更新时所要求的写操作数据量。</li>
+      <li id="im151753"><b>创建选择性的B-树索引。</b>
+        索引选择度是一个列中具有的可区分值的数量除以表中行数得到的比例。
+        例如，如果一个表有1000行并且一个列中有800个可区分的值，则该索引的选择度为0.8，这还不错。
+        唯一索引的选择度总是1.0，这是最好的选择度。Greenplum数据库只允许在分布键列上的唯一索引。
+        </li>
+      <li id="im151760"><b>为低选择度的列使用位图索引。</b>
+        Greenplum数据库的位图索引类型在常规的PostgreSQL中不可用。参见<xref href="#topic93" type="topic" format="dita"/>。
+        </li>
+      <li id="im151764"><b>索引在连接中用到的列。</b>
+        在被用于频繁连接的一个列（例如一个外键列）上的索引能够提升连接性能，因为这让查询优化器有更多的连接方法可以使用。
+        </li>
+      <li id="im151765"><b>索引在谓词中频繁使用的列。</b>
+        频繁地在<codeph>WHERE</codeph>子句中被引用的列是索引的首选。
+        </li>
+      <li id="im151766"><b>避免重叠的索引。</b>具有相同前导列的索引是冗余的。</li>
+      <li id="im151767"><b>批量载入前删掉索引。</b>
+        对于载入大量数据到一个表中，请考虑先删掉索引并且在数据装载完成后重建它们。这常常比更新索引更快。
+        </li>
+      <li id="im151768"><b>考虑一个聚簇索引。</b>
+        聚簇一个索引意味着记录会根据索引被物理排序后存储在磁盘上。
+        如果用户需要的数据被随机分布在磁盘上，数据库必须在磁盘上来回寻找以取得所需的记录。
+        如果这些记录被存储得彼此临近，那么取得它们的操作就会更高效。
+        例如，一个在日期列上的聚簇索引中数据会按照日期顺序存放。
+        针对一个指定日期范围的查询将会导致对磁盘的一次有序地读取，这会利用快速的顺序访问。
+        </li>
     </ul>
     <section id="im151772">
-      <title>To cluster an index in Greenplum Database</title>
-      <p>Using the <codeph>CLUSTER</codeph> command to physically reorder a table based on an index
-        can take a long time with very large tables. To achieve the same results much faster, you
-        can manually reorder the data on disk by creating an intermediate table and loading the data
-        in the desired order. For example:</p>
+      <title>在Greenplum数据库中聚簇一个索引</title>
+      <p>使用<codeph>CLUSTER</codeph>命令根据一个索引从物理上重新排序一个非常大的表可能会花费很长的时间。
+        为了更快达到同样的结果，用户可以通过创建一个中间表并且按照想要的顺序重载数据来手工在磁盘上重排数据。例如：
+        </p>
       <p>
         <codeblock>CREATE TABLE new_table (LIKE old_table) 
        AS SELECT * FROM old_table ORDER BY myixcolumn;
@@ -88,190 +75,166 @@ VACUUM ANALYZE old_table;
     </section>
   </body>
   <topic id="topic92" xml:lang="en">
-    <title>Index Types</title>
+    <title>索引类型</title>
     <body>
-      <p>Greenplum Database supports the Postgres index types B-tree, GiST, and GIN. Hash indexes
-        are not supported. Each index type uses a different algorithm that is best suited to
-        different types of queries. B-tree indexes fit the most common situations and are the
-        default index type. See <xref
-          href="https://www.postgresql.org/docs/8.3/indexes-types.html" scope="external"
-          format="html"><ph>Index Types</ph></xref> in the PostgreSQL documentation for a
-        description of these types.</p>
-      <note type="note">Greenplum Database allows unique indexes only if the columns of the index
-        key are the same as (or a superset of) the Greenplum distribution key. Unique indexes are
-        not supported on append-optimized tables. On partitioned tables, a unique index cannot be
-        enforced across all child table partitions of a partitioned table. A unique index is
-        supported only within a partition.</note>
+      <p>Greenplum数据库数据库支持Postgres索引类型B-树、GiST和GIN，不支持Hash索引。
+        每一种索引类型都使用一种不同的算法，它们最适合的查询类型也不同。
+        B-树索引适合于最常见的情况并且是默认的索引类型。
+        对于这些类型的描述请见PostgreSQL文档中的<xref
+                href="https://www.postgresql.org/docs/8.3/indexes-types.html" scope="external"
+                format="html"><ph>索引类型</ph></xref>。
+        </p>
+      <note type="note">只有索引键的列与Greenplum分布键相同（或者是其超集）时，Greenplum数据库才允许唯一索引。
+        在追加优化表上不支持唯一索引。在分区表上，唯一索引无法在一个分区表的所有子表分区之间被实施。唯一索引只能在一个分区内实施。
+        </note>
     </body>
     <topic id="topic93" xml:lang="en">
-      <title id="im143283">About Bitmap Indexes</title>
+      <title id="im143283">关于位图索引</title>
       <body>
-        <p>Greenplum Database provides the Bitmap index type. Bitmap indexes are best suited to data
-          warehousing applications and decision support systems with large amounts of data, many ad
-          hoc queries, and few data modification (DML) transactions.</p>
-        <p>An index provides pointers to the rows in a table that contain a given key value. A
-          regular index stores a list of tuple IDs for each key corresponding to the rows with that
-          key value. Bitmap indexes store a bitmap for each key value. Regular indexes can be
-          several times larger than the data in the table, but bitmap indexes provide the same
-          functionality as a regular index and use a fraction of the size of the indexed data.</p>
-        <p>Each bit in the bitmap corresponds to a possible tuple ID. If the bit is set, the row
-          with the corresponding tuple ID contains the key value. A mapping function converts the
-          bit position to a tuple ID. Bitmaps are compressed for storage. If the number of distinct
-          key values is small, bitmap indexes are much smaller, compress better, and save
-          considerable space compared with a regular index. The size of a bitmap index is
-          proportional to the number of rows in the table times the number of distinct values in the
-          indexed column.</p>
-        <p>Bitmap indexes are most effective for queries that contain multiple conditions in the
-            <codeph>WHERE</codeph> clause. Rows that satisfy some, but not all, conditions are
-          filtered out before the table is accessed. This improves response time, often
-          dramatically.</p>
+        <p>Greenplum数据库提供位图索引类型。
+          位图索引最适合于拥有大量数据、很多临时查询以及少量数据修改（DML）事务的数据仓库应用和决策支持系统。
+          </p>
+        <p>一个索引提供了指向表中包含一个给定键值的行的指针。
+          常规索引存储了每个键存储了一个元组ID的列表，列表中的元组ID对应于具有那个键值的行。
+          位图索引为每一个键值都存储一个位图。
+          常规索引可能会比表中的数据大几倍，但位图索引提供了和常规索引相同的功能并且只需要被索引数据尺寸的一小部分。
+          </p>
+        <p>位图中的每一个位对应于一个可能的元组ID。
+          如果该位被设置，则具有相应元组ID的行包含该键值。
+          一个映射函数负责将这个位的位置转换成一个元组ID。
+          位图被压缩存储。如果可区分键值的数量很小，位图索引会小很多同时也会被压缩得更好，并且比常规索引节省可观的空间。
+          一个位图索引的大小与该表中行数乘以被索引列中不同值数量的结果成比例。
+          </p>
+        <p>位图索引对于在<codeph>WHERE</codeph>子句中包含多个条件的查询最有效。
+          满足某些但不是全部条件的行在访问表之前就会被过滤掉。这通常会极大地改善响应时间。
+          </p>
       </body>
       <topic id="topic94" xml:lang="en">
-        <title>When to Use Bitmap Indexes</title>
+        <title>何时使用位图索引</title>
         <body>
-          <p>Bitmap indexes are best suited to data warehousing applications where users query the
-            data rather than update it. Bitmap indexes perform best for columns that have between
-            100 and 100,000 distinct values and when the indexed column is often queried in
-            conjunction with other indexed columns. Columns with fewer than 100 distinct values,
-            such as a gender column with two distinct values (male and female), usually do not
-            benefit much from any type of index. On a column with more than 100,000 distinct values,
-            the performance and space efficiency of a bitmap index decline. </p>
-          <p>Bitmap indexes can improve query performance for ad hoc queries. <codeph>AND</codeph>
-            and <codeph>OR</codeph> conditions in the <codeph>WHERE</codeph> clause of a query can
-            be resolved quickly by performing the corresponding Boolean operations directly on the
-            bitmaps before converting the resulting bitmap to tuple ids. If the resulting number of
-            rows is small, the query can be answered quickly without resorting to a full table
-            scan.</p>
+          <p>位图索引最适合用户只查询数据而不更新数据的数据仓库应用。
+            对于拥有100至100,000个可区分值的列并且当被索引列常常与其他被索引列联合查询时，位图索引表现最好。
+            低于100个可区分值的列通常无法从任何类型的索引受益，例如有两个可区分值的性别列（男和女）。
+            而在具有超过100,000个可区分值的列上，位图索引的性能和空间效率会下降。
+            </p>
+          <p>位图索引能够提升临时查询的查询性能。
+            在将结果位图转换成元组ID之前，一个查询的<codeph>WHERE</codeph>子句中的<codeph>AND</codeph>以及<codeph>OR</codeph>条件可以通过在位图上直接执行相应的布尔操作快速地解决。
+            如果结果行数很小，查询能够在不做全表扫描的情况下很快地被回答。
+            </p>
         </body>
       </topic>
       <topic id="topic95" xml:lang="en">
-        <title>When Not to Use Bitmap Indexes</title>
+        <title>何时不用位图索引</title>
         <body>
-          <p>Do not use bitmap indexes for unique columns or columns with high cardinality data,
-            such as customer names or phone numbers. The performance gains and disk space advantages
-            of bitmap indexes start to diminish on columns with 100,000 or more unique values,
-            regardless of the number of rows in the table.</p>
-          <p>Bitmap indexes are not suitable for OLTP applications with large numbers of concurrent
-            transactions modifying the data.</p>
-          <p>Use bitmap indexes sparingly. Test and compare query performance with and without an
-            index. Add an index only if query performance improves with indexed columns.</p>
+          <p>不要为唯一列或者具有高基数数据的列使用位图索引，例如顾客姓名或者电话号码。
+            位图索引的性能增益和磁盘空间优势在具有100,000或者更多唯一值的列上开始减小，这与表中的行数无关。
+            </p>
+          <p>位图索引不适合有大量并发事务修改数据的OLTP应用。</p>
+          <p>请保守地使用位图索引。测试并且比较使用索引和不使用索引的查询性能。只有被索引列的查询性能有提升时才增加索引。</p>
         </body>
       </topic>
     </topic>
   </topic>
   <topic id="topic96" xml:lang="en">
-    <title>Creating an Index</title>
+    <title>创建一个索引</title>
     <body>
-      <p>The <codeph>CREATE INDEX</codeph> command defines an index on a table. A B-tree index is
-        the default index type. For example, to create a B-tree index on the column <i>gender</i> in
-        the table <i>employee</i>:</p>
+      <p><codeph>CREATE INDEX</codeph>命令在一个表上定义一个索引。
+        例如，要在表<i>employee</i>的<i>gender</i>列上创建一个B-树索引：
+        </p>
       <p>
         <codeblock>CREATE INDEX gender_idx ON employee (gender);
 </codeblock>
       </p>
-      <p>To create a bitmap index on the column <i>title</i> in the table <i>films</i>:</p>
+      <p>要在表<i>title</i>中的列<i>title</i>上创建一个位图索引：</p>
       <p>
         <codeblock>CREATE INDEX title_bmp_idx ON films USING bitmap (title);
 </codeblock>
       </p>
     </body>
     <topic id="topic_tfz_3vz_4fb">
-      <title>Indexes on Expressions</title>
+      <title>表达式索引</title>
       <body>
-        <p>An index column need not be just a column of the underlying table, but can be a function
-          or scalar expression computed from one or more columns of the table. This feature is
-          useful to obtain fast access to tables based on the results of computations.</p>
-        <p>Index expressions are relatively expensive to maintain, because the derived expressions
-          must be computed for each row upon insertion and whenever it is updated. However, the
-          index expressions are not recomputed during an indexed search, since they are already
-          stored in the index. In both of the following examples, the system sees the query as just
-            <codeph>WHERE indexedcolumn = 'constant'</codeph> and so the speed of the search is
-          equivalent to any other simple index query. Thus, indexes on expressions are useful when
-          retrieval speed is more important than insertion and update speed.</p>
-        <p>The first example is a common way to do case-insensitive comparisons with the
-            <codeph>lower</codeph> function:</p>
+        <p>索引列不必只是表的一列，而是可以是从表的一列或多列计算的函数或标量表达式。
+          此功能对于根据计算结果快速访问表非常有用。
+          </p>
+        <p>索引表达式的维护成本相对较高，因为必须在插入和每次更新时为每一行计算派生表达式。
+          但是，索引表达式在索引搜索期间不会重新计算，因为它们已存储在索引中。
+          在下面两个例子中，系统把查询视为<codeph>WHERE indexedcolumn = 'constant'</codeph>，所以查询的速度与其他普通索引相同。
+          因此，当检索速度比插入和更新速度更重要时，表达式上的索引很有用。
+          </p>
+        <p>第一个示例是使用<codeph>lower</codeph>函数进行不区分大小写的比较的常用方法：
+          </p>
         <codeblock>SELECT * FROM test1 WHERE lower(col1) = 'value';</codeblock>
-        <p>This query can use an index if one has been defined on the result of the
-            <codeph>lower(col1)</codeph> function:</p>
+        <p>如果一个索引已经在<codeph>lower(col1)</codeph>函数的结果上被定义，该查询可以使用索引：
+          </p>
         <codeblock>CREATE INDEX test1_lower_col1_idx ON test1 (lower(col1));</codeblock>
-        <p>This example assumes the following type of query is performed often.</p>
+        <p>此示例假定经常执行以下类型的查询。</p>
         <codeblock>SELECT * FROM people WHERE (first_name || ' ' || last_name) = 'John Smith';</codeblock>
-        <p>The query might benefit from the following index.</p>
+        <p>查询可能会受益于以下索引。</p>
         <codeblock>CREATE INDEX people_names ON people ((first_name || ' ' || last_name));</codeblock>
-        <p>The syntax of the <codeph>CREATE INDEX</codeph> command normally requires writing
-          parentheses around index expressions, as shown in the second example. The parentheses can
-          be omitted when the expression is just a function call, as in the first example.</p>
+        <p><codeph>CREATE INDEX</codeph>命令的语法通常需要在索引表达式周围编写括号，如第二个示例所示。
+          当表达式只是函数调用时，可以省略括号，如第一个示例中所示。</p>
       </body>
     </topic>
   </topic>
   <topic id="topic97" xml:lang="en">
-    <title>Examining Index Usage</title>
+    <title>检查索引使用</title>
     <body>
-      <p>Greenplum Database indexes do not require maintenance and tuning. You can check which
-        indexes are used by the real-life query workload. Use the <codeph>EXPLAIN</codeph> command
-        to examine index usage for a query.</p>
-      <p>The query plan shows the steps or <i>plan nodes</i> that the database will take to answer a
-        query and time estimates for each plan node. To examine the use of indexes, look for the
-        following query plan node types in your <codeph>EXPLAIN</codeph> output:</p>
+      <p>Greenplum数据库的索引并不要求维护和调优。
+        用户可以检查实际的查询负载使用了哪些索引。
+        使用<codeph>EXPLAIN</codeph>命令可以检查一个查询的索引使用。
+        </p>
+      <p>查询计划展示了数据库将用来回答一个查询的步骤或者计划节点以及每一个计划节点的时间估计。
+        要检查索引的使用，请在用户的<codeph>EXPLAIN</codeph>输出中寻找以下查询计划节点类型：
+        </p>
       <ul id="ul_f3n_nwy_sp">
-        <li id="im143464"><b>Index Scan</b> - A scan of an index.</li>
-        <li id="im143465"><b>Bitmap Heap Scan</b> - Retrieves all </li>
-        <li id="im207555">from the bitmap generated by BitmapAnd, BitmapOr, or BitmapIndexScan and
-          accesses the heap to retrieve the relevant rows.</li>
-        <li id="im143466"><b>Bitmap Index Scan</b> - Compute a bitmap by OR-ing all bitmaps that
-          satisfy the query predicates from the underlying index.</li>
-        <li id="im143467"><b>BitmapAnd</b> or <b>BitmapOr</b> - Takes the bitmaps generated from
-          multiple BitmapIndexScan nodes, ANDs or ORs them together, and generates a new bitmap as
-          its output.</li>
+        <li id="im143464"><b>索引扫描</b> - 一次索引的扫描。</li>
+        <li id="im143465"><b>位图堆扫描</b> - 检索所有由BitmapAnd、BitmapOr或者BitmapIndexScan生成的位图并且访问堆以检索相关的行。</li>
+        <li id="im143466"><b>位图索引扫描</b> - 计算一个由所有来自底层索引的满足查询谓词的位图通过OR操作形成的位图。</li>
+        <li id="im143467"><b>BitmapAnd</b>或<b>BitmapOr</b> - 取得从多个BitmapIndexScan节点生成的位图，把它们AND或者OR在一起，并且生成一个新的位图作为其输出。</li>
       </ul>
-      <p>You have to experiment to determine the indexes to create. Consider the following
-        points.</p>
+      <p>用户必须做实验来确定要创建哪些索引。请考虑以下几点。</p>
       <ul id="ul_njn_nwy_sp">
-        <li id="im143930">Run <codeph>ANALYZE</codeph> after you create or update an index.
-            <codeph>ANALYZE</codeph> collects table statistics. The query optimizer uses table
-          statistics to estimate the number of rows returned by a query and to assign realistic
-          costs to each possible query plan.</li>
-        <li id="im143932">Use real data for experimentation. Using test data for setting up indexes
-          tells you what indexes you need for the test data, but that is all. </li>
-        <li id="im143934">Do not use very small test data sets as the results can be unrealistic or
-          skewed. </li>
-        <li id="im205776">Be careful when developing test data. Values that are similar, completely
-          random, or inserted in sorted order will skew the statistics away from the distribution
-          that real data would have. </li>
-        <li id="im144062">You can force the use of indexes for testing purposes by using run-time
-          parameters to turn off specific plan types. For example, turn off sequential scans
-            (<codeph>enable_seqscan</codeph>) and nested-loop joins
-            (<codeph>enable_nestloop</codeph>), the most basic plans, to force the system to use a
-          different plan. Time your query with and without indexes and use the <codeph>EXPLAIN
-            ANALYZE</codeph> command to compare the results.</li>
+        <li id="im143930">在创建或者更新一个索引后运行<codeph>ANALYZE</codeph>。
+          <codeph>ANALYZE</codeph>会收集表统计信息。
+          查询优化器使用表统计信息来估算一个查询所返回的行数并且为每一种可能的查询计划赋予实际开销。
+          </li>
+        <li id="im143932">实验中使用真实数据。使用测试数据建立索引会告诉用户该测试数据需要什么样的索引，但也仅此而已。</li>
+        <li id="im143934">不要使用非常小的测试数据集，因为它们的结果很可能是不真实的或者倾斜的。</li>
+        <li id="im205776">在开发测试数据时要小心。相似的、完全随机的或者排序后插入的值都将使统计信息偏离真实数据的分布。</li>
+        <li id="im144062">通过使用运行时参数来关闭特定的计划类型，用户可以强制使用索引来进行测试。
+          例如，关闭顺序扫描（<codeph>enable_seqscan</codeph>）以及嵌套循环连接（<codeph>enable_nestloop</codeph>）两种最基本的计划来强制系统使用一种不同的计划。
+          对用户的查询使用索引和不用索引的执行进行计时，并且使用<codeph>EXPLAIN ANALYZE</codeph>命令来比较结果。
+          </li>
       </ul>
     </body>
   </topic>
   <topic id="topic98" xml:lang="en">
-    <title>Managing Indexes</title>
+    <title>管理索引</title>
     <body>
-      <p>Use the <codeph>REINDEX</codeph> command to rebuild a poorly-performing index.
-          <codeph>REINDEX</codeph> rebuilds an index using the data stored in the index's table,
-        replacing the old copy of the index. </p>
+      <p>使用<codeph>REINDEX</codeph>命令可以重建一个表现不好的索引。
+        <codeph>REINDEX</codeph>使用存储在一个索引的基表中的数据重建该索引来替换该索引。
+        </p>
       <section id="im143476">
-        <title>To rebuild all indexes on a table</title>
+        <title>重建一个表上的所有索引</title>
         <codeblock>REINDEX my_table;
 </codeblock>
-        <title>To rebuild a particular index</title>
+        <title>重建一个特定的索引</title>
         <codeblock>REINDEX my_index;
 </codeblock>
       </section>
     </body>
   </topic>
   <topic id="topic99" xml:lang="en">
-    <title>Dropping an Index</title>
+    <title>删除一个索引</title>
     <body>
-      <p>The <codeph>DROP INDEX</codeph> command removes an index. For example:</p>
+      <p><codeph>DROP INDEX</codeph>命令移除一个索引。例如：
+        </p>
       <p>
         <codeblock>DROP INDEX title_idx;
 </codeblock>
       </p>
-      <p>When loading data, it can be faster to drop all indexes, load, then recreate the indexes.
+      <p>在载入数据时，删除所有索引、载入数据然后重建索引会更快。
       </p>
     </body>
   </topic>
