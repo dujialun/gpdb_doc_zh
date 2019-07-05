@@ -1,89 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_jtv_5vy_sp">
-  <title id="im140266">Creating and Managing Tables</title>
+  <title id="im140266">创建和管理表</title>
   <body>
-    <p> Greenplum Database tables are similar to tables in any relational database, except that
-      table rows are distributed across the different segments in the system. When you create a
-      table, you specify the table's distribution policy.</p>
+    <p>Greenplum数据库的表与任何一种关系型数据库中的表类似，不过其表中的行被分布在系统中的不同Segment上。
+      当用户创建一个表时，用户会指定该表的分布策略。</p>
   </body>
   <topic id="topic26" xml:lang="en">
-    <title>Creating a Table</title>
+    <title>创建一个表</title>
     <body>
-      <p>The <codeph>CREATE TABLE</codeph> command creates a table and defines its structure. When
-        you create a table, you define:</p>
+      <p><codeph>CREATE TABLE</codeph>命令创建一个表并且定义它的结果。当用户创建一个表示，用户需要定义：
+        </p>
       <ul id="ul_tyd_vvy_sp">
-        <li id="im142074">The columns of the table and their associated data types. See <xref
-            href="#topic27" type="topic" format="dita"/>.</li>
-        <li id="im142082">Any table or column constraints to limit the data that a column or table
-          can contain. See <xref href="#topic28" type="topic" format="dita"/>.</li>
-        <li id="im163705">The distribution policy of the table, which determines how Greenplum
-          Database divides data across the segments. See <xref href="#topic34" type="topic"
-            format="dita"/>.</li>
-        <li id="im163709">The way the table is stored on disk. <ph>See <xref
-              href="ddl-storage.xml"/>.</ph>
+        <li id="im142074">该表的列以及它们的数据类型。参见<xref
+            href="#topic27" type="topic" format="dita"/>。</li>
+        <li id="im142082">任何用于限制列或者表中能包含的数据的表或者列约束。参见<xref href="#topic28" type="topic" format="dita"/>。</li>
+        <li id="im163705">表的分布策略，这决定了Greenplum数据库如何在Segment之间划分数据。
+          参见<xref href="#topic34" type="topic" format="dita"/>。</li>
+        <li id="im163709">表存储在磁盘上的方式。<ph>参见<xref
+              href="ddl-storage.xml"/>。</ph>
         </li>
-        <li id="im170093">The table partitioning strategy for large tables. See <xref
-            href="ddl-database.xml" type="topic" format="dita"/>.</li>
+        <li id="im170093">大型表的表分区策略。参见<xref
+            href="ddl-database.xml" type="topic" format="dita"/>。</li>
       </ul>
     </body>
     <topic id="topic27" xml:lang="en">
-      <title id="im140304">Choosing Column Data Types</title>
+      <title id="im140304">选择列的数据类型</title>
       <body>
-        <p>The data type of a column determines the types of data values the column can contain.
-          Choose the data type that uses the least possible space but can still accommodate your
-          data and that best constrains the data. For example, use character data types for strings,
-          date or timestamp data types for dates, and numeric data types for numbers.</p>
-        <p>For table columns that contain textual data, specify the data type
-            <codeph>VARCHAR</codeph> or <codeph>TEXT</codeph>. Specifying the data type
-            <codeph>CHAR</codeph> is not recommended. In Greenplum Database, the data types
-            <codeph>VARCHAR</codeph> or <codeph>TEXT</codeph> handle padding added to the data
-          (space characters added after the last non-space character) as significant characters, the
-          data type <codeph>CHAR</codeph> does not. For information on the character data types, see
-          the <codeph>CREATE TABLE</codeph> command in the <cite>Greenplum Database Reference
-            Guide</cite>.</p>
-        <p>Use the smallest numeric data type that will accommodate your numeric data and allow for
-          future expansion. For example, using <codeph>BIGINT</codeph> for data that fits in
-            <codeph>INT</codeph> or <codeph>SMALLINT</codeph> wastes storage space. If you expect
-          that your data values will expand over time, consider that changing from a smaller
-          datatype to a larger datatype after loading large amounts of data is costly. For example,
-          if your current data values fit in a <codeph>SMALLINT</codeph> but it is likely that the
-          values will expand, <codeph>INT</codeph> is the better long-term choice.</p>
-        <p>Use the same data types for columns that you plan to use in cross-table joins.
-          Cross-table joins usually use the primary key in one table and a foreign key in the other
-          table. When the data types are different, the database must convert one of them so that
-          the data values can be compared correctly, which adds unnecessary overhead.</p>
-        <p>Greenplum Database has a rich set of native data types available to
-          users. See the <cite>Greenplum Database Reference Guide</cite> for information about the
-          built-in data types.</p>
+        <p>一个列的数据类型决定了该列能包含的数据的类型。
+          选择的数据类型应使用最少的空间，但仍能容纳用户的数据并且能最好地约束数据。
+          例如，对字符串使用character数据类型，对于日期使用date或者timestamp数据类型，而对数字使用numeric数据类型。
+          </p>
+        <p>对于包含文本数据的表列，应指定数据类型为<codeph>VARCHAR</codeph>或者<codeph>TEXT</codeph>。
+          不推荐指定数据类型为<codeph>CHAR</codeph>。
+          在Greenplum数据库中数据类型<codeph>VARCHAR</codeph>或者<codeph>TEXT</codeph>会把加在数据后面的边距（在最后一个非空白字符后面增加的空白字符）处理为有效字符，而数据类型<codeph>CHAR</codeph>不会这样做。
+          关于character数据类型的信息，请见<cite>Greenplum数据库参考指南</cite>中的<codeph>CREATE TABLE</codeph>命令。
+          </p>
+        <p>使用能容纳用户的数字型数据的且允许未来扩张的最小数字数据类型。
+          例如，为适合<codeph>INT</codeph>或<codeph>SMALLINT</codeph>的数据使用<codeph>BIGINT</codeph>会浪费存储空间。
+          如果用户预期用户的数据值将会随着时间扩张，应该考虑到在装载大量数据后从较小的数据类型更改成较大的数据类型需要很大的代价。
+          例如，如果用户当期的数据值适合<codeph>SMALLINT</codeph>，但是很可能值会扩张，这样<codeph>INT</codeph>就是更好的长期选择。
+          </p>
+        <p>对用户计划要用在交叉表连接中的列使用相同的数据类型。
+          交叉表连接通常使用一个表中的主键和其他表中的外键。
+          当数据类型不同时，数据库必须转换其中之一以便数据值能被正确地比较，这会增加不必要的开销。
+          </p>
+        <p>Greenplum数据库为用户提供了丰富的本地数据类型集合。
+          有关内建数据类型的信息请见<cite>Greenplum数据库参考指南</cite>。
+          </p>
       </body>
     </topic>
     <topic id="topic28" xml:lang="en">
-      <title id="im140306">Setting Table and Column Constraints</title>
+      <title id="im140306">设置表和列约束</title>
       <body>
-        <p>You can define constraints on columns and tables to restrict the data in your tables.
-          Greenplum Database support for constraints is the same as PostgreSQL with some
-          limitations, including:</p>
+        <p>用户可以在列和表上定义约束来限制表中的数据。
+          Greenplum数据库支持和PostgreSQL相同的约束，但是有一些限制，包括：
+          </p>
         <ul id="ul_u12_vvy_sp">
-          <li id="im206975"><codeph>CHECK</codeph> constraints can refer only to the table on which
-            they are defined. </li>
-          <li id="im206986"><codeph>UNIQUE</codeph> and <codeph>PRIMARY KEY</codeph> constraints
-            must be compatible with their tableʼs distribution key and partitioning key, if any.
-                <note><codeph>UNIQUE</codeph> and <codeph>PRIMARY KEY</codeph> constraints are not
-              allowed on append-optimized tables because the <codeph>UNIQUE</codeph> indexes that
-              are created by the constraints are not allowed on append-optimized tables.</note></li>
-          <li id="im207041"><codeph>FOREIGN KEY</codeph> constraints are allowed, but not
-            enforced.</li>
-          <li id="im206995">Constraints that you define on partitioned tables apply to the
-            partitioned table as a whole. You cannot define constraints on the individual parts of
-            the table.</li>
+          <li id="im206975"><codeph>CHECK</codeph>约束只能引用它所在的表。</li>
+          <li id="im206986"><codeph>UNIQUE</codeph>和<codeph>PRIMARY KEY</codeph>约束必须和它们所在表的分布键和分区键（如果有）兼容。
+                <note>在追加优化表上不允许<codeph>UNIQUE</codeph>和<codeph>PRIMARY KEY</codeph>约束，因为追加优化表上不允许这些约束创建的<codeph>UNIQUE</codeph>索引。</note></li>
+          <li id="im207041">允许<codeph>FOREIGN KEY</codeph>约束，但不会被强制。</li>
+          <li id="im206995">用户在分区表上定义的约束将作为整体应用到分区表上。用户不能在该表的单独的部分上定义约束。</li>
         </ul>
       </body>
       <topic id="topic29" xml:lang="en">
-        <title>Check Constraints</title>
+        <title>检查约束</title>
         <body>
-          <p>Check constraints allow you to specify that the value in a certain column must satisfy
-            a Boolean (truth-value) expression. For example, to require positive product prices:</p>
+          <p>检查约束允许用户指定一个特定列中的值必须满足一个布尔（真值）表达式。例如，要求正的产品价格：</p>
           <p>
             <codeblock>=&gt; CREATE TABLE products 
             ( product_no integer, 
@@ -93,10 +77,9 @@
         </body>
       </topic>
       <topic id="topic30" xml:lang="en">
-        <title>Not-Null Constraints</title>
+        <title>非空约束</title>
         <body>
-          <p>Not-null constraints specify that a column must not assume the null value. A not-null
-            constraint is always written as a column constraint. For example:</p>
+          <p>非空约束指定一个列不能有空值。非空约束总是被写作为列约束。例如：</p>
           <p>
             <codeblock>=&gt; CREATE TABLE products 
        ( product_no integer <b>NOT NULL</b>,
@@ -107,13 +90,12 @@
         </body>
       </topic>
       <topic id="topic31" xml:lang="en">
-        <title>Unique Constraints</title>
+        <title>唯一约束</title>
         <body>
-          <p>Unique constraints ensure that the data contained in a column or a group of columns is
-            unique with respect to all the rows in the table. The table must be hash-distributed or
-            replicated (not <codeph>DISTRIBUTED RANDOMLY</codeph>). If the table is
-            hash-distributed, the constraint columns must be the same as (or a superset of) the
-            table's distribution key columns. For example:</p>
+          <p>唯一约束确保一列或者一组列中包含的数据对于表中所有的行都是唯一的。
+            该表必须是哈希分布或复制表（不可以是<codeph>DISTRIBUTED RANDOMLY</codeph>）。
+            如果表是哈希分布的，约束列必须是该表的分布键列（或者是一个超集）。例如：
+            </p>
           <p>
             <codeblock>=&gt; CREATE TABLE products 
        ( <codeph>product_no</codeph> integer <codeph>UNIQUE</codeph>, 
@@ -125,14 +107,12 @@
         </body>
       </topic>
       <topic id="topic32" xml:lang="en">
-        <title>Primary Keys</title>
+        <title>主键</title>
         <body>
-          <p>A primary key constraint is a combination of a <codeph>UNIQUE</codeph> constraint and a
-              <codeph>NOT NULL</codeph> constraint. The table must be hash-distributed (not
-              <codeph>DISTRIBUTED RANDOMLY</codeph>), and the primary key columns must be the same
-            as (or a superset of) the table's distribution key columns. If a table has a primary
-            key, this column (or group of columns) is chosen as the distribution key for the table
-            by default. For example:</p>
+          <p>主键约束是一个<codeph>UNIQUE</codeph>约束和一个<codeph>NOT NULL</codeph>约束的组合。
+            该表必须是哈希分布（非<codeph>DISTRIBUTED RANDOMLY</codeph>）的，并且约束列必须是该表的分布键列（或者是一个超集）。
+            如果一个表具有主键，这个列（或者这一组列）会被默认选中为该表的分布键。
+            例如：</p>
           <p>
             <codeblock>=&gt; CREATE TABLE products 
        ( <codeph>product_no</codeph> integer <codeph>PRIMARY KEY</codeph>, 
@@ -144,78 +124,63 @@
         </body>
       </topic>
       <topic id="topic33" xml:lang="en">
-        <title>Foreign Keys</title>
+        <title>外键</title>
         <body>
-          <p>Foreign keys are not supported. You can declare them, but referential integrity is not
-            enforced.</p>
-          <p>Foreign key constraints specify that the values in a column or a group of columns must
-            match the values appearing in some row of another table to maintain referential
-            integrity between two related tables. Referential integrity checks cannot be enforced
-            between the distributed table segments of a Greenplum database.</p>
+          <p>不支持外键。用户可以声明它们，但是参照完整性不会被实施。</p>
+          <p>外键约束指定一列或者一组列中的值必须匹配出现在另一个表的某行中的值，以此来维护两个相关表之间的参照完整性。
+            参照完整性检查不能在一个Greenplum数据库的分布表段之间实施。</p>
         </body>
       </topic>
     </topic>
     <topic id="topic34" xml:lang="en">
-      <title id="im140308">Choosing the Table Distribution Policy</title>
+      <title id="im140308">选择表分布策略</title>
       <body>
-        <p>All Greenplum Database tables are distributed. When you create or alter a table, you
-          optionally specify <codeph>DISTRIBUTED BY</codeph> (hash distribution),
-            <codeph>DISTRIBUTED RANDOMLY</codeph> (round-robin distribution), or <codeph>DISTRIBUTED
-            REPLICATED</codeph> (fully distributed) to determine the table row distribution.</p>
-        <note>The Greenplum Database server configuration parameter
-            <codeph>gp_create_table_random_default_distribution</codeph> controls the table
-          distribution policy if the <cmdname>DISTRIBUTED BY</cmdname> clause is not specified when
-          you create a table. <p>For information about the parameter, see "Server
-            Configuration Parameters" of the <cite>Greenplum Database Reference
-          Guide</cite>.</p></note>
-        <p>Consider the following points when deciding on a table distribution policy.</p>
+        <p>所有的Greenplum数据库表都会被分布。
+          当用户创建或者修改一个表时，用户可以有选择地指定DISTRIBUTED BY（哈希分布），
+          DISTRIBUTED RANDOMLY（随机分布），或<codeph>DISTRIBUTED REPLICATED</codeph>（全分布）来决定该表的行分布。
+          </p>
+        <note>如果创建表时没有指定<cmdname>DISTRIBUTED BY</cmdname>，
+          Greenplum数据库服务器配置参数<codeph>gp_create_table_random_default_distribution</codeph>控制表的分布策略。
+          <p>更多有关该参数的信息，请见<cite>Greenplum数据库参考指南</cite>的“服务器配置参数”部分。
+            </p></note>
+        <p>在决定表分布策略时，请考虑以下几点。</p>
         <ul id="ul_dc2_vvy_sp">
-          <li id="im143035"><b>Even Data Distribution</b> — For the best possible performance, all
-            segments should contain equal portions of data. If the data is unbalanced or skewed, the
-            segments with more data must work harder to perform their portion of the query
-            processing. Choose a distribution key that is unique for each record, such as the
-            primary key.</li>
-          <li id="im143036"><b>Local and Distributed Operations</b> — Local operations are faster
-            than distributed operations. Query processing is fastest if the work associated with
-            join, sort, or aggregation operations is done locally, at the segment level. Work done
-            at the system level requires distributing tuples across the segments, which is less
-            efficient. When tables share a common distribution key, the work of joining or sorting
-            on their shared distribution key columns is done locally. With a random distribution
-            policy, local join operations are not an option.</li>
-          <li id="im200996"><b>Even Query Processing</b> — For best performance, all segments should
-            handle an equal share of the query workload. Query workload can be skewed if a table's
-            data distribution policy and the query predicates are not well matched. For example,
-            suppose that a sales transactions table is distributed on the customer ID column (the
-            distribution key). If a predicate in a query references a single customer ID, the query
-            processing work is concentrated on just one segment. </li>
+          <li id="im143035"><b>均匀数据分布</b> — 为了最好的性能，所有的Segment应该包含等量的数据。
+            如果数据不平衡或者倾斜，具有更多数据的Segment就必须做更多工作来执行它那一部分的查询处理。
+            请选择对于每一个记录都唯一的分布键，例如主键。</li>
+          <li id="im143036"><b>本地和分布式操作</b> — 本地操作比分布式操作更快。
+            在Segment层面上，如果与连接、排序或者聚集操作相关的工作在本地完成，查询处理是最快的。
+            在系统层面完成的工作要求在Segment之间分布元组，其效率会低些。
+            当表共享一个共同的分布键时，在它们共享的分布键列上的连接或者排序工作会在本地完成。
+            对于随机分布策略来说，本地连接操作就行不通了。</li>
+          <li id="im200996"><b>均匀查询处理</b> — 为了最好的性能，所有的Segment应该处理等量的查询负载。
+            如果一个表的数据分布策略与查询谓词匹配不好，查询负载可能会倾斜。
+            例如，假定一个销售事务表按照客户ID列（分布键）分布。
+            如果查询中的谓词引用了一个单一的客户ID，该查询处理工作会被集中在一个Segment上。 </li>
         </ul>
-        <p>The replicated table distribution policy (<codeph>DISTRIBUTED REPLICATED</codeph>) should
-          be used only for small tables. Replicating data to every segment is costly in both storage
-          and maintenance, and prohibitive for large fact tables. The primary use cases for
-          replicated tables are to: </p>
+        <p>复制表分布策略(<codeph>DISTRIBUTED REPLICATED</codeph>)应该在小表上使用。
+          将大表数据复制到每个节点上无论在存储还是维护上都是有代价的。
+          复制表最基本的用例是：
+          </p>
         <ul id="ul_s1w_gjn_3fb">
-          <li id="li_h5h_3jn_3fb">remove restrictions on operations that user-defined functions can
-            perform on segments, and</li>
-          <li>improve query performance by making it unnecessary to broadcast frequently used tables
-            to all segments.</li>
+          <li id="li_h5h_3jn_3fb">删除用户定义的函数可以对节点执行的操作的限制</li>
+          <li>频繁使用的表不需要广播到所有节点可以提高查询性能。</li>
         </ul>
       </body>
       <topic id="topic35" xml:lang="en">
-        <title>Declaring Distribution Keys</title>
+        <title>声明分布键</title>
         <body>
-          <p><codeph>CREATE TABLE</codeph>'s optional clauses <codeph>DISTRIBUTED BY</codeph>,
-              <codeph>DISTRIBUTED RANDOMLY</codeph>, and <codeph>DISTRIBUTED REPLICATED</codeph>
-            specify the distribution policy for a table. The default is a hash distribution policy
-            that uses either the <codeph>PRIMARY KEY</codeph> (if the table has one) or the first
-            column of the table as the distribution key. Columns with geometric or user-defined data
-            types are not eligible as Greenplum Database distribution key columns. If a table does
-            not have an eligible column, Greenplum Database distributes the rows randomly or in
-            round-robin fashion. </p>
-          <p>Replicated tables have no distribution key because every row is distributed to every
-            Greenplum Database segment instance.</p>
-          <p>To ensure even distribution of hash-distributed data, choose a distribution key that is
-            unique for each record. If that is not possible, choose <codeph>DISTRIBUTED
-              RANDOMLY</codeph>. For example:</p>
+          <p><codeph>CREATE TABLE</codeph>命令的可选子句<codeph>DISTRIBUTED BY</codeph>,
+              <codeph>DISTRIBUTED RANDOMLY</codeph>和<codeph>DISTRIBUTED REPLICATED</codeph>决定了表的分布策略。
+            默认的哈希分布策略使用<codeph>PRIMARY KEY</codeph>（如果有的话）或表的第一列作为分布键。
+            几何信息列或用户自定义数据类型的列是不能作为Greenplum数据库分布列的。
+            如果找不到合适的哈希分布的列，Greenplum数据库就选择随机分布策略。
+            </p>
+          <p>复制表没有分布列，因为每行都分布在Greenplum数据库所有节点上。
+            </p>
+          <p>为了保证哈希分布数据的均匀分布，最好选一个唯一键作为分布列。
+            如果找不到，则选择<codeph>DISTRIBUTED RANDOMLY</codeph>。例如：
+            </p>
           <p>
             <codeblock>=&gt; CREATE TABLE products
 <codeph>                        (name varchar(40),
@@ -230,29 +195,24 @@
              DISTRIBUTED RANDOMLY;
 </codeph></codeblock>
           </p>
-          <note type="important">A Primary Key is always the Distribution Key for a table. If no
-            Primary Key exists, but a Unique Key exists, this is the Distribution Key for the
-            table.</note>
+          <note type="important">主键总是表的分布列。如果没有主键，但是有唯一索引存在，则选择它为分布键。</note>
         </body>
       </topic>
       <topic id="topic36" xml:lang="en">
-        <title>Custom Distribution Key Hash Functions</title>
+        <title>自定义分布键哈希函数</title>
         <body>
-          <p>The hash function used for hash distribution policy is defined by the hash operator
-            class for the column's data type. As the default Greenplum Database uses the data type's
-            default hash operator class, the same operator class used for hash joins and hash
-            aggregates, which is suitable for most use cases. However, you can declare a non-default
-            hash operator class in the <codeph>DISTRIBUTED BY</codeph> clause. </p>
-          <p> Using a custom hash operator class can be useful to support co-located joins on a
-            different operator than the default equality operator (<codeph>=</codeph>). </p>
+          <p>用于哈希分布策略的哈希函数由列的数据类型的哈希运算符类定义。
+            由于默认的Greenplum数据库使用数据类型的默认哈希运算符类，因此用于哈希连接和哈希聚合的运算符类相同，适用于大多数用例。
+            但是，您可以在<codeph>DISTRIBUTED BY</codeph>子句中声明非默认的哈希运算符类。
+            </p>
+          <p>使用自定义哈希运算符类可以用于支持与默认相等运算符（<codeph>=</codeph>）不同的运算符上的共存连接。
+            </p>
           <section>
-            <title>Example Custom Hash Operator Class</title>
-            <p>This example creates a custom hash operator class for the integer data type that is
-              used to improve query performance. The operator class compares the absolute values of
-              integers.</p>
-            <p>Create a function and an equality operator that returns true if the absolute values
-              of two integers are
-              equal.<codeblock>CREATE FUNCTION abseq(int, int) RETURNS BOOL AS
+            <title>自定义哈希操作符类用例</title>
+            <p>此示例为整数数据类型创建自定义哈希运算符类，该类用于提高查询性能。
+              运算符类比较整数的绝对值。</p>
+            <p>创建一个函数和一个等于运算符，如果两个整数的绝对值相等，则返回true。
+              <codeblock>CREATE FUNCTION abseq(int, int) RETURNS BOOL AS
 $$
   begin return abs($1) = abs($2); end;
 $$ LANGUAGE plpgsql STRICT IMMUTABLE;
@@ -263,8 +223,8 @@ CREATE OPERATOR |=| (
   RIGHTARG = int,
   COMMUTATOR = |=|,
   hashes, merges);</codeblock></p>
-            <p>Now, create a hash function and operator class that uses the
-              operator.<codeblock>CREATE FUNCTION abshashfunc(int) RETURNS int AS
+            <p>现在，创建一个使用运算符的哈希函数和运算符类。
+              <codeblock>CREATE FUNCTION abshashfunc(int) RETURNS int AS
 $$
   begin return hashint(abs($1)); end;
 $$ LANGUAGE plpgsql STRICT IMMUTABLE;
@@ -273,10 +233,9 @@ CREATE OPERATOR CLASS abs_int_hash_ops FOR TYPE int4
   USING hash AS
   OPERATOR 1 |=|,
   FUNCTION 1 abshashfunc(int);</codeblock></p>
-            <p>Also, create less than and greater than operators, and a btree operator class for
-              them. We don't need them for our queries, but the Greenplum Database Postgres query
-              planner will not consider co-location of joins without
-              them.<codeblock>CREATE FUNCTION abslt(int, int) RETURNS BOOL AS
+            <p>并且，为它们创建小于和大于运算符和B树运算符类。
+              我们的查询不需要它们，但是Greenplum数据库的Postgres查询优化器必须依赖它们做连接的co-location。
+              <codeblock>CREATE FUNCTION abslt(int, int) RETURNS BOOL AS
 $$
   begin return abs($1) &lt; abs($2); end;
 $$ LANGUAGE plpgsql STRICT IMMUTABLE;
@@ -307,17 +266,15 @@ CREATE OPERATOR CLASS abs_int_btree_ops FOR TYPE int4
   OPERATOR 3 |=|,
   OPERATOR 5 |&gt;|,
   FUNCTION 1 abscmp(int, int);</codeblock></p>
-            <p>Now, you can use the custom hash operator class in tables.
+            <p>现在，您可以在表中使用自定义哈希运算符类。
               <codeblock>CREATE TABLE atab (a int) DISTRIBUTED BY (a abs_int_hash_ops);
 CREATE TABLE btab (b int) DISTRIBUTED BY (b abs_int_hash_ops);
 
 INSERT INTO atab VALUES (-1), (0), (1);
 INSERT INTO btab VALUES (-1), (0), (1), (2);</codeblock></p>
-            <p>Queries that perform a join that use the custom equality operator
-                <codeph>|=|</codeph> can take advantage of the co-location. With the default integer
-              opclass, this query would require Redistribute Motion nodes, but with the custom
-              opclass, a more efficient plan is
-              possible.<codeblock>EXPLAIN (COSTS OFF) SELECT a, b FROM atab, btab WHERE a = b;
+            <p>执行使用自定义相等运算符<codeph>|=|</codeph>的连接的查询 可以利用co-location。
+              使用默认的整数opclass，此查询将需要Redistribute Motion节点，但使用自定义opclass，可以实现更高效的计划。
+              <codeblock>EXPLAIN (COSTS OFF) SELECT a, b FROM atab, btab WHERE a = b;
                             QUERY PLAN                            
 ------------------------------------------------------------------
  Gather Motion 3:1  (slice3; segments: 3)

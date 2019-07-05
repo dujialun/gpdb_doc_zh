@@ -1,40 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_ivc_qvy_sp">
-  <title id="im177965">Creating and Managing Schemas</title>
+  <title id="im177965">创建和管理SCHEMA</title>
   <body>
-    <p>Schemas logically organize objects and data in a database. Schemas allow you to have more
-      than one object (such as tables) with the same name in the database without conflict if the
-      objects are in different schemas.</p>
+    <p>Schema从逻辑上组织一个数据库中的对象和数据。
+        Schema允许用户在同一个数据库中拥有多于一个对象（例如表）具有相同的名称而不发生冲突，只要把它们放在不同的Schema中就好。
+        </p>
   </body>
   <topic id="topic18" xml:lang="en">
-    <title>The Default "Public" Schema</title>
+    <title>默认的 "Public" SCHEMA</title>
     <body>
-      <p>Every database has a default schema named <i>public</i>. If you do not create any schemas,
-        objects are created in the <i>public</i> schema. All database roles (users) have
-          <codeph>CREATE</codeph> and <codeph>USAGE</codeph> privileges in the <i>public</i> schema.
-        When you create a schema, you grant privileges to your users to allow access to the
-        schema.</p>
+      <p>每个数据库都有一个名为<i>public</i>的schema。
+          如果用户没有创建任何schema，对象会被创建在这个<i>public</i>的schema中。
+          所有的数据库角色（用户）都在<i>public</i> schema中拥有<codeph>CREATE</codeph>和<codeph>USAGE</codeph>特权。
+          在用户创建一个schema时，用户应该为允许访问该schema的用户授予特权。
+          </p>
     </body>
   </topic>
   <topic id="topic19" xml:lang="en">
-    <title>Creating a Schema</title>
+    <title>创建一个SCHEMA</title>
     <body>
-      <p>Use the <codeph>CREATE SCHEMA</codeph> command to create a new schema. For example:</p>
+      <p>可以使用<codeph>CREATE SCHEMA</codeph>命令来创建一个新的schema。例如：</p>
       <p>
         <codeblock>=&gt; CREATE SCHEMA myschema;
 </codeblock>
       </p>
-      <p>To create or access objects in a schema, write a qualified name consisting of the schema
-        name and table name separated by a period. For example:</p>
+      <p>要在一个schema中创建或者访问对象，需要写一个由schema名和表名构成的限定名，两者之间用点号隔开。例如：</p>
       <p>
         <codeblock>myschema.table
 </codeblock>
       </p>
-      <p>See <xref href="#topic20" type="topic" format="dita"/> for information about accessing a
-        schema.</p>
-      <p>You can create a schema owned by someone else, for example, to restrict the activities of
-        your users to well-defined namespaces. The syntax is:</p>
+      <p>有关访问一个schema的信息请见<xref href="#topic20" type="topic" format="dita"/>。</p>
+      <p>用户可以创建一个由他人拥有的schema，例如用来把用户的活动限定在定义良好的名字空间内。语法是：</p>
       <p>
         <codeblock>=&gt; CREATE SCHEMA <codeph>schemaname</codeph> AUTHORIZATION <codeph>username</codeph>;
 </codeblock>
@@ -42,31 +39,31 @@
     </body>
   </topic>
   <topic id="topic20" xml:lang="en">
-    <title id="im142167">Schema Search Paths</title>
+    <title id="im142167">SCHEMA搜索路径</title>
     <body>
-      <p>To specify an object's location in a database, use the schema-qualified name. For
-        example:</p>
+      <p>要在数据库中指定一个对象的位置，请使用schema限定的名称。例如：</p>
       <p>
         <codeblock>=&gt; SELECT * FROM myschema.mytable;
 </codeblock>
       </p>
-      <p>You can set the <codeph>search_path</codeph> configuration parameter to specify the order
-        in which to search the available schemas for objects. The schema listed first in the search
-        path becomes the <i>default</i> schema. If a schema is not specified, objects are created in
-        the default schema.</p>
+      <p>用户可以设置<codeph>search_path</codeph>配置参数来指定在其中搜索对象的可用schema的顺序。
+          在该搜索路径中第一个列出的方案会成为默认schema。
+          如果没有指定方案，对象会被创建在默认schema中。
+          </p>
     </body>
     <topic id="topic21" xml:lang="en">
-      <title>Setting the Schema Search Path</title>
+      <title>设置SCHEMA搜索路径</title>
       <body>
-        <p>The <codeph>search_path</codeph> configuration parameter sets the schema search order.
-          The <codeph>ALTER DATABASE</codeph> command sets the search path. For example:</p>
+        <p><codeph>search_path</codeph>配置参数设置schema搜索顺序。
+            <codeph>ALTER DATABASE</codeph>命令可以设置搜索路径。例如：
+            </p>
         <p>
           <codeblock>=&gt; ALTER DATABASE mydatabase SET search_path TO myschema, 
 public, pg_catalog;
 </codeblock>
         </p>
-        <p>You can also set <codeph>search_path</codeph> for a particular role (user) using the
-            <codeph>ALTER ROLE</codeph> command. For example:</p>
+        <p>用户也可以使用<codeph>ALTER ROLE</codeph>命令为特定的角色（用户）设置<codeph>search_path</codeph>。例如：
+            </p>
         <p>
           <codeblock>=&gt; ALTER ROLE sally SET search_path TO myschema, public, 
 pg_catalog;
@@ -75,15 +72,16 @@ pg_catalog;
       </body>
     </topic>
     <topic id="topic22" xml:lang="en">
-      <title>Viewing the Current Schema</title>
+      <title>查看当前SCHEMA</title>
       <body>
-        <p>Use the <codeph>current_schema()</codeph> function to view the current schema. For
-          example:</p>
+        <p>使用<codeph>current_schema()</codeph>函数可以查看当前的schema。例如：
+            </p>
         <p>
           <codeblock>=&gt; SELECT current_schema();
 </codeblock>
         </p>
-        <p>Use the <codeph>SHOW</codeph> command to view the current search path. For example:</p>
+        <p>使用<codeph>SHOW</codeph>命令可以查看当前的搜索路径。例如：
+            </p>
         <p>
           <codeblock>=&gt; SHOW search_path;
 </codeblock>
@@ -92,15 +90,17 @@ pg_catalog;
     </topic>
   </topic>
   <topic id="topic23" xml:lang="en">
-    <title>Dropping a Schema</title>
+    <title>删除一个SCHEMA</title>
     <body>
-      <p>Use the <codeph>DROP SCHEMA</codeph> command to drop (delete) a schema. For example:</p>
+      <p>使用<codeph>DROP SCHEMA</codeph>命令可以删除一个schema。例如：
+          </p>
       <p>
         <codeblock>=&gt; DROP SCHEMA myschema;
 </codeblock>
       </p>
-      <p>By default, the schema must be empty before you can drop it. To drop a schema and all of
-        its objects (tables, data, functions, and so on) use:</p>
+      <p>默认情况下，在能够删除一个schema前，它必须为空。
+          要删除一个schema连同其中的所有对象（表、数据、函数等等），可以使用：
+          </p>
       <p>
         <codeblock>=&gt; DROP SCHEMA myschema CASCADE;
 </codeblock>
@@ -108,28 +108,22 @@ pg_catalog;
     </body>
   </topic>
   <topic id="topic24" xml:lang="en">
-    <title>System Schemas</title>
+    <title>系统SCHEMA</title>
     <body>
-      <p>The following system-level schemas exist in every database:</p>
+      <p>下列系统级schema存在于每一个数据库中：</p>
       <ul id="ul_zwq_qvy_sp">
-        <li id="im141362"><codeph>pg_catalog</codeph> contains the system catalog tables, built-in
-          data types, functions, and operators. It is always part of the schema search path, even if
-          it is not explicitly named in the search path.</li>
-        <li id="im141363"><codeph>information_schema</codeph> consists of a standardized set of
-          views that contain information about the objects in the database. These views get system
-          information from the system catalog tables in a standardized way.</li>
-        <li id="im141364"><codeph>pg_toast</codeph> stores large objects such as records that exceed
-          the page size. This schema is used internally by the Greenplum Database
-          system. </li>
-        <li id="im141879"><codeph>pg_bitmapindex</codeph> stores bitmap index objects such as lists
-          of values. This schema is used internally by the Greenplum Database
-          system.</li>
-        <li id="im180766"><codeph>pg_aoseg</codeph> stores append-optimized table objects. This
-          schema is used internally by the Greenplum Database system.</li>
-        <li id="im180819"><codeph>gp_toolkit</codeph> is an administrative schema that contains
-          external tables, views, and functions that you can access with SQL commands. All database
-          users can access <codeph>gp_toolkit</codeph> to view and query the system log files and
-          other system metrics.</li>
+        <li id="im141362"><codeph>pg_catalog</codeph>包含着系统目录表、内建数据类型、函数和操作符。
+            即便在schema搜索路径中没有显式地提到它，它也总是schema搜索路径的一部分。</li>
+        <li id="im141363"><codeph>information_schema</codeph>有一个包含数据库中对象信息的视图集合组成。
+            这些视图以一种标准化的方式从系统目录表中得到系统信息。</li>
+        <li id="im141364"><codeph>pg_toast</codeph>存储大型对象，如超过页面尺寸的记录。
+            这个schema由Greenplum数据库系统内部使用。</li>
+        <li id="im141879"><codeph>pg_bitmapindex</codeph>存储位图索引对象，例如值的列表。
+            这个schema由Greenplum数据库系统内部使用。</li>
+        <li id="im180766"><codeph>pg_aoseg</codeph>存储追加优化表对象。
+            这个schema由Greenplum数据库系统内部使用。</li>
+        <li id="im180819"><codeph>gp_toolkit</codeph>是一个管理用途的schema，它包含用户可以用SQL命令访问的外部表、视图和函数。
+            所有的数据库用户都能访问<codeph>gp_toolkit</codeph>来查看和查询系统日志文件以及其他系统指标。</li>
       </ul>
     </body>
   </topic>

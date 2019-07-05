@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_r2v_zvy_sp">
-  <title id="im148475">Choosing the Table Storage Model</title>
+  <title id="im148475">选择表存储模型</title>
   <body>
-    <p>Greenplum Database supports several storage models and a mix of storage models.
-      When you create a table, you choose how to store its data. This topic explains the options for
-      table storage and how to choose the best storage model for your workload.</p>
+    <p>Greenplum数据库支持多种存储模型和一种混合存储模型。
+      当用户创建一个表时，用户会选择如何存储它的数据。
+      这个主题解释了表存储的选项以及如何为用户的负载选择最好的存储模型。
+      </p>
     <ul id="ul_wjf_1wy_sp">
       <li id="im168064">
         <xref href="#topic37" type="topic" format="dita"/>
@@ -29,118 +30,94 @@
         <xref href="#topic62" format="dita"/>
       </li>
     </ul>
-    <note> To simplify the creation of database tables, you can specify the default values for some
-      table storage options with the Greenplum Database server configuration parameter
-        <codeph>gp_default_storage_options</codeph>. <p>For information about the
-        parameter, see "Server Configuration Parameters" in the <cite>Greenplum Database Reference
-          Guide</cite>.</p>
+    <note>为了简化数据库表的创建，用户可以使用Greenplum数据库的服务器配置参数<codeph>gp_default_storage_options</codeph>为一些表存储选项指定默认值。
+      <p>更多有关该参数的信息，请见<cite>Greenplum数据库参考指南</cite>中的“服务器配置参数”部分。
+        </p>
     </note>
   </body>
   <topic id="topic37" xml:lang="en">
-    <title id="im168000">Heap Storage</title>
+    <title id="im168000">堆存储</title>
     <body>
-      <p>By default, Greenplum Database uses the same heap storage model as PostgreSQL. Heap table
-        storage works best with OLTP-type workloads where the data is often modified after it is
-        initially loaded. <codeph>UPDATE</codeph> and <codeph>DELETE</codeph> operations require
-        storing row-level versioning information to ensure reliable database transaction processing.
-        Heap tables are best suited for smaller tables, such as dimension tables, that are often
-        updated after they are initially loaded.</p>
+      <p>默认情况下，Greenplum数据库使用和PostgreSQL相同的堆存储模型。
+        堆表存储在OLTP类型负载下表现最好，这种环境中数据会在初始载入后被频繁地修改。
+        <codeph>UPDATE</codeph>和<codeph>DELETE</codeph>操作要求存储行级版本信息来确保可靠的数据库事务处理。
+        堆表最适合于较小的表，例如维度表，它们在初始载入数据后会经常被更新。
+        </p>
     </body>
   </topic>
   <topic id="topic38" xml:lang="en">
-    <title id="im201394">Append-Optimized Storage</title>
+    <title id="im201394">追加优化存储</title>
     <body>
-      <p>Append-optimized table storage works best with denormalized fact tables in a data warehouse
-        environment. Denormalized fact tables are typically the largest tables in the system. Fact
-        tables are usually loaded in batches and accessed by read-only queries. Moving large fact
-        tables to an append-optimized storage model eliminates the storage overhead of the per-row
-        update visibility information, saving about 20 bytes per row. This allows for a leaner and
-        easier-to-optimize page structure. The storage model of append-optimized tables is optimized
-        for bulk data loading. Single row <codeph>INSERT</codeph> statements are not
-        recommended.</p>
+      <p>追加优化表存储在数据仓库环境中的非规范表表现最好。
+        非规范表通常是系统中最大的表。
+        事实表通常成批地被载入并且被只读查询访问。
+        将大型的事实表改为追加优化存储模型可以消除每行中的更新可见性信息负担，这可以为每一行节约大概20字节。
+        这可以得到一种更加简洁并且更容易优化的页面结构。
+        追加优化表的存储模型是为批量数据装载优化的，因此不推荐单行的<codeph>INSERT</codeph>语句。
+        </p>
       <section id="im168504">
-        <title>To create a heap table</title>
-        <p>Row-oriented heap tables are the default storage type.</p>
+        <title>创建一个堆表</title>
+        <p>面向行的堆表是默认的存储类型。</p>
         <p>
           <codeblock>=&gt; CREATE TABLE foo (a int, b text) DISTRIBUTED BY (a);</codeblock>
         </p>
-        <title>To create an append-optimized table</title>
-        <p>Use the <codeph>WITH</codeph> clause of the <codeph>CREATE TABLE</codeph> command to
-          declare the table storage options. The default is to create the table as a regular
-          row-oriented heap-storage table. For example, to create an append-optimized table with no
-          compression:</p>
+        <title>创建一个追加优化表</title>
+        <p>使用<codeph>CREATE TABLE</codeph>命令的<codeph>WITH</codeph>子句可以声明表的存储选项。
+          默认是将表创建为面向行的堆存储表。
+          例如，要创建一个不压缩的追加优化表：
+          </p>
         <p>
           <codeblock>=&gt; CREATE TABLE bar (a int, b text) 
     WITH (appendoptimized=true)
     DISTRIBUTED BY (a);</codeblock>
         </p>
-        <note>You use the <codeph>appendoptimized=<varname>value</varname></codeph> syntax to
-          specify the append-optimized table storage type. <codeph>appendoptimized</codeph> is
-          a thin alias for the <codeph>appendonly</codeph> legacy storage option. Greenplum Database
-          stores <codeph>appendonly</codeph> in the catalog, and displays the same when 
-          listing storage options for append-optimized tables.</note>
-        <p><codeph>UPDATE</codeph> and <codeph>DELETE</codeph> are not allowed on append-optimized
-          tables in a repeatable read  or serizalizable transaction and will cause the transaction
-          to abort. <codeph>CLUSTER</codeph>, <codeph>DECLARE...FOR UPDATE</codeph>, and triggers
-          are not supported with append-optimized tables.</p>
+        <note>使用<codeph>appendoptimized=<varname>value</varname></codeph>语法来指定追加优化类型的表存储。
+          <codeph>appendoptimized</codeph>是<codeph>appendonly</codeph>传统存储选项的精简别名。
+          Greenplum数据库在catalog里存储<codeph>appendonly</codeph>，并在列出追加优化表的存储选项时显示相同的内容。
+          </note>
+        <p>在一个可重复读或可序列化事务中的追加优化表上不允许<codeph>UPDATE</codeph>和<codeph>DELETE</codeph>，它们将导致该事务中止。
+          追加优化表上不支持<codeph>CLUSTER</codeph>、<codeph>DECLARE...FOR UPDATE</codeph>和触发器。
+          </p>
       </section>
     </body>
   </topic>
   <topic id="topic39" xml:lang="en">
-    <title id="im168256">Choosing Row or Column-Oriented Storage</title>
+    <title id="im168256">选择面向行或者面向列的存储</title>
     <body>
-      <p>Greenplum provides a choice of storage orientation models:
-        row, column, or a combination of both. This topic provides general guidelines for choosing
-        the optimum storage orientation for a table. Evaluate performance using your own data and
-        query workloads.</p>
+      <p>Greenplum提供面向存储的模型选择：行，列或两者的组合。
+        本主题提供了为表选择最佳存储的一般准则。
+        使用您自己的数据和查询工作负载评估性能。
+        </p>
       <ul id="ul_mtf_1wy_sp">
-        <li id="im201450">Row-oriented storage: good for OLTP types of workloads with many iterative
-          transactions and many columns of a single row needed all at once, so retrieving is
-          efficient.</li>
-        <li id="im201471">Column-oriented storage: good for data warehouse workloads with
-          aggregations of data computed over a small number of columns, or for single columns that
-          require regular updates without modifying other column data.</li>
+        <li id="im201450">面向行的存储：适用于具有许多迭代事务的OLTP类型的工作负载以及一次需要多列的单行，因此检索是高效的。</li>
+        <li id="im201471">面向列的存储：适合于在少量列上计算数据聚集的数据仓库负载，或者是用于需要对单列定期更新但不修改其他列数据的情况。</li>
       </ul>
-      <p>For most general purpose or mixed workloads, row-oriented storage offers the best
-        combination of flexibility and performance. However, there are use cases where a
-        column-oriented storage model provides more efficient I/O and storage. Consider the
-        following requirements when deciding on the storage orientation model for a table:</p>
+      <p>对于大部分常用目的或者混合负载，面向行的存储提供了灵活性和性能的最佳组合。
+        不过，也有场景中面向列的存储模型提供了更高效的I/O和存储。
+        在为一个表决定存储方向模型时，请考虑下列需求：</p>
       <ul id="ul_oyf_1wy_sp">
-        <li id="im168747"><b>Updates of table data.</b> If you load and update the table data
-          frequently, choose a row-oriented<ph> heap</ph> table. <ph
-           >Column-oriented table storage is only available on append-optimized
-            tables.</ph>
-          <p>See <xref href="#topic37" type="topic" format="dita"/> for more
-            information.</p></li>
-        <li id="im170466"><b>Frequent INSERTs.</b> If rows are frequently inserted into the table,
-          consider a row-oriented model. Column-oriented tables are not optimized for write
-          operations, as column values for a row must be written to different places on disk.</li>
-        <li id="im168960"><b>Number of columns requested in queries.</b> If you typically request
-          all or the majority of columns in the <codeph>SELECT</codeph> list or
-            <codeph>WHERE</codeph> clause of your queries, consider a row-oriented model.
-          Column-oriented tables are best suited to queries that aggregate many values of a single
-          column where the <codeph>WHERE</codeph> or <codeph>HAVING</codeph> predicate is also on
-          the aggregate column. For
-            example:<codeblock>SELECT SUM(salary)...</codeblock><codeblock>SELECT AVG(salary)... WHERE salary &gt; 10000</codeblock><p>Or
-            where the <codeph>WHERE</codeph> predicate is on a single column and returns a
-            relatively small number of rows. For
-          example:</p><codeblock>SELECT salary, dept ... WHERE state='CA'</codeblock></li>
-        <li id="im170487"><b>Number of columns in the table.</b> Row-oriented storage is more
-          efficient when many columns are required at the same time, or when the row-size of a table
-          is relatively small. Column-oriented tables can offer better query performance on tables
-          with many columns where you access a small subset of columns in your queries.</li>
-        <li id="im168797"><b>Compression.</b> Column data has the same data type, so storage size
-          optimizations are available in column-oriented data that are not available in row-oriented
-          data. For example, many compression schemes use the similarity of adjacent data to
-          compress. However, the greater adjacent compression achieved, the more difficult random
-          access can become, as data must be uncompressed to be read.</li>
+        <li id="im168747"><b>表数据的更新。</b>如果用户会频繁地装载和更新表数据，请选择一个面向行的堆表。
+          <ph>面向列的表存储只能用于追加优化表。</ph>
+          <p>参考<xref href="#topic37" type="topic" format="dita"/>获得更多信息。</p></li>
+        <li id="im170466"><b>频繁的插入。</b>如果频繁地向表中插入行，请考虑面向行的模型。
+          列存表并未对写操作优化，因为一行的列值必须被写到磁盘上的不同位置。</li>
+        <li id="im168960"><b>查询中要求的列数。</b>如果在查询的<codeph>SELECT</codeph>列表或者<codeph>WHERE</codeph>子句中常常要求所有或者大部分列，请考虑面向行的模型。
+          面向列的表最适合的情况是，查询会聚集一个单一列中的很多值且<codeph>WHERE</codeph>或者<codeph>HAVING</codeph>谓词也在该聚集列上。例如：
+          <codeblock>SELECT SUM(salary)...</codeblock><codeblock>SELECT AVG(salary)... WHERE salary &gt; 10000</codeblock><p>
+            或者面向列的情况是<codeph>WHERE</codeph>谓词在一个单一列上并且返回相对较少的行。例如：
+            </p><codeblock>SELECT salary, dept ... WHERE state='CA'</codeblock></li>
+        <li id="im170487"><b>表中的列数。</b>在同时要求很多列或者表的行尺寸相对较小时，面向行的存储会更有效。
+          对于具有很多列的表且查询中访问这些列的一个小子集时，面向列的表能够提供更好的查询性能。</li>
+        <li id="im168797"><b>压缩。</b>列数据具有相同的数据类型，因此在列存数据上支持存储尺寸优化，但在行存数据上则不支持。
+          例如，很多压缩方案使用临近数据的相似性来进行压缩。
+          不过，临近压缩做得越好，随机访问就会越困难，因为必须解压数据才能读取它们。</li>
       </ul>
       <section id="im169305">
-        <title>To create a column-oriented table</title>
-        <p>The <codeph>WITH</codeph> clause of the <codeph>CREATE TABLE</codeph> command specifies
-          the table's storage options. The default is a row-oriented<ph> heap
-            table. Tables that use column-oriented storage must be append-optimized tables</ph>. For
-          example, to create a column-oriented table:</p>
+        <title>创建一个面向列的表</title>
+        <p><codeph>CREATE TABLE</codeph>命令的<codeph>WITH</codeph>子句指定表的存储选项。
+          默认是面向行的堆表。<ph>使用面向列的存储的表必须是追加优化表</ph>。
+          例如，要创建一个列存表：
+          </p>
         <p>
           <codeblock>=&gt; CREATE TABLE bar (a int, b text) 
     WITH (appendoptimized=true, orientation=column)
@@ -151,90 +128,76 @@
     </body>
   </topic>
   <topic id="topic40" xml:lang="en">
-    <title id="im168077">Using Compression (Append-Optimized Tables Only)</title>
+    <title id="im168077">使用压缩（只适用于追加优化表）</title>
     <body>
-      <p>There are two types of in-database compression available in the Greenplum Database for
-        append-optimized tables:</p>
+      <p>对于追加优化表，在Greenplum数据库中有两种类型的库内压缩可用：</p>
       <ul id="ul_n2g_1wy_sp">
-        <li id="im201632">Table-level compression is applied to an entire table. </li>
-        <li id="im201672">Column-level compression is applied to a specific column. You can apply
-          different column-level compression algorithms to different columns.</li>
+        <li id="im201632">应用于一整个表的表级压缩。</li>
+        <li id="im201672">应用到一个指定列的列级压缩。用户可以为不同的列应用不同的列级压缩算法。</li>
       </ul>
-      <p>The following table summarizes the available compression algorithms.</p>
+      <p>下面的表总结了可用的压缩算法。</p>
       <table id="im198267">
-        <title>Compression Algorithms for Append-Optimized Tables</title>
+        <title>用于追加优化表的压缩算法</title>
         <tgroup cols="3">
           <colspec colnum="1" colname="col1" colwidth="130pt"/>
           <colspec colnum="2" colname="col2" colwidth="136pt"/>
           <colspec colnum="3" colname="col3" colwidth="110pt"/>
           <thead>
             <row>
-              <entry colname="col1">Table Orientation</entry>
-              <entry colname="col2">Available Compression Types</entry>
-              <entry colname="col3">Supported Algorithms</entry>
+              <entry colname="col1">表方向</entry>
+              <entry colname="col2">可用的压缩类型</entry>
+              <entry colname="col3">支持的算法</entry>
             </row>
           </thead>
           <tbody>
             <row>
-              <entry colname="col1">Row</entry>
-              <entry colname="col2">Table</entry>
-              <entry colname="col3"><codeph>ZLIB</codeph>, <codeph>ZSTD</codeph>, and
+              <entry colname="col1">行</entry>
+              <entry colname="col2">表</entry>
+              <entry colname="col3"><codeph>ZLIB</codeph>, <codeph>ZSTD</codeph>和
                 <codeph>QUICKLZ</codeph><sup>1</sup></entry>
             </row>
             <row>
-              <entry colname="col1">Column</entry>
-              <entry colname="col2">Column and Table</entry>
-              <entry colname="col3"><codeph>RLE_TYPE</codeph>, <codeph>ZLIB</codeph>, <codeph>ZSTD</codeph>, and
+              <entry colname="col1">列</entry>
+              <entry colname="col2">列和表</entry>
+              <entry colname="col3"><codeph>RLE_TYPE</codeph>, <codeph>ZLIB</codeph>, <codeph>ZSTD</codeph>和
                   <codeph>QUICKLZ</codeph><sup>1</sup></entry>
             </row>
           </tbody>
         </tgroup>
       </table>
       <p>
-        <note type="note"><sup>1</sup>QuickLZ compression is not available in the open source
-          version of Greenplum Database.</note>
+        <note type="note"><sup>1</sup>QuickLZ压缩在Greenplum数据库的开源版本中不可用。</note>
       </p>
-      <p>When choosing a compression type and level for append-optimized tables, consider these
-        factors:</p>
+      <p>在为追加优化表选择一种压缩类型和级别时，要考虑这些因素：</p>
       <ul id="ul_xlg_1wy_sp">
-        <li id="im201780">CPU usage. Your segment systems must have the available CPU power to
-          compress and uncompress the data.</li>
-        <li id="im201781">Compression ratio/disk size. Minimizing disk size is one factor, but also
-          consider the time and CPU capacity required to compress and scan data. Find the optimal
-          settings for efficiently compressing data without causing excessively long compression
-          times or slow scan rates.</li>
-        <li id="im201782">Speed of compression. QuickLZ compression generally uses less CPU capacity
-          and compresses data faster at a lower compression ratio than zlib. zlib provides higher
-          compression ratios at lower speeds. <p>For example, at compression level 1
-              (<codeph>compresslevel=1</codeph>), QuickLZ and zlib have comparable compression
-            ratios, though at different speeds. Using zlib with <codeph>compresslevel=6</codeph> can
-            significantly increase the compression ratio compared to QuickLZ, though with lower
-            compression speed. ZStandard compression can provide for either good compression ratio or
-	    speed, depending on compression level, or a good compromise on both.  </p></li>
-        <li id="im201783">Speed of decompression/scan rate. Performance with compressed
-          append-optimized tables depends on hardware, query tuning settings, and other factors.
-          Perform comparison testing to determine the actual performance in your
-            environment.<note>Do not create compressed append-optimized tables on file systems that
-            use compression. If the file system on which your segment data directory resides is a
-            compressed file system, your append-optimized table must not use
-          compression.</note></li>
+        <li id="im201780">CPU使用。用户的Segment系统必须具有可用的CPU能力来压缩和解压数据。</li>
+        <li id="im201781">压缩率/磁盘尺寸。最小化磁盘尺寸是一个因素，但也要考虑压缩和扫描数据所需的时间和CPU计算能力。
+          要找到能高效压缩数据但不导致过长压缩时间或者过慢扫描率的最优设置。</li>
+        <li id="im201782">压缩的速度。与zlib比较，QuickLZ在较低的压缩率下通常使用较少的CPU计算能力、能更快地压缩数据。
+          zlib提供更高的压缩率，但是速度较慢。
+          <p>例如，在压缩级别1上（<codeph>compresslevel=1</codeph>），QuickLZ和zlib具有差不多的压缩率，但是压缩速度不同。
+            使用<codeph>compresslevel=6</codeph>的zlib能比QuickLZ更显著地提升压缩率，但是压缩速度更慢。
+            ZStandard压缩可以提供良好的压缩比或速度，具体取决于压缩级别，或两者的良好折衷。</p></li>
+        <li id="im201783">解压速度/扫描率。压缩的追加优化表的性能取决于硬件、查询调优设置和其他因素。
+          请执行对比测试来判断在用户的环境中的真实性能。
+          <note>不要在使用压缩的文件系统上创建压缩的追加优化表。
+            如果用户的Segment数据目录所在的文件系统是一个压缩的文件系统，用户的追加优化表不能使用压缩。</note></li>
       </ul>
-      <p>Performance with compressed append-optimized tables depends on hardware, query tuning
-        settings, and other factors. You should perform comparison testing to determine
-        the actual performance in your environment.</p>
-	<note type="note">Zstd compression level can be set to values between 1 and 19.
-	QuickLZ compression level can only be set to level 1; no other values are
-        available. Compression level with zlib can be set to values from 1 - 9. Compression level
-        with RLE can be set to values from 1 - 4.<p>An <codeph>ENCODING</codeph> clause specifies
-        compression type and level for individual columns. When an <codeph>ENCODING</codeph>
-        clause conflicts with a <codeph>WITH</codeph> clause, the <codeph>ENCODING</codeph> clause
-        has higher precedence than the <codeph>WITH</codeph> clause.</p></note>
+      <p>压缩的追加优化表的性能取决于硬件、查询调优设置和其他因素。
+        请执行对比测试来判断在用户的环境中的真实性能。</p>
+	<note type="note">Zstd压缩级别可以设置为1-19。
+      QuickLZ的压缩级别只能被设置为级别1，没有其他的选项可用。
+      zlib的压缩级别可以设置为1-9的值。
+      RLE的压缩级别可以设置为1-4的值。
+      <p><codeph>ENCODING</codeph>子句指定个别列的压缩类型和级别。
+        当<codeph>ENCODING</codeph>子句与<codeph>WITH</codeph>子句冲突时，<codeph>ENCODING</codeph>子句的优先级高于<codeph>WITH</codeph>子句。
+        </p></note>
       <section id="im159764">
-        <title>To create a compressed table</title>
-        <p>The <codeph>WITH</codeph> clause of the <codeph>CREATE TABLE</codeph> command declares
-          the table storage options. Tables that use compression must be append-optimized tables.
-          For example, to create an append-optimized table with zlib compression at a compression
-          level of 5:</p>
+        <title>创建一个压缩表</title>
+        <p><codeph>CREATE TABLE</codeph>命令的<codeph>WITH</codeph>子句声明表的存储选项。
+          使用压缩技术的表必须是追加优化表。
+          例如，要创建一个使用zlib压缩且压缩级别为5的追加优化表：
+          </p>
         <p>
           <codeblock>=&gt; CREATE TABLE foo (a int, b text) 
    WITH (appendoptimized=true, compresstype=zlib, compresslevel=5);
@@ -244,51 +207,45 @@
     </body>
   </topic>
   <topic id="topic41" xml:lang="en">
-    <title id="im202441">Checking the Compression and Distribution of an Append-Optimized
-      Table</title>
+    <title id="im202441">检查追加优化表的压缩和分布</title>
     <body>
-      <p>Greenplum provides built-in functions to check the compression ratio and the distribution
-        of an append-optimized table. The functions take either the object ID or a table name. You
-        can qualify the table name with a schema name.</p>
+      <p>Greenplum提供了内建函数来检查一个追加优化表的压缩率和分布情况。
+        这些函数要求对象ID或者表名作为参数。用户可以用schema名来限定表名。</p>
       <table id="im161827">
-        <title>Functions for compressed append-optimized table metadata</title>
+        <title>用于压缩追加优化表元数据的函数</title>
         <tgroup cols="3">
           <colspec colnum="1" colname="col1" colwidth="183pt"/>
           <colspec colnum="2" colname="col2" colwidth="98pt"/>
           <colspec colnum="3" colname="col3" colwidth="169pt"/>
           <thead>
             <row>
-              <entry colname="col1">Function</entry>
-              <entry colname="col2">Return Type</entry>
-              <entry colname="col3">Description</entry>
+              <entry colname="col1">函数</entry>
+              <entry colname="col2">返回类型</entry>
+              <entry colname="col3">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">get_ao_distribution(name)<p>get_ao_distribution(oid)</p></entry>
-              <entry colname="col2">Set of (dbid, tuplecount) rows</entry>
-              <entry colname="col3">Shows the distribution of an append-optimized table's rows
-                across the array. Returns a set of rows, each of which includes a segment
-                  <i>dbid</i> and the number of tuples stored on the segment.</entry>
+              <entry colname="col2">(dbid, tuplecount)行的集合</entry>
+              <entry colname="col3">展示一个追加优化表的行在阵列中的分布情况。
+                返回一个行集合，其中每一个行包括了一个节点<i>dbid</i>以及存储在其中的元组数。</entry>
             </row>
             <row>
               <entry colname="col1"
                   >get_ao_compression_ratio(name)<p>get_ao_compression_ratio(oid)</p></entry>
               <entry colname="col2">float8</entry>
-              <entry colname="col3">Calculates the compression ratio for a compressed
-                append-optimized table. If information is not available, this function returns a
-                value of -1.</entry>
+              <entry colname="col3">为一个压缩的追加优化表计算压缩率。如果该信息不可用，这个函数会返回-1。</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
-      <p>The compression ratio is returned as a common ratio. For example, a returned value of
-          <codeph>3.19</codeph>, or <codeph>3.19:1</codeph>, means that the uncompressed table is
-        slightly larger than three times the size of the compressed table.</p>
-      <p>The distribution of the table is returned as a set of rows that indicate how many tuples
-        are stored on each segment. For example, in a system with four primary segments with
-          <i>dbid</i> values ranging from 0 - 3, the function returns four rows similar to the
-        following:</p>
+      <p>压缩比作为公共比率返回。
+        例如，返回值<codeph>3.19</codeph>或者<codeph>3.19:1</codeph>表示解压后的表比压缩表的尺寸的3倍略大。
+        </p>
+      <p>表的分布被返回为一个行集合，它们反映了每个Segment上存储了多少元组。
+        例如，在一个具有四个Primary Segment（<i>dbid</i>值从0-3）的系统中，该函数返回与以下类似的四个行：
+        </p>
       <p>
         <codeblock>=# SELECT get_ao_distribution('lineitem_comp');
  get_ao_distribution
@@ -303,46 +260,38 @@
     </body>
   </topic>
   <topic id="topic42" xml:lang="en">
-    <title>Support for Run-length Encoding</title>
+    <title>游程编码支持</title>
     <body>
-      <p>Greenplum Database supports Run-length Encoding (RLE) for column-level compression. RLE
-        data compression stores repeated data as a single data value and a count. For example, in a
-        table with two columns, a date and a description, that contains 200,000 entries containing
-        the value <codeph>date1</codeph> and 400,000 entries containing the value
-          <codeph>date2</codeph>, RLE compression for the date field is similar to
-          <codeph>date1 200000 date2 400000</codeph>. RLE is not useful with files that do not have
-        large sets of repeated data as it can greatly increase the file size.</p>
-      <p>There are four levels of RLE compression available. The levels progressively increase the
-        compression ratio, but decrease the compression speed.</p>
-      <p>Greenplum Database versions 4.2.1 and later support column-oriented RLE compression. To
-        backup a table with RLE compression that you intend to restore to an earlier version of
-        Greenplum Database, alter the table to have no compression or a compression type supported
-        in the earlier version (<codeph>ZLIB</codeph> or <codeph>QUICKLZ</codeph>) before you start
-        the backup operation.</p>
-      <p>Greenplum Database combines delta compression with RLE compression for data in columns of
-        type <codeph>BIGINT</codeph>, <codeph>INTEGER</codeph>, <codeph>DATE</codeph>,
-          <codeph>TIME</codeph>, or <codeph>TIMESTAMP</codeph>. The delta compression algorithm is
-        based on the change between consecutive column values and is designed to improve compression
-        when data is loaded in sorted order or when the compression is applied to data in sorted
-        order.</p>
+      <p>Greenplum数据库对列级压缩支持游程编码（RLE）。
+        RLE数据压缩把重复的数据存储为一个单一的数据值和一个计数。
+        例如，在有两个列date和description的表中，它包含200,000个含有值<codeph>date1</codeph>的项以及400,000个含有值<codeph>date2</codeph>的项，
+        对这个date域的RLE压缩会类似于<codeph>date1 200000 date2 400000</codeph>。
+        RLE对于没有大量重复数据集合的文件来说用处不大，因为它会大幅度增加这种文件的尺寸。
+        </p>
+      <p>有四种级别的RLE压缩可用。这些级别逐步增加了压缩率，但是同时也会降低压缩速度。</p>
+      <p>Greenplum数据库4.2.1及其后的版本支持面向列的RLE压缩。
+        如果要备份一个用了RLE压缩的表用来恢复到一个早期版本的Greenplum数据库中，
+        应在开始备份操作前修改该表为不采用压缩或者采用早期版本中支持的压缩类型（<codeph>ZLIB</codeph>或者<codeph>QUICKLZ</codeph>）。
+        </p>
+      <p>Greenplum数据库为<codeph>BIGINT</codeph>、<codeph>INTEGER</codeph>、<codeph>DATE</codeph>、<codeph>TIME</codeph>或者<codeph>TIMESTAMP</codeph>列中的数据的RLE压缩结合了增量压缩。
+        该增量压缩算法基于连续列值之间的变化来进行压缩，它的设计目的是在以排序顺序装载数据时或者对已排序数据应用压缩时改进压缩性能。
+        </p>
     </body>
   </topic>
   <topic id="topic43" xml:lang="en">
-    <title id="im198634">Adding Column-level Compression</title>
+    <title id="im198634">增加列级压缩</title>
     <body>
-      <p>You can add the following storage directives to a column for append-optimized tables with
-        column orientation:</p>
+      <p>用户可以为列存追加优化表的列增加下列存储指令：</p>
       <ul id="ul_asg_1wy_sp">
-        <li id="im203149">Compression type</li>
-        <li id="im203164">Compression level</li>
-        <li id="im203171">Block size for a column </li>
+        <li id="im203149">压缩类型</li>
+        <li id="im203164">压缩级别</li>
+        <li id="im203171">列的块尺寸</li>
       </ul>
-      <p>Add storage directives using the <codeph>CREATE TABLE</codeph>, <codeph>ALTER
-          TABLE</codeph>, and <codeph>CREATE TYPE</codeph> commands. </p>
-      <p>The following table details the types of storage directives and possible values for
-        each.</p>
+      <p>使用<codeph>CREATE TABLE</codeph>、<codeph>ALTER TABLE</codeph>以及<codeph>CREATE TYPE</codeph>命令增加存储指令。
+        </p>
+      <p>下面的表格详细介绍了存储指令的类型以及每一个指令可能的值。</p>
       <table id="im198636">
-        <title>Storage Directives for Column-level Compression</title>
+        <title>列级压缩的存储指令</title>
         <tgroup cols="4">
           <colspec colnum="1" colname="col1" colwidth="87pt"/>
           <colspec colnum="2" colname="col2" colwidth="95pt"/>
@@ -350,10 +299,10 @@
           <colspec colnum="4" colname="col4" colwidth="167.25pt"/>
           <thead>
             <row>
-              <entry colname="col1">Name</entry>
-              <entry colname="col2">Definition</entry>
-              <entry colname="col3">Values</entry>
-              <entry colname="col4">Comment</entry>
+              <entry colname="col1">名称</entry>
+              <entry colname="col2">定义</entry>
+              <entry colname="col3">值</entry>
+              <entry colname="col4">注释</entry>
             </row>
           </thead>
           <tbody>
@@ -361,75 +310,72 @@
               <entry colname="col1">
                 <codeph>compresstype</codeph>
               </entry>
-              <entry colname="col2">Type of compression.</entry>
-              <entry colname="col3"><codeph>zstd: </codeph>ZStandard
-                    algorithm<p><codeph>zlib: </codeph>deflate
-                      algorithm</p><p><codeph>quicklz</codeph>: fast
-                    compression</p><p><codeph>RLE_TYPE</codeph>: run-length encoding
-                    </p><p><codeph>none</codeph>: no compression</p></entry>
-              <entry colname="col4">Values are not case-sensitive.</entry>
+              <entry colname="col2">压缩的类型。</entry>
+              <entry colname="col3"><codeph>zstd: </codeph>ZStandard算法
+                <p><codeph>zlib: </codeph>缩小算法</p>
+                <p><codeph>quicklz: </codeph>快速算法</p>
+                <p><codeph>RLE_TYPE: </codeph>游程编码</p>
+                <p><codeph>none: </codeph>无压缩</p></entry>
+              <entry colname="col4">值不区分大小写。</entry>
             </row>
             <row>
               <entry colname="col1" morerows="3">
                 <codeph>compresslevel</codeph>
               </entry>
-              <entry colname="col2" morerows="3">Compression level.</entry>
-              <entry colname="col3"><codeph>zlib</codeph> compression:
+              <entry colname="col2" morerows="3">压缩级别。</entry>
+              <entry colname="col3"><codeph>zlib</codeph>压缩：
                   <codeph>1</codeph>-<codeph>9</codeph></entry>
-              <entry colname="col4"><codeph>1</codeph> is the fastest method with the least
-                compression. <codeph>1</codeph> is the default.<p><codeph>9</codeph> is the slowest
-                  method with the most compression.</p></entry>
+              <entry colname="col4"><codeph>1</codeph>是最快的方法但压缩率最低。<codeph>1</codeph>是默认值。
+                <p><codeph>9</codeph>是最慢的方法但压缩率最高。</p></entry>
             </row>
             <row>
-              <entry colname="col3"><codeph>zstd</codeph> compression:
+              <entry colname="col3"><codeph>zstd</codeph>压缩：
                   <codeph>1</codeph>-<codeph>19</codeph></entry>
-              <entry colname="col4"><codeph>1</codeph> is the fastest method with the least
-                compression. <codeph>1</codeph> is the default.<p><codeph>19</codeph> is the slowest
-                  method with the most compression.</p></entry>
+              <entry colname="col4"><codeph>1</codeph>是最快的方法但压缩率最低。<codeph>1</codeph>是默认值。
+                <p><codeph>19</codeph>是最慢的方法但压缩率最高。</p></entry>
             </row>
             <row>
-              <entry colname="col3"><codeph>QuickLZ</codeph> compression:<p><codeph>1</codeph> – use
-                  compression</p></entry>
-              <entry colname="col4"><codeph>1</codeph> is the default.</entry>
+              <entry colname="col3"><codeph>QuickLZ</codeph>压缩：<p><codeph>1</codeph> – 使用压缩</p></entry>
+              <entry colname="col4"><codeph>1</codeph>是默认值。</entry>
             </row>
             <row>
-              <entry colname="col3"><codeph>RLE_TYPE</codeph> compression: <codeph>1</codeph> –
-                  <codeph>4</codeph><p><codeph>1</codeph> - apply RLE only</p><p><codeph>2</codeph>
-                  - apply RLE then apply zlib compression level 1</p><p><codeph>3</codeph> - apply
-                  RLE then apply zlib compression level 5</p><p><codeph>4</codeph> - apply RLE then
-                  apply zlib compression level 9</p></entry>
-              <entry colname="col4"><codeph>1</codeph> is the fastest method with the least
-                    compression.<p><codeph>4</codeph> is the slowest method with the most
-                  compression. <codeph>1</codeph> is the default.</p></entry>
+              <entry colname="col3"><codeph>RLE_TYPE</codeph>压缩：<codeph>1</codeph> –
+                  <codeph>4</codeph><p><codeph>1</codeph> - 只应用RLE</p>
+                <p><codeph>2</codeph> - 应用RLE然后应用zlib压缩级别1</p>
+                <p><codeph>3</codeph> - 应用RLE然后应用zlib压缩级别5</p>
+                <p><codeph>4</codeph> - 应用RLE然后应用zlib压缩级别9</p></entry>
+              <entry colname="col4"><codeph>1</codeph>是最快的方法但压缩率最低。
+                <p><codeph>4</codeph>是最慢的方法但压缩率最高。
+                  <codeph>1</codeph>是默认值。</p></entry>
             </row>
             <row>
               <entry colname="col1">
                 <codeph>blocksize</codeph>
               </entry>
-              <entry colname="col2">The size in bytes for each block in the table</entry>
+              <entry colname="col2">表中每一块的以字节计的尺寸</entry>
               <entry colname="col3">
                 <codeph>8192 – 2097152</codeph>
               </entry>
-              <entry colname="col4">The value must be a multiple of 8192.</entry>
+              <entry colname="col4">该值必须是8192的倍数。</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
-      <p>The following is the format for adding storage directives.</p>
+      <p>下面是增加存储指令的格式。</p>
       <p>
         <codeblock>[ ENCODING ( <i>storage_directive</i> [,…] ) ] </codeblock>
       </p>
-      <p>where the word ENCODING is required and the storage directive has three parts:</p>
+      <p>其中单词ENCODING是必需的并且存储指令有三个部分：</p>
       <ul id="ul_hzg_1wy_sp">
-        <li id="im203108">The name of the directive</li>
-        <li id="im203115">An equals sign</li>
-        <li id="im203122">The specification </li>
+        <li id="im203108">指令的名称</li>
+        <li id="im203115">一个等号</li>
+        <li id="im203122">参数</li>
       </ul>
-      <p>Separate multiple storage directives with a comma. Apply a storage directive to a single
-        column or designate it as the default for all columns, as shown in the following
-          <codeph>CREATE TABLE</codeph> clauses.</p>
+      <p>多个存储指令用逗号分隔。
+        如下面的<codeph>CREATE TABLE</codeph>子句所示，可以把一个存储指令应用到单一列或者把它作为所有列的默认指令。
+        </p>
       <p>
-        <i>General Usage:</i>
+        <i>一般用法：</i>
       </p>
       <codeblock><i>column_name</i> <i>data_type</i> ENCODING ( <i>storage_directive </i>[, … ] ), …  
 </codeblock>
@@ -438,7 +384,7 @@
       <codeblock>DEFAULT COLUMN ENCODING ( <i>storage_directive</i> [, … ] )
 </codeblock>
       <p>
-        <i>Example:</i>
+        <i>示例：</i>
       </p>
       <codeblock>C1 char ENCODING (compresstype=quicklz, blocksize=65536) 
 </codeblock>
@@ -449,80 +395,67 @@
     </body>
     <topic id="topic44" xml:lang="en">
       <title>
-        <b>Default Compression Values</b>
+        <b>默认压缩值</b>
       </title>
       <body>
-        <p>If the compression type, compression level and block size are not defined, the default is
-          no compression, and the block size is set to the Server Configuration Parameter
-            <codeph>block_size</codeph>.</p>
+        <p>如果没有定义压缩类型、压缩级别和块尺寸，默认是无压缩并且块尺寸被设置为服务器配置参数<codeph>block_size</codeph>。
+          </p>
       </body>
     </topic>
     <topic id="topic45" xml:lang="en">
       <title id="im196311">
-        <b>Precedence of Compression Settings</b>
+        <b>压缩设置的优先级</b>
       </title>
       <body>
-        <p>Column compression settings are inherited from the type level to the table level to the partition level to
-          the subpartition level. The lowest-level settings have priority. </p>
+        <p>列压缩设置从表级继承到分区级，再到子分区级。最低级别上的设置优先。</p>
         <ul id="ul_j3h_1wy_sp">
-          <li id="im1963152">Column compression settings defined at the table level override any
-            compression settings for the type.</li>
-          <li id="im196315">Column compression settings specified at the table level override any
-            compression settings for the entire table.</li>
-          <li id="im196314">Column compression settings specified for partitions override any
-            compression settings at the column or table levels.</li>
-          <li id="im196313">Column compression settings specified for subpartitions override any
-            compression settings at the partition, column or table levels.</li>
-          <li id="im207669">When an <codeph>ENCODING</codeph> clause conflicts with a
-              <codeph>WITH</codeph> clause, the <codeph>ENCODING</codeph> clause has higher
-            precedence than the <codeph>WITH</codeph> clause.</li>
+          <li id="im1963152">表级定义的列压缩设置会覆盖该类型的任何压缩设置。</li>
+          <li id="im196315">表级指定的列压缩设置会覆盖整个表的任何压缩设置。</li>
+          <li id="im196314">为分区指定的列压缩设置会覆盖列级或表级别的任何压缩设置。</li>
+          <li id="im196313">为子分区指定的列压缩设置会覆盖分区，列或表级别的任何压缩设置。</li>
+          <li id="im207669">当<codeph>ENCODING</codeph>子句与<codeph>WITH</codeph>子句冲突时，
+            <codeph>ENCODING</codeph>子句的优先级高于<codeph>WITH</codeph>子句。</li>
         </ul>
-        <note type="note">The <codeph>INHERITS</codeph> clause is not allowed in a table that
-          contains a storage directive or a column reference storage directive.<p>Tables created
-            using the <codeph>LIKE</codeph> clause ignore storage directive and column reference
-            storage directives.</p></note>
+        <note type="note">在一个含有存储指令或者列引用存储指令的表中不允许<codeph>INHERITS</codeph>子句。
+          <p>使用<codeph>LIKE</codeph>子句创建的表忽略存储指令以及列引用存储指令。</p></note>
       </body>
     </topic>
     <topic id="topic46" xml:lang="en">
       <title>
-        <b>Optimal Location for Column Compression Settings</b>
+        <b>列压缩设置的最佳位置</b>
       </title>
       <body>
-        <p>The best practice is to set the column compression settings at the level where the data
-          resides. See <xref href="#topic52" type="topic" format="dita"/>, which shows a table with
-          a partition depth of 2. <codeph>RLE_TYPE</codeph> compression is added to a column at the
-          subpartition level.</p>
+        <p>最佳做法是在数据所在的层次上设置列压缩设置。
+          参考<xref href="#topic52" type="topic" format="dita"/>，它展示了一个分区深度为2的表。
+          <codeph>RLE_TYPE</codeph>压缩在子分区层次上被增加到一个列。</p>
       </body>
     </topic>
     <topic id="topic47" xml:lang="en">
       <title>
-        <b>Storage Directives Examples</b>
+        <b>存储指令示例</b>
       </title>
       <body>
-        <p>The following examples show the use of storage directives in <codeph>CREATE
-            TABLE</codeph> statements.</p>
+        <p>下面的例子展示了在<codeph>CREATE TABLE</codeph>语句中存储指令的使用。</p>
       </body>
       <topic id="topic48" xml:lang="en">
-        <title>Example 1 </title>
+        <title>例 1 </title>
         <body>
-          <p>In this example, column <codeph>c1</codeph> is compressed using <codeph>zstd</codeph>
-            and uses the block size defined by the system. Column <codeph>c2</codeph> is compressed
-            with <codeph>quicklz</codeph>, and uses a block size of <codeph>65536</codeph>. Column
-              <codeph>c3</codeph> is not compressed and uses the block size defined by the
-            system.</p>
+          <p>在这个例子中，列<codeph>c1</codeph>被使用<codeph>zstd</codeph>压缩并且使用系统中定义的块尺寸。
+            列<codeph>c2</codeph>用<codeph>quicklz</codeph>压缩并且使用的块尺寸为<codeph>65536</codeph>。
+            列<codeph>c3</codeph>没有被压缩并且使用系统中定义的块尺寸。
+            </p>
           <codeblock>CREATE TABLE T1 (c1 int ENCODING (compresstype=zstd),
                   c2 char ENCODING (compresstype=quicklz, blocksize=65536),
                   c3 char)    WITH (appendoptimized=true, orientation=column);</codeblock>
         </body>
       </topic>
       <topic id="topic49" xml:lang="en">
-        <title>Example 2</title>
+        <title>例 2</title>
         <body>
-          <p>In this example, column <codeph>c1</codeph> is compressed using <codeph>zlib</codeph>
-            and uses the block size defined by the system. Column <codeph>c2</codeph> is compressed
-            with <codeph>quicklz</codeph>, and uses a block size of <codeph>65536</codeph>. Column
-              <codeph>c3</codeph> is compressed using <codeph>RLE_TYPE</codeph> and uses the block
-            size defined by the system.</p>
+          <p>在这个例子中，列<codeph>c1</codeph>使用<codeph>zlib</codeph>压缩并且使用系统中定义的块尺寸。
+            列<codeph>c2</codeph>使用<codeph>quicklz</codeph>压缩，并且使用的块尺寸为<codeph>65536</codeph>。
+            列<codeph>c3</codeph>使用<codeph>RLE_TYPE</codeph>压缩并且使用系统中定义的块尺寸。
+            </p>
           <codeblock>CREATE TABLE T2 (c1 int ENCODING (compresstype=zlib),
                   c2 char ENCODING (compresstype=quicklz, blocksize=65536),
                   c3 char,
@@ -532,16 +465,13 @@
         </body>
       </topic>
       <topic id="topic50" xml:lang="en">
-        <title>Example 3</title>
+        <title>例 3</title>
         <body>
-          <p>In this example, column <codeph>c1</codeph> is compressed using <codeph>zlib</codeph>
-            and uses the block size defined by the system. Column <codeph>c2</codeph> is compressed
-            with <codeph>quicklz</codeph>, and uses a block size of <codeph>65536</codeph>. Column
-              <codeph>c3</codeph> is compressed using <codeph>zlib</codeph> and uses the block size
-            defined by the system. Note that column <codeph>c3</codeph> uses <codeph>zlib</codeph>
-            (not <codeph>RLE_TYPE</codeph>) in the partitions, because the column storage in the
-            partition clause has precedence over the storage directive in the column definition for
-            the table.</p>
+          <p>在这个例子中，列<codeph>c1</codeph>使用<codeph>zlib</codeph>压缩并且使用系统中定义的块尺寸。
+            列<codeph>c2</codeph>使用<codeph>quicklz</codeph>压缩，并且使用的块尺寸为<codeph>65536</codeph>。
+            列<codeph>c3</codeph>使用<codeph>zlib</codeph>压缩并且使用系统中定义的块尺寸。
+            注意，列<codeph>c3</codeph>在分区中使用<codeph>zlib</codeph>（而不是<codeph>RLE_TYPE</codeph>），因为在分区子句中的列存储比表的列定义中的存储指令优先级高。
+            </p>
           <codeblock>CREATE TABLE T3 (c1 int ENCODING (compresstype=zlib),
                   c2 char ENCODING (compresstype=quicklz, blocksize=65536),
                   c3 text, COLUMN c3 ENCODING (compresstype=RLE_TYPE) )
@@ -552,18 +482,16 @@
         </body>
       </topic>
       <topic id="topic51" xml:lang="en">
-        <title>Example 4</title>
+        <title>例 4</title>
         <body>
-          <p>In this example, <codeph>CREATE TABLE</codeph> assigns the <codeph>zlib</codeph> <codeph>compresstype</codeph> storage
-            directive to <codeph>c1</codeph>. Column <codeph>c2</codeph> has no storage directive
-            and inherits the compression type (<codeph>quicklz</codeph>) and block size
-              (<codeph>65536</codeph>) from the <codeph>DEFAULT COLUMN ENCODING</codeph> clause.</p>
-          <p>Column <codeph>c3</codeph>'s <codeph>ENCODING</codeph> clause defines its compression
-            type, <codeph>RLE_TYPE</codeph>. The <codeph>ENCODING</codeph> clause defined for a
-            specific column overrides the <codeph>DEFAULT ENCODING</codeph> clause, so column
-            <codeph>c3</codeph> uses the default block size, <codeph>32768</codeph>.</p>
-          <p>Column <codeph>c4</codeph> has a compress
-            type of <codeph>none</codeph> and uses the default block size.</p>
+          <p>在这个例子中，<codeph>CREATE TABLE</codeph>把<codeph>zlib</codeph>压缩类型存储指令分配给<codeph>c1</codeph>。
+            列<codeph>c2</codeph>没有存储指令并且从<codeph>DEFAULT COLUMN ENCODING</codeph>子句继承了压缩类型（<codeph>quicklz</codeph>）和块尺寸（<codeph>65536</codeph>）。
+            </p>
+          <p>列<codeph>c3</codeph>的<codeph>ENCODING</codeph>子句定义其压缩类型<codeph>RLE_TYPE</codeph>。
+            为特定列定义的<codeph>ENCODING</codeph>子句会覆盖<codeph>DEFAULT ENCODING</codeph>子句，因此列<codeph>c3</codeph>使用默认块大小<codeph>32768</codeph>。
+            </p>
+          <p>列<codeph>c4</codeph>的压缩类型为<codeph>none</codeph>，并使用默认块大小。
+            </p>
           <codeblock>CREATE TABLE T4 (c1 int ENCODING (compresstype=zlib),
                   c2 char,
                   c3 text,
@@ -576,22 +504,18 @@
         </body>
       </topic>
       <topic id="topic52" xml:lang="en">
-        <title id="im196338">Example 5</title>
+        <title id="im196338">例 5</title>
         <body>
-          <p>This example creates an append-optimized, column-oriented table, T5. T5 has two
-            partitions, <codeph>p1</codeph> and <codeph>p2</codeph>, each of which has
-            subpartitions. Each subpartition has <codeph>ENCODING</codeph> clauses:</p>
+          <p>这个例子创建一个追加优化的列存表T5。
+            T5有两个分区<codeph>p1</codeph>和<codeph>p2</codeph>，每一个都有子分区。
+            每一个子分区都有<codeph>ENCODING</codeph>子句：
+            </p>
           <ul id="ul_vlh_1wy_sp">
-            <li id="im209617">The <codeph>ENCODING</codeph> clause for partition
-              <codeph>p1</codeph>'s subpartition <codeph>sp1</codeph> defines column
-                <codeph>i</codeph>'s compression type as <codeph>zlib</codeph> and block size as
-              65536. </li>
-            <li id="im209618">The <codeph>ENCODING</codeph> clauses for partition
-                <codeph>p2</codeph>'s subpartition <codeph>sp1</codeph> defines column
-                <codeph>i</codeph>'s compression type as <codeph>rle_type</codeph> and block size is
-              the default value. Column <codeph>k</codeph> uses the default compression and its
-              block size is
-              8192.<codeblock>CREATE TABLE T5(i int, j int, k int, l int) 
+            <li id="im209617">分区<codeph>p1</codeph>的子分区<codeph>sp1</codeph>的<codeph>ENCODING</codeph>子句定义了列<codeph>i</codeph>的压缩类型是<codeph>zlib</codeph>并且块尺寸是65536。
+              </li>
+            <li id="im209618">分区<codeph>p2</codeph>的子分区<codeph>sp1</codeph>的<codeph>ENCODING</codeph>子句定义了列<codeph>i</codeph>的压缩类型是<codeph>rle_type</codeph>并且块尺寸为默认值。
+              列<codeph>k</codeph>使用默认压缩并且其块尺寸为8192。
+              <codeblock>CREATE TABLE T5(i int, j int, k int, l int)
     WITH (appendoptimized=true, orientation=column)
     PARTITION BY range(i) SUBPARTITION BY range(j)
     (
@@ -606,20 +530,19 @@
        )
     );</codeblock></li>
           </ul>
-          <p>For an example showing how to add a compressed column to an existing table with the
-              <codeph>ALTER TABLE</codeph> command, see <xref href="#topic60" type="topic"
-              format="dita"/>.</p>
+          <p>用<codeph>ALTER TABLE</codeph>命令把一个压缩列增加到现有表的例子，请见<xref href="#topic60" type="topic" format="dita"/>。
+            </p>
         </body>
       </topic>
     </topic>
     <topic id="topic53" xml:lang="en">
       <title>
-        <b>Adding Compression in a TYPE Command</b>
+        <b>在TYPE命令中增加压缩</b>
       </title>
       <body>
-        <p>When you create a new type, you can define default compression attributes for the type. For example,
-          the following <codeph>CREATE TYPE</codeph> command defines a type named <codeph>int33</codeph>
-          that specifies <codeph>quicklz</codeph> compression: </p>
+        <p>创建新类型时，可以为该类型定义默认压缩属性。
+          例如，以下<codeph>CREATE TYPE</codeph>命令定义了一个名为<codeph>int33</codeph>的类型，它指定了<codeph>quicklz</codeph>压缩：
+          </p>
         <codeblock>CREATE TYPE int33 (
    internallength = 4,
    input = int33_in,
@@ -631,102 +554,93 @@
    blocksize=65536,
    compresslevel=1
    );</codeblock>
-        <p>When you specify <codeph>int33</codeph> as a column type in a <codeph>CREATE TABLE</codeph>
-          command, the column is created with the storage directives you specified for the type:</p>
+        <p>在<codeph>CREATE TABLE</codeph>命令中将<codeph>int33</codeph>指定为列类型时，将使用您为该类型指定的存储指令创建该列：
+          </p>
         <codeblock>CREATE TABLE t2 (c1 int33)
     WITH (appendoptimized=true, orientation=column);</codeblock>
-        <p>Table- or column- level storage attributes that you specify in a table definition override
-           type-level storage attributes. For information about creating and adding compression
-           attributes to a type, see
-           <xref href="../../ref_guide/sql_commands/CREATE_TYPE.xml#topic1"/>. For information about changing compression specifications
-          in a type, see <xref href="../../ref_guide/sql_commands/ALTER_TYPE.xml#topic1"/>.</p>
+        <p>您在表定义中指定的表级或列级存储属性会覆盖类型级存储属性。
+          有关为类型创建和添加压缩属性的信息，请参阅<xref href="../../ref_guide/sql_commands/CREATE_TYPE.xml#topic1"/>。
+          有关更改类型中的压缩规范的信息，请参阅<xref href="../../ref_guide/sql_commands/ALTER_TYPE.xml#topic1"/>。
+          </p>
       </body>
       <topic id="topic54" xml:lang="en">
-        <title>Choosing Block Size</title>
+        <title>选择块尺寸</title>
         <body>
-          <p>The blocksize is the size, in bytes, for each block in a table. Block sizes must be
-            between 8192 and 2097152 bytes, and be a multiple of 8192. The default is 32768.</p>
-          <p>Specifying large block sizes can consume large amounts of memory. Block size determines
-            buffering in the storage layer. Greenplum maintains a buffer per partition, and per
-            column in column-oriented tables. Tables with many partitions or columns consume large
-            amounts of memory.</p>
+          <p>blocksize是一个表中每一块的尺寸，以字节计。
+            块尺寸必须介于8192字节和2097152字节之间，并且必须是8192的倍数。默认是32768。
+            </p>
+          <p>指定大的块尺寸可能会消耗大量的内存。
+            块大小决定了存储层中的缓存。
+            在面向列的表中，Greenplum维护为每个分区每个列维护了一个缓存。
+            具有许多分区或列的表占用大量内存。</p>
         </body>
       </topic>
     </topic>
   </topic>
   <topic id="topic55" xml:lang="en">
-    <title>Altering a Table</title>
+    <title>修改一个表</title>
     <body>
-      <p>The <codeph>ALTER TABLE </codeph>command changes the definition of a table. Use
-          <codeph>ALTER TABLE</codeph> to change table attributes such as column definitions,
-        distribution policy, storage model, and partition structure (see also <xref
-          href="ddl-partition.xml#topic77"/>). For example, to add a not-null constraint to a table
-        column:</p>
+      <p><codeph>ALTER TABLE</codeph>命令改变一个表的定义。
+        使用<codeph>ALTER TABLE</codeph>可以更改表的属性，例如列定义、分布策略、存储模型以及分区结构（另见<xref href="ddl-partition.xml#topic77"/>）。
+        例如，为一个表列增加一个非空约束：</p>
       <p>
         <codeblock>=&gt; ALTER TABLE address ALTER COLUMN street SET NOT NULL;
 </codeblock>
       </p>
     </body>
     <topic id="topic56" xml:lang="en">
-      <title>Altering Table Distribution</title>
+      <title>修改表的分布</title>
       <body>
-        <p><codeph>ALTER TABLE</codeph> provides options to change a table's
-          distribution policy. When the table distribution options change, the
-          table data may be redistributed on disk, which can be resource
-          intensive. You can also redistribute table data using the existing
-          distribution policy.</p>
+        <p><codeph>ALTER TABLE</codeph>提供了选项来改变一个表的分布策略。
+          当表分布选项改变时，表数据会被在磁盘上重新分布，这可能会造成资源紧张。
+          用户也可以使用现有的分布策略重新分布表数据。
+          </p>
       </body>
     </topic>
     <topic id="topic57" xml:lang="en">
-      <title>Changing the Distribution Policy</title>
+      <title>更改分布策略</title>
       <body>
-        <p>For partitioned tables, changes to the distribution policy apply recursively to the child
-          partitions. This operation preserves the ownership and all other attributes of the table.
-          For example, the following command redistributes the table sales across all segments using
-          the customer_id column as the distribution key:</p>
+        <p>对于已分区的表，对于分布策略的更改会递归地应用到子分区上。
+          这种操作会保留拥有关系和该表的所有其他属性。
+          例如，下列命令使用customer_id列作为分布键在所有Segment之间重新分布表sales：</p>
         <p>
           <codeblock>ALTER TABLE sales SET DISTRIBUTED BY (customer_id); 
 </codeblock>
         </p>
-        <p>When you change the hash distribution of a table, table data is automatically
-          redistributed. Changing the distribution policy to a random distribution does not cause
-          the data to be redistributed. For example, the following <codeph>ALTER TABLE</codeph>
-          command has no immediate effect:</p>
+        <p>在用户改变一个表的哈希分布时，表数据会被自动重新分布。
+          把分布策略改成随机分布不会导致数据被重新分布。
+          例如，下面的<codeph>ALTER TABLE</codeph>命令不会立刻产生效果：
+          </p>
         <p>
           <codeblock>ALTER TABLE sales SET DISTRIBUTED RANDOMLY;
 </codeblock>
         </p>
-        <p>Changing the distribution policy of a table to <codeph>DISTRIBUTED
-            REPLICATED</codeph> or from <codeph>DISTRIBUTED REPLICATED</codeph>
-          automatically redistributes the table data.</p>
+        <p>将表的分布策略更改为DISTRIBUTED REPLICATED或从DISTRIBUTED REPLICATED修改为其他分布，会自动重新分配表数据。
+          </p>
       </body>
     </topic>
     <topic id="topic58" xml:lang="en">
-      <title>Redistributing Table Data</title>
+      <title>重新分布表的数据</title>
       <body>
-        <p>To redistribute table data for tables with a random distribution policy (or when the hash
-          distribution policy has not changed) use <codeph>REORGANIZE=TRUE</codeph>. Reorganizing
-          data may be necessary to correct a data skew problem, or when segment resources are added
-          to the system. For example, the following command redistributes table data across all
-          segments using the current distribution policy, including random distribution.</p>
+        <p>要用一种随机分布策略（或者当哈希分布策略没有被更改时）对表重新分布数据，可使用<codeph>REORGANIZE=TRUE</codeph>。
+          重新组织数据对于更正一个数据倾斜问题是必要的，当系统中增加了Segment资源后也需要重新组织数据。
+          例如，下面的命令会使用当前的分布策略（包括随机分布）在所有Segment上重新分布数据。
+          </p>
         <p>
           <codeblock>ALTER TABLE sales SET WITH (REORGANIZE=TRUE);
 </codeblock>
         </p>
-        <p>Changing the distribution policy of a table to <codeph>DISTRIBUTED
-            REPLICATED</codeph> or from <codeph>DISTRIBUTED REPLICATED</codeph>
-          always redistributes the table data, even when you use
-            <codeph>REORGANIZE=FALSE</codeph>.</p>
+        <p>将表的分布策略更改为<codeph>DISTRIBUTED REPLICATED</codeph>或从<codeph>DISTRIBUTED REPLICATED</codeph>改为其它总是重新分配表数据，
+          即使<codeph>REORGANIZE=FALSE</codeph>也是如此。
+          </p>
       </body>
     </topic>
     <topic id="topic59" xml:lang="en">
-      <title>Altering the Table Storage Model</title>
+      <title>修改表的存储模型</title>
       <body>
-        <p>Table storage, compression, and orientation can be declared only at creation. To change
-          the storage model, you must create a table with the correct storage options, load the
-          original table data into the new table, drop the original table, and rename the new table
-          with the original table's name. You must also re-grant any table permissions. For
-          example:</p>
+        <p>表存储、压缩和行列类型只能在创建时声明。
+          要改变存储模型，用户必须用正确的存储选项创建一个表，再把原始表的数据载入到新表中，接着删除原始表并且把新表重命名为原始表的名称。
+          用户还必须重新授权原始表上有的权限。例如：</p>
         <p>
           <codeblock>CREATE TABLE sales2 (LIKE sales) 
 WITH (appendoptimized=true, compresstype=quicklz, 
@@ -738,20 +652,19 @@ GRANT ALL PRIVILEGES ON sales TO admin;
 GRANT SELECT ON sales TO guest;
 </codeblock>
         </p>
-        <p>See <xref href="ddl-partition.xml#topic84"/> to learn how to change the storage model of
-          a partitioned table.</p>
+        <p>可参考<xref href="ddl-partition.xml#topic84"/>来学习如何改表一个已分区表的存储模型。
+          </p>
       </body>
       <topic id="topic60" xml:lang="en">
         <title id="im196377">
-          <b>Adding a Compressed Column to Table</b>
+          <b>为表增加一个压缩列</b>
         </title>
         <body>
-          <p>Use <codeph>ALTER TABLE</codeph> command to add a compressed column to a table. All of
-            the options and constraints for compressed columns described in <xref href="#topic43"
-              type="topic" format="dita"/> apply to columns added with the <codeph>ALTER
-              TABLE</codeph> command. </p>
-          <p>The following example shows how to add a column with <codeph>zlib</codeph> compression
-            to a table, <codeph>T1</codeph>.</p>
+          <p>使用<codeph>ALTER TABLE</codeph>命令为一个表增加一个压缩列。
+            所有在<xref href="#topic43" type="topic" format="dita"/>中描述的用于压缩列的选项和约束都适用于用<codeph>ALTER TABLE</codeph>命令增加的列。
+            </p>
+          <p>下面的例子展示了如何向一个表中增加一个使用<codeph>zlib</codeph>压缩的列<codeph>T1</codeph>。
+            </p>
           <p>
             <codeblock>ALTER TABLE T1
       ADD COLUMN c4 int DEFAULT 0
@@ -762,12 +675,11 @@ GRANT SELECT ON sales TO guest;
       </topic>
       <topic id="topic61" xml:lang="en">
         <title>
-          <b>Inheritance of Compression Settings</b>
+          <b>压缩设置的继承</b>
         </title>
         <body>
-          <p>A partition added to a table that has subpartitions defined with compression settings
-            inherits the compression settings from the subpartition. The following example shows how
-            to create a table with subpartition encodings, then alter it to add a partition.</p>
+          <p>如果一个表有子分区且子分区带有压缩设置，则向该表增加的一个分区会从子分区继承那些压缩设置。
+            下面的例子展示了如何创建一个有子分区编码的表，然后修改它来增加一个分区。</p>
           <p>
             <codeblock>CREATE TABLE ccddl (i int, j int, k int, l int)
   WITH
@@ -789,34 +701,33 @@ ALTER TABLE ccddl
 ;
 </codeblock>
           </p>
-          <p>Running the <codeph>ALTER TABLE</codeph> command creates partitions of table
-              <codeph>ccddl</codeph> named <codeph>ccddl_1_prt_p3</codeph> and
-              <codeph>ccddl_1_prt_p3_2_prt_sp1</codeph>. Partition <codeph>ccddl_1_prt_p3</codeph>
-            inherits the different compression encodings of subpartition <codeph>sp1</codeph>.</p>
+          <p>运行<codeph>ALTER TABLE</codeph>命令会创建表<codeph>ccddl</codeph>的名为<codeph>ccddl_1_prt_p3</codeph>和<codeph>ccddl_1_prt_p3_2_prt_sp1</codeph>的分区。
+            分区<codeph>ccddl_1_prt_p3</codeph>继承了子分区<codeph>sp1</codeph>的不同的压缩编码。
+            </p>
         </body>
       </topic>
     </topic>
   </topic>
   <topic id="topic62" xml:lang="en">
-    <title>Dropping a Table</title>
+    <title>删除一个表</title>
     <body>
-      <p><ph>The </ph><codeph>DROP TABLE </codeph>command removes tables from the database. For
-        example:</p>
+      <p><codeph>DROP TABLE</codeph>命令把表从数据库中移除。例如：
+        </p>
       <p>
         <codeblock>DROP TABLE mytable;
 </codeblock>
       </p>
-      <p>To empty a table of rows without removing the table definition, use <codeph>DELETE</codeph>
-        or <codeph>TRUNCATE</codeph>. For example:</p>
+      <p>要清空一个表的行但不移除该表的定义，可使用<codeph>DELETE</codeph>或者<codeph>TRUNCATE</codeph>。例如：
+        </p>
       <p>
         <codeblock>DELETE FROM mytable;
 
 TRUNCATE mytable;
 </codeblock>
       </p>
-      <p><codeph>DROP TABLE </codeph>always removes any indexes, rules, triggers, and constraints
-        that exist for the target table. Specify <codeph>CASCADE </codeph>to drop a table that is
-        referenced by a view. <codeph>CASCADE</codeph> removes dependent views. </p>
+      <p><codeph>DROP TABLE</codeph>总是会移除目标表上存在的任何索引、规则、触发器和约束。
+        删除一个被视图引用的表应指定<codeph>CASCADE</codeph>。<codeph>CASCADE</codeph>会移除依赖表的视图。
+        </p>
     </body>
   </topic>
 </topic>
