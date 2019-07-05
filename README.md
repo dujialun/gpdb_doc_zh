@@ -19,9 +19,9 @@
 - Administrator Guide 进行中（参与者：杜佳伦，苑泽福，亓晓帅，钱晨，段旻，武宁）
     - Demo: [http://47.92.231.67:8080/6-0/admin_guide/](http://47.92.231.67:8080/6-0/admin_guide/)
 	- Greenplum数据库概念 （完成：杜佳伦）
-	- Managing a Greenplum System （翻译中：苑泽福，进度：21/70）
+	- Managing a Greenplum System （翻译中：苑泽福、杜佳伦 进度：21/70）
 	- Managing Greenplum Database Access （翻译中：亓晓帅，进度：1/6）
-	- Defining Database Objects （翻译中：杜佳伦，进度：8/9）
+	- Defining Database Objects （完成：杜佳伦）
 	- Distribution and Skew （待认领）
 	- Inserting, Updating, and Deleting Data （完成：段旻）
 	- Querying Data （待认领）
