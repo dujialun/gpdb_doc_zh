@@ -2,21 +2,17 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="expand-rm-schema" xml:lang="en">
-  <title id="no163283">Removing the Expansion Schema</title>
-  <shortdesc>To clean up after expanding the Greenplum cluster, remove the expansion
-    schema.</shortdesc>
+  <title id="no163283">移除扩容Schema</title>
+  <shortdesc>要在扩容Greenplum集群后进行清理，需要移除扩容Schema。</shortdesc>
   <body>
-    <p>You can safely remove the expansion schema after the expansion operation is complete and
-      verified. To run another expansion operation on a Greenplum system, first remove the existing
-      expansion schema.</p>
+    <p>在扩容操作完成并且验证后，用户可以安全地移除扩容Schema。
+      为了在一个Greenplum系统上运行另一次扩容操作，首先要移除现有的扩容Schema。</p>
     <section id="no163290">
-      <title>To remove the expansion schema</title>
+      <title>移除扩容Schema</title>
       <ol>
-        <li id="no163298">Log in on the master host as the user who will be running your Greenplum
-          Database system (for example, <codeph>gpadmin</codeph>).</li>
-        <li id="no163294">Run the <codeph>gpexpand</codeph> utility with the <codeph>-c</codeph>
-          option. For example:<codeblock>$ gpexpand -c</codeblock><note type="note">Some systems
-            require you to press Enter twice.</note></li>
+        <li id="no163298">以运行Greenplum数据库系统的用户身份登录Master(例如，<codeph>gpadmin</codeph>)。</li>
+        <li id="no163294">用<codeph>-c</codeph>选项运行<codeph>gpexpand</codeph>工具。例如：
+          <codeblock>$ gpexpand -c</codeblock><note type="note">一些系统要求用户按回车两次。</note></li>
       </ol>
     </section>
   </body>
