@@ -2,30 +2,15 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic66">
-    <title>Optimizing Data Load and Query Performance</title>
+    <title>优化数据装载和查询性能</title>
     <body>
-        <p>Use the following tips to help optimize your data load and subsequent query
-            performance.</p>
+        <p>使用下列技巧来帮助优化数据装载和后续的查询性能。</p>
         <ul>
-            <li id="du218161">Drop indexes before loading data into existing tables. <p>Creating an
-                    index on pre-existing data is faster than updating it incrementally as each row
-                    is loaded. You can temporarily increase the
-                        <codeph>maintenance_work_mem</codeph> server configuration parameter to help
-                    speed up <codeph>CREATE INDEX</codeph> commands, though load performance is
-                    affected. Drop and recreate indexes only when there are no active users on the
-                    system. </p></li>
-            <li id="du218152">Create indexes last when loading data into new tables. Create the
-                table, load the data, and create any required indexes. </li>
-            <li id="du168719">Run <codeph>ANALYZE</codeph> after loading data. If you significantly
-                altered the data in a table, run <codeph>ANALYZE</codeph> or <codeph>VACUUM
-                    ANALYZE</codeph> to update table statistics for the query optimizer. Current
-                statistics ensure that the optimizer makes the best decisions during query planning
-                and avoids poor performance due to inaccurate or nonexistent statistics.</li>
-            <li id="du168720">Run <codeph>VACUUM</codeph> after load errors. If the load operation
-                does not run in single row error isolation mode, the operation stops at the first
-                error. The target table contains the rows loaded before the error occurred. You
-                cannot access these rows, but they occupy disk space. Use the
-                    <codeph>VACUUM</codeph> command to recover the wasted space.</li>
+            <li id="du218161">在装载数据到现有表中之前删掉索引。
+                <p>在现有数据上创建一个数据比随着每个行被装载而增量更新索引更快。用户可以临时增加<codeph>maintenance_work_mem</codeph>服务器配置参数来帮助加速<codeph>CREATE INDEX</codeph>命令，不过装载性能会被影响。只有在系统中没有活动用户时才删除并重建索引。</p> </li>
+            <li id="du218152">在装载数据到新表中时，最后创建索引。创建表，装载数据，然后才创建任何需要的索引。</li>
+            <li id="du168719">在装载数据后运行<codeph>ANALYZE</codeph>。如果一个表中的数据受到了显著的更改，运行<codeph>ANALYZE</codeph>或者<codeph>VACUUM ANALYZE</codeph>来为查询优化器更新表统计信息。当前的统计信息能确保优化器在查询规划时做出最好的决定并且避免由于不准确或者不存在的统计信息造成的糟糕性能。</li>
+            <li id="du168720">在装载错误后运行<codeph>VACUUM</codeph>。如果装载错误没有运行在单行错误隔离模式中，操作会在第一个错误处停止。目标表会包含在错误发生前已经装载的行。用户无法访问这些行，但是它们仍占据磁盘空间。使用<codeph>VACUUM</codeph>命令来恢复被浪费的空间。</li>
         </ul>
     </body>
 </topic>
