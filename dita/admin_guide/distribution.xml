@@ -1,113 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="distribution">
-  <title>Distribution and Skew</title>
-    <shortdesc>Greenplum Database relies on even distribution of data across segments.</shortdesc>
+  <title>分布与倾斜</title>
+    <shortdesc>Greenplum数据库依赖于跨节点的均匀数据分布。</shortdesc>
     <body>
-      <p>In an MPP shared nothing environment, overall response time for
-        a query is measured by the completion time for all segments. The system is only as fast as
-        the slowest segment. If the data is skewed, segments with more data will take more time to
-        complete, so every segment must have an approximately equal number of rows and perform
-        approximately the same amount of processing. Poor performance and out of memory conditions
-        may result if one segment has significantly more data to process than other segments. </p>
-      <p>Optimal distributions are critical when joining large tables together. To perform a join,
-        matching rows must be located together on the same segment. If data is not distributed on
-        the same join column, the rows needed from one of the tables are dynamically redistributed
-        to the other segments. In some cases a broadcast motion, in which each segment sends its
-        individual rows to all other segments, is performed rather than a redistribution motion,
-        where each segment rehashes the data and sends the rows to the appropriate segments
-        according to the hash key. </p>
+      <p>在MPP无共享环境中，查询的总体响应时间由所有节点的完成时间来度量。
+          系统只能与最慢的节点一样快。
+          如果数据偏斜，具有更多数据的节点将花费更多时间来完成，因此每个节点必须具有大致相等的行数并执行大致相同的处理量。
+          如果一个节点具有比其他节点更多的处理数据，则可能导致性能不佳和内存不足。
+          </p>
+      <p>大表做连接操作时，最佳分布至关重要。
+          要执行连接，匹配的行必须位于同一节点上。
+          如果数据未在同一连接列上分发，则其中一个表所需的行将动态重新分发到其他节点。
+          有些情况下，执行广播动作，每个节点将其各个行发送到所有其他节点上，而不是每个节点重新哈希数据并根据哈希值将行发送到适当的节点的重新分配。
+          </p>
     </body>
     <topic id="topic1">
-      <title>Local (Co-located) Joins</title>
+      <title>本地(Co-located)连接</title>
         <body>
-        <p>Using a hash distribution that evenly distributes table rows across all segments and
-          results in local joins can provide substantial performance gains. When joined rows are on
-          the same segment, much of the processing can be accomplished within the segment instance.
-          These are called <i>local</i> or <i>co-located</i> joins. Local joins minimize data
-          movement; each segment operates independently of the other segments, without network
-          traffic or communications between segments. </p>
-        <p>To achieve local joins for large tables commonly joined together, distribute the tables
-          on the same column. Local joins require that both sides of a join be distributed on the
-          same columns (and in the same order) <i>and</i> that all columns in the distribution
-          clause are used when joining tables. The distribution columns must also be the same data
-          type—although some values with different data types may appear to have the same
-          representation, they are stored differently and hash to different values, so they are
-          stored on different segments.</p>
+        <p>使用在所有节点上均匀分布表并导致本地连接的哈希分布可以提供显着的性能提升。
+            当连接的行位于同一节点时，可以在节点实例中完成大部分处理。
+            这些连接被称为本地或<i>co-located</i>连接。
+            本地连接最小化数据移动; 每个节点独立于其他节点运营，没有节点之间的网络流量或通信。
+            </p>
+        <p>要做到经常进行连接的大型表进行本地连接，请在同一列上分布表。
+            本地连接要求连接的两端分布在相同的列上（并且顺序相同），并且在连接表时使用分布子句中的所有列。
+            分发列也必须是相同的数据类型 - 尽管不同数据类型的某些值可能看起来具有相同的表示，但它们以不同方式存储并且哈希值不同，因此它们存储在不同的节点上。
+            </p>
     </body>
       </topic>
       <topic id="topic2">
-        <title>Data Skew</title>
+        <title>数据倾斜</title>
     <body>
-        <p>Data skew may be caused by uneven data distribution due to the wrong choice of distribution
-          keys or single tuple table insert or copy operations. Present at the table level, data
-          skew, is often the root cause of poor query performance and out of memory conditions.
-          Skewed data affects scan (read) performance, but it also affects all other query execution
-          operations, for instance, joins and group by operations. </p>
-        <p>It is very important to <i>validate</i> distributions to <i>ensure</i> that data is
-          evenly distributed after the initial load. It is equally important to <i>continue</i> to
-          validate distributions after incremental loads. </p>
-        <p>The following query shows the number of rows per segment as well as the variance from the
-          minimum and maximum numbers of rows:</p>
+        <p>数据倾斜可能是由于错误选择分布键或单个元组表插入或复制操作导致的数据分布不均匀。
+            出现在表级别的数据倾斜通常是查询性能不佳和内存不足情况的根本原因。
+            倾斜的数据会影响扫描（读取）性能，它也会影响所有其他查询执行操作，例如，连接和按操作分组。
+            </p>
+        <p>验证分布以确保数据在初始加载后均匀分布非常重要。
+            在增量加载后继续验证分布同样重要。</p>
+        <p>以下查询显示每个节点的行数以及最小和最大行数的方差：</p>
         <codeblock>SELECT 'Example Table' AS "Table Name", 
     max(c) AS "Max Seg Rows", min(c) AS "Min Seg Rows", 
     (max(c)-min(c))*100.0/max(c) AS "Percentage Difference Between Max &amp; Min" 
 FROM (SELECT count(*) c, gp_segment_id FROM facts GROUP BY 2) AS a;</codeblock>
-        <p>The <codeph>gp_toolkit</codeph> schema has two views that you can use to check for
-            skew.<ul id="ul_cg4_1vp_y4">
-            <li>The <codeph>gp_toolkit.gp_skew_coefficients</codeph> view shows data distribution
-              skew by calculating the coefficient of variation (CV) for the data stored on each
-              segment. The <codeph>skccoeff</codeph>  column shows the coefficient of variation
-              (CV), which is calculated as the standard deviation divided by the average. It takes
-              into account both the average and variability around the average of a data series. The
-              lower the value, the better. Higher values indicate greater data skew.</li>
-            <li>The <codeph>gp_toolkit.gp_skew_idle_fractions</codeph> view shows data distribution
-              skew by calculating the percentage of the system that is idle during a table scan,
-              which is an indicator of computational skew. The <codeph>siffraction</codeph> column
-              shows the percentage of the system that is idle during a table scan. This is an
-              indicator of uneven data distribution or query processing skew. For example, a value
-              of 0.1 indicates  10% skew, a value of 0.5 indicates 50% skew, and so on. Tables that
-              have more than10% skew should have their distribution policies evaluated.</li>
+        <p><codeph>gp_toolkit</codeph> schema里有两个view可以供你检查倾斜。
+            <ul id="ul_cg4_1vp_y4">
+            <li><codeph>gp_toolkit.gp_skew_coefficients</codeph> view通过计算存储在每个节点上的数据的变异系数（CV）来显示数据分布倾斜。
+                <codeph>skccoeff</codeph>列显示变异系数（CV），计算为标准差除以平均值。
+                它考虑了数据系列平均值附近的平均值和可变性。
+                值越低越好。
+                值越高表示数据倾斜越大。
+                </li>
+            <li><codeph>gp_toolkit.gp_skew_idle_fractions</codeph> view通过计算表扫描期间空闲的系统百分比来显示数据分布倾斜，这是计算倾斜的指示。
+                <codeph>siffraction</codeph>列显示在表扫描期间空闲的系统百分比。
+                这是数据分布不均匀或查询处理倾斜的指标。
+                例如，值0.1表示10％偏斜，值0.5表示50％偏斜，依此类推。
+                倾斜超过10％的表应评估其分配策略。
+                </li>
           </ul></p>
           <section>
-            <title>Considerations for Randomly Distributed Tables</title>
-            <p>When you create a table with random distribution (<codeph>DISTRIBUTED RANDOMLY</codeph>),
-              Greenplum Database distributes the data you insert or copy into the table in a
-              round-robin fashion. Greenplum Database starts a new instance of a round-robin
-              cycle for each insert or copy operation. As such, single tuple inserts into a
-              randomly distributed table are assigned to the first segment and will result
-              in data skew. Greenplum Database more evenly distributes data from bulk inserts.</p>
+            <title>随机分布表的注意事项</title>
+            <p>当创建一个随机分布表(<codeph>DISTRIBUTED RANDOMLY</codeph>)，Greenplum数据库以轮询方式将您插入或复制的数据分发到表中。
+                Greenplum数据库为每个插入或复制操作启动轮询周期的新实例。
+                因此，将随机分布的表中的单个元组插入分配给第一个节点，将导致数据偏斜。
+                Greenplum数据库更均匀地分布来自批量插入的数据。
+              </p>
           </section>
       <section id="section_unk_dpf_kgb">
-        <title>Considerations for Replicated Tables</title>
-        <p>When you create a replicated table (with the <codeph>CREATE TABLE</codeph> clause
-            <codeph>DISTRIBUTED REPLICATED</codeph>), Greenplum Database distributes every table row
-          to every segment instance. Replicated table data is evenly distributed because every
-          segment has the same rows. A query that uses the <codeph>gp_segment_id</codeph> system
-          column on a replicated table to verify evenly distributed data, will fail because
-          Greenplum Database does not allow queries to reference replicated tables' system
-          columns.</p>
+        <title>复制表的注意事项</title>
+        <p>当您创建复制表（<codeph>CREATE TABLE</codeph>子句<codeph>DISTRIBUTED REPLICATED</codeph>）时，Greenplum数据库会将每个表行分发到每个节点实例。
+            复制表的数据均匀分布，因为每个节点具有相同的行。
+            使用复制表上的<codeph>gp_segment_id</codeph>系统列来验证均匀分布的数据的查询将失败，因为Greenplum数据库不允许查询引用复制表的系统列。
+            </p>
       </section>
         </body>
       </topic>
       <topic id="topic3">
-        <title>Processing Skew</title>
+        <title>处理倾斜</title>
     <body>
-        <p>Processing skew results when a disproportionate amount of data flows to, and is processed
-          by, one or a few segments. It is often the culprit behind Greenplum Database performance
-          and stability issues. It can happen with operations such join, sort, aggregation, and
-          various OLAP operations. Processing skew happens in flight while a query is executing and
-          is not as easy to detect as data skew.</p>
-        <p>If single segments are failing, that is, not all segments on a host, it may be a
-          processing skew issue. Identifying processing skew is currently a manual process. First
-          look for spill files. If there is skew, but not enough to cause spill, it will not become
-          a performance issue. If you determine skew exists, then find the query responsible for the
-          skew. Following are the steps and commands to use. (Change names like the host file name
-          passed to <codeph>gpssh</codeph> accordingly):</p>
+        <p>当不成比例的数据流向一个或几个节点并由其处理时，则要处理倾斜结果。
+            它往往是Greenplum数据库性能和稳定性问题的罪魁祸首。
+            它可能发生在诸如连接，排序，聚合和各种OLAP操作之类的操作中。
+            处理倾斜在执行查询中发生，并且不容易检测数据倾斜。
+            </p>
+        <p>如果单个节点失败，即不是主机上的所有节点，则可能是处理倾斜问题。
+            识别处理倾斜目前是一个手动过程。
+            首先查看分裂文件。
+            如果存在倾斜，但不足以导致分裂，则不会成为性能问题。
+            如果确定存在倾斜，则找到导致倾斜的查询。
+            以下是要使用的步骤和命令。
+            （更改名称，例如传递给<codeph>gpssh</codeph>的主机文件名）：
+            </p>
         <ol id="ol_hqj_2mh_hr">
-          <li>Find the OID for the database that is to be monitored for skew
-              processing:<codeblock>SELECT oid, datname FROM pg_database;</codeblock><p>Example
-              output:<codeblock>  oid  |  datname
+          <li>找到要监视倾斜处理的数据库的OID：<codeblock>SELECT oid, datname FROM pg_database;</codeblock><p>示例输出：
+              <codeblock>  oid  |  datname
 -------+-----------
  17088 | gpadmin
  10899 | postgres
@@ -117,15 +103,14 @@ FROM (SELECT count(*) c, gp_segment_id FROM facts GROUP BY 2) AS a;</codeblock>
  39682 | gpperfmon
 (6 rows)
 </codeblock></p></li>
-          <li>Run a <codeph>gpssh</codeph> command to check file sizes across all of the segment
-            nodes in the system. Replace <codeph>&lt;OID&gt;</codeph> with the OID of the database
-            from the prior
-              command:<codeblock>[gpadmin@mdw kend]$ gpssh -f ~/hosts -e \
+          <li>运行<codeph>gpssh</codeph>命令检测集群所有节点的文件大小。
+              使用先前命令将<codeph>&lt;OID&gt;</codeph>替换为数据库的OID：
+              <codeblock>[gpadmin@mdw kend]$ gpssh -f ~/hosts -e \
     "du -b /data[1-2]/primary/gpseg*/base/<varname>&lt;OID&gt;</varname>/pgsql_tmp/*" | \
     grep -v "du -b" | sort | awk -F" " '{ arr[$1] = arr[$1] + $2 ; tot = tot + $2 }; END \
     { for ( i in arr ) print "Segment node" i, arr[i], "bytes (" arr[i]/(1024**3)" GB)"; \
-    print "Total", tot, "bytes (" tot/(1024**3)" GB)" }' -</codeblock><p>Example
-              output:<codeblock>Segment node[sdw1] 2443370457 bytes (2.27557 GB)
+    print "Total", tot, "bytes (" tot/(1024**3)" GB)" }' -</codeblock><p>示例输出：
+                  <codeblock>Segment node[sdw1] 2443370457 bytes (2.27557 GB)
 Segment node[sdw2] 1766575328 bytes (1.64525 GB)
 Segment node[sdw3] 1761686551 bytes (1.6407 GB)
 Segment node[sdw4] 1780301617 bytes (1.65804 GB)
@@ -133,21 +118,22 @@ Segment node[sdw5] 1742543599 bytes (1.62287 GB)
 Segment node[sdw6] 1830073754 bytes (1.70439 GB)
 Segment node[sdw7] 1767310099 bytes (1.64594 GB)
 Segment node[sdw8] 1765105802 bytes (1.64388 GB)
-Total 14856967207 bytes (13.8366 GB)</codeblock></p><p>If
-              there is a <i>significant and sustained</i> difference in disk usage, then the queries
-              being executed should be investigated for possible skew (the example output above does
-              not reveal significant skew). In monitoring systems, there will always be some skew,
-              but often it is <i>transient</i> and will be <i>short in duration</i>. </p></li>
-          <li>If significant and sustained skew appears, the next task is to identify the offending
-            query. <p>The command in the previous step sums up the entire node. This time, find the
-              actual segment directory. You can do this from the master or by logging into the
-              specific node identified in the previous step. Following is an example run from the
-              master. </p><p>This example looks specifically for sort files. Not all spill files or
-              skew situations are caused by sort files, so you will need to customize the
-              command:<codeblock>$ gpssh -f ~/hosts -e 
+Total 14856967207 bytes (13.8366 GB)</codeblock></p>
+              <p>如果磁盘使用率存在显着且持续的差异，则应调查正在执行的查询是否存在可能的倾斜（上面的示例输出未显示出明显的倾斜）。
+                  在监控系统中，总会存在一些倾斜，但通常是短暂的，持续时间很短。
+                  </p></li>
+          <li>如果出现显着且持续的偏斜，则下一个任务是识别违规查询。
+              <p>上一步中的命令汇总了全部节点。
+                  这次，找到实际的节点目录。
+                  您可以从master执行此操作，也可以登录到上一步中标识的特定节点。
+                  以下是从master运行的示例。
+                  </p>
+              <p>此示例专门查看排序文件。
+                  并非所有分裂文件或倾斜情况都是由排序文件引起的，因此您需要自定义命令：
+                  <codeblock>$ gpssh -f ~/hosts -e
     "ls -l /data[1-2]/primary/gpseg*/base/19979/pgsql_tmp/*" 
-    | grep -i sort | awk '{sub(/base.*tmp\//, ".../", $10); print $1,$6,$10}' | sort -k2 -n</codeblock></p><p>Here
-              is output from this command:
+    | grep -i sort | awk '{sub(/base.*tmp\//, ".../", $10); print $1,$6,$10}' | sort -k2 -n</codeblock></p>
+              <p>如下是该命令的输出：
               <codeblock>[sdw1] 288718848
       /data1/primary/gpseg2/.../pgsql_tmp_slice0_sort_17758_0001.0[sdw1] 291176448
       /data2/primary/gpseg5/.../pgsql_tmp_slice0_sort_17764_0001.0[sdw8] 924581888
@@ -170,37 +156,30 @@ Total 14856967207 bytes (13.8366 GB)</codeblock></p><p>If
       /data2/primary/gpseg45/.../pgsql_tmp_slice10_sort_15673_0006.5[sdw8] 1573741824
       /data2/primary/gpseg45/.../pgsql_tmp_slice10_sort_15673_0007.6[sdw8] 1573741824
       /data2/primary/gpseg45/.../pgsql_tmp_slice10_sort_15673_0008.7[sdw8] 1573741824
-      /data2/primary/gpseg45/.../pgsql_tmp_slice10_sort_15673_0009.8</codeblock></p><p>Scanning
-              this output reveals that segment <codeph>gpseg45</codeph> on host
-                <codeph>sdw8</codeph> is the culprit, as its sort files are larger than the others
-              in the output.</p></li>
-          <li>Log in to the offending node with <codeph>ssh</codeph> and become root. Use the
-              <codeph>lsof</codeph> command to find the PID for the process that owns one of the
-            sort
-            files:<codeblock>[root@sdw8 ~]# lsof /data2/primary/gpseg45/base/19979/pgsql_tmp/pgsql_tmp_slice10_sort_15673_0002.1
+      /data2/primary/gpseg45/.../pgsql_tmp_slice10_sort_15673_0009.8</codeblock></p>
+              <p>扫描此输出显示主机<codeph>sdw8</codeph>上的节点<codeph>gpseg45</codeph>是罪魁祸首，因为其排序文件比输出中的其他文件大。</p></li>
+          <li>使用<codeph>ssh</codeph>登录到有问题的节点并切换到root。
+              使用<codeph>lsof</codeph>命令找到排序文件所属进程的PID：
+              <codeblock>[root@sdw8 ~]# lsof /data2/primary/gpseg45/base/19979/pgsql_tmp/pgsql_tmp_slice10_sort_15673_0002.1
 COMMAND  PID    USER    FD   TYPE DEVICE  SIZE        NODE        NAME
-postgres 15673  gpadmin 11u  REG  8,48    1073741824  64424546751 /data2/primary/gpseg45/base/19979/pgsql_tmp/pgsql_tmp_slice10_sort_15673_0002.1</codeblock>The
-            PID, <codeph>15673</codeph>, is also part of the file name, but this may not always be
-            the case.</li>
-          <li>Use the <codeph>ps</codeph> command with the PID to identify the database and
-            connection
-            information:<codeblock>[root@sdw8 ~]# ps -eaf | grep 15673
+postgres 15673  gpadmin 11u  REG  8,48    1073741824  64424546751 /data2/primary/gpseg45/base/19979/pgsql_tmp/pgsql_tmp_slice10_sort_15673_0002.1</codeblock>
+            PID, <codeph>15673</codeph>, 也是文件名的一部分，但并不是总是这样。</li>
+          <li>使用<codeph>ps</codeph>命令找到PID并确认数据库和连接信息：
+              <codeblock>[root@sdw8 ~]# ps -eaf | grep 15673
 gpadmin  15673 27471 28 12:05 ?        00:12:59 postgres: port 40003, sbaskin bdw
         172.28.12.250(21813) con699238 seg45 cmd32 slice10 MPPEXEC SELECT
 root     29622 29566  0 12:50 pts/16   00:00:00 grep 15673</codeblock>
           </li>
-          <li>On the master, check the <codeph>pg_log</codeph> log file for the user in the previous
-            command (<codeph>sbaskin</codeph>), connection (<codeph>con699238</codeph>, and command
-              (<codeph>cmd32</codeph>). The line in the log file with these three values
-              <i>should</i> be the line that contains the query, but occasionally, the command
-            number may differ slightly. For example, the <codeph>ps</codeph> output may show
-              <codeph>cmd32</codeph>, but in the log file it is <codeph>cmd34</codeph>. If the query
-            is still running, the last query for the user and connection is the offending query.
+          <li>在master上，检查上一个命令（<codeph>sbaskin</codeph>），连接（<codeph>con699238</codeph>）和命令（<codeph>cmd32</codeph>）中用户的<codeph>pg_log</codeph>日志文件。
+              具有这三个值的日志文件中的行应该是包含查询的行，但有时，命令编号可能略有不同。
+              例如，<codeph>ps</codeph>输出可能显示<codeph>cmd32</codeph>，但在日志文件中它是<codeph>cmd34</codeph>。
+              如果查询仍在运行，则用户和连接的最后一个查询是违规查询。
           </li>
         </ol>
-        <p>The remedy for processing skew in almost all cases is to rewrite the query. Creating
-          temporary tables can eliminate skew. Temporary tables can be randomly distributed to force
-          a two-stage aggregation. </p>
+        <p>几乎在所有情况下处理倾斜的解决方法是重写查询。
+            创建临时表可以消除倾斜。
+            临时表可以随机分配以强制进行两阶段聚合。
+            </p>
     </body>
       </topic>
 </topic>
