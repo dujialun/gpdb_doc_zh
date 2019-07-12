@@ -2,82 +2,54 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic64">
-   <title>Loading Data with COPY</title>
+   <title>用COPY装载数据</title>
    <body>
       <p>
-         <codeph>COPY FROM</codeph> copies data from a file or standard input into a table and
-         appends the data to the table contents. <codeph>COPY</codeph> is non-parallel: data is
-         loaded in a single process using the Greenplum master instance. Using <codeph>COPY</codeph>
-         is only recommended for very small data files. </p>
-     <p>The <codeph>COPY</codeph> source file must be accessible to the <codeph>postgres</codeph>
-        process on the master host. Specify the <codeph>COPY</codeph> source file name relative to
-        the data directory on the master host, or specify an absolute path. </p>
-      <p>Greenplum copies data from <codeph>STDIN</codeph> or <codeph>STDOUT</codeph> using the
-         connection between the client and the master server. </p>
+         <codeph>COPY FROM</codeph>将文件或标准输入中的数据复制到表中，并将数据附加到表内容中。 <codeph>COPY</codeph>是非并行的：使用Greenplum master实例在单个进程中加载数据。建议仅对非常小的数据文件使用<codeph>COPY</codeph>。</p>
+     <p>Master主机上的<codeph>postgres</codeph>进程必须可以访问<codeph>COPY</codeph> 源文件。指定相对于Master主机上的数据目录的<codeph>COPY</codeph> 源文件名，或指定绝对路径。</p>
+      <p>Greenplum使用客户端和master服务器之间的连接从<codeph>STDIN</codeph>或<codeph>STDOUT</codeph>复制数据。</p>
    </body>
   <topic id="topic1" xml:lang="en">
-    <title>Loading From a File</title>
+    <title>从文件装载</title>
     <body>
-      <p>The <codeph>COPY</codeph> command asks the <codeph>postgres</codeph> backend to open the
-         specified file, read it and append it to the table. In order to be able to read the file,
-         the backend needs to have read permissions on the file, and the file name must be
-         specified using an absolute path on the master host, or a relative path to the master
-         data directory.</p>
+      <p><codeph>COPY</codeph> 命令要求<codeph>postgres</codeph>后端打开指定的文件，读取文件并将其附加到表中。为了能够读取文件，后端需要具有对文件的可读权限，并且必须使用master主机上的绝对路径或master数据目录的相对路径来指定文件名。</p>
       <p>
           <codeblock>COPY <i>table_name</i> FROM <i>/path/to/filename</i>;</codeblock>
       </p>
    </body>
   </topic>
   <topic id="topic2" xml:lang="en">
-    <title>Loading From STDIN</title>
+    <title>从STDIN装载</title>
     <body>
-      <p>To avoid the problem of copying the data file to the master host before loading the data,
-         <codeph>COPY FROM STDIN</codeph> uses the Standard Input channel and feeds data directly
-         into the <codeph>postgres</codeph> backend. After the <codeph>COPY FROM STDIN</codeph>
-         command started, the backend will accept lines of data until a single line only contains
-         a backslash-period (\.).</p>
+      <p>为避免在加载数据之前将数据文件复制到master主机的问题，<codeph>COPY FROM STDIN</codeph>使用标准输入通道并将数据直接提供给<codeph>postgres</codeph>后端。 <codeph>COPY FROM STDIN</codeph>命令启动后，后端将接受数据行，直到一行只包含反斜杠句点（\.）。</p>
       <p>
           <codeblock>COPY <i>table_name</i> FROM <i>STDIN</i>;</codeblock>
       </p>
    </body>
   </topic>
   <topic id="topic3" xml:lang="en">
-    <title>Loading Data Using \copy in psql</title>
+    <title>在psql中使用\copy装载数据</title>
     <body>
-      <p>Do not confuse the psql <codeph>\copy</codeph> command with the <codeph>COPY</codeph> SQL
-         command. The <codeph>\copy</codeph> invokes a regular <codeph>COPY FROM STDIN</codeph>
-         and sends the data from the psql client to the backend. Therefore any file must reside on
-         the host where the psql client runs, and must be accessible to the user which runs the
-         client.</p>
-      <p>To avoid the problem of copying the data file to the master host before loading the data,
-         <codeph>COPY FROM STDIN</codeph> uses the Standard Input channel and feeds data directly
-         into the <codeph>postgres</codeph> backend. After the <codeph>COPY FROM STDIN</codeph>
-         command started, the backend will accept lines of data until a single line only contains
-         a backslash-period (\.). psql is wrapping all of this into the handy
-         <codeph>\copy</codeph> command.</p>
+      <p>不要将psql<codeph>\copy</codeph>命令与<codeph>COPY</codeph> SQL命令混淆。 <codeph>\copy</codeph>调用常规<codeph>COPY FROM STDIN</codeph>并将数据从psql客户端发送到后端。 因此，任何文件都必须驻留在运行psql客户端的主机上，并且必须可由运行客户端的用户访问。</p>
+      <p>为避免在加载数据之前将数据文件复制到master主机的问题，<codeph>COPY FROM STDIN</codeph>使用标准输入通道并将数据直接提供给<codeph>postgres</codeph>后端。 <codeph>COPY FROM STDIN</codeph>命令启动后，后端将接受数据行，直到一行只包含反斜杠句点（\.）。psql将所有这些包装到handy
+         <codeph>\copy</codeph> 命令中</p>
       <p>
           <codeblock>\copy <i>table_name</i> FROM <i>filename</i>;</codeblock>
       </p>
    </body>
   </topic>
   <topic id="topic4" xml:lang="en">
-    <title>Input Format</title>
+    <title>输入格式</title>
     <body>
-      <p><codeph>COPY FROM</codeph> accepts a <codeph>FORMAT</codeph> parameter, which specifies
-         the format of the input data. The possible values are <codeph>TEXT</codeph>,
-         <codeph>CSV</codeph> (Comma Separated Values), and <codeph>BINARY</codeph>.</p>
+      <p><codeph>COPY FROM</codeph>接受<codeph>FORMAT</codeph>参数，该参数指定输入数据的格式。可能的值为<codeph>TEXT</codeph>，<codeph>CSV</codeph>（逗号分隔值）和<codeph>BINARY</codeph>。</p>
       <p>
           <codeblock>COPY <i>table_name</i> FROM <i>/path/to/filename</i> WITH (FORMAT csv);</codeblock>
       </p>
-      <p>The <codeph>FORMAT csv</codeph> will read comma-separated values. The
-         <codeph>FORMAT text</codeph> by default uses tabulators to separate the values, the
-         <codeph>DELIMITER</codeph> option specifies a different character as value delimiter.</p>
+      <p><codeph>FORMAT csv</codeph>将读取逗号分隔值。默认情况下，<codeph>FORMAT text</codeph>使用制表符来分隔值，<codeph>DELIMITER</codeph>选项将不同的字符指定为值分隔符。</p>
       <p>
           <codeblock>COPY <i>table_name</i> FROM <i>/path/to/filename</i> WITH (FORMAT text, DELIMITER '|');</codeblock>
       </p>
-      <p>By default, the default client encoding is used, this can be changed with the
-         <codeph>ENCODING</codeph> option. This is useful if data is coming from another operating
-         system.</p>
+      <p>默认情况下，使用默认客户端编码，可以使用<codeph>ENCODING</codeph>选项更改此编码。这对于来自其他操作系统的数据会非常有用。</p>
       <p>
           <codeblock>COPY <i>table_name</i> FROM <i>/path/to/filename</i> WITH (ENCODING 'latin1');</codeblock>
       </p>

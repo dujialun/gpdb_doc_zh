@@ -2,15 +2,10 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic100">
-   <title>Escaping in Text Formatted Files</title>
+   <title>在文本格式的文件中转义</title>
    <body>
-      <p>By default, the escape character is a \ (backslash) for text-formatted files. You can
-         declare a different escape character in the <codeph>ESCAPE</codeph> clause of
-            <codeph>COPY</codeph>, <codeph>CREATE EXTERNAL TABLE </codeph>or
-         <codeph>gpload</codeph>. If your escape character appears in your data, use it to escape
-         itself. </p>
-      <p>For example, suppose you have a table with three columns and you want to load the following
-         three fields:</p>
+      <p>用户可以在<codeph>COPY</codeph>、<codeph>CREATE EXTERNAL TABLE </codeph>或者<codeph>gpload</codeph>的<codeph>ESCAPE</codeph>子句中声明一个不同的转义字符。如果用户的转义字符出现在用户的数据中，用它来转义自身。</p>
+      <p>例如，假定用户有一个具有三列的表并且用户想载入下列三个域：</p>
       <ul>
          <li id="du174927">
             <codeph>backslash = \</codeph>
@@ -22,26 +17,16 @@
             <codeph>exclamation point = !</codeph>
          </li>
       </ul>
-      <p>Your designated delimiter character is <codeph>|</codeph> (pipe character), and your
-         designated escape character is <codeph>\</codeph> (backslash). The formatted row in your
-         data file looks like this:</p>
+      <p>用户指派的分隔字符是<codeph>|</codeph>（竖线字符）并且用户指派的转义字符是<codeph>\</codeph>（反斜线）。用户的数据文件中的已格式化行看起来像这样：</p>
       <codeblock>backslash = <codeph>\\</codeph> | vertical bar = <codeph>\|</codeph> | exclamation point = !
 </codeblock>
-      <p>Notice how the backslash character that is part of the data is escaped with another
-         backslash character, and the pipe character that is part of the data is escaped with a
-         backslash character.</p>
-      <p>You can use the escape character to escape octal and hexadecimal sequences. The escaped
-         value is converted to the equivalent character when loaded into Greenplum Database. For example, to load the ampersand character
-            (<codeph>&amp;</codeph>), use the escape character to escape its equivalent hexadecimal
-            (<codeph>\0x26</codeph>) or octal (<codeph>\046</codeph>) representation.</p>
-      <p>You can disable escaping in <codeph>TEXT</codeph>-formatted files using the
-            <codeph>ESCAPE</codeph> clause of <codeph>COPY</codeph>, <codeph>CREATE EXTERNAL TABLE
-         </codeph>or <codeph>gpload</codeph> as follows:</p>
+      <p>注意是如何用另一个反斜线字符转义作为数据一部分的反斜线字符和竖线字符的。</p>
+      <p>用户可以使用转义字符来转义十进制和十六进制序列。在被载入到Greenplum数据库时，被转义的值会被转换成等效的字符。例如，要载入花号字符（<codeph>&amp;</codeph>），使用转义字符来转义其等效的十六进制（<codeph>\0x26</codeph>）或者十进制（<codeph>\046</codeph>）表达。</p>
+      <p>用户可以这样使用<codeph>COPY</codeph>、<codeph>CREATE EXTERNAL TABLE </codeph>或者<codeph>gpload</codeph>的<codeph>ESCAPE</codeph>子句来禁用TEXT格式文件中的转义：</p>
       <p>
          <codeblock>ESCAPE 'OFF'
 </codeblock>
       </p>
-      <p>This is useful for input data that contains many backslash characters, such as web log
-         data. </p>
+      <p>这对于包含很多反斜线字符的输入数据（例如Web日志数据）有用。 </p>
    </body>
 </topic>

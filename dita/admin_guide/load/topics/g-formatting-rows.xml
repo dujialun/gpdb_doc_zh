@@ -2,15 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic96">
-   <title>Formatting Rows</title>
+   <title>格式化行</title>
    <body>
-      <p>Greenplum Database expects rows of data to be separated by the
-        <codeph>LF</codeph> character (Line feed, <codeph>0x0A</codeph>), <codeph>CR</codeph>
-      (Carriage return, <codeph>0x0D</codeph>), or <codeph>CR</codeph> followed by
-        <codeph>LF</codeph> (<codeph>CR+LF</codeph>, <codeph>0x0D 0x0A</codeph>).
-        <codeph>LF</codeph> is the standard newline representation on UNIX or UNIX-like operating
-      systems. Operating systems such as Windows or Mac OS X use <codeph>CR</codeph> or
-        <codeph>CR+LF</codeph>. All of these representations of a newline are supported by Greenplum Database as a row delimiter. For more information, see <xref
-        href="g-importing-and-exporting-fixed-width-data.xml#topic37"/>.</p>
+      <p>Greenplum数据期望数据中的行被<codeph>LF</codeph>字符（换行，<codeph>0x0A</codeph>）、<codeph>CR</codeph>（回车，<codeph>0x0D</codeph>）或者后面跟着<codeph>LF</codeph>的<codeph>CR</codeph>（<codeph>CR+LF</codeph>，<codeph>0x0D 0x0A</codeph>）所分隔。在UNIX或者类UNIX操作系统上，<codeph>LF</codeph>是标准的新行表示。而Windows或者Mac OS X等操作系统试用<codeph>CR</codeph>或者<codeph>CR+LF</codeph>。Greenplum数据库支持所有这些新行的表示形式来作为行定界符。更多信息请见<xref
+        href="g-importing-and-exporting-fixed-width-data.xml#topic37"/>。</p>
    </body>
 </topic>
