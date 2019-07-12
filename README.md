@@ -22,7 +22,7 @@
 	- Managing a Greenplum System （翻译中：苑泽福、杜佳伦 进度：42/70）
 	- Managing Greenplum Database Access （翻译中：亓晓帅，进度：2/6）
 	- Defining Database Objects （完成：杜佳伦）
-	- Distribution and Skew （待认领）
+	- Distribution and Skew （完成：杜佳伦）
 	- Inserting, Updating, and Deleting Data （完成：段旻）
 	- Querying Data （待认领）
 	- 使用外部数据 （完成：杜佳伦）
