@@ -29,7 +29,7 @@
 	- Loading and Unloading Data （翻译中：武宁，进度：23/49）
 	- Managing Performance （翻译中：钱晨，进度：2/7）
 - Security Configuration Guide （待认领）
-- Best Practices Guide （待认领）
+- Best Practices Guide （翻译中：苑泽福）
 - Utility Guide （待认领）
 - Reference Guide （待认领）
 - Platform Extension Framework (PXF) （待认领）
