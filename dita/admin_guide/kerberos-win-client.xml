@@ -15,7 +15,7 @@
   <topic id="topic_vjg_d5m_sv">
     <title>在Windows上为Greenplum数据库客户端配置Kerberos</title>
     <body>
-      <p>当一个Greenplum数据库系统被配置为启用Kerberos作认证后，您可以为微软Windows系统上的Greenplum数据库客户端工具codeph>gpload</codeph>和<codeph>psql</codeph>配置Kerberos认证。
+		<p>当一个Greenplum数据库系统被配置为启用Kerberos作认证后，您可以为微软Windows系统上的Greenplum数据库客户端工具<codeph>gpload</codeph>和<codeph>psql</codeph>配置Kerberos认证。
         Greenplum数据库直接使用Kerberos认证，而不使用微软的活动目录（AD）。</p>
       <p>本节包含以下信息。</p>
       <p>

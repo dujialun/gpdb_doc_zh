@@ -150,7 +150,7 @@
                 <entry colname="col2">控制是否将新密码在<codeph>pg_authid</codeph>系统目录中存储为哈希字符串。
                 如果没有指定<codeph>ENCRYPTED</codeph>，或者指定<codeph>UNENCRYPTED</codeph>，
                 则默认行为由<codeph>password_encryption</codeph>配置参数决定，该参数默认值为<codeph>on</codeph>。
-                如果提供<codeph><i>password</i></codeph>字符串已经是哈希格式，无论是否指定<codeph>ENCRYPTED</codeph>或codeph>UNENCRYPTED</codeph>都原样存储。</p>
+				<p>如果提供<codeph><i>password</i></codeph>字符串已经是哈希格式，无论是否指定<codeph>ENCRYPTED</codeph>或<codeph>UNENCRYPTED</codeph>都原样存储。</p>
                 <p>有关保护登录密码的其他信息，参阅<xref href="#topic9"
                       format="dita"/>。</p></entry>
               </row>

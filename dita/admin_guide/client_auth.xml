@@ -12,8 +12,7 @@
     <body>
       <p>客户端访问和身份验证通过标准的PostgreSQL基于主机的身份验证文件<filepath>pg_hba.conf</filepath>控制。有关此文件的详细信息，请参阅PostgreSQL文档中的<xref href="https://www.postgresql.org/docs/9.1/auth-pg-hba-conf.html"
           scope="external" format="html">关于pg_hba.conf文件</xref>。</p>
-      <p>在Greenplum数据库，主实例的<filepath>pg_hba.conf</filepath>文件控制对Greenplum数据库系统的客户端访问和身份验证。在Greenplum数据库分段中也有<filepath>pg_hba.conf</filepath>文件，但这些文件已经配置为仅允许来自主主机的客户端连接。这些段永远不会接受外部客户端连接，因此无需更改分段中的<filepath>pg_hba.conf</filepath>文件。
-      pg_hba.conf文件的一般格式是一组记录，每行一个。Greenplum数据库忽略空白行和后面的任何文本＃ 评论字符。记录由许多由空格或制表符分隔的字段组成。如果引用字段值，则字段可以包含空格。记录不能跨行继续。每个远程客户端访问记录都具有以下格式：
+  <p>在Greenplum数据库，主实例的<filepath>pg_hba.conf</filepath>文件控制对Greenplum数据库系统的客户端访问和身份验证。在Greenplum数据库分段中也有<filepath>pg_hba.conf</filepath>文件，但这些文件已经配置为仅允许来自主主机的客户端连接。这些段永远不会接受外部客户端连接，因此无需更改分段中的<filepath>pg_hba.conf</filepath>文件。</p>
       <p><filepath>pg_hba.conf</filepath> 文件的一般格式是一组记录，每行一个。Greenplum数据库忽略空行和<codeph>#</codeph>注释后的内容。每行记录由许多由空格或制表符分隔的字段组成。字段值如果被引号括起来，可以包含空格。每个远程客户端访问记录都具有以下格式：</p>
       <codeblock><i>host</i>   <i>database</i>   <i>role</i>   <i>address</i>   <i>authentication-method</i></codeblock>
       <p>每个UNIX域套接字访问记录都采用以下格式：</p>
@@ -133,7 +132,7 @@ host    all   all   192.168.0.0/32  ldap ldapserver=usldap1 ldapport=138
     <title id="ip145021">限制并发连接</title>
     <shortdesc>Greenplum数据库以每个连接为基础分配资源，因此建议设置允许的最大连接数。</shortdesc>
     <body>
-      <p>要限制Greenplum数据库系统的活动并发会话数，可以配置<codeph>max_connections</codeph>服务器配置参数。这是一个<i>local</i>参数，这意味着必须在master节点、standby master节点、每个segment实例（包括primary和mirror）的<codeph>postgresql.conf</codeph>文件中设置该参数。中主服务器，备用主服务器和每个段实例（主服务器和镜像服务器）的文件。建议在segment节点的<codeph>max_connections</codeph>参数值是master节点的5-10倍。
+		<p>要限制Greenplum数据库系统的活动并发会话数，可以配置<codeph>max_connections</codeph>服务器配置参数。这是一个<i>local</i>参数，这意味着必须在master节点、standby master节点、每个segment实例（包括primary和mirror）的<codeph>postgresql.conf</codeph>文件中设置该参数。中主服务器，备用主服务器和每个段实例（主服务器和镜像服务器）的文件。建议在segment节点的<codeph>max_connections</codeph>参数值是master节点的5-10倍。</p>
       <p>当设置<codeph>max_connections</codeph>时，必须设置依赖参数<codeph>max_prepared_transactions</codeph>。该值至少与master节点上的<codeph>max_connections</codeph>取值相等。segment实例节点也设置相同的值。</p>
       <p>例如：</p>
       <ul id="ul_jlg_3b5_jp">

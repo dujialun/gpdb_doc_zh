@@ -50,7 +50,7 @@
           客户端系统需要Kerberos密钥表文件，该文件包含用于登录数据库的Greenplum数据库用户的身份认证凭据。</li>
           <li id="kd158440">客户端机器必须能够连接到Greenplum数据库master主机。
           <p>如有必要，将Greenplum数据库master主机名和IP地址添加到系统的<codeph>hosts</codeph>文件。
-          在Linux系统上，<codeph>hosts</codeph> 文件在<codeph>/etc</codeph>目录下。</li>
+			  在Linux系统上，<codeph>hosts</codeph> 文件在<codeph>/etc</codeph>目录下。</p></li>
         </ul>
       </body>
     </topic>

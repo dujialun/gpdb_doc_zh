@@ -45,14 +45,14 @@
 # openssl x509 -noout -hash -in &lt;ca-certificate-file>  
 # ln -s &lt;ca-certificate-file> &lt;ca-certificate-file>.0</codeblock></li>
           <li>使用指定的CA证书目录和证书文件为Greenplum数据库配置OpenLDAP配置文件。<p>
-          以root用户身份编辑OpenLDAP配置文件<codeph>/etc/openldap/ldap.conf</codeph>内容：
+				  以root用户身份编辑OpenLDAP配置文件<codeph>/etc/openldap/ldap.conf</codeph>内容：</p>
           <codeblock>SASL_NOCANON on
  URI ldaps://ldapA.example.priv ldaps://ldapB.example.priv ldaps://ldapC.example.priv
  BASE dc=example,dc=priv
  TLS_CACERTDIR /etc/pki/tls/certs
  TLS_CACERT /etc/pki/tls/certs/&lt;ca-certificate-file></codeblock>
           <note>要使证书验证成功，证书中的主机名必须与URI属性中的主机名匹配。否则，您还必须添加<codeph>TLS_REQCERT
-                allow</codeph>参数到文件中。
+				  allow</codeph>参数到文件中。</note></li>
           <li>以gpadmin用户身份，编辑<codeph>/usr/local/greenplum-db/greenplum_path.sh</codeph>并添加以下行。
           <codeblock>export LDAPCONF=/etc/openldap/ldap.conf</codeblock></li>
         </ol></p>

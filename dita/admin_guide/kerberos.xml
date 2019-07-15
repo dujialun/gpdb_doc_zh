@@ -177,7 +177,7 @@ postgres=# select current_user;
   <topic id="topic_kmr_gws_d2b">
     <title>将Kerberos主体映射为Greenplum数据库角色</title>
     <body>
-    要连接到启用了Kerberos身份认证的Greenplum数据库系统，用户首先使用<codeph>kinit</codeph>命令从KDC服务器请求授予票证，期间需要输入密码或者提供密钥表文件。
+		<p>要连接到启用了Kerberos身份认证的Greenplum数据库系统，用户首先使用<codeph>kinit</codeph>命令从KDC服务器请求授予票证，期间需要输入密码或者提供密钥表文件。
     随后当用户连接到启用Kerberos的Greenplum数据库系统时，用户的Kerberos主题名称将是Greenplum数据库角色名称。
     具体名称根据Greenplum数据库<codeph>pg_hba.conf</codeph>中受到在<codeph>gss</codeph>选项进行转换：</p>
       <ul id="ul_hzh_rjw_22b">
