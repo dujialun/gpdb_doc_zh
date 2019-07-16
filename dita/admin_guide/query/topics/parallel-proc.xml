@@ -2,111 +2,64 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="iy147500">About Greenplum Query Processing</title>
-  <shortdesc>This topic provides an overview of how Greenplum Database processes
-    queries. Understanding this process can be useful when writing and tuning queries.</shortdesc>
+  <title id="iy147500">关于Greenplum的查询处理</title>
+  <shortdesc>这个主题给出了Greenplum数据库如何处理查询的概述。理解这一处理有助于编写和调优查询。</shortdesc>
   <body>
-    <p>Users issue queries to Greenplum Database as they would to any database
-      management system. They connect to the database instance on the Greenplum master host using a client application such as
-        <codeph>psql</codeph> and submit SQL statements.</p>
+    <p>用户像对任何数据库管理系统那样将查询发送到Greenplum数据库。它们使用<codeph>psql</codeph>之类的客户端应用连接到Greenplum的Master主机上的数据库实例并且提交SQL语句。</p>
   </body>
   <topic id="topic2" xml:lang="en">
-    <title>Understanding Query Planning and Dispatch</title>
+    <title>理解查询规划和分发</title>
     <body>
-      <p id="iy139991">The master receives, parses, and optimizes the query. The resulting query
-        plan is either parallel or targeted. The master dispatches parallel query plans to all
-        segments, as shown in <xref href="#topic2/iy139990" type="fig" format="dita"/>. The master
-        dispatches targeted query plans to a single segment, as shown in <xref
-          href="#topic2/iy145883" type="fig" format="dita"/>. Each segment is responsible for
-        executing local database operations on its own set of data.</p>
-      <p>Most database operations—such as table scans, joins, aggregations, and sorts—execute across
-        all segments in parallel. Each operation is performed on a segment database independent of
-        the data stored in the other segment databases.</p>
+      <p id="iy139991">Master接收、解析并且优化查询。作为结果的查询计划可能是并行的或者定向的。如图 1 <xref
+              href="#topic2/iy145883" type="fig" format="dita"/>所示，Master会把并行查询计划分发到所有的Segment。而如图 2<xref href="#topic2/iy139990" type="fig" format="dita"/>所示，Master会把定向查询计划分发到单一的一个Segment。每个Segment负责在其自己的数据集上执行本地数据库操作。 </p>
+      <p>大部分的数据库操作（例如表扫描、连接、聚集和排序）都会以并行的方式在所有Segment上执行。在一个Segment的数据库上执行的每个操作都独立于存储在其他Segment数据库中的数据。</p>
       <fig id="iy139990">
-        <title>Dispatching the Parallel Query Plan</title>
+        <title>分发并行查询计划 </title>
         <image href="../../graphics/parallel_plan.jpg" placement="break" width="450px"
           height="297px"/>
       </fig>
-      <p>Certain queries may access only data on a single segment, such as single-row
-          <codeph>INSERT</codeph><ph>, <codeph>UPDATE</codeph>,
-            <codeph>DELETE</codeph>,</ph> or <codeph>SELECT</codeph> operations or queries that
-        filter on the table distribution key column(s). In queries such as these, the query plan is
-        not dispatched to all segments, but is targeted at the segment that contains the affected or
-        relevant row(s).</p>
+      <p>某些查询可能只访问单个Segment上的数据，例如单行的<codeph>INSERT</codeph><ph>, <codeph>UPDATE</codeph>,
+        <codeph>DELETE</codeph>,</ph> 或者 <codeph>SELECT</codeph>操作或者以表分布键列过滤的查询。在这些查询中，查询计划不会被分发到所有的Segment，而是定向给到包含受影响或者相关行的Segment。</p>
       <fig id="iy145883">
-        <title>Dispatching a Targeted Query Plan</title>
+        <title>分发定向查询计划 </title>
         <image href="../../graphics/targeted_dispatch.jpg" placement="break" width="454px"
           height="281px"/>
       </fig>
     </body>
   </topic>
   <topic id="topic3" xml:lang="en">
-    <title id="iy139957">Understanding Greenplum Query Plans</title>
+    <title id="iy139957">理解Greenplum的查询计划</title>
     <body>
-      <p>A query plan is the set of operations Greenplum Database will perform to
-        produce the answer to a query. Each <i>node</i> or step in the plan represents a database
-        operation such as a table scan, join, aggregation, or sort. Plans are read and executed from
-        bottom to top.</p>
-      <p id="iy146386">In addition to common database operations such as table scans, joins, and so
-        on, Greenplum Database has an additional operation type called <i>motion</i>.
-        A motion operation involves moving tuples between the segments during query processing. Note
-        that not every query requires a motion. For example, a targeted query plan does not require
-        data to move across the interconnect. </p>
-      <p>To achieve maximum parallelism during query execution, Greenplum divides the work of the query plan into <i>slices</i>. A slice is a portion of the plan
-        that segments can work on independently. A query plan is sliced wherever a <i>motion</i>
-        operation occurs in the plan, with one slice on each side of the motion.</p>
-      <p>For example, consider the following simple query involving a join between two tables:</p>
+      <p>查询计划是Greenplum数据库将要执行以产生查询答案的操作集合。计划中的每个节点或者步骤表示一个数据库操作，例如表扫描、连接、聚集或者排序。计划的读取和执行按照从底向上的顺序进行。</p>
+      <p id="iy146386">除通常的数据库操作（例如表扫描、连接等等）之外，Greenplum数据库还有一种额外的被称为移动的操作类型。移动操作涉及到在查询处理期间在Segment之间移动元组。注意并非每一个查询都需要移动操作。例如，定向查询计划就不需要通过Interconnect移动数据。</p>
+      <p>为了在查询执行期间达到最大并行度，Greenplum将查询计划的工作划分成切片。切片是Segment能够在其上独立工作的计划片段。只要有一个移动操作出现在计划中，该查询计划就会被切片，在移动的两端分别有一个切片。</p>
+      <p>例如，下面涉及两个表之间连接的简单查询：</p>
       <p>
         <codeblock>SELECT customer, amount
 FROM sales JOIN customer USING (cust_id)
 WHERE dateCol = '04-30-2016';
 </codeblock>
       </p>
-      <p><xref href="#topic3/iy140224" type="fig" format="dita"/> shows the query plan. Each segment
-        receives a copy of the query plan and works on it in parallel. </p>
-      <p>The query plan for this example has a <i>redistribute motion</i> that moves tuples between
-        the segments to complete the join. The redistribute motion is necessary because the customer
-        table is distributed across the segments by <codeph>cust_id</codeph>, but the sales table is
-        distributed across the segments by <codeph>sale_id</codeph>. To perform the join, the
-          <codeph>sales</codeph> tuples must be redistributed by <codeph>cust_id</codeph>. The plan
-        is sliced on either side of the redistribute motion, creating <i>slice 1</i> and <i>slice
-          2</i>. </p>
-      <p>This query plan has another type of motion operation called a <i>gather motion</i>. A
-        gather motion is when the segments send results back up to the master for presentation to
-        the client. Because a query plan is always sliced wherever a motion occurs, this plan also
-        has an implicit slice at the very top of the plan (<i>slice 3</i>). Not all query plans
-        involve a gather motion. For example, a <codeph>CREATE TABLE x AS SELECT...</codeph>
-        statement would not have a gather motion because tuples are sent to the newly created table,
-        not to the master. </p>
+      <p><xref href="#topic3/iy140224" type="fig" format="dita"/> 展示了这个查询计划。每个Segment接收一份查询计划的拷贝并且并行地根据计划工作。 </p>
+      <p>这个例子的查询计划有一个重分布移动，它在Segment之间移动元组以完成连接。重分布移动是必要的，因为customer表在Segment上按照cust_id分布，而sales表是按照sale_id分布。为了执行该连接，sales元组必须按照cust_id重新分布。该计划在重分布移动操作的两边被切换，形成了slice 1和slice 2。 </p>
+      <p>这个查询计划由另一种称为收集移动的移动操作。收集操作表示Segment何时将结果发回给Master，Master再将结果呈现给客户端。由于只要有移动产生查询计划就会被切片，这个计划在其最顶层也有一个隐式的切片（slice 3）。不是所有的查询计划都涉及收集移动。例如，一个CREATE TABLE x AS SELECT...语句不会有收集移动，因为元组都被发送到新创建的表而不是发给Master。 </p>
       <fig id="iy140224">
-        <title>Query Slice Plan</title>
+        <title>查询切片计划 </title>
         <image href="../../graphics/slice_plan.jpg" placement="break" width="462px"
           height="382px"/>
       </fig>
     </body>
   </topic>
   <topic id="topic4" xml:lang="en">
-    <title id="iy140034">Understanding Parallel Query Execution</title>
+    <title id="iy140034">理解并行查询执行</title>
     <body>
-      <p id="iy141128">Greenplum creates a number of database processes
-        to handle the work of a query. On the master, the query worker process is called the
-          <i>query dispatcher</i> (QD). The QD is responsible for creating and dispatching the query
-        plan. It also accumulates and presents the final results. On the segments, a query worker
-        process is called a <i>query executor</i> (QE). A QE is responsible for completing its
-        portion of work and communicating its intermediate results to the other worker
-        processes.</p>
-      <p>There is at least one worker process assigned to each <i>slice</i> of the query plan. A
-        worker process works on its assigned portion of the query plan independently. During query
-        execution, each segment will have a number of processes working on the query in parallel. </p>
-      <p>Related processes that are working on the same slice of the query plan but on different
-        segments are called <i>gangs</i>. As a portion of work is completed, tuples flow up the
-        query plan from one gang of processes to the next. This inter-process communication between
-        the segments is referred to as the <i>interconnect</i> component of Greenplum Database.</p>
-      <p><xref href="#topic4/iy141495" type="fig" format="dita"/> shows the query worker processes
-        on the master and two segment instances for the query plan illustrated in <xref
+      <p id="iy141128">Greenplum会创建若干数据库进程来处理查询的工作。在Master上，查询工作者进程被称作查询分发器（QD）。QD负责创建并且分发查询计划。它也收集并且表达最终的结果。在Segment上，查询工作者进程被称为查询执行器（QE）。QE负责完成它那一部分的工作并且与其他工作者进程交流它的中间结果。</p>
+      <p>对查询计划的每一个切片至少要分配一个工作者进程。工作者进程独立地工作在分配给它的那部分查询计划上。在查询执行期间，每个Segment将有若干进程并行地为该查询工作。 </p>
+      <p>为查询计划的同一个切片工作但位于不同Segment上的相关进程被称作团伙。随着部分工作的完成，元组会从一个进程团伙流向查询计划中的下一个团伙。这种Segment之间的进程间通信被称作Greenplum数据库的Interconnect组件。</p>
+      <p><xref href="#topic4/iy141495" type="fig" format="dita"/> 所示查询计划在Master和两个Segment实例上的查询工作者进行。<xref
           href="#topic3/iy140224" type="fig" format="dita"/>.</p>
       <fig id="iy141495">
-        <title>Query Worker Processes</title>
+        <title>查询工作者进程 </title>
         <image href="../../graphics/gangs.jpg" placement="break" width="318px" height="288px"/>
       </fig>
     </body>

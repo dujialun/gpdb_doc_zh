@@ -4,6 +4,6 @@
   <title id="in138244">查询数据</title>
   <shortdesc>本主题提供在Greenplum数据库中使用SQL的信息。</shortdesc>
   <body>
-    <p>你可以使用<codeph>psql</codeph>交互式SQL客户端和其他客户端工具输入SQL语句来查看、更改以及分析数据库中的数据。</p>
+    <p>用户可以使用<codeph>psql</codeph>交互式SQL客户端和其他客户端工具输入SQL语句来查看、更改以及分析数据库中的数据。</p>
   </body>
 </topic>
