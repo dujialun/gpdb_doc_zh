@@ -3,19 +3,17 @@
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 
 <topic id="backup-incremental" xml:lang="en">
-  <title>Creating Incremental Backups with gpbackup and gprestore</title>
+  <title>使用gpbackup和gprestore创建增量备份</title>
   <body>
-    <p>The <codeph>gpbackup</codeph> and <codeph>gprestore</codeph> utilities support creating
-      incremental backups of append-optimized tables and restoring from incremental backups. An
-      incremental backup backs up all specified heap tables and backs up append-optimized tables
-      (including append-optimized, column-oriented tables) only if the tables have changed. For
-      example, if a row of an append-optimized table has changed, the table is backed up. For
-      partitioned append-optimized tables, only the changed leaf partitions are backed up. </p>
-    <p>Incremental backups are efficient when the total amount of data in append-optimized tables or
-      table partitions that changed is small compared to the data that has not changed since the
-      last backup. </p>
-    <p>An incremental backup backs up an append-optimized table only if one of the following
-      operations was performed on the table after the last full or incremental backup:</p>
+    <p><codeph>gpbackup</codeph>和<codeph>gprestore</codeph>工具支持创建追加优化表的增量备份以及从增量备份还原。
+      只有表被更改时，增量备份才会备份所有指定的堆表和追加优化的表（包括追加优化的，面向列的表）。
+      例如，如果追加优化表的行已更改，则会备份该表。
+      对于分区的追加优化表，仅备份更改的叶子分区。
+      </p>
+    <p>当自上次备份以来，追加优化表更或分区表更改的数据与未更改的数据相比量很小的时候，增量备份是高效的。
+      </p>
+    <p>仅当在上次全量备份或增量备份后对表执行以下操作之一时，增量备份才会备份追加优化表：
+      </p>
     <ul id="ul_cvy_xhp_34">
       <li>
         <codeph>ALTER TABLE</codeph>
@@ -32,50 +30,43 @@
       <li>
         <codeph>UPDATE</codeph>
       </li>
-      <li><codeph>DROP</codeph> and then re-create the table</li>
+      <li><codeph>DROP</codeph>然后重建表</li>
     </ul>
-    <p>To restore data from incremental backups, you need a complete incremental backup set.</p>
+    <p>要从增量备份还原数据，您需要一个完整的增量备份集。</p>
   </body>
   <topic id="topic_kvf_mkr_t2b">
-    <title>About Incremental Backup Sets</title>
+    <title>关于增量备份集</title>
     <body>
-      <p>An incremental backup set includes the following backups:<ul id="ul_gzr_nkr_t2b">
-          <li>A full backup. This is the full backup that the incremental backups are based on. </li>
-          <li>The set of incremental backups that capture the changes to the database from the time
-            of the full backup.</li>
+      <p>一个增量备份集包含如下备份：<ul id="ul_gzr_nkr_t2b">
+          <li>一个全量的备份。这是增量备份基于的全量备份。</li>
+          <li>捕获全量备份后数据库的增量备份集。</li>
         </ul></p>
-      <p>For example, you can create a full backup and then create three daily incremental backups.
-        The full backup and all three incremental backups are the backup set. For information about
-        using an incremental backup set, see <xref href="#topic_btr_xfr_t2b/incr_backup_scenario"
-          format="dita"/>.</p>
-      <p>When you create or add to an incremental backup set, <codeph>gpbackup</codeph> ensures that
-        the backups in the set are created with a consistent set of backup options to ensure that
-        the backup set can be used in a restore operation. For information about backup set
-        consistency, see <xref href="#topic_btr_xfr_t2b" format="dita"/>.</p>
-      <p>When you create an incremental backup you include these options with the other
-          <codeph>gpbackup</codeph> options to create a backup:<ul id="ul_lmq_rs5_p2b">
-          <li><codeph>--leaf-partition-data</codeph> - Required for all backups in the incremental
-            backup set.<ul id="ul_sr1_cbv_p2b">
-              <li>Required when you create a full backup that will be the base backup for an
-                incremental backup set.</li>
-              <li>Required when you create an incremental backup.</li>
+      <p>例如：创建一个全量备份，然后创建三个天级增量备份。
+        全量备份和全部三个增量备份就是备份集。
+        关于增量备份更多信息，请参考<xref href="#topic_btr_xfr_t2b/incr_backup_scenario" format="dita"/>。
+        </p>
+      <p>创建或添加到增量备份集时，<codeph>gpbackup</codeph>可确保使用一组一致的备份选项创建集合中的备份，以确保可以在还原操作中使用备份集。
+        关于备份集合一致性的信息，参考<xref href="#topic_btr_xfr_t2b" format="dita"/>。
+        </p>
+      <p>创建增量备份时，包含这些选项与其他<codeph>gpbackup</codeph>选项一起创建备份：
+        <ul id="ul_lmq_rs5_p2b">
+          <li><codeph>--leaf-partition-data</codeph> - 增量备份集中的所有备份都需要。<ul id="ul_sr1_cbv_p2b">
+              <li>创建全量备份时必需，该备份将作为增量备份集的基备份。</li>
+              <li>创建增量备份时必须。</li>
             </ul></li>
-          <li><codeph>--incremental</codeph> - Required when you create an incremental backup.<p>You
-              cannot combine <codeph>--data-only</codeph> or <codeph>--metadata-only</codeph> with
-                <codeph>--incremental</codeph>.</p></li>
-          <li><codeph>--from-timestamp</codeph> - Optional. This option can be used with
-              <codeph>--incremental</codeph>. The timestamp you specify is an existing backup. The
-            timestamp can be either a full backup or incremental backup. The backup being created
-            must be compatible with the backup specified with the <codeph>--from-timestamp</codeph>
-              option.<p>If you do not specify <codeph>--from-timestamp</codeph>,
-                <codeph>gpbackup</codeph> attempts to find a compatible backup based on information
-              in the <codeph>gpbackup</codeph> history file. See <xref
-                href="#topic_btr_xfr_t2b/incr_backup_notes" format="dita"/>.</p></li>
+          <li><codeph>--incremental</codeph> - 创建增量备份时必须。
+            <p>不能将<codeph>--data-only</codeph>或<codeph>--metadata-only</codeph>和<codeph>--incremental</codeph>一起使用。</p></li>
+          <li><codeph>--from-timestamp</codeph> - 可选的。该选项可以和<codeph>--incremental</codeph>一起使用。
+            指定的时间戳是一个已经存在的备份。
+            可以是一个全量备份或增量备份。
+            创建的备份必须和使用<codeph>--from-timestamp</codeph>选项指定的备份兼容。
+            <p>如果不指定<codeph>--from-timestamp</codeph>，<codeph>gpbackup</codeph>会尝试基于<codeph>gpbackup</codeph>历史文件找一个兼容的备份。
+              参考<xref href="#topic_btr_xfr_t2b/incr_backup_notes" format="dita"/>。</p></li>
         </ul></p>
     </body>
   </topic>
   <topic id="topic_btr_xfr_t2b">
-    <title>Using Incremental Backups</title>
+    <title>使用增量备份</title>
     <body>
       <ul id="ul_ors_2lr_t2b">
         <li><xref href="#topic_btr_xfr_t2b/incr_backup_scenario" format="dita"/></li>
@@ -83,89 +74,75 @@
         <li><xref href="#topic_btr_xfr_t2b/gprestore_increment" format="dita"/></li>
         <li><xref href="#topic_btr_xfr_t2b/incr_backup_notes" format="dita"/></li>
       </ul>
-      <p>When you add an incremental backup to a backup set, <codeph>gpbackup</codeph> ensures that
-        the full backup and the incremental backups are consistent by checking these
-          <codeph>gpbackup</codeph> options:<ul id="ul_hzr_nkr_t2b">
-          <li><codeph>--dbname</codeph> - The database must be the same.</li>
-          <li><codeph>--backup-dir</codeph> - The directory must be the same. The backup set, the
-            full backup and the incremental backups, must be in the same location.</li>
-          <li><codeph>--single-data-file</codeph> - This option must be either specified or absent
-            for all backups in the set.</li>
-          <li><codeph>--plugin-config</codeph> - If this option is specified, it must be specified
-            for all backups in the backup set. The configuration must reference the same plugin
-            binary.</li>
+      <p>将增量备份添加到备份集时，<codeph>gpbackup</codeph>通过检查以下<codeph>gpbackup</codeph>选项来确保全量备份和增量备份是一致的：
+        <ul id="ul_hzr_nkr_t2b">
+          <li><codeph>--dbname</codeph> - 数据库必须相同。</li>
+          <li><codeph>--backup-dir</codeph> - 文件夹必须相同。备份集，全量和增量备份路径必须相同。</li>
+          <li><codeph>--single-data-file</codeph> - 这个选项在集合中所有的备份，要么全部指定，要么全部非指定。</li>
+          <li><codeph>--plugin-config</codeph> - 如果指定该选项，则必须在备份集中所有的备份中都指定。
+            配置必须引用相同的二进制插件文件。
+            </li>
           <li>
-            <codeph>--include-table-file</codeph>, <codeph>--include-schema</codeph>, or any other
-            options that filter tables and schemas must be the same. <p>When checking schema
-              filters, only the schema names are checked, not the objects contained in the
-              schemas.</p></li>
-          <li><codeph>--no-compression</codeph> - If this option is specified, it must be specified
-            for all backups in the backup set. <p>If compression is used on the on the full backup,
-              compression must be used on the incremental backups. Different compression levels are
-              allowed for the backups in the backup set. For a backup, the default is compression
-              level 1.</p></li>
+            <codeph>--include-table-file</codeph>, <codeph>--include-schema</codeph>, 或其他过滤表和schema的选项必须相同。
+            <p>当检查schema筛选时，只检查schema名字，不检查schema里包含的对象。</p></li>
+          <li><codeph>--no-compression</codeph> - 如果这个选项被指定，必须在备份集中所有的备份中都要指定。
+            <p>如果在全量备份上使用压缩，则必须在增量备份上使用压缩。
+              备份集中的备份允许不同的压缩级别。
+              </p></li>
         </ul></p>
-      <p>If you try to add an incremental backup to a backup set, the backup operation fails if the
-          <codeph>gpbackup</codeph> options are not consistent.</p>
-      <p>For information about the <codeph>gpbackup</codeph> and <codeph>gprestore</codeph> utility
-        options, see <xref href="../../utility_guide/admin_utilities/gpbackup.xml">gpbackup</xref>
-        and <xref href="../../utility_guide/admin_utilities/gprestore.xml">gprestore</xref><ph
-          otherprops="op-print"> in the <cite>Greenplum Database Utility Guide</cite></ph>.</p>
+      <p>如果尝试将增量备份添加到备份集，则如果<codeph>gpbackup</codeph>选项不一致，则备份操作将失败。
+        </p>
+      <p>关于<codeph>gpbackup</codeph>和<codeph>gprestore</codeph>工具选项信息，
+        参考<cite>Greenplum数据库工具指南</cite>中的<xref href="../../utility_guide/admin_utilities/gpbackup.xml">gpbackup</xref>
+        和<xref href="../../utility_guide/admin_utilities/gprestore.xml">gprestore</xref><ph
+          otherprops="op-print"></ph>.</p>
       <section id="incr_backup_scenario">
-        <title>Example Using Incremental Backup Sets</title>
-        <p>Each backup has a timestamp taken when the backup is created. For example, if you create
-          a backup on May 14, 2017, the backup file names contain
-              <codeph>20170514<varname>hhmmss</varname></codeph>. The <varname>hhmmss</varname>
-          represents the time: hour, minute, and second.</p>
-        <p>This example assumes that you have created two full backups and incremental backups of
-          the database <i>mytest</i>. To create the full backups, you used this command: </p>
+        <title>使用增量备份集的例子</title>
+        <p>每个备份都有一个创建备份时的时间戳。
+          例如，如果您在2017年5月14日创建备份，则备份文件名包含<codeph>20170514<varname>hhmmss</varname></codeph>。
+          <varname>hhmmss</varname>表示时间：小时，分钟和秒。
+          </p>
+        <p>此示例假定您已创建数据库<i>mytest</i>的两个全量备份和增量备份。
+          要创建全量备份，请使用以下命令：
+          </p>
         <codeblock>gpbackup --dbname mytest --backup-dir /mybackup --leaf-partition-data</codeblock>
-        <p>You created incremental backups with this command:</p>
+        <p>使用下面命令创建增量备份：</p>
         <codeblock>gpbackup --dbname mytest --backup-dir /mybackup --leaf-partition-data --incremental</codeblock>
-        <p>When you specify the <codeph>--backup-dir</codeph> option, the backups are created in the
-            <codeph>/mybackup</codeph> directory on each Greenplum Database host.</p>
-        <p>In the example, the full backups have the timestamp keys <codeph>20170514054532</codeph>
-          and <codeph>20171114064330</codeph>. The other backups are incremental backups. The
-          example consists of two backup sets, the first with two incremental backups, and second
-          with one incremental backup. The backups are listed from earliest to most recent.</p>
+        <p>当指定<codeph>--backup-dir</codeph>选项时，备份被创建在每个数据库主机的<codeph>/mybackup</codeph>目录里。</p>
+        <p>在该示例中，全量备份具有时间戳键<codeph>20170514054532</codeph>和<codeph>20171114064330</codeph>。其他备份是增量备份。
+          该示例包含两个备份集，第一个具有两个增量备份，第二个具有一个增量备份。
+          备份从最早到最近列出。</p>
         <p id="p_ryy_33p_34">
           <ul id="ul_cwq_j3p_34">
-            <li><codeph>20170514054532</codeph> (full backup)</li>
+            <li><codeph>20170514054532</codeph> (全量备份)</li>
             <li><codeph>20170714095512</codeph>
             </li>
             <li><codeph>20170914081205</codeph>
             </li>
-            <li><codeph>20171114064330</codeph> (full backup) </li>
+            <li><codeph>20171114064330</codeph> (全量备份) </li>
             <li><codeph>20180114051246</codeph>
             </li>
           </ul>
         </p>
-        <p>To create a new incremental backup based on the latest incremental backup, you must
-          include the same <codeph>--backup-dir</codeph> option as the incremental backup as well as
-          the options <codeph>--leaf-partition-data</codeph> and
-          <codeph>--incremental</codeph>.<codeblock>gpbackup --dbname mytest --backup-dir /mybackup --leaf-partition-data --incremental</codeblock></p>
-        <p>You can specify the <codeph>--from-timestamp</codeph> option to create an incremental
-          backup based on an existing incremental or full backup. Based on the example, this command
-          adds a fourth incremental backup to the backup set that includes
-            <codeph>20170914081205</codeph> as an incremental backup and uses
-            <codeph>20170514054532</codeph> as the full backup.</p>
+        <p>要基于最新的增量备份创建新的增量备份，必须包含与增量备份相同的<codeph>--backup-dir</codeph>选项以及<codeph>--leaf-partition-data</codeph>和<codeph>--incremental</codeph>选项。
+          <codeblock>gpbackup --dbname mytest --backup-dir /mybackup --leaf-partition-data --incremental</codeblock></p>
+        <p>您可以指定<codeph>--from-timestamp</codeph>选项以基于现有增量备份或全量备份创建增量备份。
+          根据该示例，此命令将第四个增量备份添加到备份集，其中包括<codeph>20170914081205</codeph>作为增量备份，并使用<codeph>20170514054532</codeph>作为全量备份。
+          </p>
         <codeblock>gpbackup --dbname mytest --backup-dir /mybackup --leaf-partition-data --incremental --from-timestamp 20170914081205</codeblock>
-        <p>This command creates an incremental backup set based on the full backup
-            <codeph>20171114064330</codeph> and is separate from the backup set that includes the
-          incremental backup
-          <codeph>20180114051246</codeph>.<codeblock>gpbackup --dbname mytest --backup-dir /mybackup --leaf-partition-data --incremental --from-timestamp 20171114064330</codeblock></p>
-        <p>To restore a database with the incremental backup <codeph>20170914081205</codeph>, you
-          need the incremental backups <codeph>20120914081205</codeph> and
-            <codeph>20170714095512</codeph>, and the full backup <codeph>20170514054532</codeph>.
-          This would be the <codeph>gprestore</codeph> command.
+        <p>此命令基于全量备份<codeph>20171114064330</codeph>创建增量备份集，并与包含增量备份<codeph>20180114051246</codeph>的备份集分开。
+          <codeblock>gpbackup --dbname mytest --backup-dir /mybackup --leaf-partition-data --incremental --from-timestamp 20171114064330</codeblock></p>
+        <p>要使用增量备份<codeph>20170914081205</codeph>还原数据库，
+          需要增量备份<codeph>20120914081205</codeph>和<codeph>20170714095512</codeph>，
+          以及全量备份<codeph>20170514054532</codeph>。这将是<codeph>gprestore</codeph>命令。
           <codeblock>gprestore --backup-dir /backupdir --timestamp 20170914081205</codeblock></p>
       </section>
       <section id="gpbackup_increment">
-        <title>Creating an Incremental Backup with gpbackup</title>
-        <p>The <codeph>gpbackup</codeph> output displays the timestamp of the backup on which the
-          incremental backup is based. In this example, the incremental backup is based on the
-          backup with timestamp <codeph>20180802171642</codeph>. The backup
-            <codeph>20180802171642</codeph> can be an incremental or full backup.</p>
+        <title>使用gpbackup创建增量备份</title>
+        <p><codeph>gpbackup</codeph>输出显示增量备份所基于的备份的时间戳。
+          在此示例中，增量备份基于时间戳为<codeph>20180802171642</codeph>的备份。
+          备份<codeph>20180802171642</codeph>可以是增量备份或全量备份。
+          </p>
         <codeblock>$ <b>gpbackup --dbname test --backup-dir /backups --leaf-partition-data --incremental</b>
 20180803:15:40:51 gpbackup:gpadmin:mdw:002907-[INFO]:-Starting backup of database test
 20180803:15:40:52 gpbackup:gpadmin:mdw:002907-[INFO]:-Backup Timestamp = 20180803154051
@@ -190,13 +167,11 @@ Tables backed up:  4 / 4 [======================================================
 20180803:15:40:53 gpbackup:gpadmin:mdw:002907-[INFO]:-Backup completed successfully</codeblock>
       </section>
       <section id="gprestore_increment">
-        <title>Restoring from an Incremental Backup with gprestore</title>
-        <p>When restoring an from an incremental backup, you can specify the
-            <codeph>--verbose</codeph> option to display the backups that are used in the restore
-          operation on the command line. For example, the following <codeph>gprestore</codeph>
-          command restores a backup using the timestamp <codeph>20180807092740</codeph>, an
-          incremental backup. The output includes the backups that were used to restore the database
-          data.<codeblock>$ <b>gprestore --create-db --timestamp 20180807162904 --verbose</b>
+        <title>使用gprestore从增量备份恢复</title>
+        <p>从增量备份还原时，可以指定<codeph>--verbose</codeph>选项以在命令行上显示还原操作中使用的备份。
+          例如，以下<codeph>gprestore</codeph>命令使用时间戳<codeph>20180807092740</codeph>（增量备份）还原备份。
+          输出包括用于还原数据库数据的备份。
+          <codeblock>$ <b>gprestore --create-db --timestamp 20180807162904 --verbose</b>
 ...
 20180807:16:31:56 gprestore:gpadmin:mdw:008603-[INFO]:-Pre-data metadata restore complete
 20180807:16:31:56 gprestore:gpadmin:mdw:008603-[DEBUG]:-Verifying backup file count
@@ -216,50 +191,41 @@ Tables backed up:  4 / 4 [======================================================
 20180807:16:31:57 gprestore:gpadmin:mdw:008603-[INFO]:-Restoring post-data metadata
 20180807:16:31:57 gprestore:gpadmin:mdw:008603-[INFO]:-Post-data metadata restore complete
 ...</codeblock></p>
-        <p>The output shows that the restore operation used three backups. </p>
-        <p>When restoring an from an incremental backup, <codeph>gprestore</codeph> also lists the
-          backups that are used in the restore operation in the <codeph>gprestore</codeph> log
-          file.</p>
-        <p>During the restore operation, <codeph>gprestore</codeph> displays an error if the full
-          backup or other required incremental backup is not available. </p>
+        <p>输出显示还原操作使用了三个备份。</p>
+        <p>从增量备份还原时，<codeph>gprestore</codeph>还会在<codeph>gprestore</codeph>日志文件中列出还原操作中使用的备份。
+          </p>
+        <p>在还原操作期间，如果全量备份或其他所需的增量备份不可用，<codeph>gprestore</codeph>将显示错误。
+          </p>
       </section>
       <section id="incr_backup_notes">
-        <title>Incremental Backup Notes</title>
-        <p>To create an incremental backup, or to restore data from an incremental backup set, you
-          need the complete backup set. When you archive incremental backups, the complete backup
-          set must be archived. You must archive all the files created on the master and all
-          segments. </p>
-        <p>Each time <codeph>gpbackup</codeph> runs, the utility adds backup information to the
-          history file <codeph>gpbackup_history.yaml</codeph> in the Greenplum Database master data
-          directory. The file includes backup options and other backup information. </p>
-        <p>If you do not specify the <codeph>--from-timestamp</codeph> option when you create an
-          incremental backup, <codeph>gpbackup</codeph> uses the most recent backup with a
-          consistent set of options. The utility checks the backup history file to find the backup
-          with a consistent set of options. If the utility cannot find a backup with a consistent
-          set of options or the history file does not exist, <codeph>gpbackup</codeph> displays a
-          message stating that a full backup must be created before an incremental can be created. </p>
-        <p>If you specify the <codeph>--from-timestamp</codeph> option when you create an
-          incremental backup, <codeph>gpbackup</codeph> ensures that the options of the backup that
-          is being created are consistent with the options of the specified backup.</p>
-        <p>The <codeph>gpbackup</codeph> option <codeph>--with-stats</codeph> is not required to be
-          the same for all backups in the backup set. However, to perform a restore operation with
-          the <codeph>gprestore</codeph> option <codeph>--with-stats</codeph> to restore statistics,
-          the backup you specify must have must have used the <codeph>--with-stats</codeph> when
-          creating the backup. </p>
-        <p>You can perform a restore operation from any backup in the backup set. However, changes
-          captured in incremental backups later than the backup use to restore database data will
-          not be restored.</p>
-        <p>When restoring from an incremental backup set, <codeph>gprestore</codeph> checks the
-          backups and restores each append-optimized table from the most recent version of the
-          append-optimized table in the backup set and restores the heap tables from the latest
-          backup.</p>
-        <p>The incremental back up set, a full backup and associated incremental backups, must be on
-          a single device. For example, the backups in a backup set must all be on a file system or
-          must all be on a Data Domain system. </p>
-        <note type="warning">Changes to the Greenplum Database segment configuration invalidate
-          incremental backups. After you change the segment configuration (add or remove segment
-          instances), you must create a full backup before you can create an incremental
-          backup.</note>
+        <title>增量备份说明</title>
+        <p>要创建增量备份或从增量备份集还原数据，您需要完整的备份集。
+          存档增量备份时，必须存档完整的备份集。
+          您必须归档在master和所有segment上创建的所有文件。
+          </p>
+        <p>每次运行<codeph>gpbackup</codeph>时，该工具都会将备份信息添加到Greenplum数据库master数据目录中的历史文件<codeph>gpbackup_history.yaml</codeph>。
+          该文件包括备份选项和其他备份信息。
+          </p>
+        <p>如果在创建增量备份时未指定<codeph>--from-timestamp</codeph>选项，则<codeph>gpbackup</codeph>将使用具有一致选项集的最新备份。
+          该工具检查备份历史记录文件以查找具有一致选项集的备份。
+          如果工具找不到具有一致选项集的备份或历史文件不存在，则<codeph>gpbackup</codeph>会显示一条消息，指出必须先创建全量备份才能创建增量。
+          </p>
+        <p>如果在创建增量备份时指定<codeph>--from-timestamp</codeph>选项，则<codeph>gpbackup</codeph>可确保正在创建的备份选项与指定备份的选项一致。
+          </p>
+        <p>对于备份集中的所有备份，<codeph>gpbackup</codeph>选项<codeph>--with-stats</codeph>不需要相同。
+          但是，要使用<codeph>gprestore</codeph>选项<codeph>--with-stats</codeph>执行还原操作以还原统计信息，您指定的备份必须在创建备份时必须使用<codeph>--with-stats</codeph>。
+          </p>
+        <p>您可以从备份集中的任何备份执行还原操作。
+          但是，将不会还原在备份用于还原数据库数据之后的增量备份中捕获的更改。
+          </p>
+        <p>从增量备份集还原时，<codeph>gprestore</codeph>会检查备份并从备份集中最新版本的追加优化表中还原每个追加优化表，并从最新备份还原堆表。
+          </p>
+        <p>增量备份集，全量备份和关联的增量备份必须位于单个设备上。
+          例如，备份集中的备份必须全部位于文件系统上，或者必须全部位于Data Domain系统上。
+          </p>
+        <note type="warning">对Greenplum数据库segment配置的更改会使增量备份无效。
+          更改segment配置（添加或删除segment实例）后，必须先创建全量备份，然后才能创建增量备份。
+          </note>
       </section>
     </body>
   </topic>

@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_isj_khw_sbs">
-  <title>Using gpbackup Storage Plugins</title>
+  <title>使用gpbackup存储插件</title>
   <body>
-    <p>You can configure the Greenplum Database <xref
-        href="../../utility_guide/admin_utilities/gpbackup.xml"><codeph>gpbackup</codeph></xref> and
-        <xref href="../../utility_guide/admin_utilities/gprestore.xml"
-        ><codeph>gprestore</codeph></xref> utilities to use a storage plugin to process backup files
-      during a backup or restore operation. For example, during a backup operation, the plugin sends
-      the backup files to a remote location. During a restore operation, the plugin retrieves the
-      files from the remote location. </p>
-    <p>You can also develop a custom storage plugin with the Greenplum Database Backup/Restore
-      Storage Plugin API (Beta). See <xref href="backup-plugin-api.xml"/>.</p>
-    <note>Only the Backup/Restore Storage Plugin API is a Beta feature. The storage plugins are
-      supported features.</note>
+    <p>您可以配置Greenplum数据库<xref
+            href="../../utility_guide/admin_utilities/gpbackup.xml"><codeph>gpbackup</codeph></xref>和<xref href="../../utility_guide/admin_utilities/gprestore.xml"
+    ><codeph>gprestore</codeph></xref>工具，以使用存储插件在备份或还原操作期间处理备份文件。
+        例如，在备份操作期间，插件会将备份文件发送到远程位置。
+        在还原操作期间，插件从远程位置检索文件。
+        </p>
+    <p>您还可以使用Greenplum数据库备份/还原存储插件API（Beta）开发自定义存储插件。
+        参考<xref href="backup-plugin-api.xml"/>。</p>
+    <note>只有备份/还原存储插件API才是Beta功能。存储插件是受支持的功能。</note>
   </body>
 </topic>
