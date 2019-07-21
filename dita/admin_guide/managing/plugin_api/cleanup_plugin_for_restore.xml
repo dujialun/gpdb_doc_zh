@@ -4,77 +4,70 @@
 <topic id="topic1">
   <title id="pa137116">cleanup_plugin_for_restore</title>
   <body>
-    <p>Plugin command to clean up a storage plugin after restore.</p>
+    <p>用于在还原后清理存储插件的插件命令。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><varname>plugin_executable</varname> <b>cleanup_plugin_for_restore</b> <varname>plugin_config_file</varname> <varname>local_backup_dir</varname> <varname>scope</varname></codeblock>
       <codeblock><varname>plugin_executable</varname> <b>cleanup_plugin_for_restore</b> <varname>plugin_config_file</varname> <varname>local_backup_dir</varname> <varname>scope</varname> <varname>contentID</varname></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>gprestore</codeph> invokes the <codeph>cleanup_plugin_for_restore</codeph> plugin
-        command when a <codeph>gprestore</codeph> operation completes, both in success and failure
-        cases. The <varname>scope</varname> argument specifies the execution scope.
-          <codeph>gprestore</codeph> will invoke the command with each of the
-          <varname>scope</varname> values.</p>
-      <p>The <codeph>cleanup_plugin_for_restore</codeph> implementation should perform the actions
-        necessary to clean up the remote storage system after a restore. Clean up activities may
-        include removing remote directories or temporary files created during the restore,
-        disconnecting from the backup service, etc.</p>
+      <title>描述</title>
+      <p><codeph>gprestore</codeph>在<codeph>gprestore</codeph>操作完成时调用<codeph>cleanup_plugin_for_restore</codeph>插件命令，包括成功和失败情况。
+          <varname>scope</varname>参数指定执行范围。
+          <codeph>gprestore</codeph>将使用每个<varname>scope</varname>值调用该命令。
+        </p>
+      <p><codeph>cleanup_plugin_for_restore</codeph>实现应执行还原后清理远程存储系统所需的操作。
+          清理活动可能包括删除在还原期间创建的远程目录或临时文件，与备份服务断开连接等。
+        </p>
     </section>
-    <section id="section4"><title>Arguments</title><parml>
+    <section id="section4"><title>参数</title><parml>
         <plentry>
           <pt><varname>plugin_config_file</varname></pt>
-          <pd>The absolute path to the plugin configuration YAML file.</pd>
+          <pd>插件配置YAML文件的绝对路径。</pd>
         </plentry>
         <plentry>
           <pt><varname>local_backup_dir</varname></pt>
-          <pd>The local directory on the Greenplum Database host (master and segments) from which
-              <codeph>gprestore</codeph> reads backup files.<ul id="ul_rrs_vts_m2b">
-              <li>When <varname>scope</varname> is <codeph>master</codeph>, the
-                  <varname>local_backup_dir</varname> is the backup directory of the Greenplum
-                Database master.</li>
-              <li>When <varname>scope</varname> is <codeph>segment</codeph>, the
-                  <varname>local_backup_dir</varname> is the backup directory of a segment instance.
-                The <varname>contentID</varname> identifies the segment instance.</li>
-              <li>When the scope is <codeph>segment_host</codeph>, the
-                  <varname>local_backup_dir</varname> is an arbitrary backup directory on the
-                host.</li>
-            </ul></pd>
+          <pd>Greenplum数据库主机（master和segment）上的本地目录，<codeph>gprestore</codeph>从该目录读取备份文件。
+              <ul id="ul_rrs_vts_m2b">
+                  <li>当<varname>scope</varname>是<codeph>master</codeph>时，local_backup_dir是Greenplum数据库master服务器的备份目录。
+                  </li>
+                  <li>当<varname>scope</varname>是<codeph>segment</codeph>时，<varname>local_backup_dir</varname>是segment实例的备份目录。
+                      <varname>contentID</varname>标识segment实例。
+                  </li>
+                  <li>当<varname>scope</varname>是<codeph>segment_host</codeph>时，<varname>local_backup_dir</varname>是主机上的任意备份目录。
+                  </li>
+              </ul></pd>
         </plentry>
         <plentry>
-          <pt><varname>scope</varname></pt>
-          <pd>The execution scope value indicates the host and number of times the plugin command is
-            executed. <varname>scope</varname> can be one of these values:<ul id="ul_rpk_tzt_k2b">
-              <li><codeph>master</codeph> - Execute the plugin command once on the master host.</li>
-              <li><codeph>segment_host</codeph> - Execute the plugin command once on each of the
-                segment hosts.</li>
-              <li><codeph>segment</codeph> - Execute the plugin command once for each active segment
-                instance on the host running the segment instance. The <varname>contentID</varname>
-                identifies the segment instance.</li>
-            </ul></pd>
-          <pd>The Greenplum Database hosts and segment instances are based on the Greenplum Database
-            configuration when the back up was first initiated. </pd>
+            <pt><varname>scope</varname></pt>
+            <pd>执行<varname>scope</varname>值表示主机和插件命令的执行次数。<varname>scope</varname>可以是以下值之一：
+                <ul id="ul_rpk_tzt_k2b">
+                    <li><codeph>master</codeph> - 在master主机上执行一次插件命令。</li>
+                    <li><codeph>segment_host</codeph> - 在每个segment主机上执行一次plugin命令。</li>
+                    <li><codeph>segment</codeph> - 对运行segment实例的主机上的每个活动segment实例执行一次plugin命令。
+                        <varname>contentID</varname>标识segment实例。
+                    </li>
+                </ul></pd>
+            <pd>在首次启动备份时，Greenplum数据库master和segment实例基于Greenplum数据库配置。
+            </pd>
         </plentry>
         <plentry>
-          <pt><varname>contentID</varname></pt>
-          <pd>The contentID of the Greenplum Database master or segment instance corresponding to
-            the scope. <varname>contentID</varname> is passed only when the <varname>scope</varname>
-            is <codeph>master</codeph> or <codeph>segment</codeph>.<ul id="ul_okg_2bs_m2b">
-              <li>When <varname>scope</varname> is <codeph>master</codeph>, the
-                  <varname>contentID</varname> is <codeph>-1</codeph>.</li>
-              <li>When <varname>scope</varname> is <codeph>segment</codeph>, the
-                  <varname>contentID</varname> is the content identifier of an active segment
-                instance.</li>
-            </ul></pd>
+            <pt><varname>contentID</varname></pt>
+            <pd>与scope对应的Greenplum数据库master或segment实例的contentID。
+                仅当<varname>scope</varname>为<codeph>master</codeph>或<codeph>segment</codeph>时才传递<varname>contentID</varname>。
+                <ul id="ul_vqv_wly_m2b">
+                    <li>当<varname>scope</varname>为<codeph>master</codeph>时，<varname>contentID</varname>为<codeph>-1</codeph>。
+                    </li>
+                    <li>当<varname>scope</varname>是<codeph>segment</codeph>时，<varname>contentID</varname>是活动segment实例的内容标识符。
+                    </li>
+                </ul></pd>
         </plentry>
       </parml>
     </section>
-    <section id="section5"><title>Exit Code</title>
-      <p>The <codeph>cleanup_plugin_for_restore</codeph> command must exit with a value of 0 on
-        success, non-zero if an error occurs. In the case of a non-zero exit code,
-          <codeph>gprestore</codeph> displays the contents of <codeph>stderr</codeph> to the
-        user.</p>
+    <section id="section5"><title>退出码</title>
+        <p><codeph>cleanup_plugin_for_restore</codeph>命令必须在成功时以值0退出，如果发生错误则必须为非零。
+            在非零退出代码的情况下，<codeph>gprestore</codeph>向用户显示<codeph>stderr</codeph>的内容。
+            </p>
     </section>
   </body>
 </topic>
