@@ -4,29 +4,36 @@
 <topic id="topic1">
   <title id="pa137116">restore_data</title>
   <body>
-    <p>Plugin command to stream data from the remote storage system to <codeph>stdout</codeph>.</p>
+    <p>插件命令将数据从远程存储系统流式传输到<codeph>stdout</codeph>。
+      </p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><varname>plugin_executable</varname> <b>restore_data</b> <varname>plugin_config_file</varname> <varname>data_filenamekey</varname></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>gprestore</codeph> invokes the <codeph>restore_data</codeph> plugin command on each segment host when a restoring a streaming backup.</p>
-      <p>The <codeph>restore_data</codeph> implementation should read a potentially large data file named or mapped to <codeph>data_filenamekey</codeph> from the remote storage system and write the contents to <codeph>stdout</codeph>. If the <codeph>backup_data</codeph> command modified the data in any way (i.e. compressed), <codeph>restore_data</codeph> should perform the reverse operation.</p>
+      <title>描述</title>
+      <p>当还原流式备份时，<codeph>gprestore</codeph>会在每个segment主机上调用<codeph>restore_data</codeph>插件命令。</p>
+      <p><codeph>restore_data</codeph>实现应该从远程存储系统读取一个名为或映射到<codeph>data_filenamekey</codeph>的潜在大型数据文件，并将内容写入<codeph>stdout</codeph>。
+        如果<codeph>backup_data</codeph>命令以任何方式（即压缩）修改了数据，则<codeph>restore_data</codeph>应执行撤销操作。
+        </p>
     </section>
-    <section id="section4"><title>Arguments</title><parml>
+    <section id="section4"><title>参数</title><parml>
         <plentry>
           <pt><varname>plugin_config_file</varname></pt>
-          <pd>The absolute path to the plugin configuration YAML file.</pd>
+          <pd>插件配置YAML文件的绝对路径。</pd>
         </plentry>
         <plentry>
           <pt><varname>data_filenamekey</varname></pt>
-          <pd>The mapping key to a backup file on the remote storage system. <varname>data_filenamekey</varname> is the same key provided to the <codeph>backup_data</codeph> command.</pd>
+          <pd>远程存储系统上备份文件的映射关键字。
+            <varname>data_filenamekey</varname>与<codeph>backup_data</codeph>命令提供的密钥相同。
+            </pd>
         </plentry>
         </parml>
     </section>
-    <section id="section5"><title>Exit Code</title>
-      <p>The <codeph>restore_data</codeph> command must exit with a value of 0 on success, non-zero if an error occurs. In the case of a non-zero exit code, <codeph>gprestore</codeph> displays the contents of <codeph>stderr</codeph> to the user.</p>
+    <section id="section5"><title>返回值</title>
+      <p><codeph>restore_data</codeph>命令必须在成功时以值0退出，如果发生错误则必须为非零。
+        在非零退出代码的情况下，<codeph>gprestore</codeph>向用户显示<codeph>stderr</codeph>的内容。
+        </p>
     </section>
   </body>
 </topic>

@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_j1d_4qz_rz">
-  <title>Configuring Kerberos for Linux Clients</title>
-  <shortdesc>You can configure Linux client applications to connect to a Greenplum Database system
-    that is configured to authenticate with Kerberos.</shortdesc>
+  <title>为Linux客户端进行Kerberos配置</title>
+  <shortdesc>您可以配置Linux client客户端应用来连接一个已配置Kerberos认证的Greenplum数据库系统。</shortdesc>
   <body>
-    <p>If your JDBC application on Red Hat Enterprise Linux uses Kerberos authentication when it
-      connects to your Greenplum Database, your client system must be configured to use Kerberos
-      authentication. If you are not using Kerberos authentication to connect to a Greenplum
-      Database, Kerberos is not needed on your client system.</p>
+    <p>如果在Red Hat Enterprise Linux，JDBC连接Greenplum数据库时，使用Kerberos认证。
+      在客户端系统必须被配置为使用Kerberos认证。
+      如果不使用Kerberos认证连接Greenplum数据库，在客户端系统中不需要Kerberos。</p>
     <ul id="ul_nmz_1rz_rz">
       <li id="kd158375">
         <xref href="#topic13" type="topic" format="dita"/>
@@ -20,15 +18,15 @@
         <xref href="#topic18" type="topic" format="dita"/>
       </li>
     </ul>
-    <p>For information about enabling Kerberos authentication with Greenplum Database, see the
-      chapter "Setting Up Kerberos Authentication" in the <i>Greenplum Database Administrator
-        Guide</i>. </p>
+    <p>
+      有关在Greenplum数据库中启用Kerberos认证的信息，参阅<i>Greenplum数据库管理员指南</i>中的“使用Kerberos认证”部分。
+    </p>
   </body>
   <topic id="topic13" xml:lang="en">
-    <title id="kd158392">Requirements</title>
+    <title id="kd158392">要求</title>
     <body>
-      <p>The following are requirements to connect to a Greenplum Database that is enabled with
-        Kerberos authentication from a client system with a JDBC application.</p>
+      <p>
+      如下是从客户端系统使用JDBC应用连接到已启用Kerberos认证的Greenplum数据库的要求。</p>
       <ul id="ul_hrb_crz_rz">
         <li id="kd158400">
           <xref href="#topic14" type="topic" format="dita"/>
@@ -39,106 +37,89 @@
       </ul>
     </body>
     <topic id="topic14" xml:lang="en">
-      <title id="kd158410">Prerequisites</title>
+      <title id="kd158410">先决条件</title>
       <body>
         <ul id="ul_irb_crz_rz">
-          <li id="kd158414">Kerberos must be installed and configured on the Greenplum Database
-            master host. <note type="important">Greenplum Database must be configured so that a
-              remote user can connect to Greenplum Database with Kerberos authentication.
-              Authorization to access Greenplum Database is controlled by the
-                <codeph>pg_hba.conf</codeph> file. For details, see "Editing the pg_hba.conf File"
-              in the <i>Greenplum Database Administration Guide</i>, and also see the <i>Greenplum
-                Database Security Configuration Guide</i>.</note></li>
+          <li id="kd158414">在Greenplum数据库master主机上必须安装并配置好Kerberos。
+          <note type="important">Greenplum数据库必须被配置完毕，这样远程用户才能使用Kerberos认证连接到Greenplum数据库。
+              授权访问Greenplum Database数据库，通过<codeph>pg_hba.conf</codeph>文件控制。
+              关于细节，参阅<i>Greenplum数据库管理员指南</i>中的“编辑pg_hba.conf文件”部分。</note></li>
           <li id="kd158429">The client system requires the Kerberos configuration file
               <codeph>krb5.conf</codeph> from the Greenplum Database master. </li>
-          <li id="kd158433">The client system requires a Kerberos keytab file that contains the
-            authentication credentials for the Greenplum Database user that is used to log into the
-            database. </li>
-          <li id="kd158440">The client machine must be able to connect to Greenplum Database master
-            host. <p>If necessary, add the Greenplum Database master host name and IP address to the
-              system <codeph>hosts</codeph> file. On Linux systems, the <codeph>hosts</codeph> file
-              is in <codeph>/etc</codeph>.</p></li>
+          <li id="kd158433">客户端系统从Greenplum数据库的Master请求Kerberos配置文件krb5.conf。
+          客户端系统需要Kerberos密钥表文件，该文件包含用于登录数据库的Greenplum数据库用户的身份认证凭据。</li>
+          <li id="kd158440">客户端机器必须能够连接到Greenplum数据库master主机。
+          <p>如有必要，将Greenplum数据库master主机名和IP地址添加到系统的<codeph>hosts</codeph>文件。
+			  在Linux系统上，<codeph>hosts</codeph> 文件在<codeph>/etc</codeph>目录下。</p></li>
         </ul>
       </body>
     </topic>
     <topic id="topic15" xml:lang="en">
-      <title id="kd158447">Required Software on the Client Machine</title>
+      <title id="kd158447">客户端机器上的必需软件</title>
       <body>
         <ul id="ul_jrb_crz_rz">
-          <li id="kd158448">The Kerberos <codeph>kinit</codeph> utility is required on the client
-            machine. The <codeph>kinit</codeph> utility is available when you install the Kerberos
-            packages: <p>
+          <li id="kd158448">在客户端机器上需要Kerberos的<codeph>kinit</codeph>工具。
+            该<codeph>kinit</codeph>在安装安装Kerberos软件包时即可获得：<p>
               <ul id="ul_qkg_zhr_l4">
                 <li>krb5-libs</li>
                 <li>krb5-workstation</li>
               </ul>
-              <note>When you install the Kerberos packages, you can use other Kerberos utilities
-                such as <codeph>klist</codeph> to display Kerberos ticket information. </note>
+              <note>安装Kerberos软件包时，可以使用其他Kerberos的<codeph>klist</codeph>工具显示Kerberos票证信息。</note>
             </p></li>
         </ul>
-        <p>Java applications require this additional software:<ul id="ul_w5p_pxj_h1b">
-            <li id="kd158450">Java JDK <p>Java JDK 1.7.0_17 is supported on Red Hat Enterprise Linux
-                6.x. </p></li>
-            <li id="kd158455">Ensure that JAVA_HOME is set to the installation directory of the
-              supported Java JDK. </li>
+        <p>Java应用程序需要如下额外软件：<ul id="ul_w5p_pxj_h1b">
+            <li id="kd158450">Java JDK <p>Red Hat Enterprise Linux 6.x支持Java JDK 1.7.0_17。</p></li>
+            <li id="kd158455">确保将JAVA_HOME设置为Java JDK支持的安装目录。</li>
           </ul></p>
       </body>
     </topic>
   </topic>
   <topic id="topic17" xml:lang="en">
-    <title id="kd158460">Setting Up Client System with Kerberos Authentication</title>
+    <title id="kd158460">设置客户端系统使用Kerberos身份认证</title>
     <body>
-      <p>To connect to Greenplum Database with Kerberos authentication requires a Kerberos ticket.
-        On client systems, tickets are generated from Kerberos keytab files with the
-          <codeph>kinit</codeph> utility and are stored in a cache file.</p>
+      <p>要使用Kerberos身份认证连接到Greenplum数据库，需要Kerberos票证。
+        在客户端系统上，使用<codeph>kinit</codeph>工具生成Kerberos的密钥表文件生成票证并存储在缓存文件中。</p>
       <ol id="ol_lrb_crz_rz">
-        <li id="kd158467">Install a copy of the Kerberos configuration file
-            <codeph>krb5.conf</codeph> from the Greenplum Database master. The file is used by the
-          Greenplum Database client software and the Kerberos utilities. <p>Install
-              <codeph>krb5.conf</codeph> in the directory <codeph>/etc</codeph>. </p><p>If needed,
-            add the parameter <codeph>default_ccache_name</codeph> to the
-              <codeph>[libdefaults]</codeph> section of the <codeph>krb5.ini</codeph> file and
-            specify location of the Kerberos ticket cache file on the client system. </p></li>
-        <li id="kd158474">Obtain a Kerberos keytab file that contains the authentication credentials
-          for the Greenplum Database user. </li>
-        <li id="kd158478">Run <codeph>kinit</codeph> specifying the keytab file to create a ticket
-          on the client machine. For this example, the keytab file
-            <codeph>gpdb-kerberos.keytab</codeph> is in the the current directory. The ticket cache
-          file is in the <codeph>gpadmin</codeph> user home directory.
+        <li id="kd158467">
+            安装Greenplum数据库maste主机中Kerberos配置文件<codeph>krb5.conf</codeph>的副本。
+            该文件可用于Greenplum数据库客户端软件和Kerberos实用程序。
+            <p>安装<codeph>krb5.conf</codeph>文件到<codeph>/etc</codeph>目录。</p>
+            <p>如果需要，增加<codeph>default_ccache_name</codeph>参数到<codeph>krb5.ini</codeph>文件的
+              <codeph>[libdefaults]</codeph>部分，用于指定Kerberos票据缓存文件在客户端系统中位置。</p></li>
+        <li id="kd158474">获取包含Greenplum数据库用户的身份认证凭据的Kerberos密钥表文件。</li>
+        <li id="kd158478">运行<codeph>kinit</codeph>指定密钥表文件在客户端计算机上创建票证。
+            对于此示例，密钥表文件<codeph>gpdb-kerberos.keytab</codeph>在当前目录中。
+            票证缓存文件位于<codeph>gpadmin</codeph>用户家目录。
           <codeblock>&gt; kinit -k -t gpdb-kerberos.keytab -c /home/gpadmin/cache.txt 
    gpadmin/kerberos-gpdb@KRB.EXAMPLE.COM</codeblock></li>
       </ol>
     </body>
   </topic>
   <topic id="topic12" xml:lang="en">
-    <title id="mh151086">Running psql </title>
+    <title id="mh151086">运行psql </title>
     <body>
-      <p>From a remote system, you can access a Greenplum Database that has Kerberos authentication
-        enabled. </p>
+      <p>您可以远程系统访问启用了Kerberos身份认证的Greenplum数据库。</p>
       <section id="mh151095">
-        <title>To connect to Greenplum Database with psql</title>
+        <title>使用psql连接到Greenplum数据库</title>
         <ol id="ol_xzc_lxj_h1b">
-          <li id="mh151096">As the gpadmin user, open a command window. </li>
-          <li id="mh151099">Start <codeph>psql</codeph> from the command window and specify a
-            connection to the Greenplum Database specifying the user that is configured with
-            Kerberos authentication.<p>The following example logs into the Greenplum Database on the
-              machine <codeph>kerberos-gpdb</codeph> as the <codeph>gpadmin</codeph> user with the
-              Kerberos credentials
-            <codeph>gpadmin/kerberos-gpdb</codeph>:</p><codeblock>$ psql -U "gpadmin/kerberos-gpdb" -h kerberos-gpdb postgres</codeblock></li>
+          <li id="mh151096">作为gpadmin用户打开命令窗口。</li>
+          <li id="mh151099">从命令窗口启动<codeph>psql</codeph>，指定与Greenplum数据库的连接，使用Kerberos身份验证配置的用户。
+          <p>
+            例如，使用Kerberos主体<codeph>gpadmin/kerberos-gpdb</codeph>，以<codeph>gpadmin</codeph>用户身份，
+            登录到计算机上的Greenplum数据库：</p>
+            <codeblock>$ psql -U "gpadmin/kerberos-gpdb" -h kerberos-gpdb postgres</codeblock></li>
         </ol>
       </section>
     </body>
   </topic>
   <topic id="topic18" xml:lang="en">
-    <title id="kd158481">Running a Java Application </title>
+    <title id="kd158481">运行Java应用程序 </title>
     <body>
-      <p>Accessing Greenplum Database from a Java application with Kerberos authentication uses the
-        Java Authentication and Authorization Service (JAAS) </p>
+      <p>使用Java身份验证和授权服务（JAAS），通过Java应用程序访问已启用Kerberos身份验证的Greenplum数据库。</p>
       <ol id="ol_mrb_crz_rz">
-        <li id="kd158486">Create the file <codeph>.java.login.config</codeph> in the user home
-          folder. <p>For example, on a Linux system, the home folder is similar to
-              <codeph>/home/gpadmin</codeph>. </p><p>Add the following text to the
-          file:</p><codeblock>pgjdbc {
+        <li id="kd158486">在用户家目录创建<codeph>.java.login.config</codeph>文件控制。
+          <p>例如，在Linux系统，家目录类似于<codeph>/home/gpadmin</codeph>。</p>
+          <p>添加如下内容到文件中：</p><codeblock>pgjdbc {
   com.sun.security.auth.module.Krb5LoginModule required
   doNotPrompt=true
   useTicketCache=true
@@ -146,16 +127,16 @@
   debug=true
   client=true;
 };</codeblock></li>
-        <li id="kd158493">Create a Java application that connects to Greenplum Database using
-          Kerberos authentication and run the application as the user. </li>
+        <li id="kd158493">
+        创建Java应用程序连接到已启用Kerberos身份验证的Greenplum数据库的，并以用户身份运行应用程序。</li>
       </ol>
-      <p>This example database connection URL uses a PostgreSQL JDBC driver and specifies parameters
-        for Kerberos authentication.</p>
+      <p>
+      此示例数据库连接URL使用PostgreSQL的JDBC驱动程序并指定Kerberos身份验证的参数。
+      </p>
       <codeblock>jdbc:postgresql://kerberos-gpdb:5432/mytest? 
   kerberosServerName=postgres&amp;jaasApplicationName=pgjdbc&amp; 
   user=gpadmin/kerberos-gpdb</codeblock>
-      <p>The parameter names and values specified depend on how the Java application performs
-        Kerberos authentication.</p>
+      <p>指定的参数名称和值取决于Java应用程序如何执行Kerberos身份验证。</p>
     </body>
   </topic>
 </topic>

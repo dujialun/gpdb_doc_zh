@@ -2,12 +2,11 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="nq173529">Managing Greenplum Database Access</title>
-  <shortdesc>Securing Greenplum Database includes protecting access to the database through network
-    configuration, database user authentication, and encryption. </shortdesc>
+  <title id="nq173529">管理Greenplum数据库访问</title>
+  <shortdesc>保护Greenplum数据库，包括通过网络配置、数据库用户身份验证、加密来保护对数据库的访问。 </shortdesc>
   <body>
     <section otherprops="op-print">
-      <p>This section contains the following topics:<ul id="ul_xwm_y4q_lp" otherprops="op-print">
+      <p>此章节包含如下主题:<ul id="ul_xwm_y4q_lp" otherprops="op-print">
           <li><xref href="client_auth.xml#topic1"/><ul id="ul_myv_zwj_3w">
               <li><xref href="ldap.xml#topic_z4g_32q_54"/></li>
               <li><xref href="kerberos.xml#topic1"/></li>

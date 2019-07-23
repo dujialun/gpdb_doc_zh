@@ -2,30 +2,20 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title>Expanding a Greenplum System</title>
-  <shortdesc>To scale up performance and storage capacity, expand your Greenplum Database system by
-    adding hosts to the system.</shortdesc>
+  <title>扩容Greenplum系统</title>
+  <shortdesc>为了放大性能和存储能力，通过向集群增加主机来扩容用户的Greenplum系统。</shortdesc>
   <body>
-    <p>Data warehouses typically grow over time as additional data is gathered and the retention
-      periods increase for existing data. At times, it is necessary to increase database capacity to
-      consolidate different data warehouses into a single database. Additional computing capacity
-      (CPU) may also be needed to accommodate newly added analytics projects. Although it is wise to
-      provide capacity for growth when a system is initially specified, it is not generally possible
-      to invest in resources long before they are required. Therefore, you should expect to execute
-      a database expansion project periodically. </p>
-    <p>Because of the Greenplum MPP architecture, when you add resources to the system, the capacity
-      and performance are the same as if the system had been originally implemented with the added
-      resources. Unlike data warehouse systems that require substantial downtime in order to dump
-      and restore the data, expanding a Greenplum Database system is a phased process with minimal
-      downtime. Regular and ad hoc workloads can continue while data is redistributed and
-      transactional consistency is maintained. The administrator can schedule the distribution
-      activity to fit into ongoing operations and can pause and resume as needed. Tables can be
-      ranked so that datasets are redistributed in a prioritized sequence, either to ensure that
-      critical workloads benefit from the expanded capacity sooner, or to free disk space needed to
-      redistribute very large tables.</p>
-    <p>The expansion process uses standard Greenplum Database operations so it is transparent and
-      easy for administrators to troubleshoot. Segment mirroring and any replication mechanisms in
-      place remain active, so fault-tolerance is uncompromised and disaster recovery measures remain
-      effective. </p>
+    <p>随着额外的数据被收集以及现有数据的保留时间增加，数据仓库会随着时间而长大。
+      有时，有必要增加数据库能力来联合不同的数据仓库到一个数据库中。
+      也可能需要额外的计算能力（CPU）来适应新增加的分析项目。
+      尽管在系统被初始定义时就留出增长的空间是最为明智的，但是通常不太可能在提前太多在资源上投资。
+      因此，用户应该寄望于定期地执行一次数据库扩容项目。</p>
+    <p>由于Greenplum的MPP架构，在用户增加资源到系统时，得到的容量和性能就好像该系统一开始就用增加后的资源实现一样。
+      和要求大量停机时间来转储和恢复数据的数据仓库系统不同，扩容一个Greenplum数据库系统是一种最小化停机时间的分阶段处理。
+      在数据被重新分布时，常规和特别负载可以继续并且事务一致性也能被维护。
+      管理员可以安排分布活动以适合正在进行的操作并且可以按需暂停和继续。
+      表可以被排名，这样数据集可以以一种优先序列的方式被重新分布，从而确保关键性的负载能很快从扩容后的能力受益，或者释放所需的磁盘空间来重新分布非常大的表。</p>
+    <p>扩容处理使用标准的Greenplum数据库操作，因此它是透明的并且管理员易于排查错误。
+      Segment镜像和任何复制机制就地保持活动，因此容错性没有打折扣并且灾难恢复措施也保持有效。</p>
   </body>
 </topic>
