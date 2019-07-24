@@ -24,7 +24,7 @@
 	- Defining Database Objects （完成：杜佳伦）
 	- Distribution and Skew （完成：杜佳伦）
 	- Inserting, Updating, and Deleting Data （完成：段旻）
-	- Querying Data （待认领）
+	- Querying Data （朱丽云）
 	- 使用外部数据 （完成：杜佳伦）
 	- Loading and Unloading Data （翻译中：武宁，进度：23/49）
 	- Managing Performance （翻译中：钱晨，进度：2/7）
