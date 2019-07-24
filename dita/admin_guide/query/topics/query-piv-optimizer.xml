@@ -2,13 +2,12 @@
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
  
 <topic id="topic_i4y_prl_vp">
-  <title>About GPORCA</title>
+  <title>关于GPORCA</title>
   <abstract>
-    <shortdesc>In Greenplum Database, the default GPORCA optmizer co-exists with the Postgres query
-      optimizer. </shortdesc>
+    <shortdesc>在Greenplum数据库中，默认的GPORCA优化器与传统查询优化器共存。</shortdesc>
   </abstract>
   <body>
-    <p>These sections describe GPORCA functionality and usage:<ul
+    <p>这些小节描述GPORCA的功能和用法<ul
         id="ul_zjl_3c3_kr" otherprops="op-print">
         <li><xref href="query-piv-opt-overview.xml"/></li>
         <li><xref href="query-piv-opt-enable.xml"/></li>
