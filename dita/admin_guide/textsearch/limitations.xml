@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="limitations">
-  <title>Limitations</title>
-  <shortdesc>This topic lists limitations and maximums for Greenplum Database full text search
-    objects.</shortdesc>
+  <title>限制</title>
+  <shortdesc>本主题列出了Greenplum数据库全文搜索对象的限制和最大值。
+      </shortdesc>
   <body>
-    <p>The current limitations of Greenplum Database's text search features are:</p>
+    <p>Greenplum数据库的文本搜索功能目前的局限性是：</p>
     <ul id="ul_qjs_s41_lfb">
-      <li>The <codeph>tsvector</codeph> and <codeph>tsquery</codeph> types are not supported in the
-        distribution key for a Greenplum Database table</li>
-      <li>The length of each lexeme must be less than 2K bytes</li>
-      <li>The length of a <codeph>tsvector</codeph> (lexemes + positions) must be less than 1
-        megabyte</li>
-      <li>The number of lexemes must be less than 2<sup>64</sup></li>
-      <li>Position values in <codeph>tsvector</codeph> must be greater than 0 and no more than
-        16,383</li>
-      <li>No more than 256 positions per lexeme</li>
-      <li>The number of nodes (lexemes + operators) in a tsquery must be less than 32,768</li>
+      <li>Greenplum数据库表的分发键不支持<codeph>tsvector</codeph>和<codeph>tsquery</codeph>类型
+        </li>
+      <li>每个词位的长度必须小于2K字节</li>
+      <li><codeph>tsvector</codeph>的长度（词位 + 位置）必须小于1M
+        </li>
+      <li>词位数必须小于2<sup>64</sup></li>
+      <li><codeph>tsvector</codeph>中的位置值必须大于0且不大于16,383
+        </li>
+      <li>每个词位不超过256个位置</li>
+      <li>tsquery中的节点数（词位 + 运算符）必须小于32,768</li>
     </ul>
-    <p>For comparison, the PostgreSQL 8.1 documentation contained 10,441 unique words, a total of
-      335,420 words, and the most frequent word "postgresql" was mentioned 6,127 times in 655
-      documents.</p>
-    <p>Another example — the PostgreSQL mailing list archives contained 910,989 unique words with
-      57,491,343 lexemes in 461,020 messages.</p>
+    <p>为了比较，PostgreSQL 8.1文档包含10,441个不同单词，总共335,420个单词，最常用的单词“postgresql”在655个文档中被提及6,127次。
+        </p>
+    <p>另一个例子 -  PostgreSQL邮件列表存档包含910,989个不同单词，其中包含57,491,343个词位，共461,020条消息。
+        </p>
   </body>
 </topic>
