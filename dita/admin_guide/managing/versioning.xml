@@ -2,28 +2,21 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="kg1382433">About the Greenplum Database Release Version Number</title>
-  <shortdesc>Greenplum Database version numbers and they way they change identify
-    what has been modified from one Greenplum Database release to the next.</shortdesc>
+  <title id="kg1382433">关于Greenplum数据库发布版本号</title>
+  <shortdesc>Greenplum的版本号和其组织方式的改变，界定了从一个版本到下一个版本做了那些修改。</shortdesc>
   <body>
-    <p>A Greenplum Database release version number takes the format
-      <varname>x.y.z</varname>, where:
+    <p>Greenplum数据库的发布版本号采用格式<varname>x.y.z</varname>，含义分别为:
       <ul>
-        <li><varname>x</varname> identifies the Major version number</li>
-        <li><varname>y</varname> identifies the Minor version number</li>
-        <li><varname>z</varname> identifies the Patch version number</li>
+        <li><varname>x</varname>表明主版本号</li>
+        <li><varname>y</varname>表明小版本号</li>
+        <li><varname>z</varname>表明补丁版本号</li>
       </ul>
     </p>
-    <p>Greenplum Database releases that have the same Major release number are 
-      guaranteed to be backwards compatible. Greenplum Database increments the
-      Major release number when the catalog changes or when incompatible feature
-      changes or new features are introduced. Previously deprecated functionality
-      may be removed in a major release.</p>
-    <p>The Minor release number for a given Major release increments when 
-      backwards compatible new features are introduced or when a Greenplum Database
-      feature is deprecated. (Previously deprecated functionality will never be
-      removed in a minor release.)</p>
-    <p>Greenplum Database increments the Patch release number for a given Minor
-      release for backwards-compatible bug fixes.</p>
+    <p>具有相同主版本号的Greenplum数据库保证在该版本下具有向后兼容性。 当Greenplum数据库的
+      元数据目录修改或不适配的特性改变出现或新特性被引入时，才会增加主版本号。之前版本中被注释
+      掉的功能在新的主版本发布时可能被移除。</p>
+    <p>当向后兼容的新特性被引入或曾经的特性被注释时，会在某一主版本的基础上增加小版本号。
+      （之前注释的功能不会在该小版本中被移除）</p>
+    <p>当出现向后兼容的问题修复时，Greenplum数据库会在某一小版本号的基础上增加补丁版本号。</p>
   </body>
 </topic>

@@ -2,57 +2,44 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic4">
-    <title>Overview of Master Mirroring</title>
+    <title>Master镜像概述</title>
     <body>
-        <p>You can deploy a backup or mirror of the master instance on a separate host machine. The
-            backup master instance, called the <i>standby master</i>, serves as a warm standby if
-            the primary master becomes nonoperational. You create a standby master from the primary
-            master while the primary is online. </p>
-        <p>When you enable master mirroring for an existing system, the primary master continues to
-            provide service to users while a snapshot of the primary master instance is taken. While
-            the snapshot is taken and deployed on the standby master, changes to the primary master
-            are also recorded. After the snapshot has been deployed on the standby master, the
-            standby master is synchronized and kept current using Write-Ahead Logging (WAL)-based
-            streaming replication. Greenplum Database WAL replication uses the
-                <codeph>walsender</codeph> and <codeph>walreceiver</codeph> replication processes.
-            The <codeph>walsender</codeph> process is a primary master process. The
-                <codeph>walreceiver</codeph> is a standby master process. </p>
+        <p>可以在单独的主机或者同一台主机上部署Master实例的一个备份或者镜像。当主Master变得无法使用时，备份
+            Master或者后备Master会作为一个温备提供服务。可在主Master在线时从中创建一个后备Master。</p>
+        <p>在取一个主Master实例的事务快照时，主Master会继续为用户提供服务。在取事务快照以及在后备Master上部署
+            事务快照时，对主Master的更改也会被记录。在该快照被部署在后备Master上之后，那些更新会被部署以同步后备
+            Master和主Master。当镜像Master快照部署完成后，变化会应用，二者之间会通过基于WAL日志的流复制的方式
+            保持同步。Greenplum WAL复制通过<codeph>walsender</codeph>和<codeph>walreceiver</codeph>
+            复制进程保持同步。<codeph>walsender</codeph>是主master的进程。<codeph>walreceiver</codeph>
+            是standby master的进程。</p>
         <fig id="ki155262">
-            <title>Master Mirroring in Greenplum Database</title>
+            <title>Greenplum数据库中的Master镜像</title>
             <image href="../../graphics/standby_master.jpg" placement="break" width="271px"
                 height="165px" id="image_xrf_qpw_2fb"/>
         </fig>
-        <p>Since the master does not house user data, only system catalog tables are synchronized
-            between the primary and standby masters. When these tables are updated, the replication
-            logs that capture the changes are streamed to the standby master to keep it current with
-            the primary. During WAL replication, all database modifications are written to
-            replication logs before being applied, to ensure data integrity for any in-process
-            operations. </p>
-        <p>This is how Greenplum Database handles a master failure. <ul id="ul_lf2_br4_3fb">
-                <li>If the primary master fails, the Greenplum Database system shuts down and the
-                    master replication process stops. The administrator runs the
-                        <codeph>gpactivatestandby</codeph> utility to have the standby master take
-                    over as the new primary master. Upon activation of the standby master, the
-                    replicated logs reconstruct the state of the primary master at the time of the
-                    last successfully committed transaction. The activated standby master then
-                    functions as the Greenplum Database master, accepting connections on the port
-                    specified when standby master was initialized. See <xref
-                        href="g-recovering-a-failed-master.xml#topic16"/>.</li>
-                <li>If the standby master fails or becomes inaccessible while the primary master is
-                    active, the primary master tracks database changes in logs that are applied to
-                    the standby master when it is recovered.</li>
+        <p>由于Master不保存用户数据，只有系统目录表被在主Master和后备Master之间同步。当这些表被更新时，复制日志
+            会捕获变化并流向standby master以保持与其主master的同步。WAL复制期间，所有的数据库更改在应用之前都
+            会写入复制日志，以保证任何正在进行的操作的数据完整性。</p>
+        <p>以下是Greenplum数据库如何处理Master故障 <ul id="ul_lf2_br4_3fb">
+                <li>如果主master故障，Greenplum数据库系统关闭，master复制进程停止。管理员运行
+                   <codeph>gpactivatestandby</codeph>命令将standby master提升为主master。
+                    随着standby master提升为主，复制日志会重建主master最后成功提交的事务的相关日志。
+                    活动standby master接下来会完全成为Greenplum数据库的master，以standby master初始化
+                    时定义的端口号接受外部连接。详情请见<xref
+                        href="g-recovering-a-failed-master.xml#topic16"/>。</li>
+                <li>如果在主master可用时，standby master故障或不可访问。主master会将数据库变化写入追踪日志，
+                    然后等待standby master恢复后应用到其上面。</li>
             </ul></p>
-        <p>These Greenplum Database system catalog tables contain mirroring and replication
-            information. <ul id="ul_tfw_btw_2fb">
-                <li>The catalog table <codeph><xref
+        <p>以下这些Greenplum系统表包含镜像和复制相关信息。<ul id="ul_tfw_btw_2fb">
+                <li>系统表<codeph><xref
                             href="../../../ref_guide/system_catalogs/gp_segment_configuration.xml#topic1"
-                        /></codeph> contains the current configuration and state of primary and
-                    mirror segment instances and the master and standby master instance.</li>
-                <li>The catalog view <codeph><xref
+                        /></codeph>包含主segment、镜像segment、主master和standby master实例的当前配置
+                    及状态信息。</li>
+                <li>系统视图<codeph><xref
                             href="../../../ref_guide/system_catalogs/gp_stat_replication.xml#topic1"
-                        /></codeph> contains replication statistics of the
-                        <codeph>walsender</codeph> processes that are used for Greenplum Database
-                    master and segment mirroring.</li>
+                /></codeph>包含Greenplum数据库master和segment镜像用到的<codeph>walsender</codeph>
+                    进程的复制统计信息。
+                    </li>
             </ul></p>
     </body>
 </topic>

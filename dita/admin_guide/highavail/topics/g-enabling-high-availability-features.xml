@@ -2,20 +2,15 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-   <title>Enabling High Availability and Data Consistency Features</title>
+   <title>启用高可用和数据持久化特征</title>
    <abstract>
-      <shortdesc>The fault tolerance and the high-availability features of Greenplum Database can be
-         configured.</shortdesc>
+      <shortdesc>Greenplum数据库的容错和高可用特征可以通过配置启用</shortdesc>
    </abstract>
    <body>
-      <note type="important"> When data loss is not acceptable for a <ph otherprops="pivotal"
-            >Pivotal </ph>Greenplum Database cluster, master and segment mirroring must be
-            enabled<ph otherprops="pivotal"> in order for the cluster to be supported by
-            Pivotal</ph>. Without mirroring, system and data availability is not guaranteed<ph
-            otherprops="pivotal">, Pivotal will make best efforts to restore a cluster in this
-            case</ph>. For information about master and segment mirroring, see <xref
-            href="../../intro/about_ha.xml#about_ha">About Redundancy and Failover</xref>.</note>
-      <p>For information about the utilities that are used to enable high availability, see the
-            <i>Greenplum Database Utility Guide</i>. </p>
+      <note type="important">当<ph otherprops="pivotal">Pivotal </ph>Greenplum数据库
+         集群不允许数据丢失时，master和segment镜像功能必须启用。没有镜像就不能保证系统和数据的
+         高可用，此时Pivotal会尽最大的努力恢复故障集群。master和segment镜像详情，请见<xref
+            href="../../intro/about_ha.xml#about_ha">关于冗余和故障转移</xref>。</note>
+      <p>关于启用高可用的工具详情，请见<i>Greenplum数据库工具指南</i>。</p>
    </body>
 </topic>

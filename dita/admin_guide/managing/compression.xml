@@ -1,36 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="in198679">Enabling Compression</title>
-  <abstract><shortdesc>You can configure Greenplum Database to use data compression with some
-      database features and with some utilities. </shortdesc>Compression reduces disk usage and
-    improves I/O across the system, however, it adds some performance overhead when compressing and
-    decompressing data. </abstract>
+  <title id="in198679">启用压缩</title>
+  <abstract><shortdesc>可以利用Greenplum数据库自身的特性或工具来配置启用数据压缩。</shortdesc>
+    压缩能减少磁盘空间使用并提高系统访问的I/O，但是在压缩和解压缩数据时会带来一些额外的负载。</abstract>
   <body>
-    <p>You can configure support for data compression with these features and utilities. See the
-      specific feature or utility for information about support for compression.<ul
+    <p>可以采用一下特性或工具来让Greenplum数据库支持数据压缩，具体见以下特定文档。<ul
         id="ul_a4l_h3c_sgb">
-        <li>Append-optimized tables support compressing table data. See <codeph><xref
+        <li>追加优化表支持压缩表数据，请见<codeph><xref
               href="../../ref_guide/sql_commands/CREATE_TABLE.xml" format="dita"/></codeph>.</li>
-        <li>User-defined data types can be defined to compress data. See <codeph><xref
+        <li>采用用户自定义数据类型来压缩数据，请见<codeph><xref
               href="../../ref_guide/sql_commands/CREATE_TYPE.xml" format="dita"/></codeph>.</li>
-        <li>The external table protocols <codeph><xref
+        <li>通过外部表协议<codeph><xref
               href="../../admin_guide/external/g-gpfdist-protocol.xml" format="dita"
             >gpfdist</xref></codeph>
           <codeph>(<xref href="../../admin_guide/external/g-gpfdists-protocol.xml" format="dita"
               >gpfdists</xref></codeph>), <codeph><xref
               href="../../admin_guide/external/g-s3-protocol.xml" format="dita">s3</xref></codeph>,
           and <codeph><xref href="../../admin_guide/external/pxf-overview.xml" format="dita"
-              >pxf</xref></codeph> support compression when accessing external data. For information
-          about external tables, see <codeph><xref
+              >pxf</xref></codeph> 访问外部数据时支持压缩。请见<codeph><xref
               href="../../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.xml" format="dita"
           /></codeph>.</li>
-        <li>Workfiles (temporary spill files that are created when executing a query that requires
-          more memory than it is allocated) can be compressed. See the server configuration
-          parameter <codeph><xref
+        <li>Workfiles (查询所用内存超出系统分配内存时临时溢出的文件) 压缩。请见服务器配置参数<codeph><xref
               href="../../ref_guide/config_params/guc-list.xml#gp_workfile_compression"
               format="dita"/></codeph>. </li>
-        <li>The Greenplum Database utilities <codeph><xref
+        <li>Greenplum数据库工具<codeph><xref
               href="../../utility_guide/admin_utilities/gpbackup.xml" format="dita"/></codeph>,
               <codeph><xref href="../../utility_guide/admin_utilities/gprestore.xml" format="dita"
             /></codeph>,<ph otherprops="pivotal">
@@ -39,12 +33,10 @@
           <codeph><xref href="../../utility_guide/admin_utilities/gpload.xml" format="dita"
             /></codeph>, and <codeph><xref
               href="../../utility_guide/admin_utilities/gplogfilter.xml" format="dita"/></codeph>
-          support compression.</li>
+          支持压缩</li>
       </ul></p>
-    <p>For some compression algorithms (such as zlib) Greenplum Database requires software packages
-      installed on the host system.<ph otherprops="pivotal"> For information about required software
-        packages, see the <cite>Greenplum Database Installation Guide</cite></ph>.<ph
-        otherprops="oss-only"> The support of some compression algorithms (such as zstd) depends on
-        the configuration options specified when building Greenplum Database.</ph></p>
+    <p>针对一些压缩算法（例如zlib），Greenplum要求软件包已经安装在主机系统中。<ph otherprops="pivotal"> 
+        这些所需的软件包，请见<cite>Greenplum Database Installation Guide</cite></ph>.<ph
+        otherprops="oss-only"> 另外一些压缩算法（例如zstd）的支持则依赖于编译Greenplum数据库时是否配置了该选项。</ph></p>
   </body>
 </topic>

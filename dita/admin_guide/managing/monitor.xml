@@ -2,43 +2,36 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="kj138244">Monitoring a Greenplum System</title>
-  <shortdesc>You can monitor a Greenplum Database system using a variety of tools included with the
-    system or available as add-ons.</shortdesc>
+  <title id="kj138244">监控Greenplum系统</title>
+  <shortdesc>可以用系统中包含的各种工具以及附加组件来监控一个Greenplum数据库系统。</shortdesc>
   <body>
-    <p>Observing the Greenplum Database system day-to-day performance helps administrators
-      understand the system behavior, plan workflow, and troubleshoot problems. This chapter
-      discusses tools for monitoring database performance and activity.</p>
-    <p>Also, be sure to review <xref href="../monitoring/monitoring.dita#topic_kmz_lbg_rp"/> for
-      monitoring activities you can script to quickly detect problems in the system. </p>
+    <p>观察Greenplum数据库系统日常的性能有助于管理员理解系统的行为、计划工作流以及故障排查问题。
+      本章讨论用于监控数据库性能和活动的工具。</p>
+    <p>另外，记得回顾<xref href="../monitoring/monitoring.dita#topic_kmz_lbg_rp"/>中编写脚本
+      监控活动来快速检测系统中问题的有关内容。</p>
   </body>
   <topic id="topic2" xml:lang="en">
-    <title id="kj157177">Monitoring Database Activity and Performance</title>
+    <title id="kj157177">监控数据库活动和性能</title>
     <body>
-      <p>Greenplum Database includes an optional system monitoring and management database,
-          <codeph>gpperfmon</codeph>, that administrators can enable. The
-          <codeph>gpperfmon_install</codeph> command-line utility creates the
-          <codeph>gpperfmon</codeph> database and enables data collection agents that collect and
-        store query and system metrics in the database. Administrators can query metrics in the
-          <codeph>gpperfmon</codeph> database. See the documentation for the
-          <codeph>gpperfmon</codeph> database in the <cite>Greenplum Database Reference
-        Guide</cite>.</p>
-      <p otherprops="pivotal">Pivotal Greenplum Command Center, an optional web-based interface,
-        graphically displays the metrics collected in the <codeph>gpperfmon</codeph> database and
-        provides additional system management tools. Download the Greenplum Command Center package
-        from <xref href="https://network.pivotal.io/products/pivotal-gpdb" scope="external" format="html">Pivotal
-          Network</xref> and view the documentation at the <xref href="http://gpcc.docs.pivotal.io"
-          scope="external" format="html">Greenplum Command Center Documentation</xref> web site.
+      <p>Greenplum数据库包含一个可选的系统监控和管理数据库<codeph>gpperfmon</codeph>，管理员可以
+        选择启用它。<codeph>gpperfmon_install</codeph>命令行工具创建<codeph>gpperfmon</codeph>
+        数据库并启用数据收集代理来存储查询和系统矩阵信息到该数据库。管理员可以查询<codeph>gpperfmon</codeph>
+        数据库中的矩阵信息。更多<codeph>gpperfmon</codeph>的信息，请见<cite>Greenplum Database Reference
+        Guide</cite>。</p>
+      <p otherprops="pivotal">Pivotal Greenplum Command Center，是一个图形化界面选项，可以用图形化界面展示
+        <codeph>gpperfmon</codeph>数据库收集的矩阵信息并提供其他一些系统管理工具。可以从
+       <xref href="https://network.pivotal.io/products/pivotal-gpdb" scope="external" format="html">Pivotal
+          Network</xref>下载安装包，可以从<xref href="http://gpcc.docs.pivotal.io"
+          scope="external" format="html">Greenplum Command Center Documentation</xref>网站查看相关文档。
       </p>
     </body>
   </topic>
   <topic id="topic3" xml:lang="en">
-    <title id="kj155080">Monitoring System State</title>
+    <title id="kj155080">监控系统状态</title>
     <body>
-      <p>As a Greenplum Database administrator, you must monitor the system for problem events such
-        as a segment going down or running out of disk space on a segment host. The following topics
-        describe how to monitor the health of a Greenplum Database system and examine certain state
-        information for a Greenplum Database system.</p>
+      <p>作为一个Greenplum数据库管理员，必须监控系统的问题事件，例如一个Segment宕机或者一台Segment主机磁盘
+        空间耗尽。下面的主题描述如何监控一个Greenplum数据库系统的健康状况以及检查一个Greenplum数据库系统的
+        特定状态信息。</p>
       <ul>
         <li id="kj167000">
           <xref href="#topic12" type="topic" format="dita"/>
@@ -62,26 +55,23 @@
     </body>
     </topic>
     <topic id="topic12" xml:lang="en">
-      <title id="kj169037">Checking System State</title>
+      <title id="kj169037">检查系统状态</title>
       <body>
-        <p>A Greenplum Database system is comprised of multiple PostgreSQL instances (the master and
-          segments) spanning multiple machines. To monitor a Greenplum Database system, you need to
-          know information about the system as a whole, as well as status information of the
-          individual instances. The <codeph>gpstate</codeph> utility provides status information
-          about a Greenplum Database system. </p>
+        <p>一个Greenplum数据库系统由横跨多台机器的多个PostgreSQL实例（Master和Segment）构成。要监控一个
+          Greenplum数据库系统，需要了解整个系统的信息以及个体实例的状态信息。<codeph>gpstate</codeph>
+          工具提供有关一个Greenplum数据库系统的状态信息。</p>
       </body>
       <topic id="topic13" xml:lang="en">
-        <title>Viewing Master and Segment Status and Configuration </title>
+        <title>查看Master和Segment的状态及配置</title>
         <body>
-          <p>The default <codeph>gpstate</codeph> action is to check segment instances and show a
-            brief status of the valid and failed segments. For example, to see a quick status of
-            your Greenplum Database system: </p>
+          <p>默认的<codeph>gpstate</codeph>行为是检查Segment实例并且显示可用和失效Segment的一个简短状态。
+            例如，要快速查看Greenplum数据库系统的状态：</p>
           <p>
             <codeblock>$ gpstate
 </codeblock>
           </p>
-          <p>To see more detailed information about your Greenplum Database array configuration, use
-              <codeph>gpstate</codeph> with the <codeph>-s</codeph> option:</p>
+          <p>要查看Greenplum数据库阵列配置更详细的信息，使用带有<codeph>-s</codeph>选项的<codeph>gpstate</codeph>：
+               </p>
           <p>
             <codeblock>$ gpstate -s
 </codeblock>
@@ -89,21 +79,20 @@
         </body>
       </topic>
       <topic id="topic14" xml:lang="en">
-        <title id="kj156031">Viewing Your Mirroring Configuration and Status</title>
+        <title id="kj156031">查看镜像配置和状态</title>
         <body>
-          <p>If you are using mirroring for data redundancy, you may want to see the list of mirror
-            segment instances in the system, their current synchronization status, and the mirror to
-            primary mapping. For example, to see the mirror segments in the system and their status: </p>
+          <p>如果在使用镜像作为数据冗余，用户可能想要看看系统中的镜像Segment实例列表、它们当前的同步状态以及
+            镜像和主Segment之间的映射。例如，要查看一个系统中的镜像Segment和它们的状态：5</p>
           <p>
             <codeblock>$ gpstate -m 
 </codeblock>
           </p>
-          <p>To see the primary to mirror segment mappings: </p>
+          <p>要查看主Segment到镜像Segment的映射：</p>
           <p>
             <codeblock>$ gpstate -c
 </codeblock>
           </p>
-          <p>To see the status of the standby master mirror:</p>
+          <p>要查看后备Master镜像的状态：</p>
           <p>
             <codeblock>$ gpstate -f
 </codeblock>
@@ -112,16 +101,13 @@
       </topic>
     </topic>
     <topic id="topic15" xml:lang="en">
-      <title id="kj155115">Checking Disk Space Usage</title>
+      <title id="kj155115">检查磁盘空间使用</title>
       <body>
-        <p>A database administrator's most important monitoring task is to make sure the file
-          systems where the master and segment data directories reside do not grow to more than 70
-          percent full. A filled data disk will not result in data corruption, but it may prevent
-          normal database activity from continuing. If the disk grows too full, it can cause the
-          database server to shut down.</p>
-        <p>You can use the <codeph>gp_disk_free</codeph> external table in the
-            <codeph>gp_toolkit</codeph> administrative schema to check for remaining free space (in
-          kilobytes) on the segment host file systems. For example:</p>
+        <p>一个数据库管理员最重要的监控任务是确保Master和Segment数据目录所在的文件系统的使用率不会超过
+          70%的。完全占满的数据磁盘不会导致数据损坏，但是可能会妨碍数据库的正常操作。如果磁盘占用得太满，
+          可能会导致数据库服务器关闭。</p>
+        <p>可以使用<codeph>gp_toolkit</codeph>管理模式中的<codeph>gp_disk_free</codeph>外部表
+          来检查Segment主机文件系统中的剩余空闲空间（以KB为计量单位）。例如：</p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_disk_free 
    ORDER BY dfsegment;
@@ -129,19 +115,17 @@
         </p>
       </body>
       <topic id="topic16" xml:lang="en">
-        <title>Checking Sizing of Distributed Databases and Tables</title>
+        <title>检查分布式数据库和表的大小</title>
         <body>
-          <p>The <codeph>gp_toolkit</codeph> administrative schema contains several views that you
-            can use to determine the disk space usage for a distributed Greenplum Database database,
-            schema, table, or index. </p>
-          <p>For a list of the available sizing views for checking database object sizes and disk
-            space, see the <i>Greenplum Database Reference Guide</i>.</p>
+          <p><codeph>gp_toolkit</codeph>管理模式包含几个可以用来判断Greenplum数据库的分布式数据库、
+            模式、表或索引磁盘空间使用的视图。</p>
+          <p>用于检查数据库对象尺寸和磁盘空间的视图列表，请见<i>Greenplum Database Reference Guide</i>.</p>
         </body>
         <topic id="topic17" xml:lang="en">
-          <title id="kj155338">Viewing Disk Space Usage for a Database </title>
+          <title id="kj155338">查看一个数据库的磁盘空间使用情况</title>
           <body>
-            <p>To see the total size of a database (in bytes), use the <i>gp_size_of_database</i>
-              view in the <i>gp_toolkit</i> administrative schema. For example: </p>
+            <p>要查看一个数据库的总大小（以字节计），使用<i>gp_toolkit</i>管理模式中的<i>gp_size_of_database</i>
+              视图。例如：</p>
             <p>
               <codeblock>=&gt; SELECT * FROM gp_toolkit.gp_size_of_database 
    ORDER BY sodddatname;
@@ -150,12 +134,11 @@
           </body>
         </topic>
         <topic id="topic18" xml:lang="en">
-          <title id="kj155347">Viewing Disk Space Usage for a Table </title>
+          <title id="kj155347">查看一个表的磁盘空间使用情况</title>
           <body>
-            <p>The <i>gp_toolkit</i> administrative schema contains several views for checking the
-              size of a table. The table sizing views list the table by object ID (not by name). To
-              check the size of a table by name, you must look up the relation name
-                (<codeph>relname</codeph>) in the <i>pg_class</i> table. For example:</p>
+            <p><i>gp_toolkit</i>管理模式包含几个检查表大小的视图。表大小视图根据对象ID
+              （而不是名称）列出表。要根据一个表的名称检查其尺寸，必须在<i>pg_class</i>表中查找关系名称
+              （<codeph>relname</codeph>）。例如：</p>
             <p>
               <codeblock>=&gt; SELECT relname AS name, sotdsize AS size, sotdtoastsize 
    AS toast, sotdadditionalsize AS other 
@@ -163,20 +146,17 @@
    WHERE sotd.sotdoid=pg_class.oid ORDER BY relname;
 </codeblock>
             </p>
-            <p>For a list of the available table sizing views, see the <i>Greenplum Database
+            <p>可用的表大小视图的列表请见<i>Greenplum Database
                 Reference Guide</i>.</p>
           </body>
         </topic>
         <topic id="topic19" xml:lang="en">
-          <title id="kj176079">Viewing Disk Space Usage for Indexes </title>
+          <title id="kj176079">查看索引的磁盘空间使用情况</title>
           <body>
-            <p>The <i>gp_toolkit</i> administrative schema contains a number of views for checking
-              index sizes. To see the total size of all index(es) on a table, use the
-                <i>gp_size_of_all_table_indexes</i> view. To see the size of a particular index, use
-              the <i>gp_size_of_index</i> view. The index sizing views list tables and indexes by
-              object ID (not by name). To check the size of an index by name, you must look up the
-              relation name (<codeph>relname</codeph>) in the <i>pg_class</i> table. For
-              example:</p>
+            <p><i>gp_toolkit</i>管理模式包含几个用于检查索引大小的视图。要查看一个表上所有索引的总大小，使用
+              <i>gp_size_of_all_table_indexes</i>视图。要查看一个特定索引的大小，使用<i>gp_size_of_index</i>视图。
+              该索引大小视图根据对象ID（而不是名称）列出表和索引。要根据一个索引的名称查看其尺寸，必须在<i>pg_class</i>
+              表中查找关系名称（<codeph>relname</codeph>）。例如：</p>
             <p>
               <codeblock>=&gt; SELECT soisize, relname as indexname
    FROM pg_class, gp_toolkit.gp_size_of_index
@@ -189,13 +169,11 @@
       </topic>
     </topic>
     <topic id="topic20" xml:lang="en">
-      <title id="kj155117">Checking for Data Distribution Skew</title>
+      <title id="kj155117">检查数据分布倾斜</title>
       <body>
-        <p>All tables in Greenplum Database are distributed, meaning their data is divided across
-        all of the segments in the system. Unevenly distributed data may diminish query processing
-        performance. A table's distribution policy, set at table creation time, determines how the
-        table's rows are distributed. For information about choosing the table distribution policy,
-        see the following topics:</p>
+        <p>Greenplum数据库中所有的表都是分布式的，意味着它们的数据被按规则划分到系统中的所有Segment上。
+          不均匀分布的数据可能会削弱查询处理性能。一个表的分布策略在表创建时被确定。有关选择表分布策略的信息，
+          请见下列主题：</p>
         <ul>
           <li id="kj191663">
             <xref href="#topic21" type="topic" format="dita"/>
@@ -207,16 +185,15 @@
             <xref href="#topic23" type="topic" format="dita"/>
           </li>
         </ul>
-        <p>The <i>gp_toolkit</i> administrative schema also contains a number of views for checking
-          data distribution skew on a table. For information about how to check for uneven data
-          distribution, see the <cite>Greenplum Database Reference Guide</cite>.</p>
+        <p><i>gp_toolkit</i>管理模式还包含一些用于检查表上数据分布倾斜的视图。有关如何检查非均匀数据分布的信息，
+          请见<cite>Greenplum Database Reference Guide</cite>.</p>
       </body>
       <topic id="topic21" xml:lang="en">
-        <title id="kj155907">Viewing a Table's Distribution Key</title>
+        <title id="kj155907">查看一个表的分布键</title>
         <body>
-          <p>To see the columns used as the data distribution key for a table, you can use the
-              <codeph>\d+</codeph> meta-command in <codeph>psql</codeph> to examine the definition
-            of a table. For example:</p>
+          <p>要查看一个表中被用作数据分布键的列，可以使用<codeph>psql</codeph>中的<codeph>\d+</codeph>
+            元命令来检查表的定义。例如：
+           </p>
           <p>
             <codeblock>=# <codeph>\d+ sales
 </codeph>                Table "retail.sales"
@@ -229,101 +206,85 @@ Has OIDs: no
 Distributed by: (sale_id)
 </codeblock>
           </p>
-        <p>When you create a <i>replicated</i> table, Greenplum Database stores all rows in the
-          table on every segment. Replicated tables have no distribution key. Where the
-            <codeph>\d+</codeph> meta-command reports the distribution key for a normally
-          distributed table, it shows <codeph>Distributed Replicated</codeph> for a replicated
-          table.</p>
+        <p>当我们创建复制表时，Greenplum数据库会在每个Segment上都存储一份完整的表数据。复制表没有分布键。
+          <codeph>\d+</codeph>元命令会展示分布表的分布键，复制表展示状态为<codeph>Distributed Replicated</codeph>。</p>
         </body>
       </topic>
       <topic id="topic22" xml:lang="en">
-        <title id="kj155842">Viewing Data Distribution</title>
+        <title id="kj155842">查看数据分布</title>
         <body>
-          <p>To see the data distribution of a table's rows (the number of rows on each segment),
-            you can run a query such as:</p>
+          <p>要查看一个表中行的数据分布（每个Segment上的行数），可以运行一个这样的查询：</p>
           <p>
             <codeblock>=# SELECT gp_segment_id, count(*) 
    FROM <i>table_name</i> GROUP BY gp_segment_id;
 </codeblock>
           </p>
-          <p>A table is considered to have a balanced distribution if all segments have roughly the
-            same number of rows.</p>
+          <p>如果所有的Segment都有大致相同的行数，一个表就可以被认为是分布均匀的。</p>
         <note>
-          <p>If you run this query on a replicated table it fails because Greenplum Database does
-            not permit user queries to reference the <codeph>gp_segment_id</codeph> system column in
-            replicated tables. Because every segment has all of the tables' rows, replicated tables
-            are evenly distributed by definition.</p>
+          <p>如果在复制表上运行该查询会执行失败，因为Greenplum数据库不允许用户查询复制表的<codeph>gp_segment_id</codeph>
+            系统列数据。由于每个Segment上都有一份完整的表数据，复制表必然是均匀的。</p>
         </note>
         </body>
       </topic>
       <topic id="topic23" xml:lang="en">
-        <title id="kj155974">Checking for Query Processing Skew</title>
+        <title id="kj155974">检查查询过程倾斜</title>
         <body>
-          <p>When a query is being processed, all segments should have equal workloads to ensure the
-            best possible performance. If you identify a poorly-performing query, you may need to
-            investigate further using the <codeph>EXPLAIN</codeph> command. For information about
-            using the <codeph>EXPLAIN</codeph> command and query profiling, see <xref
+          <p>当一个查询被执行时，所有的Segment应该具有等量的负载来保证最好的性能。如果发现了一个执行性能低下的查询，
+            可能需要使用<codeph>EXPLAIN</codeph>命令进行深入研究。有关使用<codeph>EXPLAIN</codeph>命令和查询
+            分析的信息，请见<xref
               href="../query/topics/query-profiling.xml#topic39"/>.</p>
-          <p>Query processing workload can be skewed if the table's data distribution policy and the
-            query predicates are not well matched. To check for processing skew, you can run a query
-            such as:</p>
+          <p>如果表的数据分布策略与查询谓词没有很好地匹配，查询执行负载可能会倾斜。要检查执行倾斜，可以运行一个这样
+            的查询：</p>
           <p>
             <codeblock>=# SELECT gp_segment_id, count(*) FROM <i>table_name</i>
    WHERE <i>column</i>='<i>value</i>' GROUP BY gp_segment_id;
 </codeblock>
           </p>
-          <p>This will show the number of rows returned by segment for the given
-              <codeph>WHERE</codeph> predicate.</p>
-        <p>As noted in <xref href="#topic22" format="dita"/>, this query will fail if you run it on
-          a replicated table because you cannot reference the <codeph>gp_segment_id</codeph> system
-          column in a query on a replicated table.</p>
+          <p>这将显示对于给定的<codeph>WHERE</codeph>谓词，Segment会返回的行数。</p>
+        <p>如<xref href="#topic22" format="dita"/>所说的, 该查询在复制表上运行时也会报错，因为在复制表上查询的
+          <codeph>gp_segment_id</codeph>列不具有参考价值。</p>
           <section>
-            <title>Avoiding an Extreme Skew Warning</title>
-            <p>You may receive the following warning message while executing a query that performs a
-              hash join operation:</p>
+            <title>避免极度倾斜警告</title>
+            <p>当执行一个使用哈希连接操作的查询时，可能会收到下面的警告消息：</p>
             <p>
               <codeph>Extreme skew in the innerside of Hashjoin</codeph>
             </p>
-            <p>This occurs when the input to a hash join operator is skewed. It does not prevent the
-              query from completing successfully. You can follow these steps to avoid skew in the
-                plan:<ol id="ol_nwc_tyx_bq">
-                <li>Ensure that all fact tables are analyzed.</li>
-                <li>Verify that any populated temporary table used by the query is analyzed.</li>
-                <li>View the <codeph>EXPLAIN ANALYZE</codeph> plan for the query and look for the
-                    following:<ul id="ul_kph_zyx_bq">
-                    <li>If there are scans with multi-column filters that are producing more rows
-                      than estimated, then set the <codeph>gp_selectivity_damping_factor</codeph>
-                      server configuration parameter to 2 or higher and retest the query.</li>
-                    <li>If the skew occurs while joining a single fact table that is relatively
-                      small (less than 5000 rows), set the <codeph>gp_segments_for_planner</codeph>
-                      server configuration parameter to 1 and retest the query.</li>
+            <p>当一个哈希连接操作符的输入倾斜时，就会发生这种情况。它不会阻碍查询成功完成。可以按照这些步骤来避免计划
+              中的倾斜：
+              <ol id="ol_nwc_tyx_bq">
+                <li>确保所有的事实表都被分析过。</li>
+                <li>验证该查询用到的任何已填充临时表都被分析过。</li>
+                <li>查看该查询的<codeph>EXPLAIN ANALYZE</codeph>计划，并且在其中查找以下信息：
+                  <ul id="ul_kph_zyx_bq">
+                    <li>如果有带多列过滤的扫描产生超过预估的行数，则将<codeph>gp_selectivity_damping_factor</codeph>
+                      服务器配置参数的值设置为当前值的2倍以上并且重新测试该查询。
+                      </li>
+                    <li>如果在连接一个相对较小（小于5000行）的单一事实表时发生倾斜，将<codeph>gp_segments_for_planner</codeph>
+                      服务器配置参数设置为1并且重新测试该查询。
+                    </li>
                   </ul></li>
-                <li>Check whether the filters applied in the query match distribution keys of the
-                  base tables. If the filters and distribution keys are the same, consider
-                  redistributing some of the base tables with different distribution keys. </li>
-                <li> Check the cardinality of the join keys. If they have low cardinality, try to
-                  rewrite the query with different joining columns or or additional filters on the
-                  tables to reduce the number of rows. These changes could change the query
-                  semantics.</li>
+                <li>检查应用于该查询的过滤属性是否匹配基表的分布键。如果过滤属性和分布键相同，考虑用不同的
+                  分布键重新分布一些基表。</li>
+                <li>检查连接键的基数。如果基数较低，尝试用不同的连接列或者表上额外的过滤属性来重写该查询以降低行数。
+                  这些更改可能会改变查询的语义。</li>
               </ol></p>
           </section>
         </body>
       </topic>
     </topic>
     <topic id="topic24" xml:lang="en">
-      <title id="kj164952">Viewing Metadata Information about Database Objects</title>
+      <title id="kj164952">查看数据库对象的元数据信息</title>
       <body>
-        <p>Greenplum Database tracks various metadata information in its system catalogs about the
-          objects stored in a database, such as tables, views, indexes and so on, as well as global
-          objects such as roles and tablespaces. </p>
+        <p>Greenplum数据库在其系统目录中跟踪各种有关存储在数据库中对象（例如表、视图、索引等等）和
+          全局对象（例如角色和表空间）的元数据信息。
+         </p>
       </body>
       <topic id="topic25" xml:lang="en">
-        <title>Viewing the Last Operation Performed</title>
+        <title>查看最后一个执行的操作</title>
         <body>
-          <p>You can use the system views <i>pg_stat_operations</i> and
-              <i>pg_stat_partition_operations</i> to look up actions performed on an object, such as
-            a table. For example, to see the actions performed on a table, such as when it was
-            created and when it was last vacuumed and analyzed:</p>
+          <p>可以使用系统视图<i>pg_stat_operations</i>和 <i>pg_stat_partition_operations</i>
+            查看在一个对象（例如一个表）上执行的动作。例如，要查看在一个表上执行的动作，比如它何时被创建以及它上一次是什么时候被清理和分析：
+           </p>
           <p>
             <codeblock>=&gt; SELECT schemaname as schema, objname as table, 
    usename as role, actionname as action, 
@@ -341,11 +302,11 @@ Distributed by: (sale_id)
         </body>
       </topic>
       <topic id="topic26" xml:lang="en">
-        <title>Viewing the Definition of an Object</title>
+        <title>查看一个对象的定义</title>
         <body>
-          <p>To see the definition of an object, such as a table or view, you can use the
-              <codeph>\d+</codeph> meta-command when working in <codeph>psql</codeph>. For example,
-            to see the definition of a table:</p>
+          <p>要查看一个对象（例如表或者视图）的定义，在<codeph>psql</codeph>中可以使用<codeph>\d+</codeph>元命令。
+            例如，要查看一个表的定义：
+           </p>
           <p>
             <codeblock>=&gt; \d+ <i>mytable</i>
 </codeblock>
@@ -354,13 +315,11 @@ Distributed by: (sale_id)
       </topic>
     </topic>
     <topic id="topic_slt_ddv_1q">
-      <title>Viewing Session Memory Usage Information</title>
+      <title>查看会话内存使用信息</title>
       <body>
-        <p>You can create and use the <i>session_level_memory_consumption</i> view that provides
-          information about the current memory utilization for sessions that are running queries on
-          Greenplum Database. The view contains session information and information such as the
-          database that the session is connected to, the query that the session is currently
-          running, and memory consumed by the session processes. </p>
+        <p>可以创建并且使用<i>session_level_memory_consumption</i>视图来查看正在Greenplum数据库上运行查询的会话的
+          当前内存利用信息。该视图包含会话信息以及该会话连接到的数据库、该会话当前运行的查询和会话处理所消耗的内存等信息。
+          </p>
         <ul id="ul_hwv_bbb_dq" otherprops="op-help">
           <li>
             <xref href="#topic_nby_j1b_dq" format="dita"/>
@@ -371,30 +330,26 @@ Distributed by: (sale_id)
         </ul>
       </body>
       <topic id="topic_nby_j1b_dq">
-        <title>Creating the session_level_memory_consumption View</title>
+        <title>创建session_level_memory_consumption视图</title>
         <body>
-          <p>To create the <i>session_level_memory_consumption</i> view in a Greenplum Database, run
-            the script <codeph>CREATE EXTENSION gp_internal_tools;</codeph> once
-            for each database. For example, to install the view in the database
-              <codeph>testdb</codeph>, use this
-            command:<codeblock>$ psql -d testdb -c "CREATE EXTENSION gp_internal_tools;"</codeblock></p>
+          <p>要在Greenplum数据库中创建<i>session_level_memory_consumption</i>视图，
+            为每一个数据库运行一次扩展创建语句<codeph>CREATE EXTENSION gp_internal_tools;</codeph>。
+            例如，要在数据库<codeph>testdb</codeph>中安装该视图，可使用这个命令：
+           <codeblock>$ psql -d testdb -c "CREATE EXTENSION gp_internal_tools;"</codeblock></p>
         </body>
       </topic>
       <topic id="topic7" xml:lang="en">
-        <title id="ff142493">The session_level_memory_consumption View</title>
+        <title id="ff142493">session_level_memory_consumption视图</title>
         <body>
-          <p>The <i>session_level_memory_consumption</i> view provides information about memory
-            consumption and idle time for sessions that are running SQL queries. </p>
-          <p>When resource queue-based resource management is active, the column
-            <codeph>is_runaway</codeph> indicates whether Greenplum
-            Database considers the session a runaway session based on the vmem memory consumption of
-            the session's queries. Under the resource queue-based resource management scheme, Greenplum
-            Database considers the session a runaway when the queries consume an excessive amount of
-            memory. The Greenplum Database server configuration
-            parameter <codeph>runaway_detector_activation_percent</codeph> governs the
-            conditions under which Greenplum Database considers a session a runaway session. </p>
-          <p>The <codeph>is_runaway</codeph>, <codeph>runaway_vmem_mb</codeph>, and
-            <codeph>runaway_command_cnt</codeph> columns are not applicable when resource group-based resource management is active.</p>
+          <p>
+            <i>session_level_memory_consumption</i>视图提供有关正在运行SQL查询的会话的内存消耗以及闲置时间的信息。</p>
+          <p>当基于资源队列的资源管理方式启用时，在该视图中，列<codeph>is_runaway</codeph>表示是否Greenplum数据库认为
+            该会话是一个失控会话，这种判断基于该会话的查询的vmem内存消耗来做出。在资源队列管理模式下，当查询消耗过多内存时，
+            Greenplum数据库认为该会话处于失控状态。Greenplum数据库的服务器配置参数<codeph>runaway_detector_activation_percent</codeph>
+            控制Greenplum数据库什么时候会认为一个会话是失控会话。
+          </p>
+          <p>在该视图中，当基于组的资源管理方式启用时，列<codeph>is_runaway</codeph>, <codeph>runaway_vmem_mb</codeph>,和
+            <codeph>runaway_command_cnt</codeph>功能失效。</p>
           <table id="session_level_memory_consumption_table">
             <title>session_level_memory_consumption</title>
             <tgroup cols="4">
@@ -404,10 +359,10 @@ Distributed by: (sale_id)
               <colspec colnum="4" colname="col4" colwidth="147pt"/>
               <thead>
                 <row>
-                  <entry colname="col1">column</entry>
-                  <entry colname="col2">type</entry>
-                  <entry colname="col3">references</entry>
-                  <entry colname="col4">description</entry>
+                  <entry colname="col1">列</entry>
+                  <entry colname="col2">类型</entry>
+                  <entry colname="col3">引用</entry>
+                  <entry colname="col4">描述</entry>
                 </row>
               </thead>
               <tbody>
@@ -417,8 +372,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">name</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Name of the database that the session is connected
-                    to.</entry>
+                  <entry colname="col4">该会话连接到的数据库名。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -426,7 +380,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">integer</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Session ID.</entry>
+                  <entry colname="col4">会话ID。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -434,7 +388,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">name</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Name of the session user.</entry>
+                  <entry colname="col4">会话用户的用户名。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -442,7 +396,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">text</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Current SQL query that the session is running.</entry>
+                  <entry colname="col4">该会话正在运行的当前SQL查询。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -450,7 +404,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">integer</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Segment ID.</entry>
+                  <entry colname="col4">Segment ID。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -458,7 +412,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">integer</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Total vmem memory usage for the session in MB.</entry>
+                  <entry colname="col4">该会话的总vmem内存使用，以MB计。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -466,7 +420,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">boolean</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Session is marked as runaway on the segment.</entry>
+                  <entry colname="col4">会话被标记为在Segment上失控。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -474,7 +428,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">integer</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Number of query processes for the session.</entry>
+                  <entry colname="col4">该会话的查询处理数量。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -482,7 +436,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">integer</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Number of active query processes for the session.</entry>
+                  <entry colname="col4">该会话的活动查询处理数量。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -490,9 +444,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">integer</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Number of query processes that have not yet released their
-                      memory.<p>The value is <codeph>-1</codeph> for sessions that are not
-                      running.</p></entry>
+                  <entry colname="col4">还没有释放其内存的查询处理的数量。<p>对于没有运行的会话该值为<codeph>-1</codeph>。</p></entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -500,8 +452,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">integer</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Amount of vmem memory that the session was consuming when it
-                    was marked as a runaway session.</entry>
+                  <entry colname="col4">当会话被标记为失控会话时消耗的vmem内存量。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -509,8 +460,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">integer</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">Command count for the session when it was marked as a
-                    runaway session.</entry>
+                  <entry colname="col4">当会话被标记为失控会话时的命令计数。</entry>
                 </row>
                 <row>
                   <entry colname="col1">
@@ -518,8 +468,7 @@ Distributed by: (sale_id)
                   </entry>
                   <entry colname="col2">timestamptz</entry>
                   <entry colname="col3"/>
-                  <entry colname="col4">The last time a query process in this session became
-                    idle.</entry>
+                  <entry colname="col4">这个会话中上一次一个查询处理变成空闲的时间。</entry>
                 </row>
               </tbody>
             </tgroup>
@@ -528,48 +477,42 @@ Distributed by: (sale_id)
       </topic>
     </topic>
     <topic id="topic27" xml:lang="en">
-      <title id="kj185498">Viewing Query Workfile Usage Information</title>
+      <title id="kj185498">查看查询工作文件使用信息</title>
       <body>
-        <p>The Greenplum Database administrative schema <i>gp_toolkit</i> contains views that
-          display information about Greenplum Database workfiles. Greenplum Database creates
-          workfiles on disk if it does not have sufficient memory to execute the query in memory.
-          This information can be used for troubleshooting and tuning queries. The information in
-          the views can also be used to specify the values for the Greenplum Database configuration
-          parameters <codeph>gp_workfile_limit_per_query</codeph> and
-            <codeph>gp_workfile_limit_per_segment</codeph>. </p>
-        <p>These are the views in the schema <i>gp_toolkit</i>:</p>
+        <p>Greenplum数据库管理方案<i>gp_toolkit</i>包含显示Greenplum数据库工作文件信息的视图。
+          如果没有足够的内存让查询完全在内存中执行，Greenplum数据库会在磁盘上创建工作文件。这些
+          信息可以用来故障排查和查询调优。这些视图中的信息也可以被用来为Greenplum数据库配置参数
+          <codeph>gp_workfile_limit_per_query</codeph>和<codeph>gp_workfile_limit_per_segment</codeph>
+          指定值。</p>
+        <p>在模式<i>gp_toolkit</i>中有下面这些视图：</p>
         <ul>
-          <li id="kj191083">The gp_workfile_entries view contains one row for each operator using
-            disk space for workfiles on a segment at the current time.</li>
-          <li id="kj191084">The gp_workfile_usage_per_query view contains one row for each query
-            using disk space for workfiles on a segment at the current time. </li>
-          <li id="kj191085">The gp_workfile_usage_per_segment view contains one row for each
-            segment. Each row displays the total amount of disk space used for workfiles on the
-            segment at the current time.</li>
+          <li id="kj191083">gp_workfile_entries视图为当前在Segment上创建了工作文件的每个
+            操作符都包含一行。</li>
+          <li id="kj191084">gp_workfile_usage_per_query视图为当前在Segment上创建了工作
+            文件的每个查询都包含一行。</li>
+          <li id="kj191085">gp_workfile_usage_per_segment视图为每个Segment都包含一行。
+            每一行显示了当前在该Segment上用于工作文件的总磁盘空间。</li>
         </ul>
-        <p>For information about using <i>gp_toolkit</i>, see <xref href="#topic31" format="dita"
-          />.</p>
+        <p>有关使用<i>gp_toolkit</i>的信息请见<xref href="#topic31" format="dita"
+          />。</p>
       </body>
     </topic>
   <topic id="topic28" xml:lang="en">
-    <title id="kj166926">Viewing the Database Server Log Files</title>
+    <title id="kj166926">查看数据库服务器日志文件</title>
     <body>
-      <p>Every database instance in Greenplum Database (master and segments) runs a PostgreSQL
-        database server with its own server log file. Log files are created in the
-          <codeph>pg_log</codeph> directory of the master and each segment data directory.</p>
+      <p>Greenplum数据库中的每一个数据库实例（Master和Segment）都运行着一个有着自己的服务器日志文件的
+        PostgreSQL数据库服务器。日常的日志文件被创建在Master和每个Segment的数据目录中的
+        <codeph>pg_log</codeph>目录下。</p>
     </body>
     <topic id="topic29" xml:lang="en">
-      <title id="kj165340">Log File Format</title>
+      <title id="kj165340">日志文件格式</title>
       <body>
-        <p>The server log files are written in comma-separated values (CSV) format. Some log entries
-          will not have values for all log fields. For example, only log entries associated with a
-          query worker process will have the <codeph>slice_id</codeph> populated. You can identify
-          related log entries of a particular query by the query's session identifier
-            (<codeph>gp_session_id</codeph>) and command identifier
-            (<codeph>gp_command_count</codeph>).</p>
-        <p>The following fields are written to the log:</p>
+        <p>服务器日志文件被写成一种逗号分隔值（CSV）格式。一些日志项并不会所有的域都有值。例如，只有与一个查询
+          工作者进程相关的日志项才会有<codeph>slice_id</codeph>值。可以用查询的会话标识符（<codeph>gp_session_id</codeph>）
+          和命令标识符（<codeph>gp_command_count</codeph>）来确定一个特定查询的相关日志项。</p>
+        <p>下列域会被写入到日志中：</p>
         <table id="kj165707">
-          <title>Greenplum Database Server Log Format</title>
+          <title>Greenplum数据库服务器日志格式</title>
           <tgroup cols="4">
             <colspec colnum="1" colname="col1" colwidth="28*"/>
             <colspec colnum="2" colname="col2" colwidth="90*"/>
@@ -578,9 +521,9 @@ Distributed by: (sale_id)
             <thead>
               <row>
                 <entry colname="col1">#</entry>
-                <entry colname="col2">Field Name</entry>
-                <entry colname="col3">Data Type</entry>
-                <entry colname="col4">Description</entry>
+                <entry colname="col2">域名称</entry>
+                <entry colname="col3">数据类型</entry>
+                <entry colname="col4">描述</entry>
               </row>
             </thead>
             <tbody>
@@ -588,191 +531,181 @@ Distributed by: (sale_id)
                 <entry colname="col1">1</entry>
                 <entry colname="col2">event_time</entry>
                 <entry colname="col3">timestamp with time zone</entry>
-                <entry colname="col4">Time that the log entry was written to the log</entry>
+                <entry colname="col4">该日志项被写入到日志中的时间</entry>
               </row>
               <row>
                 <entry colname="col1">2</entry>
                 <entry colname="col2">user_name</entry>
                 <entry colname="col3">varchar(100)</entry>
-                <entry colname="col4">The database user name</entry>
+                <entry colname="col4">数据库用户名</entry>
               </row>
               <row>
                 <entry colname="col1">3</entry>
                 <entry colname="col2">database_name</entry>
                 <entry colname="col3">varchar(100)</entry>
-                <entry colname="col4">The database name</entry>
+                <entry colname="col4">数据库名</entry>
               </row>
               <row>
                 <entry colname="col1">4</entry>
                 <entry colname="col2">process_id</entry>
                 <entry colname="col3">varchar(10)</entry>
-                <entry colname="col4">The system process ID (prefixed with "p")</entry>
+                <entry colname="col4">系统进程ID（以"p"为前缀）</entry>
               </row>
               <row>
                 <entry colname="col1">5</entry>
                 <entry colname="col2">thread_id</entry>
                 <entry colname="col3">varchar(50)</entry>
-                <entry colname="col4">The thread count (prefixed with "th")</entry>
+                <entry colname="col4">线程号（以"th"为前缀）</entry>
               </row>
               <row>
                 <entry colname="col1">6</entry>
                 <entry colname="col2">remote_host</entry>
                 <entry colname="col3">varchar(100)</entry>
-                <entry colname="col4">On the master, the hostname/address of the client machine. On
-                  the segment, the hostname/address of the master.</entry>
+                <entry colname="col4">在Master上，是客户端机器的主机名/地址。在Segment上，是Master的主机名/地址。</entry>
               </row>
               <row>
                 <entry colname="col1">7</entry>
                 <entry colname="col2">remote_port</entry>
                 <entry colname="col3">varchar(10)</entry>
-                <entry colname="col4">The segment or master port number</entry>
+                <entry colname="col4">Segment或者Master的端口号</entry>
               </row>
               <row>
                 <entry colname="col1">8</entry>
                 <entry colname="col2">session_start_time</entry>
                 <entry colname="col3">timestamp with time zone</entry>
-                <entry colname="col4">Time session connection was opened</entry>
+                <entry colname="col4">会话连接被打开的时间</entry>
               </row>
               <row>
                 <entry colname="col1">9</entry>
                 <entry colname="col2">transaction_id </entry>
                 <entry colname="col3">int</entry>
-                <entry colname="col4">Top-level transaction ID on the master. This ID is the parent
-                  of any subtransactions.</entry>
+                <entry colname="col4">Master上的顶层事务ID。这个ID是任何子事务的父亲。</entry>
               </row>
               <row>
                 <entry colname="col1">10</entry>
                 <entry colname="col2">gp_session_id</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">Session identifier number (prefixed with "con")</entry>
+                <entry colname="col4">会话标识符号（以"con"为前缀）</entry>
               </row>
               <row>
                 <entry colname="col1">11</entry>
                 <entry colname="col2">gp_command_count</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">The command number within a session (prefixed with
-                  "cmd")</entry>
+                <entry colname="col4">会话中的命令号（以"cmd"为前缀）</entry>
               </row>
               <row>
                 <entry colname="col1">12</entry>
                 <entry colname="col2">gp_segment</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">The segment content identifier (prefixed with "seg" for
-                  primaries or "mir" for mirrors). The master always has a content ID of -1.</entry>
+                <entry colname="col4">Segment内容标识符（主Segment以"seg"为前缀，镜像Segment以"mir"为前缀）。Master的内容ID总是为-1。</entry>
               </row>
               <row>
                 <entry colname="col1">13</entry>
                 <entry colname="col2">slice_id</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">The slice ID (portion of the query plan being
-                  executed)</entry>
+                <entry colname="col4">切片ID（被执行的查询计划的一部分）</entry>
               </row>
               <row>
                 <entry colname="col1">14</entry>
                 <entry colname="col2">distr_tranx_id</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">Distributed transaction ID</entry>
+                <entry colname="col4">分布式事务ID</entry>
               </row>
               <row>
                 <entry colname="col1">15</entry>
                 <entry colname="col2">local_tranx_id</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">Local transaction ID</entry>
+                <entry colname="col4">本地事务ID</entry>
               </row>
               <row>
                 <entry colname="col1">16</entry>
                 <entry colname="col2">sub_tranx_id</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">Subtransaction ID</entry>
+                <entry colname="col4">子事务ID</entry>
               </row>
               <row>
                 <entry colname="col1">17</entry>
                 <entry colname="col2">event_severity</entry>
                 <entry colname="col3">varchar(10)</entry>
-                <entry colname="col4">Values include: LOG, ERROR, FATAL, PANIC, DEBUG1,
-                  DEBUG2</entry>
+                <entry colname="col4">值包括：LOG、ERROR、FATAL、PANIC、DEBUG1、DEBUG2</entry>
               </row>
               <row>
                 <entry colname="col1">18</entry>
                 <entry colname="col2">sql_state_code</entry>
                 <entry colname="col3">varchar(10)</entry>
-                <entry colname="col4">SQL state code associated with the log message</entry>
+                <entry colname="col4">与日志消息相关的SQL状态代码</entry>
               </row>
               <row>
                 <entry colname="col1">19</entry>
                 <entry colname="col2">event_message </entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">Log or error message text</entry>
+                <entry colname="col4">日志或者错误消息文本</entry>
               </row>
               <row>
                 <entry colname="col1">20</entry>
                 <entry colname="col2">event_detail</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">Detail message text associated with an error or warning
-                  message</entry>
+                <entry colname="col4">与一个错误或者警告消息相关的详细消息文本</entry>
               </row>
               <row>
                 <entry colname="col1">21</entry>
                 <entry colname="col2">event_hint</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">Hint message text associated with an error or warning
-                  message</entry>
+                <entry colname="col4">与一个错误或者警告消息相关的提示消息文本</entry>
               </row>
               <row>
                 <entry colname="col1">22</entry>
                 <entry colname="col2">internal_query</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">The internally-generated query text</entry>
+                <entry colname="col4">内部生成的查询文本</entry>
               </row>
               <row>
                 <entry colname="col1">23</entry>
                 <entry colname="col2">internal_query_pos</entry>
                 <entry colname="col3">int</entry>
-                <entry colname="col4">The cursor index into the internally-generated query
-                  text</entry>
+                <entry colname="col4">内部生成的查询文本的指针式索引</entry>
               </row>
               <row>
                 <entry colname="col1">24</entry>
                 <entry colname="col2">event_context</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">The context in which this message gets generated</entry>
+                <entry colname="col4">这个消息产生的上下文</entry>
               </row>
               <row>
                 <entry colname="col1">25</entry>
                 <entry colname="col2">debug_query_string</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">User-supplied query string with full detail for debugging.
-                  This string can be modified for internal use. </entry>
+                <entry colname="col4">完整的用户提供的查询字符串，用于调试。内部使用可能会修改这个字符串。</entry>
               </row>
               <row>
                 <entry colname="col1">26</entry>
                 <entry colname="col2">error_cursor_pos</entry>
                 <entry colname="col3">int</entry>
-                <entry colname="col4">The cursor index into the query string</entry>
+                <entry colname="col4">该查询字符串中的指针式索引</entry>
               </row>
               <row>
                 <entry colname="col1">27</entry>
                 <entry colname="col2">func_name</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">The function in which this message is generated</entry>
+                <entry colname="col4">这个消息产生的函数</entry>
               </row>
               <row>
                 <entry colname="col1">28</entry>
                 <entry colname="col2">file_name</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">The internal code file where the message originated</entry>
+                <entry colname="col4">产生该消息的内部代码文件</entry>
               </row>
               <row>
                 <entry colname="col1">29</entry>
                 <entry colname="col2">file_line</entry>
                 <entry colname="col3">int</entry>
-                <entry colname="col4">The line of the code file where the message originated</entry>
+                <entry colname="col4">产生该消息的内部代码文件的行号</entry>
               </row>
               <row>
                 <entry colname="col1">30</entry>
                 <entry colname="col2">stack_trace</entry>
                 <entry colname="col3">text</entry>
-                <entry colname="col4">Stack trace text associated with this message</entry>
+                <entry colname="col4">与这个消息相关的堆栈跟踪</entry>
               </row>
             </tbody>
           </tgroup>
@@ -780,20 +713,19 @@ Distributed by: (sale_id)
       </body>
     </topic>
     <topic id="topic30" xml:lang="en">
-      <title>Searching the Greenplum Server Log Files</title>
+      <title>搜索Greenplum服务器日志文件</title>
       <body>
-        <p>Greenplum Database provides a utility called <codeph>gplogfilter</codeph> can search
-          through a Greenplum Database log file for entries matching the specified criteria. By
-          default, this utility searches through the Greenplum Database master log file in the
-          default logging location. For example, to display the last three lines of the master log
-          file:</p>
+        <p>Greenplum数据库提供一个名为<codeph>gplogfilter</codeph>的工具，它可以在一个Greenplum数据库
+          日志文件中搜索匹配指定条件的项。默认情况下，这个工具在默认日志位置搜索Greenplum数据库的Master日志。
+          例如，要显示Master日志文件的最后三行：
+          </p>
         <p>
           <codeblock>$ gplogfilter -n 3
 </codeblock>
         </p>
-        <p>To search through all segment log files simultaneously, run <codeph>gplogfilter</codeph>
-          through the <codeph>gpssh</codeph> utility. For example, to display the last three lines
-          of each segment log file:</p>
+        <p>要同时搜索所有Segment的日志文件，可以通过<codeph>gpssh</codeph>工具来运行<codeph>gplogfilter</codeph>。
+          例如，要显示每个Segment日志文件的最后三行：
+          </p>
         <p>
           <codeblock>$ gpssh -f seg_host_file
 </codeblock>
@@ -804,43 +736,39 @@ Distributed by: (sale_id)
     </topic>
   </topic>
   <topic id="topic31" xml:lang="en">
-    <title id="kj168900">Using gp_toolkit</title>
+    <title id="kj168900">使用gp_toolkit</title>
     <body>
-      <p>Use the Greenplum Database administrative schema <i>gp_toolkit</i> to query the system
-        catalogs, log files, and operating environment for system status information. The
-          <codeph>gp_toolkit</codeph> schema contains several views you can access using SQL
-        commands. The <i>gp_toolkit</i> schema is accessible to all database users. Some objects
-        require superuser permissions. Use a command similar to the following to add the
-          <i>gp_toolkit</i> schema to your schema search path:</p>
+      <p>使用Greenplum数据库的管理方案<i>gp_toolkit</i>来查询系统目录、日志文件和操作系统环境以得到系统状态信息。
+        gp_toolkit方案包含一些可以用SQL命令访问的视图。<i>gp_toolkit</i>方案对所有数据库用户都可以访问。一些对象
+        要求超级用户权限。用与下面类似的命令把<i>gp_toolkit</i>方案增加到用户的方案搜索路径中：
+      </p>
       <codeblock>=&gt; ALTER ROLE myrole SET search_path TO myschema,gp_toolkit;</codeblock>
-      <p>For a description of the available administrative schema views and their usages, see the
+      <p>有关可用的管理方案视图及其用法的描述，请见
           <cite>Greenplum Database Reference Guide</cite>.</p>
     </body>
   </topic>
     <topic id="topic_pyh_sqg_kp">
-      <title>SQL Standard Error Codes</title>
+      <title>SQL标准错误代码</title>
       <body>
-        <p>The following table lists all the defined error codes. Some are not used, but are defined
-          by the SQL standard. The error classes are also shown. For each error class there is a
-          standard error code having the last three characters 000. This code is used only for error
-          conditions that fall within the class but do not have any more-specific code assigned. </p>
-        <p>The PL/pgSQL condition name for each error code is the same as the phrase shown in the
-          table, with underscores substituted for spaces. For example, code 22012, DIVISION BY ZERO,
-          has condition name DIVISION_BY_ZERO. Condition names can be written in either upper or
-          lower case.</p>
-        <note>PL/pgSQL does not recognize warning, as opposed to error, condition names; those are
-          classes 00, 01, and 02.</note>
+        <p>下面的表格列出了所有定义好的错误代码。有些没有被用到，但是在SQL标准中有定义。其中也显示了错误分类。
+          对于每一种错误分类都有一个标准错误代码，它的最后三个字符为000。这种代码只用于落入该分类却没有更详细
+          代码的错误情况。</p>
+        <p>每种错误代码的PL/pgSQL情况名称与该表中显示的短语相同，但是把空格替换成下划线。例如，代码22012
+          （DIVISION BY ZERO）的情况名称是DIVISION_BY_ZERO。情况名称不区分大小写。</p>
+        <note>与error截然不同，PL/pgSQL不识别warning、condition names，warning、error和
+          condition names的分类分别为00、01和02。
+         </note>
         <table frame="all" id="table_m1k_sqg_kp">
-          <title>SQL Codes</title>
+          <title>SQL代码</title>
           <tgroup cols="3">
             <colspec colnum="1" colname="col1" colwidth=".8*"/>
             <colspec colnum="2" colname="col2" colwidth="2.5*"/>
             <colspec colnum="3" colname="col3" colwidth="3*"/>
             <thead>
               <row>
-                <entry>Error Code</entry>
-                <entry>Meaning</entry>
-                <entry>Constant</entry>
+                <entry>错误代码</entry>
+                <entry>含义</entry>
+                <entry>常量</entry>
               </row>
             </thead>
             <tbody>

@@ -2,17 +2,12 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic3">
-   <title>Setting Configuration Parameters</title>
+  <title>设置配置参数</title>
    <body>
-      <p>Many configuration parameters limit who can change them and where or when they can be set.
-      For example, to change certain parameters, you must be a Greenplum Database superuser. Other
-      parameters can be set only at the system level in the <filepath>postgresql.conf</filepath>
-      file or require a system restart to take effect. </p>
-      <p>Many configuration parameters are <i>session</i> parameters. You can set session parameters
-      at the system level, the database level, the role level or the session level. Database users
-      can change most session parameters within their session, but some require superuser
-      permissions. </p>
-    <p outputclass="">See the <cite>Greenplum Database Reference Guide</cite> for
-      information about setting server configuration parameters.</p>
+     <p>很多配置参数限制了谁能改变它们以及何时何处它们可以被设置。例如，要改变特定的参数，用户必须是一个Greenplum数据库超级用户。
+       其他参数只能从<filepath>postgresql.conf</filepath>文件中在系统级别上被设置，或者还要求系统重启让设置生效。</p>
+     <p>很多配置参数是<i>会话</i>参数。用户可以在系统级别、数据库级别、角色级别或者会话级别设置会话参数。数据库用户可以在他们的
+       会话中改变大部分会话参数，但是某些要求超级用户权限。</p>
+     <p outputclass="">关于设置服务器配置参数的信息请见<cite>Greenplum数据库参考指南</cite>。</p>
    </body>
 </topic>

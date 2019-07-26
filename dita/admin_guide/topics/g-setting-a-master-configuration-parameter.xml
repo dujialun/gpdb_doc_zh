@@ -2,12 +2,10 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic5">
-   <title>Setting a Master Configuration Parameter</title>
+  <title>设置Master配置参数</title>
    <body>
-      <p>To set a master configuration parameter, set it at the Greenplum Database master instance.
-      If it is also a <i>session</i> parameter, you can set the parameter for a particular database,
-      role or session. If a parameter is set at multiple levels, the most granular level takes
-      precedence. For example, session overrides role, role overrides database, and database
-      overrides system.</p>
+     <p>要设置Master配置参数，请在Greenplum数据库的Master实例上设置它。如果它也是一个<i>session</i>参数，
+       用户可以为一个特定数据库、角色或者会话设置该桉树。如果一个参数在多个级别上都被设置，最细粒度级别上的
+       设置会优先。例如，会话覆盖角色，角色覆盖数据库，而数据库覆盖系统。</p>
    </body>
 </topic>

@@ -2,12 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic11">
-   <title>Configuration Parameter Categories</title>
+   <title>配置参数种类</title>
    <body>
-      <p>Configuration parameters affect categories of server behaviors, such as resource
-         consumption, query tuning, and authentication. Refer to <xref
-            href="../../ref_guide/config_params/guc_category-list.xml">Parameter Categories</xref>
-         in the <cite>Greenplum Database Reference Guide</cite> for a list of Greenplum server
-         configuration parameter categories.</p>
+      <p>配置参数影响着多种服务器行为，例如资源消耗、查询调节以及认证。有关配置参数种类的细节，请见<cite>Greenplum数据库参考指南</cite>中的<xref
+            href="../../ref_guide/config_params/guc_category-list.xml">参数分类</xref>部分。</p>
    </body>
 </topic>

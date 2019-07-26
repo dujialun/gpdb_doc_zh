@@ -2,19 +2,16 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic3">
-  <title>Supported Client Applications</title>
+  <title>支持的客户端应用</title>
   <body>
-    <p>Users can connect to Greenplum Database using various client applications:</p>
+    <p>用户可以使用多种客户端应用连接到Greenplum数据库：</p>
     <ul>
-      <li id="io141965">A number of <xref href="g-greenplum-database-client-applications.xml#topic4"
-        /> are provided with your Greenplum installation. The
-          <codeph>psql</codeph> client application provides an interactive command-line interface to
-        Greenplum Database. </li>
-      <li id="io141985">Using standard <xref href="g-database-application-interfaces.xml#topic12"/>,
-        such as ODBC and JDBC, users can create their own client applications that interface to
-        Greenplum Database.</li>
-      <li id="io141996">Most client tools that use standard database interfaces, such as ODBC and
-        JDBC, can be configured to connect to Greenplum Database.</li>
+      <li id="io141965">用户的Greenplum安装中已经提供了一些<xref href="g-greenplum-database-client-applications.xml#topic4"
+      /><codeph>psql</codeph>客户端应用提供了一种对Greenplum数据库的交互式命令行接口。</li>
+      <li id="io141985">使用标准的<xref href="g-database-application-interfaces.xml#topic12"/>,
+        ，如ODBC和JDBC，用户可以创建他们自己的客户端应用来接入到Greenplum数据库。因为Greenplum数据库基于PostgreSQL开发，
+        所以它使用标准的PostgreSQL数据库驱动。</li>
+      <li id="io141996">大部分使用ODBC和JDBC等标准数据库接口的客户端工具都可以被配置来连接到 Greenplum数据库。</li>
     </ul>
   </body>
 </topic>

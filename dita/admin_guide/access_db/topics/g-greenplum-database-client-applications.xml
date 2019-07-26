@@ -2,20 +2,19 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic4">
-   <title>Greenplum Database Client Applications</title>
+   <title>Greenplum数据库客户端应用</title>
    <body>
-      <p>Greenplum Database comes installed with a number of client utility
-         applications located in the <codeph>$GPHOME/bin</codeph> directory of your Greenplum Database master host installation. The following are the most commonly
-         used client utility applications:</p>
+      <p>Greenplum数据库安装后就会带有一些客户端工具应用，它们位于用户的Greenplum数据库Master主机安装的
+         <codeph>$GPHOME/bin</codeph>目录中。下列是最常用的客户端工具应用：</p>
       <table id="io142026">
-         <title>Commonly used client applications</title>
+         <title>最常用的客户端应用</title>
          <tgroup cols="2">
             <colspec colnum="1" colname="col1" colwidth="110pt"/>
             <colspec colnum="2" colname="col2" colwidth="266pt"/>
             <thead>
                <row>
-                  <entry colname="col1">Name</entry>
-                  <entry colname="col2">Usage</entry>
+                  <entry colname="col1">名称</entry>
+                  <entry colname="col2">用法</entry>
                </row>
             </thead>
             <tbody>
@@ -23,75 +22,71 @@
                   <entry colname="col1">
                      <codeph>createdb</codeph>
                   </entry>
-                  <entry colname="col2">create a new database</entry>
+                  <entry colname="col2">创建一个新数据库</entry>
                </row>
                <row>
                   <entry colname="col1">
                      <codeph>createlang</codeph>
                   </entry>
-                  <entry colname="col2">define a new procedural language</entry>
+                  <entry colname="col2">定义一种新的过程语言</entry>
                </row>
                <row>
                   <entry colname="col1">
                      <codeph>createuser</codeph>
                   </entry>
-                  <entry colname="col2">define a new database role</entry>
+                  <entry colname="col2">定义一个新的数据库角色</entry>
                </row>
                <row>
                   <entry colname="col1">
                      <codeph>dropdb</codeph>
                   </entry>
-                  <entry colname="col2">remove a database</entry>
+                  <entry colname="col2">移除一个数据库</entry>
                </row>
                <row>
                   <entry colname="col1">
                      <codeph>droplang</codeph>
                   </entry>
-                  <entry colname="col2">remove a procedural language</entry>
+                  <entry colname="col2">移除一种过程语言</entry>
                </row>
                <row>
                   <entry colname="col1">
                      <codeph>dropuser</codeph>
                   </entry>
-                  <entry colname="col2">remove a role</entry>
+                  <entry colname="col2">移除一个角色</entry>
                </row>
                <row>
                   <entry colname="col1">
                      <codeph>psql</codeph>
                   </entry>
-                  <entry colname="col2">PostgreSQL interactive terminal</entry>
+                  <entry colname="col2">PostgreSQL交互式终端</entry>
                </row>
                <row>
                   <entry colname="col1">
                      <codeph>reindexdb</codeph>
                   </entry>
-                  <entry colname="col2">reindex a database</entry>
+                  <entry colname="col2">对一个数据库重建索引</entry>
                </row>
                <row>
                   <entry colname="col1">
                      <codeph>vacuumdb</codeph>
                   </entry>
-                  <entry colname="col2">garbage-collect and analyze a database</entry>
+                  <entry colname="col2">对一个数据库进行垃圾收集和分析</entry>
                </row>
             </tbody>
          </tgroup>
       </table>
-      <p>When using these client applications, you must connect to a database through the Greenplum master instance. You will need to know the name of your
-         target database, the host name and port number of the master, and what database user name
-         to connect as. This information can be provided on the command-line using the options
-            <codeph>-d</codeph>, <codeph>-h</codeph>, <codeph>-p</codeph>, and <codeph>-U</codeph>
-         respectively. If an argument is found that does not belong to any option, it will be
-         interpreted as the database name first.</p>
-      <p>All of these options have default values which will be used if the option is not specified.
-         The default host is the local host. The default port number is 5432. The default user name
-         is your OS system user name, as is the default database name. Note that OS user names and
-            Greenplum Database user names are not necessarily the same. </p>
-      <p id="io141912">If the default values are not correct, you can set the environment variables
-            <codeph>PGDATABASE</codeph>, <codeph>PGHOST</codeph>, <codeph>PGPORT</codeph>, and
-            <codeph>PGUSER</codeph> to the appropriate values, or use a <codeph>psql</codeph>
-         <codeph>~/.pgpass</codeph> file to contain frequently-used passwords. </p>
-      <p>For information about Greenplum Database environment variables, see the
-            <i>Greenplum Database Reference Guide</i>. For information about psql, see the
-            <i>Greenplum Database Utility Guide</i>.</p>
+      <p>在使用这些客户端应用时，用户必须通过Greenplum的Master实例连接到一个数据库。
+         用户将需要知道目标数据库的名称、Master的主机名和端口号，还有用于连接的数据库用户名。
+         这些信息可以在命令行上分别用选项<codeph>-d</codeph>、<codeph>-h</codeph>、
+         <codeph>-p</codeph>和<codeph>-U</codeph>来提供。如果找到不属于任何一个选项的参数，
+         它将被首先解释为数据库名。</p>
+      <p>所有这些选项都有默认值，如果该选项没有被指定就会使用其默认值。默认主机是本地主机。默认
+         端口号是5432。默认用户名是用户的操作系统用户名，同时也是默认的数据库名。注意操作系统
+         用户名和Greenplum数据库用户名并不需要一样。</p>
+      <p id="io141912">如果默认值和实际情况不同，用户可以设置环境变量<codeph>PGDATABASE</codeph>、
+         <codeph>PGHOST</codeph>、<codeph>PGPORT</codeph>和<codeph>PGUSER</codeph>为合适的值，
+         或者使用一个<codeph>psql</codeph><codeph>~/.pgpass</codeph>文件来包含常用的口令。</p>
+      <p>更多有关Greenplum数据库环境变量的信息，请见<i>Greenplum数据库参考指南</i>。
+         有关psql的详细信息请见，<i>Greenplum数据库工具指南</i>。</p>
    </body>
 </topic>

@@ -2,18 +2,16 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic2">
-  <title>About Greenplum Database Master and Local Parameters</title>
+  <title>关于Greenplum数据库的Master参数和本地参数</title>
   <body>
-    <p>Server configuration files contain parameters that configure server behavior. The Greenplum
-      Database configuration file, <filepath>postgresql.conf</filepath>, resides in the data
-      directory of the database instance.</p>
-    <p>The master and each segment instance have their own <filepath>postgresql.conf</filepath>
-      file. Some parameters are <i>local</i>: each segment instance examines its
-        <filepath>postgresql.conf</filepath> file to get the value of that parameter. Set local
-      parameters on the master and on each segment instance.</p>
-    <p>Other parameters are <i>master</i> parameters that you set on the master instance. The value
-      is passed down to (or in some cases ignored by) the segment instances at query run time.</p>
-    <p>See the <cite>Greenplum Database Reference Guide</cite> for information
-      about <i>local</i> and <i>master</i> server configuration parameters.</p>
+    <p>服务器配置文件包含着配置服务器行为的参数。Greenplum数据库的配置文件<filepath>postgresql.conf</filepath>
+      位于数据库实例的数据目录之下。</p>
+    <p>Master和每一个Segment实例都有自己的<filepath>postgresql.conf</filepath>文件。
+      一些参数是<i>本地</i>的：每个Segment实例检查它的<filepath>postgresql.conf</filepath>文件来得到这类
+      参数的值。在Master和每一个Segment实例上都要设置本地参数。</p>
+    <p>其他参数是用户要在Master实例上设置的<i>master</i>参数。其值会在查询运行时被向下传递到Segment实例
+      （或者在某些情况中会被忽略）。</p>
+    <p>有关<i>local</i>以及<i>master</i>服务器配置参数的信息请见
+      <cite>Greenplum数据库参考指南</cite>。</p>
   </body>
 </topic>

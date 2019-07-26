@@ -2,27 +2,22 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic13">
-  <title>Recovering a Failed Segment</title>
+  <title>恢复故障Segment</title>
   <body>
-    <p>If the master cannot connect to a segment instance, it marks that segment as down in the
-      Greenplum Database system catalog. The segment instance remains offline until an administrator
-      takes steps to bring the segment back online. The process for recovering a failed segment
-      instance or host depends on the failure cause and whether or not mirroring is enabled. A
-      segment instance can be unavailable for many reasons:</p>
+    <p>如果Master无法连接到一个Segment实例，它会在Greenplum数据库的系统表中把该Segment标记为“down”。
+      该Segment实例会保持离线状态直到管理员采取步骤让它重新回到线上。恢复一个失效Segment实例或者主机的
+      处理取决于失效原因以及是否启用了镜像。一个Segment实例的故障原因多种多样：
+      </p>
     <ul>
-      <li id="ki155624">A segment host is unavailable; for example, due to network or hardware
-        failures.</li>
-      <li id="ki155625">A segment instance is not running; for example, there is no
-          <codeph>postgres</codeph> database listener process.</li>
-      <li id="ki155626">The data directory of the segment instance is corrupt or missing; for
-        example, data is not accessible, the file system is corrupt, or there is a disk
-        failure.</li>
+      <li id="ki155624">Segment主机不可用，例如由于网络或者硬件失效。</li>
+      <li id="ki155625">Segment实例没有运行，例如没有<codeph>postgres</codeph>数据监听器进程。</li>
+      <li id="ki155626">Segment实例的数据目录损坏或者丢失，例如数据不可访问、文件系统损坏或者磁盘失效。</li>
     </ul>
     <p>
-      <xref href="#topic13/ki155628" type="fig" format="dita"/> shows the high-level steps for each
-      of the preceding failure scenarios.<fig id="ki155628">
+      <xref href="#topic13/ki155628" type="fig" format="dita"/>展示了前述失效场景的高层排查步骤。
+      <fig id="ki155628">
         <!-- 2 image settings online and PDF width="660" height="630" -->
-        <title>Segment Failure Troubleshooting Matrix</title>
+        <title>Segment失效故障排查矩阵</title>
         <image otherprops="op-print" href="../../graphics/recovermatrix.png" placement="break"
           width="460" id="image_cdg_nfp_35"/>
         <image otherprops="op-help" href="../../graphics/recovermatrix.png" placement="break"

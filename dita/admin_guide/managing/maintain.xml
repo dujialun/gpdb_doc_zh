@@ -2,146 +2,114 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="np160185">Routine System Maintenance Tasks</title>
-  <shortdesc>To keep a Greenplum Database system running efficiently, the database must be regularly
-    cleared of expired data and the table statistics must be updated so that the query optimizer has
-    accurate information. </shortdesc>
+  <title id="np160185">日常系统维护任务</title>
+  <shortdesc>要保持一个Greenplum数据库系统高效运行，必须对数据库定期清理过期数据并且更新表统计信息，
+    这样查询优化器才能有准确的信息。</shortdesc>
   <body>
-    <p>Greenplum Database requires that certain tasks be performed regularly to achieve optimal
-      performance. The tasks discussed here are required, but database administrators can automate
-      them using standard UNIX tools such as <codeph>cron</codeph> scripts. An administrator sets up
-      the appropriate scripts and checks that they execute successfully. See <xref
-        href="../monitoring/monitoring.dita#topic_kmz_lbg_rp"/> for additional suggested maintenance
-      activities you can implement to keep your Greenplum system running optimally.</p>
+    <p>Greenplum数据库要求定期执行特定的任务来达到最优性能。这里讨论的任务都是必须的，但数据库管理员可以使用
+      标准的UNIX工具（如<codeph>cron</codeph>脚本）来自动化这些任务。管理员建立适当的脚本并且检查它们是否
+      成功执行。关于用来保持Greenplum系统最优化运行的额外建议维护活动，请见<xref
+        href="../monitoring/monitoring.dita#topic_kmz_lbg_rp"/>。</p>
   </body>
   <topic id="topic2" xml:lang="en">
-    <title id="np157166">Routine Vacuum and Analyze</title>
+    <title id="np157166">例行清理和分析</title>
     <body>
-      <p>The design of the MVCC transaction concurrency model used in Greenplum Database means that
-        deleted or updated data rows still occupy physical space on disk even though they are not
-        visible to new transactions. If your database has many updates and deletes, many expired
-        rows exist and the space they use must be reclaimed with the <codeph>VACUUM</codeph>
-        command. The <codeph>VACUUM</codeph> command also collects table-level statistics, such as
-        numbers of rows and pages, so it is also necessary to vacuum append-optimized tables, even
-        when there is no space to reclaim from updated or deleted rows. </p>
-      <p>Vacuuming an append-optimized table follows a different process than vacuuming heap tables.
-        On each segment, a new segment file is created and visible rows are copied into it from the
-        current segment. When the segment file has been copied, the original is scheduled to be
-        dropped and the new segment file is made available. This requires sufficient available disk
-        space for a copy of the visible rows until the original segment file is dropped. </p>
-      <p>If the ratio of hidden rows to total rows in a segment file is less than a threshold value
-        (10, by default), the segment file is not compacted. The threshold value can be configured
-        with the <codeph>gp_appendonly_compaction_threshold</codeph> server configuration parameter.
-          <codeph>VACUUM FULL</codeph> ignores the value of
-          <codeph>gp_appendonly_compaction_threshold</codeph> and rewrites the segment file
-        regardless of the ratio.</p>
-      <p>You can use the <codeph>__gp_aovisimap_compaction_info()</codeph> function in the the
-          <i>gp_toolkit</i> schema to investigate the effectiveness of a <cmdname>VACUUM</cmdname>
-        operation on append-optimized tables. </p>
-      <p>For information about the <codeph>__gp_aovisimap_compaction_info()</codeph> function see,
-        "Checking Append-Optimized Tables" in the <cite>Greenplum Database Reference
-        Guide</cite>.</p>
-      <p><codeph>VACUUM</codeph> can be disabled for append-optimized tables using the
-          <codeph>gp_appendonly_compaction</codeph> server configuration parameter. </p>
-      <p>For details about vacuuming a database, see <xref href="../dml.xml#topic9" type="topic"
-          format="dita"/>. </p>
-      <p>For information about the <codeph>gp_appendonly_compaction_threshold</codeph> server
-        configuration parameter and the <codeph>VACUUM</codeph> command, see the <cite>Greenplum
-          Database Reference Guide</cite>.</p>
+      <p>Greenplum数据库中使用的MVCC事务并发模型的设计意味着被删除或者被更新的数据行仍在磁盘上占据物理空间，
+        即便它们已经对新事务不可见。如果数据库进行了很多更新和删除，会有很多过期行存在并且它们所使用的空间必须使用
+        <codeph>VACUUM</codeph>命令来回收。<codeph>VACUUM</codeph>命令还会收集表级的统计信息，例如行数和
+        页面数，因此即便无需从被更新或者被删除行回收空间，也还是有必要去清理追加优化表。</p>
+      <p>清理一个追加优化表遵循一种和清理堆表不同的处理逻辑。在每一个Segment上，会创建一个新的Segment文件并且
+        把可见行从当前Segment复制到该文件中。当Segment文件被拷贝完时，将会安排删除原始的Segment文件并且让新
+        的Segment文件变得可用。这要求足够的可用磁盘空间用于拷贝可见行，直到原始的Segment文件被删除为止。</p>
+      <p>如果一个Segment文件中隐藏行和所有行的比率低于一个阈值（默认是10），该Segment文件不会被紧缩。
+        该阈值可以通过<codeph>gp_appendonly_compaction_threshold</codeph>服务器配置参数配置。<codeph>VACUUM FULL</codeph>
+        忽略<codeph>gp_appendonly_compaction_threshold</codeph>的值并且不管该比率为多少都会重写Segment文件。</p>
+      <p>可以使用<i>gp_toolkit</i>模式中的<codeph>__gp_aovisimap_compaction_info()</codeph>函数来查看
+        追加优化表上的<cmdname>VACUUM</cmdname>操作的效果。</p>
+      <p>有关<codeph>__gp_aovisimap_compaction_info()</codeph>函数的信息请见<cite>Greenplum Database Reference Guide</cite>
+        “检查追加优化表”部分</p>
+      <p>可以使用<codeph>gp_appendonly_compaction</codeph>服务器配置参数为追加优化表禁用
+        <codeph>VACUUM</codeph>操作。</p>
+      <p>有关清理数据库的细节请见<xref href="../dml.xml#topic9" type="topic"
+          format="dita"/>。</p>
+      <p>有关<codeph>gp_appendonly_compaction_threshold</codeph>服务器配置参数和<codeph>VACUUM</codeph>
+        命令的信息请见<cite>Greenplum Database Reference Guide</cite>。</p>
     </body>
     <topic id="topic3" xml:lang="en">
-      <title>Transaction ID Management</title>
+      <title>事务ID管理</title>
       <body>
-        <p>Greenplum's MVCC transaction semantics depend on comparing transaction ID (XID) numbers
-          to determine visibility to other transactions. Transaction ID numbers are compared using
-          modulo 2<sup>32</sup> arithmetic, so a Greenplum system that runs more than about two
-          billion transactions can experience transaction ID wraparound, where past transactions
-          appear to be in the future. This means past transactions' outputs become invisible.
-          Therefore, it is necessary to <codeph>VACUUM</codeph> every table in every database at
-          least once per two billion transactions. </p>
-        <p>Greenplum Database assigns XID values only to transactions that involve DDL or DML
-          operations, which are typically the only transactions that require an XID.</p>
-        <note type="important">Greenplum Database monitors transaction IDs. If you do not vacuum the
-          database regularly, Greenplum Database will generate a warning and error.</note>
-        <p>Greenplum Database issues the following warning when a significant portion of the
-          transaction IDs are no longer available and before transaction ID wraparound occurs: </p>
+        <p>Greenplum的MVCC事务机制依赖于比较事务ID（XID）号来判断当前数据对于其他事务的可见性。
+          事务ID号使用一种模2<sup>32</sup>的算法来比较，因此一个运行了超过二十亿事务的
+          Greenplum系统可能会遇到事务ID回卷，即过去的事务变成了未来的事务。这意味着过去的事务的
+          输出变得不可见。因此，每过二十亿个事务就有必要<codeph>VACUUM</codeph>每个数据库中的
+          每个表至少一次。</p>
+        <p>Greenplum数据库只对涉及DDL或者DML操作的事务分配XID值，通常也只有这些事务需要XID。</p>
+        <note type="important">Greenplum数据库会监控事务ID。如果没有定期清理数据库，Greenplum
+          数据库将产生警告和错误。</note>
+        <p>当事务ID中相当多的一部分变得不再可用并且事务ID回卷还没有发生时，Greenplum数据库会发出
+          下面的警告：</p>
         <p>
           <codeph>WARNING: database "database_name" must be vacuumed within
               <i>number_of_transactions</i> transactions</codeph>
         </p>
-        <p>When the warning is issued, a <codeph>VACUUM</codeph> operation is required. If a
-            <codeph>VACUUM</codeph> operation is not performed, Greenplum Database stops creating
-          transactions when it reaches a limit prior to when transaction ID wraparound occurs.
-          Greenplum Database issues this error when it stops creating transactions to avoid possible
-          data loss: </p>
+        <p>当这个警告被发出时，需要一次<codeph>VACUUM</codeph>操作。如果没有执行<codeph>VACUUM</codeph>
+          操作，当Greenplum数据库在事务ID回卷发生前达到一个限制，它会停止创建新的事务。在停止创建
+          事务以避免可能的数据丢失时，Greenplum数据库会发出这个错误：</p>
         <p>
           <codeblock>FATAL: database is not accepting commands to avoid 
 wraparound data loss in database "database_name"
 </codeblock>
         </p>
-        <p>The Greenplum Database configuration parameter <codeph>xid_warn_limit</codeph> controls
-          when the warning is displayed. The parameter <codeph>xid_stop_limit</codeph> controls when
-          Greenplum Database stops creating transactions. </p>
+        <p>Greenplum数据库配置参数<codeph>xid_warn_limit</codeph>控制何时显示该警告。参数
+          <codeph>xid_stop_limit</codeph>控制何时Greenplum数据库停止创建事务。</p>
         <section id="np160654">
-          <title>Recovering from a Transaction ID Limit Error</title>
-          <p>When Greenplum Database reaches the <codeph>xid_stop_limit</codeph> transaction ID
-            limit due to infrequent <codeph>VACUUM</codeph> maintenance, it becomes unresponsive. To
-            recover from this situation, perform the following steps as database administrator:</p>
+          <title>从一次事务ID限制错误中恢复</title>
+          <p>当Greenplum数据库由于不频繁的<codeph>VACUUM</codeph>维护而达到
+            <codeph>xid_stop_limit</codeph>事务ID限制时，它会变得没有响应。为了从这种情况中
+            恢复过来，作为数据库管理员执行下面的步骤：</p>
           <ol>
-            <li id="np160540">Shut down Greenplum Database.</li>
-            <li id="np160541">Temporarily lower the <codeph>xid_stop_limit</codeph> by
-              10,000,000.</li>
-            <li id="np160542">Start Greenplum Database.</li>
-            <li id="np160543">Run <codeph>VACUUM FREEZE</codeph> on all affected databases.</li>
-            <li id="np160517">Reset the <codeph>xid_stop_limit</codeph> to its original value.</li>
-            <li id="np160622">Restart Greenplum Database.</li>
+            <li id="np160540">关闭Greenplum数据库。</li>
+            <li id="np160541">临时将<codeph>xid_stop_limit</codeph>降低10,000,000。</li>
+            <li id="np160542">启动Greenplum数据库。</li>
+            <li id="np160543">在所有受影响的数据库上运行<codeph>VACUUM FREEZE</codeph>。</li>
+            <li id="np160517">将<codeph>xid_stop_limit</codeph>重置为原来的值。</li>
+            <li id="np160622">重启Greenplum数据库。</li>
           </ol>
-          <p>For information about the configuration parameters, see the <i>Greenplum Database
-              Reference Guide</i>. </p>
-          <p>For information about transaction ID wraparound see the <xref
+          <p>有关这些配置参数的信息请见<i>Greenplum Database Reference Guide</i>。</p>
+          <p>有关事务ID回卷的信息请见<xref
               href="https://www.postgresql.org/docs/9.4/index.html" scope="external"
               format="html"><ph>PostgreSQL documentation</ph></xref>.</p>
         </section>
       </body>
     </topic>
     <topic id="topic4" xml:lang="en">
-      <title>System Catalog Maintenance</title>
+      <title>系统目录维护</title>
       <body>
-        <p>Numerous database updates with <codeph>CREATE</codeph> and <codeph>DROP</codeph> commands
-          increase the system catalog size and affect system performance. For example, running many
-            <codeph>DROP TABLE</codeph> statements degrades the overall system performance due to
-          excessive data scanning during metadata operations on catalog tables. The performance loss
-          occurs between thousands to tens of thousands of <codeph>DROP TABLE</codeph> statements,
-          depending on the system.</p>
-        <p>You should run a system catalog maintenance procedure regularly to reclaim the space
-          occupied by deleted objects. If a regular procedure has not been run for a long time, you
-          may need to run a more intensive procedure to clear the system catalog. This topic
-          describes both procedures.</p>
+        <p>多次使用<codeph>CREATE</codeph>和<codeph>DROP</codeph>命令的数据库更新会增长系统目录尺寸并且
+          影响系统性能。例如，运行很多次<codeph>DROP TABLE</codeph>语句会降低总体系统性能，因为在目录表上
+          的元数据查询期间会需要更多扫描时间。性能损失会在数千次或者数万次<codeph>DROP TABLE</codeph>语句
+          之间发生，具体时间取决于系统。</p>
+        <p>应该定期维护系统目录来回收已删除对象所占据的空间。如果长时间没有运行这种定期回收操作，那可能需要运行
+          一个更彻底的回收操作来清理系统目录。这个主题会描述这两种方式。</p>
       </body>
       <topic id="topic5" xml:lang="en">
-        <title>Regular System Catalog Maintenance</title>
+        <title>常规系统目录维护</title>
         <body>
-          <p>It is recommended that you periodically run <codeph>REINDEX</codeph> and
-              <codeph>VACUUM</codeph> on the system catalog to clear the space that deleted objects
-            occupy in the system indexes and tables. If regular database operations include numerous
-              <codeph>DROP</codeph> statements, it is safe and appropriate to run a system catalog
-            maintenance procedure with <codeph>VACUUM</codeph> daily at off-peak hours. You can do
-            this while the system is available.</p>
-          <p>These are Greenplum Database system catalog maintenance steps.<ol id="ol_un5_p1l_f2b">
-              <li>Perform a <codeph>REINDEX</codeph> on the system catalog tables to rebuild the
-                system catalog indexes. This removes bloat in the indexes and improves
-                  <codeph>VACUUM</codeph> performance.
-                <note>When performing <codeph>REINDEX</codeph> on the system catalog tables, locking
-                  will occur on the tables and might have an impact on currently running queries.
-                  You can schedule the <codeph>REINDEX</codeph> operation during a period of low
-                  activity to avoid disrupting ongoing business operations.</note></li>
-              <li>Perform a <codeph>VACUUM</codeph> on the system catalog tables. </li>
-              <li>Perform an <codeph>ANALYZE</codeph> on the system catalog tables to update the
-                catalog table statistics. </li>
+          <p>推荐周期性地在系统目录上运行<codeph>REINDEX</codeph>和<codeph>VACUUM</codeph>来清理系统索引和
+            表中已删除对象所占用的空间。如果常规的数据库操作包括很多<codeph>DROP</codeph>语句，那么每天在非峰值
+            时间用<codeph>VACUUM</codeph>命令运行一次系统目录维护是安全且适当的。用户可以在系统可用时执行这种操作。</p>
+          <p>下面是Greenplum数据库系统目录维护步骤。<ol id="ol_un5_p1l_f2b">
+            <li>在系统表上执行<codeph>REINDEX</codeph>命令以重建系统表索引。该操作移除索引膨胀并提高<codeph>VACUUM</codeph>
+              性能。
+                <note>当在系统表上执行<codeph>REINDEX</codeph>操作时，表上会产生锁，此时可能会对当前正在运行的
+                  查询产生比较大的影响。建议在系统负载较低时执行<codeph>REINDEX</codeph>操作，以避免对正在运行的
+                  业务操作产生较大的干扰。</note></li>
+              <li>在系统表上执行<codeph>VACUUM</codeph>操作。</li>
+              <li>在系统表上执行<codeph>ANALYZE</codeph>操作，用以更新统计信息。</li>
             </ol></p>
-          <p>This example script performs a <codeph>REINDEX</codeph>, <codeph>VACUUM</codeph>, and
-              <codeph>ANALYZE</codeph> of a Greenplum Database system catalog. In the script,
-            replace <codeph>&lt;<varname>database-name</varname>></codeph> with a database name.</p>
+          <p>下面的示例脚本在一个Greenplum数据库系统目录上执行一次<codeph>REINDEX</codeph>、<codeph>VACUUM</codeph>
+            以及<codeph>ANALYZE</codeph>操作：
+            将脚本中的<codeph>&lt;<varname>database-name</varname>></codeph>替换为真实数据库名。</p>
           <codeblock>#!/bin/bash
 DBNAME="&lt;<varname>database-name</varname>>"
 SYSTABLES="' pg_catalog.' || relname || ';' FROM pg_class a, pg_namespace b 
@@ -151,117 +119,91 @@ reindexdb --system -d $DBNAME
 psql -tc "SELECT 'VACUUM' || $SYSTABLES" $DBNAME | psql -a $DBNAME
 analyzedb -s pg_catalog -d $DBNAME
 </codeblock>
-          <note>If you are performing catalog maintenance during a maintenance period and you need
-            to stop a process due to time constraints, run the Greenplum Database function
-                <codeph>pg_cancel_backend(&lt;<varname>PID</varname>>)</codeph> to safely stop the
-            Greenplum Database process.</note>
+          <note>如果在系统维护时间内已经开始了正常的系统目录维护操作，但是由于时间原因想要停止某一维护进程，
+            此时可以运行Greenplum数据库函数<codeph>pg_cancel_backend(&lt;<varname>PID</varname>>)</codeph>
+            以安全停止该Greenplum数据库进程。</note>
         </body>
       </topic>
       <topic id="topic6" xml:lang="en">
-        <title>Intensive System Catalog Maintenance</title>
+        <title>深度系统目录维护</title>
         <body>
-          <p>If system catalog maintenance has not been performed in a long time, the catalog can
-            become bloated with dead space; this causes excessively long wait times for simple
-            metadata operations. A wait of more than two seconds to list user tables, such as with
-            the <codeph>\d</codeph> metacommand from within <codeph>psql</codeph>, is an indication
-            of catalog bloat.</p>
-          <p>If you see indications of system catalog bloat, you must perform an intensive system
-            catalog maintenance procedure with <codeph>VACUUM FULL</codeph> during a scheduled
-            downtime period. During this period, stop all catalog activity on the system; the
-              <codeph>VACUUM FULL</codeph> system catalog maintenance procedure takes exclusive
-            locks against the system catalog.</p>
-          <p>Running regular system catalog maintenance procedures can prevent the need for this
-            more costly procedure.</p>
-          <p>These are steps for intensive system catalog maintenance.<ol id="ol_trp_xqs_f2b">
-              <li>Stop all catalog activity on the Greenplum Database system.</li>
-              <li>Perform a <codeph>REINDEX</codeph> on the system catalog tables to rebuild the
-                system catalog indexes. This removes bloat in the indexes and improves
-                  <codeph>VACUUM</codeph> performance.</li>
-              <li>Perform a <codeph>VACUUM FULL</codeph> on the system catalog tables. See the
-                following Note.</li>
-              <li>Perform an <codeph>ANALYZE</codeph> on the system catalog tables to update the
-                catalog table statistics. </li>
+          <p>如果很长时间都没有执行一次系统目录维护操作，该目录可能因为废弃空间而膨胀。这会导致简单的元数据
+            操作都会等待很长时间。在<codeph>psql</codeph>中用<codeph>\d</codeph>命令列出用户表需要超过
+            两秒的等待，就是目录膨胀的一种征兆。</p>
+          <p>如果发现系统目录膨胀的征兆，就必须在计划好的停机时段用<codeph>VACUUM FULL</codeph>执行一次
+            深度系统目录维护操作。在这一时段中，停止系统上的所有目录活动，这种<codeph>VACUUM FULL</codeph>
+            系统目录维护过程会对系统目录加排他锁。</p>
+          <p>运行定期系统目录维护操作可以防止对这种更高开销操作的需求。</p>
+          <p>以下是深度系统目录维护操作的步骤。<ol id="ol_trp_xqs_f2b">
+              <li>停止Greenplum数据库系统上的所有活动元数据操作。</li>
+              <li>在系统表上执行<codeph>REINDEX</codeph>操作以重建系统表索引。该操作移除索引上的膨胀并提高
+                  <codeph>VACUUM</codeph>操作性能。</li>
+              <li>在系统表上执行<codeph>VACUUM FULL</codeph>命令，具体查看下面的注释。</li>
+              <li>在系统表上执行<codeph>ANALYZE</codeph>命令以更新系统表的统计信息。</li>
             </ol></p>
-          <note>The system catalog table <codeph>pg_attribute</codeph> is usually the largest
-            catalog table. If the <codeph>pg_attribute</codeph> table is significantly bloated, a
-              <codeph>VACUUM FULL</codeph> operation on the table might require a significant amount
-            of time and might need to be performed separately. The presence of both of these
-            conditions indicate a significantly bloated <codeph>pg_attribute</codeph> table that
-            might require a long <codeph>VACUUM FULL</codeph> time:<ul id="ul_fl3_dty_f2b">
-              <li>The <codeph>pg_attribute</codeph> table contains a large number of records.</li>
-              <li>The diagnostic message for <codeph>pg_attribute</codeph> is <codeph>significant
-                  amount of bloat</codeph> in the <codeph>gp_toolkit.gp_bloat_diag</codeph>
-                view.</li>
+          <note>通常来说，表<codeph>pg_attribute</codeph>是最大的系统表。如果<codeph>pg_attribute</codeph>
+            表膨胀的特别厉害，该表上的<codeph>VACUUM FULL</codeph>操作可能需要更长的时间并且可能需要分开执行。
+            以下两种情况的出现预示着<codeph>pg_attribute</codeph>表膨胀很厉害并且需要长时间的<codeph>VACUUM FULL</codeph>
+            操作：<ul id="ul_fl3_dty_f2b">
+              <li><codeph>pg_attribute</codeph>表包含大量记录。</li>
+              <li><codeph>gp_toolkit.gp_bloat_diag</codeph>视图中的信息显示<codeph>pg_attribute</codeph>的状态为<codeph>significant
+                  amount of bloat</codeph></li>
             </ul></note>
         </body>
       </topic>
     </topic>
     <topic id="topic7" xml:lang="en">
-      <title>Vacuum and Analyze for Query Optimization</title>
+      <title>为查询优化进行清理和分析</title>
       <body>
-        <p>Greenplum Database uses a cost-based query optimizer that relies on database statistics.
-          Accurate statistics allow the query optimizer to better estimate selectivity and the
-          number of rows that a query operation retrieves. These estimates help it choose the most
-          efficient query plan. The <codeph>ANALYZE</codeph> command collects column-level
-          statistics for the query optimizer.</p>
-        <p>You can run both <codeph>VACUUM</codeph> and <codeph>ANALYZE</codeph> operations in the
-          same command. For example:</p>
+        <p>Greenplum数据库使用一种基于代价的查询优化器，它依赖于数据库的统计信息。准确的统计信息帮助查询优化器
+          更好的评估选择度以及一个查询操作检索的行数。这些评估会帮助它选择最有效的查询计划。<codeph>ANALYZE</codeph>
+          命令会为查询优化器收集列级的统计信息。</p>
+        <p>可以在同一个命令中同时执行<codeph>VACUUM</codeph>和<codeph>ANALYZE</codeph>操作。例如：</p>
         <p>
           <codeblock>=# VACUUM ANALYZE mytable;
 </codeblock>
         </p>
-        <p>Running the <cmdname>VACUUM ANALYZE</cmdname> command might produce incorrect statistics
-          when the command is run on a table with a significant amount of bloat (a significant
-          amount of table disk space is occupied by deleted or obsolete rows). For large tables, the
-            <codeph>ANALYZE</codeph> command calculates statistics from a random sample of rows. It
-          estimates the number rows in the table by multiplying the average number of rows per page
-          in the sample by the number of actual pages in the table. If the sample contains many
-          empty pages, the estimated row count can be inaccurate. </p>
-        <p>For a table, you can view information about the amount of unused disk space (space that
-          is occupied by deleted or obsolete rows) in the <i>gp_toolkit</i> view
-            <i>gp_bloat_diag</i>. If the <codeph>bdidiag</codeph> column for a table contains the
-          value <codeph>significant amount of bloat suspected</codeph>, a significant amount of
-          table disk space consists of unused space. Entries are added to the <i>gp_bloat_diag</i>
-          view after a table has been vacuumed.</p>
-        <p>To remove unused disk space from the table, you can run the command <cmdname>VACUUM
-            FULL</cmdname> on the table. Due to table lock requirements, <cmdname>VACUUM
-            FULL</cmdname> might not be possible until a maintenance period. </p>
-        <p>As a temporary workaround, run <cmdname>ANALYZE</cmdname> to compute column statistics
-          and then run <cmdname>VACUUM</cmdname> on the table to generate an accurate row count.
-          This example runs <cmdname>ANALYZE</cmdname> and then <cmdname>VACUUM</cmdname> on the
-            <i>cust_info</i> table.<codeblock>ANALYZE cust_info;
+        <p>当在一个显著膨胀的表（显著膨胀的表磁盘空间被已删除或者已废弃行占据）上运行<cmdname>VACUUM ANALYZE</cmdname>
+          命令时，该命令可能会产生不正确的统计信息。对于大型的表，<codeph>ANALYZE</codeph>命令会从行的一个随机
+          采样中计算统计信息。它会通过计算采样中每页的平均行数与表中实际页数的成绩来估算表中的总行数。如果采样包含
+          很多空页，估计出的行计数可能会不准确。
+          </p>
+        <p>对于一个表，可以在<i>gp_toolkit</i>视图<i>gp_bloat_diag</i>中查看有关未使用磁盘空间（被已删除或者
+          已废弃行占据的空间）量的信息。如果一个表的<codeph>bdidiag</codeph>列包含值
+          <codeph>significant amount of bloat suspected</codeph>，那么相当多的表磁盘空间由未使用空间组成。
+          在一个表被清理后，相关项会被加入到<i>gp_bloat_diag</i>视图中。</p>
+        <p>要从表中移除未使用的磁盘空间，可以在该表上运行命令<cmdname>VACUUM FULL</cmdname>。由于对表锁的需求，
+          <cmdname>VACUUM FULL</cmdname>可能无法在非维护时段运行。
+        </p>
+        <p>作为一种临时的变通方案，可以运行<cmdname>ANALYZE</cmdname>来计算列统计信息，然后在该表上运行
+          <cmdname>VACUUM</cmdname>来生成准确的行计数。这个例子在<i>cust_info</i>表上先运行<cmdname>ANALYZE</cmdname>，
+          然后运行<cmdname>VACUUM</cmdname>。
+         <codeblock>ANALYZE cust_info;
 VACUUM cust_info;</codeblock></p>
-        <note type="important">If you intend to execute queries on partitioned tables with GPORCA
-          enabled (the default), you must collect statistics on the partitioned table root partition
-          with the <cmdname>ANALYZE</cmdname> command. For information about GPORCA, see <xref
-            href="../query/topics/query-piv-opt-overview.xml"/>. </note>
-        <note>You can use the Greenplum Database utility <cmdname>analyzedb</cmdname> to update
-          table statistics. Tables can be analyzed concurrently. For append optimized tables,
-            <cmdname>analyzedb</cmdname> updates statistics only if the statistics are not current.
-          See the <codeph><xref href="../../utility_guide/admin_utilities/analyzedb.xml"
-              >analyzedb</xref></codeph> utility.</note>
+        <note type="important">如果想要在启用了GPORCA（默认启用）的情况下对分区表执行查询，
+          必须用<cmdname>ANALYZE</cmdname>命令在分区表根分区上收集统计信息。有关GPORCA的信息，请见<xref
+            href="../query/topics/query-piv-opt-overview.xml"/>。</note>
+        <note>可以使用Greenplum数据库工具<cmdname>analyzedb</cmdname>来更新表统计信息。表可以被并行地分析。
+          对于追加优化表，只有统计信息不是当前值时，<cmdname>analyzedb</cmdname>才会更新统计信息。有关analyzedb
+          工具的信息，请见<codeph><xref href="../../utility_guide/admin_utilities/analyzedb.xml"
+              >analyzedb</xref></codeph>。</note>
       </body>
     </topic>
   </topic>
   <topic id="topic8" xml:lang="en">
-    <title id="np157197">Routine Reindexing</title>
+    <title id="np157197">常规的索引重建</title>
     <body>
-      <p>For B-tree indexes, a freshly-constructed index is slightly faster to access than one that
-        has been updated many times because logically adjacent pages are usually also physically
-        adjacent in a newly built index. Reindexing older indexes periodically can improve access
-        speed. If all but a few index keys on a page have been deleted, there will be wasted space
-        on the index page. A reindex will reclaim that wasted space. In Greenplum Database it is
-        often faster to drop an index (<codeph>DROP INDEX</codeph>) and then recreate it
-          (<codeph>CREATE INDEX</codeph>) than it is to use the <codeph>REINDEX</codeph>
-        command.</p>
-      <p>For table columns with indexes, some operations such as bulk updates or inserts to the
-        table might perform more slowly because of the updates to the indexes. To enhance
-        performance of bulk operations on tables with indexes, you can drop the indexes, perform the
-        bulk operation, and then re-create the index.</p>
+      <p>对于B-树索引，一个刚刚构建的索引访问起来比一个已经更新过很多次的索引要快一点，因为在新构建的索引中逻辑
+        上相邻的页面在物理上也相邻。定期地重建旧的索引可以提升访问速度。如果一个页面上除了索引以外的数据都被删除，
+        那么索引页上对应的也会产生浪费的空间。重建索引操作会回收这些被浪费的空间。在Greenplum数据库中，删除索引
+        (<codeph>DROP INDEX</codeph>)再重建 (<codeph>CREATE INDEX</codeph>)通常比直接使用<codeph>REINDEX</codeph>
+        命令要快。</p>
+      <p>对于有索引的表列，批量更新或者插入之类的一些操作可能会执行得更慢，因为需要更新索引。为了提高带有索引
+        的表上的批量操作性能，可以先删除掉索引，然后执行批量操作，最后再重建索引。</p>
     </body>
   </topic>
   <topic id="topic9" xml:lang="en">
-    <title id="np157216">Managing Greenplum Database Log Files</title>
+    <title id="np157216">管理Greenplum数据库日志文件</title>
     <body>
       <ul>
         <li id="np159000">
@@ -273,47 +215,38 @@ VACUUM cust_info;</codeblock></p>
       </ul>
     </body>
     <topic id="topic10" xml:lang="en">
-      <title id="np157220">Database Server Log Files</title>
+      <title id="np157220">数据库服务器日志文件</title>
       <body>
-        <p>Greenplum Database log output tends to be voluminous, especially at higher debug levels,
-          and you do not need to save it indefinitely. Administrators should purge older log files
-          periodically.</p>
-        <p>Greenplum Database by default has log file rotation enabled for the master and segment
-          database logs. Log files are created in the <codeph>pg_log</codeph> subdirectory of the
-          master and each segment data directory using the following naming convention:
-              <codeph>gpdb-<i>YYYY</i>-<i>MM</i>-<i>DD_hhmmss</i>.csv</codeph>. Administrators need
-          to implement scripts or programs to periodically clean up old log files in the
-            <codeph>pg_log</codeph> directory of the master and each segment instance.</p>
-        <p>Log rotation can be triggered by the size of the current log file or the age of the
-          current log file. The <codeph>log_rotation_size</codeph> configuration parameter sets the
-          size of an individual log file that triggers log rotation. When the log file size is equal
-          to or greater than the specified size, the file is closed and a new log file is created.
-          The <codeph>log_rotation_size</codeph> value is specified in kilobytes. The default is
-          1048576 kilobytes, or 1GB. If <codeph>log_rotation_size</codeph> is set to 0, size-based
-          rotation is disabled.</p>
-        <p>The <codeph>log_rotation_age</codeph> configuration parameter specifies the age of a log
-          file that triggers rotation. When the specified amount of time has elapsed since the log
-          file was created, the file is closed and a new log file is created. The default
-            <codeph>log_rotation_age</codeph>, 1d, creates a new log file 24 hours after the current
-          log file was created. If <codeph>log_rotation_age</codeph> is set to 0, time-based
-          rotation is disabled.</p>
-        <p>For information about viewing the database server log files, see <xref
+        <p>Greenplum数据库的日志输出常常会体量很大，尤其是在调试级别时，用户不需要无限期保存它。管理员可以应该
+          定期清理日志文件。</p>
+        <p>Greenplum数据库在Master和所有的Segment实例上都启用了日志文件轮转。
+          日志文件被创建在Master以及每个Segment的数据目录中的<codeph>pg_log</codeph>子目录下，这些文件使用
+          命名规则：<codeph>gpdb-<i>YYYY</i>-<i>MM</i>-<i>DD_hhmmss</i>.csv</codeph>。数据库管理员需要
+          编写脚本或程序定期清理Master以及每个Segment日志目录<codeph>pg_log</codeph>下的旧文件。</p>
+        <p>日志轮转可以被当前日志文件的大小或当前日志文件的年龄触发。<codeph>log_rotation_size</codeph>
+          配置参数设置触发日志轮转的单个日志文件大小。当日志文件大小等于或大于特定的大小时，该文件会停止写入，
+          系统重新创建一个新的日志文件。<codeph>log_rotation_size</codeph>的值的单位为KB。默认为1048576，
+          即1GB。如果<codeph>log_rotation_size</codeph>设置为0，表示基于文件大小的日志轮转被禁用。
+          </p>
+        <p><codeph>log_rotation_age</codeph>配置参数定义了出发日志轮转的日志文件年龄。当文件自创建时开始到达
+          特定长度的时间时，该文件停止写入，系统重新创建一个新的日志文件。默认的<codeph>log_rotation_age</codeph>
+          时间为1d，即当前日志文件创建24小时之后。如果<codeph>log_rotation_age</codeph>设置为0，表示基于时间
+          的轮转被禁用。</p>
+        <p>更多查看数据库日志文件的信息，请见<xref
             href="monitor.xml#topic28" type="topic" format="dita"/>.</p>
       </body>
     </topic>
     <topic id="topic11" xml:lang="en">
-      <title id="np158979">Management Utility Log Files</title>
+      <title id="np158979">管理工具日志文件</title>
       <body>
-        <p>Log files for the Greenplum Database management utilities are written to
-            <codeph>~/gpAdminLogs</codeph> by default. The naming convention for management log
-          files is: </p>
+        <p>reenplum数据库管理工具的日志文件默认被写入到<codeph>~/gpAdminLogs</codeph>。管理日志文件的命名规则是：
+            </p>
         <codeblock><varname>script_name</varname>_<varname>date</varname>.log
 </codeblock>
-        <p>The log entry format is: </p>
+        <p>日志详情的格式是：</p>
         <codeblock><varname>timestamp</varname>:<varname>utility</varname>:<varname>host</varname>:<varname>user</varname>:[INFO|WARN|FATAL]:<varname>message</varname>
 </codeblock>
-        <p>The log file for a particular utility execution is appended to its daily log file each
-          time that utility is run.</p>
+        <p>每次一个工具运行时，就会向其每日的日志文件中增加与其执行相关的日志信息。</p>
       </body>
     </topic>
   </topic>

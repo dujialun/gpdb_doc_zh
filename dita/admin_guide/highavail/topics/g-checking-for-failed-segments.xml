@@ -2,38 +2,34 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic11">
-  <title>Checking for Failed Segments</title>
+  <title>检测故障Segment</title>
   <body>
-    <p>With mirroring enabled, you can have failed segment instances in the system without
-      interruption of service or any indication that a failure has occurred. You can verify the
-      status of your system using the <codeph>gpstate</codeph> utility. <codeph>gpstate</codeph>
-      provides the status of each individual component of a Greenplum Database system, including
-      primary segments, mirror segments, master, and standby master.</p>
+    <p>启用镜像的情况下，系统允许存在故障Segment并且不影响数据库服务正常运行。可以通过
+      <codeph>gpstate</codeph>工具查看整个数据库系统状态。<codeph>gpstate</codeph>
+      可以展示整个数据库系统中包括主Segment、镜像Segment、Master和备用Master在内的每
+      一个单独系统组件的状态。</p>
     <section id="ki155580">
-      <title>To check for failed segments</title>
+      <title>如何检测故障Segment</title>
       <ol>
-        <li id="ki155584">On the master host, run the <codeph><xref
+        <li id="ki155584">在Master上，用<codeph>-e</codeph>选项运行<codeph><xref
               href="../../../utility_guide/admin_utilities/gpstate.xml" type="topic" format="dita"
-            /></codeph> utility with the <codeph>-e</codeph> option to show segment instances with
-          error conditions:<codeblock>$ gpstate -e</codeblock><p>If the utility lists
-              <codeph>Segments with Primary and Mirror Roles Switched</codeph>, the segment is not
-            in its <i>preferred role</i> (the role to which it was assigned at system
-            initialization). This means the system is in a potentially unbalanced state, as some
-            segment hosts may have more active segments than is optimal for top system performance.
-            </p><p>Segments that display the <codeph>Config status</codeph> as <codeph>Down</codeph>
-            indicate the corresponding mirror segment is down. </p><p>See <xref
-              href="g-recovering-from-segment-failures.xml#topic14"/> for instructions to fix this
-            situation.</p></li>
-        <li id="ki165350">To get detailed information about failed segments, you can check the
+        /></codeph>工具显示有错误情况的Segment：
+          <codeblock>$ gpstate -e</codeblock>
+          <p>如果工具列出<codeph>Segments with Primary and Mirror Roles Switched</codeph>，表明
+            segment不在他的<i>原始角色</i>（系统初始化时赋予的角色）。这意味着系统处于一种潜在的不平衡状态，
+            因为一些segment主机可能比正常状态下拥有更多的活动segment，并不处于它们的最佳性能状态。
+            </p><p>Segments展示<codeph>Config status</codeph>为<codeph>Down</codeph>则预示着
+              其对应的镜像segment产生故障下线了。</p><p>修复该问题的详细过程，请见<xref
+              href="g-recovering-from-segment-failures.xml#topic14"/>。</p></li>
+        <li id="ki165350">为了获取故障segment的详细信息，可以检查
               <codeph><xref href="../../../ref_guide/system_catalogs/gp_segment_configuration.xml"
-            /></codeph> catalog table. For example:<p>
+            /></codeph>系统表。例如：<p>
             <codeblock>$ psql postgres -c "SELECT * FROM gp_segment_configuration WHERE status='d';"</codeblock>
           </p></li>
-        <li id="ki162539">For failed segment instances, note the host, port, preferred role, and
-          data directory. This information will help determine the host and segment instances to
-          troubleshoot.</li>
-        <li id="ki155591">To show information about mirror segment instances,
-          run:<codeblock>$ gpstate -m</codeblock>
+        <li id="ki162539">针对那些故障的segment实例，注意主机、端口号、原来角色和数据目录。这些信息会帮助您在问题定位时
+          提供有用的决策信息。</li>
+        <li id="ki155591">要展示镜像segment实例的信息，运行：
+          <codeblock>$ gpstate -m</codeblock>
         </li>
       </ol>
     </section>
