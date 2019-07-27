@@ -350,7 +350,7 @@ SELECT plainto_tsquery('supernova star');
         </p>
       <p>标准Greenplum数据库分发不包含任何Ispell配置文件。
           <xref href="http://ficus-www.cs.ucla.edu/geoff/ispell.html" format="html" scope="external">Ispell</xref>提供大量语言的字典。
-          此外，还支持一些更现代的字典文件格式 -  <xref href="http://en.wikipedia.org/wiki/MySpell" format="html" scope="external">MySpell</xref>（OO < 2.0.1）
+          此外，还支持一些更现代的字典文件格式 -  <xref href="http://en.wikipedia.org/wiki/MySpell" format="html" scope="external">MySpell</xref>（OO &lt; 2.0.1）
           和<xref href="http://sourceforge.net/projects/hunspell/" format="html" scope="external">Hunspell</xref>（OO> = 2.0.2）。
           <xref href="http://wiki.services.openoffice.org/wiki/Dictionaries" format="html" scope="external">OpenOffice Wiki</xref>上提供了大量字典。
         </p>
