@@ -37,7 +37,7 @@
           对于每个token，查阅字典列表（<xref href="dictionaries.xml#dictionaries"/>），其中列表可以根据token类型而变化。
           识别token的第一个字典发出一个或多个规范化的词位来表示token。
           例如，<codeph>rats</codeph>变成<codeph>rat</codeph>，因为其中一个词典认识到单词<codeph>rats</codeph>是复数形式的<codeph>rat</codeph>。
-          有些单词被识别为<i>stop words</i>，这会导致它们被忽略，因为它们过于频繁而无法用于搜索。
+          有些单词被识别为<i>停止词</i>，这会导致它们被忽略，因为它们过于频繁而无法用于搜索。
           在我们的例子中，这些是<codeph>a</codeph>，<codeph>on</codeph>和<codeph>it</codeph>。
           如果列表中没有字典识别出token，那么它也会被忽略。
           在这个标点符号发生的例子中 <codeph>-</codeph> 因为实际上没有为其token类型（空间符号）分配字典，这意味着空间token永远不会被索引。
@@ -71,7 +71,7 @@
           该值必须由布尔运算符<codeph>&amp;</codeph> (AND), <codeph>|</codeph> (OR) 和 <codeph>!</codeph>(NOT)分隔的单个token组成。
           可以使用括号对这些运算符进行分组。
           换句话说，<codeph>to_tsquery</codeph>的输入必须已经遵循<codeph>tsquery</codeph>输入的一般规则，如<xref href="../../ref_guide/datatype-textsearch.xml"/>中所述。
-          不同之处在于，虽然基本的<codeph>tsquery</codeph>输入将token置于面值，但<codeph>to_tsquery</codeph>使用指定或默认配置将每个token规范化为一个lexeme，并根据配置丢弃任何stop words的标记。
+          不同之处在于，虽然基本的<codeph>tsquery</codeph>输入将token置于面值，但<codeph>to_tsquery</codeph>使用指定或默认配置将每个token规范化为一个词位，并根据配置丢弃任何停止词的标记。
           例如：
           </p>
       <codeblock>SELECT to_tsquery('english', 'The &amp; Fat &amp; Rats');

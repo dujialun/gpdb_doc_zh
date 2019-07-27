@@ -88,7 +88,7 @@
             integer</codeph></dt>
           <dd>
             <p>返回tsquery中的节点数（词位加运算符）。
-                此函数可用于确定查询是否有意义（返回> 0），或仅包含停用词（返回0）。
+                此函数可用于确定查询是否有意义（返回> 0），或仅包含停止词（返回0）。
                 例子：
                 </p>
             <codeblock>SELECT numnode(plainto_tsquery('the any'));
@@ -107,7 +107,7 @@ SELECT numnode('foo &amp; bar'::tsquery);
           <dt><codeph>querytree(<i>query</i> tsquery) returns text</codeph></dt>
           <dd>
             <p>返回可用于搜索索引的tsquery部分。
-                此函数对于检测不可索引的查询很有用，例如那些仅包含停用词或仅包含否定词的查询。
+                此函数对于检测不可索引的查询很有用，例如那些仅包含停止词或仅包含否定词的查询。
                 例如：
                 </p>
             <codeblock>SELECT querytree(to_tsquery('!defined'));
@@ -258,13 +258,13 @@ CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
     </section>
     <section id="statistics">
       <title>收集文档统计信息</title>
-      <p>函数<codeph>ts_stat</codeph>可用于检查配置和查找停用词候选。
+      <p>函数<codeph>ts_stat</codeph>可用于检查配置和查找停止词候选。
         </p>
       <codeblock>ts_stat(<i>sqlquery</i> text, [ <i>weights</i> text, ]
         OUT <i>word</i> text, OUT <i>ndoc</i> integer,
         OUT <i>nentry</i> integer) returns setof record</codeblock>
       <p><codeph><i>sqlquery</i></codeph>是一个包含SQL查询的文本值，该查询必须返回单个<codeph>tsvector</codeph>列。
-          <codeph>ts_stat</codeph>执行查询并返回有关<codeph>tsvector</codeph>数据中包含的每个不同lexeme（word）的统计信息。
+          <codeph>ts_stat</codeph>执行查询并返回有关<codeph>tsvector</codeph>数据中包含的每个不同词位（word）的统计信息。
           返回的列是
         </p>
       <ul id="ul_rwg_ml5_kfb">

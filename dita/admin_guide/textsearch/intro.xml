@@ -51,25 +51,25 @@
           Greenplum数据库使用解析器执行此步骤。
           提供了标准解析器，可以根据特定需求创建自定义解析器。
           </li>
-        <li><b>将token转换为lexeme。</b>
-          lexeme是一个字符串，就像一个token，但它已被标准化，以便使相同单词的不同形式相似。
+        <li><b>将token转换为词位。</b>
+          词位是一个字符串，就像一个token，但它已被标准化，以便使相同单词的不同形式相似。
           例如，规范化几乎总是包括将大写字母折叠成小写字母，并且通常涉及删除后缀（例如英语中的s或es）。
           这允许搜索找到相同单词的变体形式，而无需繁琐地输入所有可能的变体。
-          此外，该步骤通常消除了<i>stop words</i>，这些词是如此常见以至于它们对搜索无用。
-          （简而言之，token是文档文本的原始片段，而lexeme是被认为对索引和搜索有用的词。）
+          此外，该步骤通常消除了<i>停止词</i>，这些词是如此常见以至于它们对搜索无用。
+          （简而言之，token是文档文本的原始片段，而词位是被认为对索引和搜索有用的词。）
           Greenplum数据库使用词典来执行此步骤。
           提供各种标准词典，并且可以为特定需求创建自定义词典。
           </li>
         <li><b>存储为搜索而优化的预处理文档。</b>
-          例如，每个文档可以表示为标准化lexeme的排序数组。
-          与lexeme一起，通常希望存储位置信息以用于邻近度排序，使得包含更“密集”的查询词区域的文档被分配比具有分散查询词的更高的等级。
+          例如，每个文档可以表示为标准化词位的排序数组。
+          与词位一起，通常希望存储位置信息以用于邻近度排序，使得包含更“密集”的查询词区域的文档被分配比具有分散查询词的更高的等级。
           </li>
       </ul>
       <p>字典允许对token如何标准化进行细粒度控制。
         使用适当的词典，您可以：
         </p>
       <ul id="ul_ry4_m5t_kfb">
-        <li>定义不应编入索引的stop words。</li>
+        <li>定义不应编入索引的停止词。</li>
         <li>使用Ispell将同义词映射到单个单词。</li>
         <li>使用同义词库将短语映射到单个单词。</li>
         <li>使用Ispell字典将单词的不同变体映射到规范形式。</li>
@@ -79,7 +79,7 @@
     <section id="document">
       <title>什么是文档</title>
       <p>文档是在全文搜索系统中搜索的单位; 例如，杂志文章或电子邮件消息。
-        文本搜索引擎必须能够解析文档并存储与其父文档关联的lexeme（关键词）。
+        文本搜索引擎必须能够解析文档并存储与其父文档关联的词位（关键词）。
         稍后，这些关联用于搜索包含查询词的文档。
         </p>
       <p>对于Greenplum数据库中的搜索，文档通常是数据库表的行中的文本字段，或者可能是这些字段的组合（串联），可能存储在若干表中或动态获得。
@@ -122,7 +122,7 @@ SELECT 'fat &amp; cow'::tsquery @@ 'a fat cat sat on a mat and ate a fat rat'::t
 ----------
  f</codeblock>
       <p>如上例所示，<codeph>tsquery</codeph>不仅仅是原始文本，也不仅仅是<codeph>tsvector</codeph>。
-        <codeph>tsquery</codeph>包含搜索项，它必须是已经规范化的lexeme，并且可以使用AND，OR和NOT运算符组合多个项。
+        <codeph>tsquery</codeph>包含搜索项，它必须是已经规范化的词位，并且可以使用AND，OR和NOT运算符组合多个项。
         （有关详细信息，请参阅。）有一些函数<codeph>to_tsquery</codeph>和<codeph>plainto_tsquery</codeph>有助于将用户编写的文本转换为正确的<codeph>tsquery</codeph>，例如通过规范化文本中出现的单词。
         同样，<codeph>to_tsvector</codeph>用于解析和规范化文档字符串。
         所以在实践中，文本搜索匹配看起来更像是这样的：
@@ -137,7 +137,7 @@ SELECT 'fat &amp; cow'::tsquery @@ 'a fat cat sat on a mat and ate a fat rat'::t
 ----------
  f</codeblock>
       <p>因为这里没有<codeph>rats</codeph>这个词的标准化。
-        <codeph>tsvector</codeph>的元素是lexemes，假设已经标准化，因此<codeph>rats</codeph>与<codeph>rat</codeph>不匹配。
+        <codeph>tsvector</codeph>的元素是词位，假设已经标准化，因此<codeph>rats</codeph>与<codeph>rat</codeph>不匹配。
         </p>
       <p><codeph>@@</codeph>运算符还支持文本输入，允许在简单情况下将文本字符串显式转换为<codeph>tsvector</codeph>或<codeph>tsquery</codeph>。
         可用的变体是：
@@ -154,7 +154,7 @@ text @@ text</codeblock>
     <section id="configurations">
       <title>配置</title>
       <p>以上都是简单的文本搜索示例。
-        如前所述，全文搜索功能包括执行更多操作的能力：跳过索引某些单词（stop words），处理同义词，以及使用复杂的解析，例如，基于不仅仅是空格的解析。
+        如前所述，全文搜索功能包括执行更多操作的能力：跳过索引某些单词（停止词），处理同义词，以及使用复杂的解析，例如，基于不仅仅是空格的解析。
         此功能由文本搜索配置控制。
         Greenplum数据库附带了许多语言的预定义配置，您可以轻松创建自己的配置。
         （psql的<codeph>\dF</codeph>命令显示所有可用的配置。）
@@ -174,7 +174,7 @@ text @@ text</codeblock>
       <ul id="ul_vjd_jyt_kfb">
         <li><i>文本搜索解析器</i>将文档分解为token并对每个token进行分类（例如，作为单词或数字）。
           </li>
-        <li><i>文本搜索词典</i>将token转换为标准化形式并拒绝stop words。
+        <li><i>文本搜索词典</i>将token转换为标准化形式并拒绝停止词。
           </li>
         <li><i>文本搜索模板</i>提供基本字典的功能。（字典只是为模板指定模板和一组参数。）
           </li>
