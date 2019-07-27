@@ -1,65 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="configuration">
-  <title>Text Search Configuration Example</title>
-  <shortdesc>This topic shows how to create a customized text search
-    configuration to process document and query text. </shortdesc>
+  <title>文本搜索配置示例</title>
+  <shortdesc>本主题说明如何创建自定义文本搜索配置以处理文档和查询文本。
+      </shortdesc>
   <body>
-    <p>A text search configuration specifies all options necessary to transform
-      a document into a <codeph>tsvector</codeph>: the parser to use to break
-      text into tokens, and the dictionaries to use to transform each token into
-      a lexeme. Every call of <codeph>to_tsvector</codeph> or
-        <codeph>to_tsquery</codeph> needs a text search configuration to perform
-      its processing. The configuration parameter <xref
-        href="../../ref_guide/config_params/guc-list.xml#default_text_search_config"
-      /> specifies the name of the default configuration, which is the one used
-      by text search functions if an explicit configuration parameter is
-      omitted. It can be set in <codeph>postgresql.conf</codeph> using the
-        <codeph>gpconfig</codeph> command-line utility, or set for an individual
-      session using the <codeph>SET</codeph> command.</p>
-    <p>Several predefined text search configurations are available, and you can
-      create custom configurations easily. To facilitate management of text
-      search objects, a set of SQL commands is available, and there are several
-      psql commands that display information about text search objects (<xref
-        href="psql-support.xml" format="dita"/>).</p>
-    <p>As an example we will create a configuration <codeph>pg</codeph>, starting by duplicating the
-      built-in <codeph>english</codeph> configuration:</p>
+    <p>文本搜索配置指定将文档转换为<codeph>tsvector</codeph>所需的所有选项：用于将文本分解为token的解析器，以及用于将每个token转换为词位的字典。
+        每次调用<codeph>to_tsvector</codeph>或<codeph>to_tsquery</codeph>都需要文本搜索配置来执行其处理。
+        配置参数<xref href="../../ref_guide/config_params/guc-list.xml#default_text_search_config"
+        />指定默认配置的名称，如果省略显式配置参数，则默认配置是文本搜索功能使用的名称。
+        可以使用gpconfig命令行工具在<codeph>postgresql.conf</codeph>中设置，也可以使用<codeph>SET</codeph>命令为单个会话设置。
+        </p>
+    <p>有几种预定义的文本搜索配置可供使用，您可以轻松创建自定义配置。
+        为了便于管理文本搜索对象，可以使用一组SQL命令，并且有几个psql命令显示有关文本搜索对象的信息（<xref href="psql-support.xml" format="dita"/>）。
+        </p>
+    <p>作为一个例子，我们将创建一个配置<codeph>pg</codeph>，首先复制内置的<codeph>english</codeph>配置：
+        </p>
     <codeblock>CREATE TEXT SEARCH CONFIGURATION public.pg ( COPY = pg_catalog.english );</codeblock>
-    <p>We will use a PostgreSQL-specific synonym list and store it in
-        <codeph>$SHAREDIR/tsearch_data/pg_dict.syn</codeph>. The file contents look like:</p>
+    <p>我们将使用PostgreSQL特定的同义词列表并将其存储在<codeph>$SHAREDIR/tsearch_data/pg_dict.syn</codeph>中。
+        文件内容如下：
+        </p>
     <codeblock>postgres    pg
 pgsql       pg
 postgresql  pg</codeblock>
-    <p>We define the synonym dictionary like this:</p>
+    <p>我们像这样定义同义词字典：</p>
     <codeblock>CREATE TEXT SEARCH DICTIONARY pg_dict (
     TEMPLATE = synonym,
     SYNONYMS = pg_dict
 );</codeblock>
-    <p>Next we register the Ispell dictionary <codeph>english_ispell</codeph>, which has its own
-      configuration files:</p>
+    <p>接下来我们注册Ispell字典<codeph>english_ispell</codeph>，它有自己的配置文件：
+        </p>
     <codeblock>CREATE TEXT SEARCH DICTIONARY english_ispell (
     TEMPLATE = ispell,
     DictFile = english,
     AffFile = english,
     StopWords = english
 );</codeblock>
-    <p>Now we can set up the mappings for words in configuration <codeph>pg</codeph>:</p>
+    <p>现在我们可以在配置<codeph>pg</codeph>中设置单词的映射：</p>
     <codeblock>ALTER TEXT SEARCH CONFIGURATION pg
     ALTER MAPPING FOR asciiword, asciihword, hword_asciipart,
                       word, hword, hword_part
     WITH pg_dict, english_ispell, english_stem;</codeblock>
-    <p>We choose not to index or search some token types that the built-in configuration does
-      handle:</p>
+    <p>我们选择不索引或搜索内置配置处理的某些token类型：</p>
     <codeblock>ALTER TEXT SEARCH CONFIGURATION pg
     DROP MAPPING FOR email, url, url_path, sfloat, float;</codeblock>
-    <p>Now we can test our configuration:</p>
+    <p>现在我们可以测试我们的配置：</p>
     <codeblock>SELECT * FROM ts_debug('public.pg', '
 PostgreSQL, the highly scalable, SQL compliant, open source object-relational
 database management system, is now undergoing beta testing of the next
 version of our software.
 ');</codeblock>
-    <p>The next step is to set the session to use the new configuration, which was created in the
-        <codeph>public</codeph> schema:</p>
+    <p>下一步是将会话设置为使用在<codeph>public</codeph> schema中创建的新配置：</p>
     <codeblock>=> \dF
    List of text search configurations
  Schema  | Name | Description
