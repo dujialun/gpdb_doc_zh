@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="features">
-  <title>Additional Text Search Features</title>
-  <shortdesc>Greenplum Database has additional functions and operators you can
-    use to manipulate search and query vectors, and to rewite search queries. </shortdesc>
+  <title>文本搜索附加功能</title>
+  <shortdesc>Greenplum数据库具有其他附加功能和操作符，您可以使用它们来操作搜索和查询向量，以及重写搜索查询。</shortdesc>
   <body>
-    <p>This section contains the following subtopics:</p>
+    <p>本节包含以下子主题：</p>
     <ul id="ul_tyj_lyw_4fb">
       <li><xref href="#features/manipulating-documents" format="dita"/></li>
       <li><xref href="#features/manipulate_queries" format="dita"/></li>
@@ -13,100 +12,85 @@
       <li><xref href="#features/statistics" format="dita"/></li>
     </ul>
     <section id="manipulating-documents">
-      <title>Manipulating Documents</title>
-      <p><xref href="controlling.xml#controlling/parsing-documents"/> showed how
-        raw textual documents can be converted into <codeph>tsvector</codeph>
-        values. Greenplum Database also provides functions and operators that
-        can be used to manipulate documents that are already in
-          <codeph>tsvector</codeph> form.</p>
+      <title>操纵文档</title>
+      <p><xref href="controlling.xml#controlling/parsing-documents"/>显示了如何将原始文本文档转换为<codeph>tsvector</codeph>值。
+          Greenplum数据库还提供了可用于处理已经处于<codeph>tsvector</codeph>形式的文档的函数和运算符。
+        </p>
       <dl>
         <dlentry>
           <dt><codeph>tsvector || tsvector</codeph></dt>
           <dd>
-            <p>The <codeph>tsvector</codeph> concatenation operator returns a vector which combines
-              the lexemes and positional information of the two vectors given as arguments.
-              Positions and weight labels are retained during the concatenation. Positions appearing
-              in the right-hand vector are offset by the largest position mentioned in the left-hand
-              vector, so that the result is nearly equivalent to the result of performing
-                <codeph>to_tsvector</codeph> on the concatenation of the two original document
-              strings. (The equivalence is not exact, because any stop-words removed from the end of
-              the left-hand argument will not affect the result, whereas they would have affected
-              the positions of the lexemes in the right-hand argument if textual concatenation were
-              used.)</p>
-            <p>One advantage of using concatenation in the vector form, rather than concatenating
-              text before applying <codeph>to_tsvector</codeph>, is that you can use different
-              configurations to parse different sections of the document. Also, because the
-                <codeph>setweight</codeph> function marks all lexemes of the given vector the same
-              way, it is necessary to parse the text and do <codeph>setweight</codeph> before
-              concatenating if you want to label different parts of the document with different
-              weights.</p>
+            <p><codeph>tsvector</codeph>连接运算符返回一个向量，该向量合并了作为参数给出的两个向量的词位和位置信息。
+                在连接期间保留位置和重量标签。
+                出现在右侧向量中的位置按左侧向量中提到的最大位置偏移，因此结果几乎等于在两个原始文档字符串的串联上执行<codeph>to_tsvector</codeph>的结果。
+                （等价不精确，因为从左手参数末尾删除的任何停止词都不会影响结果，而如果使用文本连接，它们会影响右手参数中词位的位置。）
+                </p>
+            <p>在向量形式中使用连接的一个优点是，您可以使用不同的配置来解析文档的不同部分，而不是在应用<codeph>to_tsvector</codeph>之前连接文本。
+                此外，因为<codeph>setweight</codeph>函数以相同的方式标记给定向量的所有词位，所以如果要使用不同的权重标记文档的不同部分，则必须在连接之前解析文本并执行<codeph>setweight</codeph>。
+                </p>
           </dd>
         </dlentry>
         <dlentry>
           <dt><codeph>setweight(<i>vector</i> tsvector, <i>weight</i> "char") returns
               tsvector</codeph></dt>
           <dd>
-            <p><codeph>setweight</codeph> returns a copy of the input vector in which every position
-              has been labeled with the given <codeph><i>weight</i></codeph>, either
-                <codeph>A</codeph>, <codeph>B</codeph>, <codeph>C</codeph>, or <codeph>D</codeph>.
-                (<codeph>D</codeph> is the default for new vectors and as such is not displayed on
-              output.) These labels are retained when vectors are concatenated, allowing words from
-              different parts of a document to be weighted differently by ranking functions.</p>
-            <p>Note that weight labels apply to <b>positions</b>, not <b>lexemes</b>. If the input
-              vector has been stripped of positions then <codeph>setweight</codeph> does
-              nothing.</p>
+            <p><codeph>setweight</codeph>返回输入向量的副本，其中每个位置都标有给定的权重，<codeph>A</codeph>, <codeph>B</codeph>, <codeph>C</codeph>, 或<codeph>D</codeph>。
+                （<codeph>D</codeph>是新向量的默认值，因此不会在输出中显示。）
+                这些标签在连接向量时保留，允许来自文档的不同部分的单词通过排名函数被不同地加权。
+                </p>
+            <p>请注意，重量标签适用于位置，而不是词位。
+                如果输入向量已被剥离，则<codeph>setweight</codeph>不执行任何操作。
+                </p>
           </dd>
         </dlentry>
         <dlentry>
           <dt><codeph>length(<i>vector</i> tsvector) returns integer</codeph></dt>
           <dd>
-            <p>Returns the number of lexemes stored in the vector.</p>
+            <p>返回向量中存储的词位数。</p>
           </dd>
         </dlentry>
         <dlentry>
           <dt>strip(vector tsvector) returns tsvector</dt>
           <dd>
-            <p>Returns a vector which lists the same lexemes as the given vector, but which lacks
-              any position or weight information. While the returned vector is much less useful than
-              an unstripped vector for relevance ranking, it will usually be much smaller.</p>
+            <p>返回一个向量，该向量列出与给定向量相同的词位，但缺少任何位置或权重信息。
+                虽然返回的向量比未被剥离的向量用于相关性排名要小得多，但它通常会小得多。
+                </p>
           </dd>
         </dlentry>
       </dl>
     </section>
     <section id="manipulate_queries">
-      <title>Manipulating Queries</title>
-      <p><xref href="controlling.xml#controlling/parsing-queries"/> showed how
-        raw textual queries can be converted into <codeph>tsquery</codeph>
-        values. Greenplum Database also provides functions and operators that
-        can be used to manipulate queries that are already in
-          <codeph>tsquery</codeph> form.</p>
+      <title>操纵查询</title>
+      <p><xref href="controlling.xml#controlling/parsing-queries"/>显示了如何将原始文本查询转换为<codeph>tsquery</codeph>值。
+          Greenplum数据库还提供了可用于操作已经处于<codeph>tsquery</codeph>形式的查询的函数和运算符。
+        </p>
       <dl>
         <dlentry>
           <dt><codeph>tsquery &amp;&amp; tsquery</codeph></dt>
           <dd>
-            <p>Returns the AND-combination of the two given queries.</p>
+            <p>返回两个给定查询的AND组合。</p>
           </dd>
         </dlentry>
         <dlentry>
           <dt><codeph>tsquery || tsquery</codeph></dt>
           <dd>
-            <p>Returns the OR-combination of the two given queries.</p>
+            <p>返回两个给定查询的OR组合。</p>
           </dd>
         </dlentry>
         <dlentry>
           <dt><codeph>!! tsquery</codeph></dt>
           <dd>
-            <p>Returns the negation (NOT) of the given query.</p>
+            <p>返回给定查询的非（NOT）。</p>
           </dd>
         </dlentry>
         <dlentry>
           <dt><codeph>numnode(<i>query</i> tsquery) returns
             integer</codeph></dt>
           <dd>
-            <p>Returns the number of nodes (lexemes plus operators) in a
-              tsquery. This function is useful to determine if the <b>query</b>
-              is meaningful (returns > 0), or contains only stop words (returns
-              0). Examples:</p>
+            <p>返回tsquery中的节点数（词位加运算符）。
+                此函数可用于确定查询是否有意义（返回> 0），或仅包含停止词（返回0）。
+                例子：
+                </p>
             <codeblock>SELECT numnode(plainto_tsquery('the any'));
 NOTICE:  query contains only stopword(s) or doesn't contain lexeme(s), ignored
  numnode
@@ -122,10 +106,10 @@ SELECT numnode('foo &amp; bar'::tsquery);
         <dlentry>
           <dt><codeph>querytree(<i>query</i> tsquery) returns text</codeph></dt>
           <dd>
-            <p>Returns the portion of a tsquery that can be used for searching
-              an index. This function is useful for detecting unindexable
-              queries, for example those containing only stop words or only
-              negated terms. For example:</p>
+            <p>返回可用于搜索索引的tsquery部分。
+                此函数对于检测不可索引的查询很有用，例如那些仅包含停止词或仅包含否定词的查询。
+                例如：
+                </p>
             <codeblock>SELECT querytree(to_tsquery('!defined'));
  querytree
 -----------
@@ -135,30 +119,23 @@ SELECT numnode('foo &amp; bar'::tsquery);
       </dl>
     </section>
     <section id="rewriting">
-      <title>Rewriting Queries</title>
-      <p>The <codeph>ts_rewrite</codeph> family of functions search a given
-          <codeph>tsquery</codeph> for occurrences of a target subquery, and
-        replace each occurrence with a substitute subquery. In essence this
-        operation is a <codeph>tsquery</codeph>-specific version of substring
-        replacement. A target and substitute combination can be thought of as a
-          <i>query rewrite rule</i>. A collection of such rewrite rules can be a
-        powerful search aid. For example, you can expand the search using
-        synonyms (e.g., <codeph>new york</codeph>, <codeph>big apple</codeph>,
-          <codeph>nyc</codeph>, <codeph>gotham</codeph>) or narrow the search to
-        direct the user to some hot topic. There is some overlap in
-        functionality between this feature and thesaurus dictionaries (<xref
-          href="dictionaries.xml#dictionaries/thesaurus-dictionary"/>). However,
-        you can modify a set of rewrite rules on-the-fly without reindexing,
-        whereas updating a thesaurus requires reindexing to be effective.</p>
+      <title>重写查询</title>
+      <p><codeph>ts_rewrite</codeph>系列函数在给定的<codeph>tsquery</codeph>中搜索目标子查询的出现，并在每次出现替换子查询。
+          实质上，此操作是子串替换的特定于<codeph>tsquery</codeph>的版本。
+          目标和替代组合可以被认为是查询重写规则。
+          这种重写规则的集合可以是强大的搜索辅助工具。
+          例如，您可以使用同义词（例如，<codeph>new york</codeph>, <codeph>big apple</codeph>, <codeph>nyc</codeph>, <codeph>gotham</codeph>）扩展搜索范围，或者缩小搜索范围以引导用户查看某些热门话题。
+          此功能与同义词词典（<xref href="dictionaries.xml#dictionaries/thesaurus-dictionary"/>）之间在功能上存在一些重叠。
+          但是，您可以在不重建索引的情况下即时修改一组重写规则，而更新同义词库则需要重建索引才能生效。
+          </p>
       <dl>
         <dlentry>
           <dt><codeph>ts_rewrite(<i>query</i> tsquery, <i>target</i> tsquery,
                 <i>substitute</i> tsquery) returns tsquery</codeph></dt>
           <dd>
-            <p>This form of <codeph>ts_rewrite</codeph> simply applies a single
-              rewrite rule: <codeph><i>target</i></codeph> is replaced by
-                  <codeph><i>substitute</i></codeph> wherever it appears in
-                  <codeph><i>query</i></codeph>. For example:</p>
+            <p>这种形式的<codeph>ts_rewrite</codeph>只应用一个重写规则：<codeph><i>target</i></codeph>在查询中出现的任何地方都被<codeph><i>substitute</i></codeph>替换。
+                例如：
+                </p>
             <codeblock>SELECT ts_rewrite('a &amp; b'::tsquery, 'a'::tsquery, 'c'::tsquery);
  ts_rewrite
 ------------
@@ -169,15 +146,11 @@ SELECT numnode('foo &amp; bar'::tsquery);
           <dt><codeph>ts_rewrite(<i>query</i> tsquery, <i>select</i> text)
               returns tsquery</codeph></dt>
           <dd>
-            <p>This form of <codeph>ts_rewrite</codeph> accepts a starting
-                  <codeph><i>query</i></codeph> and a SQL
-                <codeph><i>select</i></codeph> command, which is given as a text
-              string. The <codeph><i>select</i></codeph> must yield two columns
-              of <codeph>tsquery</codeph> type. For each row of the
-                  <codeph><i>select</i></codeph> result, occurrences of the
-              first column value (the target) are replaced by the second column
-              value (the substitute) within the current
-                <codeph><i>query</i></codeph> value. For example:</p>
+            <p>这种形式的<codeph>ts_rewrite</codeph>接受一个起始查询和一个SQL select命令，它以文本字符串形式给出。
+                select必须产生两列<codeph>tsquery</codeph>类型。
+                对于select结果的每一行，第一列值（target）的出现被当前查询值中的第二列值（substitute）替换。
+                例如：
+                </p>
             <codeblock>CREATE TABLE aliases (id int, t tsquery, s tsquery);
 INSERT INTO aliases VALUES('a', 'c');
 
@@ -185,15 +158,15 @@ SELECT ts_rewrite('a &amp; b'::tsquery, 'SELECT t,s FROM aliases');
  ts_rewrite
 ------------
  'b' &amp; 'c'</codeblock>
-            <p>Note that when multiple rewrite rules are applied in this way,
-              the order of application can be important; so in practice you will
-              want the source query to <codeph>ORDER BY</codeph> some ordering
-              key.</p>
+            <p>请注意，当以这种方式应用多个重写规则时，应用程序的顺序可能很重要;
+                所以在实践中你会希望源查询<codeph>ORDER BY</codeph>一些排序键。
+                </p>
           </dd>
         </dlentry>
       </dl>
-      <p>Let's consider a real-life astronomical example. We'll expand query
-          <codeph>supernovae</codeph> using table-driven rewriting rules:</p>
+      <p>让我们考虑一个现实生活中的天文例子。
+          我们将使用表驱动的重写规则扩展查询<codeph>supernovae</codeph>：
+          </p>
       <codeblock>CREATE TABLE aliases (id int, t tsquery primary key, s tsquery);
 INSERT INTO aliases VALUES(1, to_tsquery('supernovae'), to_tsquery('supernovae|sn'));
 
@@ -201,7 +174,7 @@ SELECT ts_rewrite(to_tsquery('supernovae &amp; crab'), 'SELECT t, s FROM aliases
            ts_rewrite            
 ---------------------------------
  'crab' &amp; ( 'supernova' | 'sn' )</codeblock>
-      <p>We can change the rewriting rules just by updating the table:</p>
+      <p>我们可以通过更新表来更改重写规则：</p>
       <codeblock>UPDATE aliases
 SET s = to_tsquery('supernovae|sn &amp; !nebulae')
 WHERE t = to_tsquery('supernovae');
@@ -210,11 +183,10 @@ SELECT ts_rewrite(to_tsquery('supernovae &amp; crab'), 'SELECT t, s FROM aliases
                  ts_rewrite                  
 ---------------------------------------------
  'crab' &amp; ( 'supernova' | 'sn' &amp; !'nebula' )</codeblock>
-      <p>Rewriting can be slow when there are many rewriting rules, since it
-        checks every rule for a possible match. To filter out obvious
-        non-candidate rules we can use the containment operators for the
-          <codeph>tsquery</codeph> type. In the example below, we select only
-        those rules which might match the original query:</p>
+      <p>当有许多重写规则时，重写可能会很慢，因为它会检查每个规则是否存在可能的匹配。
+          为了过滤掉明显的非候选规则，我们可以使用<codeph>tsquery</codeph>类型的包含运算符。
+          在下面的示例中，我们仅选择可能与原始查询匹配的规则：
+        </p>
       <codeblock>SELECT ts_rewrite('a &amp; b'::tsquery,
                   'SELECT t,s FROM aliases WHERE ''a &amp; b''::tsquery @> t');
  ts_rewrite
@@ -222,16 +194,15 @@ SELECT ts_rewrite(to_tsquery('supernovae &amp; crab'), 'SELECT t, s FROM aliases
  'b' &amp; 'c'</codeblock>
     </section>
     <section otherprops="op-hidden" id="triggers-for-automatic-updates">
-      <title>Triggers for Automatic Updates</title>
-      <p>When using a separate column to store the <codeph>tsvector</codeph> representation of your
-        documents, it is necessary to create a trigger to update the <codeph>tsvector</codeph>
-        column when the document content columns change. Two built-in trigger functions are
-        available for this, or you can write your own.</p>
+      <title>触发自动更新</title>
+      <p>当使用单独的列存储文档的<codeph>tsvector</codeph>表示时，有必要创建一个触发器，以在文档内容列更改时更新<codeph>tsvector</codeph>列。
+          可以使用两个内置触发器功能，或者您可以自己编写。
+        </p>
       <codeblock>tsvector_update_trigger(<i>tsvector_column_name</i>, <i>config_name</i>, <i>text_column_name</i> [, ... ])
 tsvector_update_trigger_column(<i>tsvector_column_name</i>, <i>config_column_name</i>, <i>text_column_name</i> [, ... ])</codeblock>
-      <p>These trigger functions automatically compute a tsvector column from one or more textual
-        columns, under the control of parameters specified in the <codeph>CREATE TRIGGER</codeph>
-        command. An example of their use is:</p>
+      <p>这些触发器函数在<codeph>CREATE TRIGGER</codeph>命令中指定的参数的控制下，自动从一个或多个文本列计算tsvector列。
+          使用他们的一个例子是：
+          </p>
       <codeblock>CREATE TABLE messages (
     msgnum      int,
     title       text,
@@ -254,24 +225,22 @@ SELECT title, body FROM messages WHERE tsv @@ to_tsquery('title &amp; body');
    title    |         body          
 ------------+-----------------------
  title here | the body text is here</codeblock>
-      <p>Having created this trigger, any change in <codeph>title</codeph> or <codeph>body</codeph>
-        will automatically be reflected into <codeph>tsv</codeph>, without the application having to
-        worry about it.</p>
-      <p>The first trigger argument must be the name of the <codeph>tsvector</codeph> column to be
-        updated. The second argument specifies the text search configuration to be used to perform
-        the conversion. For <codeph>tsvector_update_trigger</codeph>, the configuration name is
-        simply given as the second trigger argument. It must be schema-qualified as shown above, so
-        that the trigger behavior will not change with changes in <codeph>search_path</codeph>. For
-          <codeph>tsvector_update_trigger_column</codeph>, the second trigger argument is the name
-        of another table column, which must be of type <codeph>regconfig</codeph>. This allows a
-        per-row selection of configuration to be made. The remaining argument(s) are the names of
-        textual columns (of type <codeph>text</codeph>, <codeph>varchar</codeph>, or
-          <codeph>char</codeph>). These will be included in the document in the order given. NULL
-        values will be skipped (but the other columns will still be indexed).</p>
-      <p>A limitation of these built-in triggers is that they treat all the input columns alike. To
-        process columns differently — for example, to weight title differently from body — it is
-        necessary to write a custom trigger. Here is an example using PL/pgSQL as the trigger
-        language:</p>
+      <p>创建此触发器后，<codeph>title</codeph>或<codeph>body</codeph>中的任何更改都将自动反映到<codeph>tsv</codeph>中，而无需担心应用程序。
+        </p>
+      <p>第一个触发器参数必须是要更新的<codeph>tsvector</codeph>列的名称。
+          第二个参数指定用于执行转换的文本搜索配置。
+          对于<codeph>tsvector_update_trigger</codeph>，配置名称仅作为第二个触发器参数给出。
+          它必须要指定schema，如上所示，因此触发器行为不会随<codeph>search_path</codeph>中的更改而改变。
+          对于<codeph>tsvector_update_trigger_column</codeph>，第二个触发器参数是另一个表列的名称，该列必须是<codeph>regconfig</codeph>类型。
+          这允许进行每行选择的配置。
+          其余参数是文本列的名称（类型为<codeph>text</codeph>，<codeph>varchar</codeph>或<codeph>char</codeph>）。
+          这些将按给定的顺序包含在文档中。
+          将跳过NULL值（但其他列仍将被编入索引）。
+        </p>
+      <p>这些内置触发器的一个限制是它们同样处理所有输入列。
+          要以不同方式处理列 - 例如，以不同于正文的方式对标题进行加权 - 必须编写自定义触发器。
+          以下是使用PL/pgSQL作为触发语言的示例：
+          </p>
       <codeblock>CREATE FUNCTION messages_trigger() RETURNS trigger AS $$
 begin
   new.tsv :=
@@ -283,40 +252,34 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
     ON messages FOR EACH ROW EXECUTE PROCEDURE messages_trigger();</codeblock>
-      <p>Keep in mind that it is important to specify the configuration name explicitly when
-        creating <codeph>tsvector</codeph> values inside triggers, so that the column's contents
-        will not be affected by changes to <codeph>default_text_search_config</codeph>. Failure to
-        do this is likely to lead to problems such as search results changing after a dump and
-        reload.</p>
+      <p>请记住，在触发器中创建<codeph>tsvector</codeph>值时，显式指定配置名称非常重要，这样列的内容不会受到对<codeph>default_text_search_config</codeph>的更改的影响。
+          如果不这样做，可能会导致转储和重新加载后搜索结果发生变化等问题。
+        </p>
     </section>
     <section id="statistics">
-      <title>Gathering Document Statistics</title>
-      <p>The function <codeph>ts_stat</codeph> is useful for checking your
-        configuration and for finding stop-word candidates.</p>
+      <title>收集文档统计信息</title>
+      <p>函数<codeph>ts_stat</codeph>可用于检查配置和查找停止词候选。
+        </p>
       <codeblock>ts_stat(<i>sqlquery</i> text, [ <i>weights</i> text, ]
         OUT <i>word</i> text, OUT <i>ndoc</i> integer,
         OUT <i>nentry</i> integer) returns setof record</codeblock>
-      <p><codeph><i>sqlquery</i></codeph> is a text value containing an SQL
-        query which must return a single <codeph>tsvector</codeph> column.
-          <codeph>ts_stat</codeph> executes the query and returns statistics
-        about each distinct lexeme (word) contained in the
-          <codeph>tsvector</codeph> data. The columns returned are</p>
+      <p><codeph><i>sqlquery</i></codeph>是一个包含SQL查询的文本值，该查询必须返回单个<codeph>tsvector</codeph>列。
+          <codeph>ts_stat</codeph>执行查询并返回有关<codeph>tsvector</codeph>数据中包含的每个不同词位（word）的统计信息。
+          返回的列是
+        </p>
       <ul id="ul_rwg_ml5_kfb">
-        <li><codeph><i>word</i> text</codeph> — the value of a lexeme</li>
-        <li><codeph><i>ndoc</i> integer</codeph> — number of documents
-            (<codeph>tsvector</codeph>s) the word occurred in</li>
-        <li><codeph><i>nentry</i> integer</codeph> — total number of occurrences
-          of the word</li>
+        <li><codeph><i>word</i> text</codeph> — 词位的值</li>
+        <li><codeph><i>ndoc</i> integer</codeph> — 出现这个词的文件数量（<codeph>tsvector</codeph>s）</li>
+        <li><codeph><i>nentry</i> integer</codeph> — 单词出现总数</li>
       </ul>
-      <p>If weights is supplied, only occurrences having one of those weights
-        are counted.</p>
-      <p>For example, to find the ten most frequent words in a document
-        collection:</p>
+      <p>如果提供权重，则仅计算具有这些权重之一的事件。</p>
+      <p>例如，要查找文档集合中十个最常用的单词：
+        </p>
       <codeblock>SELECT * FROM ts_stat('SELECT vector FROM apod')
 ORDER BY nentry DESC, ndoc DESC, word
 LIMIT 10;</codeblock>
-      <p>The same, but counting only word occurrences with weight
-          <codeph>A</codeph> or <codeph>B</codeph>:</p>
+      <p>相同，但只计算权重为<codeph>A</codeph>或<codeph>B</codeph>的单词出现次数：
+        </p>
       <codeblock>SELECT * FROM ts_stat('SELECT vector FROM apod', 'ab')
 ORDER BY nentry DESC, ndoc DESC, word
 LIMIT 10;</codeblock>

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="dictionaries">
-  <title>Text Search Dictionaries</title>
-  <shortdesc>Tokens produced by the Greenplum Database full text search parser
-    are passed through a chain of dictionaries to produce a normalized term or
-    "lexeme". Different kinds of dictionaries are available to filter and
-    transform tokens in different ways and for different languages.</shortdesc>
+  <title>文本搜索词典</title>
+  <shortdesc>由Greenplum数据库全文搜索解析器生成的token通过一系列字典传递以产生标准化术语或“词位”。
+      不同种类的词典可用于以不同方式和不同语言过滤和转换token。
+      </shortdesc>
   <body>
-    <p>This section contains the following subtopics:</p>
+    <p>本节包含以下子主题：</p>
     <ul id="ul_tjn_nzw_4fb">
       <li><xref href="#dictionaries/section_j2z_lzw_4fb" format="dita"/></li>
       <li><xref href="#dictionaries/stop-words" format="dita"/></li>
@@ -18,98 +17,73 @@
       <li><xref href="#dictionaries/section_xgc_2zw_4fb" format="dita"/></li>
     </ul>
     <section id="section_j2z_lzw_4fb">
-      <title>About Text Search Dictionaries</title>
-      <p>Dictionaries are used to eliminate words that should not be considered
-        in a search (<i>stop words</i>), and to <i>normalize</i> words so that
-        different derived forms of the same word will match. A successfully
-        normalized word is called a <i>lexeme</i>. Aside from improving search
-        quality, normalization and removal of stop words reduces the size of the
-          <codeph>tsvector</codeph> representation of a document, thereby
-        improving performance. Normalization does not always have linguistic
-        meaning and usually depends on application semantics.</p>
-      <p>Some examples of normalization:</p>
+      <title>关于文本搜索词典</title>
+      <p>字典用于消除在搜索中不应考虑的单词（停用单词），并对单词进行标准化，以使相同单词的不同派生形式匹配。
+          成功标准化的单词称为词位。
+          除了提高搜索质量之外，停止词的标准化和删除减少了文档的<codeph>tsvector</codeph>表示的大小，从而提高了性能。
+          规范化并不总是具有语言意义，通常依赖于应用语义。
+          </p>
+      <p>标准化的一些例子：</p>
       <ul id="ul_y5r_vm5_kfb">
-        <li>Linguistic - Ispell dictionaries try to reduce input words to a
-          normalized form; stemmer dictionaries remove word endings</li>
-        <li>URL locations can be canonicalized to make equivalent URLs match:<ul
+        <li>语法 -  Ispell词典试图将输入词减少到标准化形式; 词干词典删除单词结尾</li>
+        <li>可以规范化URL位置以使URL等效匹配：<ul
             id="ul_z5r_vm5_kfb">
             <li><codeph>http://www.pgsql.ru/db/mw/index.html</codeph></li>
             <li><codeph>http://www.pgsql.ru/db/mw/</codeph></li>
             <li><codeph>http://www.pgsql.ru/db/../db/mw/index.html</codeph></li>
           </ul></li>
-        <li>Color names can be replaced by their hexadecimal values, e.g.,
-            <codeph>red</codeph>, <codeph>green</codeph>, <codeph>blue</codeph>,
-            <codeph>magenta</codeph> -> <codeph>FF0000</codeph>,
-            <codeph>00FF00</codeph>, <codeph>0000FF</codeph>,
-            <codeph>FF00FF</codeph></li>
-        <li>If indexing numbers, we can remove some fractional digits to reduce
-          the range of possible numbers, so for example 3.14159265359,
-          3.1415926, 3.14 will be the same after normalization if only two
-          digits are kept after the decimal point.</li>
+        <li>颜色名称可以用它们的十六进制值替换，例如红色，绿色，蓝色，品红色 -> FF0000,00FF00,0000FF，FF00FF
+            </li>
+        <li>如果索引数字，我们可以删除一些小数位以减少可能数字的范围，因此例如3.14159265359,3.1415926,3.14在归一化后将是相同的，如果小数点后只保留两位数。
+            </li>
       </ul>
-      <p>A dictionary is a program that accepts a token as input and
+      <p>字典是一个接受token作为输入并返回的程序：A dictionary is a program that accepts a token as input and
         returns:</p>
       <ul id="ul_avr_vm5_kfb">
-        <li>an array of lexemes if the input token is known to the dictionary
-          (notice that one token can produce more than one lexeme)</li>
-        <li>a single lexeme with the <codeph>TSL_FILTER</codeph> flag set, to
-          replace the original token with a new token to be passed to subsequent
-          dictionaries (a dictionary that does this is called a <i>filtering
-            dictionary</i>)</li>
-        <li>an empty array if the dictionary knows the token, but it is a stop
-          word</li>
-        <li><codeph>NULL</codeph> if the dictionary does not recognize the input
-          token</li>
+        <li>如果字典已知输入token（注意一个token可以产生多个词位），则为词位数组</li>
+        <li>设置了<codeph>TSL_FILTER</codeph>标志的单个词位，用新token替换原始token以传递给后续字典（执行此操作的字典称为过滤字典）</li>
+        <li>如果字典知道token，则为空数组，但它是停止词</li>
+        <li>如果字典无法识别输入token，则为<codeph>NULL</codeph></li>
       </ul>
-      <p>Greenplum Database provides predefined dictionaries for many languages.
-        There are also several predefined templates that can be used to create
-        new dictionaries with custom parameters. Each predefined dictionary
-        template is described below. If no existing template is suitable, it is
-        possible to create new ones; see the <codeph>contrib/</codeph> area of
-        the Greenplum Database distribution for examples.</p>
-      <p>A text search configuration binds a parser together with a set of
-        dictionaries to process the parser's output tokens. For each token type
-        that the parser can return, a separate list of dictionaries is specified
-        by the configuration. When a token of that type is found by the parser,
-        each dictionary in the list is consulted in turn, until some dictionary
-        recognizes it as a known word. If it is identified as a stop word, or if
-        no dictionary recognizes the token, it will be discarded and not indexed
-        or searched for. Normally, the first dictionary that returns a
-          <codeph>non-NULL</codeph> output determines the result, and any
-        remaining dictionaries are not consulted; but a filtering dictionary can
-        replace the given word with a modified word, which is then passed to
-        subsequent dictionaries.</p>
-      <p>The general rule for configuring a list of dictionaries is to place
-        first the most narrow, most specific dictionary, then the more general
-        dictionaries, finishing with a very general dictionary, like a Snowball
-        stemmer or <codeph>simple</codeph>, which recognizes everything. For
-        example, for an astronomy-specific search (<codeph>astro_en</codeph>
-        configuration) one could bind token type <codeph>asciiword</codeph>
-        (ASCII word) to a synonym dictionary of astronomical terms, a general
-        English dictionary and a Snowball English stemmer:</p>
+      <p>Greenplum数据库为许多语言提供预定义的词典。
+          还有一些预定义模板可用于创建具有自定义参数的新词典。
+          每个预定义的字典模板如下所述。
+          如果没有适合的现有模板，则可以创建新模板;
+          有关示例，请参阅Greenplum数据库分发的<codeph>contrib/</codeph>区域。
+        </p>
+      <p>文本搜索配置将解析器与一组字典绑定在一起，以处理解析器的输出token。
+          对于解析器可以返回的每个token类型，配置指定单独的字典列表。
+          当解析器找到该类型的token时，依次查询列表中的每个字典，直到某些字典将其识别为已知字。
+          如果它被识别为停止词，或者没有字典识别该token，则它将被丢弃并且不被索引或搜索。
+          通常，返回<codeph>non-NULL</codeph>输出的第一个字典确定结果，并且不查阅任何剩余的字典;
+          但是过滤字典可以用修改后的单词替换给定单词，然后将其传递给后续词典。
+        </p>
+      <p>配置字典列表的一般规则是首先放置最窄，最具体的字典，然后是更一般的字典，最后是一个非常通用的字典，如Snowball stemmer或<codeph>simple</codeph>，它可以识别所有内容。
+          例如，对于特定于天文学的搜索（<codeph>astro_en</codeph>配置），可以将token类型<codeph>asciiword</codeph>（ASCII字）绑定到天文术语的同义词词典，通用英语词典和Snowball英语词干分析器：
+        </p>
       <codeblock>ALTER TEXT SEARCH CONFIGURATION astro_en
     ADD MAPPING FOR asciiword WITH astrosyn, english_ispell, english_stem;</codeblock>
-      <p>A filtering dictionary can be placed anywhere in the list, except at
-        the end where it'd be useless. Filtering dictionaries are useful to
-        partially normalize words to simplify the task of later dictionaries.
-        For example, a filtering dictionary could be used to remove accents from
-        accented letters, as is done by the <xref
-          href="https://www.postgresql.org/docs/9.4/unaccent.html"
-          format="html" scope="external">unaccent</xref> module.</p>
+      <p>过滤字典可以放在列表中的任何位置，除非它没有用处。
+          过滤词典对于部分规范化单词以简化后续词典的任务非常有用。
+          例如，过滤字典可用于从重音字母中删除重音，如<xref
+                  href="https://www.postgresql.org/docs/9.4/unaccent.html"
+                  format="html" scope="external">非重音</xref>模块所做的那样。
+        </p>
     </section>
     <section id="stop-words">
-      <title>Stop Words</title>
-      <p>Stop words are words that are very common, appear in almost every document, and have no
-        discrimination value. Therefore, they can be ignored in the context of full text searching.
-        For example, every English text contains words like a and the, so it is useless to store
-        them in an index. However, stop words do affect the positions in <codeph>tsvector</codeph>,
-        which in turn affect ranking:</p>
+      <title>停止词</title>
+      <p>停止词是非常常见的词，几乎出现在每个文档中，并且没有区分值。
+          因此，在全文搜索的上下文中可以忽略它们。
+          例如，每个英文文本都包含像a和the这样的单词，因此将它们存储在索引中是没用的。
+          但是，停止词会影响<codeph>tsvector</codeph>中的位置，从而影响排名：
+        </p>
       <codeblock>SELECT to_tsvector('english','in the list of stop words');
         to_tsvector
 ----------------------------
  'list':3 'stop':5 'word':6</codeblock>
-      <p>The missing positions 1,2,4 are because of stop words. Ranks calculated for documents with
-        and without stop words are quite different:</p>
+      <p>丢失的位置1,2,4是因为停止词。
+          计算带有和不带停止词的文档的等级是完全不同的：
+        </p>
       <codeblock>SELECT ts_rank_cd (to_tsvector('english','in the list of stop words'), to_tsquery('list &amp; stop'));
  ts_rank_cd
 ------------
@@ -119,37 +93,33 @@ SELECT ts_rank_cd (to_tsvector('english','list stop words'), to_tsquery('list &a
  ts_rank_cd
 ------------
         0.1</codeblock>
-      <p>It is up to the specific dictionary how it treats stop words. For example,
-          <codeph>ispell</codeph> dictionaries first normalize words and then look at the list of
-        stop words, while <codeph>Snowball</codeph> stemmers first check the list of stop words. The
-        reason for the different behavior is an attempt to decrease noise.</p>
+      <p>它取决于特定字典如何处理停止词。
+          例如，<codeph>ispell</codeph>词典首先将单词标准化，然后查看停止词列表，而<codeph>Snowball</codeph>词干表首先检查停止词列表。
+          不同行为的原因是试图降低噪音。
+        </p>
     </section>
     <section id="simple">
-      <title>Simple Dictionary</title>
-      <p>The simple dictionary template operates by converting the input token
-        to lower case and checking it against a file of stop words. If it is
-        found in the file then an empty array is returned, causing the token to
-        be discarded. If not, the lower-cased form of the word is returned as
-        the normalized lexeme. Alternatively, the dictionary can be configured
-        to report non-stop-words as unrecognized, allowing them to be passed on
-        to the next dictionary in the list.</p>
-      <p>Here is an example of a dictionary definition using the simple
-        template:</p>
+      <title>简单的字典</title>
+      <p>简单字典模板通过将输入token转换为小写字母并针对停用字文件进行检查来进行操作。
+          如果在文件中找到它，则返回一个空数组，导致该token被丢弃。
+          如果不是，则将该词的小写形式作为标准化词位返回。
+          或者，可以将字典配置为将非停止词报告为无法识别，允许将它们传递到列表中的下一个词典。
+        </p>
+      <p>以下是使用简单模板的字典定义示例：</p>
       <codeblock>CREATE TEXT SEARCH DICTIONARY public.simple_dict (
     TEMPLATE = pg_catalog.simple,
     STOPWORDS = english
 );</codeblock>
-      <p>Here, <codeph>english</codeph> is the base name of a file of stop
-        words. The file's full name will be
-          <codeph>$SHAREDIR/tsearch_data/english.stop</codeph>, where
-          <codeph>$SHAREDIR</codeph> means the Greenplum Database installation's
-        shared-data directory, often
-          <codeph>/usr/local/greenplum-db-&lt;version>/share/postgresql</codeph>
-        (use <codeph>pg_config --sharedir</codeph> to determine it if you're not
-        sure). The file format is simply a list of words, one per line. Blank
-        lines and trailing spaces are ignored, and upper case is folded to lower
-        case, but no other processing is done on the file contents.</p>
-      <p>Now we can test our dictionary:</p>
+      <p>这里，<codeph>english</codeph>是停止词文件的基本名称。
+          该文件的全名为<codeph>$SHAREDIR/tsearch_data/english.stop</codeph>，
+          其中<codeph>$SHAREDIR</codeph>表示Greenplum数据库安装的共享数据目录，
+          通常为<codeph>/usr/local/greenplum-db-&lt;version>/share/postgresql</codeph>
+          （使用<codeph>pg_config --sharedir</codeph>来确定它，如果您不确定。
+          文件格式只是一个单词列表，每行一个。
+          空行和尾随空格被忽略，大写折叠为小写，但没有对文件内容进行其他处理。
+          often
+        </p>
+      <p>现在我们可以测试我们的字典：</p>
       <codeblock>SELECT ts_lexize('public.simple_dict','YeS');
  ts_lexize
 -----------
@@ -159,10 +129,10 @@ SELECT ts_lexize('public.simple_dict','The');
  ts_lexize
 -----------
  {}</codeblock>
-      <p>We can also choose to return <codeph>NULL</codeph>, instead of the
-        lower-cased word, if it is not found in the stop words file. This
-        behavior is selected by setting the dictionary's <codeph>Accept</codeph>
-        parameter to false. Continuing the example:</p>
+      <p>如果在停止词文件中找不到，我们也可以选择返回<codeph>NULL</codeph>而不是小写的词。
+          通过将字典的<codeph>Accept</codeph>参数设置为false来选择此行为。
+          继续这个例子：
+        </p>
       <codeblock>ALTER TEXT SEARCH DICTIONARY public.simple_dict ( Accept = false );
 
 SELECT ts_lexize('public.simple_dict','YeS');
@@ -174,32 +144,26 @@ SELECT ts_lexize('public.simple_dict','The');
  ts_lexize
 -----------
  {}</codeblock>
-      <p>With the default setting of <codeph>Accept = true</codeph>, it is only
-        useful to place a simple dictionary at the end of a list of
-        dictionaries, since it will never pass on any token to a following
-        dictionary. Conversely, <codeph>Accept = false</codeph> is only useful
-        when there is at least one following dictionary.</p>
-      <note type="caution">Most types of dictionaries rely on configuration
-        files, such as files of stop words. These files must be stored in UTF-8
-        encoding. They will be translated to the actual database encoding, if
-        that is different, when they are read into the server.</note>
-      <note type="caution">Normally, a database session will read a dictionary
-        configuration file only once, when it is first used within the session.
-        If you modify a configuration file and want to force existing sessions
-        to pick up the new contents, issue an <codeph>ALTER TEXT SEARCH
-          DICTIONARY </codeph>command on the dictionary. This can be a "dummy"
-        update that doesn't actually change any parameter values.</note>
+      <p>使用<codeph>Accept = true</codeph>的默认设置，只在字典列表的末尾放置一个简单的字典是有用的，因为它永远不会将任何token传递给后面的字典。
+          相反，<codeph>Accept = false</codeph>仅在至少有一个后续字典时才有用。
+        </p>
+      <note type="caution">大多数类型的词典都依赖于配置文件，例如停止词的文件。
+          这些文件必须以UTF-8编码存储。
+          如果它们被读入服务器，它们将被转换为实际的数据库编码（如果不同）。
+        </note>
+      <note type="caution">通常，数据库会话将首次在会话中使用时读取字典配置文件一次。
+          如果修改配置文件并希望强制现有会话获取新内容，请在字典上发出<codeph>ALTER TEXT SEARCH DICTIONARY命令</codeph>。
+          这可以是“虚拟”更新，实际上不会更改任何参数值。
+        </note>
     </section>
     <section id="synonym">
-      <title>Synonym Dictionary</title>
-      <p>This dictionary template is used to create dictionaries that replace a
-        word with a synonym. Phrases are not supported—use the thesaurus
-        template (<xref href="#dictionaries/thesaurus-dictionary" format="dita"
-        />) for that. A synonym dictionary can be used to overcome linguistic
-        problems, for example, to prevent an English stemmer dictionary from
-        reducing the word "Paris" to "pari". It is enough to have a
-          <codeph>Paris paris</codeph> line in the synonym dictionary and put it
-        before the <codeph>english_stem</codeph> dictionary. For example:</p>
+      <title>同义词词典</title>
+      <p>此词典模板用于创建用同义词替换单词的词典。
+          不支持短语 - 使用同义词库模板（<xref href="#dictionaries/thesaurus-dictionary" format="dita" />）。
+          同义词词典可用于克服语言问题，例如，防止英语词干分词将“Paris”一词减少为“pari”。
+          在同义词词典中有一个<codeph>Paris paris</codeph>线就足够了，并把它放在<codeph>english_stem</codeph>字典之前。
+          例如：
+        </p>
       <codeblock>SELECT * FROM ts_debug('english', 'Paris');
    alias   |   description   | token |  dictionaries  |  dictionary  | lexemes 
 -----------+-----------------+-------+----------------+--------------+---------
@@ -218,34 +182,25 @@ SELECT * FROM ts_debug('english', 'Paris');
    alias   |   description   | token |       dictionaries        | dictionary | lexemes 
 -----------+-----------------+-------+---------------------------+------------+---------
  asciiword | Word, all ASCII | Paris | {my_synonym,english_stem} | my_synonym | {paris}</codeblock>
-      <p>The only parameter required by the synonym template is
-          <codeph>SYNONYMS</codeph>, which is the base name of its configuration
-        file — <codeph>my_synonyms</codeph> in the above example. The file's
-        full name will be
-          <codeph>$SHAREDIR/tsearch_data/my_synonyms.syn</codeph> (where
-          <codeph>$SHAREDIR</codeph> means the Greenplum Database installation's
-        shared-data directory). The file format is just one line per word to be
-        substituted, with the word followed by its synonym, separated by white
-        space. Blank lines and trailing spaces are ignored.</p>
-      <p>The synonym template also has an optional parameter
-          <codeph>CaseSensitive</codeph>, which defaults to
-          <codeph>false</codeph>. When <codeph>CaseSensitive</codeph> is
-          <codeph>false</codeph>, words in the synonym file are folded to lower
-        case, as are input tokens. When it is <codeph>true</codeph>, words and
-        tokens are not folded to lower case, but are compared as-is.</p>
-      <p>An asterisk (*) can be placed at the end of a synonym in the
-        configuration file. This indicates that the synonym is a prefix. The
-        asterisk is ignored when the entry is used in
-          <codeph>to_tsvector()</codeph>, but when it is used in
-          <codeph>to_tsquery()</codeph>, the result will be a query item with
-        the prefix match marker (see <xref
-          href="controlling.xml#controlling/parsing-queries"/>). For example,
-        suppose we have these entries in
-          <codeph>$SHAREDIR/tsearch_data/synonym_sample.syn</codeph>:</p>
+      <p>同义词模板所需的唯一参数是<codeph>SYNONYMS</codeph>，它是其配置文件的基本名称 - 上例中的<codeph>my_synonyms</codeph>。
+          该文件的全名为<codeph>$SHAREDIR/tsearch_data/my_synonyms.syn</codeph>（其中<codeph>$SHAREDIR</codeph>表示Greenplum数据库安装的共享数据目录）。
+          文件格式只是每个要替换的单词一行，单词后跟其同义词，用空格分隔。
+          空行和尾随空格将被忽略。
+        </p>
+      <p>同义词模板还有一个可选参数<codeph>CaseSensitive</codeph>，默认为<codeph>false</codeph>。
+          当<codeph>CaseSensitive</codeph>为<codeph>false</codeph>时，同义词文件中的单词将折叠为小写，输入token也是如此。
+          如果是<codeph>true</codeph>，则单词和token不会折叠为小写，而是按原样进行比较。
+        </p>
+      <p>星号（*）可以放在配置文件中同义词的末尾。
+          这表示同义词是前缀。
+          当在<codeph>to_tsvector()</codeph>中使用该条目时，将忽略星号，但在<codeph>to_tsquery()</codeph>中使用该条目时，结果将是具有前缀匹配标记的查询项（请参阅<xref
+                  href="controlling.xml#controlling/parsing-queries"/>）。
+          例如，假设我们在<codeph>$SHAREDIR/tsearch_data/synonym_sample.syn</codeph>中有这些条目：
+          </p>
       <codeblock>postgres pgsql postgresql pgsql postgre pgsql 
 gogle googl 
 indices index*</codeblock>
-      <p>Then we will get these results:</p>
+      <p>然后我们将得到这些结果：</p>
       <codeblock>mydb=# CREATE TEXT SEARCH DICTIONARY syn (template=synonym, synonyms='synonym_sample');
 mydb=# SELECT ts_lexize('syn','indices');
  ts_lexize
@@ -280,80 +235,73 @@ mydb=# SELECT 'indexes are very useful'::tsvector @@ to_tsquery('tst','indices')
 (1 row)</codeblock>
     </section>
     <section id="thesaurus-dictionary">
-      <title>Thesaurus Dictionary</title>
-      <p>A thesaurus dictionary (sometimes abbreviated as TZ) is a collection of words that includes
-        information about the relationships of words and phrases, i.e., broader terms (BT), narrower
-        terms (NT), preferred terms, non-preferred terms, related terms, etc.</p>
-      <p>Basically a thesaurus dictionary replaces all non-preferred terms by one preferred term
-        and, optionally, preserves the original terms for indexing as well. Greenplum Database's
-        current implementation of the thesaurus dictionary is an extension of the synonym dictionary
-        with added <i>phrase</i> support. A thesaurus dictionary requires a configuration file of
-        the following format:</p>
+      <title>同义词词典</title>
+      <p>同义词词典（有时缩写为TZ）是一组词，包括有关词和短语关系的信息，即更宽泛的术语（BT），更窄的术语（NT），首选术语，非首选术语，相关术语，等等。
+        </p>
+      <p>基本上，同义词词典将所有非首选术语替换为一个优选术语，并且可选地，也保留用于索引的原始术语。
+          Greenplum数据库的同义词词典的当前实现是同义词词典的扩展，增加了词组支持。
+          同义词词典需要以下格式的配置文件：
+          </p>
       <codeblock># this is a comment
 sample word(s) : indexed word(s)
 more sample word(s) : more indexed word(s)
 ...</codeblock>
-      <p>where the colon (<codeph>:</codeph>) symbol acts as a delimiter between a phrase and its
-        replacement.</p>
-      <p>A thesaurus dictionary uses a <i>subdictionary</i> (which is specified in the dictionary's
-        configuration) to normalize the input text before checking for phrase matches. It is only
-        possible to select one subdictionary. An error is reported if the subdictionary fails to
-        recognize a word. In that case, you should remove the use of the word or teach the
-        subdictionary about it. You can place an asterisk (<codeph>*</codeph>) at the beginning of
-        an indexed word to skip applying the subdictionary to it, but all sample words <b>must</b>
-        be known to the subdictionary.</p>
-      <p>The thesaurus dictionary chooses the longest match if there are multiple phrases matching
-        the input, and ties are broken by using the last definition.</p>
-      <p>Specific stop words recognized by the subdictionary cannot be specified; instead use
-          <codeph>?</codeph> to mark the location where any stop word can appear. For example,
-        assuming that <codeph>a</codeph> and <codeph>the</codeph> are stop words according to the
-        subdictionary:</p>
+      <p>其中冒号（<codeph>:</codeph>)符号充当短语及其替换之间的分隔符。</p>
+      <p>同义词词典使用子词典（在词典的配置中指定）来在检查词组匹配之前规范化输入文本。
+          只能选择一个子字典。
+          如果子字典无法识别单词，则会报告错误。
+          在这种情况下，您应该删除单词的使用或教它关于它的子字典。
+          您可以在索引单词的开头放置一个星号（<codeph>*</codeph>）以跳过对其应用子字典，但所有样本单词必须为子字典所知。
+        </p>
+      <p>如果存在多个与输入匹配的短语，则同义词词典选择最长匹配，并且通过使用最后定义来断开关系。
+        </p>
+      <p>无法指定子字典识别的特定停止词; 改为使用<codeph>?</codeph>标记任何停止词可以出现的位置。
+          例如，假设<codeph>a</codeph>和<codeph>the</codeph>根据子字典是停止词：
+        </p>
       <codeblock>? one ? two : swsw</codeblock>
-      <p>matches <codeph>a one the two</codeph> and <codeph>the one a two</codeph>; both would be
-        replaced by <codeph>swsw</codeph>.</p>
-      <p>Since a thesaurus dictionary has the capability to recognize phrases it must remember its
-        state and interact with the parser. A thesaurus dictionary uses these assignments to check
-        if it should handle the next word or stop accumulation. The thesaurus dictionary must be
-        configured carefully. For example, if the thesaurus dictionary is assigned to handle only
-        the <codeph>asciiword</codeph> token, then a thesaurus dictionary definition like
-          <codeph>one 7</codeph> will not work since token type <codeph>uint</codeph> is not
-        assigned to the thesaurus dictionary.</p>
-      <note type="caution">Thesauruses are used during indexing so any change in the thesaurus
-        dictionary's parameters requires reindexing. For most other dictionary types, small changes
-        such as adding or removing stopwords does not force reindexing.</note>
+      <p>匹配<codeph>a one the two</codeph>和<codeph>the one a two</codeph>; 两者都将被<codeph>swsw</codeph>取代。
+        </p>
+      <p>由于同义词词典具有识别短语的能力，因此它必须记住其状态并与解析器交互。
+          同义词词典使用这些分配来检查它是否应该处理下一个单词或停止累积。
+          必须仔细配置同义词词典。
+          例如，如果分配同义词词典仅处理<codeph>asciiword</codeph> token，那么像<codeph>one 7</codeph>一样的同义词词典定义将不起作用，因为token类型<codeph>uint</codeph>未分配给同义词词典。
+          </p>
+      <note type="caution">在索引期间使用同义词，因此同义词词典参数的任何更改都需要重新索引。
+          对于大多数其他字典类型，添加或删除停止词等小的更改不会强制重新编制索引。
+        </note>
       <sectiondiv>
-        <p><b>Thesaurus Configuration</b></p>
-        <p>To define a new thesaurus dictionary, use the <codeph>thesaurus</codeph> template. For
-          example:</p>
+        <p><b>同义词库配置</b></p>
+        <p>要定义新的同义词词典，请使用<codeph>thesaurus</codeph>模板。例如：
+            </p>
         <codeblock>CREATE TEXT SEARCH DICTIONARY thesaurus_simple (
     TEMPLATE = thesaurus,
     DictFile = mythesaurus,
     Dictionary = pg_catalog.english_stem
 );</codeblock>
-        <p>Here:</p>
+        <p>其中：</p>
         <ul id="ul_dz3_kq5_kfb">
-          <li><codeph>thesaurus_simple</codeph> is the new dictionary's name</li>
-          <li><codeph>mythesaurus</codeph> is the base name of the thesaurus configuration file.
-            (Its full name will be <codeph>$SHAREDIR/tsearch_data/mythesaurus.ths</codeph>, where
-              <codeph>$SHAREDIR</codeph> means the installation shared-data directory.)</li>
-          <li><codeph>pg_catalog.english_stem</codeph> is the subdictionary (here, a Snowball
-            English stemmer) to use for thesaurus normalization. Notice that the subdictionary will
-            have its own configuration (for example, stop words), which is not shown here.</li>
+          <li><codeph>thesaurus_simple</codeph>是新的词典名称</li>
+          <li><codeph>mythesaurus</codeph>是同义词库配置文件的基本名称。
+              （它的全名是<codeph>$SHAREDIR/tsearch_data/mythesaurus.ths</codeph>，其中<codeph>$SHAREDIR</codeph>表示安装共享数据目录。）
+            </li>
+          <li><codeph>pg_catalog.english_stem</codeph>是用于词库规范化的子字典（这里是一个Snowball英语词干分析器）。
+              请注意，subdictionary将具有自己的配置（例如，停止词），此处未显示。
+            </li>
         </ul>
-        <p>Now it is possible to bind the thesaurus dictionary <codeph>thesaurus_simple</codeph> to
-          the desired token types in a configuration, for example:</p>
+        <p>现在可以将同义词词典<codeph>thesaurus_simple</codeph>绑定到配置中的所需token类型，例如：
+            </p>
         <codeblock>ALTER TEXT SEARCH CONFIGURATION russian
     ALTER MAPPING FOR asciiword, asciihword, hword_asciipart
     WITH thesaurus_simple;</codeblock>
       </sectiondiv>
       <sectiondiv>
-        <p><b>Thesaurus Example</b></p>
-        <p>Consider a simple astronomical thesaurus <codeph>thesaurus_astro</codeph>, which contains
-          some astronomical word combinations:</p>
+        <p><b>词库示例</b></p>
+        <p>考虑一个简单的天文词库<codeph>thesaurus_astro</codeph>，其中包含一些天文单词组合：
+            </p>
         <pre>supernovae stars : sn
 crab nebulae : crab</pre>
-        <p>Below we create a dictionary and bind some token types to an astronomical thesaurus and
-          English stemmer:</p>
+        <p>下面我们创建一个字典并将一些token类型绑定到天文词库和英语词干分析器：
+            </p>
         <codeblock>CREATE TEXT SEARCH DICTIONARY thesaurus_astro (
     TEMPLATE = thesaurus,
     DictFile = thesaurus_astro,
@@ -363,10 +311,10 @@ crab nebulae : crab</pre>
 ALTER TEXT SEARCH CONFIGURATION russian
     ALTER MAPPING FOR asciiword, asciihword, hword_asciipart
     WITH thesaurus_astro, english_stem;</codeblock>
-        <p>Now we can see how it works. <codeph>ts_lexize</codeph> is not very useful for testing a
-          thesaurus, because it treats its input as a single token. Instead we can use
-            <codeph>plainto_tsquery</codeph> and <codeph>to_tsvector</codeph>, which will break
-          their input strings into multiple tokens:</p>
+        <p>现在我们可以看到它是如何工作的。
+            <codeph>ts_lexize</codeph>对于测试同义词库并不是非常有用，因为它将其输入视为单个token。
+            相反，我们可以使用<codeph>plainto_tsquery</codeph>和<codeph>to_tsvector</codeph>，它们会将输入字符串分成多个token：
+            </p>
         <codeblock>SELECT plainto_tsquery('supernova star');
  plainto_tsquery
 -----------------
@@ -376,17 +324,16 @@ SELECT to_tsvector('supernova star');
  to_tsvector
 -------------
  'sn':1</codeblock>
-        <p>In principle, one can use <codeph>to_tsquery</codeph> if you quote the argument:</p>
+        <p>原则上，如果引用参数，可以使用<codeph>to_tsquery</codeph>：</p>
         <codeblock>SELECT to_tsquery('''supernova star''');
  to_tsquery
 ------------
  'sn'</codeblock>
-        <p>Notice that <codeph>supernova star</codeph> matches <codeph>supernovae stars</codeph> in
-            <codeph>thesaurus_astro</codeph> because we specified the <codeph>english_stem</codeph>
-          stemmer in the <codeph>thesaurus</codeph> definition. The stemmer removed the
-            <codeph>e</codeph> and <codeph>s</codeph>.</p>
-        <p>To index the original phrase as well as the substitute, just include it in the right-hand
-          part of the definition:</p>
+        <p>请注意，<codeph>supernova star</codeph>与<codeph>thesaurus_astro</codeph>中的<codeph>supernovae stars</codeph>相匹配，
+            因为我们在同义词定义中指定了<codeph>english_stem</codeph>提取器。
+            提取器去掉了<codeph>e</codeph>和<codeph>s</codeph>。
+            </p>
+        <p>要索引原始短语以及替换，只需将其包含在定义的右侧部分：</p>
         <codeblock>supernovae stars : sn supernovae stars
 
 SELECT plainto_tsquery('supernova star');
@@ -396,84 +343,63 @@ SELECT plainto_tsquery('supernova star');
       </sectiondiv>
     </section>
     <section id="ispell">
-      <title>Ispell Dictionary</title>
-      <p>The Ispell dictionary template supports <i>morphological
-          dictionaries</i>, which can normalize many different linguistic forms
-        of a word into the same lexeme. For example, an English Ispell
-        dictionary can match all declensions and conjugations of the search term
-          <codeph>bank</codeph>, e.g., <codeph>banking</codeph>,
-          <codeph>banked</codeph>, <codeph>banks</codeph>,
-          <codeph>banks</codeph>', and <codeph>bank's</codeph>.</p>
-      <p>The standard Greenplum Database distribution does not include any
-        Ispell configuration files. Dictionaries for a large number of languages
-        are available from <xref
-          href="http://ficus-www.cs.ucla.edu/geoff/ispell.html" format="html"
-          scope="external">Ispell</xref>. Also, some more modern dictionary file
-        formats are supported — <xref
-          href="http://en.wikipedia.org/wiki/MySpell" format="html"
-          scope="external">MySpell</xref> (OO &lt; 2.0.1) and <xref
-          href="http://sourceforge.net/projects/hunspell/" format="html"
-          scope="external">Hunspell</xref> (OO >= 2.0.2). A large list of
-        dictionaries is available on the <xref
-          href="http://wiki.services.openoffice.org/wiki/Dictionaries"
-          format="html" scope="external">OpenOffice Wiki</xref>.</p>
-      <p>To create an Ispell dictionary, use the built-in
-          <codeph>ispell</codeph> template and specify several parameters:</p>
+      <title>Ispell字典</title>
+      <p>Ispell字典模板支持形态词典，可以将单词的许多不同语言形式归一化为相同的词位。
+          例如，英语Ispell字典可以匹配搜索项<codeph>bank</codeph>的所有词形组合和变化，
+          例如<codeph>banking</codeph>，<codeph>banked</codeph>，<codeph>banks</codeph>，<codeph>banks</codeph>'和<codeph>bank's</codeph>。
+        </p>
+      <p>标准Greenplum数据库分发不包含任何Ispell配置文件。
+          <xref href="http://ficus-www.cs.ucla.edu/geoff/ispell.html" format="html" scope="external">Ispell</xref>提供大量语言的字典。
+          此外，还支持一些更现代的字典文件格式 -  <xref href="http://en.wikipedia.org/wiki/MySpell" format="html" scope="external">MySpell</xref>（OO &lt; 2.0.1）
+          和<xref href="http://sourceforge.net/projects/hunspell/" format="html" scope="external">Hunspell</xref>（OO> = 2.0.2）。
+          <xref href="http://wiki.services.openoffice.org/wiki/Dictionaries" format="html" scope="external">OpenOffice Wiki</xref>上提供了大量字典。
+        </p>
+      <p>要创建Ispell字典，请使用内置<codeph>ispell</codeph>模板并指定几个参数：</p>
       <codeblock>CREATE TEXT SEARCH DICTIONARY english_ispell (
     TEMPLATE = ispell,
     DictFile = english,
     AffFile = english,
     StopWords = english
 );</codeblock>
-      <p>Here, <codeph>DictFile</codeph>, <codeph>AffFile</codeph>, and
-          <codeph>StopWords</codeph> specify the base names of the dictionary,
-        affixes, and stop-words files. The stop-words file has the same format
-        explained above for the <codeph>simple</codeph> dictionary type. The
-        format of the other files is not specified here but is available from
-        the above-mentioned web sites.</p>
-      <p>Ispell dictionaries usually recognize a limited set of words, so they
-        should be followed by another broader dictionary; for example, a
-        Snowball dictionary, which recognizes everything.</p>
-      <p>Ispell dictionaries support splitting compound words; a useful feature.
-        Notice that the affix file should specify a special flag using the
-          <codeph>compoundwords controlled</codeph> statement that marks
-        dictionary words that can participate in compound formation:</p>
+      <p>这里，<codeph>DictFile</codeph>，<codeph>AffFile</codeph>和<codeph>StopWords</codeph>指定字典，词缀和停止词文件的基本名称。
+          停止词文件具有与上述<codeph>simple</codeph>词典类型相同的格式。
+          此处未指定其他文件的格式，但可从上述网站获取。
+        </p>
+      <p>Ispell字典通常识别一组有限的单词，因此应该跟着另一个更广泛的字典; 例如，一个可以识别一切的Snowball字典。</p>
+      <p>Ispell词典支持分裂复合词; 一个有用的功能。
+          请注意，词缀文件应使用<codeph>compoundwords controlled</codeph>语句指定一个特殊标志，该语句标记可以参与复合词形成的词典单词：
+        </p>
       <codeblock>compoundwords  controlled z</codeblock>
-      <p>Here are some examples for the Norwegian language:</p>
+      <p>以下是挪威语的一些示例：</p>
       <codeblock>SELECT ts_lexize('norwegian_ispell', 'overbuljongterningpakkmesterassistent');
    {over,buljong,terning,pakk,mester,assistent}
 SELECT ts_lexize('norwegian_ispell', 'sjokoladefabrikk');
    {sjokoladefabrikk,sjokolade,fabrikk}</codeblock>
       <note>
-        <p> MySpell does not support compound words. Hunspell has sophisticated
-          support for compound words. At present, Greenplum Database implements
-          only the basic compound word operations of Hunspell.</p>
+        <p>MySpell不支持复合词。
+            Hunspell对复合词有着复杂的支持。
+            目前，Greenplum数据库仅实现了Hunspell的基本复合词操作。
+            </p>
       </note>
     </section>
     <section id="section_xgc_2zw_4fb">
-      <title>SnowBall Dictionary</title>
-      <p>The Snowball dictionary template is based on a project by Martin
-        Porter, inventor of the popular Porter's stemming algorithm for the
-        English language. Snowball now provides stemming algorithms for many
-        languages (see the <xref href="http://snowballstem.org/" format="html"
-          scope="external">Snowball site</xref> for more information). Each
-        algorithm understands how to reduce common variant forms of words to a
-        base, or stem, spelling within its language. A Snowball dictionary
-        requires a language parameter to identify which stemmer to use, and
-        optionally can specify a stopword file name that gives a list of words
-        to eliminate. (Greenplum Database's standard stopword lists are also
-        provided by the Snowball project.) For example, there is a built-in
-        definition equivalent to</p>
+      <title>SnowBall词典</title>
+      <p>Snowball词典模板基于Martin Porter的一个项目，他是流行的Porter英语词干算法的发明者。
+          Snowball现在为许多语言提供词干算法（有关更多信息，请参阅<xref href="http://snowballstem.org/" format="html" scope="external">Snowball站点</xref>）。
+          每种算法都理解如何将单词的常见变体形式减少到其语言中的基础或词干拼写。
+          Snowball字典需要一个语言参数来识别要使用的词干分析器，并且可以选择指定一个停止词文件名，该名称提供要删除的单词列表。
+          （Greenplum数据库的标准停止词列表也由Snowball项目提供。）
+          例如，有一个内置的定义等效于
+          </p>
       <codeblock>CREATE TEXT SEARCH DICTIONARY english_stem (
     TEMPLATE = snowball,
     Language = english,
     StopWords = english
 );</codeblock>
-      <p>The stopword file format is the same as already explained.</p>
-      <p>A Snowball dictionary recognizes everything, whether or not it is able
-        to simplify the word, so it should be placed at the end of the
-        dictionary list. It is useless to have it before any other dictionary
-        because a token will never pass through it to the next dictionary.</p>
+      <p>停止词文件格式与已经说明的相同。</p>
+      <p>Snowball字典可以识别所有内容，无论它是否能够简化单词，因此它应该放在字典列表的末尾。
+          在任何其他字典之前使用它是没用的，因为token永远不会通过它传递到下一个字典。
+        </p>
     </section>
   </body>
 </topic>
