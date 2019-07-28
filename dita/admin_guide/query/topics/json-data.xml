@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="ih135496">Working with JSON Data</title>
-  <shortdesc>Greenplum Database supports the <codeph>json</codeph> and <codeph>jsonb</codeph> data
-    types that store JSON (JavaScript Object Notation) data.</shortdesc>
+  <title id="ih135496">使用JSON数据</title>
+  <shortdesc>Greenplum数据库支持<codeph>json</codeph>和<codeph>jsonb</codeph>数据类型来存储JSON (JavaScript Object Notation)数据。</shortdesc>
   <body>
-    <p>Greenplum Database supports JSON as specified in the <xref
+    <p>Greenplum数据库按照文档<xref
         href="https://tools.ietf.org/html/rfc7159" format="html" scope="external">RFC 7159</xref>
-      document and enforces data validity according to the JSON rules. There are also JSON-specific
-      functions and operators available for the <codeph>json</codeph> and <codeph>jsonb</codeph>
-      data types. See <xref href="#topic_gn4_x3w_mq" format="dita"/>. </p>
-    <p>This section contains the following topics:<ul id="ul_sjd_hsr_fz">
+      支持JSON,并且根据JSON规则强制数据有效性。也有一些用于<codeph>json</codeph> and <codeph>jsonb</codeph>数据类型的JSON相关的函数和操作符。参见<xref href="#topic_gn4_x3w_mq" format="dita"/>. </p>
+    <p>这一节包含下列主题：<ul id="ul_sjd_hsr_fz">
         <li><xref href="#topic_upc_tcs_fz" format="dita"/></li>
         <li><xref href="#topic_isn_ltw_mq" format="dita"/></li>
         <li><xref href="#topic_eyt_3tw_mq" format="dita"/></li>
@@ -20,45 +17,30 @@
       </ul></p>
   </body>
   <topic id="topic_upc_tcs_fz">
-    <title>About JSON Data</title>
+    <title>关于JSON数据</title>
     <body>
-      <p>Greenplum Database supports two JSON data types: <codeph>json</codeph> and
-          <codeph>jsonb</codeph>. They accept almost identical sets of values as input. The major
-        difference is one of efficiency. <ul id="ul_qv2_zrw_mq">
-          <li>The <codeph>json</codeph> data type stores an exact copy of the input text. This
-            requires JSON processing functions to reparse <codeph>json</codeph> data on each
-            execution. The <codeph>json</codeph> data type does not alter the input text.<ul
+      <p>Greenplum数据库支持两种JSON数据类型: <codeph>json</codeph> and
+          <codeph>jsonb</codeph>. 他们输入值基本一致，主要区别之一是效率。 <ul id="ul_qv2_zrw_mq">
+          <li>The <codeph>json</codeph>数据类型存储输入副本. 这要求JSON处理函数每次执行时处理<codeph>json</codeph> 数据。<codeph>json</codeph>数据类型不会修改输入文本。<ul
               id="ul_yrn_njf_pfb">
-              <li>Semantically-insignificant white space between tokens is retained, as well as the
-                order of keys within JSON objects. </li>
-              <li>All key/value pairs are kept even if a JSON object contains duplicate keys. For
-                duplicate keys, JSON processing functions consider the last value as the operative
-                one.</li>
+              <li>记号之间没有语义意义的空格被保留，JSON对象内的键的顺序也被保留。</li>
+              <li>即便JSON对象含有重复键，所有的键/值对也会被保留。对于重复键，JSON处理函数把其中的最后一个值当作有效值。</li>
             </ul></li>
-          <li>The <codeph>jsonb</codeph> data type stores a decomposed binary format of the input
-            text. The conversion overhead makes data input slightly slower than the
-              <codeph>json</codeph> data type. However, The JSON processing functions are
-            significantly faster because reparsing <codeph>jsonb</codeph> data is not required. The
-              <codeph>jsonb</codeph> data type alters the input text.<ul id="ul_bzp_hkf_pfb">
-              <li>White space is not preserved.</li>
-              <li>The order of object keys is not preserved.</li>
-              <li>Duplicate object keys are not kept. If the input includes duplicate keys, only the
-                last value is kept.</li>
-            </ul><p>The <codeph>jsonb</codeph> data type supports indexing. See <xref
+          <li> <codeph>jsonb</codeph>数据类型存储输入文本的二进制格式。输入数据的转换开销使jsonb稍慢于
+              <codeph>json</codeph>数据类型. 但是, json处理函数明显更快，因为解析<codeph>jsonb</codeph>数据不是必须的。
+              <codeph>jsonb</codeph>数据类型修改输入文本。<ul id="ul_bzp_hkf_pfb">
+              <li>空格不保留</li>
+              <li>对象内的键的顺序不保留</li>
+              <li>重复键对象不保留，如果输入包含重复键，仅保留最后一个值。</li>
+            </ul><p><codeph>jsonb</codeph>数据类型支持索引。参考 <xref
                 href="#topic_aqt_1tw_mq" format="dita"/>.</p></li>
         </ul></p>
-      <p>In general, JSON data should be stored as the <codeph>jsonb</codeph> data type unless there
-        are specialized needs, such as legacy assumptions about ordering of object keys.</p>
+      <p>一般来说，JSON数据应该存储为<codeph>jsonb</codeph>数据类型，除非特殊需要，例如关于对象键顺序的遗留假设。</p>
       <section>
-        <title>About Unicode Characters in JSON Data</title>
+        <title>关于JSON数据中的Unicode字符</title>
         <p>The <xref href="http://rfc7159.net/rfc7159" format="html" scope="external">RFC
-            7159</xref> document permits JSON strings to contain Unicode escape sequences denoted by
-              <codeph>\u<varname>XXXX</varname></codeph>. However, Greenplum Database allows only
-          one character set encoding per database. It is not possible for the <codeph>json</codeph>
-          data type to conform rigidly to the JSON specification unless the database encoding is
-          UTF8. Attempts to include characters that cannot be represented in the database encoding
-          will fail. Characters that can be represented in the database encoding, but not in UTF8,
-          are allowed.</p>
+            7159</xref>文档允许JSON字符串包含表示为\uXXXX的<codeph>\u<varname>XXXX</varname></codeph>Unicode转义序列。However, Greenplum对每一个数据库只允许一种字符集编码。
+          除非数据库编码为UTF8，<codeph>json</codeph>类型不可能严格地符合JSON说明。尝试包括数据库编码中无法表示的字符将会失败。允许可在数据库编码中表示但不在UTF8中的字符。</p>
         <p>
           <ul id="ul_ejw_ppf_pfb">
             <li>The Greenplum Database input function for the <codeph>json</codeph> data type allows

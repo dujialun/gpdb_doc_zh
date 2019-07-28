@@ -3,29 +3,18 @@
 
 
 <topic id="topic38" xml:lang="en">
-  <title id="in198679">Query Performance</title>
-  <abstract><shortdesc>Greenplum Database dynamically eliminates irrelevant partitions
-      in a table and optimally allocates memory for different operators in a query.
-    </shortdesc>These enhancements scan less data for a query, accelerate query processing, and
-    support more concurrency.</abstract>
+  <title id="in198679">查询性能</title>
+  <abstract><shortdesc>Greenplum数据库动态地消除一个表中的不相关分区并且为查询中的不同操作符最优地分配内存。
+  </shortdesc>这些增强可以让查询扫描更少的数据、加速查询处理以及支持更大的并发度。</abstract>
 
   <body>
 
     <ul>
-      <li id="in198681">Dynamic Partition Elimination<p>In Greenplum Database, values
-          available only when a query runs are used to dynamically prune partitions, which improves
-          query processing speed. Enable or disable dynamic partition elimination by setting the
-          server configuration parameter <codeph>gp_dynamic_partition_pruning</codeph> to
-            <codeph>ON</codeph> or <codeph>OFF</codeph>; it is <codeph>ON</codeph> by
-        default.</p></li>
+      <li id="in198681">动态分区消除<p>在Greenplum数据库中，只有在查询运行时才可用的值被用来动态地剪枝分区，这会改进查询的处理速度。通过将服务器配置参数<codeph>gp_dynamic_partition_pruning</codeph>设置为<codeph>ON</codeph> 或者<codeph>OFF</codeph> 可启用或者禁用动态分区消除，该参数默认是ON。</p></li>
 
-      <li id="in198822">Memory Optimizations<p>Greenplum Database allocates memory
-          optimally for different operators in a query and frees and re-allocates memory during the
-          stages of processing a query.</p></li>
+      <li id="in198822">内存优化<p>Greenplum数据库为一个查询中的不同操作符最优地分配内存以及在处理查询的各阶段中释放并重新分配内存。</p></li>
     </ul>
-    <note>Greenplum Database uses GPORCA, the Greenplum next generation query optimizer, by default.
-      GPORCA extends the planning and optimization capabilities of the Postgres
-      optimizer. For information about the features and limitations of GPORCA, see <xref
+    <note>Greenplum数据库默认使用下一代查询优化器GPORCA。GPORCA扩展了Greenplum数据库传统优化器的规划和优化能力。有关GPORCA的特性和限制信息，请参看 <xref
         href="query-piv-opt-overview.xml"/>.</note>
   </body>
 </topic>

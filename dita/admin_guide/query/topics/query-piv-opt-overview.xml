@@ -4,19 +4,19 @@
  
 <topic id="topic1">
   <title>GPORCA概述</title>
-  <abstract><shortdesc>GPORCA扩展了Greenplum数据库传统优化器的规划和优化能力。 </shortdesc>GPORCA是可扩展的，它能在多核环境中获得更好的性能。Greenplum数据库默认使用GPORCA by default to generate
+  <abstract><shortdesc>GPORCA扩展了Greenplum数据库传统优化器的规划和优化能力。 </shortdesc>GPORCA是可扩展的，它能在多核环境中获得更好的性能。Greenplum数据库默认使用GPORCA
    来生成查询计划。</abstract>
   <body>
-    <p>GPORCA也增强了Greenplum数据库在以下场景的查询性能： <ul
+    <p>GPORCA也在下列领域增强了Greenplum数据库的查询性能调优： <ul
         id="ul_z4r_51m_vp">
-        <li>查询分区表 </li>
-        <li>查询通用表达式(CTE)</li>
-        <li>子查询</li>
+        <li>针对分区表的查询</li>
+        <li>包含公共表表达式（CTE）的查询</li>
+        <li>包含子查询的查询</li>
       </ul></p>
-    <p>在Greenplum数据库中, 默认GPORCA与传统查询优化器并存。 Greenplum数据库使用GPORCA. 如果GPORCA不能用, 那么传统的查询优化器将被使用。</p>
-    <p>下图展示了GPORCA如何适应查询计划基础架构。</p>
+    <p>在Greenplum数据库中, GPORCA与传统查询优化器并存。默认情况下，Greenplum数据库使用GPORCA。 如果无法使用GPORCA，则会使用传统查询优化器。</p>
+    <p>下图展示了GPORCA如何融合到查询规划架构中。</p>
     <image href="../../graphics/piv-opt.png" id="image_tqw_2bm_vp"/>
     <note>GPORCA会忽略所有的传统查询优化器服务器参数。然而，如果Greenplum数据库回退到传统查询优化器, 优化器服务器配置参数将影响查询计划的生成. 关于传统查询优化器的服务器参数，查看<xref
-        href="../../../ref_guide/config_params/guc_category-list.xml#topic21">查询参数调优</xref>.</note>
+        href="../../../ref_guide/config_params/guc_category-list.xml#topic21">查询调节参数</xref>.</note>
   </body>
 </topic>
