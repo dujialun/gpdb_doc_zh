@@ -16,7 +16,7 @@
 可以参考目前Greenplum4和5的文档翻译，[https://greenplum.cn/docs/](https://greenplum.cn/docs/)。
 
 ## 翻译进展
-- Administrator Guide 进行中（参与者：杜佳伦，苑泽福，亓晓帅，钱晨，段旻，武宁，朱丽云、肖磊）
+- Administrator Guide 进行中（参与者：杜佳伦，苑泽福，亓晓帅，钱晨，段旻，武宁，朱丽云）
     - Demo: [http://47.92.231.67:8080/6-0/admin_guide/](http://47.92.231.67:8080/6-0/admin_guide/)
     - Greenplum数据库概念 （完成：杜佳伦）
     - Managing a Greenplum System （完成：苑泽福、杜佳伦）
@@ -24,17 +24,18 @@
     - Defining Database Objects （完成：杜佳伦）
     - Distribution and Skew （完成：杜佳伦）
     - Inserting, Updating, and Deleting Data （完成：段旻）
-    - Querying Data （翻译中：朱丽云、杜佳伦）
+    - Querying Data （翻译中：朱丽云、杜佳伦，进度：17/32）
     - 使用外部数据 （完成：杜佳伦）
-    - Loading and Unloading Data （翻译中：武宁，进度：43/49）
-    - Managing Performance （翻译中：钱晨，进度：3/7）
+    - Loading and Unloading Data （完成：武宁）
+    - Managing Performance （翻译中：钱晨，进度：4/7）
 - Security Configuration Guide （待认领）
-- Best Practices Guide （翻译中：苑泽福）
+- Best Practices Guide （翻译中：苑泽福，进度：3/15）
+    - Demo: [http://47.92.231.67:8080/6-0/best_practices/](http://47.92.231.67:8080/6-0/best_practices/)
 - Utility Guide （待认领）
-- Reference Guide 进行中（参与者：肖磊）
+- Reference Guide 进行中（参与者：肖磊、杜佳伦）
     - Demo: [http://47.92.231.67:8080/6-0/ref_guide/](http://47.92.231.67:8080/6-0/ref_guide/)
     - SQL Command Reference（翻译中：肖磊）
-    - System Catalog Reference（待认领）
+    - System Catalog Reference（翻译中：杜佳伦）
     - The gp_toolkit Administrative Schema（待认领）
     - The gpperfmon Database（待认领）
     - Greenplum Database Data Types（待认领）
