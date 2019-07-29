@@ -2,124 +2,104 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic14">
-  <title>Recovering From Segment Failures</title>
+  <title>从Segment故障中恢复</title>
   <body>
-    <p>Segment host failures usually cause multiple segment failures: all primary or mirror segment
-      instances on the host are marked as down and nonoperational. If mirroring is not enabled and a
-      segment goes down, the system automatically becomes nonoperational.</p>
-    <p>A segment instance can fail for several reasons, such as a host failure, network failure, or
-      disk failure. When a segment instance fails, its status is marked as <i>down</i> in the
-      Greenplum Database system catalog, and its mirror is activated in <i>change tracking</i> mode.
-      In order to bring the failed segment instance back into operation again, you must first
-      correct the problem that made it fail in the first place, and then recover the segment
-      instance in Greenplum Database using <codeph>gprecoverseg</codeph>.</p>
-    <p>If a segment host is not recoverable and you have lost one or more segment instances with
-      mirroring enabled, you can attempt to recover a segment instance from its mirror. See <xref
-        href="g-when-a-segment-host-is-not-recoverable.xml"/>. You can also recreate your Greenplum
-      Database system from backup files. See <xref href="../../managing/backup-main.xml"/>. </p>
+    <p>Segment主机故障通常会导致多个Segment故障：在该主机上的所有主Segment或者镜像Segment都被标记为“down”
+      并且不可操作。如果没有启用镜像并且一个Segment宕掉，系统会自动变成不可操作。
+      </p>
+    <p>segment实例可能会因为很多原因产生故障。例如主机故障，网络故障或磁盘故障。当segment实例故障时，它的
+      状态在系统表中被标记为<i>down</i>，它的镜像切换到<i>change tracking</i>模式。为了将故障segment实例
+      修复并重新进入可操作状态，您必须首先修复导致故障的问题，然后使用<codeph>gprecoverseg</codeph>工具
+      恢复该故障实例。</p>
+    <p>如果一台segment主机不可恢复，此时您已经失去了一个或多个segment实例，那么您可以尝试从它的镜像segment
+      来恢复该segment实例。详见<xref href="g-when-a-segment-host-is-not-recoverable.xml"/>。
+      您也可以从备份文件重新创建Greenplum数据库。详见<xref href="../../managing/backup-main.xml"/>。</p>
     <section id="ki155642">
-      <title>To recover with mirroring enabled</title>
+      <title>在启用了镜像的情况下恢复</title>
       <ol>
-        <li id="ki155643">Ensure you can connect to the segment host from the master host. For
-          example:<codeblock>$ ping <i>failed_seg_host_address</i></codeblock>
+        <li id="ki155643">确保可以从Master主机连接到该Segment主机。例如：
+          <codeblock>$ ping <i>failed_seg_host_address</i></codeblock>
         </li>
-        <li id="ki155645">Troubleshoot the problem that prevents the master host from connecting to
-          the segment host. For example, the host machine may need to be restarted or replaced.</li>
-        <li id="ki155646">After the host is online and you can connect to it, run the <codeph><xref
+        <li id="ki155645">排查解决妨碍Master主机连接到Segment主机的问题。例如，主机可能需要被重启或者替换。</li>
+        <li id="ki155646">在主机上线并且能连接到它后，从Master主机运行<codeph><xref
               href="../../../utility_guide/admin_utilities/gprecoverseg.xml"
-            >gprecoverseg</xref></codeph> utility from the master host to reactivate the failed
-          segment instances and start the process of sycnronizing the master and mirror instances.
-          For example:<codeblock>$ gprecoverseg</codeblock>
+          >gprecoverseg</xref></codeph>工具来重新激活故障的Segment实例。
+          例如：<codeblock>$ gprecoverseg</codeblock>
         </li>
-        <li id="ki158500">The recovery process brings up the failed segments and identifies the
-          changed files that need to be synchronized. The process can take some time; wait for the
-          process to complete.</li>
-        <li id="ki164382">After <codeph>gprecoverseg</codeph> completes, the system goes into
-            <i>Resynchronizing</i> mode and begins copying the changed files. This process runs in
-          the background while the system is online and accepting database requests.</li>
-        <li id="ki158504">When the resynchronization process completes, the system state is
-            <i>Synchronized</i>. Run the <codeph><xref
+        <li id="ki158500">恢复过程会启动失效的Segment并且确定需要同步的已更改文件。该过程可能会花一些时间，
+          请等待该过程结束。在此过程中，数据库的写活动会被禁止。</li>
+        <li id="ki164382">在<codeph>gprecoverseg</codeph>完成后，系统会进入到<i>Resynchronizing</i>
+          模式并且开始复制更改过的文件。这个过程在后台运行，而系统处于在线状态并且能够接受数据库请求。</li>
+        <li id="ki158504">当重新同步过程完成时，系统状态是<i>Synchronized</i>。运行<codeph><xref
               href="../../../utility_guide/admin_utilities/gpstate.xml" type="topic" format="dita"
-              >gpstate</xref></codeph> utility to verify the status of the resynchronization
-          process:<codeblock>$ gpstate -m</codeblock></li>
+          >gpstate</xref></codeph>工具来验证重新同步进程的状态：<codeblock>$ gpstate -m</codeblock></li>
       </ol>
-      <note otherprops="pivotal"> If incremental recovery was not successful and the down segment
-        instance data is not corrupted, contact Pivotal Support. </note>
+      <note otherprops="pivotal">如果增量恢复不成功且故障segment实例数据没有损坏，可以联系Pivotal技术支持。</note>
     </section>
     <section id="ki155666">
-      <title>To return all segments to their preferred role</title>
-      <p>When a primary segment instance goes down, the mirror activates and becomes the primary
-        segment. After running <codeph>gprecoverseg</codeph>, the currently active segment instance
-        remains the primary and the failed segment becomes the mirror. The segment instances are not
-        returned to the preferred role that they were given at system initialization time. This
-        means that the system could be in a potentially unbalanced state if segment hosts have more
-        active segments than is optimal for top system performance. To check for unbalanced segments
-        and rebalance the system, run:</p>
+      <title>要让所有Segment返回到它们的首选角色</title>
+      <p>当一个主Segment宕掉后，镜像会激活并且成为主Segment。在运行<codeph>gprecoverseg</codeph>之后，
+        当前活动的Segment仍是主Segment而失效的Segment变成镜像Segment。这些Segment实例并没有回到在系统
+        初始化时为它们指定的首选角色。这意味着，如果Segment主机上的活动Segment数量超过了让系统性能最优的
+        数量，系统可能处于一种潜在地非平衡状态。要检查非平衡的Segment并且重新平衡系统，运行：
+       </p>
       <codeblock>$ gpstate -e</codeblock>
-      <p>All segments must be online and fully synchronized to rebalance the system. Database
-        sessions remain connected during rebalancing, but queries in progress are canceled and
-        rolled back. </p>
+      <p>所有Segment都必须在线并且被完全同步以重新平衡系统。在重新平衡过程中，数据库会话保持连接，但正在
+        进行的查询会被取消并且回滚。</p>
       <ol>
-        <li id="ki165540">Run <codeph>gpstate -m</codeph> to ensure all mirrors are
-            <i>Synchronized</i>. <codeblock>$ gpstate -m</codeblock>
+        <li id="ki165540">运行<codeph>gpstate -m</codeph>来确保所有镜像都是
+            <i>Synchronized</i>。<codeblock>$ gpstate -m</codeblock>
         </li>
-        <li id="ki165577">If any mirrors are in <i>Resynchronizing</i> mode, wait for them to
-          complete.</li>
-        <li id="ki165591">Run <codeph>gprecoverseg</codeph> with the <codeph>-r</codeph> option to
-          return the segments to their preferred roles.<codeblock>$ gprecoverseg -r</codeblock>
+        <li id="ki165577">如果有任何镜像处于<i>Resynchronizing</i>模式，等它们完成。</li>
+        <li id="ki165591">运行<codeph>gprecoverseg</codeph>工具并带有<codeph>-r</codeph>选项，
+          让Segment回到它们的首选角色。
+          <codeblock>$ gprecoverseg -r</codeblock>
         </li>
-        <li id="ki166668">After rebalancing, run <codeph>gpstate -e</codeph> to confirm all segments
-          are in their preferred roles.<codeblock>$ gpstate -e</codeblock>
+        <li id="ki166668">在重新平衡之后，运行<codeph>gpstate -e</codeph>来确认所有的Segment都处于
+          它们的首选角色。<codeblock>$ gpstate -e</codeblock>
         </li>
       </ol>
     </section>
     <section id="sec-df">
-      <title>To recover from a double fault</title>
-      <p>In a double fault, both a primary segment and its mirror are down. This can occur if
-        hardware failures on different segment hosts happen simultaneously. Greenplum Database is
-        unavailable if a double fault occurs. </p>
-      <p>To recover from a double fault.</p>
+      <title>从双重故障中恢复</title>
+      <p>在双重故障中，主Segment和它的镜像都宕掉。如果在不同的Segment主机上同时发生硬件失效，就有可能发生
+        这种情况。如果发生双重故障，Greenplum数据库会变得不可用。从一次双重故障中恢复的步骤如下：</p>
+      <p>从双重故障中恢复</p>
       <ol>
-        <li>Troubleshoot the problem that caused the double fault and ensure that the segment hosts
-          are operational and are accessible from the master host.</li>
-        <li id="ki165670">Restart Greenplum Database. The <codeph><xref
+        <li>处理引起双重故障的问题原因并解决，确保segment主机可操作并且可以从master主机访问。</li>
+        <li id="ki165670">重启Greenplum数据库。<codeph><xref
               href="../../../utility_guide/admin_utilities/gpstop.xml" type="topic" format="dita"
-              >gpstop</xref></codeph> option <codeph>-r</codeph> stops and restarts the
-          system.<codeblock>$ gpstop -r</codeblock></li>
-        <li id="ki165671">After the system restarts, run <codeph>gprecoverseg</codeph> to reactivate
-          the failed segment instances.<codeblock>$ gprecoverseg</codeblock>
-          <note otherprops="pivotal"> If incremental recovery was not successful and the down
-            segment instance data is not corrupted, contact Pivotal Support. </note></li>
-        <li id="ki165709">After <codeph>gprecoverseg</codeph> completes, use
-            <codeph>gpstate</codeph> to check the status of your mirrors and ensure the segment
-          instances have gone from <i>Resynchronizing</i> mode to <i>Synchronized</i>
-          mode:<codeblock>$ gpstate -m </codeblock></li>
-        <li id="ki165730">If you still have segment instances in <i>change tracking</i> mode, you
-          can run <codeph>gprecoverseg</codeph> with the <codeph>-F</codeph> option to perform a
-          full segment recovery.
-          <note type="warning">A full recovery deletes the data directory of the down segment
-            instance before copying the data from the active (current primary) segment instance.
-            Before performing a full recovery, ensure that the segment failure did not cause data
-            corruption and that any host segment disk issues have been
-          fixed.</note><codeblock>$ gprecoverseg -F</codeblock></li>
-        <li>If needed, return segment instances to their preferred role. See <xref
-            href="#topic14/ki155666" format="dita"/>.</li>
+              >gpstop</xref></codeph>工具带有<codeph>-r</codeph>参数执行时，会停止并重新启动Greenplum
+          数据库系统。<codeblock>$ gpstop -r</codeblock></li>
+        <li id="ki165671">在系统重启后，运行<codeph>gprecoverseg</codeph>重新激活故障segment实例：
+          <codeblock>$ gprecoverseg</codeblock>
+          <note otherprops="pivotal">如果增量恢复不成功且故障segment实例数据未损坏，可以联系Pivotal技术
+            支持。</note></li>
+        <li id="ki165709">在<codeph>gprecoverseg</codeph>完成后，使用
+          <codeph>gpstate</codeph>检查所有镜像状态，确保segment实例的状态从<i>Resynchronizing</i>
+          模式变成模式： 
+          <codeblock>$ gpstate -m </codeblock></li>
+        <li id="ki165730">如果仍有Segment处于<i>change tracking</i>模式，运行<codeph>gprecoverseg</codeph>
+          并带有<codeph>-F</codeph>选项执行一次完整恢复。
+          <note type="warning">一个完整的恢复会在从活动segment实例（当前主实例）复制数据前，
+            删除离线segment实例的数据目录。在执行全量恢复前，确保segment失败不会引起数据损坏，
+            任何主机的segment磁盘问题都已经被修复。</note><codeblock>$ gprecoverseg -F</codeblock></li>
+        <li>如果需要，将segment实例的角色恢复到它们的最佳角色。详见<xref
+            href="#topic14/ki155666" format="dita"/>。</li>
       </ol>
     </section>
     <section>
-      <title><ph>To recover without mirroring enabled</ph></title>
+      <title><ph>在没有启用镜像的情况下恢复</ph></title>
       <ol id="ol_lb2_rkq_kr">
-        <li id="ki155667">Ensure you can connect to the segment host from the master host. For
-          example:<codeblock>$ ping <varname>failed_seg_host_address</varname></codeblock>
+        <li id="ki155667">确保能够从Master主机连接到该Segment主机。例如：
+          <codeblock>$ ping <varname>failed_seg_host_address</varname></codeblock>
         </li>
-        <li id="ki155669">Troubleshoot the problem that is preventing the master host from
-          connecting to the segment host. For example, the host machine may need to be
-          restarted.</li>
-        <li id="ki155670">After the host is online, verify that you can connect to it and restart
-          Greenplum Database. The <codeph>gpstop</codeph> option <codeph>-r</codeph> stops and
-          restarts the system:<codeblock>$ gpstop -r </codeblock></li>
-        <li id="ki155681">Run the <codeph>gpstate</codeph> utility to verify that all segment
-          instances are online:<codeblock>$ gpstate</codeblock>
+        <li id="ki155669">排查解决妨碍Master主机连接到Segment主机的问题。例如，主机可能需要被重新启动。</li>
+        <li id="ki155670">在主机在线之后，验证能够连接到它并且重启Greenplum数据库。
+         <codeph>gpstop</codeph>带有<codeph>-r</codeph>选项可以停止并重启系统：
+          <codeblock>$ gpstop -r </codeblock></li>
+        <li id="ki155681">运行<codeph>gpstate</codeph>工具来验证所有的实例都在线：
+          <codeblock>$ gpstate</codeblock>
         </li>
       </ol>
     </section>

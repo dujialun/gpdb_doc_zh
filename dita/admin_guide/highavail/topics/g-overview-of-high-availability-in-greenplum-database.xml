@@ -2,177 +2,120 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic2">
-   <title>Overview of Greenplum Database High Availability</title>
+   <title>Greenplum数据库高可用性概述</title>
    <body>
-      <p>A Greenplum Database system can be made highly available by providing a fault-tolerant
-         hardware platform, by enabling Greenplum Database high-availability features, and by
-         performing regular monitoring and maintenance procedures to ensure the health of all system
-         components. </p>
-      <p>Hardware components will eventually fail, whether due to normal wear or an unexpected
-         circumstance. Loss of power can lead to temporarily unavailable components. A system can be
-         made highly available by providing redundant standbys for components that can fail so that
-         services can continue uninterrupted when a failure does occur. In some cases, the cost of
-         redundancy is higher than users' tolerance for interruption in service. When this is the
-         case, the goal is to ensure that full service is able to be restored, and can be restored
-         within an expected timeframe.</p>
-      <p>With Greenplum Database, fault tolerance and data availability is achieved with:<ul
+      <p>Greenplum数据库系统的高可用可以通过提供容错硬件平台实现，可以通过启用Greenplum数据库高可用特性实现，
+         也可以通过执行定期监控和运维作业来确保整个系统所有组件保持健康来实现。</p>
+      <p>硬件平台的最终故障，可能因为常见的持久运行故障或非预期的运行环境。异常断电会导致组件临时不可用。系统可以
+         通过为可能故障的节点配置冗余备份节点来保证异常出现时仍能够不间断提供服务。在一些情况下，系统冗余的成本高于
+         用户的服务终端容忍度。此时，高可用的目标可以改为确保服务能在预期的时间内恢复。</p>
+      <p>Greenplum数据库的容错和高可用通过以下几种方式实现：<ul
             id="ul_lft_kpv_tp">
-            <li><xref href="#topic2/raid" format="dita">Hardware level RAID storage
-                  protection</xref></li>
+            <li><xref href="#topic2/raid" format="dita">硬件级别的RAID存储保护</xref></li>
             <li><xref href="#topic2/checksums" format="dita"/></li>
-            <li><xref href="#topic2/segment_mirroring" format="dita">Greenplum segment
-                  mirroring</xref></li>
-            <li><xref href="#topic2/master_mirroring" format="dita">Master mirroring</xref></li>
-            <li><xref href="#topic2/dual_clusters" format="dita">Dual clusters</xref></li>
-            <li><xref href="#topic2/backup_restore" format="dita">Database backup and
-               restore</xref></li>
+            <li><xref href="#topic2/segment_mirroring" format="dita">Greenplum segment节点镜像</xref></li>
+            <li><xref href="#topic2/master_mirroring" format="dita">Master镜像</xref></li>
+            <li><xref href="#topic2/dual_clusters" format="dita">双集群</xref></li>
+            <li><xref href="#topic2/backup_restore" format="dita">数据库备份和恢复</xref></li>
          </ul></p>
       <section id="raid">
-         <title>Hardware level RAID</title>
-         <p>A best practice Greenplum Database deployment uses hardware level RAID to provide high
-            performance redundancy for single disk failure without having to go into the database
-            level fault tolerance. This provides a lower level of redundancy at the disk level.</p>
+         <title>硬件级别RAID</title>
+         <p>Greenplum数据库部署最佳时间是采用硬件级别的RAID为单盘失败的情况提供高性能的磁盘冗余，避免只采用
+            数据库级别的容错机制。该方式可以在磁盘级别提供低级别的冗余保护。</p>
       </section>
       <section id="checksums">
-         <title>Data storage checksums</title>
-         <p>Greenplum Database uses checksums to verify that data loaded from disk to memory has not
-            been corrupted on the file system. </p>
-         <p>Greenplum Database has two kinds of storage for user data: heap and append-optimized.
-            Both storage models use checksums to verify data read from the file system and, with the
-            default settings, they handle checksum verification errors in a similar way.</p>
-         <p>Greenplum Database master and segment database processes update data on pages in the
-            memory they manage. When a memory page is updated and flushed to disk, checksums are
-            computed and saved with the page. When a page is later retrieved from disk, the
-            checksums are verified and the page is only permitted to enter managed memory if the
-            verification succeeds. A failed checksum verification is an indication of corruption in
-            the file system and causes Greenplum Database to generate an error, aborting the
-            transaction.</p>
-         <p>The default checksum settings provide the best level of protection from undetected disk
-            corruption propagating into the database and to mirror segments.</p>
-         <p>Heap checksum support is enabled by default when the Greenplum Database cluster is
-            initialized with the <codeph>gpinitsystem</codeph> management utility. Although it is
-            strongly discouraged, a cluster can be initialized without heap checksum support by
-            setting the <codeph>HEAP_CHECKSUM</codeph> parameter to off in the
-               <codeph>gpinitsystem</codeph> cluster configuration file. See <codeph><xref
-                  href="../../../utility_guide/admin_utilities/gpinitsystem.xml#topic1"/></codeph>. </p>
-         <p>Once initialized, it is not possible to change heap checksum support for a cluster
-            without reinitializing the system and reloading databases.</p>
-         <p>You can check the read-only server configuration parameter <codeph><xref
-                  href="../../../ref_guide/config_params/guc-list.xml#data_checksums"/></codeph> to
-            see if heap checksums are enabled in a cluster:</p>
+         <title>数据存储总和校验</title>
+         <p>Greenplum数据库采用总和校验机制在文件系统上验证从磁盘加载到内存的数据没有被破坏。</p>
+         <p>Greenplum数据库有两种存储用户数据的方式：堆表和追加优化表。两种存储模型均采用总和校验机制
+            验证从文件系统读取的数据，默认配置下，二者采用总和校验机制验证错误的方式基本类似。</p>
+         <p>Greenplum数据库master和segment实例在他们所管理的自有内存中更新页上的数据。当内存页被更新
+            并刷新到磁盘时，会执行总和校验并保存起来。当下次该页数据从磁盘读取时，先进行总和校验，只有成功
+            通过验证的数据才能进入管理内存。如果总和校验失败，就意味着文件系统有损坏等情况发生，此时Greenplum
+            数据库会生成错误并中断该事务。</p>
+         <p>默认的总和校验设置能提供最好的保护，可以防止未检测到的磁盘损坏影响到数据库实例及其镜像Segment节点。</p>
+         <p>堆表的总和校验机制在Greenplum数据库采用<codeph>gpinitsystem</codeph>初始化时默认启用。我们可以通过设置
+            <codeph>gpinitsystem</codeph>配置文件中的<codeph>HEAP_CHECKSUM</codeph>参数为off来禁用堆表的总和校验
+            功能，但是我们强烈不推荐这么做，详见<codeph><xref
+                  href="../../../utility_guide/admin_utilities/gpinitsystem.xml#topic1"/></codeph>。</p>
+         <p>一旦集群初始化完成，就不能改变堆表总和校验机制在该集群上的状态，除非重新初始化系统并重载数据库。</p>
+         <p>可以通过查看只读服务器配置参数 <codeph><xref
+                  href="../../../ref_guide/config_params/guc-list.xml#data_checksums"/></codeph> 来查看
+         堆表的总和校验是否开启。</p>
          <codeblock>$ gpconfig -s data_checksums</codeblock>
-         <p>When a Greenplum Database cluster starts up, the <codeph>gpstart</codeph> utility checks
-            that heap checksums are consistently enabled or disabled on the master and all segments.
-            If there are any differences, the cluster fails to start. See <codeph><xref
-                  href="../../../utility_guide/admin_utilities/gpstart.xml#topic1"/></codeph>.</p>
-         <p>In cases where it is necessary to ignore heap checksum verification errors so that data
-            can be recovered, setting the <codeph><xref
+         <p>当启动Greenplum数据库集群时，<codeph>gpstart</codeph>工具会检查堆表的总和校验机制在master和所有segment
+            上是启用了还是禁用了。如果有任何异常，集群会启动失败。详情请见<codeph><xref
+                  href="../../../utility_guide/admin_utilities/gpstart.xml#topic1"/></codeph>。</p>
+         <p>在一些情况下，为了保证数据及时恢复有必要忽略堆表总和校验产生的错误，设置<codeph><xref
                   href="../../../ref_guide/config_params/guc-list.xml#ignore_checksum_failure"
-               /></codeph> system configuration parameter to on causes Greenplum Database to issue a
-            warning when a heap checksum verification fails, but the page is then permitted to load
-            into managed memory. If the page is updated and saved to disk, the corrupted data could
-            be replicated to the mirror segment. Because this can lead to data loss, setting
-               <codeph>ignore_checksum_failure</codeph> to on should only be done to enable data
-            recovery. </p>
-         <p>For append-optimized storage, checksum support is one of several storage options set at
-            the time an append-optimized table is created with the <codeph>CREATE TABLE</codeph>
-            command. The default storage options are specified in the
-               <codeph>gp_default_storage_options</codeph> server configuration parameter. The
-               <codeph>checksum</codeph> storage option is enabled by default and disabling it is
-            strongly discouraged. </p>
-         <p>If you choose to disable checksums for an append-optimized table, you can either</p>
+               /></codeph>系统配置参数为on会使在堆表总和校验失败时只生成一个警告信息，数据页仍然可以被夹在到管理内存中。
+            如果该页被更新并存到磁盘，损坏的数据会被复制到镜像segment节点。因为该操作会导致数据丢失，所以只有在启用数据
+            恢复时才允许设置<codeph>ignore_checksum_failure</codeph>参数为on。</p>
+         <p>追加优化存储表的总和校验可以在使用<codeph>CREATE TABLE</codeph>命令创建表时定义。默认的存储选项在
+            <codeph>gp_default_storage_options</codeph>服务器配置参数中定义。<codeph>checksum</codeph>
+            存储选项默认被启用并且强烈不建议禁用它。</p>
+         <p>如果想要禁用追加优化表上的总和校验机制，你可以</p>
          <ul id="ul_qyt_cwg_z1b">
-            <li>change the <codeph>gp_default_storage_options</codeph> configuration parameter to
-               include <codeph>checksum=false</codeph> before creating the table, or </li>
-            <li>add the <codeph>checksum=false</codeph> option to the <codeph>WITH
-                     <varname>storage_options</varname></codeph> clause of the <codeph>CREATE
-                  TABLE</codeph> statement. </li>
+            <li>在创建表时，修改<codeph>gp_default_storage_options</codeph>配置参数包含<codeph>checksum=false</codeph>
+              或</li>
+            <li>增加<codeph>checksum=false</codeph>选项到<codeph>CREATE TABLE</codeph>语句的<codeph>WITH
+                     <varname>storage_options</varname></codeph>语法部分。</li>
          </ul>
-         <p>Note that the <codeph>CREATE TABLE</codeph> statement allows you to set storage options,
-            including checksums, for individual partition files.</p>
-         <p>See the <codeph><xref href="../../../ref_guide/sql_commands/CREATE_TABLE.xml#topic1"
-               /></codeph> command reference and the <codeph><xref
+         <p>注意<codeph>CREATE TABLE</codeph>允许为每一个单独的分区表设置包括checksums在内的存储选项。</p>
+         <p>查看<codeph><xref href="../../../ref_guide/sql_commands/CREATE_TABLE.xml#topic1"
+               /></codeph>命令参考和<codeph><xref
                   href="../../../ref_guide/config_params/guc-list.xml#gp_default_storage_options"
-               /></codeph> configuration parameter reference for syntax and examples.</p>
+               /></codeph>配置文件参考语法和示例。</p>
       </section>
       <section id="segment_mirroring">
-         <title>Segment Mirroring</title>
-         <p>Greenplum Database stores data in multiple segment instances, each of which is a
-            Greenplum Database PostgreSQL instance. The data for each table is spread between the
-            segments based on the distribution policy that is defined for the table in the DDL at
-            the time the table is created. When segment mirroring is enabled, for each segment
-            instance there is a <i>primary</i> and <i>mirror</i> pair. The mirror segment is kept up
-            to date with the primary segment using Write-Ahead Logging (WAL)-based streaming
-            replication. See <xref href="g-overview-of-segment-mirroring.xml"/>.</p>
-         <p>The mirror instance for each segment is usually initialized with the
-               <codeph>gpinitsystem</codeph> utility or the <codeph>gpexpand</codeph> utility. As a
-            best practice, the mirror runs on a different host than the primary instance to protect
-            from a single machine failure. There are different strategies for assigning mirrors to
-            hosts. When choosing the layout of the primaries and mirrors, it is important to
-            consider the failure scenarios to ensure that processing skew is minimized in the case
-            of a single machine failure. </p>
+         <title>Segment镜像</title>
+         <p>Greenplum数据库将数据存储在多个segment实例中，每一个实例都是Greenplum数据库的一个PostgreSQL实例，
+            数据依据建表语句中定义的分布策略在segment节点中分布。启用segment镜像时，每个segment实例都由一对
+            <i>primary</i>和<i>mirror</i>组成。镜像segment采用基于预写日志（WAL）流复制的方式保持与主segment
+            的数据一致。详情请见<xref href="g-overview-of-segment-mirroring.xml"/>。</p>
+         <p>镜像实例通常采用<codeph>gpinitsystem</codeph>或<codeph>gpexpand</codeph>工具进行初始化。
+            作为最佳实践，为了保证单机失败镜像通常运行在与主segment不同的主机上。将镜像分配到不同的主机上也有不同
+            的策略。当搭配镜像和主segment的放置位置时，要充分考虑单机失败发生时处理倾斜最小化的场景。</p>
       </section>
       <section id="master_mirroring">
-         <title>Master Mirroring</title>
-         <p>There are two master instances in a highly available cluster, a <i>primary</i> and a
-               <i>standby</i>. As with segments, the master and standby should be deployed on
-            different hosts so that the cluster can tolerate a single host failure. Clients connect
-            to the primary master and queries can be executed only on the primary master. The
-            standby master is kept up to date with the primary master using Write-Ahead Logging
-            (WAL)-based streaming replication. See <xref
+         <title>Master镜像</title>
+         <p>在一个高可用集群中，有两种master实例，<i>primary</i>和<i>standby</i>。像segment一样，master和standby
+            应该部署在不同的主机上，以保证集群不出现单节点故障问题。客户端只能连接到primary master并在上面执行查询。
+            standby master采用基于预写日志（WAL）流复制的方式保持与primary master的数据一致。详情请见<xref
                href="g-overview-of-master-mirroring.xml#topic4"/>.</p>
-         <p>If the master fails, the administrator runs the <codeph>gpactivatestandby</codeph>
-            utility to have the standby master take over as the new primary master. You can
-            configure a virtual IP address for the master and standby so that client programs do not
-            have to switch to a different network address when the current master changes. If the
-            master host fails, the virtual IP address can be swapped to the actual acting master.
+         <p>如果master故障了，管理员可以通过运行<codeph>gpactivatestandby</codeph>工具切换standby master成为
+            新的primary master。可以通过在master和standby上配置一个虚拟IP地址来保证当发生切换后，客户端不需要在
+            不同的网址之间切换。如果master主机故障，虚拟IP可以漂移到新的活动master节点上继续提供服务。
          </p>
       </section>
       <section id="dual_clusters">
-         <title>Dual Clusters</title>
-         <p>An additional level of redundancy can be provided by maintaining two Greenplum Database
-            clusters, both storing the same data. </p>
-         <p>Two methods for keeping data synchronized on dual clusters are "dual ETL" and
-            "backup/restore."</p>
-         <p>Dual ETL provides a complete standby cluster with the same data as the primary cluster.
-            ETL (extract, transform, and load) refers to the process of cleansing, transforming,
-            validating, and loading incoming data into a data warehouse. With dual ETL, this process
-            is executed twice in parallel, once on each cluster, and is validated each time. It also
-            allows data to be queried on both clusters, doubling the query throughput. Applications
-            can take advantage of both clusters and also ensure that the ETL is successful and
-            validated on both clusters.</p>
-         <p>To maintain a dual cluster with the backup/restore method, create backups of the primary
-            cluster and restore them on the secondary cluster. This method takes longer to
-            synchronize data on the secondary cluster than the dual ETL strategy, but requires less
-            application logic to be developed. Populating a second cluster with backups is ideal in
-            use cases where data modifications and ETL are performed daily or less frequently.</p>
+         <title>双集群</title>
+         <p>可以通过维护两套Greenplum数据库集群，都存储相同的数据来提供额外的冗余。</p>
+         <p>保持双集群数据同步有两种方法，分别叫做"双ETL"和"备份/恢复"。</p>
+         <p>双ETL提供一个与主集群数据一致的热备份集群。ETL（抽取，转换和加载）大致的过程为清理数据，转换数据，验证数据
+            和加载数据进入数据仓库。双ETL的方式，以上过程会被执行两次，每个集群一次，每次都需要被验证。这允许在两个集群
+            上进行查询数据操作，还可以提高查询的吞吐量为原来的两倍。应用可以有效的利用两套集群的优势，页可以确保ETL
+            成功进行并在两套集群上验证通过。</p>
+         <p>通过备份/恢复的方法来维护一个双集群，可以直接采用在主集群上创建备份，然后恢复到第二个集群上。该方法可能会比
+            双ETL的方式花费更多的时间来同步数据，但是对应用端特定业务逻辑开发的要求几乎没有。双ETL的优势是同步频率上更
+            快，时间间隔更小。</p>
       </section>
       <section id="backup_restore">
-         <title>Backup and Restore</title>
-         <p>Making regular backups of the databases is recommended except in cases where the
-            database can be easily regenerated from the source data. Backups should be taken to
-            protect from operational, software, and hardware errors. </p>
-         <p>Use the <codeph><xref href="../../../utility_guide/admin_utilities/gpbackup.xml"
-               /></codeph> utility to backup Greenplum databases. <codeph>gpbackup</codeph> performs
-            the backup in parallel across segments, so backup performance scales up as hardware is
-            added to the cluster. </p>
-         <p>When designing a backup strategy, a primary concern is where to store the backup data.
-            The data each segment manages can be backed up on the segment's local storage, but
-            should not be stored there permanently—the backup reduces disk space available to the
-            segment and, more importantly, a hardware failure could simultaneously destroy the
-            segment's live data and the backup. After performing a backup, the backup files should
-            be moved from the primary cluster to separate, safe storage. Alternatively, the backup
-            can be made directly to separate storage. </p>
-         <p>Using a Greenplum Database storage plugin with the <codeph>gpbackup</codeph> and
-               <codeph>gprestore</codeph> utilities, you can send a backup to, or retrieve a backup
-            from a remote location or a storage appliance. Greenplum Database storage plugins
-            support connecting to locations including Amazon Simple Storage Service (Amazon S3)
-            locations and Dell EMC Data Domain storage appliances.</p>
-         <p>Using the Backup/Restore Storage Plugin API you can create a custom plugin that the
-               <codeph>gpbackup</codeph> and <codeph>gprestore</codeph> utilities can use to
-            integrate a custom backup storage system with the Greenplum Database. </p>
-         <p>For information about using <codeph>gpbackup</codeph> and <codeph>gprestore</codeph>,
-            see <xref href="../../managing/backup-gpbackup.xml"/>.</p>
+         <title>备份和恢复</title>
+         <p>建议经常备份数据库，可以保证一旦出现问题可以很容易的重新生成数据库集群。备份可以很好的保护
+            误操作、软件错误和硬件错误。</p>
+         <p>使用<codeph><xref href="../../../utility_guide/admin_utilities/gpbackup.xml"
+         /></codeph>工具备份Greenplum数据库。<codeph>gpbackup</codeph>在所有segment上执行并行备份，
+            所以备份能力随着硬件增加线性扩展。</p>
+         <p>当我们设计备份策略时，最主要的关注点是将数据存储在哪里。数据可以备份在每个segment各自的本地存储中，
+            但是存储在该位置会导致正常segment可用生产空间锐减，更重要的是，硬件失败可能会摧毁活动segment的
+            生产数据和备份数据。执行完备份后，备份文件应该从主集群移动到独立、安全的存储位置。另外，备份可以直接
+            存储在独立存储中。</p>
+         <p>采用<codeph>gpbackup</codeph>和<codeph>gprestore</codeph>工具，可以从一个远程位置或存储设备
+            发送/读取备份。目前该存储插件支持连接到Amazon S3存储服务和Dell EMC Data Domain存储设备。</p>
+         <p>采用备份/恢复存储扩展API，您可以创建<codeph>gpbackup</codeph>和<codeph>gprestore</codeph>
+            工具可用的定制化插件，用来集成您的存储系统到Greenplum数据库。</p>
+         <p>更多如何使用<codeph>gpbackup</codeph>和<codeph>gprestore</codeph>的信息，请见
+            <xref href="../../managing/backup-gpbackup.xml"/>。</p>
       </section>
    </body>
 </topic>

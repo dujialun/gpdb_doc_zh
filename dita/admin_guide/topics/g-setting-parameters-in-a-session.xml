@@ -2,18 +2,16 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic9">
-   <title>Setting Parameters in a Session</title>
+   <title>设置会话级别参数</title>
    <body>
-      <p>Any session parameter can be set in an active database session using the
-            <codeph>SET</codeph> command. For example:</p>
+      <p>任何会话参数都可以在一个活动数据库会话中用<codeph>SET</codeph>命令设置。例如：</p>
       <p>
          <codeblock>=# SET statement_mem TO '200MB';</codeblock>
       </p>
-      <p>The parameter setting is valid for the rest of that session or until you issue a
-            <codeph>RESET</codeph> command. For example:</p>
+      <p>该参数设置对于这个会话的剩余时间都有效，直到发出一个<codeph>RESET</codeph>命令。例如：</p>
       <p>
          <codeblock>=# RESET statement_mem;</codeblock>
       </p>
-      <p>Settings at the session level override those at the role level.</p>
+      <p>会话级别的设置覆盖角色级别的设置。</p>
    </body>
 </topic>

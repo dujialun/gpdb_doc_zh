@@ -2,16 +2,14 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic10">
-  <title>Viewing Server Configuration Parameter Settings</title>
+  <title>查看服务器配置参数设置</title>
   <body>
-    <p>The SQL command <codeph>SHOW</codeph> allows you to see the current server configuration
-      parameter settings. For example, to see the settings for all parameters: </p>
+    <p>SQL命令<codeph>SHOW</codeph>允许用户查看当前的服务器配置参数设置。例如，要查看所有参数的设置：</p>
     <p>
       <codeblock>$ psql -c 'SHOW ALL;'</codeblock>
     </p>
-    <p><codeph>SHOW</codeph> lists the settings for the master instance only. To see the value of a
-      particular parameter across the entire system (master and all segments), use the
-        <codeph>gpconfig</codeph> utility. For example:</p>
+    <p><codeph>SHOW</codeph>只列出Master实例的设置。要查看整个系统（Master和所有的Segment）
+      中一个特定参数的值，使用<codeph>gpconfig</codeph>工具。例如：</p>
     <p>
       <codeblock>$ gpconfig --show max_connections</codeblock>
     </p>

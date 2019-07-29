@@ -2,14 +2,12 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic6">
-   <title>Enabling Mirroring in Greenplum Database</title>
+   <title>在Greenplum数据库中启用镜像</title>
    <body>
-      <p>You can configure your Greenplum Database system with mirroring at setup time
-         using <codeph>gpinitsystem</codeph> or enable mirroring later using
-            <codeph>gpaddmirrors</codeph> and <codeph>gpinitstandby</codeph>. This topic assumes you
-         are adding mirrors to an existing system that was initialized without mirrors.</p>
+      <p>可以在建立Greenplum数据库系统时使用<codeph>gpinitsystem</codeph>配置系统使用镜像，或者之后用<codeph>gpaddmirrors</codeph>
+         以及<codeph>gpinitstandby</codeph>启用镜像。这个主题假定现有系统初始化时没有镜像，现在要向其中加入镜像。</p>
       <!-- hack for HTML/PDF -->
-      <p otherprops="op-print">You can enable the following types of mirroring:<ul
+      <p otherprops="op-print">可以启用以下镜像内容：<ul
             id="ul_wgd_dpx_dq">
             <li id="ki155350">
                <xref href="g-enabling-segment-mirroring.xml#topic7"/>

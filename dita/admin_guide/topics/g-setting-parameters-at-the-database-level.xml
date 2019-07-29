@@ -2,15 +2,13 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic7">
-   <title>Setting Parameters at the Database Level</title>
+   <title>设置数据库级别参数</title>
    <body>
-      <p>Use <codeph>ALTER DATABASE</codeph> to set parameters at the database level. For
-         example:</p>
+      <p>使用<codeph>ALTER DATABASE</codeph>在数据库级别设置参数。例如：</p>
       <p>
          <codeblock>=# ALTER DATABASE mydatabase SET search_path TO myschema;</codeblock>
       </p>
-      <p>When you set a session parameter at the database level, every session that connects to that
-         database uses that parameter setting. Settings at the database level override settings at
-         the system level.</p>
+      <p>当用户在数据库级别设置一个会话参数时，每一个连接到该数据库的会话都使用该参数设置。
+         数据库级别的设置覆盖系统级别的设置。</p>
    </body>
 </topic>

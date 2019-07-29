@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
   <topic id="topic_fstrm">
-    <title>Using the PgBouncer Connection Pooler </title>
+    <title>使用PgBouncer连接池</title>
     <body>
-      <p>The PgBouncer utility manages connection pools for PostgreSQL and Greenplum Database
-      connections.</p>
-      <p>The
-        following topics describe how to set up and use PgBouncer with Greenplum Database. Refer to the
-          <xref href="https://pgbouncer.github.io" format="html" scope="external">PgBouncer web
-          site</xref> for information about using PgBouncer with PostgreSQL.</p>
+      <p>PgBouncer工具可以管理PostgreSQL和Greenplum数据库连接的连接池。</p>
+      <p>以下话题描述了如何在Greenplum数据库上配置PgBouncer。
+        更多有关如何在PostgreSQL上使用PgBouncer的信息，请参考
+          <xref href="https://pgbouncer.github.io" format="html" scope="external">PgBouncer网站
+          </xref>。</p>
       <ul id="ul_off_zqj_5s">
         <li>
           <xref href="#topic_nzk_nqg_cs" format="dita"/>
@@ -28,66 +27,68 @@
       </ul>
     </body>
     <topic id="topic_nzk_nqg_cs">
-      <title>Overview</title>
+      <title>概述</title>
       <body>
-        <p>A database connection pool is a cache of database connections. Once a pool of connections
-          is established, connection pooling eliminates the overhead of creating new database
-          connections, so clients connect much faster and the server load is reduced.</p>
-        <p>The PgBouncer connection pooler, from the PostgreSQL community, is included in
-          your Greenplum Database installation. PgBouncer is a light-weight connection pool
-          manager for Greenplum and PostgreSQL.
-          PgBouncer maintains a pool for connections for each database and user combination. PgBouncer either creates a new database connection for a client or reuses an
-          existing connection for the same user and database. When the client disconnects, PgBouncer
-          returns the connection to the pool for re-use.</p>
-        <p>PgBouncer shares connections in one of three pool modes:<ul id="ul_jyx_rvg_cs">
-            <li><i>Session pooling</i> – When a client connects, a connection is assigned to it as
-              long as it remains connected. When the client disconnects, the connection is placed
-              back into the pool.</li>
-            <li><i>Transaction pooling</i> – A connection is assigned to a client for the duration
-              of a transaction. When PgBouncer notices the transaction is done, the connection is
-              placed back into the pool. This mode can be used only with applications that do not
-              use features that depend upon a session. </li>
-            <li><i>Statement pooling</i> – Statement pooling is like transaction pooling, but
-              multi-statement transactions are not allowed. This mode is intended to enforce
-              autocommit mode on the client and is targeted for PL/Proxy on PostgreSQL.</li>
+        <p>数据库连接池是一种数据库连接的缓存。一旦一个池子的连接被建立，连接池就能消除创建
+          数据库连接的开销，这样客户端能更快地连接并且服务器的负载也能被降低。</p>
+        <p>PgBouncer连接池来自于PostgreSQL社区，它被包括在Greenplum数据库中。PgBouncer
+          可以为多个数据库管理连接池，并且这些数据库可以位于不同的Greenplum数据库集群或者
+          PostgreSQL后端。PgBouncer会为每一种数据库用户与数据库的组合建立一个池。一个被
+          池化的连接只能被来自于同一个用户和数据库的另一个连接请求重用。当客户端断开连接后，
+          PgBouncer会将连接归还给连接池以做下次重用。</p>
+        <p>PgBouncer有三种池模式来共享连接：<ul id="ul_jyx_rvg_cs">
+          <li><i>会话池化</i> – 当一个客户端连接时，只要它保持连接状态，就分配给它一个连接。
+            当该客户端断开连接时，该连接才被放回到池中。</li>
+          <li><i>事务池化</i> – 在一个事务运行期间，分配一个连接给客户端。当PgBouncer发现
+            事务完成，该连接就被放回到池中。这种模式只能被用于不使用依赖于会话的特性的应用。</li>
+          <li><i>语句池化</i> – 语句池化类似于事务池化，但是不允许多语句事务。这种模式的
+            目标是为了在客户端强制自动提交模式，且它的定位是PostgreSQL上的PL/Proxy。</li>
           </ul></p>
-        <p>You can set a default pool mode for the PgBouncer instance. You can override this
-          mode for individual databases and users. </p>
-        <p>PgBouncer supports the standard connection interface shared by PostgreSQL and Greenplum
-          Database. The Greenplum Database client application (for example, <codeph>psql</codeph>)
-          connects to the host and port on which PgBouncer is running rather than the Greenplum Database master host and port.</p>
-        <p>PgBouncer includes a <codeph>psql</codeph>-like administration console. Authorized users can connect to a virtual database to monitor and manage PgBouncer. You can manage a PgBouncer daemon process via the admin console. You can also use the console to update and reload PgBouncer configuration at runtime without stopping and restarting the process.</p>
-        <p>PgBouncer natively supports TLS.</p>
+        <p>可以为PgBouncer设置一种默认的池模式，并且该模式可以被单个数据库和用户覆盖。</p>
+        <p>通过连接到一个虚拟的pgbouncer数据库，用户可以使用类SQL命令监控和管理PgBouncer。
+          可以不重启PgBouncer就修改配置参数，只需要重新载入配置文件就能发现更改。
+          PgBouncer支持PostgreSQL和Greenplum数据库上的标准连接接口。Greenplum数据库客户端应用
+          （例如<codeph>psql</codeph>）可以连接到正在运行的PgBouncer主机和端口号，而不是
+          Greenplum的Master主机和端口号。</p>
+        <p>PgBouncer有一个类<codeph>psql</codeph>的管理控制台界面。授权用户可以通过该控制台
+          连接到一个虚拟数据库来监控和管理PgBouncer。您可以通过管理控制台来管理PgBouncer后台进程，
+          也可以用控制台在运行时更新和重载PgBouncer配置，而不停止和重启PgBouncer进程。</p>
+        <p>PgBouncer原生支持TLS。</p>
       </body>
     </topic>
     <topic id="pgb_migrate">
-      <title>Migrating PgBouncer</title>
+      <title>迁移PgBouncer</title>
       <body>
-        <p>When you migrate to a new Greenplum Database version, you must migrate your PgBouncer
-          instance to that in the new Greenplum Database installation.</p>
-        <ul><li><b>If you are migrating to a Greenplum Database version 5.8.x or earlier</b>, you can migrate PgBouncer without dropping connections. Launch the new PgBouncer
-          process with the <codeph>-R</codeph> option and the configuration file that you started the process with:
+        <p>当您迁移到一套新版本的Greenplum数据库时，必须迁移PgBouncer实例到新版本的Greenplum
+          数据库。</p>
+        <ul><li><b>如果您正在迁移Greenplum 5.8.x版本数据库或更早版本</b>，可以在不丢弃连接的
+          情况下迁移PgBouncer。采用带有<codeph>-R</codeph>选项和配置文件的命令拉起新的PgBouncer
+          进程。
         <codeblock>$ pgbouncer -R -d pgbouncer.ini</codeblock>
-        <p>The <codeph>-R</codeph> (reboot) option causes the new process to connect to the console
-          of the old process through a Unix socket and issue the following commands:</p>
+        <p><codeph>-R</codeph>（重启）选项启动新进程以Unix套接字的方式连接到旧进程并发出以下命令：</p>
         <codeblock>SUSPEND;
 SHOW FDS;
 SHUTDOWN;</codeblock>
-        <p>When the new process detects that the old process is gone, it resumes the work with the old
-          connections. This is possible because the <codeph>SHOW FDS</codeph> command sends actual
-          file descriptors to the new process. If the transition fails for any reason, kill the new
-          process and the old process will resume.</p></li>
-        <li><b>If you are migrating to a Greenplum Database version 5.9.0 or later</b>, you must shut down the PgBouncer instance in your old installation and reconfigure and restart PgBouncer in your new installation.</li>
-        <li>If you used stunnel to secure PgBouncer connections in your old installation, you must configure SSL/TLS in your new installation using the built-in TLS capabilities of PgBouncer 1.8.1 and later.</li>
-        <li>If you used LDAP authentication in your old installation, you must configure LDAP in your new installation using the built-in PAM integration capabilities of PgBouncer 1.8.1 and later. You must also remove or replace any <codeph>ldap://</codeph>-prefixed password strings in the <codeph>auth_file</codeph>.</li></ul>
+          <p>当新进程检测到旧进程完成后，它接管旧连接的工作。最可能的原因是<codeph>SHOW FDS</codeph>
+            命令将实际的文件定位符发送新进程。如果事务因任何原因失败，新进程会被杀掉，旧进程仍然接管
+            原来的工作。</p></li>
+          <li><b>如果您正在迁移Greenplum 5.9.0版本数据库或更高版本</b>，您必须关闭旧版本安装文件中
+            的PgBouncer实例，在新数据库安装文件中重新配置并启动PgBouncer实例。</li>
+          <li>如果您采用stunnel加密旧安装文件的PgBouncer连接，在新环境中必须使用与PgBouncer 1.8.1
+            及更新版本适配的内建TLS配置SSL/TLS。</li>
+          <li>如果您在旧环境中使用了LDAP授权，在新环境中必须使用与PgBouncer 1.8.1及更新版本适配的
+            内建集成PAM配置LDAP。必须移除或替换<codeph>auth_file</codeph>中所有
+            以<codeph>ldap://</codeph>开头的密码串。</li></ul>
       </body>
     </topic>
     <topic id="pgb_config">
-      <title>Configuring PgBouncer</title>
+      <title>配置PgBouncer</title>
       <body>
         <p></p>
-        <p>You configure PgBouncer and its access to Greenplum Database via a configuration file. This configuration file, commonly named <codeph>pgbouncer.ini</codeph>, provides location information for Greenplum databases. The <codeph>pgbouncer.ini</codeph> file also specifies process, connection pool, authorized users, and authentication configuration for PgBouncer.</p>
-        <p>Sample <codeph>pgbouncer.ini</codeph> file contents:<codeblock>[databases]
+        <p>通过配置文件配置PgBouncer和它到Greenplum数据库的访问。配置文件通常命名为<codeph>pgbouncer.ini</codeph>，
+          提供Greenplum数据库的位置信息。<codeph>pgbouncer.ini</codeph>文件也指定PgBouncer的进程、连接池、
+          授权用户和授权配置。</p>
+        <p><codeph>pgbouncer.ini</codeph>配置文件示例内容如下：<codeblock>[databases]
 postgres = host=127.0.0.1 port=5432 dbname=postgres
 pgb_mydb = host=127.0.0.1 port=5432 dbname=mydb
 
@@ -100,42 +101,41 @@ auth_file = users.txt
 logfile = pgbouncer.log
 pidfile = pgbouncer.pid
 admin_users = gpadmin</codeblock></p>
-        <p>Refer to the <xref href="../../../utility_guide/admin_utilities/pgbouncer-ini.xml" format="dita"
-              scope="peer">pgbouncer.ini</xref> reference page for the
-          PgBouncer configuration file format and the list of configuration properties it supports.</p>
-         <p>When a client connects to PgBouncer, the connection pooler looks up the
-           the configuration for the requested database (which may be an alias for the actual database) that was specified in the
-           <codeph>pgbouncer.ini</codeph> configuration file to find the host name, port, and
-          database name for the database connection. The configuration file also identifies
-          the authentication mode in effect for the database. </p>
-        <p>PgBouncer requires an authentication file, a text file that contains a list of
-          Greenplum Database users and passwords. The contents of the file are dependent on the <codeph>auth_type</codeph> you configure in the <codeph>pgbouncer.ini</codeph> file. Passwords may be either clear text or MD5-encoded strings.
-          You can also configure PgBouncer to query the destination database to obtain
-          password information for users that are not in the authentication file. </p>
+        <p>有关PgBouncer配置文件格式和其支持的配置参数列表等信息信息，请见
+          <xref href="../../../utility_guide/admin_utilities/pgbouncer-ini.xml" format="dita"
+              scope="peer">pgbouncer.ini</xref>参考页面。</p>
+        <p>当客户端连接到PgBouncer时，连接池从<codeph>pgbouncer.ini</codeph>配置文件中查找
+          受访数据库（可能是实际数据库的别名）对应的主机名、端口号和数据库名。该配置文件也定义数据库的
+          授权模式。</p>
+        <p>PgBouncer要求有一个授权文件，该文件是一个包含Greenplum数据库用户名和密码的文本文件。
+          文件内容与<codeph>pgbouncer.ini</codeph>中配置的<codeph>auth_type</codeph>
+          授权类型密切相关。密码可能是干净文本或MD5编码的字符串。用户也可以配置PgBouncer通过
+          查询目标数据库来获取授权文件中未定义的密码信息。</p>
       <section id="pgb_auth">
-        <title>PgBouncer Authentication File Format</title>
-        <p>PgBouncer requires its own user authentication file. You specify the name of this file 
-          in the <codeph>auth_file</codeph> property of the <codeph>pgbouncer.ini</codeph> configuration
-           file. <codeph>auth_file</codeph> is a text file in the following format:</p>
+        <title>PgBouncer授权文件格式</title>
+        <p>PgBouncer有自己的用户授权文件。用户可以在<codeph>pgbouncer.ini</codeph>配置文件
+          的<codeph>auth_file</codeph>属性中定义文件名。<codeph>auth_file</codeph>文本文件
+          格式如下：</p>
         <codeblock>"username1" "password" ...
 "username2" "md5abcdef012342345" ...</codeblock>
-        <p><codeph>auth_file</codeph> contains one line per user. Each line must have at least two fields,
-          both of which are enclosed in double quotes (<codeph>" "</codeph>). The first
-          field identifies the Greenplum Database user name. The second field is
-          either a plain-text or an MD5-encoded password. PgBouncer ignores the remainder of the line.</p>
-        <p>(The format of <codeph>auth_file</codeph> is similar to that of the <codeph>pg_auth</codeph>
-          text file that Greenplum Database uses for authentication information. PgBouncer
-          can work directly with this Greenplum Database authentication file.)</p>
-        <p>Use an MD5 encoded password. The format of an MD5 encoded password is: 
+        <p><codeph>auth_file</codeph>为每个用户占用一行。每行至少有两个域，两个都用双引号包裹
+          （<codeph>" "</codeph>）。第一部分定义Greenplum数据库用户名，第二部分为明文或
+          MD5编码的密码。PgBouncer忽略改行余下的部分。</p>
+        <p>（<codeph>auth_file</codeph>文件格式与Greenplum数据库所用的授权信息文件
+          <codeph>pg_auth</codeph>相似。PgBouncer可以直接使用Greenplum数据库授权文件。）</p>
+        <p>使用MD5编码的密码，密码格式如下： 
         <codeblock>"md5" + MD5_encoded(<varname>&lt;password>&lt;username></varname>)</codeblock></p>
-        <p>You can also obtain the MD5-encoded passwords of all Greenplum Database users from the <codeph>pg_shadow</codeph> view.</p>
+        <p>可以从<codeph>pg_shadow</codeph>视图中获取所有Greenplum数据库用户的MD5编码密码。</p>
       </section>
       <section id="pgb_hba">
-        <title>Configuring HBA-based Authentication for PgBouncer</title>
-        <p>PgBouncer supports HBA-based authentication. To configure HBA-based authentication for PgBouncer, you set <codeph>auth_type=hba</codeph> in the <codeph>pgbouncer.ini</codeph> configuration file. You also provide the filename of the HBA-format file in the <codeph>auth_hba_file</codeph> parameter of the <codeph>pgbouncer.ini</codeph> file.</p>
-        <p>Contents of an example PgBouncer HBA file named <codeph>hba_bouncer.conf</codeph>:<codeblock>local       all     bouncer             trust
+        <title>为PgBouncer配置基于HBA的授权</title>
+        <p>PgBouncer支持基于HBA的授权。要为PgBouncer配置基于HBA的授权，在<codeph>pgbouncer.ini</codeph>
+          配置文件中设置<codeph>auth_type=hba</codeph>，并在<codeph>pgbouncer.ini</codeph>文件中配置
+          HBA格式文件参数<codeph>auth_hba_file</codeph>。</p>
+        <p>名称为<codeph>hba_bouncer.conf</codeph>的PgBouncer HBA文件的内容如下：
+          <codeblock>local       all     bouncer             trust
 host        all     bouncer      127.0.0.1/32       trust</codeblock></p>
-        <p>Example excerpt from the related <codeph>pgbouncer.ini</codeph> configuration file:</p><codeblock>[databases]
+        <p>相关<codeph>pgbouncer.ini</codeph>配置文件中的对应配置部分：</p><codeblock>[databases]
 p0 = port=15432 host=127.0.0.1 dbname=p0 user=bouncer pool_size=2
 p1 = port=15432 host=127.0.0.1 dbname=p1 user=bouncer
 ...
@@ -146,22 +146,21 @@ auth_type = hba
 auth_file = userlist.txt
 auth_hba_file = hba_bouncer.conf
 ...</codeblock>
-         <p>Refer to the <xref href="https://pgbouncer.github.io/config.html#hba-file-format" format="html" scope="external">HBA file format
-          </xref> discussion in the PgBouncer documentation for information about PgBouncer support of the HBA authentication file format.</p>
+         <p>有关PgBouncer支持的HBA授权文件格式的详细讨论，请参考<xref href="https://pgbouncer.github.io/config.html#hba-file-format" format="html" scope="external">HBA file format
+          </xref>。</p>
       </section>
       </body>
     </topic>
     <topic id="pgb_start">
-      <title>Starting PgBouncer</title>
+      <title>启动PgBouncer</title>
       <body>
-        <p>You can run PgBouncer on the Greenplum Database master or on another server. If you
-          install PgBouncer on a separate server, you can easily switch clients to the standby
-          master by updating the PgBouncer configuration file and reloading the configuration using
-          the PgBouncer Administration Console. </p>
-        <p>Follow these steps to set up PgBouncer.</p>
+        <p>用户可以在Greenplum数据库master主机或其他服务器上运行PgBouncer。如果在一台单独的服务器上
+          安装PgBouncer，用户可以使用PgBouncer管理客户端，通过更新PgBouncer配置文件和重载配置很容易的
+          切换客户端连接到standby master。</p>
+        <p>参考以下配置设置PgBouncer。</p>
         <ol id="ol_xyn_qwg_cs">
-          <li>Create a PgBouncer configuration file. For example, add the following text
-           to a file named <codeph>pgbouncer.ini</codeph>:<codeblock>[databases]
+          <li>创建PgBouncer配置文件。例如，增加以下文本到文件<codeph>pgbouncer.ini</codeph>中：
+            <codeblock>[databases]
 postgres = host=127.0.0.1 port=5432 dbname=postgres
 pgb_mydb = host=127.0.0.1 port=5432 dbname=mydb
 
@@ -173,51 +172,49 @@ auth_type = md5
 auth_file = users.txt
 logfile = pgbouncer.log
 pidfile = pgbouncer.pid
-admin_users = gpadmin</codeblock><p>The file lists databases and their connection details. The file also configures the PgBouncer instance. Refer to the <xref href="../../../utility_guide/admin_utilities/pgbouncer-ini.xml" format="dita"
-              scope="peer">pgbouncer.ini</xref> reference page for information about the
-              format and content of a PgBouncer configuration file.</p></li>
-          <li>Create an authentication file. The filename should be the name you specified for the <codeph>auth_file</codeph> parameter of the <codeph>pgbouncer.ini</codeph> file, <codeph>users.txt</codeph>.
-            Each line contains a user name and
-            password. The format of the password string matches the <codeph>auth_type</codeph>
-            you configured in the PgBouncer configuration file. If the <codeph>auth_type</codeph>
-            parameter is <codeph>plain</codeph>, the password string is a clear text password, for
-            example: <codeblock>"gpadmin" "gpadmin1234"</codeblock><p>If the <codeph>auth_type</codeph>
-              in the following example is <codeph>md5</codeph>, the authentication field must be
-              MD5-encoded. The format for an MD5-encoded password
-              is:<codeblock>"md5" + MD5_encoded(<varname>&lt;password>&lt;username></varname>)</codeblock></p></li>
-          <li>Launch
-              <codeph>pgbouncer</codeph>:<codeblock>$ $GPHOME/bin/pgbouncer -d pgbouncer.ini</codeblock><p>The
-                <codeph>-d</codeph> option runs PgBouncer as a
-              background (daemon) process. Refer to the <xref href="../../../utility_guide/admin_utilities/pgbouncer.xml" format="dita"
-              scope="peer">pgbouncer</xref> reference page for the
-              <codeph>pgbouncer</codeph> command syntax and options.</p></li>
-          <li>Update your client applications to connect to <codeph>pgbouncer</codeph> instead of
-            directly to Greenplum Database server. For example, to connect to the Greenplum
-            database named <codeph>mydb</codeph> configured above, run <codeph>psql</codeph> as follows:<codeblock>$ psql -p 6543 -U <varname>someuser</varname> pgb_mydb</codeblock><p>The <codeph>-p</codeph> option value is the <codeph>listen_port</codeph> that you configured for the PgBouncer instance.</p></li>
+admin_users = gpadmin</codeblock>
+            <p>该文件列出了数据库和它们连接的详细信息。该文件也配置了PgBouncer实例。
+              有关PgBouncer配置文件内容和格式的详细信息，请参考
+              Refer to the <xref href="../../../utility_guide/admin_utilities/pgbouncer-ini.xml" format="dita"
+              scope="peer">pgbouncer.ini</xref>参考页面。</p></li>
+          <li>创建授权文件。文件名应该和<codeph>pgbouncer.ini</codeph>文件中定义的<codeph>auth_file</codeph>
+            参数名字一样，<codeph>users.txt</codeph>。每行包含一个用户名和一个密码。密码的格式应该匹配PgBouncer
+            配置文件中定义的<codeph>auth_type</codeph>。如果<codeph>auth_type</codeph>参数为<codeph>plain</codeph>，
+            密码串应该为干净的文本文件密码，例如：<codeblock>"gpadmin" "gpadmin1234"</codeblock>。
+            <p>如果<codeph>auth_type</codeph>如下面例子中为<codeph>md5</codeph>，授权部分必须是MD5编码格式。
+              MD5编码的密码格式如下：
+              <codeblock>"md5" + MD5_encoded(<varname>&lt;password>&lt;username></varname>)</codeblock></p></li>
+          <li>开始启动
+              <codeph>pgbouncer</codeph>:<codeblock>$ $GPHOME/bin/pgbouncer -d pgbouncer.ini</codeblock>
+            <p><codeph>-d</codeph>选项代表以后台进程的形式运行PgBouncer。<codeph>pgbouncer</codeph>命令的
+              语法和选项，请见<xref href="../../../utility_guide/admin_utilities/pgbouncer.xml" format="dita"
+              scope="peer">pgbouncer</xref>参考页面。</p></li>
+          <li>更新客户应用连接到<codeph>pgbouncer</codeph>，以代替直接连接到Greenplum数据库服务器。例如，
+            连接到上面配置的Greenplum数据库<codeph>mydb</codeph>，像如下方式一样运行<codeph>psql</codeph>：
+            <codeblock>$ psql -p 6543 -U <varname>someuser</varname> pgb_mydb</codeblock>
+            <p><codeph>-p</codeph>选项的值代表用户配置的PgBouncer实例的<codeph>listen_port</codeph>端口号。</p></li>
         </ol>
       </body>
     </topic>
     <topic id="topic_manage">
-      <title>Managing PgBouncer</title>
+      <title>管理PgBouncer</title>
       <body>
-        <p>PgBouncer provides a <codeph>psql</codeph>-like administration console. You
-          log in to the PgBouncer Administration Console by specifying the PgBouncer port
-           number and a virtual database named <codeph>pgbouncer</codeph>.
-          The console accepts SQL-like commands that you can use to monitor, reconfigure, and manage PgBouncer.</p>
-        <p>For complete documentation of PgBouncer Administration Console
-          commands, refer to the <xref href="../../../utility_guide/admin_utilities/pgbouncer-admin.xml" format="dita"
-              scope="peer">PgBouncer Administration Console</xref> command reference.</p>
-        <p>Follow these steps to get started with the PgBouncer Administration Console.</p>
+        <p>PgBouncer提供一个类<codeph>psql</codeph>的管理控制台，可以通过指定PgBouncer端口号
+          和虚拟数据库名称<codeph>pgbouncer</codeph>来登录到PgBouncer管理控制台。
+          该控制台接受类SQL命令，这些命令允许用户监控、重新配置和管理PgBouncer。</p>
+        <p>有关PgBouncer管理控制台命令的完整文档，请参考
+          <xref href="../../../utility_guide/admin_utilities/pgbouncer-admin.xml" format="dita"
+              scope="peer">PgBouncer管理控制台</xref>命令参考。</p>
+        <p>要开始使用PgBouncer管理控制台，请遵循下列步骤。</p>
         <ol id="ol_jwt_hyn_ts">
-          <li>Use <codeph>psql</codeph> to log in to the <codeph>pgbouncer</codeph>
-            virtual database:<codeblock>$ psql -p 6543 -U <varname>username</varname> pgbouncer</codeblock><p>The
-              <varname>username</varname> that you specify must be listed in the <codeph>admin_users</codeph> parameter in the
-                <codeph>pgbouncer.ini</codeph> configuration file. You can also log in 
-              to the PgBouncer Administration Console with the
-              current Unix username if the <codeph>pgbouncer</codeph> process is running under that
-              user's UID.</p></li>
-          <li>To view the available PgBouncer Administration Console commands, run the <codeph>SHOW help</codeph>
-            command:<codeblock>pgbouncer=# SHOW help;
+          <li>用<codeph>psql</codeph>登录到<codeph>pgbouncer</codeph>虚拟数据库：
+            <codeblock>$ psql -p 6543 -U <varname>username</varname> pgbouncer</codeblock>
+            <p><varname>username</varname>必须是<codeph>pgbouncer.ini</codeph>配置文件中
+              <codeph>admin_users</codeph>参数中所设置的值。
+              如果<codeph>pgbouncer</codeph>进程运行在用户登录的当前Unix用户的UID下，用户还可以用该用户名登录。
+              </p></li>
+          <li>要看PgBouncer管理控制台命令，运行<codeph>SHOW help</codeph>命令：
+           <codeblock>pgbouncer=# SHOW help;
 NOTICE:  Console usage
 DETAIL:
     SHOW HELP|CONFIG|DATABASES|POOLS|CLIENTS|SERVERS|VERSION
@@ -233,20 +230,21 @@ DETAIL:
     KILL &lt;db>
     SUSPEND
     SHUTDOWN</codeblock></li>
-          <li>If you update PgBouncer configuration by editing the <codeph>pgbouncer.ini</codeph> configuration file, you use the <codeph>RELOAD</codeph> command to reload the file:<codeblock>pgbouncer=# RELOAD;</codeblock></li>
+          <li>如果用户对PgBouncer配置文件<codeph>pgbouncer.ini</codeph>做了修改，
+            用户可以用<codeph>RELOAD</codeph>命令重载它：
+            <codeblock>pgbouncer=# RELOAD;</codeblock></li>
         </ol>
         <section>
-          <title>Mapping PgBouncer Clients to Greenplum Database Server Connections</title>
-          <p>To map a PgBouncer client to a Greenplum Database server connection, use the 
-            PgBouncer Administration Console <codeph>SHOW CLIENTS</codeph> and
-              <codeph>SHOW SERVERS</codeph> commands:</p>
+          <title>映射PgBouncer客户端到Greenplum数据库服务器连接</title>
+          <p>要映射PgBouncer客户端到Greenplum数据库服务器连接，可以使用PgBouncer管理控制台
+            命令<codeph>SHOW CLIENTS</codeph>和<codeph>SHOW SERVERS</codeph>：</p>
           <ol id="ol_xgn_qfq_bt">
-            <li>Use <codeph>ptr</codeph> and <codeph>link</codeph> to map the local client
-              connection to the server connection.</li>
-            <li>Use the <codeph>addr</codeph> and the <codeph>port</codeph> of the client connection to
-              identify the TCP connection from the client.</li>
-            <li>Use <codeph>local_addr</codeph> and <codeph>local_port</codeph> to identify the TCP
-              connection to the server.</li>
+            <li>使用<codeph>ptr</codeph>和<codeph>link</codeph>把本地客户端连接映射到服务器连接。
+              </li>
+            <li>使用客户端连接的<codeph>addr</codeph>和<codeph>port</codeph>标识来自客户端的TCP连接。
+              </li>
+            <li>使用<codeph>local_addr</codeph>和<codeph>local_port</codeph>标识到服务器的TCP连接。
+              </li>
           </ol>
         </section>
       </body>
