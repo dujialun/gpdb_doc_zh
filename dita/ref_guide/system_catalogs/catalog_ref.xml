@@ -2,19 +2,16 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="eu135496">System Catalog Reference</title>
+  <title id="eu135496">系统目录参考</title>
   <body>
-    <p>This reference describes the Greenplum Database system catalog tables and views. System
-      tables prefixed with <codeph>gp_</codeph> relate to the parallel features of Greenplum
-      Database. Tables prefixed with <codeph>pg_</codeph> are either standard PostgreSQL system
-      catalog tables supported in Greenplum Database, or are related to features Greenplum that
-      provides to enhance PostgreSQL for data warehousing workloads. Note that the global system
-      catalog for Greenplum Database resides on the master instance.</p>
-    <note type="warning"> Changes to <ph otherprops="pivotal">Pivotal </ph>Greenplum Database system
-      catalog tables or views are not supported. If a catalog table or view is changed<ph
-        otherprops="pivotal"> by the customer</ph>, the <ph otherprops="pivotal">Pivotal Greenplum
-        Database cluster is not supported. The </ph>cluster must be reinitialized and restored<ph
-        otherprops="pivotal"> by the customer</ph>.</note>
+    <p>该参考文献描述了Greenplum数据库系统目录表和视图。
+      以<codeph>gp_</codeph>为前缀的系统表与Greenplum数据库的并行特性有关。
+      以<codeph>pg_</codeph>为前缀的表是Greenplum数据库中支持的标准PostgreSQL系统目录表，或与Greenplum数据库性能有关，以提升PostgreSQL的数据仓库工作负载。
+      请注意，Greenplum数据库的全局系统目录位于主实例上。
+      </p>
+    <note type="warning">不支持对Greenplum数据库系统目录表或视图的更改。
+      如果更改目录表或视图，则必须重新初始化并还原集群。
+      </note>
     <!--links are print-only-->
     <ul id="ul_lyl_np1_1q" otherprops="op-print">
       <li>
