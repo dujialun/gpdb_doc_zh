@@ -4,9 +4,9 @@
 <topic id="topic1" xml:lang="en">
   <title id="fn141670">gp_pgdatabase</title>
   <body>
-    <p>The <codeph>gp_pgdatabase</codeph> view shows status information about the Greenplum segment instances and whether they are acting as the mirror or
-      the primary. This view is used internally by the Greenplum fault
-      detection and recovery utilities to determine failed segments.</p>
+    <p><codeph>gp_pgdatabase</codeph>视图显示Greenplum中Segment实例的状态信息，以及它们是作为镜像Segment还是主Segment。
+      Greenplum的故障检测和恢复工具在内部使用此视图来确定失效的Segment。
+      </p>
     <table id="fn141982">
       <title>pg_catalog.gp_pgdatabase</title>
       <tgroup cols="4">
@@ -16,10 +16,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -29,8 +29,7 @@
             </entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3">gp_segment_configuration.dbid</entry>
-            <entry colname="col4">System-assigned ID. The unique identifier of a segment (or master)
-              instance.</entry>
+            <entry colname="col4">系统分配的ID。Segment（或者Master）实例的唯一标识符。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -38,8 +37,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3">gp_segment_configuration.role</entry>
-            <entry colname="col4">Whether or not this instance is active. Is it currently acting as
-              the primary segment (as opposed to the mirror).</entry>
+            <entry colname="col4">该实例是否处于活动状态。它目前是否作为主Segment（还是镜像Segment）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -47,9 +45,10 @@
             </entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3">gp_segment_ configuration.content</entry>
-            <entry colname="col4">The ID for the portion of data on an instance. A primary segment
-              instance and its mirror will have the same content ID.<p>For a segment the value is
-                from 0-<i>N-1</i>, where <i>N</i> is the number of segments in Greenplum Database.</p><p>For the master, the value is -1.</p></entry>
+            <entry colname="col4">实例上部分数据的ID。主Segment实例及其镜像将具有相同的内容ID。
+              <p>对于Segment，值为 0-<i>N-1</i>, 其中<i>N</i>是Greenplum数据库中的Segment数量。
+                </p>
+              <p>对于Master，值为-1。</p></entry>
           </row>
           <row>
             <entry colname="col1">
@@ -57,8 +56,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3">gp_segment_ configuration.preferred_role</entry>
-            <entry colname="col4">Whether or not this instance was defined as the primary (as
-              opposed to the mirror) at the time the system was initialized.</entry>
+            <entry colname="col4">在初始化系统时，该实例是否被定义为主Segment（而不是镜像Segment）。</entry>
           </row>
         </tbody>
       </tgroup>

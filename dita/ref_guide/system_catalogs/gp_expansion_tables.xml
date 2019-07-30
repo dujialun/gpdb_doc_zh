@@ -4,12 +4,12 @@
 <topic id="topic1" xml:lang="en">
   <title id="fb138336">gpexpand.status_detail</title>
   <body>
-    <p>The <codeph>gpexpand.status_detail</codeph> table contains information about the status of
-      tables involved in a system expansion operation. You can query this table to determine the
-      status of tables being expanded, or to view the start and end time for completed tables. </p>
-    <p>This table also stores related information about the table such as the oid and disk size.
-      Overall status information for the expansion is stored in
-        <xref href="gp_expansion_status.xml#topic1" type="topic" format="dita"/>.</p>
+    <p><codeph>gpexpand.status_detail</codeph>表包含了有关系统扩容操作所涉及的表的状态的信息。
+      用户可以查询此表以确定正在扩容的表的状态，或查看已完成表的开始和结束时间。
+      </p>
+    <p>此表还存储表的相关信息，如OID、磁盘尺寸。
+      扩容的整体状态信息存储在<xref href="gp_expansion_status.xml#topic1" type="topic" format="dita" />中。
+      </p>
     <p>In a normal expansion operation it is not necessary to modify the data stored in this
       table.</p>
     <table id="fb138428">
@@ -21,10 +21,10 @@
         <colspec colnum="4" colname="col4" colwidth="138pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -34,7 +34,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of the database to which the table belongs. </entry>
+            <entry colname="col4">表所属数据库的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -42,7 +42,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Fully qualified name of the table.</entry>
+            <entry colname="col4">表的完全限定名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -50,7 +50,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">OID of the table.</entry>
+            <entry colname="col4">表的OID.</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -58,8 +58,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For a partitioned table, the name of the root partition.
-              Otherwise, <codeph>None</codeph>.</entry>
+            <entry colname="col4">对于分区表来说，根分区的名称。否则，<codeph>None</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -67,9 +66,7 @@
             </entry>
             <entry colname="col2">int</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Rank determines the order in which tables are expanded. The
-              expansion utility will sort on rank and expand the lowest-ranking tables
-              first.</entry>
+            <entry colname="col4">等级决定表被扩容的顺序。扩容工具将在rank上排序，并首先扩容排名最低的表。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -77,9 +74,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Identifies whether or not the table is an external
-              writable table. (External writable tables require a different syntax
-              to expand).</entry>
+            <entry colname="col4">标识表是否是外部可写表。（外部可写表需要不同的语法来扩容）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -87,7 +82,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Status of expansion for this table. Valid values are:<p>NOT
+            <entry colname="col4">此表的扩容状态。有效值为:<p>NOT
                 STARTED</p><p>IN PROGRESS</p>FINISHED<p>NO LONGER EXISTS</p></entry>
           </row>
           <row>
@@ -96,8 +91,7 @@
             </entry>
             <entry colname="col2">timestamp without time zone</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Timestamp for the start of the expansion of this table. This field
-              is only populated after a table is successfully expanded.</entry>
+            <entry colname="col4">此表扩容开始的时间戳。此字段仅在表成功扩容后填充。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -105,7 +99,7 @@
             </entry>
             <entry colname="col2">timestamp without time zone</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Timestamp for the completion of expansion of this table.</entry>
+            <entry colname="col4">此表扩容完成的时间戳。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -113,11 +107,10 @@
             </entry>
             <entry colname="col2"/>
             <entry colname="col3"/>
-            <entry colname="col4">The size of disk space associated with the source table. Due to
-              table bloat in heap tables and differing numbers of segments after expansion, it is
-              not expected that the final number of bytes will equal the source number. This
-              information is tracked to help provide progress measurement to aid in duration
-              estimation for the end-to-end expansion operation.</entry>
+            <entry colname="col4">与源表相关的磁盘空间尺寸。
+              由于堆表中的表膨胀和扩容后不同的Segment数量，最终的字节数是否与源字节相同是不可预测的。
+              跟踪此信息有助于提供进度度量，以帮助进行端到端扩容操作的持续时间估计。
+              </entry>
           </row>
         </tbody>
       </tgroup>
