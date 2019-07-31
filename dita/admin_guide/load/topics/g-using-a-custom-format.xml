@@ -2,24 +2,17 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic36">
-   <title>Using a Custom Format</title>
+   <title>使用一种自定义格式</title>
    <body>
-      <p>You specify a custom data format in the <codeph>FORMAT</codeph> clause of <codeph>CREATE
-            EXTERNAL TABLE</codeph>.</p>
+      <p>用户在<codeph>CREATE EXTERNAL TABLE</codeph>的<codeph>FORMAT</codeph>子句中指定一种自定义数据格式。</p>
       <codeblock>FORMAT 'CUSTOM' (formatter=format_function, key1=val1,...keyn=valn)
 </codeblock>
-      <p>Where the <codeph>'CUSTOM'</codeph> keyword indicates that the data has a custom format and
-            <codeph>formatter</codeph> specifies the function to use to format the data, followed by
-         comma-separated parameters to the formatter function.</p>
-      <p>Greenplum Database provides functions for formatting fixed-width data, but
-         you must author the formatter functions for variable-width data. The steps are as
-         follows.</p>
+      <p>这里<codeph>'CUSTOM'</codeph>关键词表示数据是一种自定义格式，而<codeph>formatter</codeph>指定用来格式化该数据的函数，其后跟着给formatter函数的用逗号分隔的参数。</p>
+      <p>Greenplum数据库为格式化固定宽度的数据提供了函数，但是用户必须编写用于可变宽度数据的formatter函数。步骤如下。</p>
       <ol>
-         <li id="du223375">Author and compile input and output functions as a shared library.</li>
-         <li id="du223378">Specify the shared library function with <codeph>CREATE FUNCTION</codeph>
-            in Greenplum Database.</li>
-         <li id="du223380">Use the <codeph>formatter</codeph> parameter of <codeph>CREATE EXTERNAL
-               TABLE</codeph>'s <codeph>FORMAT</codeph> clause to call the function.</li>
+         <li id="du223375">编写并且编译输入和输出函数为一个共享库。</li>
+         <li id="du223378">用<codeph>CREATE FUNCTION</codeph>在Greenplum数据库中指定该共享库函数。</li>
+         <li id="du223380">使用<codeph>CREATE EXTERNAL TABLE</codeph>的<codeph>FORMAT</codeph>子句的<codeph>formatter</codeph>参数来调用该函数。</li>
       </ol>
    </body>
 </topic>

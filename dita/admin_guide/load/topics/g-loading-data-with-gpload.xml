@@ -2,35 +2,16 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic62">
-    <title>Loading Data with gpload</title>
+    <title>用gpload装载数据</title>
     <body>
-        <p>The Greenplum <codeph>gpload</codeph> utility loads data using readable external tables
-            and the Greenplum parallel file server (<cmdname>gpfdist</cmdname> or
-                <codeph>gpfdists</codeph>). It handles parallel file-based external table setup and
-            allows users to configure their data format, external table definition, and
-                <cmdname>gpfdist</cmdname> or <codeph>gpfdists</codeph> setup in a single
-            configuration file.<note><codeph>gpfdist</codeph> and <codeph>gpload</codeph> are
-                compatible only with the Greenplum Database major version in which they are shipped.
-                For example, a <codeph>gpfdist</codeph> utility that is installed with Greenplum
-                Database 4.x cannot be used with Greenplum Database 5.x or 6.x.</note><note
-                id="gpload-limitation"><codeph>MERGE</codeph> and <codeph>UPDATE</codeph> operations
-                are not supported if the target table column name is a reserved keyword, has capital
-                letters, or includes any character that requires quotes (" ") to identify the
-                column.</note></p>
+        <p>Greenplum的<codeph>gpload</codeph>工具使用可读外部表和Greenplum并行文件服务器（<cmdname>gpfdist</cmdname>或者<codeph>gpfdists</codeph>）来装载数据。它处理并行的基于文件的外部表设置并且允许用户在一个单一配置文件中配置他们的数据格式、外部表定义以及<cmdname>gpfdist</cmdname>或者<codeph>gpfdists</codeph>设置。<note><codeph>gpfdist</codeph>和<codeph>gpload</codeph>仅与发布它们的Greenplum数据库主要版本兼容。 例如，与Greenplum Database 4.x一起安装的<codeph>gpfdist</codeph>实用程序不能与Greenplum Database 5.x或6.x一起使用。</note><note
+                id="gpload-limitation">如果目标表列名是保留关键字，即包含大写字母，或者包含需要引号（“”）来标识列的任何字符，则不支持<codeph>MERGE</codeph>和<codeph>UPDATE</codeph>操作。</note></p>
         <section id="du168147">
-            <title>To use gpload</title>
+            <title>要使用gpload</title>
             <ol>
-                <li id="du168152">Ensure that your environment is set up to run
-                        <codeph>gpload</codeph>. Some dependent files from your Greenplum Database
-                    installation are required, such as <cmdname>gpfdist</cmdname> and Python, as
-                    well as network access to the Greenplum segment hosts. <p>See the <i>Greenplum
-                            Database Reference Guide</i> for details.</p>
+                <li id="du168152">确保环境已经设置好来运行<codeph>gpload</codeph>。一些来自于Greenplum数据库安装的依赖文件是必需的，例如<cmdname>gpfdist</cmdname>和Python，还有访问Greenplum的Segment主机的网络。<p>详见<i>Greenplum数据库参考指南</i>。</p>
                 </li>
-                <li id="du168179">Create your load control file. This is a YAML-formatted file that
-                    specifies the Greenplum Database connection information,
-                        <cmdname>gpfdist</cmdname> configuration information, external table
-                    options, and data format. <p>See the <i>Greenplum Database Reference Guide</i>
-                        for details. </p><p>For example:</p>
+                <li id="du168179">创建装载控制文件。这是一个YAML格式的文件，它指定Greenplum数据库连接信息、<cmdname>gpfdist</cmdname>的配置信息、外表选项和数据格式。<p>详见<i>Greenplum数据库参考指南</i>。</p><p>例如：</p>
                     <p>
                         <codeblock>---
 VERSION: 1.0.0.1
@@ -70,7 +51,7 @@ SQL:
 </codeblock>
                     </p>
                 </li>
-                <li id="du168184">Run <codeph>gpload</codeph>, passing in the load control file. For example:<p>
+                <li id="du168184">运行<codeph>gpload</codeph>，传入该装载控制文件。例如：<p>
                         <codeblock>gpload -f my_load.yml
 </codeblock>
                     </p>

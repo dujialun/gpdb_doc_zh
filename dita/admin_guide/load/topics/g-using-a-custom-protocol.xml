@@ -2,52 +2,38 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic43">
-   <title>Using a Custom Protocol</title>
+   <title>使用一种自定协议</title>
    <body>
-      <p>Greenplum Database provides protocols such as <cmdname>gpfdist</cmdname>,
-            <codeph>http</codeph>, and <codeph>file</codeph> for accessing data over a network, or
-         you can author a custom protocol. You can use the standard data formats,
-            <codeph>TEXT</codeph> and <codeph>CSV</codeph>, or a custom data format with custom
-         protocols.</p>
-      <p>You can create a custom protocol whenever the available built-in protocols do not suffice
-         for a particular need. For example, you could connect Greenplum Database in parallel to another
-         system directly, and stream data from one to the other without the need to materialize the
-         data on disk or use an intermediate process such as <cmdname>gpfdist</cmdname>. You must be
-         a superuser to create and register a custom protocol.</p>
+      <p>Greenplum提供了诸如<cmdname>gpfdist</cmdname>、<codeph>http</codeph>以及<codeph>file</codeph>等协议来通过网络访问数据，或者用户可以创作一个自定义协议。用户可以为自定义协议使用标准的数据格式<codeph>TEXT</codeph>和<codeph>CSV</codeph>，或者使用一种自定义数据格式。</p>
+      <p>只要可用的内建协议无法满足一种特定需要，用户就可以创建一种自定义的协议。例如，如果用户需要并行地把Greenplum数据库直接连接到另一个系统，并且在两者之间发送数据流而无需在磁盘上物化系统数据或者使用<cmdname>gpfdist</cmdname>这样的中间进程。用户必须是超级用户才能创建和注册自定义协议。</p>
       <ol>
-         <li id="du226058">Author the send, receive, and (optionally) validator functions in C, with
-            a predefined API. These functions are compiled and registered with the Greenplum
-            Database. For an example custom protocol, see <xref
-               href="g-example-custom-data-access-protocol.xml#topic103"/>. </li>
-         <li id="du226065">After writing and compiling the read and write functions into a shared
-            object (.so), declare a database function that points to the .so file and function
-            names. <p>The following examples use the compiled import and export
-               code.</p><codeblock>CREATE FUNCTION myread() RETURNS integer
+         <li id="du226058">用C语言和预定义的API创作发送、接受以及（可选的）验证器函数。这些函数会被编译并且注册在Greenplum数据库中。自定义协议的例子可见<a xref
+               href="g-example-custom-data-access-protocol.xml#topic103">自定义数据访问协议实例</a></li>
+         <li id="du226065">在编写并且编译读写函数到一个共享对象（.so）中之后，声明一个数据库函数指向该.so文件和函数名。 
+        <p>下面的例子使用了编译好的导入和导出代码。</p>
+             <codeblock>CREATE FUNCTION myread() RETURNS integer
 as '$libdir/gpextprotocol.so', 'myprot_import'
 LANGUAGE C STABLE;
 CREATE FUNCTION mywrite() RETURNS integer
 as '$libdir/gpextprotocol.so', 'myprot_export'
 LANGUAGE C STABLE;
-</codeblock><p>The
-               format of the optional validator function is:</p><p>
+</codeblock><p>可选函数的格式是：</p><p>
                <codeblock>CREATE OR REPLACE FUNCTION myvalidate() RETURNS void 
 AS '$libdir/gpextprotocol.so', 'myprot_validate' 
 LANGUAGE C STABLE; 
 </codeblock>
             </p>
          </li>
-         <li id="du226078">Create a protocol that accesses these functions.
-               <codeph>Validatorfunc</codeph> is
-            optional.<codeblock>CREATE TRUSTED PROTOCOL myprot(
+         <li id="du226078">创建一个访问这些函数的协议。<codeph>Validatorfunc</codeph>是可选的。<codeblock>CREATE TRUSTED PROTOCOL myprot(
 writefunc='mywrite',
 readfunc='myread', 
 validatorfunc='myvalidate');</codeblock>
          </li>
-         <li id="du226083">Grant access to any other users, as
-            necessary.<codeblock>GRANT ALL ON PROTOCOL myprot TO otheruser;
+         <li id="du226083">必要时，把访问权限授予给任何其他用户。
+             <codeblock>GRANT ALL ON PROTOCOL myprot TO otheruser;
 </codeblock>
          </li>
-         <li id="du226085">Use the protocol in readable or writable external tables.<p>
+         <li id="du226085">在可读或可写外部表中使用该协议。<p>
                <codeblock>CREATE WRITABLE EXTERNAL TABLE ext_sales(LIKE sales)
 LOCATION ('myprot://&lt;meta&gt;/&lt;meta&gt;/…')
 FORMAT 'TEXT';
@@ -58,18 +44,13 @@ FORMAT 'TEXT';
             </p>
          </li>
       </ol>
-      <p>Declare custom protocols with the SQL command <codeph>CREATE TRUSTED PROTOCOL</codeph>,
-         then use the <codeph>GRANT</codeph> command to grant access to your users. For example:</p>
+      <p>用SQL命令<codeph>CREATE TRUSTED PROTOCOL</codeph>声明自定义协议，然后使用<codeph>GRANT</codeph>命令把访问权限授予给用户。例如：</p>
       <ul>
-         <li id="du201414">Allow a user to create a readable external table with a trusted
-            protocol<codeblock>GRANT SELECT ON PROTOCOL <i>&lt;protocol name&gt;</i> TO <i>&lt;user name&gt;</i>;</codeblock>
+         <li id="du201414">允许一个用户使用一种受信的协议创建一个可读的外部表<codeblock>GRANT SELECT ON PROTOCOL <i>&lt;protocol name&gt;</i> TO <i>&lt;user name&gt;</i>;</codeblock>
          </li>
-         <li id="du201461">Allow a user to create a writable external table with a trusted
-            protocol<codeblock>GRANT INSERT ON PROTOCOL <i>&lt;protocol name&gt;</i> TO <i>&lt;user name&gt;</i>;</codeblock>
+         <li id="du201461">允许一个用户使用一种受信的协议创建一个可写的外部表<codeblock>GRANT INSERT ON PROTOCOL <i>&lt;protocol name&gt;</i> TO <i>&lt;user name&gt;</i>;</codeblock>
          </li>
-         <li id="du201474">Allow a user to create readable and writable external tables with a
-            trusted
-            protocol<codeblock>GRANT ALL ON PROTOCOL <i>&lt;protocol name&gt;</i> TO <i>&lt;user name&gt;</i>;</codeblock>
+         <li id="du201474">允许一个用户使用一种受信的协议创建一个可读写的外部表<codeblock>GRANT ALL ON PROTOCOL <i>&lt;protocol name&gt;</i> TO <i>&lt;user name&gt;</i>;</codeblock>
          </li>
       </ul>
    </body>

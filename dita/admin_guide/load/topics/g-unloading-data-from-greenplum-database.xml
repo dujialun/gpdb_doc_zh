@@ -2,13 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic67">
-   <title>Unloading Data from Greenplum Database</title>
+   <title>从Greenplum数据库卸载数据</title>
    <body>
-      <p>A writable external table allows you to select rows from other database tables and output
-         the rows to files, named pipes, to applications, or as output targets for Greenplum
-         parallel MapReduce calculations. You can define file-based and web-based writable external
-         tables.</p>
-      <p>This topic describes how to unload data from Greenplum Database using parallel unload
-         (writable external tables) and non-parallel unload (<codeph>COPY</codeph>). </p>
+      <p>一个可写外部表允许用户从其他数据库表选择行并且把这些行输出到文件、命名管道、应用或者作为Greenplum并行MapReduce计算的输出目标。用户可以定义基于文件的和基于Web的可写外部表。</p>
+      <p>这一主题描述了如何从Greenplum数据库中使用并行卸载（可写外部表）和非并行卸载（<codeph>COPY</codeph>）来卸载数据。</p>
    </body>
 </topic>

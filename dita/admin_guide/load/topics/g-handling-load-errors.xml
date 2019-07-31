@@ -2,42 +2,16 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic55">
-    <title>Handling Load Errors</title>
+    <title>处理装载错误</title>
     <body>
-        <p>Readable external tables are most commonly used to select data to load into regular
-            database tables. You use the <codeph>CREATE TABLE AS SELECT</codeph> or <codeph>INSERT
-                INTO </codeph>commands to query the external table data. By default, if the data
-            contains an error, the entire command fails and the data is not loaded into the target
-            database table. </p>
-        <p>The <codeph>SEGMENT REJECT LIMIT</codeph> clause allows you to isolate format errors in
-            external table data and to continue loading correctly formatted rows. Use
-                <codeph>SEGMENT REJECT LIMIT </codeph>to set an error threshold, specifying the
-            reject limit <codeph>count</codeph> as number of <codeph>ROWS</codeph> (the default) or
-            as a <codeph>PERCENT</codeph> of total rows (1-100).</p>
-        <p>The entire external table operation is aborted, and no rows are processed, if the number
-            of error rows reaches the <codeph>SEGMENT REJECT LIMIT</codeph>. The limit of error rows
-            is per-segment, not per entire operation. The operation processes all good rows, and it
-            discards and optionally logs formatting errors for erroneous rows, if the number of
-            error rows does not reach the <codeph>SEGMENT REJECT
-                LIMIT</codeph>.</p>
-        <p>The <codeph>LOG ERRORS</codeph> clause allows you to keep error rows for further
-            examination. For information about the <codeph>LOG ERRORS</codeph> clause, see the
-                <codeph>CREATE EXTERNAL TABLE</codeph> command in the <cite>Greenplum Database
-                Reference Guide</cite>.</p>
-        <p>When you set <codeph>SEGMENT REJECT LIMIT</codeph>, Greenplum scans the external data in
-            single row error isolation mode. Single row error isolation mode applies to external
-            data rows with format errors such as extra or missing attributes, attributes of a wrong
-            data type, or invalid client encoding sequences. Greenplum does not check constraint
-            errors, but you can filter constraint errors by limiting the <codeph>SELECT</codeph>
-            from an external table at runtime. For example, to eliminate duplicate key errors:</p>
+        <p>可读外部表最常被用来选择数据装载到普通数据库表中。用户使用<codeph>CREATE TABLE AS SELECT</codeph>或者<codeph>INSERT INTO</codeph> 命令来查询外部表数据。默认情况下，如果数据包含错误，整个命令会失败并且数据不会被装载到目标数据库表中。 </p>
+        <p><codeph>SEGMENT REJECT LIMIT</codeph>子句允许用户隔离外部表数据中的格式错误并且继续装载正确格式的行。使用<codeph>SEGMENT REJECT LIMIT</codeph>设置一个错误阈值，就可以指定拒绝限制计数为<codeph>ROWS</codeph>的数量（默认）或者全部行的一个<codeph>PERCENT</codeph>（1-100）。</p>
+        <p>如果错误行的数量达到<codeph>SEGMENT REJECT LIMIT</codeph>，整个外部表操作会被中止并且不会有行被处理。错误行的限制是针对每个Segment的，而不针对整个操作。如果错误行的数量没有达到<codeph>SEGMENT REJECT LIMIT</codeph>，该操作处理所有好的行并且抛弃错误的行，也可以选择把错误行的格式错误记录下来。</p>
+        <p><codeph>LOG ERRORS</codeph>子句允许用户保留错误行以便进一步的检查。关于<codeph>LOG ERRORS</codeph>子句的信息，请见<cite>Greenplum</cite>数据库参考指南中的<codeph>CREATE EXTERNAL TABLE</codeph>命令。</p>
+        <p>若用户设置了<codeph>SEGMENT REJECT LIMIT</codeph>，Greenplum以单行错误隔离模式扫描外部数据。单行错误隔离模式适用于外部数据行有如多出或者缺少属性、属性数据类型错误或者非法客户端编码序列等格式错误的情况。Greenplum不会检查约束错误，但是用户可以通过在运行时限制外部表的<codeph>SELECT</codeph>来过滤约束错误。例如，要消除重复键错误：</p>
         <codeblock>=# INSERT INTO table_with_pkeys 
     SELECT DISTINCT * FROM external_table;
 </codeblock>
-        <note>When loading data with the <codeph>COPY</codeph> command or an
-            external table, the value of the server configuration parameter
-                <codeph>gp_initial_bad_row_limit</codeph> limits the initial number of rows that are
-            processed that are not formatted properly. The default is to stop processing if the
-            first 1000 rows contain formatting errors. See the <cite>Greenplum Database Reference
-                Guide</cite> for information about the parameter.</note>
+        <note>在用<codeph>COPY</codeph>命令或者外部表装载数据时，服务器配置参数<codeph>gp_initial_bad_row_limit</codeph>的值限制最开始的没有被正确格式化的行的数量。默认是如果前1000行都包含格式化错误，则停止处理。关于该参数的信息请见<cite>Greenplum</cite>数据库参考指南。</note>
     </body>
 </topic>
