@@ -12,6 +12,6 @@
    WITH DELIMITER '|' LOG ERRORS
    SEGMENT REJECT LIMIT 10 ROWS;</codeblock>
         </example>
-        <p>有关调查错误行的信息，请见< xref href="g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58"/>。</p>
+        <p>有关调查错误行的信息，请见<xref href="g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58"/>。</p>
     </body>
 </topic>

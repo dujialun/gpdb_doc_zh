@@ -5,7 +5,7 @@
    <title>在错误日志中查看不正确的行</title>
    <body>
       <p>如果用户使用了单行错误隔离（见<xref
-            href="g-define-an-external-table-with-single-row-error-isolation.xml#topic56"/>或者< xref href="g-running-copy-in-single-row-error-isolation-mode.xml#topic65"/>），任何由格式错误的行会被Greenplum数据库内部记录下来。</p>
+            href="g-define-an-external-table-with-single-row-error-isolation.xml#topic56"/>或者<xref href="g-running-copy-in-single-row-error-isolation-mode.xml#topic65"/>），任何由格式错误的行会被Greenplum数据库内部记录下来。</p>
       <p>Greenplum数据库用一种表格式捕捉下列错误信息：</p>
       <table id="du166024">
          <title>错误日志格式</title>
