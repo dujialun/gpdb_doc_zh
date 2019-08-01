@@ -4,12 +4,11 @@
 <topic id="topic1" xml:lang="en">
   <title id="fp141670">gp_resgroup_status_per_host</title>
   <body>
-    <p>The <codeph>gp_toolkit.gp_resgroup_status_per_host</codeph> view allows administrators
-      to see current memory and CPU usage and allocation for each resource group on a
-      per-host basis.</p>
-    <p>Memory amounts are specified in MBs.</p>
-      <note>The <codeph>gp_resgroup_status_per_host</codeph> view is valid only when resource
-        group-based resource management is active.</note>
+    <p><codeph>gp_toolkit.gp_resgroup_status_per_host</codeph>视图允许管理员基于每个主机查看每个资源组的当前内存和CPU使用率和分配。
+      </p>
+    <p>内存量以MB为单位指定。</p>
+      <note>仅当基于资源组的资源管理处于活动状态时，<codeph>gp_resgroup_status_per_host</codeph>视图才有效。
+        </note>
     <table id="fp141982">
       <title>gp_toolkit.gp_resgroup_status_per_host</title>
       <tgroup cols="4">
@@ -19,10 +18,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -32,7 +31,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3">pg_resgroup.rsgname</entry>
-            <entry colname="col4">The name of the resource group.</entry>
+            <entry colname="col4">资源组的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -40,7 +39,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_resgroup.oid</entry>
-            <entry colname="col4">The ID of the resource group.</entry>
+            <entry colname="col4">资源组的ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -48,7 +47,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">gp_segment_configuration.hostname</entry>
-            <entry colname="col4">The hostname of the segment host.</entry>
+            <entry colname="col4">segment主机的主机名。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -56,8 +55,7 @@
             </entry>
             <entry colname="col2">numeric</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The real-time CPU usage of the resource group on the
-              host.</entry>
+            <entry colname="col4">主机上资源组的实时CPU使用情况。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -65,9 +63,9 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The real-time memory usage of the resource group on
-              the host. This total includes resource group fixed and shared memory.
-              It also includes global shared memory used by the resource group.</entry>
+            <entry colname="col4">主机上资源组的实时内存使用情况。
+              此总数包括资源组固定和共享内存。
+              它还包括资源组使用的全局共享内存。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -75,9 +73,8 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The unused fixed and shared memory for the resource
-              group that is available on the host. This total does not include available
-              resource group global shared memory.</entry>
+            <entry colname="col4">主机上可用的资源组的未使用的固定和共享内存。
+              此总计不包括可用资源组全局共享内存。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -85,8 +82,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The real-time fixed memory usage for the resource
-              group on the host.</entry>
+            <entry colname="col4">主机上资源组的实时固定内存使用情况。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -94,8 +90,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The fixed memory available to the resource group
-              on the host.</entry>
+            <entry colname="col4">主机上资源组可用的固定内存。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -103,8 +98,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The total amount of fixed memory that Greenplum
-              Database has allotted to the resource group on the host.</entry>
+            <entry colname="col4">Greenplum数据库分配给主机上资源组的固定内存总量。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -112,9 +106,8 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The group shared memory used by the resource
-              group on the host. If any global shared memory is used by the resource
-              group, this amount is included in the total as well.</entry>
+            <entry colname="col4">该组共享主机上资源组使用的内存。
+              如果资源组使用任何全局共享内存，则此数量也包含在总计中。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -122,9 +115,8 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The amount of group shared memory available to the
-              resource group on the host. Resource group global shared memory is not
-              included in this total.</entry>
+            <entry colname="col4">主机上资源组可用的组共享内存量。
+              资源组全局共享内存不包含在此总计中。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -132,9 +124,8 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The portion of group shared memory that Greenplum
-              Database has allotted to the resource group on the host. Resource
-              group global shared memory is not included in this value.</entry>
+            <entry colname="col4">Greenplum数据库分配给主机上资源组的组共享内存部分。
+              资源组全局共享内存不包含在此值中。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -142,8 +133,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The total amount of group shared memory requested
-              by the resource group on the host.</entry>
+            <entry colname="col4">主机上资源组请求的组共享内存总量。</entry>
           </row>
         </tbody>
       </tgroup>

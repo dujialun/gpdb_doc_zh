@@ -4,11 +4,11 @@
 <topic id="topic1" xml:lang="en">
   <title id="fp141670">gp_resgroup_status</title>
   <body>
-    <p>The <codeph>gp_toolkit.gp_resgroup_status</codeph> view allows administrators to see status
-      and activity for a resource group. It shows how many queries are waiting
-      to run and how many queries are currently active in the system for each resource
-      group. The view also displays current memory and CPU usage for the resource group.</p>
-      <note>The <codeph>gp_resgroup_status</codeph> view is valid only when resource group-based resource management is active.</note>
+    <p><codeph>gp_toolkit.gp_resgroup_status</codeph>视图允许管理员查看资源组的状态和活动。
+      它显示了等待运行的查询数以及系统中每个资源组当前有多少查询处于活动状态。
+      该视图还显示资源组的当前内存和CPU使用情况。
+      </p>
+      <note>仅当基于资源组的资源管理处于活动状态时，<codeph>gp_resgroup_status</codeph>视图才有效。</note>
     <table id="fp141982">
       <title>gp_toolkit.gp_resgroup_status</title>
       <tgroup cols="4">
@@ -18,10 +18,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -31,7 +31,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3">pg_resgroup.rsgname</entry>
-            <entry colname="col4">The name of the resource group.</entry>
+            <entry colname="col4">资源组的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -39,7 +39,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_resgroup.oid</entry>
-            <entry colname="col4">The ID of the resource group.</entry>
+            <entry colname="col4">资源组的ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -47,7 +47,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The number of transactions currently executing in the resource group.</entry>
+            <entry colname="col4">当前在资源组中执行的事务数。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -55,7 +55,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The number of currently queued transactions for the resource group.</entry>
+            <entry colname="col4">资源组的当前排队事务数。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -63,7 +63,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The total number of queued transactions for the resource group since the Greenplum Database cluster was last started, excluding the <codeph>num_queueing</codeph>.</entry>
+            <entry colname="col4">自Greenplum数据库集群上次启动以来资源组的排队事务总数，不包括<codeph>num_queueing</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -71,7 +71,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The total number of executed transactions in the resource group since the Greenplum Database cluster was last started, excluding the <codeph>num_running</codeph>.</entry>
+            <entry colname="col4">自Greenplum数据库集群上次启动以来资源组中执行的事务总数，不包括<codeph>num_running</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -79,7 +79,7 @@
             </entry>
             <entry colname="col2">interval</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The total time any transaction was queued since the Greenplum Database cluster was last started.</entry>
+            <entry colname="col4">自上次启动Greenplum数据库集群以来，任何事务排队的总时间。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -87,7 +87,7 @@
             </entry>
             <entry colname="col2">json</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The real-time CPU usage of the resource group on each Greenplum Database segment's host.</entry>
+            <entry colname="col4">每个Greenplum数据库网段主机上资源组的实时CPU使用情况。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -95,7 +95,7 @@
             </entry>
             <entry colname="col2">json</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">The real-time memory usage of the resource group on each Greenplum Database segment's host.</entry>
+            <entry colname="col4">每个Greenplum数据库segment主机上资源组的实时内存使用情况。</entry>
           </row>
         </tbody>
       </tgroup>
