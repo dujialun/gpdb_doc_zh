@@ -1,26 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="fu141670">pg_aggregate</title><body><p>The <codeph>pg_aggregate</codeph> table stores information about aggregate
-functions. An aggregate function is a function that operates on a set
-of values (typically one column from each row that matches a query condition)
-and returns a single value computed from all these values. Typical aggregate
-functions are <codeph>sum</codeph>, <codeph>count</codeph>, and <codeph>max</codeph>.
-Each entry in <codeph>pg_aggregate</codeph> is an extension of an entry
-in <codeph>pg_proc</codeph>. The <codeph>pg_proc</codeph> entry carries
-the aggregate's name, input and output data types, and other information
-that is similar to ordinary functions.</p><table id="fu141982"><title>pg_catalog.pg_aggregate</title><tgroup cols="4"><colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="86pt"/><colspec colnum="3" colname="col3" colwidth="85pt"/><colspec colnum="4" colname="col4" colwidth="147pt"/><thead><row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row></thead><tbody>
-<row><entry colname="col1"><codeph>aggfnoid</codeph></entry><entry colname="col2">regproc</entry><entry colname="col3">pg_proc.oid</entry><entry colname="col4">Aggregate function OID</entry></row>
-<row><entry colname="col1"><codeph>aggtransfn</codeph></entry><entry colname="col2">regproc</entry><entry colname="col3">pg_proc.oid</entry><entry colname="col4">Transition function OID</entry></row>
-<row><entry colname="col1"><codeph>aggcombinefn</codeph></entry><entry colname="col2">regproc</entry><entry colname="col3"/><entry colname="col4">Combine function OID (zero if none)</entry></row>
-<row><entry colname="col1"><codeph>aggfinalfn</codeph></entry><entry colname="col2">regproc</entry><entry colname="col3">pg_proc.oid</entry><entry colname="col4">Final function OID (zero if none)</entry></row>
-<row><entry colname="col1"><codeph>agginitval</codeph></entry><entry colname="col2">text</entry><entry colname="col3"/><entry colname="col4">The initial value of the transition state. This
-is a text field containing the initial value in its external string representation.
-If this field is NULL, the transition state value starts out NULL</entry></row>
-<row><entry colname="col1"><codeph>aggordered</codeph></entry><entry colname="col2">Boolean</entry><entry colname="col3"/><entry colname="col4">If <codeph>true</codeph>, the aggregate is defined
-as <codeph>ORDERED</codeph>.</entry></row>
-<row><entry colname="col1"><codeph>aggsortop</codeph></entry><entry colname="col2">oid</entry><entry colname="col3">pg_operator.oid</entry><entry colname="col4">Associated sort operator OID (zero if none)</entry></row>
-<row><entry colname="col1"><codeph>aggtranstype</codeph></entry><entry colname="col2">oid</entry><entry colname="col3">pg_type.oid</entry><entry colname="col4">Data type of the aggregate function's internal
-transition (state) data</entry></row>
-<row><entry colname="col1"><codeph>aggtransspace</codeph></entry><entry colname="col2">int4</entry><entry colname="col3">pg_type.int4</entry><entry colname="col4">Estimated size of state data (0 for default estimate)</entry></row>
-</tbody></tgroup></table></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1" xml:lang="en">
+    <title id="fu141670">pg_aggregate</title>
+    <body>
+        <p><codeph>pg_aggregate</codeph>存储关于聚集函数的信息。
+            聚集函数是对一个值集合（通常是来自于匹配某个查询条件的每个行的一个列值）进行操作并且返回从这些值计算出的一个值的函数。
+            典型的聚集函数是<codeph>sum</codeph>、<codeph>count</codeph>和<codeph>max</codeph>。
+            <codeph>pg_aggregate</codeph>里的每个项都是一个<codeph>pg_proc</codeph>项的扩展。
+            <codeph>pg_proc</codeph>的项记载该聚集的名字、输入输出的数据类型以及其他和普通函数类似的信息。
+        </p>
+        <table id="fu141982">
+            <title>pg_catalog.pg_aggregate</title>
+            <tgroup cols="4">
+                <colspec colnum="1" colname="col1" colwidth="131pt"/>
+                <colspec colnum="2" colname="col2" colwidth="86pt"/>
+                <colspec colnum="3" colname="col3" colwidth="85pt"/>
+                <colspec colnum="4" colname="col4" colwidth="147pt"/>
+                <thead>
+                    <row>
+                        <entry colname="col1">列</entry>
+                        <entry colname="col2">类型</entry>
+                        <entry colname="col3">参考</entry>
+                        <entry colname="col4">描述</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>aggfnoid</codeph>
+                        </entry>
+                        <entry colname="col2">regproc</entry>
+                        <entry colname="col3">pg_proc.oid</entry>
+                        <entry colname="col4">聚集函数的OID</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>aggtransfn</codeph>
+                        </entry>
+                        <entry colname="col2">regproc</entry>
+                        <entry colname="col3">pg_proc.oid</entry>
+                        <entry colname="col4">转移函数的OID</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>aggcombinefn</codeph>
+                        </entry>
+                        <entry colname="col2">regproc</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">预备函数的OID（如果没有就为0）</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>aggfinalfn</codeph>
+                        </entry>
+                        <entry colname="col2">regproc</entry>
+                        <entry colname="col3">pg_proc.oid</entry>
+                        <entry colname="col4">最终函数的OID（如果没有就为0）</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>agginitval</codeph>
+                        </entry>
+                        <entry colname="col2">text</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">转移状态的初始值。
+                            这是一个文本域，它包含初始值的外部字符串表现形式。
+                            如果这个域为NULL，则转移状态从NULL开始
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>aggordered</codeph>
+                        </entry>
+                        <entry colname="col2">Boolean</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">如果为<codeph>true</codeph>，则聚集定义为<codeph>ORDERED</codeph>。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>aggsortop</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3">pg_operator.oid</entry>
+                        <entry colname="col4">相关的排序操作符的OID（如果没有则为零）</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>aggtranstype</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3">pg_type.oid</entry>
+                        <entry colname="col4">聚集函数的内部转移（状态）数据的数据类型
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>aggtransspace</codeph>
+                        </entry>
+                        <entry colname="col2">int4</entry>
+                        <entry colname="col3">pg_type.int4</entry>
+                        <entry colname="col4">估计的状态数据大小（默认估计为0）</entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </body>
+</topic>

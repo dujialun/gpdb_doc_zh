@@ -4,19 +4,18 @@
 <topic id="topic1" xml:lang="en">
   <title id="fv141670">pg_am</title>
   <body>
-    <p>The <codeph>pg_am</codeph> table stores information about index access
-methods. There is one row for each index access method supported by the
-system.</p>
+    <p><codeph>pg_am</codeph>表存储有关索引访问方法的信息。
+        系统所支持的每一种索引访问方法都有一行。</p>
     <table id="fv141982">
       <title>pg_catalog.pg_am</title>
       <tgroup cols="4">
         <colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="86pt"/><colspec colnum="3" colname="col3" colwidth="85pt"/><colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -24,197 +23,187 @@ system.</p>
             <entry colname="col1"><codeph>oid</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Row identifier (hidden attribute; must be explicitly selected)</entry>
+            <entry colname="col4">行标识符（隐藏属性;必须显式选择）</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amname</codeph></entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of the access method</entry>
+            <entry colname="col4">访问方法的名称</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amstrategies</codeph></entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Number of operator strategies for this access
-method,
-              or zero if the access method does not have a fixed set of operator strategies</entry>
+            <entry colname="col4">此访问方法的运算符策略数，如果访问方法没有一组固定的运算符策略，则为零</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amsupport</codeph></entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Number of support routines for this access method</entry>
+            <entry colname="col4">此访问方法的支持例程数量</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amcanorder</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Does the access method support ordered scans sorted by the indexed
-              column's value?</entry>
+            <entry colname="col4">访问方法是否支持按索引列的值排序的有序扫描？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amcanorderbyop</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Does the access method support ordered scans sorted by the result
-              of an operator on the indexed column?</entry>
+            <entry colname="col4">访问方法是否支持按索引列上的运算符结果排序的有序扫描？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amcanbackward</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Does the access method support backward scanning?</entry>
+            <entry colname="col4">访问方法是否支持后向扫描？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amcanunique</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Does the access method support unique indexes?</entry>
+            <entry colname="col4">访问方法是否支持唯一索引？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amcanmulticol</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Does the access method support multicolumn indexes?</entry>
+            <entry colname="col4">访问方法是否支持多列索引？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amoptionalkey</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Does the access method support a scan without
-              any constraint for the first index column?</entry>
+            <entry colname="col4">访问方法是否支持对第一个索引列没有任何约束的扫描？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amsearcharray</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Does the access method support <codeph>ScalarArrayOpExpr</codeph>
-              searches?</entry>
+            <entry colname="col4">访问方法是否支持<codeph>ScalarArrayOpExpr</codeph>搜索？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amsearchnulls</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Does the access method support <codeph>IS NULL/NOT NULL</codeph>
-              searches?</entry>
+            <entry colname="col4">访问方法是否支持<codeph>IS NULL/NOT NULL</codeph>搜索？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amstorage</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Can index storage data type differ from column
-data type?</entry>
+            <entry colname="col4">索引存储数据类型可以与列数据类型不同吗？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amclusterable</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Can an index of this type be clustered on?</entry>
+            <entry colname="col4">这种类型的索引可以聚集在一起吗？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>ampredlocks</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Does an index of this type manage fine-grained predicae locks?</entry>
+            <entry colname="col4">这种类型的索引是否管理细粒度的谓词锁？</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amkeytype</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Type of data stored in index, or zero if not a fixed type</entry>
+            <entry colname="col4">存储在索引中的数据类型，如果不是固定类型，则为零</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>aminsert</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">"Insert this tuple" function</entry>
+            <entry colname="col4">“插入此元组”函数</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>ambeginscan</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">"Prepare for index scan" function</entry>
+            <entry colname="col4">“准备索引扫描”函数</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amgettuple</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">"Next valid tuple" function, or zero if none</entry>
+            <entry colname="col4">“下一个有效元组”函数，如果没有则为零</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amgetbitmap</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">"Fetch all tuples" function, or zero if none</entry>
+            <entry colname="col4">“获取所有元组”函数，如果没有，则返回零</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amrescan</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">"(Re)start index scan" function</entry>
+            <entry colname="col4">“（重新）启动索引扫描”函数</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amendscan</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">"Clean up after index scan" function</entry>
+            <entry colname="col4">“索引扫描后清理”函数</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>ammarkpos</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">"Mark current scan position" function</entry>
+            <entry colname="col4">“标记当前扫描位置”函数</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amrestrpos</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">"Restore marked scan position" function</entry>
+            <entry colname="col4">“恢复标记的扫描位置”函数</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>ambuild</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">"Build new index" function</entry>
+            <entry colname="col4">“建立新的索引”函数</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>ambuildempty</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">"Build empty index" function</entry>
+            <entry colname="col4">“构建空索引”函数</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>ambulkdelete</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Bulk-delete function</entry>
+            <entry colname="col4">批量删除函数</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amvacuumcleanup</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Post-<codeph>VACUUM</codeph> cleanup function</entry>
+            <entry colname="col4">Post-<codeph>VACUUM</codeph>清理功能</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amcanreturn</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Function to check whether index supports index-only scans, or
-              zero if none</entry>
+            <entry colname="col4">用于检查索引是否支持仅索引扫描的函数，如果没有则支持零</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amcostestimate</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Function to estimate cost of an index scan</entry>
+            <entry colname="col4">用于估计索引扫描成本的函数</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amoptions</codeph></entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Function to parse and validate <codeph>reloptions</codeph> for
-              an index</entry>
+            <entry colname="col4">为索引解析和验证<codeph>reloptions</codeph>的函数</entry>
           </row>
         </tbody>
       </tgroup>
