@@ -4,10 +4,10 @@
 <topic id="topic1" xml:lang="en">
   <title id="gn143896">pg_available_extensions</title>
   <body>
-    <p>The <codeph>pg_available_extensions</codeph> view lists the extensions that are available for
-      installation. The <xref href="pg_extension.xml"><i>pg_extension</i></xref> system catalog
-      table shows the extensions currently installed.</p>
-    <p>The view is read only.</p>
+    <p>该<codeph>pg_available_extensions</codeph>视图列出了可用于安装的扩展。
+      该<xref href="pg_extension.xml"><i>pg_extension</i></xref>系统目录表显示当前安装的扩展。
+      </p>
+    <p>该视图是只读的。</p>
     <table id="gn143898">
       <title>pg_catalog.pg_available_extensions</title>
       <tgroup cols="3">
@@ -16,33 +16,31 @@
         <colspec colnum="3" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
           <row>
             <entry colname="col1"><codeph>name</codeph></entry>
             <entry colname="col2">name</entry>
-            <entry colname="col4">Extension name.</entry>
+            <entry colname="col4">扩展名称</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>default_version</codeph></entry>
             <entry colname="col2">text</entry>
-            <entry colname="col4">Name of default version, or <codeph>NULL</codeph> if none is
-              specified.</entry>
+            <entry colname="col4">默认版本名，如果没指定的话为<codeph>NULL</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>installed_version</codeph></entry>
             <entry colname="col2">text</entry>
-            <entry colname="col4">Currently installed version of the extension, or
-                <codeph>NULL</codeph> if not installed.</entry>
+            <entry colname="col4">当前安装的扩展的版本，如果未安装则为<codeph>NULL</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>comment</codeph></entry>
             <entry colname="col2">text</entry>
-            <entry colname="col4">Comment string from the extension control file.</entry>
+            <entry colname="col4">扩展控制文件的注释字符串。</entry>
           </row>
         </tbody>
       </tgroup>
