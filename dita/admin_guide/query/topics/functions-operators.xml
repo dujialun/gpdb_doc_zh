@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic26" xml:lang="en">
-    <title id="in151167">Using Functions and Operators</title>
-    <shortdesc>Description of user-defined and built-in functions and operators in Greenplum
-        Database.</shortdesc>
+    <title id="in151167">使用函数和操作符</title>
+    <shortdesc>用户定义和内置函数和运算符的说明。</shortdesc>
     <body>
         <ul>
             <li id="in140953">
@@ -23,25 +22,20 @@
         </ul>
     </body>
     <topic id="topic27" xml:lang="en">
-        <title id="in201560">Using Functions in Greenplum Database</title>
+        <title id="in201560">在Greenplum数据库中使用函数</title>
         <body>
-            <p>When you invoke a function in Greenplum Database, function attributes control the
-                execution of the function. The volatility attributes (<codeph>IMMUTABLE</codeph>,
-                    <codeph>STABLE</codeph>, <codeph>VOLATILE</codeph>) and the <codeph>EXECUTE
-                    ON</codeph> attributes control two different aspects of function execution. In
-                general, volatility indicates when the function is executed, and <codeph>EXECUTE
-                    ON</codeph> indicates where it is executed. The volatility attributes are
-                PostgreSQL based attributes, the <codeph>EXECUTE ON</codeph> attributes are
-                Greenplum Database attributes.</p>
+            <p>在Greenplum数据库中调用函数时，函数属性控制函数的执行。易变性属性 (<codeph>IMMUTABLE</codeph>,
+                    <codeph>STABLE</codeph>, <codeph>VOLATILE</codeph>) 和<codeph>EXECUTE
+                    ON</codeph> 属性控制函数执行的两个不同方面。一般来说，易变性指示函数执行时间， <codeph>EXECUTE
+                    ON</codeph> 指示执行位置。易变性属性是基于PostgreSQL的属性, <codeph>EXECUTE ON</codeph> 属性是Greenplum的属性。</p>
             <p>For example, a function defined with the <codeph>IMMUTABLE</codeph> attribute can be executed at query
                 planning time, while a function with the <codeph>VOLATILE</codeph> attribute must be executed for every
                 row in the query. A function with the <codeph>EXECUTE ON MASTER</codeph> attribute executes only on the
                 master instance, and a function with the <codeph>EXECUTE ON ALL SEGMENTS</codeph> attribute executes on
                 all primary segment instances (not the master). </p>
-            <p>These tables summarize what Greenplum Database assumes about function execution based
-                on the attribute.</p>
+            <p>这些表总结了Greenplum数据库基于这些属性，对函数执行的假设。</p>
             <table id="in201681">
-                <title>Function Volatility Attributes in Greenplum Database</title>
+                <title>Greenplum数据库的函数易变性</title>
                 <tgroup cols="4">
                     <colspec colname="col1" colnum="1" colwidth="77*"/>
                     <colspec colname="col2" colnum="2" colwidth="86*"/>
@@ -49,57 +43,47 @@
                     <colspec colname="col4" colnum="4" colwidth="144*"/>
                     <thead>
                         <row>
-                            <entry colname="col1">Function Attribute</entry>
-                            <entry colname="col2">Greenplum Support</entry>
-                            <entry colname="col3">Description</entry>
-                            <entry colname="col4">Comments</entry>
+                            <entry colname="col1">函数属性</entry>
+                            <entry colname="col2">Greenplum支持</entry>
+                            <entry colname="col3">描述</entry>
+                            <entry colname="col4">注释</entry>
                         </row>
                     </thead>
                     <tbody>
                         <row>
                             <entry colname="col1">IMMUTABLE</entry>
-                            <entry colname="col2">Yes</entry>
-                            <entry colname="col3">Relies only on information directly in its
-                                argument list. Given the same argument values, always returns the
-                                same result.</entry>
+                            <entry colname="col2">支持</entry>
+                            <entry colname="col3">仅直接依赖信息参数列表。如果给定相同的参数值，则始终返回同样的结果。</entry>
                             <entry colname="col4"/>
                         </row>
                         <row>
                             <entry colname="col1">STABLE</entry>
-                            <entry colname="col2">Yes, in most cases</entry>
-                            <entry colname="col3">Within a single table scan, returns the same
-                                result for same argument values, but results change across SQL
-                                statements.</entry>
-                            <entry colname="col4">Results depend on database lookups or parameter
-                                values. <codeph>current_timestamp</codeph> family of functions is
-                                    <codeph>STABLE</codeph>; values do not change within an
-                                execution.</entry>
+                            <entry colname="col2">大部分情况下支持</entry>
+                            <entry colname="col3">在一个单一表扫描中，对相同的参数值返回相同的结果，但是对不同的SQL语句结果会改变。</entry>
+                            <entry colname="col4">结果依赖于数据库查找或者参数值。<codeph>current_timestamp</codeph>函数族是<codeph>STABLE</codeph>的，在一次执行中值不会改变。</entry>
                         </row>
                         <row>
                             <entry colname="col1">VOLATILE</entry>
-                            <entry colname="col2">Restricted</entry>
-                            <entry colname="col3">Function values can change within a single table
-                                scan. For example: <codeph>random()</codeph>,
-                                    <codeph>timeofday()</codeph>. This is the default
-                                attribute.</entry>
-                            <entry colname="col4">Any function with side effects is volatile, even
-                                if its result is predictable. For example:
-                                <codeph>setval()</codeph>.</entry>
+                            <entry colname="col2">受限</entry>
+                            <entry colname="col3">在一个单一表扫描中函数值可能会改变。例如：<codeph>random()</codeph>,
+                                <codeph>timeofday()</codeph>，这是默认属性。</entry>
+                            <entry colname="col4">任何有副作用的函数都是volatile，即使它的结果是可预测的也一样。例如：<codeph>setval()</codeph>。
+                            </entry>
                         </row>
                     </tbody>
                 </tgroup>
             </table>
             <table id="table_cnz_4ng_gcb">
-                <title>Function EXECUTE ON attributes in Greenplum Database </title>
+                <title>Greenplum数据库的EXECUTE ON函数属性 </title>
                 <tgroup cols="3">
                     <colspec colname="col1" colnum="1" colwidth="77*"/>
                     <colspec colname="col3" colnum="2" colwidth="144*"/>
                     <colspec colname="col4" colnum="3" colwidth="144*"/>
                     <thead>
                         <row>
-                            <entry colname="col1">Function Attribute</entry>
-                            <entry colname="col3">Description</entry>
-                            <entry colname="col4">Comments</entry>
+                            <entry colname="col1">函数属性</entry>
+                            <entry colname="col3">描述</entry>
+                            <entry colname="col4">注释</entry>
                         </row>
                     </thead>
                     <tbody>
