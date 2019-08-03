@@ -4,11 +4,10 @@
 <topic id="topic1" xml:lang="en">
   <title id="fv141670">pg_enum</title>
   <body>
-    <p>The <codeph>pg_enum</codeph> table contains entries matching enum types to their associated
-      values and labels. The internal representation of a given enum value is actually the OID of
-      its associated row in <codeph>pg_enum</codeph>. The OIDs for a particular enum type are
-      guaranteed to be ordered in the way the type should sort, but there is no guarantee about the
-      ordering of OIDs of unrelated enum types.</p>
+    <p>该<codeph>pg_enum</codeph>表包含与其相关联的值和标签匹配的枚举类型条目。
+      给定枚举值的内部表示其实是<codeph>pg_enum</codeph>表中相关行的OID。
+      特定枚举类型的Oid保证按照应有类型排序方式进行排序，但是不保证不相关枚举类型Oid的排序。
+      </p>
     <table id="fv141982">
       <title>pg_catalog.pg_enum</title>
       <tgroup cols="4">
@@ -18,10 +17,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">Column</entry>
-            <entry colname="col2">Type</entry>
-            <entry colname="col3">References</entry>
-            <entry colname="col4">Description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -29,13 +28,13 @@
             <entry colname="col1"><codeph>enumtypid</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pgtype.oid</entry>
-            <entry>The OID of the <codeph>pg_type</codeph> entry owning this enum value</entry>
+            <entry>拥有此枚举类型<codeph>pg_type</codeph>条目的OID</entry>
           </row>
           <row>
             <entry><codeph>enumlabel</codeph></entry>
             <entry>name</entry>
             <entry/>
-            <entry>The textual label for this enum value</entry>
+            <entry>此枚举值的文本标签</entry>
           </row>
         </tbody>
       </tgroup>

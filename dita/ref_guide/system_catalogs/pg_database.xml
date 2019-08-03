@@ -4,11 +4,11 @@
 <topic id="topic1" xml:lang="en">
   <title id="gj143896">pg_database</title>
   <body>
-    <p>The <codeph>pg_database</codeph> system catalog table stores information about the available
-      databases. Databases are created with the <codeph>CREATE DATABASE</codeph> SQL command. Unlike
-      most system catalogs, <codeph>pg_database</codeph> is shared across all databases in the
-      system. There is only one copy of <codeph>pg_database</codeph> per system, not one per
-      database.</p>
+    <p><codeph>pg_database</codeph>系统目录表储存了可用数据库的信息。
+      数据库由SQL命令<codeph>CREATE DATABASE</codeph>创建。
+      和大多数系统目录不同，<codeph>pg_database</codeph>在系统中所有数据库之间共享。
+      每个系统只有一个<codeph>pg_database</codeph>副本，而不是每个数据库一个。
+      </p>
     <table id="gj143898">
       <title>pg_catalog.pg_database</title>
       <tgroup cols="4">
@@ -18,10 +18,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -31,7 +31,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Database name.</entry>
+            <entry colname="col4">数据库名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -39,7 +39,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the database, usually the user who created it.</entry>
+            <entry colname="col4">数据库的拥有者，通常是创建它的人。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -47,21 +47,20 @@
             </entry>
             <entry colname="col2">int4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Character encoding for this database.
-                <codeph>pg_encoding_to_char()</codeph> can translate this number to the encoding
-              name.</entry>
+            <entry colname="col4">数据库的字符编码。
+              <codeph>pg_encoding_to_char()</codeph>可以将此编号转换为编码名称。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>datcollate</codeph></entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4"><codeph>LC_COLLATE</codeph> for this database.</entry>
+            <entry colname="col4">此数据库的<codeph>LC_COLLATE</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>datctype</codeph></entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4"><codeph>LC_CTYPE</codeph> for this database.</entry>
+            <entry colname="col4">此数据库的<codeph>LC_CTYPE</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -69,9 +68,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">If true then this database can be used in the
-                <codeph>TEMPLATE</codeph> clause of <codeph>CREATE DATABASE</codeph> to create a new
-              database as a clone of this one.</entry>
+            <entry colname="col4">如果为真则这个数据库可以被用在<codeph>CREATE DATABASE</codeph>的<codeph>TEMPLATE</codeph>子句中来创建一个新的数据库作为这个数据库的克隆体。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -79,8 +76,8 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">If false then no one can connect to this database. This is used to
-              protect the <codeph>template0</codeph> database from being altered.</entry>
+            <entry colname="col4">如果为假，则该数据库不可连接。
+              这用于保护数据库<codeph>template0</codeph>不被修改。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -88,8 +85,8 @@
             </entry>
             <entry colname="col2">int4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Sets the maximum number of concurrent connections that can be made
-              to this database. <codeph>-1</codeph> means no limit.</entry>
+            <entry colname="col4">设置该数据库最大并发连接数。
+              <codeph>-1</codeph>表示没有限制。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -97,7 +94,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Last system OID in the database.</entry>
+            <entry colname="col4">数据库中的最后一个系统OID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -105,11 +102,9 @@
             </entry>
             <entry colname="col2">xid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">All transaction IDs (XIDs) before this one have been replaced with
-              a permanent (frozen) transaction ID in this database. This is used to track whether
-              the database needs to be vacuumed in order to prevent transaction ID wraparound or to
-              allow pg_clog to be shrunk. It is the minimum of the per-table
-                <i>pg_class.relfrozenxid</i> values.</entry>
+            <entry colname="col4">这个数据库中在此值之前的所有事务ID已被替换为的永久（冻结）事务ID。
+              这用于追踪该数据库是否需要清理，以防止事务ID回卷或允许pg_clog收缩，它是每个表的<i>pg_class.relfrozenxid</i>的最小值。
+              </entry>
           </row>
           <row>
             <entry colname="col1"><codeph>datminmxid</codeph></entry>
@@ -128,9 +123,10 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_tablespace.oid</entry>
-            <entry colname="col4">The default tablespace for the database. Within this database, all
-              tables for which <i>pg_class.reltablespace</i> is zero will be stored in this
-              tablespace. All non-shared system catalogs will also be there.</entry>
+            <entry colname="col4">数据库的默认表空间。
+              在此数据库中，所有<i>pg_class.reltablespace</i>为0的表都将存储在此表空间中。
+              所有非共享的系统目录也将放在那里。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -138,8 +134,7 @@
             </entry>
             <entry colname="col2">aclitem[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Database access privileges as given by <codeph>GRANT</codeph> and
-                <codeph>REVOKE</codeph>.</entry>
+            <entry colname="col4">由<codeph>GRANT</codeph>和<codeph>REVOKE</codeph>所给予的数据库访问特权。</entry>
           </row>
         </tbody>
       </tgroup>

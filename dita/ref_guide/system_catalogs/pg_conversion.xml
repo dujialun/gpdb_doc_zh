@@ -4,8 +4,7 @@
 <topic id="topic1" xml:lang="en">
   <title id="gi143896">pg_conversion</title>
   <body>
-    <p>The <codeph>pg_conversion</codeph> system catalog table describes the available encoding
-      conversion procedures as defined by <codeph>CREATE CONVERSION</codeph>.</p>
+    <p><codeph>pg_conversion</codeph>系统目录表描述了由CREATE CONVERSION定义的可用编码转换过程。</p>
     <table id="gi143898">
       <title>pg_catalog.pg_conversion</title>
       <tgroup cols="4">
@@ -15,10 +14,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -28,7 +27,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Conversion name (unique within a namespace).</entry>
+            <entry colname="col4">转换的名称（在命名空间中唯一）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -36,8 +35,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_namespace.oid</entry>
-            <entry colname="col4">The OID of the namespace (schema) that contains this
-              conversion.</entry>
+            <entry colname="col4">包含此转换的命名空间（schema）的OID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -45,7 +43,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the conversion.</entry>
+            <entry colname="col4">转换的拥有者。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -53,7 +51,7 @@
             </entry>
             <entry colname="col2">int4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Source encoding ID.</entry>
+            <entry colname="col4">源编码ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -61,7 +59,7 @@
             </entry>
             <entry colname="col2">int4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Destination encoding ID.</entry>
+            <entry colname="col4">目标编码ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -69,7 +67,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Conversion procedure.</entry>
+            <entry colname="col4">转换过程。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -77,7 +75,7 @@
             </entry>
             <entry colname="col2">boolean </entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if this is the default conversion.</entry>
+            <entry colname="col4">如果是默认转换，则为真。</entry>
           </row>
         </tbody>
       </tgroup>

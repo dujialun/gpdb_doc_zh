@@ -4,11 +4,12 @@
 <topic id="topic1" xml:lang="en">
   <title id="gh143896">pg_constraint</title>
   <body>
-    <p>The <codeph>pg_constraint</codeph> system catalog table stores check, primary key, unique,
-      and foreign key constraints on tables. Column constraints are not treated specially. Every
-      column constraint is equivalent to some table constraint. Not-null constraints are represented
-      in the <xref href="pg_attribute.xml#topic1">pg_attribute</xref> catalog table. Check
-      constraints on domains are stored here, too.</p>
+    <p><codeph>pg_constraint</codeph>系统目录表储存表上的检查、主键、唯一和外键约束。
+      列约束不被特别对待。
+      每个列约束都等效于某种表约束。
+      非空约束在<xref href="pg_attribute.xml#topic1">pg_attribute</xref>目录表中表示。
+      域上的检查约束也储存在这里。
+      </p>
     <table id="gh143898">
       <title>pg_catalog.pg_constraint</title>
       <tgroup cols="4">
@@ -18,10 +19,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -31,7 +32,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Constraint name (not necessarily unique!)</entry>
+            <entry colname="col4">约束名称（不一定唯一！）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -39,8 +40,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_namespace.oid</entry>
-            <entry colname="col4">The OID of the namespace (schema) that contains this
-              constraint.</entry>
+            <entry colname="col4">包含约束的命名空间（schema）的OID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -48,9 +48,9 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4"><codeph>c</codeph> = check constraint, <codeph>f</codeph> =
-              foreign key constraint, <codeph>p</codeph> = primary key constraint,
-                <codeph>u</codeph> = unique constraint.</entry>
+            <entry colname="col4"><codeph>c</codeph> = 检查约束，<codeph>f</codeph> =
+              外键约束，<codeph>p</codeph> = 主键约束，
+                <codeph>u</codeph> = 唯一约束。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -58,7 +58,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Is the constraint deferrable?</entry>
+            <entry colname="col4">约束是否可以延迟？</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -66,7 +66,7 @@
             </entry>
             <entry colname="col2">boolean </entry>
             <entry colname="col3"/>
-            <entry colname="col4">Is the constraint deferred by default?</entry>
+            <entry colname="col4">约束是否默认延迟？</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -74,8 +74,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">The table this constraint is on; 0 if not a table
-              constraint.</entry>
+            <entry colname="col4">约束所在的表；如果不是一个表约束则为0。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -83,8 +82,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">The domain this constraint is on; 0 if not a domain
-              constraint.</entry>
+            <entry colname="col4">该约束所在的域；如果不是一个域约束则为0。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -92,7 +90,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">If a foreign key, the referenced table; else 0.</entry>
+            <entry colname="col4">如果是一个外键，则表示所引用的表；否则为0。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -100,7 +98,7 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Foreign key update action code.</entry>
+            <entry colname="col4">外键更新动作代码。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -108,7 +106,7 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Foreign key deletion action code.</entry>
+            <entry colname="col4">外键删除动作代码。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -116,7 +114,7 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Foreign key match type.</entry>
+            <entry colname="col4">外键匹配类型。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -124,8 +122,7 @@
             </entry>
             <entry colname="col2">int2[]</entry>
             <entry colname="col3">pg_attribute.attnum</entry>
-            <entry colname="col4">If a table constraint, list of columns which the constraint
-              constrains.</entry>
+            <entry colname="col4">如果是一个表约束，则表示所约束的列的列表。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -133,7 +130,7 @@
             </entry>
             <entry colname="col2">int2[]</entry>
             <entry colname="col3">pg_attribute.attnum</entry>
-            <entry colname="col4">If a foreign key, list of the referenced columns.</entry>
+            <entry colname="col4">如果是一个外键，则表示所引用列的列表。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -141,8 +138,7 @@
             </entry>
             <entry colname="col2">text </entry>
             <entry colname="col3"/>
-            <entry colname="col4">If a check constraint, an internal representation of the
-              expression.</entry>
+            <entry colname="col4">如果是一个检查约束，则表示表达式的内部表示。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -150,11 +146,10 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">If a check constraint, a human-readable representation of the
-              expression. This is not updated when referenced objects change; for example, it won't
-              track renaming of columns. Rather than relying on this field, it is best to use
-                <codeph>pg_get_constraintdef()</codeph> to extract the definition of a check
-              constraint.</entry>
+            <entry colname="col4">如果是一个检查约束，则表示表达式的人类可读的表示。
+              当被引用对象改变时候，这个属性不会被更新；例如，它不会跟踪列的重命名。
+              最好使用<codeph>pg_get_constraintdef()</codeph>来提取检查约束的定义，而不是依赖此字段。
+              </entry>
           </row>
         </tbody>
       </tgroup>

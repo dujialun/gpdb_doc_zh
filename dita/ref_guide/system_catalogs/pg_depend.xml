@@ -4,64 +4,120 @@
 <topic id="topic1" xml:lang="en">
   <title id="gk143896">pg_depend</title>
   <body>
-    <p>The <codeph>pg_depend</codeph> system catalog table records the dependency relationships
-      between database objects. This information allows <codeph>DROP</codeph> commands to find which
-      other objects must be dropped by <codeph>DROP CASCADE</codeph> or prevent dropping in the
-        <codeph>DROP RESTRICT</codeph> case. See also <xref href="pg_shdepend.xml#topic1"
-        >pg_shdepend</xref>, which performs a similar function for dependencies involving objects
-      that are shared across a Greenplum system. </p>
-    <p>In all cases, a <codeph>pg_depend</codeph> entry indicates that the referenced object may not
-      be dropped without also dropping the dependent object. However, there are several subflavors
-      identified by <codeph>deptype</codeph>: </p>
+    <p><codeph>pg_depend</codeph>系统目录表记录数据库对象之间依赖关系。
+        此信息允许<codeph>DROP</codeph>命令查找哪些其他对象必须由<codeph>DROP CASCADE</codeph>删除或者必须防止在<codeph>DROP RESTRICT</codeph>情况中被删除。
+        另请参见<xref href="pg_shdepend.xml#topic1">pg_shdepend</xref>，它对涉及Greenplum系统共享对象的依赖执行类似的功能。
+        </p>
+    <p>在所有的情况下，<codeph>pg_depend</codeph>项表示在不删除依赖对象的前提下也不能删除被引用对象。
+        不过，有几种由<codeph>deptype</codeph>区分的子类型：
+        </p>
     <ul>
-      <li id="gk155721"><b>DEPENDENCY_NORMAL (n)</b> — A normal relationship between
-        separately-created objects. The dependent object may be dropped without affecting the
-        referenced object. The referenced object may only be dropped by specifying
-          <codeph>CASCADE</codeph>, in which case the dependent object is dropped, too. Example: a
-        table column has a normal dependency on its data type.</li>
-      <li id="gk155724"><b>DEPENDENCY_AUTO (a)</b> — The dependent object can be dropped separately
-        from the referenced object, and should be automatically dropped (regardless of
-          <codeph>RESTRICT</codeph> or <codeph>CASCADE</codeph> mode) if the referenced object is
-        dropped. Example: a named constraint on a table is made autodependent on the table, so that
-        it will go away if the table is dropped.</li>
-      <li id="gk155727"><b>DEPENDENCY_INTERNAL (i)</b> — The dependent object was created as part of
-        creation of the referenced object, and is really just a part of its internal implementation.
-        A <codeph>DROP</codeph> of the dependent object will be disallowed outright (we'll tell the
-        user to issue a <codeph>DROP</codeph> against the referenced object, instead). A
-          <codeph>DROP</codeph> of the referenced object will be propagated through to drop the
-        dependent object whether <codeph>CASCADE</codeph> is specified or not.</li>
-      <li id="gk155730"><b>DEPENDENCY_PIN (p)</b> — There is no dependent object; this type of entry
-        is a signal that the system itself depends on the referenced object, and so that object must
-        never be deleted. Entries of this type are created only by system initialization. The
-        columns for the dependent object contain zeroes.<table id="gk143898"
-            ><title>pg_catalog.pg_depend</title><tgroup cols="4"><colspec colnum="1" colname="col1"
-              colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="86pt"/><colspec
-              colnum="3" colname="col3" colwidth="85pt"/><colspec colnum="4" colname="col4"
-              colwidth="147pt"/><thead><row><entry colname="col1">column</entry><entry
-                  colname="col2">type</entry><entry colname="col3">references</entry><entry
-                  colname="col4">description</entry></row></thead><tbody><row><entry colname="col1"
-                    ><codeph>classid</codeph></entry><entry colname="col2">oid</entry><entry
-                  colname="col3">pg_class.oid</entry><entry colname="col4">The OID of the system
-                  catalog the dependent object is in.</entry></row><row><entry colname="col1"
-                    ><codeph>objid</codeph></entry><entry colname="col2">oid</entry><entry
-                  colname="col3">any OID column</entry><entry colname="col4"> The OID of the
-                  specific dependent object.</entry></row><row><entry colname="col1"
-                    ><codeph>objsubid </codeph></entry><entry colname="col2">int4</entry><entry
-                  colname="col3"/><entry colname="col4">For a table column, this is the column
-                  number. For all other object types, this column is zero.</entry></row><row><entry
-                  colname="col1"><codeph>refclassid</codeph></entry><entry colname="col2"
-                  >oid</entry><entry colname="col3">pg_class.oid</entry><entry colname="col4">The
-                  OID of the system catalog the referenced object is in.</entry></row><row><entry
-                  colname="col1"><codeph>refobjid</codeph></entry><entry colname="col2"
-                  >oid</entry><entry colname="col3">any OID column</entry><entry colname="col4">The
-                  OID of the specific referenced object.</entry></row><row><entry colname="col1"
-                    ><codeph>refobjsubid </codeph></entry><entry colname="col2">int4</entry><entry
-                  colname="col3"/><entry colname="col4">For a table column, this is the referenced
-                  column number. For all other object types, this column is
-                  zero.</entry></row><row><entry colname="col1"
-                  ><codeph>deptype</codeph></entry><entry colname="col2">char</entry><entry
-                  colname="col3"/><entry colname="col4">A code defining the specific semantics of
-                  this dependency relationship.</entry></row></tbody></tgroup></table></li>
+      <li id="gk155721"><b>DEPENDENCY_NORMAL (n)</b> — 单独创建的对象之间的正常关系。
+          可以删除依赖对象而不影响被引用的对象。
+          被引用对象只能通过指定<codeph>CASCADE</codeph>来删除，在这种情况下依赖对象也会被删除。
+          例如：表列对其数据类型具有正常的依赖性。
+          </li>
+      <li id="gk155724"><b>DEPENDENCY_AUTO (a)</b> — 依赖对象可以独立于被引用对象而删除，并且如果被引用对象被删除，则依赖对象应该自动被删除（不管是<codeph>RESTRICT</codeph>还是<codeph>CASCADE</codeph>模式）。
+          例如：表上的命名约束自动依赖表，因此如果表被删除，该约束也将消失。
+          </li>
+      <li id="gk155727"><b>DEPENDENCY_INTERNAL (i)</b> — 依赖对象作为被引用对象的一部分创建，实际只是其内部实现的一部分。
+          依赖对象的<codeph>DROP</codeph>操作将被完全禁止（我们会告诉用户针对被引用对象发出<codeph>DROP</codeph>命令来代替）。
+          被引用对象的<codeph>DROP</codeph>命令会被传播以删除依赖对象，不管是否指定<codeph>CASCADE</codeph>（级联删除）。
+          </li>
+        <li id="gk155730">
+            <b>DEPENDENCY_PIN (p)</b>
+            — 没有依赖对象; 这种类型的条目是系统本身依赖于引用对象的信号，因此绝不能删除该对象。
+            此类型的条目仅由系统初始化创建。
+            从属对象的列包含零。
+            <table id="gk143898"
+            >
+                <title>pg_catalog.pg_depend</title>
+                <tgroup cols="4">
+                    <colspec colnum="1" colname="col1" colwidth="131pt"/>
+                    <colspec colnum="2" colname="col2" colwidth="86pt"/>
+                    <colspec colnum="3" colname="col3" colwidth="85pt"/>
+                    <colspec colnum="4" colname="col4" colwidth="147pt"/>
+                    <thead>
+                        <row>
+                            <entry colname="col1">列</entry>
+                            <entry colname="col2">类型</entry>
+                            <entry colname="col3">参考</entry>
+                            <entry colname="col4">描述</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry colname="col1">
+                                <codeph>classid</codeph>
+                            </entry>
+                            <entry colname="col2">oid</entry>
+                            <entry colname="col3">pg_class.oid</entry>
+                            <entry colname="col4">依赖对象所在的系统目录的OID。
+                            </entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">
+                                <codeph>objid</codeph>
+                            </entry>
+                            <entry colname="col2">oid</entry>
+                            <entry
+                                    colname="col3">any OID column
+                            </entry>
+                            <entry colname="col4">特定依赖对象的OID。
+                            </entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">
+                                <codeph>objsubid</codeph>
+                            </entry>
+                            <entry colname="col2">int4</entry>
+                            <entry colname="col3"/>
+                            <entry colname="col4">对于表列，这是列编号。
+                                对于其他对象类型，此列为0。
+                            </entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">
+                                <codeph>refclassid</codeph>
+                            </entry>
+                            <entry colname="col2">oid</entry>
+                            <entry colname="col3">pg_class.oid</entry>
+                            <entry colname="col4">被引用对象所在的系统目录的OID。
+                            </entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">
+                                <codeph>refobjid</codeph>
+                            </entry>
+                            <entry colname="col2">oid
+                            </entry>
+                            <entry colname="col3">any OID column</entry>
+                            <entry colname="col4">特定被引用对象的OID。
+                            </entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">
+                                <codeph>refobjsubid</codeph>
+                            </entry>
+                            <entry colname="col2">int4</entry>
+                            <entry colname="col3"/>
+                            <entry colname="col4">对于表列，这是被引用的列编号。
+                                对于其他对象类型，该列为0。
+                            </entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">
+                                <codeph>deptype</codeph>
+                            </entry>
+                            <entry colname="col2">char</entry>
+                            <entry colname="col3"/>
+                            <entry colname="col4">定义此依赖关系的特定语义的代码。
+                            </entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+        </li>
     </ul>
   </body>
 </topic>

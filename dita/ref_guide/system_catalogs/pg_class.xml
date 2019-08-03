@@ -4,11 +4,10 @@
 <topic id="topic1" xml:lang="en">
   <title id="gf143896">pg_class</title>
   <body>
-    <p>The system catalog table <codeph>pg_class</codeph> catalogs tables and most everything else
-      that has columns or is otherwise similar to a table (also known as <i>relations</i>). This
-      includes indexes (see also <xref href="pg_index.xml#topic1">pg_index</xref>), sequences,
-      views, composite types, and TOAST tables. Not all columns are meaningful for all relation
-      types.</p>
+    <p>系统目录表<codeph>pg_class</codeph>记录表以及其他大部分具有列或者与表（也称为<i>关系</i>）相似的东西。
+      这包括索引（另见<xref href="pg_index.xml#topic1">pg_index</xref>）、序列、视图、组合类型和TOAST表。
+      并不是所有的列对所有的关系类型都有意义。
+      </p>
     <table id="gf143898">
       <title>pg_catalog.pg_class</title>
       <tgroup cols="4">
@@ -18,10 +17,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -31,7 +30,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of the table, index, view, etc.</entry>
+            <entry colname="col4">表、索引、视图等的名字。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -39,8 +38,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_namespace.oid</entry>
-            <entry colname="col4">The OID of the namespace (schema) that contains this
-              relation</entry>
+            <entry colname="col4">包含这个关系的命名空间（schema）的OID</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -48,15 +46,13 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">The OID of the data type that corresponds to this table's row
-              type, if any (zero for indexes, which have no pg_type entry)</entry>
+            <entry colname="col4">如果有的话（索引为0，没有pg_type项)，对应与此表的行类型的数据类型的OID</entry>
           </row>
           <row>
             <entry><codeph>reloftype</codeph></entry>
             <entry>oid</entry>
             <entry>pg_type.oid</entry>
-            <entry>The OID of an entry in <codeph>pg_type</codeph> for an underlying composite
-              type.</entry>
+            <entry><codeph>pg_type</codeph>中条目的OID，用于隐含的复合类型。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -64,7 +60,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the relation</entry>
+            <entry colname="col4">关系的所有者</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -72,8 +68,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_am.oid</entry>
-            <entry colname="col4">If this is an index, the access method used (B-tree, Bitmap, hash,
-              etc.)</entry>
+            <entry colname="col4">如果这是一个索引，则表示访问方法（B树、位图、哈希等。）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -81,8 +76,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of the on-disk file of this relation; <codeph>0</codeph> if
-              none.</entry>
+            <entry colname="col4">此关系的磁盘文件的名称，如果没有则为<codeph>0</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -90,9 +84,9 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_tablespace.oid</entry>
-            <entry colname="col4">The tablespace in which this relation is stored. If zero, the
-              database's default tablespace is implied. (Not meaningful if the relation has no
-              on-disk file.)</entry>
+            <entry colname="col4">存储此关系的表空间。
+              如果为0，则表示数据库的默认表空间（如果关系没有磁盘文件，则无意义）。The tablespace in which this relation is stored. If zero, the
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -100,9 +94,10 @@
             </entry>
             <entry colname="col2">int4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Size of the on-disk representation of this table in pages (of 32K
-              each). This is only an estimate used by the planner. It is updated by
-                <codeph>VACUUM</codeph>, <codeph>ANALYZE</codeph>, and a few DDL commands.</entry>
+            <entry colname="col4">该表的磁盘尺寸，以页面为单位（每页32k）。
+              这只是优化器使用的估计值。
+              它由<codeph>VACUUM</codeph>、<codeph>ANALYZE</codeph>和一些DDL命令更新。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -110,15 +105,15 @@
             </entry>
             <entry colname="col2">float4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Number of rows in the table. This is only an estimate used by the
-              planner. It is updated by <codeph>VACUUM</codeph>, <codeph>ANALYZE</codeph>, and a few
-              DDL commands.</entry>
+            <entry colname="col4">表中的行数。
+              这只是优化器使用的估计值。
+              它由<codeph>VACUUM</codeph>、<codeph>ANALYZE</codeph>和一些DDL命令更新。</entry>
           </row>
           <row>
             <entry><codeph>relallvisible</codeph></entry>
             <entry>int32</entry>
             <entry/>
-            <entry>Number of all-visible blocks (this value may not be up-to-date).</entry>
+            <entry>全部可见块的数量（此值可能不是最新的）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -126,9 +121,9 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">OID of the TOAST table associated with this table,
-                <codeph>0</codeph> if none. The TOAST table stores large attributes "out of line" in
-              a secondary table.</entry>
+            <entry colname="col4">与这张表关联的TOAST表的OID，没有的就为<codeph>0</codeph>。
+              TOAST表在辅助表中存储“行溢出”的大型属性。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -136,10 +131,10 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if this is a table and it has (or recently had) any indexes.
-              This is set by <codeph>CREATE INDEX</codeph>, but not cleared immediately by
-                <codeph>DROP INDEX</codeph>. <codeph>VACUUM</codeph> will clear if it finds the
-              table has no indexes.</entry>
+            <entry colname="col4">如果这是一个表并且它（或最近有）任何索引，则为True。
+              这由<codeph>CREATE INDEX</codeph>设置，但不会立即由<codeph>DROP INDEX</codeph>清除。
+              如果发现表没有索引，<codeph>VACUUM</codeph>将清除。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -147,16 +142,14 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if this table is shared across all databases in the system.
-              Only certain system catalog tables are shared.</entry>
+            <entry colname="col4">如果此表在系统中的所有数据库之间共享，则为True。
+              仅共享某些系统目录表。</entry>
           </row>
           <row>
             <entry><codeph>relpersistence</codeph></entry>
             <entry>char</entry>
             <entry/>
-            <entry>The type of object persistence: <codeph>p</codeph> = heap or append-optimized
-              table, <codeph>u</codeph> = unlogged temporary table, <codeph>t</codeph> = temporary
-              table.</entry>
+            <entry>对象持久性的类型：<codeph>p</codeph> =堆或追加优化表，<codeph>u</codeph> =未记录的临时表，<codeph>t</codeph> =临时表。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -164,13 +157,12 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The type of object<p><codeph>r</codeph> = heap or append-optimized
-                table, <codeph>i</codeph> = index, <codeph>S</codeph> = sequence, <codeph>t</codeph>
-                = TOAST value, <codeph>v</codeph> = view, <codeph>c</codeph> = composite type,
-                  <codeph>f</codeph> = foreign table, <codeph>u</codeph> = uncatalogued temporary
-                heap table, <codeph>o</codeph> = internal append-optimized segment files and EOFs,
-                  <codeph>b</codeph> = append-only block directory, <codeph>M</codeph> = append-only
-                visibility map</p></entry>
+            <entry colname="col4">对象的类型<p><codeph>r</codeph> = 堆或追加优化表，
+              <codeph>i</codeph> = 索引，<codeph>S</codeph> = 序列，<codeph>t</codeph>
+                = TOAST值，<codeph>v</codeph> = 视图，<codeph>c</codeph> = 组合类型，
+                  <codeph>f</codeph> = 外部表，<codeph>u</codeph> = 未登记的临时堆表，
+              <codeph>o</codeph> = 内部追加优化的segment文件和EOF，
+                  <codeph>b</codeph> = 追加的块目录，<codeph>M</codeph> = 追加的可视化映射</p></entry>
           </row>
           <row>
             <entry colname="col1">
@@ -178,9 +170,9 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The storage mode of a table<p><codeph>a</codeph>=
-                append-optimized, <codeph>c</codeph>= column-oriented, <codeph>h</codeph> = heap,
-                  <codeph>v</codeph> = virtual, <codeph>x</codeph>= external table.</p></entry>
+            <entry colname="col4">表的存储模式<p><codeph>a</codeph>=
+                追加优化，<codeph>c</codeph>= 面向列的，<codeph>h</codeph> = 堆表，
+                  <codeph>v</codeph> = 虚拟，<codeph>x</codeph>= 外部表。</p></entry>
           </row>
           <row>
             <entry colname="col1">
@@ -188,8 +180,8 @@
             </entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Number of user columns in the relation (system columns not
-              counted). There must be this many corresponding entries in pg_attribute.</entry>
+            <entry colname="col4">关系中用户列的数量（系统列不计入）。
+              pg_attribute中必须有这么多个相应的项。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -197,7 +189,7 @@
             </entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Number of check constraints on the table.</entry>
+            <entry colname="col4">表中检查约束的个数。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -205,7 +197,7 @@
             </entry>
             <entry colname="col2">boolean </entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if an OID is generated for each row of the relation.</entry>
+            <entry colname="col4">如果为关系的每一行生成OID，则为True。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -213,7 +205,7 @@
             </entry>
             <entry colname="col2">boolean </entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if the table has (or once had) a primary key.</entry>
+            <entry colname="col4">如果表具有（或曾经拥有）主键，则为True。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -221,13 +213,13 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if table has rules.</entry>
+            <entry colname="col4">如果表有规则，则为True。</entry>
           </row>
           <row>
             <entry><codeph>relhastriggers</codeph></entry>
             <entry>boolean</entry>
             <entry/>
-            <entry>True if table has (or once had) triggers.</entry>
+            <entry>如果表有（或曾经有）触发器，则为True。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -235,7 +227,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if table has (or once had) any inheritance children.</entry>
+            <entry colname="col4">如果表具有（或曾经有）任何继承子项，则为True。</entry>
           </row>
           <row>
             <entry>
@@ -245,16 +237,14 @@
               boolean
             </entry>
             <entry></entry>
-            <entry>True if relation is populated (this is true for all relations other than some
-              materialized views).</entry>
+            <entry>如果关系被填充，则为真（对于除某些物化视图之外的所有关系都是如此）。</entry>
           </row>
           <row>
             <entry><codeph>relreplident</codeph></entry>
             <entry>char</entry>
              <entry></entry>
-            <entry>Columns used to form “replica identity” for rows: d = default (primary key, if
-              any), n = nothing, f = all columns i = index with <codeph>indisreplident</codeph> set, or
-              default</entry>
+            <entry>用于为行形成“副本标识”的列：d =默认（主键，如果有），n =无，f =所有列 i =具有<codeph>indisreplident</codeph>设置的索引，或默认值
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -262,23 +252,19 @@
             </entry>
             <entry colname="col2">xid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">All transaction IDs before this one have been replaced with a
-              permanent (frozen) transaction ID in this table. This is used to track whether the
-              table needs to be vacuumed in order to prevent transaction ID wraparound or to allow
-              <codeph>pg_clog</codeph> to be shrunk. <p>The value is <codeph>0</codeph>
-                (<codeph>InvalidTransactionId</codeph>) if the relation is not a table or if the
-                table does not require vacuuming to prevent transaction ID wraparound. The table
-                still might require vacuuming to reclaim disk space.</p></entry>
+            <entry colname="col4">此表中该值之前的所有事务ID都已替换为此表中的永久（冻结）事务ID。
+              这用于跟踪表是否需要被清理以防止事务ID环绕或允许<codeph>pg_clog</codeph>收缩。
+              <p>如果关系不是表，或者表不需要清理以防止事务ID环绕，则值为0（<codeph>InvalidTransactionId</codeph>）。
+                该表仍可能需要清理才能回收磁盘空间。
+                </p></entry>
           </row>
           <row>
             <entry><codeph>relminmxid</codeph></entry>
             <entry>xid</entry>
             <entry></entry>
-            <entry>All multixact IDs before this one have been replaced by a transaction ID in this
-              table. This is used to track whether the table needs to be vacuumed in order to
-              prevent multixact ID wraparound or to allow <codeph>pg_multixact</codeph> to be
-              shrunk. Zero (<codeph>InvalidMultiXactId</codeph>) if the relation is not a
-              table.</entry>
+            <entry>此表中该值之前的所有multixact ID都已被此表中的事务ID替换。
+              这用于跟踪表是否需要被清理以防止多重ID环绕或允许<codeph>pg_multixact</codeph>收缩。
+              如果关系不是表，则为零（<codeph>InvalidMultiXactId</codeph>）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -286,8 +272,7 @@
             </entry>
             <entry colname="col2"> aclitem[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Access privileges assigned by <codeph>GRANT</codeph> and
-              <codeph>REVOKE</codeph>.</entry>
+            <entry colname="col4"><codeph>GRANT</codeph>和<codeph>REVOKE</codeph>分配的访问权限。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -295,8 +280,7 @@
             </entry>
             <entry colname="col2"> text[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Access-method-specific options, as "keyword=value"
-              strings.</entry>
+            <entry colname="col4">特定于访问方法的选项，作为“keyword = value”字符串。</entry>
           </row>
         </tbody>
       </tgroup>
