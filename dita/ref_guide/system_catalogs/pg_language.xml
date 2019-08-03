@@ -4,8 +4,8 @@
 <topic id="topic1" xml:lang="en">
   <title id="gs143896">pg_language</title>
   <body>
-    <p>The <codeph>pg_language</codeph> system catalog table registers languages in which you can
-      write functions or stored procedures. It is populated by <codeph>CREATE LANGUAGE</codeph>.</p>
+    <p><codeph>pg_language</codeph>系统目录表注册用户可以用来编写函数和存储程序的语言。
+      它由<codeph>CREATE LANGUAGE</codeph>填充。</p>
     <table id="gs143898">
       <title>pg_catalog.pg_language</title>
       <tgroup cols="4">
@@ -15,10 +15,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -26,62 +26,59 @@
             <entry colname="col1"><codeph>lanname</codeph></entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of the language.</entry>
+            <entry colname="col4">语言的名称。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>lanowner</codeph>
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the language.</entry>
+            <entry colname="col4">语言的拥有者。</entry>
           </row>
           <row>
-            <entry colname="col1"><codeph>lanispl </codeph></entry>
+            <entry colname="col1"><codeph>lanispl</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">This is false for internal languages (such as SQL) and true for
-              user-defined languages. Currently, <codeph>pg_dump</codeph> still uses this to
-              determine which languages need to be dumped, but this may be replaced by a different
-              mechanism in the future.</entry>
+            <entry colname="col4">对内部语言（如SQL）而言，值为假。
+              而对于用户自定义的语言为真。
+              目前，<codeph>pg_dump</codeph>仍然使用它来确定哪些语言需要被转存，但是，在将来它可能会被不同的机制所代替。
+              </entry>
           </row>
           <row>
             <entry colname="col1"><codeph>lanpltrusted </codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if this is a trusted language, which means that it is
-              believed not to grant access to anything outside the normal SQL execution environment.
-              Only superusers may create functions in untrusted languages.</entry>
+            <entry colname="col4">如果这是一种可信的语言，则为真，表示它不会为正常SQL执行环境之外的任何东西授予访问。
+              只有超级用户才能用不可信语言创建函数。
+              </entry>
           </row>
           <row>
             <entry colname="col1"><codeph>lanplcallfoid</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">For noninternal languages this references the language handler,
-              which is a special function that is responsible for executing all functions that are
-              written in the particular language.</entry>
+            <entry colname="col4">对于非内部的语言，该属性引用了一个语言处理程序，该程序是一个特殊的函数，负责执行所有以特定语言编写的函数。
+              </entry>
           </row>
           <row>
             <entry colname="col1"><codeph>laninline</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">This references a function that is responsible for executing
-              inline anonymous code blocks (see the <codeph><xref
-                  href="../sql_commands/DO.xml#topic1"/></codeph> command). Zero if anonymous blocks
-              are not supported.</entry>
+            <entry colname="col4">这个属性引用一个函数负责执行内联匿名代码块的函数（参见<codeph><xref href="../sql_commands/DO.xml#topic1"/></codeph>命令）。
+              如果不支持匿名块，则为0。
+              </entry>
           </row>
           <row>
             <entry colname="col1"><codeph>lanvalidator</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">This references a language validator function that is responsible
-              for checking the syntax and validity of new functions when they are created. Zero if
-              no validator is provided.</entry>
+            <entry colname="col4">这个属性引用一个语言验证器函数，负责在创建新函数时检查新函数的语法和合法性。
+              如果没有提供验证器，则为0。</entry>
           </row>
           <row>
-            <entry colname="col1"><codeph>lanacl </codeph></entry>
+            <entry colname="col1"><codeph>lanacl</codeph></entry>
             <entry colname="col2">aclitem[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Access privileges for the language.</entry>
+            <entry colname="col4">语言的访问特权。</entry>
           </row>
         </tbody>
       </tgroup>

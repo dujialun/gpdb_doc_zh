@@ -4,7 +4,10 @@
 <topic xml:lang="en" id="topic1">
   <title>pg_foreign_server</title>
   <body>
-    <p>The system catalog table <codeph>pg_foreign_server</codeph> stores foreign server definitions. A foreign server describes a source of external data, such as a remote server. You access a foreign server via a foreign-data wrapper.</p>
+    <p>系统目录表<codeph>pg_foreign_server</codeph>存储外部服务器定义。
+      外部服务器描述外部数据源，例如远程服务器。
+      您可以通过外部数据包装器访问外部服务器。
+      </p>
     <table id="table_zgy_xfx_tz">
       <title>pg_catalog.pg_foreign_server</title>
       <tgroup cols="4">
@@ -14,10 +17,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -25,43 +28,43 @@
             <entry colname="col1"><codeph>srvname</codeph></entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of the foreign server.</entry>
+            <entry colname="col4">外部服务器的名称。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>srvowner</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the foreign server.</entry>
+            <entry colname="col4">外部服务器的所有者。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>srvfdw</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_foreign_data_wrapper.oid</entry>
-            <entry colname="col4">OID of the foreign-data wrapper of this foreign server.</entry>
+            <entry colname="col4">此外部服务器的外部数据包装器的OID。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>srvtype</codeph></entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Type of server (optional).</entry>
+            <entry colname="col4">服务器类型（可选）。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>srvversion</codeph></entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Version of the server (optional).</entry>
+            <entry colname="col4">服务器版本（可选）。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>srvacl</codeph></entry>
             <entry colname="col2">aclitem[]</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Access privileges; see <codeph><xref href="../sql_commands/GRANT.xml#topic1" type="topic" format="dita"/></codeph> and <codeph><xref href="../sql_commands/REVOKE.xml#topic1" type="topic" format="dita"/></codeph> for details.</entry>
+            <entry colname="col4">访问权限; 有关详细信息，请参阅<codeph><xref href="../sql_commands/GRANT.xml#topic1" type="topic" format="dita"/></codeph>和<codeph><xref href="../sql_commands/REVOKE.xml#topic1" type="topic" format="dita"/></codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>srvoptions</codeph></entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Foreign server-specific options, as "keyword=value" strings.</entry>
+            <entry colname="col4">外部服务器特定选项，作为“keyword = value”字符串。</entry>
           </row>
         </tbody>
       </tgroup>

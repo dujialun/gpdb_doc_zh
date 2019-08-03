@@ -4,7 +4,9 @@
 <topic xml:lang="en" id="topic1">
   <title>pg_foreign_data_wrapper</title>
   <body>
-    <p>The system catalog table <codeph>pg_foreign_data_wrapper</codeph> stores foreign-data wrapper definitions. A foreign-data wrapper is a mechanism by which you access external data residing on foreign servers.</p>
+    <p>系统目录表<codeph>pg_foreign_data_wrapper</codeph>存储外部数据包装器定义。
+      外部数据包装器是一种访问驻留在外部服务器上的外部数据的机制。
+      </p>
     <table id="table_zgy_xfx_tz">
       <title>pg_catalog.pg_foreign_data_wrapper</title>
       <tgroup cols="4">
@@ -14,10 +16,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -25,37 +27,40 @@
             <entry colname="col1"><codeph>fdwname</codeph></entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of the foreign-data wrapper.</entry>
+            <entry colname="col4">外部数据包装器的名称。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>fdwowner</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the foreign-data wrapper.</entry>
+            <entry colname="col4">外部数据包装器的所有者。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>fdwhandler</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">A reference to a handler function that is responsible for supplying execution routines for the foreign-data wrapper. Zero if no handler is provided.</entry>
+            <entry colname="col4">对处理程序函数的引用，该函数负责为外部数据包装器提供执行例程。
+              如果没有提供处理程序则为零。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>fdwvalidator</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">A reference to a validator function that is responsible for checking the validity of the options provided to the foreign-data wrapper. This function also checks the options for foreign servers and user mappings using the foreign-data wrapper. Zero if no validator is provided.</entry>
+            <entry colname="col4">对验证器函数的引用，该函数负责检查提供给外部数据包装器的选项的有效性。
+              此函数还使用外部数据包装器检查外部服务器和用户映射的选项。
+              如果未提供验证器，则为零。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>fdwacl</codeph></entry>
             <entry colname="col2">aclitem[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Access privileges; see <codeph><xref href="../sql_commands/GRANT.xml#topic1" type="topic" format="dita"/></codeph> and <codeph><xref href="../sql_commands/REVOKE.xml#topic1" type="topic" format="dita"/></codeph> for details.</entry>
+            <entry colname="col4">访问权限; 有关详细信息，请参阅<codeph><xref href="../sql_commands/GRANT.xml#topic1" type="topic" format="dita"/></codeph>和<codeph><xref href="../sql_commands/REVOKE.xml#topic1" type="topic" format="dita"/></codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>fdwoptions</codeph></entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Foreign-data wrapper-specific options, as "keyword=value" strings.</entry>
+            <entry colname="col4">外部数据包装器特定选项，作为“keyword = value”字符串。</entry>
           </row>
         </tbody>
       </tgroup>
