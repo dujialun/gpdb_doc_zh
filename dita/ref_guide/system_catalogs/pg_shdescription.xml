@@ -1,14 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="hp143896">pg_shdescription</title><body><p>The <codeph>pg_shdescription</codeph> system catalog table stores optional descriptions
-      (comments) for shared database objects. Descriptions can be manipulated with the
-        <codeph>COMMENT</codeph> command and viewed with <codeph>psql</codeph>'s <codeph>\d</codeph>
-      meta-commands. See also <xref href="pg_description.xml#topic1">pg_description</xref>, which
-      performs a similar function for descriptions involving objects within a single database.
-      Unlike most system catalogs, <codeph>pg_shdescription</codeph> is shared across all databases
-      of a Greenplum system: there is only one copy of
-        <codeph>pg_shdescription</codeph> per system, not one per database.</p><table id="hp143898"><title>pg_catalog.pg_shdescription</title><tgroup cols="4"><colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="86pt"/><colspec colnum="3" colname="col3" colwidth="85pt"/><colspec colnum="4" colname="col4" colwidth="147pt"/><thead><row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row></thead><tbody><row><entry colname="col1"><codeph>objoid</codeph></entry><entry colname="col2">oid</entry><entry colname="col3">any OID column</entry><entry colname="col4">The OID of the object this description pertains
-to.</entry></row><row><entry colname="col1"><codeph>classoid</codeph></entry><entry colname="col2">oid</entry><entry colname="col3">pg_class.oid</entry><entry colname="col4">The OID of the system catalog this object appears
-in</entry></row><row><entry colname="col1"><codeph>description</codeph></entry><entry colname="col2">text</entry><entry colname="col3"/><entry colname="col4">Arbitrary text that serves as the description
-of this object.</entry></row></tbody></tgroup></table></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1" xml:lang="en">
+    <title id="hp143896">pg_shdescription</title>
+    <body>
+        <p><codeph>pg_shdescription</codeph>系统目录表存储共享数据库对象的可选描述（注释）。
+            描述可以通过<codeph>COMMENT</codeph>命令操作，并且可以使用<codeph>psql</codeph>的<codeph>\d</codeph>元命令来查看。
+            另见<xref href="pg_description.xml#topic1">pg_description</xref>，它对单个数据库中对象的描述提供了相似的功能。
+            与大部分其他系统目录不同，<codeph>pg_shdescription</codeph>在Greenplum系统的所有数据库之间共享：在每一个系统中只有一份<codeph>pg_shdescription</codeph>拷贝，而不是每个数据库一份。
+        </p>
+        <table id="hp143898">
+            <title>pg_catalog.pg_shdescription</title>
+            <tgroup cols="4">
+                <colspec colnum="1" colname="col1" colwidth="131pt"/>
+                <colspec colnum="2" colname="col2" colwidth="86pt"/>
+                <colspec colnum="3" colname="col3" colwidth="85pt"/>
+                <colspec colnum="4" colname="col4" colwidth="147pt"/>
+                <thead>
+                    <row>
+                        <entry colname="col1">列</entry>
+                        <entry colname="col2">类型</entry>
+                        <entry colname="col3">参考</entry>
+                        <entry colname="col4">描述</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>objoid</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3">any OID column</entry>
+                        <entry colname="col4">该描述所属的对象的OID。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>classoid</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3">pg_class.oid</entry>
+                        <entry colname="col4">该对象所在系统目录的OID。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>description</codeph>
+                        </entry>
+                        <entry colname="col2">text</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">作为该对象描述的任意文本。
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </body>
+</topic>
