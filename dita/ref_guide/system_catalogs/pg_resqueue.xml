@@ -1,14 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="hi141670">pg_resqueue</title>
-  <body>
-    <note>The <codeph>pg_resqueue</codeph> system catalog table is valid only when resource queue-based resource management is active.</note>
-    <p>The <codeph>pg_resqueue</codeph> system catalog table contains information about Greenplum Database resource queues, which are used for the resource management feature.
-      This table is populated only on the master. This table is defined in the
-        <codeph>pg_global</codeph> tablespace, meaning it is globally shared across all databases in
-      the system.</p>
-    <table id="hi141982"><title>pg_catalog.pg_resqueue</title><tgroup cols="4"><colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="86pt"/><colspec colnum="3" colname="col3" colwidth="85pt"/><colspec colnum="4" colname="col4" colwidth="147pt"/><thead><row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row></thead><tbody><row><entry colname="col1"><codeph>rsqname</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">The name of the resource queue.</entry></row><row><entry colname="col1"><codeph>rsqcountlimit</codeph></entry><entry colname="col2">real</entry><entry colname="col3"/><entry colname="col4">The active query threshold of the resource queue.</entry></row><row><entry colname="col1"><codeph>rsqcostlimit</codeph></entry><entry colname="col2">real</entry><entry colname="col3"/><entry colname="col4">The query cost threshold of the resource queue.</entry></row><row><entry colname="col1"><codeph>rsqovercommit</codeph></entry><entry colname="col2">boolean</entry><entry colname="col3"/><entry colname="col4">Allows queries that exceed the cost threshold
-to run when the system is idle.</entry></row><row><entry colname="col1"><codeph>rsqignorecostlimit</codeph></entry><entry colname="col2">real</entry><entry colname="col3"/><entry colname="col4">The query cost limit of what is considered a
-'small query'. Queries with a cost under this limit will not be queued
-and run immediately.</entry></row></tbody></tgroup></table></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1" xml:lang="en">
+    <title id="hi141670">pg_resqueue</title>
+    <body>
+        <note>仅当基于资源队列的资源管理处于活动状态时，<codeph>pg_resqueue</codeph>系统目录表才有效。
+        </note>
+        <p><codeph>pg_resqueue</codeph>系统目录表包含有关Greenplum数据库资源队列的信息，这些队列用于资源管理功能。
+          此表仅在master服务器上填充。
+          此表在<codeph>pg_global</codeph>表空间中定义，这意味着它在系统中的所有数据库中全局共享。
+        </p>
+        <table id="hi141982">
+            <title>pg_catalog.pg_resqueue</title>
+            <tgroup cols="4">
+                <colspec colnum="1" colname="col1" colwidth="131pt"/>
+                <colspec colnum="2" colname="col2" colwidth="86pt"/>
+                <colspec colnum="3" colname="col3" colwidth="85pt"/>
+                <colspec colnum="4" colname="col4" colwidth="147pt"/>
+                <thead>
+                    <row>
+                        <entry colname="col1">列</entry>
+                        <entry colname="col2">类型</entry>
+                        <entry colname="col3">参考</entry>
+                        <entry colname="col4">描述</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>rsqname</codeph>
+                        </entry>
+                        <entry colname="col2">name</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">资源队列的名称。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>rsqcountlimit</codeph>
+                        </entry>
+                        <entry colname="col2">real</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">资源队列的活跃查询阈值。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>rsqcostlimit</codeph>
+                        </entry>
+                        <entry colname="col2">real</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">资源队列的查询开销阈值。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>rsqovercommit</codeph>
+                        </entry>
+                        <entry colname="col2">boolean</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">允许超出成本阈值的查询在系统空闲时运行。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>rsqignorecostlimit</codeph>
+                        </entry>
+                        <entry colname="col2">real</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">被视为“小查询”的查询成本限制。
+                          成本低于此限制的查询将不会排队并立即运行。
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </body>
+</topic>

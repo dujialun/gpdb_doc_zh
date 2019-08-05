@@ -4,17 +4,14 @@
 <topic id="topic1" xml:lang="en">
   <title id="fw143540">pg_opfamily</title>
   <body>
-    <p>The catalog <codeph>pg_opfamily</codeph> defines operator families. Each operator family is a
-      collection of operators and associated support routines that implement the semantics specified
-      for a particular index access method. Furthermore, the operators in a family are all
-      compatible in a way that is specified by the access method. The operator family concept allows
-      cross-data-type operators to be used with indexes and to be reasoned about using knowledge of
-      access method semantics.</p>
-    <p>The majority of the information defining an operator family is not in its
-      <codeph>pg_opfamily</codeph> row, but in the associated rows in
-      <codeph><xref href="./pg_amop.xml#topic1" type="topic" format="dita"/></codeph>,
-      <codeph><xref href="./pg_amproc.xml#topic1" type="topic" format="dita"/></codeph>, and
-      <codeph><xref href="./pg_opclass.xml#topic1" type="topic" format="dita"/></codeph>.</p>
+    <p>目录<codeph>pg_opfamily</codeph>定义了运算符系列。
+      每个运算符族都是运算符和相关支持例程的集合，这些例程实现了为特定索引访问方法指定的语义。
+      此外，一个系列中的运算符都以访问方法指定的方式兼容。
+      运算符族概念允许跨数据类型的运算符与索引一起使用，并被推理为使用访问方法语义的知识。
+      </p>
+    <p>定义运算符族的大多数信息不在其<codeph>pg_opfamily</codeph>行中，而是在<codeph><xref href="./pg_amop.xml#topic1" type="topic" format="dita"/></codeph>，
+      <codeph><xref href="./pg_amproc.xml#topic1" type="topic" format="dita"/></codeph>和<codeph><xref href="./pg_opclass.xml#topic1" type="topic" format="dita"/></codeph>中的关联行中。
+      </p>
     <table id="table_dfn_chh_sfb">
       <title>pg_opfamily</title>
       <tgroup cols="4">
@@ -24,10 +21,10 @@
         <colspec colnum="4" colname="col4" colwidth="161.83pt"/>
         <thead>
           <row>
-            <entry>Name</entry>
-            <entry>Type</entry>
-            <entry>References</entry>
-            <entry>Description</entry>
+            <entry>名称</entry>
+            <entry>类型</entry>
+            <entry>参考</entry>
+            <entry>描述</entry>
           </row>
         </thead>
         <tbody>
@@ -35,31 +32,31 @@
             <entry><codeph>oid</codeph></entry>
             <entry>oid</entry>
             <entry></entry>
-            <entry>Row identifier (hidden attribute; must be explicitly selected)</entry>
+            <entry>行标识符（隐藏属性;必须显式选择）</entry>
           </row>
           <row>
             <entry><codeph>opfmethod</codeph></entry>
             <entry>oid</entry>
             <entry>pg_am.oid</entry>
-            <entry>Index access method operator for this family</entry>
+            <entry>此系列的索引访问方法运算符</entry>
           </row>
           <row>
             <entry><codeph>opfname</codeph></entry>
             <entry>name</entry>
             <entry> </entry>
-            <entry>Name of this operator family</entry>
+            <entry>此运算符系列的名称</entry>
           </row>
           <row>
             <entry><codeph>opfnamespace</codeph></entry>
             <entry>oid</entry>
             <entry>pg_namespace.oid</entry>
-            <entry>Namespace of this operator family</entry>
+            <entry>此运算符系列的命名空间</entry>
           </row>
           <row>
             <entry><codeph>opfowner</codeph></entry>
             <entry>oid</entry>
             <entry>pg_authid.oid</entry>
-            <entry>Owner of the operator family</entry>
+            <entry>此运算符系列的所有者</entry>
           </row>
         </tbody>
       </tgroup>
