@@ -4,8 +4,8 @@
 <topic id="topic1" xml:lang="en">
   <title id="hy156255">pg_trigger</title>
   <body>
-    <p>The <codeph>pg_trigger</codeph> system catalog table stores triggers on tables.</p>
-    <note type="note">Greenplum Database does not support triggers. </note>
+    <p><codeph>pg_trigger</codeph>系统目录表存储表上的触发器。</p>
+    <note type="note">Greenplum数据库不支持触发器。</note>
     <table id="hy183441">
       <title>pg_catalog.pg_trigger</title>
       <tgroup cols="4">
@@ -15,89 +15,84 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
           <row>
             <entry colname="col1"><codeph>tgrelid</codeph></entry>
             <entry colname="col2">oid </entry>
-            <entry colname="col3"><i>pg_class.oid</i><p>Note that Greenplum Database
-                does not enforce referential integrity.</p></entry>
-            <entry colname="col4">The table this trigger is on.</entry>
+            <entry colname="col3"><i>pg_class.oid</i><p>请注意，Greenplum数据库不强制引用完整性。</p></entry>
+            <entry colname="col4">触发器所在的表。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tgname</codeph></entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Trigger name (must be unique among triggers of same
-              table).</entry>
+            <entry colname="col4">触发器名（同一个表的触发器名必须唯一）。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tgfoid</codeph></entry>
             <entry colname="col2">oid</entry>
-            <entry colname="col3"><i>pg_proc.oid</i><p>Note that Greenplum Database
-                does not enforce referential integrity.</p></entry>
-            <entry colname="col4">The function to be called.</entry>
+            <entry colname="col3"><i>pg_proc.oid</i><p>请注意，Greenplum数据库不强制引用完整性。</p></entry>
+            <entry colname="col4">被触发器调用的函数。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tgtype</codeph></entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Bit mask identifying trigger conditions.</entry>
+            <entry colname="col4">触发器触发条件的位掩码。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tgenabled</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if trigger is enabled.</entry>
+            <entry colname="col4">启用触发器则为True。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tgisinternal</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if trigger is internally generated (usually, to enforce the constraint identified by tgconstraint).</entry>
+            <entry colname="col4">如果触发器是内部生成的，则为True（通常，强制执行tgconstraint标识的约束）。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tgconstrrelid</codeph></entry>
             <entry colname="col2">oid</entry>
-            <entry colname="col3"><i>pg_class.oid</i><p>Note that Greenplum Database
-                does not enforce referential integrity.</p></entry>
-            <entry colname="col4">The table referenced by an referential integrity
-              constraint.</entry>
+            <entry colname="col3"><i>pg_class.oid</i><p>请注意，Greenplum数据库不强制引用完整性。</p></entry>
+            <entry colname="col4">被一个参照完整性约束引用的表。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tgdeferrable</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if deferrable.</entry>
+            <entry colname="col4">如果可延迟则为True。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tginitdeferred</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if initially deferred.</entry>
+            <entry colname="col4">如果初始可延迟则为True。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tgnargs</codeph></entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Number of argument strings passed to trigger function.</entry>
+            <entry colname="col4">传递给触发器函数的参数字符串个数。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tgattr</codeph></entry>
             <entry colname="col2">int2vector</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Currently not used.</entry>
+            <entry colname="col4">当前没有使用。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>tgargs</codeph></entry>
             <entry colname="col2">bytea</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Argument strings to pass to trigger, each NULL-terminated.</entry>
+            <entry colname="col4">传递给触发器的参数字符串，每一个都以NULL结尾。</entry>
           </row>
         </tbody>
       </tgroup>

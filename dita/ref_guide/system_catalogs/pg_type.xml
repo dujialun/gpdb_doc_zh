@@ -4,11 +4,12 @@
 <topic id="topic1" xml:lang="en">
   <title id="hz156255">pg_type</title>
   <body>
-    <p>The <codeph>pg_type</codeph> system catalog table stores information about data types. Base
-      types (scalar types) are created with <codeph>CREATE TYPE</codeph>, and domains with
-        <codeph>CREATE DOMAIN</codeph>. A composite type is automatically created for each table in
-      the database, to represent the row structure of the table. It is also possible to create
-      composite types with <codeph>CREATE TYPE AS</codeph>.</p>
+    <p><codeph>pg_type</codeph>系统目录表存储有关数据类型的信息。
+      基类（标量类型）由<codeph>CREATE TYPE</codeph>创建。
+      而域由<codeph>CREATE DOMAIN</codeph>创建。
+      数据库中的每一个表都会有一个自动创建的组合类型，用于表示表的行结构。
+      也可以使用<codeph>CREATE TYPE AS</codeph>创建组合类型。
+      </p>
     <table id="hz156260">
       <title>pg_catalog.pg_type</title>
       <tgroup cols="4">
@@ -18,10 +19,10 @@
         <colspec colnum="4" colname="col4" colwidth="189pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -31,7 +32,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Row identifier (hidden attribute; must be explicitly selected)</entry>
+            <entry colname="col4">行标识符（隐藏属性;必须显示选择）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -39,7 +40,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Data type name</entry>
+            <entry colname="col4">数据类型名称</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -47,7 +48,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_namespace.oid</entry>
-            <entry colname="col4">The OID of the namespace that contains this type</entry>
+            <entry colname="col4">包含此类型的命名空间的OID</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -55,7 +56,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the type</entry>
+            <entry colname="col4">类型的拥有者</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -63,11 +64,10 @@
             </entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For a fixed-size type, <codeph>typlen</codeph> is the number of
-              bytes in the internal representation of the type. But for a variable-length type,
-                <codeph>typlen</codeph> is negative. <codeph>-1</codeph> indicates a 'varlena' type
-              (one that has a length word), <codeph>-2</codeph> indicates a null-terminated C
-              string.</entry>
+            <entry colname="col4">对于一个固定尺寸的类型，<codeph>typlen</codeph>是该类型内部表示的字节数。
+              对于一个变长类型，<codeph>typlen</codeph>为负值。
+              <codeph>-1</codeph>表示一个“varlena”类型（具有长度字），<codeph>-2</codeph>表示一个以null结尾的C字符串。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -75,11 +75,11 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Determines whether internal routines pass a value of this type by
-              value or by reference. <codeph>typbyval </codeph>had better be false if
-                <codeph>typlen</codeph> is not 1, 2, or 4 (or 8 on machines where Datum is 8 bytes).
-              Variable-length types are always passed by reference. Note that
-                <codeph>typbyval</codeph> can be false even if the length would allow pass-by-value.</entry>
+            <entry colname="col4">决定内部例程传递这个类型的数值时是通过传值还是传引用方式。
+              如果<codeph>typlen</codeph>不是1、2或4（或者在Datum为8字节的机器上为8），<codeph>typlen</codeph>最好是假。
+              变长类型总是传引用。
+              注意即使长度允许传值，<codeph>typbyval</codeph>也可以为假。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -87,10 +87,9 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4"><codeph>b</codeph> for a base type, <codeph>c</codeph> for a
-              composite type, <codeph>d</codeph> for a domain, <codeph>e</codeph> for an enum 
-              type, <codeph>p</codeph> for a pseudo-type, or <codeph>r</codeph> for a range
-              type. See also <codeph>typrelid</codeph> and <codeph>typbasetype</codeph>.</entry>
+            <entry colname="col4"><codeph>b</codeph>表示基类，<codeph>c</codeph>表示组合类型，
+              <codeph>d</codeph>表示域，<codeph>e</codeph>表示枚举类型，<codeph>p</codeph>表示伪类型，或<codeph>r</codeph>表示范围类型。
+              另见<codeph>typrelid</codeph>和<codeph>typbasetype</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -98,9 +97,8 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Arbitrary classification of data types that is used
-              by the parser to determine which implicit casts should be preferred.
-              See <xref href="#topic1/typcategory" type="topic" format="dita">Category Codes</xref>.</entry>
+            <entry colname="col4">解析器使用的数据类型的任意分类，以确定应首选哪些隐式转换。
+              请参阅<xref href="#topic1/typcategory" type="topic" format="dita">类别代码</xref>。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -108,8 +106,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if the type is a preferred cast target within
-              its <codeph>typcategory</codeph></entry>
+            <entry colname="col4">如果类型是其<codeph>typcategory</codeph>中的首选转换目标，则为True</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -117,9 +114,9 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if the type is defined, false if this is a placeholder entry
-              for a not-yet-defined type. When false, nothing except the type name, namespace, and
-              OID can be relied on.</entry>
+            <entry colname="col4">如果定义了类型，则为True;如果是尚未定义的类型的占位符条目，则为false。
+              如果为false，则可以依赖除类型名称，名称空间和OID之外的任何内容。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -127,9 +124,9 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Character that separates two values of this type when parsing
-              array input. Note that the delimiter is associated with the array element data type,
-              not the array data type.</entry>
+            <entry colname="col4">解析数组输入时分隔此类型的两个值的字符。
+              请注意，分隔符与数组元素数据类型相关联，而不是与数组数据类型相关联。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -137,12 +134,9 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">If this is a composite type (see <codeph>typtype</codeph>), then this column points to the
-                <codeph>pg_class</codeph> entry that defines the corresponding table. (For a
-              free-standing composite type, the <codeph>pg_class</codeph> entry does not really
-              represent a table, but it is needed anyway for the type's
-                <codeph>pg_attribute</codeph> entries to link to.) Zero for non-composite
-              types.</entry>
+            <entry colname="col4">如果这是复合类型（请参阅<codeph>typtype</codeph>），则此列指向定义相应表的<codeph>pg_class</codeph>条目。
+              （对于独立的复合类型，<codeph>pg_class</codeph>条目实际上并不代表表，但无论如何都需要将类型的<codeph>pg_attribute</codeph>条目链接到。）非复合类型为零。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -150,25 +144,21 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">If not <codeph>0</codeph> then it identifies another row in
-              <codeph>pg_type</codeph>. The current type can then be subscripted like an array yielding values of
-              type <codeph>typelem</codeph>. A "true" array type is variable length
-                (<codeph>typlen</codeph> = <codeph>-1</codeph>), but some fixed-length
-                (<codeph>typlen</codeph> &gt; <codeph>0</codeph>) types also have nonzero
-                <codeph>typelem</codeph>, for example <codeph>name</codeph> and
-                <codeph>point</codeph>. If a fixed-length type has a <codeph>typelem</codeph> then
-              its internal representation must be some number of values of the
-                <codeph>typelem</codeph> data type with no other data. Variable-length array types
-              have a header defined by the array subroutines.</entry>
+            <entry colname="col4">如果不为<codeph>0</codeph>，则它标识<codeph>pg_type</codeph>中的另一行。
+              然后，当前类型可以像数组一样下标，产生类型为<codeph>typelem</codeph>的值。
+              “true”数组类型是可变长度（<codeph>typlen</codeph> = <codeph>-1</codeph>），
+              但某些固定长度（<codeph>typlen</codeph> &gt; <codeph>0</codeph>）类型也具有非零<codeph>typelem</codeph>，例如<codeph>name</codeph>和<codeph>point</codeph>。
+              如果固定长度类型有<codeph>typelem</codeph>，则其内部表示必须是<codeph>typelem</codeph>数据类型的某些值，而没有其他数据。
+              可变长度数组类型具有由数组子例程定义的头。
+              </entry>
           </row>
           <row>
             <entry colname="col1"><codeph>typarray</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">If not 0, identifies another row in <codeph>pg_type</codeph>,
-              which is the "true" array type having this type as its  element. Use
-                <codeph>pg_type.typarray</codeph> to locate the array type associated with a
-              specific type.</entry>
+            <entry colname="col4">如果不为0，则标识<codeph>pg_type</codeph>中的另一行，这是具有此类型作为其元素的“true”数组类型。
+              使用<codeph>pg_type.typarray</codeph>查找与特定类型关联的数组类型。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -176,7 +166,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Input conversion function (text format)</entry>
+            <entry colname="col4">输入转换函数（文本格式）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -184,7 +174,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Output conversion function (text format)</entry>
+            <entry colname="col4">输出转换函数（文本格式）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -192,7 +182,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Input conversion function (binary format), or 0 if none</entry>
+            <entry colname="col4">输入转换函数（二进制格式），如果没有则为0</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -200,7 +190,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Output conversion function (binary format), or 0 if none</entry>
+            <entry colname="col4">输出转换函数（二进制格式），如果没有则为0</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -208,8 +198,8 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Type modifier input function, or 0 if the type does not support
-              modifiers</entry>
+            <entry colname="col4">键入修饰符输入函数，如果类型不支持修饰符，则为0
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -217,8 +207,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Type modifier output function, or 0 to use the standard 
-              format</entry>
+            <entry colname="col4">键入修饰符输出函数，或0以使用标准格式</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -226,8 +215,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Custom <codeph>ANALYZE</codeph> function, or 0 to use the standard
-              function</entry>
+            <entry colname="col4">自定义<codeph>ANALYZE</codeph>函数，0表示使用标准函数</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -235,17 +223,16 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The alignment required when storing a value of this type. It
-              applies to storage on disk as well as most representations of the value inside
-                Greenplum Database. When multiple values are stored consecutively,
-              such as in the representation of a complete row on disk, padding is inserted before a
-              datum of this type so that it begins on the specified boundary. The alignment
-              reference is the beginning of the first datum in the sequence. Possible values are:
-                  <p><codeph>c</codeph> = char alignment (no alignment
-                  needed).</p><p><codeph>s</codeph> = short alignment (2 bytes on most
-                machines).</p><p><codeph>i</codeph> = int alignment (4 bytes on most
-                  machines).</p><p><codeph>d</codeph> = double alignment (8 bytes on many machines,
-                but not all).</p></entry>
+            <entry colname="col4">存储此类型的值时所需的对齐方式。
+              它适用于磁盘上的存储以及Greenplum数据库中值的大多数表示。
+              当连续存储多个值时，例如在磁盘上的完整行的表示中，在此类型的数据之前插入填充，以便它在指定的边界上开始。
+              对齐参考是序列中第一个数据的开头。
+              可能的值是：
+              <p><codeph>c</codeph> = char对齐，即不需要对齐。</p>
+              <p><codeph>s</codeph> = short对齐（在大部分机器上为2字节）。</p>
+              <p><codeph>i</codeph> = int对齐（在大部分机器上为4字节）。</p>
+              <p><codeph>d</codeph> = double对齐（在很多机器上为8字节，但绝不是全部）。</p>
+            </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -253,16 +240,14 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For varlena types (those with <codeph>typlen</codeph> = -1) tells
-              if the type is prepared for toasting and what the default strategy for attributes of
-              this type should be. Possible values are:<p><codeph>p</codeph>: Value must always be
-                stored plain.</p><p><codeph>e</codeph>: Value can be stored in a secondary relation
-                (if relation has one, see <codeph>pg_class.reltoastrelid</codeph>).
-                  </p><p><codeph>m</codeph>: Value can be stored compressed
-                  inline.</p><p><codeph>x</codeph>: Value can be stored compressed inline or stored
-                in secondary storage.</p><p>Note that <codeph>m</codeph> columns can also be moved
-                out to secondary storage, but only as a last resort (<codeph>e</codeph> and
-                  <codeph>x</codeph> columns are moved first).</p></entry>
+            <entry colname="col4">对于varlena类型（具有<codeph>typlen</codeph> = -1的那些），告知该类型是否准备好toasting以及该类型的属性的默认策略应该是什么。
+              可能的值是：
+              <p><codeph>p</codeph>: 值必须明文存储。</p>
+              <p><codeph>e</codeph>: 值可以存储在辅助关系中（如果关系有一个，请参阅<codeph>pg_class.reltoastrelid</codeph>）。</p>
+              <p><codeph>m</codeph>: 值可以压缩内联存储。</p>
+              <p><codeph>x</codeph>: 值可以内联压缩存储或存储在二级存储中。</p>
+              <p>请注意，<codeph>m</codeph>列也可以移出到辅助存储，但仅作为最后的手段（首先移动<codeph>e</codeph>和<codeph>x</codeph>列）。</p>
+            </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -270,8 +255,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Represents a not-null constraint on a type. Used for domains
-              only.</entry>
+            <entry colname="col4">表示类型的非空约束。仅用于域。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -279,8 +263,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Identifies the type that a domain is based on. Zero if this type
-              is not a domain.</entry>
+            <entry colname="col4">标识域所基于的类型。如果此类型不是域，则为零。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -288,9 +271,9 @@
             </entry>
             <entry colname="col2">int4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Domains use <codeph>typtypmod</codeph> to record the <codeph>typmod</codeph> to be applied to their
-              base type (-1 if base type does not use a <codeph>typmod</codeph>). -1 if this type is not a
-              domain.</entry>
+            <entry colname="col4">域使用<codeph>typtypmod</codeph>来记录要应用于其基类型的<codeph>typmod</codeph>（如果基类型不使用<codeph>typmod</codeph>，则为-1）。
+              -1如果此类型不是域。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -298,9 +281,9 @@
             </entry>
             <entry colname="col2">int4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The number of array dimensions for a domain over an array (if
-               <codeph>typbasetype</codeph> is an array type). Zero for types other than
-               domains over  array types.</entry>
+            <entry colname="col4">域上数组的数组维数（如果<codeph>typbasetype</codeph>是数组类型）。
+              除了数组类型的域以外的类型为零。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -308,10 +291,11 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_collation.oid</entry>
-            <entry colname="col4">Specifies the collation of the type. Zero if the type
-              does not support collations. The value is <codeph>DEFAULT_COLLATION_OID</codeph>
-              for a base type that supports collations. A domain over a collatable type
-              can have some other collation OID if one was specified for the domain.</entry>
+            <entry colname="col4">指定类型的排序规则。
+              如果类型不支持排序规则，则为零。
+              对于支持排序规则的基本类型，该值为<codeph>DEFAULT_COLLATION_OID</codeph>。
+              如果为域指定了一个域，则通过可折叠类型的域可以具有一些其他排序规则OID。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -319,9 +303,9 @@
             </entry>
             <entry colname="col2">pg_node_tree</entry>
             <entry colname="col3"/>
-            <entry colname="col4">If not null, it is the <codeph>nodeToString()</codeph>
-              representation of a default expression for the type. This is only used for
-              domains.</entry>
+            <entry colname="col4">如果不为null，则为该类型的默认表达式的<codeph>nodeToString()</codeph>表示。
+              这仅用于域。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -329,13 +313,10 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Null if the type has no associated default value. If <codeph>typdefaultbin</codeph> is not null,
-              <codeph>typdefault</codeph> must contain a human-readable version of
-              the default expression represented
-              by <codeph>typdefaultbin</codeph>. If <codeph>typdefaultbin</codeph> is
-              null and <codeph>typdefault</codeph> is not, then <codeph>typdefault</codeph> is
-              the external representation of the type's default value, which may be fed to the
-              type's input converter to produce a constant.</entry>
+            <entry colname="col4">如果类型没有关联的默认值，则为null。
+              如果<codeph>typdefaultbin</codeph>不为null，则<codeph>typdefault</codeph>必须包含由<codeph>typdefaultbin</codeph>表示的默认表达式的人类可读版本。
+              如果<codeph>typdefaultbin</codeph>为null且<codeph>typdefault</codeph>不为null，则<codeph>typdefault</codeph>是类型默认值的外部表示，可以将其输入到类型的输入转换器以生成常量。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -343,18 +324,18 @@
             </entry>
             <entry colname="col2">aclitem[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Access privileges; see <codeph><xref href="../sql_commands/GRANT.xml#topic1" type="topic" format="dita"/></codeph>
-              and <codeph><xref href="../sql_commands/REVOKE.xml#topic1" type="topic" format="dita"/></codeph>
-              for details.</entry>
+            <entry colname="col4">访问权限; 有关详细信息，
+              请参阅<codeph><xref href="../sql_commands/GRANT.xml#topic1" type="topic" format="dita"/></codeph>和<codeph><xref href="../sql_commands/REVOKE.xml#topic1" type="topic" format="dita"/></codeph>。
+            </entry>
           </row>
         </tbody>
       </tgroup>
     </table>
 
-    <p>The following table lists the system-defined values of
-       <codeph>typcategory</codeph>. Any future additions to this list will also
-       be upper-case ASCII letters. All other ASCII characters are reserved for
-        user-defined categories.</p>
+    <p>下表列出了<codeph>typcategory</codeph>的系统定义值。
+      此列表的任何未来添加项也将是大写ASCII字母。
+      所有其他ASCII字符都保留给用户定义的类别。
+      </p>
     <table id="typcategory">
       <title>typcategory Codes</title>
       <tgroup cols="2">
@@ -362,70 +343,70 @@
         <colspec colnum="2" colname="col2" colwidth="352pt"/>
         <thead>
           <row>
-            <entry colname="col1">Code</entry>
-            <entry colname="col2">Category</entry>
+            <entry colname="col1">代码</entry>
+            <entry colname="col2">种类</entry>
           </row>
         </thead>
         <tbody>
           <row>
             <entry colname="col1">A</entry>
-            <entry colname="col2">Array types</entry>
+            <entry colname="col2">数组类型</entry>
           </row>
           <row>
             <entry colname="col1">B</entry>
-            <entry colname="col2">Boolean types</entry>
+            <entry colname="col2">布尔类型</entry>
           </row>
           <row>
             <entry colname="col1">C</entry>
-            <entry colname="col2">Composite types</entry>
+            <entry colname="col2">复合类型</entry>
           </row>
           <row>
             <entry colname="col1">D</entry>
-            <entry colname="col2">Date/time types</entry>
+            <entry colname="col2">日期/时间类型</entry>
           </row>
           <row>
             <entry colname="col1">E</entry>
-            <entry colname="col2">Enum types</entry>
+            <entry colname="col2">枚举类型</entry>
           </row>
           <row>
             <entry colname="col1">G</entry>
-            <entry colname="col2">Geometric types</entry>
+            <entry colname="col2">几号类型</entry>
           </row>
           <row>
             <entry colname="col1">I</entry>
-            <entry colname="col2">Network address types</entry>
+            <entry colname="col2">网络地址类型</entry>
           </row>
           <row>
             <entry colname="col1">N</entry>
-            <entry colname="col2">Numeric types</entry>
+            <entry colname="col2">数字类型</entry>
           </row>
           <row>
             <entry colname="col1">P</entry>
-            <entry colname="col2">Pseudo-types</entry>
+            <entry colname="col2">伪类型</entry>
           </row>
           <row>
             <entry colname="col1">R</entry>
-            <entry colname="col2">Range types</entry>
+            <entry colname="col2">范围类型</entry>
           </row>
           <row>
             <entry colname="col1">S</entry>
-            <entry colname="col2">String types</entry>
+            <entry colname="col2">字符串类型</entry>
           </row>
           <row>
             <entry colname="col1">T</entry>
-            <entry colname="col2">Timespan types</entry>
+            <entry colname="col2">时间跨度类型</entry>
           </row>
           <row>
             <entry colname="col1">U</entry>
-            <entry colname="col2">User-defined types</entry>
+            <entry colname="col2">用户自定义类型</entry>
           </row>
           <row>
             <entry colname="col1">V</entry>
-            <entry colname="col2">Bit-string types</entry>
+            <entry colname="col2">位串类型</entry>
           </row>
           <row>
             <entry colname="col1">X</entry>
-            <entry colname="col2"><codeph>unknown</codeph> type</entry>
+            <entry colname="col2">未知类型</entry>
           </row>
         </tbody>
       </tgroup>

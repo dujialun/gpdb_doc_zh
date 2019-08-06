@@ -1,11 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="ff142493">gp_id</title><body><p>The <codeph>gp_id</codeph> system catalog table identifies the Greenplum Database
-      system name and number of segments for the system. It also has <codeph>local</codeph> values
-      for the particular database instance (segment or master) on which the table resides. This
-      table is defined in the <codeph>pg_global</codeph> tablespace, meaning it is globally shared
-      across all databases in the system.</p><table id="ff142504"><title>pg_catalog.gp_id</title><tgroup cols="4"><colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="86pt"/><colspec colnum="3" colname="col3" colwidth="85pt"/><colspec colnum="4" colname="col4" colwidth="147pt"/><thead><row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row></thead><tbody><row><entry colname="col1"><codeph>gpname</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">The name of this Greenplum Database system.</entry></row><row><entry colname="col1"><codeph>numsegments</codeph></entry><entry colname="col2">integer</entry><entry colname="col3"/><entry colname="col4">The number of segments in the Greenplum Database system.</entry></row><row><entry colname="col1"><codeph>dbid</codeph></entry><entry colname="col2">integer</entry><entry colname="col3"/><entry colname="col4">The unique identifier of this segment (or master)
-instance.</entry></row><row><entry colname="col1"><codeph>content</codeph></entry><entry colname="col2">integer</entry><entry colname="col3"/><entry colname="col4">The ID for the portion of data on this segment instance. A primary and its
-              mirror will have the same content ID.<p>For a segment the value is from 0-<i>N-1</i>,
-                where <i>N</i> is the number of segments in Greenplum Database.</p><p>For the master, the value is -1. </p></entry></row></tbody></tgroup></table></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1" xml:lang="en">
+    <title id="ff142493">gp_id</title>
+    <body>
+        <p><codeph>gp_id</codeph>系统目录表标识了Greenplum数据库系统名称和系统的Segment数量。
+            它还具有表所在的特定数据库实例（Segment或Master）的本地值。
+            该表在<codeph>pg_global</codeph>表空间中定义，这意味着它在系统中的所有数据库之间全局共享。
+        </p>
+        <table id="ff142504">
+            <title>pg_catalog.gp_id</title>
+            <tgroup cols="4">
+                <colspec colnum="1" colname="col1" colwidth="131pt"/>
+                <colspec colnum="2" colname="col2" colwidth="86pt"/>
+                <colspec colnum="3" colname="col3" colwidth="85pt"/>
+                <colspec colnum="4" colname="col4" colwidth="147pt"/>
+                <thead>
+                    <row>
+                        <entry colname="col1">列</entry>
+                        <entry colname="col2">类型</entry>
+                        <entry colname="col3">参考</entry>
+                        <entry colname="col4">描述</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>gpname</codeph>
+                        </entry>
+                        <entry colname="col2">name</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">这个Greenplum数据库系统的名称。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>numsegments</codeph>
+                        </entry>
+                        <entry colname="col2">integer</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">Greenplum数据库系统中的Segment数量。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>dbid</codeph>
+                        </entry>
+                        <entry colname="col2">integer</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">此Segment（或Master）实例的唯一标识符。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>content</codeph>
+                        </entry>
+                        <entry colname="col2">integer</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">该Segment实例上的这部份数据的ID。主Segment及其镜像Segment将具有相同的内容ID。
+                            <p>对于Segment，值为0-<i>N-1</i>， 其中<i>N</i>是Greenplum数据库中的Segment数量。</p>
+                            <p>对于Master,其值为-1。</p>
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </body>
+</topic>

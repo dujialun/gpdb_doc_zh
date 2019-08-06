@@ -4,10 +4,9 @@
 <topic id="topic1" xml:lang="en">
   <title id="fp141670">gp_resqueue_status</title>
   <body>
-    <p>The <codeph>gp_toolkit.gp_resqueue_status</codeph> view allows administrators to see status
-      and activity for a resource queue. It shows how many queries are waiting
-      to run and how many queries are currently active in the system from a particular resource
-      queue.</p>
+    <p><codeph>gp_toolkit.gp_resqueue_status</codeph>视图允许管理员查看资源队列的状态和活动。
+      它显示了有多少查询正在等待运行以及系统中当前有多少查询来自特定资源队列。
+      </p>
       <note>The <codeph>gp_resqueue_status</codeph> view is valid only when resource queue-based resource management is active.</note>
     <table id="fp141982">
       <title>gp_toolkit.gp_resqueue_status</title>
@@ -18,10 +17,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -31,7 +30,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">gp_toolkit.gp_resqueue_ queueid</entry>
-            <entry colname="col4">The ID of the resource queue.</entry>
+            <entry colname="col4">资源队列的ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -39,7 +38,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3">gp_toolkit.gp_resqueue_ rsqname</entry>
-            <entry colname="col4">The name of the resource queue.</entry>
+            <entry colname="col4">资源队列的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -47,8 +46,8 @@
             </entry>
             <entry colname="col2">real</entry>
             <entry colname="col3">gp_toolkit.gp_resqueue_ rsqcountlimit</entry>
-            <entry colname="col4">The active query threshold of the resource queue. A value of -1
-              means no limit.</entry>
+            <entry colname="col4">资源队列的活动查询阈值。
+              值-1表示没有限制。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -56,8 +55,7 @@
             </entry>
             <entry colname="col2">real</entry>
             <entry colname="col3">gp_toolkit.gp_resqueue_ rsqcountvalue</entry>
-            <entry colname="col4">The number of active query slots currently being used in the
-              resource queue.</entry>
+            <entry colname="col4">当前在资源队列中使用的活动查询槽的数量。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -65,8 +63,7 @@
             </entry>
             <entry colname="col2">real</entry>
             <entry colname="col3">gp_toolkit.gp_resqueue_ rsqcostlimit</entry>
-            <entry colname="col4">The query cost threshold of the resource queue. A value of -1
-              means no limit.</entry>
+            <entry colname="col4">资源队列的查询开销阈值。值-1表示没有限制。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -74,8 +71,7 @@
             </entry>
             <entry colname="col2">real</entry>
             <entry colname="col3">gp_toolkit.gp_resqueue_ rsqcostvalue</entry>
-            <entry colname="col4">The total cost of all statements currently in the resource
-              queue.</entry>
+            <entry colname="col4">当前在资源队列中的所有语句的总成本。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -83,7 +79,7 @@
             </entry>
             <entry colname="col2">real</entry>
             <entry colname="col3">gp_toolkit.gp_resqueue_ rsqmemorylimit</entry>
-            <entry colname="col4">The memory limit for the resource queue.</entry>
+            <entry colname="col4">资源队列的内存限制。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -91,8 +87,7 @@
             </entry>
             <entry colname="col2">real</entry>
             <entry colname="col3">gp_toolkit.gp_resqueue_ rsqmemoryvalue</entry>
-            <entry colname="col4">The total memory used by all statements currently in the resource
-              queue.</entry>
+            <entry colname="col4">当前在资源队列中的所有语句使用的总内存。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -100,8 +95,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3">gp_toolkit.gp_resqueue_ rsqwaiter</entry>
-            <entry colname="col4">The number of statements currently waiting in the resource
-              queue.</entry>
+            <entry colname="col4">当前在资源队列中等待的语句数。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -109,8 +103,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3">gp_toolkit.gp_resqueue_ rsqholders</entry>
-            <entry colname="col4">The number of statements currently running on the system from this
-              resource queue.</entry>
+            <entry colname="col4">当前在此资源队列中在系统上运行的语句数。</entry>
           </row>
         </tbody>
       </tgroup>

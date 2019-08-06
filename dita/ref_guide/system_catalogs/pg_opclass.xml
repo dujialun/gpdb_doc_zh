@@ -4,16 +4,14 @@
 <topic id="topic1" xml:lang="en">
   <title id="gw141670">pg_opclass</title>
   <body>
-    <p>The <codeph>pg_opclass</codeph> system catalog table defines index access method operator
-      classes. Each operator class defines semantics for index columns of a particular data type and
-      a particular index access method. An operator class essentially specifies that a particular
-      operator family is applicable to a particular indexable column data type. The set of operators
-      from the family that are actually usable with the indexed column are those that accept the
-      column's data type as their left-hand input.</p>
-    <p>An operator class's <codeph>opcmethod</codeph> must match the <codeph>opfmethod</codeph> of
-      its containing operator family. Also, there must be no more than one <codeph>pg_opclass</codeph>
-      row having <codeph>opcdefault</codeph> true for any given combination of
-      <codeph>opcmethod</codeph> and <codeph>opcintype</codeph>.</p>
+    <p><codeph>pg_opclass</codeph>系统目录表定义索引访问方法操作符类。
+      每个运算符类为特定数据类型的索引列和特定索引访问方法定义语义。
+      运算符类实质上指定特定运算符族适用于特定的可索引列数据类型。
+      系列中实际可用于索引列的运算符集是那些接受列的数据类型作为其左侧输入的运算符。
+      </p>
+    <p>运算符类的<codeph>opcmethod</codeph>必须与其包含运算符族的<codeph>opfmethod</codeph>匹配。
+      此外，对于任何给定的<codeph>opcmethod</codeph>和<codeph>opcintype</codeph>组合，必须有不超过一个<codeph>pg_opclass</codeph>行具有<codeph>opcdefault</codeph>为true。
+      </p>
     <table id="gw141982">
       <title>pg_catalog.pg_opclass</title>
       <tgroup cols="4">
@@ -23,10 +21,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -36,7 +34,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Row identifier (hidden attribute; must be explicitly selected)</entry>
+            <entry colname="col4">行标识符（隐藏属性;必须显式选择）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -44,7 +42,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_am.oid</entry>
-            <entry colname="col4">Index access method operator class is for</entry>
+            <entry colname="col4">运算符类用的索引访问方法</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -52,7 +50,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of this operator class</entry>
+            <entry colname="col4">运算符类的名称</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -60,7 +58,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_namespace.oid</entry>
-            <entry colname="col4">Namespace of this operator class </entry>
+            <entry colname="col4">运算符类所属的命名空间</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -68,7 +66,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the operator class</entry>
+            <entry colname="col4">运算符类的拥有者</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -76,7 +74,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_opfamily.oid</entry>
-            <entry colname="col4">Operator family containing the operator class</entry>
+            <entry colname="col4">包含运算符类的运算符族</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -84,7 +82,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Data type that the operator class indexes</entry>
+            <entry colname="col4">运算符类索引的数据类型</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -92,8 +90,8 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if this operator class is the default for the data type
-              <codeph>opcintype</codeph></entry>
+            <entry colname="col4">如果此运算符类是数据类型<codeph>opcintype</codeph>的缺省值，则为True
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -101,8 +99,8 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Type of data stored in index, or zero if same as
-              <codeph>opcintype</codeph></entry>
+            <entry colname="col4">存储在索引中的数据类型，如果与<codeph>opcintype</codeph>相同则为零
+              </entry>
           </row>
         </tbody>
       </tgroup>

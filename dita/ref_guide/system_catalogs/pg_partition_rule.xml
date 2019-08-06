@@ -4,11 +4,9 @@
 <topic id="topic1" xml:lang="en">
   <title id="hc143896">pg_partition_rule</title>
   <body>
-    <p>The <codeph>pg_partition_rule</codeph> system catalog table is used to track partitioned
-      tables, their check constraints, and data containment rules. Each row of
-        <codeph>pg_partition_rule</codeph> represents either a leaf partition (the bottom level
-      partitions that contain data), or a branch partition (a top or mid-level partition that is
-      used to define the partition hierarchy, but does not contain any data).</p>
+    <p><codeph>pg_partition_rule</codeph>系统目录表被用来跟踪分区表、它们的检查约束以及数据包含规则。
+      <codeph>pg_partition_rule</codeph>表中的每一行要么代表了一个叶子分区（最底层包含数据的分区），要么是一个分支分区（用于定义分区层次的顶层或者中间层分区，但不包含数据）。
+      </p>
     <table id="hc179425">
       <title>pg_catalog.pg_partition_rule</title>
       <tgroup cols="4">
@@ -18,10 +16,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -31,11 +29,10 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_partition.oid</entry>
-            <entry colname="col4">Row identifier of the partitioning level (from <xref
-                href="pg_partition.xml#topic1" type="topic" format="dita"/>) to which this partition
-              belongs. In the case of a branch partition, the corresponding table (identified by
-                <codeph>pg_partition_rule</codeph>) is an empty container table. In case of a leaf
-              partition, the table contains the rows for that partition containment rule.</entry>
+            <entry colname="col4">这个分区所属的分区级别的行标识符（来自<xref href="pg_partition.xml#topic1" type="topic" format="dita"/>）。
+              对于分支分区，相应的表（由<codeph>pg_partition_rule</codeph>标识）是一个空的容器表。
+              对于叶子分区，这个表含有分区包含规则的行。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -43,7 +40,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">The table identifier of the partition (child table).</entry>
+            <entry colname="col4">分区（子表）的表标识符。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -51,8 +48,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_partition_rule.paroid</entry>
-            <entry colname="col4">The row identifier of the rule associated with the parent table of
-              this partition.</entry>
+            <entry colname="col4">与该分区的父表相关的规则的行标识符。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -60,7 +56,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The given name of this partition.</entry>
+            <entry colname="col4">该分区的给定名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -68,7 +64,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Whether or not this partition is a default partition.</entry>
+            <entry colname="col4">该分区是否为默认分区。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -76,8 +72,7 @@
             </entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For range partitioned tables, the rank of this partition on this
-              level of the partition hierarchy.</entry>
+            <entry colname="col4">对于范围分区表，该分区在分区层次的这个级别上的排名。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -85,8 +80,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For range partitioned tables, whether or not the starting value is
-              inclusive.</entry>
+            <entry colname="col4">对于范围分区表，是否包括起始值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -94,8 +88,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For range partitioned tables, whether or not the ending value is
-              inclusive.</entry>
+            <entry colname="col4">对于范围分区表，是否包括结束值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -103,8 +96,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For range partitioned tables, the starting value of the
-              range.</entry>
+            <entry colname="col4">对于范围分区表，范围的开始值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -112,8 +104,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For range partitioned tables, the ending value of the
-              range.</entry>
+            <entry colname="col4">对于范围分区表，范围的结束值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -121,8 +112,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For range partitioned tables, the interval value of the
-                <codeph>EVERY</codeph> clause.</entry>
+            <entry colname="col4">对于范围分区表，<codeph>EVERY</codeph>子句的间隔值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -130,8 +120,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For list partitioned tables, the list of values assigned to this
-              partition.</entry>
+            <entry colname="col4">对于列表分区表，指派给该分区的值列表。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -139,8 +128,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">An array describing the storage characteristics of the particular
-              partition.</entry>
+            <entry colname="col4">一个描述特定分区存储特性的数组。</entry>
           </row>
         </tbody>
       </tgroup>

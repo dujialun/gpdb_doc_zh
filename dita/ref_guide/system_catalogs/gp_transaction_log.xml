@@ -4,9 +4,8 @@
 <topic id="topic1" xml:lang="en">
   <title id="fs142834">gp_transaction_log</title>
   <body>
-    <p>The <codeph>gp_transaction_log</codeph> view contains status information about transactions
-      local to a particular segment. This view allows you to see the status of local
-      transactions.</p>
+    <p><codeph>gp_transaction_log</codeph>视图包含特定Segment的本地事务的状态信息。
+      此视图允许用户查看本地事务的状态。</p>
     <table id="fs142842">
       <title>pg_catalog.gp_transaction_log</title>
       <tgroup cols="4">
@@ -16,10 +15,10 @@
         <colspec colnum="4" colname="col4" colwidth="145pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -29,8 +28,7 @@
             </entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3">gp_segment_ configuration.content</entry>
-            <entry colname="col4">The content id if the segment. The master is always -1 (no
-              content).</entry>
+            <entry colname="col4">如果是Segment，则是内容ID。Master总为-1 (没有内容)。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -38,7 +36,7 @@
             </entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3">gp_segment_ configuration.dbid</entry>
-            <entry colname="col4">The unique id of the segment instance. </entry>
+            <entry colname="col4">Segment实例的唯一ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -46,7 +44,7 @@
             </entry>
             <entry colname="col2">xid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The local transaction ID.</entry>
+            <entry colname="col4">本地事务的ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -54,8 +52,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The status of the local transaction (Committed or
-              Aborted).</entry>
+            <entry colname="col4">本地事务的状态（提交或者中止）。</entry>
           </row>
         </tbody>
       </tgroup>

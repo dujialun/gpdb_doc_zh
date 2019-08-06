@@ -4,7 +4,10 @@
 <topic xml:lang="en" id="topic1">
   <title>pg_foreign_table</title>
   <body>
-    <p>The system catalog table <codeph>pg_foreign_table</codeph> contains auxiliary information about foreign tables. A foreign table is primarily represented by a <codeph>pg_class</codeph> entry, just like a regular table. Its <codeph>pg_foreign_table</codeph> entry contains the information that is pertinent only to foreign tables and not any other kind of relation.</p>
+    <p>系统目录表<codeph>pg_foreign_table</codeph>包含有关外部表的辅助信息。
+      外表主要由<codeph>pg_class</codeph>条目表示，就像常规表一样。
+      它的<codeph>pg_foreign_table</codeph>条目包含仅与外表相关的信息，而不包含任何其他类型的关系。
+      </p>
     <table id="table_zgy_xfx_tz">
       <title>pg_catalog.pg_foreign_table</title>
       <tgroup cols="4">
@@ -14,10 +17,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -25,19 +28,19 @@
             <entry colname="col1"><codeph>ftrelid</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">OID of the <codeph>pg_class</codeph> entry for this foreign table.</entry>
+            <entry colname="col4">此外表的<codeph>pg_class</codeph>条目的OID。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>ftserver</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_foreign_server.oid</entry>
-            <entry colname="col4">OID of the foreign server for this foreign table.</entry>
+            <entry colname="col4">此外表的外部服务器的OID。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>ftoptions</codeph></entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Foreign table options, as "keyword=value" strings.</entry>
+            <entry colname="col4">外表选项，如“keyword = value”字符串。.</entry>
           </row>
         </tbody>
       </tgroup>

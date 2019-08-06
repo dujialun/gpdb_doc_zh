@@ -4,10 +4,9 @@
 <topic id="topic1" xml:lang="en">
   <title id="fz143896">pg_attrdef</title>
   <body>
-    <p>The <codeph>pg_attrdef</codeph> table stores column default values. The main information
-      about columns is stored in <xref href="pg_attribute.xml#topic1">pg_attribute</xref>. Only
-      columns that explicitly specify a default value (when the table is created or the column is
-      added) will have an entry here.</p>
+    <p><codeph>pg_attrdef</codeph>表储存列的默认值，关于列的主要信息储存在<xref href="pg_attribute.xml#topic1">pg_attribute</xref>中。
+      只有那些显式指定了默认值的列（在创建表或者添加列时）才会在该表中有一项。
+      </p>
     <table id="fz143898">
       <title>pg_catalog.pg_attrdef</title>
       <tgroup cols="4">
@@ -17,10 +16,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -30,7 +29,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">The table this column belongs to</entry>
+            <entry colname="col4">该列所属的表</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -38,7 +37,7 @@
             </entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3">pg_attribute.attnum</entry>
-            <entry colname="col4">The number of the column</entry>
+            <entry colname="col4">列编号</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -46,7 +45,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The internal representation of the column default value</entry>
+            <entry colname="col4">列默认值的内部表示</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -54,8 +53,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">A human-readable representation of the default value. This field
-              is historical, and is best not used.</entry>
+            <entry colname="col4">人类可读的默认值表示。这个字段是历史遗留下来的，最好别用。A human-readable representation of the default value. </entry>
           </row>
         </tbody>
       </tgroup>

@@ -4,15 +4,11 @@
 <topic id="topic1" xml:lang="en">
   <title id="hk141670">pg_resgroupcapability</title>
   <body>
-    <note>The <codeph>pg_resgroupcapability</codeph> system catalog table is valid only when resource group-based resource management is active.</note>
-    <p>The <codeph>pg_resgroupcapability</codeph> system catalog table contains information about
-      the capabilities and limits of defined Greenplum Database resource groups.
-      You can join this table to the <xref
-        href="pg_resgroup.xml#topic1" type="topic" format="dita"/> table by resource group object
-      ID.</p>
-    <p>The <codeph>pg_resgroupcapability</codeph> table, defined in the
-        <codeph>pg_global</codeph> tablespace, is globally shared across all databases in
-      the system.</p>
+    <note>仅当基于资源组的资源管理处于活动状态时，<codeph>pg_resgroupcapability</codeph>系统目录表才有效。</note>
+    <p><codeph>pg_resgroupcapability</codeph>系统目录表包含有关已定义的Greenplum数据库资源组的功能和限制的信息。
+      您可以按资源组对象ID将此表连接到<xref href="pg_resgroup.xml#topic1" type="topic" format="dita"/>表。
+      </p>
+    <p><codeph>pg_global</codeph>表空间中定义的<codeph>pg_resgroupcapability</codeph>表在系统中的所有数据库之间全局共享。</p>
     <table id="hk141982">
       <title>pg_catalog.pg_resgroupcapability</title>
       <tgroup cols="4">
@@ -22,10 +18,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -37,7 +33,7 @@
             <entry colname="col3">
               <codeph>pg_resgroup.oid</codeph>
             </entry>
-            <entry colname="col4">The object ID of the associated resource group.</entry>
+            <entry colname="col4">关联资源组的对象ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -47,7 +43,15 @@
             <entry colname="col3">
               <codeph></codeph>
             </entry>
-            <entry colname="col4">The resource group limit type:<p>0 - Unknown</p><p>1 - Concurrency</p><p>2 - CPU</p><p>3 - Memory</p><p>4 - Memory shared quota</p><p>5 - Memory spill ratio</p><p>6 - Memory auditor</p><p>7 - CPU set</p>
+            <entry colname="col4">资源组限制类型：
+              <p>0 - 未知</p>
+              <p>1 - 并发度</p>
+              <p>2 - CPU</p>
+              <p>3 - 内存</p>
+              <p>4 - 内存共享配额</p>
+              <p>5 - 内存溢出比例</p>
+              <p>6 - 内存审查</p>
+              <p>7 - CPU集合</p>
             </entry>
           </row>
           <row>
@@ -56,9 +60,9 @@
             </entry>
             <entry colname="col2">opaque type</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The specific value set for the resource limit referenced in 
-              this record. This value has the fixed type <codeph>text</codeph>, and will be
-              converted to a different data type depending upon the limit referenced. </entry>
+            <entry colname="col4">为此记录中引用的资源限制设置的特定值。
+              此值具有固定类型文本，并将根据引用的限制转换为不同的数据类型。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -66,10 +70,9 @@
             </entry>
             <entry colname="col2">opaque type</entry>
             <entry colname="col3"/>
-            <entry colname="col4">If you altered a resource limit and the limit cannot be
-               updated immediately, the proposed value for the limit referenced in this
-               record. Otherwise, <codeph>proposed</codeph> reflects the currently set
-               <codeph>value</codeph>.</entry>
+            <entry colname="col4">如果您更改了资源限制并且无法立即更新限制，此记录中引用的限制的<codeph>proposed</codeph>值。
+              否则，<codeph>proposed</codeph>反映当前设定的<codeph>value</codeph>。
+              </entry>
           </row>
         </tbody>
       </tgroup>

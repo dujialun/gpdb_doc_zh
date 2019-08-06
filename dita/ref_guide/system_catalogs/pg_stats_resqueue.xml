@@ -1,17 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="hw141670">pg_stat_resqueues</title>
-  <body>
-    <note>The <codeph>pg_stat_resqueues</codeph> view is valid only when resource queue-based resource management is active.</note>
-    <p>The <codeph>pg_stat_resqueues</codeph> view allows administrators to view metrics about a
-      resource queue's workload over time. To allow statistics to be collected for this view, you
-      must enable the <codeph>stats_queue_level</codeph> server configuration parameter on the
-        Greenplum Database master instance. Enabling the collection of these metrics
-      does incur a small performance penalty, as each statement submitted through a resource queue
-      must be logged in the system catalog tables.</p>
-    <table id="hw141982"><title>pg_catalog.pg_stat_resqueues</title><tgroup cols="4"><colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="66pt"/><colspec colnum="3" colname="col3" colwidth="104pt"/><colspec colnum="4" colname="col4" colwidth="147pt"/><thead><row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row></thead><tbody><row><entry colname="col1"><codeph>queueoid</codeph></entry><entry colname="col2">oid</entry><entry colname="col3"/><entry colname="col4">The OID of the resource queue.</entry></row><row><entry colname="col1"><codeph>queuename</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">The name of the resource queue.</entry></row><row><entry colname="col1"><codeph>n_queries_exec</codeph></entry><entry colname="col2">bigint</entry><entry colname="col3"/><entry colname="col4">Number of queries submitted for execution from
-this resource queue.</entry></row><row><entry colname="col1"><codeph>n_queries_wait</codeph></entry><entry colname="col2">bigint</entry><entry colname="col3"/><entry colname="col4">Number of queries submitted to this resource
-queue that had to wait before they could execute.</entry></row><row><entry colname="col1"><codeph>elapsed_exec</codeph></entry><entry colname="col2">bigint</entry><entry colname="col3"/><entry colname="col4">Total elapsed execution time for statements
-submitted through this resource queue.</entry></row><row><entry colname="col1"><codeph>elapsed_wait</codeph></entry><entry colname="col2">bigint</entry><entry colname="col3"/><entry colname="col4">Total elapsed time that statements submitted
-through this resource queue had to wait before they were executed.</entry></row></tbody></tgroup></table></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1" xml:lang="en">
+    <title id="hw141670">pg_stat_resqueues</title>
+    <body>
+        <note>仅当基于资源队列的资源管理处于活动状态时，<codeph>pg_stat_resqueues</codeph>视图才有效。
+        </note>
+        <p><codeph>pg_stat_resqueues</codeph>视图允许管理员查看有关资源队列工作负载的指标。
+          要允许为此视图收集统计信息，必须在Greenplum数据库master实例上启用<codeph>stats_queue_level</codeph>服务器配置参数。
+          启用这些度量标准的收集会导致性能损失很小，因为通过资源队列提交的每个语句都必须记录在系统目录表中。
+        </p>
+        <table id="hw141982">
+            <title>pg_catalog.pg_stat_resqueues</title>
+            <tgroup cols="4">
+                <colspec colnum="1" colname="col1" colwidth="131pt"/>
+                <colspec colnum="2" colname="col2" colwidth="66pt"/>
+                <colspec colnum="3" colname="col3" colwidth="104pt"/>
+                <colspec colnum="4" colname="col4" colwidth="147pt"/>
+                <thead>
+                    <row>
+                        <entry colname="col1">列</entry>
+                        <entry colname="col2">类型</entry>
+                        <entry colname="col3">参考</entry>
+                        <entry colname="col4">描述</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>queueoid</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">资源队列的OID。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>queuename</codeph>
+                        </entry>
+                        <entry colname="col2">name</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">资源队列的名称。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>n_queries_exec</codeph>
+                        </entry>
+                        <entry colname="col2">bigint</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">已提交的要从该资源队列中执行的查询数目。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>n_queries_wait</codeph>
+                        </entry>
+                        <entry colname="col2">bigint</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">已提交到该资源队列中，在执行之前必须进行等待的查询数目。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>elapsed_exec</codeph>
+                        </entry>
+                        <entry colname="col2">bigint</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">通过该资源队列提交的语句的总执行时间。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>elapsed_wait</codeph>
+                        </entry>
+                        <entry colname="col2">bigint</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">通过该资源队列提交的语句，在执行之前必须进行等待的总时间。
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </body>
+</topic>

@@ -4,17 +4,16 @@
 <topic id="topic1" xml:lang="en">
   <title id="gd143896">pg_authid</title>
   <body>
-    <p>The <codeph>pg_authid</codeph> table contains information about database authorization
-      identifiers (roles). A role subsumes the concepts of users and groups. A user is a role with
-      the <codeph>rolcanlogin</codeph> flag set. Any role (with or without
-        <codeph>rolcanlogin</codeph>) may have other roles as members. See <xref
-        href="pg_auth_members.xml#topic1" type="topic" format="dita"/>. </p>
-    <p>Since this catalog contains passwords, it must not be publicly readable. <xref
-        href="./pg_roles.xml#topic1" type="topic" format="dita"/> is a publicly readable view on
-        <codeph>pg_authid</codeph> that blanks out the password field.</p>
-    <p>Because user identities are system-wide, <codeph>pg_authid</codeph> is shared across all
-      databases in a Greenplum Database system: there is only one copy of
-        <codeph>pg_authid</codeph> per system, not one per database.</p>
+    <p><codeph>pg_authid</codeph>表包含了有关数据库认证标识符（角色）的信息。
+      角色包含用户和组的概念。
+      用户是设置了<codeph>rolcanlogin</codeph>标志的角色。
+      任何角色（有或者没有<codeph>rolcanlogin</codeph>）可能有其他角色作为其成员。
+      请参阅<xref href="pg_auth_members.xml#topic1" type="topic" format="dita"/>。
+      </p>
+    <p>由于此目录包含密码，因此不是公众可读的。
+      <xref href="./pg_roles.xml#topic1" type="topic" format="dita"/>是<codeph>pg_authid</codeph>上的一个公开可读的视图，其中模糊化了密码字段。
+      </p>
+    <p>由于用户身份是全系统范围的，因此<codeph>pg_authid</codeph>在Greenplum数据库系统中的所有数据库之间共享：每个系统只有一个<codeph>pg_authid</codeph>副本，而不是每个数据库一个。</p>
     <table id="gd143898">
       <title>pg_catalog.pg_authid</title>
       <tgroup cols="4">
@@ -24,10 +23,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -37,7 +36,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Row identifier (hidden attribute; must be explicitly selected)</entry>
+            <entry colname="col4">行标识符（隐藏属性;必须显式选择）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -45,7 +44,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role name</entry>
+            <entry colname="col4">角色名称</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -53,7 +52,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role has superuser privileges</entry>
+            <entry colname="col4">角色具有超级用户特权</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -61,8 +60,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role automatically inherits privileges of roles it is a member
-              of</entry>
+            <entry colname="col4">角色自动继承其所属角色的权限</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -70,7 +68,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may create more roles</entry>
+            <entry colname="col4">角色可以创建其他更多角色</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -78,7 +76,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may create databases</entry>
+            <entry colname="col4">角色可以创建数据库</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -86,8 +84,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may update system catalogs directly. (Even a superuser may
-              not do this unless this column is true)</entry>
+            <entry colname="col4">角色可以直接更新系统目录（即使超级用户也不能这样做，除非此列为真）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -95,8 +92,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may log in. That is, this role can be given as the initial
-              session authorization identifier </entry>
+            <entry colname="col4">角色可以登录。也就是说，该角色可以作为初始会话授权标识符</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -104,9 +100,8 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role is a replication role. That is, this role can initiate streaming
-              replication and set/unset the system backup mode using <codeph>pg_start_backup</codeph>
-              and <codeph>pg_stop_backup</codeph>.</entry>
+            <entry colname="col4">角色是复制角色。
+              也就是说，此角色可以使用<codeph>pg_start_backup</codeph>和<codeph>pg_stop_backup</codeph>启动流复制并设置/取消设置系统备份模式。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -114,8 +109,8 @@
             </entry>
             <entry colname="col2">int4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For roles that can log in, this sets maximum number of concurrent
-              connections this role can make. <codeph>-1</codeph> means no limit</entry>
+            <entry colname="col4">对于那些可以登录的角色，这一列设置此角色可以创建的最大并发连接数。
+              <codeph>-1</codeph>表示没有限制。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -123,13 +118,12 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Password (possibly encrypted); NULL if none. If the password is
-              encrypted, this column will begin with the string <codeph>md5</codeph> followed by a
-              32-character hexadecimal MD5 hash. The MD5 hash will be the user's password concatenated
-              to their user name. For example, if user <codeph>joe</codeph> has password
-              <codeph>xyzzy</codeph>, Greenplum Database will store the md5 hash of
-              <codeph>xyzzyjoe</codeph>. Greenplum assumes that a password that does not follow that
-              format is unencrypted.</entry>
+            <entry colname="col4">密码（可能是加密的）; 如果没有则为NULL。
+              如果密码已加密，则此列将以字符串<codeph>md5</codeph>开头，后跟32个字符的十六进制MD5哈希。
+              MD5哈希将是用户的密码连接到他们的用户名。
+              例如，如果用户<codeph>joe</codeph>的密码为<codeph>xyzzy</codeph>，则Greenplum数据库将存储<codeph>xyzzyjoe</codeph>的md5哈希值。
+              Greenplum假定不遵循该格式的密码未加密。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -137,8 +131,7 @@
             </entry>
             <entry colname="col2">timestamptz</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Password expiry time (only used for password authentication); NULL
-              if no expiration</entry>
+            <entry colname="col4">密码到期时间（仅用于密码验证）；不过期则为NULL</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -146,8 +139,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Object ID of the associated resource queue ID in
-                <i>pg_resqueue</i>
+            <entry colname="col4"><i>pg_resqueue</i>中关联资源队列ID的对象ID
             </entry>
           </row>
           <row>
@@ -156,8 +148,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Privilege to create read external tables with the
-                <codeph>gpfdist</codeph> or <codeph>gpfdists</codeph> protocol</entry>
+            <entry colname="col4">使用<codeph>gpfdist</codeph>或<codeph>gpfdists</codeph>协议创建读取外部表的权限</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -165,8 +156,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Privilege to create read external tables with the
-                <codeph>http</codeph> protocol </entry>
+            <entry colname="col4">使用<codeph>http</codeph>协议创建读取外部表的权限</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -174,8 +164,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Privilege to create write external tables with the
-                <codeph>gpfdist</codeph> or <codeph>gpfdists</codeph> protocol</entry>
+            <entry colname="col4">使用<codeph>gpfdist</codeph>或<codeph>gpfdists</codeph>协议创建写入外部表的权限</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -183,8 +172,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Object ID of the associated resource group ID in
-                <i>pg_resgroup</i>
+            <entry colname="col4"><i>pg_resgroup</i>中关联资源组ID的对象ID
             </entry>
           </row>
         </tbody>

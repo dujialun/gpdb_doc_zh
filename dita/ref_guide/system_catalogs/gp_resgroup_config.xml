@@ -4,11 +4,11 @@
 <topic id="topic1" xml:lang="en">
   <title id="fp141670">gp_resgroup_config</title>
   <body>
-    <p>The <codeph>gp_toolkit.gp_resgroup_config</codeph> view allows administrators to see the
-      current CPU, memory, and concurrency limits for a resource group. The
-      view also displays proposed limit settings. A proposed limit will differ from a current
-      limit when the limit has been altered, but the new value could not be immediately applied.</p>
-      <note>The <codeph>gp_resgroup_config</codeph> view is valid only when resource group-based resource management is active.</note>
+    <p><codeph>gp_toolkit.gp_resgroup_config</codeph>视图允许管理员查看资源组的当前CPU，内存和并发限制。
+      该视图还显示建议的限制设置。
+      当限制被更改时，建议的限制将不同于当前限制，但新值不能立即应用。
+      </p>
+      <note>仅当基于资源组的资源管理处于活动状态时，<codeph>gp_resgroup_config</codeph>视图才有效。</note>
     <table id="fp141982">
       <title>gp_toolkit.gp_resgroup_config</title>
       <tgroup cols="4">
@@ -18,10 +18,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -31,7 +31,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_resgroup.oid</entry>
-            <entry colname="col4">The ID of the resource group.</entry>
+            <entry colname="col4">资源组的OID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -39,7 +39,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3">pg_resgroup.rsgname</entry>
-            <entry colname="col4">The name of the resource group.</entry>
+            <entry colname="col4">资源组的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -47,7 +47,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.value for pg_resgroupcapability.reslimittype = 1</entry>
-            <entry colname="col4">The concurrency (<codeph>CONCURRENCY</codeph>) value specified for the resource group.</entry>
+            <entry colname="col4">为资源组指定的并发（<codeph>CONCURRENCY</codeph>）值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -55,7 +55,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.proposed for pg_resgroupcapability.reslimittype = 1</entry>
-            <entry colname="col4">The pending concurrency value for the resource group.</entry>
+            <entry colname="col4">资源组的挂起并发值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -63,7 +63,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.value for pg_resgroupcapability.reslimittype = 2</entry>
-            <entry colname="col4">The CPU limit (<codeph>CPU_RATE_LIMIT</codeph>) value specified for the resource group, or -1.</entry>
+            <entry colname="col4">为资源组指定的CPU限制（<codeph>CPU_RATE_LIMIT</codeph>）值，或-1。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -71,7 +71,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.value for pg_resgroupcapability.reslimittype = 3</entry>
-            <entry colname="col4">The memory limit (<codeph>MEMORY_LIMIT</codeph>) value specified for the resource group.</entry>
+            <entry colname="col4">为资源组指定的内存限制（<codeph>MEMORY_LIMIT</codeph>）值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -79,7 +79,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.proposed for pg_resgroupcapability.reslimittype = 3</entry>
-            <entry colname="col4">The pending memory limit value for the resource group.</entry>
+            <entry colname="col4">资源组的挂起内存限制值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -87,7 +87,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.value for pg_resgroupcapability.reslimittype = 4</entry>
-            <entry colname="col4">The shared memory quota (<codeph>MEMORY_SHARED_QUOTA</codeph>) value specified for the resource group.</entry>
+            <entry colname="col4">为资源组指定的共享内存配额（<codeph>MEMORY_SHARED_QUOTA</codeph>）值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -95,7 +95,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.proposed for pg_resgroupcapability.reslimittype = 4</entry>
-            <entry colname="col4">The pending shared memory quota value for the resource group.</entry>
+            <entry colname="col4">资源组的挂起共享内存配额值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -103,7 +103,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.value for pg_resgroupcapability.reslimittype = 5</entry>
-            <entry colname="col4">The memory spill ratio (<codeph>MEMORY_SPILL_RATIO</codeph>) value specified for the resource group.</entry>
+            <entry colname="col4">为资源组指定的内存溢出率（<codeph>MEMORY_SPILL_RATIO</codeph>）值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -111,7 +111,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.proposed for pg_resgroupcapability.reslimittype> = 5</entry>
-            <entry colname="col4">The pending memory spill ratio value for the resource group.</entry>
+            <entry colname="col4">资源组的待处理内存溢出比率值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -119,7 +119,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.value for pg_resgroupcapability.reslimittype = 6</entry>
-            <entry colname="col4">The memory auditor in use for the resource group.</entry>
+            <entry colname="col4">用于资源组的内存审计器。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -127,7 +127,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroupcapability.value for pg_resgroupcapability.reslimittype = 7</entry>
-            <entry colname="col4">The CPU cores reserved for the resource group, or -1.</entry>
+            <entry colname="col4">为资源组保留的CPU核心，或-1。</entry>
           </row>
         </tbody>
       </tgroup>

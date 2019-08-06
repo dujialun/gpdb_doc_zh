@@ -4,9 +4,8 @@
 <topic id="topic1" xml:lang="en">
   <title id="go138336">pg_max_external_files</title>
   <body>
-    <p>The <codeph>pg_max_external_files</codeph> view shows the maximum number of external table
-      files allowed per segment host when using the external table <codeph>file</codeph>
-      protocol.</p>
+    <p><codeph>pg_max_external_files</codeph>视图显示使用外部表文件协议时每台Segment主机允许的外部表文件最大数量。
+      </p>
     <table id="go138428">
       <title>pg_catalog.pg_max_external_files</title>
       <tgroup cols="4">
@@ -16,10 +15,10 @@
         <colspec colnum="4" colname="col4" colwidth="138pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -27,14 +26,13 @@
             <entry colname="col1"><codeph>hostname</codeph></entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The host name used to access a particular segment instance on a
-              segment host. </entry>
+            <entry colname="col4">在Segment主机上访问特定Segment实例所使用的主机名。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>maxfiles</codeph></entry>
             <entry colname="col2">bigint</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Number of primary segment instances on the host.</entry>
+            <entry colname="col4">该主机上的主Segment实例数。</entry>
           </row>
         </tbody>
       </tgroup>

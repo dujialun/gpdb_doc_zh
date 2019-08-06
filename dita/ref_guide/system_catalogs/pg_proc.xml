@@ -4,16 +4,14 @@
 <topic id="topic1" xml:lang="en">
   <title id="hg141670">pg_proc</title>
   <body>
-    <p>The <codeph>pg_proc</codeph> system catalog table stores information about functions (or
-      procedures), both built-in functions and those defined by <codeph>CREATE FUNCTION</codeph>.
-      The table contains data for aggregate and window functions as well as plain functions. If
-        <codeph>proisagg</codeph> is true, there should be a matching row in
-        <codeph>pg_aggregate</codeph>.</p>
-    <p>For compiled functions, both built-in and dynamically loaded, <codeph>prosrc</codeph>
-      contains the function's C-language name (link symbol). For all other currently-known language
-      types, <codeph>prosrc</codeph> contains the function's source text. <codeph>probin</codeph> is
-      unused except for dynamically-loaded C functions, for which it gives the name of the shared
-      library file containing the function.</p>
+    <p><codeph>pg_proc</codeph>系统目录表存储关于函数（或过程）的信息，包括所有的内建函数以及由<codeph>CREATE FUNCTION</codeph>定义的函数。
+      该表也包含了聚集和窗口函数以及普通函数的数据。
+      如果<codeph>proisagg</codeph>为真，在<codeph>pg_aggregate</codeph>中应该有一个相匹配的行。
+      </p>
+    <p>对于内置和动态加载的已编译函数，<codeph>prosrc</codeph>包含函数的C语言名称（链接符号）。
+      对于所有其他当前已知的语言类型，<codeph>prosrc</codeph>包含函数的源文本。
+      除了动态加载的C函数之外，<codeph>probin</codeph>是未使用的，它为此提供了包含该函数的共享库文件的名称。
+      </p>
     <table id="hg150092">
       <title>pg_catalog.pg_proc</title>
       <tgroup cols="4">
@@ -23,10 +21,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -36,7 +34,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Row identifier (hidden attribute; ust be explicitly selected)</entry>
+            <entry colname="col4">行标识符（隐藏属性;必须显式选择）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -44,7 +42,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of the function</entry>
+            <entry colname="col4">函数的名字</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -52,7 +50,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_namespace.oid</entry>
-            <entry colname="col4">The OID of the namespace that contains this function</entry>
+            <entry colname="col4">函数所属的名字空间的OID</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -60,7 +58,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the function</entry>
+            <entry colname="col4">函数的拥有者</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -68,8 +66,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_language.oid</entry>
-            <entry colname="col4">Implementation language or call interface of this
-              function</entry>
+            <entry colname="col4">该函数的实现语言或调用接口</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -77,8 +74,8 @@
             </entry>
             <entry colname="col2">float4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Estimated execution cost (in cpu_operator_cost units); if
-              <codeph>proretset</codeph> is <codeph>true</codeph>, identifies the cost per row returned</entry>
+            <entry colname="col4">估计的执行代价（以cpu_operator_cost为单位），如果<codeph>proretset</codeph>为<codeph>true</codeph>，这是返回每行的代价
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -86,7 +83,7 @@
             </entry>
             <entry colname="col2">float4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Estimated number of result rows (zero if not <codeph>proretset</codeph>)</entry>
+            <entry colname="col4">估计的结果行数（如果不是<codeph>proretset</codeph>则为零）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -94,8 +91,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Data type of the variadic array parameter's elements, or zero if
-              the function does not have a variadic parameter</entry>
+            <entry colname="col4">可变数组参数的元素的数据类型，如果函数没有可变参数则为0</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -103,7 +99,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Calls to this function can be simplified by this other function</entry>
+            <entry colname="col4">这个函数可以简化对此函数的调用</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -111,7 +107,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Function is an aggregate function</entry>
+            <entry colname="col4">函数是否为一个聚集函数</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -119,7 +115,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Function is a window function</entry>
+            <entry colname="col4">功能是否为一个窗口函数</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -127,8 +123,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Function is a security definer (for example, a 'setuid'
-              function)</entry>
+            <entry colname="col4">函数是一个安全性定义器（例如，一个"setuid"函数）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -136,9 +131,10 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The function has no side effects. No information about the arguments
-              is conveyed except via the return value. Any function that might throw an error
-              depending on the values of its arguments is not leak-proof.</entry>
+            <entry colname="col4">该功能没有副作用。
+              除了通过返回值之外，不会传达有关参数的信息。
+              任何可能根据其参数的值抛出错误的函数都不是防漏的。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -146,9 +142,10 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Function returns NULL if any call argument is NULL. In that case
-              the function will not actually be called at all. Functions that are not strict must be
-              prepared to handle NULL inputs.</entry>
+            <entry colname="col4">当任意调用参数为空时，函数是否会返回空值。
+              在那种情况下函数实际上根本不会被调用。
+              非“strict”函数必须准备好处理空值输入。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -156,8 +153,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Function returns a set (multiple values of the specified data
-              type)</entry>
+            <entry colname="col4">函数是否返回一个集合（即，指定数据类型的多个值）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -165,12 +161,11 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Tells whether the function's result depends only on its input
-              arguments, or is affected by outside factors. <codeph>i</codeph> = <i>immutable</i>
-              (always delivers the same result for the same inputs), <codeph>s</codeph> =
-                <i>stable</i> (results (for fixed inputs) do not change within a scan), or
-                <codeph>v</codeph> = <i>volatile</i> (results may change at any time or functions
-              with side-effects). </entry>
+            <entry colname="col4">说明函数的结果是仅依赖于它的输入参数，还是会被外部因素影响。
+              值<codeph>i</codeph>表示“不变的”函数，它对于相同的输入总是输出相同的结果。
+              值<codeph>s</codeph>表示“稳定的”函数，它的结果（对于固定输入）在一次扫描内不会变化。
+              值<codeph>v</codeph>表示“不稳定的”函数，它的结果在任何时候都可能变化（使用具有副作用，结果可能在任何时刻发生改变）。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -178,7 +173,7 @@
             </entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Number of arguments</entry>
+            <entry colname="col4">输入参数的个数</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -186,7 +181,7 @@
             </entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Number of arguments that have default values</entry>
+            <entry colname="col4">具有默认值的参数个数</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -194,7 +189,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Data type of the return value</entry>
+            <entry colname="col4">返回值的数据类型</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -202,10 +197,9 @@
             </entry>
             <entry colname="col2">oidvector</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">An array with the data types of the function arguments. This
-              includes only input arguments (including <codeph>INOUT</codeph> and
-                <codeph>VARIADIC</codeph> arguments), and thus represents the call signature of the
-              function.</entry>
+            <entry colname="col4">函数参数的数据类型的数组。
+              这只包括输入参数（包括<codeph>INOUT</codeph>和<codeph>VARIADIC</codeph>参数），因此也表现了函数的调用特征。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -213,11 +207,11 @@
             </entry>
             <entry colname="col2">oid[]</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">An array with the data types of the function arguments. This
-              includes all arguments (including <codeph>OUT</codeph> and <codeph>INOUT</codeph>
-              arguments); however, if all of the arguments are <codeph>IN</codeph> arguments, this
-              field will be null. Note that subscripting is 1-based, whereas for historical reasons
-              <codeph>proargtypes</codeph> is subscripted from 0.</entry>
+            <entry colname="col4">函数参数的数据类型的数组。
+              这包括所有参数（含<codeph>OUT</codeph>和<codeph>INOUT</codeph>参数）。
+              不过，如果所有参数都是<codeph>IN</codeph>参数，这个属性将为空。
+              注意下标是从1开始，然而由于历史原因<codeph>proargtypes</codeph>的下标是从0开始。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -225,12 +219,10 @@
             </entry>
             <entry colname="col2">char[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">An array with the modes of the function arguments:
-                <codeph>i</codeph> = <codeph>IN</codeph>, <codeph>o</codeph> = <codeph>OUT</codeph>
-              , <codeph>b</codeph> = <codeph>INOUT</codeph>, <codeph>v</codeph> =
-                <codeph>VARIADIC</codeph>. If all the arguments are IN arguments, this field will be
-              null. Note that subscripts correspond to positions of <codeph>proallargtypes</codeph>,
-              not <codeph>proargtypes</codeph>.</entry>
+            <entry colname="col4">函数参数的模式的数组：<codeph>i</codeph>表示<codeph>IN</codeph>参数，<codeph>o</codeph>表示<codeph>OUT</codeph>参数，<codeph>b</codeph>表示<codeph>INOUT</codeph>参数，<codeph>v</codeph>表示<codeph>VARIADIC</codeph>参数。
+              如果所有的参数都是IN参数，这个属性为空。
+              注意这里的下标对应着<codeph>proallargtypes</codeph>而不是<codeph>proargtypes</codeph>中的位置。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -238,10 +230,11 @@
             </entry>
             <entry colname="col2"> text[] </entry>
             <entry colname="col3"/>
-            <entry colname="col4">An array with the names of the function arguments. Arguments
-              without a name are set to empty strings in the array. If none of the arguments have a
-              name, this field will be null. Note that subscripts correspond to positions of
-              <codeph>proallargtypes</codeph> not <codeph>proargtypes</codeph>.</entry>
+            <entry colname="col4">函数参数的名字的数组。
+              没有名字的参数在数组中设置为空字符串。
+              如果没有一个参数有名字，这个属性为空。
+              注意这里的下标对应着<codeph>proallargtypes</codeph>而不是<codeph>proargtypes</codeph>中的位置。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -249,10 +242,10 @@
             </entry>
             <entry colname="col2">pg_node_tree</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Expression trees (in <codeph>nodeToString()</codeph> representation) for default argument values. This is a list with
-              <codeph>pronargdefaults</codeph> elements, corresponding to the last <varname>N</varname> input
-              arguments (i.e., the last <varname>N</varname> <codeph>proargtypes</codeph> positions). If none of the
-              arguments have defaults, this field will be null.</entry>
+            <entry colname="col4">表达式树（在<codeph>nodeToString()</codeph>表示中）用于默认参数值。
+              这是一个带有<codeph>pronargdefaults</codeph>元素的列表，对应于最后<varname>N</varname>个输入参数（即最后<varname>N</varname>个<codeph>proargtypes</codeph>位置）。
+              如果没有参数具有默认值，则此字段将为null。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -260,10 +253,9 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">This tells the function handler how to invoke the function. It
-              might be the actual source code of the function for interpreted languages, a link
-              symbol, a file name, or just about anything else, depending on the implementation
-              language/call convention.</entry>
+            <entry colname="col4">这个域告诉函数处理者如何调用该函数。
+              它可能是针对解释型语言的实际源码、一个符号链接、一个文件名或任何其他东西，这取决于实现语言/调用规范。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -271,14 +263,14 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Additional information about how to invoke the function. Again,
-              the interpretation is language-specific.</entry>
+            <entry colname="col4">关于如何调用函数的附加信息。
+              同样，其解释是与语言相关的。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>proconfig</codeph></entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Function's local settings for run-time configuration variables.</entry>
+            <entry colname="col4">函数的运行时配置变量的本地设置。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -286,25 +278,21 @@
             </entry>
             <entry colname="col2">aclitem[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Access privileges for the function as given by
-                <codeph>GRANT</codeph>/<codeph>REVOKE</codeph></entry>
+            <entry colname="col4"><codeph>GRANT</codeph>/<codeph>REVOKE</codeph>给出的函数访问权限</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>prodataaccess</codeph></entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Provides a hint regarding the type SQL statements that are
-              included in the function: <codeph>n</codeph> - does not contain SQL,
-                <codeph>c</codeph> - contains SQL, <codeph>r</codeph> - contains SQL that reads
-              data, <codeph>m</codeph> - contains SQL that modifies data</entry>
+            <entry colname="col4">提供有关函数中包含的SQL语句类型的提示：<codeph>n</codeph>  - 不包含SQL，<codeph>c</codeph>  - 包含SQL，<codeph>r</codeph>  - 包含读取数据的SQL，<codeph>m</codeph>  - 包含修改数据的SQL
+              </entry>
           </row>
           <row>
             <entry colname="col1"><codeph>proexeclocation</codeph></entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Where the function executes when it is invoked: <codeph>m</codeph>
-              - master only, <codeph>a</codeph> - any segment instance, <codeph>s</codeph> - all
-              segment instances.</entry>
+            <entry colname="col4">函数在调用时执行的位置：<codeph>m</codeph>  - 仅限master，<codeph>a</codeph>  - 任何段实例，<codeph>s</codeph>  - 所有段实例。
+              </entry>
           </row>
         </tbody>
       </tgroup>

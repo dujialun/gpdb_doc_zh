@@ -4,8 +4,7 @@
 <topic id="topic1" xml:lang="en">
   <title id="hb143896">pg_partition_encoding</title>
   <body>
-    <p>The <codeph>pg_partition_encoding</codeph> system catalog table describes the available
-      column compression options for a partition template.</p>
+    <p><codeph>pg_partition_encoding</codeph>系统目录表描述一个分区模板的可用的列压缩选项。</p>
     <table id="hb177831">
       <title>pg_catalog.pg_attribute_encoding</title>
       <tgroup cols="5">
@@ -16,11 +15,11 @@
         <colspec colnum="5" colname="col5" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">modifers</entry>
-            <entry colname="col4">storage</entry>
-            <entry colname="col5">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">修饰符</entry>
+            <entry colname="col4">存储</entry>
+            <entry colname="col5">描述</entry>
           </row>
         </thead>
         <tbody>

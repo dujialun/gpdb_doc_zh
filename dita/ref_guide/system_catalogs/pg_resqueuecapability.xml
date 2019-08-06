@@ -4,17 +4,14 @@
 <topic id="topic1" xml:lang="en">
   <title id="hk141670">pg_resqueuecapability</title>
   <body>
-    <note>The <codeph>pg_resqueuecapability</codeph> system catalog table is valid only when resource queue-based resource management is active.</note>
-    <p>The <codeph>pg_resqueuecapability</codeph> system catalog table contains information about
-      the extended attributes, or capabilities, of existing Greenplum Database
-      resource queues. Only resource queues that have been assigned an extended capability, such as
-      a priority setting, are recorded in this table. This table is joined to the <xref
-        href="pg_resqueue.xml#topic1" type="topic" format="dita"/> table by resource queue object
-      ID, and to the <xref href="pg_resourcetype.xml#topic1" type="topic" format="dita"/> table by
-      resource type ID (<codeph>restypid</codeph>).</p>
-    <p>This table is populated only on the master. This table is defined in the
-        <codeph>pg_global</codeph> tablespace, meaning it is globally shared across all databases in
-      the system.</p>
+    <note>仅当基于资源队列的资源管理处于活动状态时，<codeph>pg_resqueuecapability</codeph>系统目录表才有效。</note>
+    <p><codeph>pg_resqueuecapability</codeph>系统目录表包含有关现有Greenplum数据库资源队列的扩展属性或功能的信息。
+      只有已分配了扩展功能的资源队列（例如优先级设置）才会记录在此表中。
+      此表通过资源队列对象ID连接到<xref href="pg_resqueue.xml#topic1" type="topic" format="dita"/>表，并通过资源类型ID（<codeph>restypid</codeph>）连接到<xref href="pg_resourcetype.xml#topic1" type="topic" format="dita"/>表。
+      </p>
+    <p>此表仅在master服务器上填充。
+      此表在<codeph>pg_global</codeph>表空间中定义，这意味着它在系统中的所有数据库中全局共享。
+      </p>
     <table id="hk141982">
       <title>pg_catalog.pg_resqueuecapability</title>
       <tgroup cols="4">
@@ -24,10 +21,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -39,7 +36,7 @@
             <entry colname="col3">
               <codeph>pg_resqueue.oid</codeph>
             </entry>
-            <entry colname="col4">The object ID of the associated resource queue.</entry>
+            <entry colname="col4">关联资源队列的对象ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -49,9 +46,8 @@
             <entry colname="col3">
               <codeph>pg_resourcetype. restypid</codeph>
             </entry>
-            <entry colname="col4">The resource type, derived from the <i><xref
-                  href="pg_resourcetype.xml#topic1" format="dita">pg_resqueuecapability</xref></i>
-              system table.</entry>
+            <entry colname="col4">资源类型，派生自<i><xref
+                    href="pg_resourcetype.xml#topic1" format="dita">pg_resqueuecapability</xref></i>系统表。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -59,9 +55,9 @@
             </entry>
             <entry colname="col2">opaque type</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The specific value set for the capability referenced in this
-              record. Depending on the actual resource type, this value may have different data
-              types. </entry>
+            <entry colname="col4">为此记录中引用的功能设置的特定值。
+              根据实际资源类型，此值可能具有不同的数据类型。
+              </entry>
           </row>
         </tbody>
       </tgroup>
