@@ -78,7 +78,8 @@
             <entry colname="col1"><codeph>amopsortfamily</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_opfamily.oid</entry>
-            <entry colname="col4">如果是一个排序运算符，则该条目按此排序的B树运算符系列; 如果是搜索运算符则为零
+            <entry colname="col4">如果是一个排序运算符，则该条目按此排序的B树运算符系列; 如果是搜索运算符则为零</entry>
+          </row>
         </tbody>
       </tgroup>
     </table>
