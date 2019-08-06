@@ -4,9 +4,9 @@
 <topic id="topic1" xml:lang="en">
   <title id="fs142834">user_mapping_options</title>
   <body>
-    <p>The <codeph>user_mapping_options</codeph> view contains all of the options defined for
-      user mappings in the current database. Greenplum Database displays only those user
-       mappings to which the current user has access (by way of being the owner or having some privilege).</p>
+    <p><codeph>user_mapping_options</codeph>视图包含为当前数据库中的用户映射定义的所有选项。
+      Greenplum数据库仅显示当前用户可以访问的那些用户映射（通过作为所有者或具有某些权限）。
+      </p>
     <table id="fs142842">
       <title>user_mapping_options</title>
       <tgroup cols="4">
@@ -16,10 +16,10 @@
         <colspec colnum="4" colname="col4" colwidth="145pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -29,8 +29,7 @@
             </entry>
             <entry colname="col2">sql_identifier</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Name of the user being mapped, or <codeph>PUBLIC</codeph> if
-             the mapping is public.</entry>
+            <entry colname="col4">要映射的用户的名称，如果映射是公共的，则为<codeph>PUBLIC</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -38,8 +37,7 @@
             </entry>
             <entry colname="col2">sql_identifier</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Name of the database in which the foreign server used by
-              this mapping is defined (always the current database).</entry>
+            <entry colname="col4">定义此映射使用的外部服务器的数据库的名称（始终是当前数据库）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -47,7 +45,7 @@
             </entry>
             <entry colname="col2">sql_identifier</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Name of the foreign server used by this mapping.</entry>
+            <entry colname="col4">此映射使用的外部服务器的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -55,7 +53,7 @@
             </entry>
             <entry colname="col2">sql_identifier</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of an option.</entry>
+            <entry colname="col4">选项的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -63,11 +61,11 @@
             </entry>
             <entry colname="col2">character_data</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Value of the option. This column will display null unless:<ul>
-              <li>The current user is the user being mapped.</li>
-              <li>The mapping is for <codeph>PUBLIC</codeph> and the current user is the foreign server owner.</li>
-              <li>The current user is a superuser.</li></ul>
-              <p>The intent is to protect password information stored as a user mapping option.</p></entry>
+            <entry colname="col4">选项的值。此列将显示null，除非：<ul>
+              <li>当前用户是被映射的用户。</li>
+              <li>映射适用于<codeph>PUBLIC</codeph>，当前用户是外部服务器所有者。</li>
+              <li>当前用户是超级用户。</li></ul>
+              <p>目的是保护存储为用户映射选项的密码信息。</p></entry>
           </row>
         </tbody>
       </tgroup>
