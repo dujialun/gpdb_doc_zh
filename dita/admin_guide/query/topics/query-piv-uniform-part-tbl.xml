@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="ih135496">About Uniform Multi-level Partitioned Tables</title>
+  <title id="ih135496">关于统一多级分区表</title>
   <body>
-    <p>GPORCA supports queries on a multi-level partitioned (MLP) table if the MLP
-      table is a <term>uniform partitioned table</term>. A multi-level partitioned table is a
-      partitioned table that was created with the <codeph>SUBPARTITION</codeph> clause. A uniform
-      partitioned table must meet these requirements. <ul id="ul_utn_5lt_zs">
-        <li>The partitioned table structure is uniform. Each partition node at the same level must
-          have the same hierarchical structure.</li>
-        <li>The partition key constraints must be consistent and uniform. At each subpartition
-          level, the sets of constraints on the child tables created for each branch must
-          match.</li>
+    <p>如果一个多级分区（MLP）表是一个统一分区表，GPORCA支持在该MLP上的查询。多级分区表是用SUBPARTITION子句创建的分区表。统一分区表必须满足下面这些条件。
+ <ul id="ul_utn_5lt_zs">
+        <li>分区表结构统一。同一层上的每一个分区节点必须具有相同的层次结构。</li>
+        <li>分区键约束必须一致且统一。在每一个子分区层次上，为每个分支创建的子表上的约束集必须匹配。</li>
       </ul></p>
-    <p>You can display information about partitioned tables in several ways, including displaying
-      information from these sources:<ul id="ul_tlr_js1_1t">
-        <li>The <codeph>pg_partitions</codeph> system view contains information on the structure of
-          a partitioned table.</li>
-        <li>The <codeph>pg_constraint</codeph> system catalog table contains information on table
-          constraints.</li>
-        <li>The psql meta command \d+ <varname>tablename</varname> displays the table constraints
-          for child leaf tables of a partitioned table.</li>
+    <p>可以用几种方式显示分区表的信息，包括显示来自这些来源的信息：
+  <ul id="ul_tlr_js1_1t">
+        <li>pg_partitions系统视图包含分区表结构的信息。</li>
+        <li>pg_constraint系统目录表包含表约束的信息。</li>
+        <li>psql元命令\d+ tablename显示一个分区表的叶子子表的表约束。</li>
       </ul></p>
   </body>
   <topic id="topic_zn1_m3m_ss">
-    <title>Example</title>
+    <title>例子</title>
     <body>
-      <p>This <codeph>CREATE TABLE</codeph> command creates a uniform partitioned table. </p>
+      <p>这个CREATE TABLE命令创建一个统一分区表。</p>
       <codeblock>CREATE TABLE mlp (id  int,  year int,  month int,  day int,
    region  text)
    DISTRIBUTED  BY (id)
@@ -37,9 +29,7 @@
           SUBPARTITION europe  VALUES ( 'europe'),
           SUBPARTITION asia  VALUES ( 'asia'))
    (  START ( 2006)  END ( 2016) EVERY ( 5));</codeblock>
-      <p>These are child tables and the partition hierarchy that are created for the table
-          <codeph>mlp</codeph>. This hierarchy consists of one subpartition level that contains two
-        branches.
+      <p>下面这些是为表mlp创建的子表和分区层次。这个层次由一个包含两个分支的子分区构成。
         <codeblock>mlp_1_prt_11
    mlp_1_prt_11_2_prt_usa
    mlp_1_prt_11_2_prt_europe
@@ -49,13 +39,9 @@ mlp_1_prt_21
    mlp_1_prt_21_2_prt_usa
    mlp_1_prt_21_2_prt_europe
    mlp_1_prt_21_2_prt_asia</codeblock></p>
-      <p>The hierarchy of the table is uniform, each partition contains a set of three child tables
-        (subpartitions). The constraints for the region subpartitions are uniform, the set of
-        constraints on the child tables for the branch table <codeph>mlp_1_prt_11</codeph> are the
-        same as the constraints on the child tables for the branch table
-          <codeph>mlp_1_prt_21</codeph>.</p>
-      <p>As a quick check, this query displays the constraints for the
-        partitions.<codeblock>WITH tbl AS (SELECT oid, partitionlevel AS level, 
+      <p>该表的层次是统一的，每个分区包含三个子表（子分区）的集合。区域子分区的约束也是统一的，分支表mlp_1_prt_11的子表上的约束集和分支表mlp_1_prt_21的子表的约束相同。
+     </p>
+      <p>作为一种快速检查，这个查询显示这些分区的约束。<codeblock>WITH tbl AS (SELECT oid, partitionlevel AS level,
              partitiontablename AS part 
          FROM pg_partitions, pg_class 
          WHERE tablename = 'mlp' AND partitiontablename=relname 
@@ -63,12 +49,8 @@ mlp_1_prt_21
   SELECT tbl.part, consrc 
     FROM tbl, pg_constraint 
     WHERE tbl.oid = conrelid ORDER BY consrc;</codeblock></p>
-      <note>You will need modify the query for more complex partitioned tables. For example, the
-        query does not account for table names in different schemas.</note>
-      <p>The <codeph>consrc</codeph> column displays constraints on the subpartitions. The set of
-        region constraints for the subpartitions in <codeph>mlp_1_prt_1</codeph> match the
-        constraints for the subpartitions in <codeph>mlp_1_prt_2</codeph>. The constraints for year
-        are inherited from the parent branch tables.</p>
+      <note>注意： 对于更复杂的分区表将需要修改该查询。例如，该查询不会对不同方案中的表名加以区分。</note>
+      <p>consrc列显示子分区上的约束。mlp_1_prt_1中子分区的区域约束集合匹配mlp_1_prt_2中子分区的约束。year的约束继承自父分支表。</p>
       <codeblock>           part           |               consrc
 --------------------------+------------------------------------
  mlp_1_prt_2_2_prt_asia   | (region = 'asia'::text)
@@ -84,26 +66,15 @@ mlp_1_prt_21
  mlp_1_prt_2_2_prt_asia   | ((year >= 2011) AND (year &lt; 2016))
  mlp_1_prt_2_2_prt_europe | ((year >= 2011) AND (year &lt; 2016))
 (12 rows)</codeblock>
-      <p>If you add a default partition to the example partitioned table with this
-        command:<codeblock>ALTER TABLE mlp ADD DEFAULT PARTITION def</codeblock></p>
-      <p>The partitioned table remains a uniform partitioned table. The branch created for default
-        partition contains three child tables and the set of constraints on the child tables match
-        the existing sets of child table constraints. </p>
-      <p>In the above example, if you drop the subpartition <codeph>mlp_1_prt_21_2_prt_asia</codeph>
-        and add another subpartition for the region <codeph>canada</codeph>, the constraints are no
-        longer
-        uniform.<codeblock>ALTER TABLE mlp ALTER PARTITION FOR (RANK(2))
-  DROP PARTITION asia ;
+      <p>如果用下面的命令对例子中的分区表增加一个默认分区：<codeblock>ALTER TABLE mlp ADD DEFAULT PARTITION def</codeblock></p>
+        <p>该分区表仍然会是一个统一分区表。为默认分区创建的分支包含三个子表并且子表上的约束集匹配现有的子表约束集。</p>
 
 ALTER TABLE mlp ALTER PARTITION FOR (RANK(2))
-  ADD PARTITION canada VALUES ('canada');</codeblock></p>
-      <p>Also, if you add a partition <codeph>canada</codeph> under <codeph>mlp_1_prt_21</codeph>,
-        the partitioning hierarchy is not uniform. </p>
-      <p>However, if you add the subpartition <codeph>canada</codeph> to both
-          <codeph>mlp_1_prt_21</codeph> and <codeph>mlp_1_prt_11</codeph> the of the original
-        partitioned table, it remains a uniform partitioned table.</p>
-      <note>Only the constraints on the sets of partitions at a partition level must be the same.
-        The names of the partitions can be different.</note>
+  ADD PARTITION canada VALUES ('canada');</p>
+      <p>还有，如果在mlp_1_prt_21之下增加一个分区canada，分区结构会变得不再统一。
+          不过，如果对原始分区表的mlp_1_prt_21和mlp_1_prt_11都增加子分区canada，它就还是一个统一分区表。<codeph>canada</codeph> to both
+          <codeph>mlp_1_prt_21</codeph> and <codeph>mlp_1_prt_11</codeph> 注意： 只有在一个分区级别上的分区集合的约束必须相同。这些分区的名称可以不同。</p>
+      <note>注意： 只有在一个分区级别上的分区集合的约束必须相同。这些分区的名称可以不同。</note>
     </body>
   </topic>
 </topic>
