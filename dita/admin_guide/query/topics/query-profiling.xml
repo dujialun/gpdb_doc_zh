@@ -2,10 +2,9 @@
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 
 <topic id="topic39" xml:lang="en">
-  <title id="in198649">Query Profiling</title>
+  <title id="in198649">查询画像</title>
   <abstract>
-    <shortdesc>Examine the query plans of poorly performing queries to identify possible performance
-      tuning opportunities.</shortdesc>
+    <shortdesc>检查性能不好的查询的查询计划来确定可能的性能调优机会。.</shortdesc>
   </abstract>
   <body>
     <p>Greenplum Database devises a <i>query plan</i> for each query. Choosing the

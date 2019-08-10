@@ -2,18 +2,16 @@
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 
 <topic id="topic1">
-  <title>Changed Behavior with the GPORCA</title>
+  <title>GPORCA带来的改变</title>
   <abstract>
-    <shortdesc>There are changes to Greenplum Database behavior with the GPORCA optimizer enabled
-      (the default) as compared to the Postgres planner.</shortdesc>
+    <shortdesc>相比使用传统规划器，启用了GPORCA优化器（默认启用）的Greenplum数据库的行为有些改变。</shortdesc>
   </abstract>
   <body>
     <ul id="ul_v1c_kll_gr">
-      <li><cmdname>UPDATE</cmdname> operations on distribution keys are allowed.</li>
-      <li><cmdname>UPDATE</cmdname> operations on partitioned keys are allowed.</li>
-      <li>Queries against uniform partitioned tables are supported.</li>
-      <li>Queries against partitioned tables that are altered to use an external table as a leaf
-        child partition fall back to the Postgres query optimizer.</li>
+      <li>允许在分布键上的<cmdname>UPDATE</cmdname>操作。</li>
+      <li>允许在分区键上的<cmdname>UPDATE</cmdname>操作。</li>
+      <li>支持对均衡分区表的查询。</li>
+      <li>被修改为使用外部表作为叶子子分区的分区表上的查询会退回到传统查询优化器处理。</li>
       <li>Except for <codeph>INSERT</codeph>, DML operations directly on partition (child table) of
         a partitioned table are not supported.<p>For the <codeph>INSERT</codeph> command, you can
           specify a leaf child table of the partitioned table to insert data into a partitioned
