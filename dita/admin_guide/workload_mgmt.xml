@@ -4,36 +4,25 @@
 <topic id="topic1" xml:lang="en">
   <title id="iz173472">Using Resource Queues</title>
   <body>
-    <p>Use Greenplum Database resource queues to prioritize and allocate resources to queries
-      according to business requirements and to prevent queries from starting when resources are
-      unavailable.</p>
-    <p>Resource queues are one tool to manage the degree of concurrency in a Greenplum Database
-      system. Resource queues are database objects that you create with the <codeph>CREATE RESOURCE
-        QUEUE</codeph> SQL statement. You can use them to manage the number of active queries that
-      may execute concurrently, the amount of memory each type of query is allocated, and the
-      relative priority of queries. Resource queues can also guard against queries that would
-      consume too many resources and degrade overall system performance.</p>
-    <p>Each database role is associated with a single resource queue; multiple roles can share the
-      same resource queue. Roles are assigned to resource queues using the <codeph>RESOURCE
-        QUEUE</codeph> phrase of the <codeph>CREATE ROLE</codeph> or <codeph>ALTER ROLE</codeph>
-      statements. If a resource queue is not specified, the role is associated with the default
-      resource queue, <codeph>pg_default</codeph>. </p>
-    <p>When the user submits a query for execution, the query is evaluated against the resource
-      queue's limits. If the query does not cause the queue to exceed its resource limits, then that
-      query will run immediately. If the query causes the queue to exceed its limits (for example,
-      if the maximum number of active statement slots are currently in use), then the query must
-      wait until queue resources are free before it can run. Queries are evaluated on a first in,
-      first out basis. If query prioritization is enabled, the active workload on the system is
-      periodically assessed and processing resources are reallocated according to query priority
-      (see <xref href="#priorities" format="dita"/>). Roles with the <codeph>SUPERUSER</codeph>
-      attribute are exempt from resource queue limits. Superuser queries always run immediately
-      regardless of limits imposed by their assigned resource queue. </p>
+    <p>使用Greenplum数据库的工作负载管理根据业务需求对查询按照优先级分配资源，并且在资源不可用时阻止查询开始。</p>
+    <p>资源队列是用来管理Greenplum数据库系统中并行的程度的工具。你可以使用<codeph>CREATE RESOURCE
+        QUEUE</codeph>SQL声明创建资源队列这一数据库对象，你可以用资源队列来管理可能并行执行的活跃查询，
+		控制它们的内存使用量，以及队列中的相对排序。资源队列同时也可以防止查询消耗太多资源进而降低系统性能。</p>
+    <p>每个数据库角色都与一个单个资源队列关联；多个角色可以共享同一个资源队列，使用<codeph>RESOURCE QUEUE</codeph>
+	中的<codeph>CREATE ROLE</codeph>或<codeph>ALTER ROLE</codeph>来将角色分配到资源队列中。如果没有指定资源队列，
+	则角色将会自动被关联到默认资源队列<codeph>pg_default</codeph>。</p>
+    <p>当用户提交了一个要执行的查询时，资源队列会根据其限制对查询进行评估，若该查询所需的资源没有超过限制，
+	它将会立即执行；若超过了限制（例如，如果目前所有活跃声明槽位都已被占用），该查询则必须等到队列资源有
+	空闲时才能执行。对查询的评估将遵从先进先出的原则。如果启用了查询优先级，则将会预估系统当前的负载并根据
+	查询优先级（参考<xref href="#priorities" format="dita"/>）进行资源分配。拥有<codeph>SUPERUSER</codeph>属性
+	的角色将会不受资源队列限制的限制，无论何时，超级用户的查询都会无视其所在资源队列的限制并立即执行。
+	</p>
     <fig id="iz153477">
-      <title>Resource Queue Process</title>
+      <title>资源队列进程</title>
       <image href="graphics/resource_queues.jpg" placement="break" width="443px" height="173px"
         id="image_u4c_qxw_wq"/>
     </fig>
-    <p>Resource queues define classes of queries with similar resource requirements. Administratrors
+    <p>资源队列决定Resource queues define classes of queries with similar resource requirements. Administratrors
       should create resource queues for the various types of workloads in their organization. For
       example, you could create resource queues for the following classes of queries, corresponding
       to different service level agreements: <ul id="ul_h3q_5qz_zp">
