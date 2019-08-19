@@ -22,113 +22,70 @@
       <image href="graphics/resource_queues.jpg" placement="break" width="443px" height="173px"
         id="image_u4c_qxw_wq"/>
     </fig>
-    <p>资源队列决定Resource queues define classes of queries with similar resource requirements. Administratrors
-      should create resource queues for the various types of workloads in their organization. For
-      example, you could create resource queues for the following classes of queries, corresponding
-      to different service level agreements: <ul id="ul_h3q_5qz_zp">
-        <li>ETL queries</li>
-        <li>Reporting queries</li>
-        <li>Executive queries</li>
+    <p>资源队列会将资源需求相似的查询合并为Class，管理员应该根据组织中不同种类的负载创建资源队列。例如，参考以下不同的服务级别
+		，用户需要根据其所对应的的查询的Class创建资源组：<ul id="ul_h3q_5qz_zp">
+        <li>ETL查询</li>
+        <li>报告查询</li>
+        <li>执行查询</li>
       </ul></p>
-    <p>A resource queue has the following characteristics:<parml>
+    <p>拥有以下特性的资源组：<parml>
         <plentry>
           <pt>MEMORY_LIMIT</pt>
-          <pd>The amount of memory used by all the queries in the queue (per segment). For example,
-            setting <varname>MEMORY_LIMIT</varname> to 2GB on the ETL queue allows ETL queries to
-            use up to 2GB of memory in each segment. </pd>
+          <pd>队列（每个Segment）中所有查询所使用的的内存的量。例如，对ETL查询设置2GB的<varname>MEMORY_LIMIT</varname>，
+		  这样每个Segment里的ETL查询最多使用2GB的内存。</pd>
         </plentry>
         <plentry>
           <pt>ACTIVE_STATEMENTS</pt>
-          <pd>The number of <i>slots</i> for a queue; the maximum concurrency level for a queue.
-            When all slots are used, new queries must wait. Each query uses an equal amount of
-            memory by default. </pd>
-          <pd>For example, the <codeph>pg_default</codeph> resource queue has
-              <varname>ACTIVE_STATEMENTS</varname> = 20.</pd>
+          <pd>队列中<i>槽位</i>的数量；一个队列中最大可并行数，当所有槽位都占用时，新的查询必须等待。默认每个查询使用
+		  等量的内存，。</pd>
+          <pd>例如，<codeph>pg_default</codeph>资源组的<varname>ACTIVE_STATEMENTS</varname>为20。</pd>
         </plentry>
         <plentry>
           <pt>PRIORITY</pt>
-          <pd>The relative CPU usage for queries. This may be one of the following levels:
-              <codeph>LOW</codeph>, <codeph>MEDIUM</codeph>, <codeph>HIGH</codeph>,
-              <codeph>MAX</codeph>. The default level is <codeph>MEDIUM</codeph>. The query
-            prioritization mechanism monitors the CPU usage of all the queries running in the
-            system, and adjusts the CPU usage for each to conform to its priority level. For
-            example, you could set <codeph>MAX</codeph> priority to the <codeph>executive</codeph>
-            resource queue and <codeph>MEDIUM</codeph> to other queues to ensure that executive
-            queries receive a greater share of CPU.</pd>
+          <pd>查询使用的相对CPU使用量，可以设置为以下级别：<codeph>LOW</codeph>、<codeph>MEDIUM</codeph>、<codeph>HIGH</codeph>
+              和<codeph>MAX</codeph>。默认级别是<codeph>MEDIUM</codeph>，查询优先级的机制会监控系统中所有正在运行的查询的CPU使用量，
+			  并根据其优先级别来调整其CPU使用量。例如，你可以为<codeph>执行</codeph>资源队列设置<codeph>MAX</codeph>优先级，为其他
+			  查询设置<codeph>MEDIUM</codeph>优先级，确保执行查询可以获得比较多的CPU资源。</pd>
         </plentry>
         <plentry>
           <pt>MAX_COST</pt>
-          <pd>Query plan cost limit. </pd>
-          <pd>The Greenplum Database optimizer assigns a numeric cost to each query. If the cost
-            exceeds the <codeph>MAX_COST</codeph> value set for the resource queue, the query is
-            rejected as too expensive.</pd>
+          <pd>查询计划消耗限制。</pd>
+          <pd>Greenplum数据优化器会为每个查询分配数字型消耗，如果该消耗超过了资源队列的<codeph>MAX_COST</codeph>的值，该查询就会被拒绝。</pd>
           <pd>
-            <note>GPORCA and the Postgres query optimizer utilize different
-              query costing models and may compute different costs for the same query.
-              The Greenplum Database resource queue resource management scheme neither
-              differentiates nor aligns costs between GPORCA and the Postgres optimizer; it
-              uses the literal cost value returned from the optimizer to throttle
-              queries.<p> When resource queue-based resource management is active, use the
-              <codeph>MEMORY_LIMIT</codeph> and <codeph>ACTIVE_STATEMENTS</codeph> limits for
-              resource queues rather than configuring cost-based limits. Even when using GPORCA,
-              Greenplum Database may fall back to using the Postgres query optimizer for certain
-              queries, so using cost-based limits can lead to unexpected results.</p></note>
+            <note>GPORCA和Postgres查询优化器使用不同的查询消耗模型，因此同一个查询可能会得出不同的消耗，Greenplum数据库资源队列资源管理模式不会
+				采用GPORCA或Postgres优化器得出的消耗，而是使用根据优化器直接返还的消耗来限制查询。
+				<p> 当基于资源队列的资源管理系统激活时，会使用<codeph>MEMORY_LIMIT</codeph>和<codeph>ACTIVE_STATEMENTS</codeph>限制资源，
+				而不是配置基于消耗的限制。因为即便是使用GPORCA的时候，Greenplum数据库仍然可能会在特定查询中使用Postgres查询优化器从而导致未知的结果。</p></note>
           </pd>
         </plentry>
       </parml></p>
-    <p>The default configuration for a Greenplum Database system has a single default resource queue
-      named <codeph>pg_default</codeph>. The <codeph>pg_default</codeph> resource queue has an
-        <codeph>ACTIVE_STATEMENTS</codeph> setting of 20, no <codeph>MEMORY_LIMIT</codeph>, medium
-        <codeph>PRIORITY</codeph>, and no set <codeph>MAX_COST</codeph>. This means that all queries
-      are accepted and run immediately, at the same priority and with no memory limitations;
-      however, only twenty queries may execute concurrently. </p>
-    <p>The number of concurrent queries a resource queue allows depends on whether the
-        <codeph>MEMORY_LIMIT</codeph> parameter is set:</p>
+    <p>Greenplum数据库系统默认配置有一个默认资源队列，名为<codeph>pg_default</codeph>，<codeph>pg_default</codeph>资源队列的<codeph>ACTIVE_STATEMENTS</codeph>
+	设置数值为20，没有<codeph>MEMORY_LIMIT</codeph>和<codeph>MAX_COST</codeph>，<codeph>PRIORITY</codeph>为中。这意味所有查询都会被接受并立即执行，没有优先级划分
+	和内存限制；但是并行的查询最多是20个。</p>
+    <p>一个资源队列所允许的并行查询的数量由是否有设置<codeph>MEMORY_LIMIT</codeph>决定：</p>
     <ul id="ul_p5p_jxp_wq">
-      <li>If no <codeph>MEMORY_LIMIT</codeph> is set for a resource queue, the amount of memory
-        allocated per query is the value of the <codeph><xref
-            href="../ref_guide/config_params/guc-list.xml#statement_mem" type="section"
-            >statement_mem</xref></codeph> server configuration parameter. The maximum memory the
-        resource queue can use is the product of <codeph>statement_mem</codeph> and
-          <codeph>ACTIVE_STATEMENTS</codeph>. </li>
-      <li>When a <codeph>MEMORY_LIMIT</codeph> is set on a resource queue, the number of queries
-        that the queue can execute concurrently is limited by the queue's available memory. </li>
+      <li>如果一个资源队列没有设置<codeph>MEMORY_LIMIT</codeph>的话，每个资源所分配到的内存大小就是<codeph><xref href="../ref_guide/config_params/guc-list.xml#statement_mem" type="section">statement_mem</xref></codeph>的服务器配置参数，一个资源队列的可用内存大小是根据<codeph>statement_mem</codeph>和<codeph>ACTIVE_STATEMENTS</codeph>的计算结果。</li>
+      <li>当资源队列有设置<codeph>MEMORY_LIMIT</codeph>时，资源队列中可以并行执行的查询数将会受到该队列的可用内存限制。</li>
     </ul>
-    <p>A query admitted to the system is allocated an amount of memory and a query plan tree is
-      generated for it. Each node of the tree is an operator, such as a sort or hash join. Each
-      operator is a separate execution thread and is allocated a fraction of the overall statement
-      memory, at minimum 100KB. If the plan has a large number of operators, the minimum memory
-      required for operators can exceed the available memory and the query will be rejected with an
-      insufficient memory error. Operators determine if they can complete their tasks in the memory
-      allocated, or if they must spill data to disk, in work files. The mechanism that allocates and
-      controls the amount of memory used by each operator is called <i>memory quota</i>. </p>
-    <p>Not all SQL statements submitted through a resource queue are evaluated against the queue
-      limits. By default only <codeph>SELECT</codeph>, <codeph>SELECT INTO</codeph>, <codeph>CREATE
-        TABLE AS SELECT</codeph>, and <codeph>DECLARE CURSOR</codeph> statements are evaluated. If
-      the server configuration parameter <codeph>resource_select_only</codeph> is set to <i>off</i>,
-      then <codeph>INSERT</codeph><ph>, <codeph>UPDATE</codeph>, and <codeph>DELETE</codeph></ph>
-      statements will be evaluated as well.</p>
-    <p>Also, an SQL statement that is run during the execution of an <codeph>EXPLAIN
-        ANALYZE</codeph> command is excluded from resource queues.</p>
+    <p>提交到系统中的查询将会被分配一定量的内存，且系统会对其生成一个查询计划树。计划树的每个节点都是运算符，例如排序连接和哈希连接。每个运算符都是单独的执行线程，且被分配到了总陈述说明内存中的
+		一部分（至少100KB）。如果计划中含有大量的运算符，运算符所需的最小内存大小可能会超过可用内存，则该查询会因内存不足而被拒绝。运算符会确定能否使用分配到的内存量完成任务，否则就会
+		采取spill to disk的处理方式。这种分配和控制每个运算符使用的内存大小的机制被称为<i>内存配额</i>。</p>
+    <p>并不是所有提交到资源队列的SQL声明都会受到队列限制的评估，默认只会评估<codeph>SELECT</codeph>、<codeph>SELECT INTO</codeph>、<codeph>CREATE TABLE AS SELECT</codeph>和
+	<codeph>DECLARE CURSOR</codeph>声明。如果服务器配置的<codeph>resource_select_only</codeph>参数为<i>off</i>，那么<codeph>INSERT</codeph><ph>、<codeph>UPDATE</codeph>
+	和<codeph>DELETE</codeph></ph>声明也会受评估。</p>
+    <p>与此同时，在执行<codeph>EXPLAIN ANALYZE</codeph>命令期间跑的SQL声明也会被资源队列排除。</p>
   </body>
   <topic id="topic111" xml:lang="en">
-    <title>Resource Queue Example</title>
+    <title>资源队列示例</title>
     <body>
-      <p>The default resource queue, <codeph>pg_default</codeph>, allows a maximum of 20 active
-        queries and allocates the same amount of memory to each. This is generally not adequate
-        resource control for production systems. To ensure that the system meets performance
-        expectations, you can define classes of queries and assign them to resource queues
-        configured to execute them with the concurrency, memory, and CPU resources best suited for
-        that class of query.</p>
-      <p>The following illustration shows an example resource queue configuration for a Greenplum
-        Database system with <codeph>gp_vmem_protect_limit</codeph> set to 8GB:<fig
+      <p>默认资源队列<codeph>pg_default</codeph>允许最多20个活跃查询平分内存以并行执行。一般来说这是不足以满足生产环境下的资源需求的。为了确保系统能够满足性能期望，用户可以定义查询的组并
+	  对其分配拥有相应的并行量、内存以及CPU的资源队列。</p>
+      <p>如下展示了一个示例Greenplum数据库系统（<codeph>gp_vmem_protect_limit</codeph>为8GB）的资源队列的配置：<fig
           id="fig_p3y_mg5_1q">
-          <title>Resource Queue Configuration Example</title>
+          <title>资源队列配置示例</title>
           <image href="graphics/resource_queue_examp.png" id="image_wnh_wpc_dq" width="6in"/>
         </fig></p>
-      <p>This example has three classes of queries with different characteristics and service level
-        agreements (SLAs). Three resource queues are configured for them. A portion of the segment
-        memory is reserved as a safety margin. <table frame="all" id="table_kns_wg5_1q">
+      <p>该示例有三个不同属性和服务等级协议的组，各个有对应的资源队列。其中预留有一部分内存作为冗余。 <table frame="all" id="table_kns_wg5_1q">
           <tgroup cols="4">
             <colspec colname="c1" colnum="1" colwidth="1.0*"/>
             <colspec colname="c2" colnum="2" colwidth="1.0*"/>
@@ -136,10 +93,10 @@
             <colspec colname="c4" colnum="4" colwidth="1.0*"/>
             <thead>
               <row>
-                <entry>Resource Queue Name</entry>
-                <entry>Active Statements</entry>
-                <entry>Memory Limit</entry>
-                <entry>Memory per Query</entry>
+                <entry>资源队列名</entry>
+                <entry>活跃声明</entry>
+                <entry>内存限制</entry>
+                <entry>每个查询的内存</entry>
               </row>
             </thead>
             <tbody>
@@ -150,13 +107,13 @@
                 <entry>667MB</entry>
               </row>
               <row>
-                <entry>Reporting</entry>
+                <entry>报告</entry>
                 <entry>7</entry>
                 <entry>3GB</entry>
                 <entry>429MB</entry>
               </row>
               <row>
-                <entry>Executive</entry>
+                <entry>执行</entry>
                 <entry>1</entry>
                 <entry>1.4GB</entry>
                 <entry>1.4GB</entry>
@@ -164,11 +121,10 @@
             </tbody>
           </tgroup>
         </table></p>
-      <p>The total memory allocated to the queues is 6.4GB, or 80% of the total segment memory
-        defined by the <codeph>gp_vmem_protect_limit</codeph> server configuration parameter.
-        Allowing a safety margin of 20% accommodates some operators and queries that are known to
-        use more memory than they are allocated by the resource queue. </p>
-      <p>See the <codeph>CREATE RESOURCE QUEUE</codeph> and <codeph>CREATE/ALTER ROLE</codeph>
+      <p>队列所分配的内存总量为6.4GB，也就是说<codeph>gp_vmem_protect_limit</codeph>服务器配置参数所定义的总Segment内存的80%。剩余的20%是为了那些可能会需要更多内存的
+	  运算符和查询所预留的。</p>
+      <p>
+		  See the <codeph>CREATE RESOURCE QUEUE</codeph> and <codeph>CREATE/ALTER ROLE</codeph>
         statements in the <cite>Greenplum Database Reference Guide</cite> for help with command
         syntax and detailed reference information.</p>
     </body>
