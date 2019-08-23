@@ -2,11 +2,11 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="guc-cat-list">
-  <title id="kh155019">Parameter Categories</title>
+  <title id="kh155019">参数类别</title>
   <body>
-    <p>Configuration parameters affect categories of server behaviors, such as resource consumption,
-      query tuning, and authentication. The following topics describe Greenplum configuration
-      parameter categories.</p>
+    <p>配置参数会影响服务器行为的类别，例如资源消耗，查询调整和身份验证。
+      以下主题描述了Greenplum配置参数类别。
+      </p>
     <ul id="ul_blz_1kk_wy">
       <li id="kh158485">
         <xref href="#topic12" type="topic" format="dita"/>
@@ -65,9 +65,9 @@
     </ul>
   </body>
   <topic id="topic12" xml:lang="en">
-    <title id="kh155037">Connection and Authentication Parameters</title>
+    <title id="kh155037">连接和验证参数</title>
     <body>
-      <p>These parameters control how clients connect and authenticate to Greenplum Database.</p>
+      <p>这些参数控制客户端如何连接和验证Greenplum数据库。</p>
     </body>
     <topic id="topic13" xml:lang="en">
       <title>Connection Parameters</title>
@@ -128,7 +128,7 @@
       </body>
     </topic>
     <topic id="topic14" xml:lang="en">
-      <title>Security and Authentication Parameters</title>
+      <title>安全和身份验证参数</title>
       <body>
         <simpletable id="kh159695" frame="none">
           <strow>
@@ -170,13 +170,12 @@
     </topic>
   </topic>
   <topic id="topic15" xml:lang="en">
-    <title id="kh155038">System Resource Consumption Parameters</title>
-    <abstract>These parameters set the limits for system resources consumed by Greenplum
-      Database.</abstract>
+    <title id="kh155038">系统资源消耗参数</title>
+    <abstract>这些参数设置Greenplum数据库消耗的系统资源限制。</abstract>
     <topic id="topic16" xml:lang="en">
-      <title>Memory Consumption Parameters</title>
+      <title>内存消耗参数</title>
       <body>
-        <p>These parameters control system memory usage.</p>
+        <p>这些参数控制系统内存使用。</p>
         <simpletable id="kh160388" frame="none">
           <strow>
             <stentry>
@@ -186,10 +185,10 @@
               </p>
               <p>
                 <xref href="guc-list.xml#gp_resource_group_memory_limit" type="section"
-                  >gp_resource_group_memory_limit</xref> (resource group-based resource management) </p>
+                  >gp_resource_group_memory_limit</xref>(基于资源组的资源管理)</p>
               <p>
                 <xref href="guc-list.xml#gp_vmem_protect_limit" type="section"
-                  >gp_vmem_protect_limit</xref> (resource queue-based resource management) </p>
+                  >gp_vmem_protect_limit</xref>(基于资源队列的资源管理)</p>
               <p>
                 <xref href="guc-list.xml#gp_vmem_protect_segworker_cache_limit" type="section"
                   >gp_vmem_protect_segworker_cache_limit</xref>
@@ -224,7 +223,7 @@
       </body>
     </topic>
     <topic id="topic18" xml:lang="en">
-      <title>OS Resource Parameters</title>
+      <title>OS资源参数</title>
       <body>
         <simpletable id="d1e422" frame="none">
           <strow>
@@ -243,16 +242,14 @@
       </body>
     </topic>
     <topic id="topic19" xml:lang="en">
-      <title>Cost-Based Vacuum Delay Parameters</title>
+      <title>基于成本的清理延迟参数</title>
       <body>
-        <note type="warning">Do not use cost-based vacuum delay because it runs asynchronously among
-          the segment instances. The vacuum cost limit and delay is invoked at the segment level
-          without taking into account the state of the entire Greenplum Database array</note>
-        <p>You can configure the execution cost of <codeph>VACUUM</codeph> and
-            <codeph>ANALYZE</codeph> commands to reduce the I/O impact on concurrent database
-          activity. When the accumulated cost of I/O operations reaches the limit, the process
-          performing the operation sleeps for a while, Then resets the counter and continues
-          execution</p>
+        <note type="warning">不要使用基于成本的清理延迟，因为它在segment实例之间异步运行。
+          在segment级别调用清理成本限制和延迟，而不考虑整个Greenplum数据库阵列的状态
+          </note>
+        <p>您可以配置<codeph>VACUUM</codeph>和<codeph>ANALYZE</codeph>命令的执行成本，以减少I/O对并发数据库活动的影响。
+          当I/O操作的累计成本达到限制时，执行操作的进程会暂停一段时间，然后重置计数器并继续执行
+          </p>
         <simpletable id="kh161372" frame="none">
           <strow>
             <stentry>
@@ -282,7 +279,7 @@
       </body>
     </topic>
     <topic id="topic20" xml:lang="en">
-      <title>Transaction ID Management Parameters</title>
+      <title>事务ID管理参数</title>
       <body>
         <simpletable id="d1e474" frame="none">
           <strow>
@@ -300,11 +297,11 @@
     </topic>
   </topic>
   <topic id="topic57">
-    <title>GPORCA Parameters</title>
+    <title>GPORCA参数</title>
     <body>
-      <p>These parameters control the usage of GPORCA by Greenplum Database. For information about
-        GPORCA, see <xref href="../../admin_guide/query/topics/query-piv-optimizer.xml">About
-          GPORCA</xref><ph otherprops="op-print"> in the <cite>Greenplum Database Administrator
+      <p>这些参数控制Greenplum数据库对GPORCA的使用。
+        有关GPORCA的信息，请参阅<xref href="../../admin_guide/query/topics/query-piv-optimizer.xml">关于GPORCA</xref>。
+        <ph otherprops="op-print"> in the <cite>Greenplum Database Administrator
             Guide</cite></ph>. </p>
       <simpletable frame="none" id="simpletable_nq5_z2c_kr">
         <strow>
@@ -366,16 +363,16 @@
     </body>
   </topic>
   <topic id="topic21" xml:lang="en">
-    <title id="kh183779">Query Tuning Parameters</title>
-    <abstract>These parameters control aspects of SQL query processing such as query operators and
-      operator settings and statistics sampling.</abstract>
+    <title id="kh183779">查询调优参数</title>
+    <abstract>这些参数控制SQL查询处理的各个方面，例如查询运算符和运算符设置以及统计采样。
+      </abstract>
     <topic id="topic22" xml:lang="en">
-      <title>Postgres Query Optimizer Operator Control Parameters</title>
+      <title>Postgres查询优化器运算符控制参数</title>
       <body>
-        <p>The following parameters control the types of plan operations the Postgres query optimizer
-          can use. Enable or disable plan operations to force the Postgres optimizer to choose a
-          different plan. This is useful for testing and comparing query performance using different
-          plan types.</p>
+        <p>以下参数控制Postgres查询优化器可以使用的计划操作类型。
+          启用或禁用计划操作以强制Postgres优化程序选择其他计划。
+          这对于使用不同计划类型测试和比较查询性能非常有用。
+          </p>
         <simpletable id="kh158625" frame="none">
           <strow>
             <stentry>
@@ -467,12 +464,13 @@
       </body>
     </topic>
     <topic id="topic23" xml:lang="en">
-      <title>Postgres Query Optimizer Costing Parameters</title>
+      <title>Postgres查询优化器成本计算参数</title>
       <body>
-        <note type="warning">Do not adjust these query costing parameters. They are tuned to reflect
-          Greenplum Database hardware configurations and typical workloads. All of these parameters
-          are related. Changing one without changing the others can have adverse affects on
-          performance.</note>
+        <note type="warning">请勿调整这些查询成本计算参数。
+          它们经过调整以反映Greenplum数据库硬件配置和典型工作负载。
+          所有这些参数都是相关的。
+          更改一个而不更改其他一个可能会对性能产生负面影响。
+          </note>
         <simpletable id="kh181234" frame="none">
           <strow>
             <stentry>
@@ -516,12 +514,12 @@
       </body>
     </topic>
     <topic id="topic24" xml:lang="en">
-      <title>Database Statistics Sampling Parameters</title>
+      <title>数据库统计采样参数</title>
       <body>
-        <p>These parameters adjust the amount of data sampled by an <codeph>ANALYZE</codeph>
-          operation. Adjusting these parameters affects statistics collection system-wide. You can
-          configure statistics collection on particular tables and columns by using the
-            <codeph>ALTER TABLE</codeph><codeph>SET STATISTICS</codeph> clause.</p>
+        <p>这些参数调整<codeph>ANALYZE</codeph>操作采样的数据量。
+          调整这些参数会影响系统范围内的统计信息收集。
+          您可以使用<codeph>ALTER TABLE</codeph> <codeph>SET STATISTICS</codeph>子句在特定表和列上配置统计信息收集。
+          </p>
         <simpletable id="d1e655" frame="none">
           <strow>
             <stentry>
@@ -535,7 +533,7 @@
       </body>
     </topic>
     <topic id="topic25" xml:lang="en">
-      <title>Sort Operator Configuration Parameters</title>
+      <title>排序运算符配置参数</title>
       <body>
         <simpletable id="d1e668" frame="none">
           <strow>
@@ -554,7 +552,7 @@
       </body>
     </topic>
     <topic id="topic26" xml:lang="en">
-      <title>Aggregate Operator Configuration Parameters</title>
+      <title>聚合运算符配置参数</title>
       <body>
         <simpletable id="kh162730" frame="none">
           <strow>
@@ -595,7 +593,7 @@
       </body>
     </topic>
     <topic id="topic27" xml:lang="en">
-      <title>Join Operator Configuration Parameters</title>
+      <title>连接运算符配置参数</title>
       <body>
         <simpletable id="kh162782" frame="none">
           <strow>
@@ -628,7 +626,7 @@
       </body>
     </topic>
     <topic id="topic28" xml:lang="en">
-      <title>Other Postgres Query Optimizer Configuration Parameters</title>
+      <title>其他Postgres查询优化器配置参数</title>
       <body>
         <simpletable id="d1e746" frame="none">
           <strow>
@@ -654,9 +652,9 @@
       </body>
     </topic>
     <topic id="topic_zd5_p32_mdb">
-      <title>Query Plan Execution</title>
+      <title>查询计划执行</title>
       <body>
-        <p>Control the query plan execution.</p>
+        <p>控制查询计划的执行。</p>
         <simpletable frame="none" id="simpletable_kbx_t32_mdb">
           <strow>
             <stentry>
@@ -668,10 +666,10 @@
     </topic>
   </topic>
   <topic id="topic29" xml:lang="en">
-    <title id="kh155046">Error Reporting and Logging Parameters</title>
-    <abstract>These configuration parameters control Greenplum Database logging. </abstract>
+    <title id="kh155046">错误报告和日志参数</title>
+    <abstract>这些配置参数控制Greenplum数据库日志记录。</abstract>
     <topic id="topic30" xml:lang="en">
-      <title>Log Rotation</title>
+      <title>日志轮换</title>
       <body>
         <simpletable id="kh163344" frame="none">
           <strow>
@@ -694,7 +692,7 @@
       </body>
     </topic>
     <topic id="topic31" xml:lang="en">
-      <title>When to Log</title>
+      <title>何时记录</title>
       <body>
         <simpletable id="kh163424" frame="none">
           <strow>
@@ -732,7 +730,7 @@
       </body>
     </topic>
     <topic id="topic32" xml:lang="en">
-      <title>What to Log</title>
+      <title>记录什么</title>
       <body>
         <simpletable id="kh171216" frame="none">
           <strow>
@@ -819,14 +817,12 @@
     </topic>
   </topic>
   <topic id="topic33" xml:lang="en">
-    <title id="kh171299">System Monitoring Parameters</title>
-    <abstract>These configuration parameters control Greenplum Database data collection and
-      notifications related to database monitoring.</abstract>
+    <title id="kh171299">系统监控参数</title>
+    <abstract>这些配置参数控制Greenplum数据库数据收集和与数据库监视相关的通知。</abstract>
     <topic id="topic36" xml:lang="en">
-      <title>Greenplum Performance Database</title>
+      <title>Greenplum性能数据库</title>
       <body>
-        <p>The following parameters configure the data collection agents that populate the
-            <codeph>gpperfmon</codeph> database.</p>
+        <p>以下参数配置填充<codeph>gpperfmon</codeph>数据库的数据收集代理。</p>
         <simpletable id="kh171891" frame="none">
           <strow>
             <stentry>
@@ -853,12 +849,12 @@
       </body>
     </topic>
     <topic id="query-metrics">
-      <title>Query Metrics Collection Parameters</title>
+      <title>查询指标收集参数</title>
       <body>
-        <p>These parameters enable and configure query metrics collection. When enabled, Greenplum
-          Database saves metrics to shared memory during query execution. These metrics are used by
-          Pivotal Greenplum Command Center, which is included with Pivotal's commercial version of
-          Greenplum Database.</p>
+        <p>这些参数启用和配置查询指标收集。
+          启用后，Greenplum数据库会在查询执行期间将指标保存到共享内存。
+          这些指标由Pivotal Greenplum Command Center使用，该系统包含在Pivotal的商业版Greenplum数据库中。
+          </p>
         <simpletable id="query-metrics" frame="none">
           <strow>
             <stentry>
@@ -879,11 +875,11 @@
     </topic>
   </topic>
   <topic id="topic37" xml:lang="en">
-    <title id="kh171364">Runtime Statistics Collection Parameters</title>
+    <title id="kh171364">运行时统计信息收集参数</title>
     <body>
-      <p>These parameters control the server statistics collection feature. When statistics
-        collection is enabled, you can access the statistics data using the <i>pg_stat</i> family of
-        system catalog views.</p>
+      <p>这些参数控制服务器统计信息收集功能。
+        启用统计信息收集后，可以使用<i>pg_stat</i>系列目录视图访问统计信息数据。
+        </p>
       <simpletable id="kh171301" frame="none">
         <strow>
           <stentry>
@@ -902,16 +898,12 @@
     </body>
   </topic>
   <topic id="topic38" xml:lang="en">
-    <title id="kh155054">Automatic Statistics Collection Parameters</title>
+    <title id="kh155054">自动统计收集参数</title>
     <body>
-      <p>When automatic statistics collection is enabled, you can run <codeph>ANALYZE</codeph>
-        automatically in the same transaction as an <codeph>INSERT</codeph>,
-        <codeph>UPDATE</codeph>, <codeph>DELETE</codeph>, <codeph>COPY</codeph> or <codeph>CREATE
-          TABLE...AS SELECT</codeph> statement when a certain threshold of rows is affected
-          (<codeph>on_change</codeph>), or when a newly generated table has no statistics
-          (<codeph>on_no_stats</codeph>). To enable this feature, set the following server
-        configuration parameters in your Greenplum Database master <codeph>postgresql.conf</codeph>
-        file and restart Greenplum Database: </p>
+      <p>启用自动统计信息收集时，您可以在与某个阈值的行数被更新（<codeph>on_change</codeph>）或新生成没有统计信息的表时，
+        在与<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>，<codeph>DELETE</codeph>，<codeph>COPY</codeph>或<codeph>CREATE TABLE ... AS SELECT</codeph>语句相同的事务中自动运行<codeph>ANALYZE</codeph>。
+        要启用此功能，请在Greenplum数据库master的<codeph>postgresql.conf</codeph>文件中设置以下服务器配置参数，然后重新启动Greenplum数据库：
+        </p>
       <simpletable id="d1e1057" frame="none">
         <strow>
           <stentry>
@@ -932,17 +924,16 @@
           </stentry>
         </strow>
       </simpletable>
-      <note type="warning">Depending on the specific nature of your database operations, automatic
-        statistics collection can have a negative performance impact. Carefully evaluate whether the
-        default setting of <codeph>on_no_stats</codeph> is appropriate for your system.</note>
+      <note type="warning">根据数据库操作的特定性质，自动统计信息收集可能会对性能产生负面影响。
+        仔细评估<codeph>on_no_stats</codeph>的默认设置是否适合您的系统。
+        </note>
     </body>
   </topic>
   <topic id="topic39" xml:lang="en">
-    <title id="kh181507">Client Connection Default Parameters</title>
-    <abstract>These configuration parameters set defaults that are used for client
-      connections.</abstract>
+    <title id="kh181507">客户端连接默认参数</title>
+    <abstract>这些配置参数设置用于客户端连接的默认值。</abstract>
     <topic id="topic40" xml:lang="en">
-      <title>Statement Behavior Parameters</title>
+      <title>语句行为参数</title>
       <body>
         <simpletable id="kh163609" frame="none">
           <strow>
@@ -977,7 +968,7 @@
       </body>
     </topic>
     <topic id="topic41" xml:lang="en">
-      <title>Locale and Formatting Parameters</title>
+      <title>区域设置和格式化参数</title>
       <body>
         <simpletable id="kh163748" frame="none">
           <strow>
@@ -1024,7 +1015,7 @@
       </body>
     </topic>
     <topic id="topic42" xml:lang="en">
-      <title>Other Client Default Parameters</title>
+      <title>其他客户端默认参数</title>
       <body>
         <simpletable id="kh164407" frame="none">
           <strow>
@@ -1050,8 +1041,8 @@
     </topic>
   </topic>
   <topic id="topic43" xml:lang="en">
-    <title id="kh163788">Lock Management Parameters</title>
-    <abstract>These configuration parameters set limits for locks and deadlocks.</abstract>
+    <title id="kh163788">锁管理参数</title>
+    <abstract>这些配置参数设置锁和死锁的限制。</abstract>
     <body>
       <simpletable id="d1e1187" frame="none">
         <strow>
@@ -1079,10 +1070,10 @@
     </body>
   </topic>
   <topic id="topic44" xml:lang="en">
-    <title id="kh155069">Resource Management Parameters (Resource Queues)</title>
+    <title id="kh155069">资源管理参数（资源队列）</title>
     <body>
-      <p>The following configuration parameters configure the Greenplum Database resource management
-        feature (resource queues), query prioritization, memory utilization and concurrency control. </p>
+      <p>以下配置参数配置Greenplum数据库资源管理功能（资源队列），查询优先级，内存利用率和并发控制。
+        </p>
       <simpletable id="kh157161" frame="none">
         <strow>
           <stentry>
@@ -1153,10 +1144,9 @@
     </body>
   </topic>
   <topic id="topic444" xml:lang="en">
-    <title id="kh1550694">Resource Management Parameters (Resource Groups)</title>
+    <title id="kh1550694">资源管理参数（资源组）</title>
     <body>
-      <p>The following parameters configure the Greenplum Database resource group workload
-        management feature. </p>
+      <p>以下参数配置Greenplum数据库资源组工作负载管理功能。</p>
       <simpletable id="kh1571613" frame="none">
         <strow>
           <stentry><p>
@@ -1195,9 +1185,9 @@
     </body>
   </topic>
   <topic id="topic45" xml:lang="en">
-    <title id="kh155070">External Table Parameters</title>
+    <title id="kh155070">外部表参数</title>
     <body>
-      <p>The following parameters configure the external tables feature of Greenplum Database.</p>
+      <p>以下参数配置Greenplum数据库的外部表功能。</p>
       <simpletable id="kh164454" frame="none">
         <strow>
           <stentry>
@@ -1237,10 +1227,9 @@
     </body>
   </topic>
   <topic id="topic46" xml:lang="en">
-    <title id="kh155071">Database Table Parameters</title>
+    <title id="kh155071">数据库表参数</title>
     <body>
-      <p>The following parameter configures default option settings for Greenplum Database
-        tables.</p>
+      <p>以下参数配置Greenplum数据库表的默认选项设置。</p>
       <simpletable id="d1e1287" frame="none">
         <strow>
           <stentry>
@@ -1265,10 +1254,9 @@
       </simpletable>
     </body>
     <topic id="topic_hfd_1tl_zp">
-      <title>Append-Optimized Table Parameters</title>
+      <title>追加优化表参数</title>
       <body>
-        <p>The following parameters configure the <ph>append-optimized</ph> tables feature of
-          Greenplum Database.</p>
+        <p>以下参数配置Greenplum数据库的追加优化表功能。</p>
         <simpletable frame="none" id="simpletable_awg_1tl_zp">
           <strow>
             <stentry>
@@ -1291,10 +1279,11 @@
     </topic>
   </topic>
   <topic id="topic48" xml:lang="en">
-    <title id="kh178569">Past Version Compatibility Parameters</title>
+    <title id="kh178569">历史版本兼容性参数</title>
     <body>
-      <p>The following parameters provide compatibility with older PostgreSQL and Greenplum Database
-        versions. You do not need to change these parameters in Greenplum Database.</p>
+      <p>以下参数提供与较旧的PostgreSQL和Greenplum数据库版本的兼容性。
+        您无需在Greenplum数据库中更改这些参数。
+        </p>
     </body>
     <topic id="topic_ax3_r1v_bdb">
       <title>PostgreSQL</title>
@@ -1330,7 +1319,7 @@
       </body>
     </topic>
     <topic id="topic_jq1_n1v_bdb">
-      <title>Greenplum Database</title>
+      <title>Greenplum数据库</title>
       <body>
         <simpletable frame="none" id="simpletable_uy5_1bv_bdb">
           <strow>
@@ -1344,14 +1333,13 @@
     </topic>
   </topic>
   <topic id="topic49" xml:lang="en">
-    <title id="kh182770">Greenplum Database Array Configuration Parameters</title>
+    <title id="kh182770">Greenplum数据库阵列配置参数</title>
     <body>
-      <p>The parameters in this topic control the configuration of the Greenplum Database array and
-        its components: segments, master, distributed transaction manager, master mirror, and
-        interconnect.</p>
+      <p>本主题中的参数控制Greenplum数据库阵列及其组件的配置：segment，master，分布式事务管理器，主镜像和互连。
+        </p>
     </body>
     <topic id="topic50" xml:lang="en">
-      <title>Interconnect Configuration Parameters</title>
+      <title>互连配置参数</title>
       <body>
         <simpletable frame="none" id="simpletable_uxc_w3s_wv">
           <strow>
@@ -1389,12 +1377,11 @@
             </stentry>
           </strow>
         </simpletable>
-        <note>Greenplum Database supports only the UDPIFC (default) and TCP interconnect
-          types.</note>
+        <note>Greenplum数据库仅支持UDPIFC（默认）和TCP互连类型。</note>
       </body>
     </topic>
     <topic id="topic51" xml:lang="en">
-      <title>Dispatch Configuration Parameters</title>
+      <title>调度配置参数</title>
       <body>
         <simpletable id="kh162158" frame="none">
           <strow>
@@ -1423,7 +1410,7 @@
       </body>
     </topic>
     <topic id="topic52" xml:lang="en">
-      <title>Fault Operation Parameters</title>
+      <title>故障操作参数</title>
       <body>
         <simpletable id="kh165991" frame="none">
           <strow>
@@ -1457,7 +1444,7 @@
       </body>
     </topic>
     <topic id="topic53" xml:lang="en">
-      <title>Distributed Transaction Management Parameters</title>
+      <title>分布式事务管理参数</title>
       <body>
         <simpletable id="d1e1450" frame="none">
           <strow>
@@ -1472,7 +1459,7 @@
       </body>
     </topic>
     <topic id="topic54" xml:lang="en">
-      <title>Read-Only Parameters</title>
+      <title>只读参数</title>
       <body>
         <simpletable id="d1e1459" frame="none">
           <strow>
@@ -1508,10 +1495,10 @@
     </topic>
   </topic>
   <topic id="topic55" xml:lang="en">
-    <title id="kh184289">Greenplum Mirroring Parameters for Master and Segments</title>
+    <title id="kh184289">master和segment的Greenplum镜像参数</title>
     <body>
-      <p>These parameters control the configuration of the replication between Greenplum Database
-        primary master and standby master.</p>
+      <p>这些参数控制Greenplum数据库master和standby之间的复制配置。
+        </p>
       <simpletable id="d1e1490" frame="none">
         <strow>
           <stentry>
@@ -1536,9 +1523,9 @@
     </body>
   </topic>
   <topic id="topic56">
-    <title>Greenplum Database Extension Parameters</title>
+    <title>Greenplum数据库扩展参数</title>
     <body>
-      <p>The parameters in this topic control the configuration of Greenplum Database extensions. </p>
+      <p>本主题中的参数控制Greenplum数据库扩展的配置。</p>
       <simpletable frame="none" id="simpletable_n1h_tzl_zp">
         <strow>
           <stentry>
@@ -1560,7 +1547,7 @@
       </simpletable>
     </body>
     <topic id="topic_t3n_qml_rz">
-      <title>XML Data Parameters</title>
+      <title>XML数据参数</title>
       <body>
         <simpletable frame="none" id="simpletable_yyd_tml_rz">
           <strow>
