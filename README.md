@@ -24,10 +24,10 @@
     - Defining Database Objects （完成：杜佳伦）
     - Distribution and Skew （完成：杜佳伦）
     - Inserting, Updating, and Deleting Data （完成：段旻）
-    - Querying Data （翻译中：朱丽云、杜佳伦，进度：19/32）
+    - Querying Data （翻译中：朱丽云、杜佳伦，进度：25/32）
     - 使用外部数据 （完成：杜佳伦）
     - Loading and Unloading Data （完成：武宁）
-    - Managing Performance （翻译中：钱晨，进度：4/7）
+    - Managing Performance （翻译中：钱晨，进度：5/7）
 - Security Configuration Guide （待认领）
 - Best Practices Guide （翻译中：苑泽福，进度：7/15）
     - Demo: [http://47.92.231.67:8080/6-0/best_practices/](http://47.92.231.67:8080/6-0/best_practices/)
@@ -36,10 +36,10 @@
     - Demo: [http://47.92.231.67:8080/6-0/ref_guide/](http://47.92.231.67:8080/6-0/ref_guide/)
     - SQL Command Reference（翻译中：肖磊，进度：7/157）
     - System Catalog Reference（完成：杜佳伦）
-    - The gp_toolkit Administrative Schema（翻译中：亓晓帅）
+    - The gp_toolkit Administrative Schema（翻译中：亓晓帅，进度：1/12）
     - The gpperfmon Database（待认领）
     - Greenplum Database Data Types（待认领）
-    - Server Configuration Parameters（翻译中：杜佳伦）
+    - Server Configuration Parameters（完成：杜佳伦）
     - Additional Supplied Modules（待认领）
-    - Others（待认领）
+    - Others（翻译中：杜佳伦）
 - Platform Extension Framework (PXF) （待认领）
