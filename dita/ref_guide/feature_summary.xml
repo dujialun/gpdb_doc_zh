@@ -2,223 +2,195 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="ik110126">Summary of Greenplum Features</title>
+  <title id="ik110126">Greenplum 特点概要</title>
   <body>
-    <p>This section provides a high-level overview of the system requirements and feature set of
-      Greenplum Database. It contains the following topics:</p>
+    <p>该部分提供了Greenplum数据库的系统要求和功能集合的高级概述。它包含以下主题：
+      </p>
     <ul>
       <li id="ik143345"><xref href="#topic2" type="topic" format="dita"/></li>
       <li id="ik143353"><xref href="#topic8" type="topic" format="dita"/></li>
     </ul>
   </body>
   <topic id="topic2" xml:lang="en">
-    <title id="ik215318">Greenplum SQL Standard Conformance</title>
+    <title id="ik215318">Greenplum SQL标准一致性</title>
     <body>
-      <p>The SQL language was first formally standardized in 1986 by the American National Standards
-        Institute (ANSI) as SQL 1986. Subsequent versions of the SQL standard have been released by
-        ANSI and as International Organization for Standardization (ISO) standards: SQL 1989, SQL
-        1992, SQL 1999, SQL 2003, SQL 2006, and finally SQL 2008, which is the current SQL standard.
-        The official name of the standard is ISO/IEC 9075-14:2008. In general, each new version adds
-        more features, although occasionally features are deprecated or removed.</p>
-      <p>It is important to note that there are no commercial database systems that are fully
-        compliant with the SQL standard. Greenplum Database is almost fully compliant with the SQL
-        1992 standard, with most of the features from SQL 1999. Several features from SQL 2003 have
-        also been implemented (most notably the SQL OLAP features). </p>
-      <p>This section addresses the important conformance issues of Greenplum Database as they
-        relate to the SQL standards. For a feature-by-feature list of Greenplum's support of the
-        latest SQL standard, see <xref href="SQL2008_support.xml#topic1" type="topic" format="dita"
-        />.</p>
+      <p>SQL语言于1986年被美国国家标准学会（ANSI）第一次作为SQL正式标准化。
+        SQL标准的后续版本已由ANSI和国际标准化组织（ISO）标准发布：SQL 1989，SQL 1992，SQL 1999，SQL 2003，SQL 2006，和最后的 SQL 2008，它就是当前的SQL标准。
+        该标准的正式名称为 ISO/IEC 9075-14:2008。
+        一般来说，每个更新的版本都增加了更多的内容，虽然偶尔也有一些内容被启用或者删除。
+        </p>
+      <p>重要的是要注意，没有完全遵从SQL标准的商业数据库系统。
+        Greenplum数据库几乎完全符合SQL 1992的标准，多数功能来源于SQL 1999。
+        几个来源于SQL 2003的功能也被实现了（最著名的是 SQL OLAP 功能）。
+        </p>
+      <p>该部分针对Greenplum数据库和SQL标准相关的重要一致性的问题。
+        有关对最新的SQL标准的支持功能列表，请参阅<xref href="SQL2008_support.xml#topic1" type="topic" format="dita" />。
+        </p>
     </body>
     <topic id="topic3" xml:lang="en">
-      <title>Core SQL Conformance</title>
+      <title>核心SQL一致性</title>
       <body>
-        <p>In the process of building a parallel, shared-nothing database system and query
-          optimizer, certain common SQL constructs are not currently implemented in Greenplum
-          Database. The following SQL constructs are not supported:</p>
+        <p>在构建并行，无共享架构的数据库系统和查询优化器的过程中，某些常见的SQL结构尚未在Greenplum数据库中实现。
+          不支持以下的SQL结构：
+          </p>
         <ol>
-          <li id="ik264434">Some set returning subqueries in <codeph>EXISTS</codeph> or <codeph>NOT
-              EXISTS</codeph> clauses that Greenplum's parallel optimizer cannot rewrite into
-            joins.</li>
-          <li id="ik264484">Backwards scrolling cursors, including the use of <codeph>FETCH
-              PRIOR</codeph>, <codeph>FETCH FIRST</codeph>, <codeph>FETCH ABSOLUTE</codeph>, and
-              <codeph>FETCH RELATIVE</codeph>.</li>
-          <li id="ik264507">In <codeph>CREATE TABLE</codeph> statements (on hash-distributed
-            tables): a <codeph>UNIQUE</codeph> or <codeph>PRIMARY KEY</codeph> clause must include
-            all of (or a superset of) the distribution key columns. Because of this restriction,
-            only one <codeph>UNIQUE</codeph> clause or <codeph>PRIMARY KEY</codeph> clause is
-            allowed in a <codeph>CREATE TABLE</codeph> statement. <codeph>UNIQUE</codeph> or
-              <codeph>PRIMARY KEY</codeph> clauses are not allowed on randomly-distributed
-            tables.</li>
-          <li id="ik264567"><codeph>CREATE UNIQUE INDEX</codeph> statements that do not contain all
-            of (or a superset of) the distribution key columns. <codeph>CREATE UNIQUE INDEX</codeph>
-            is not allowed on randomly-distributed tables. <p>Note that <codeph>UNIQUE
-                INDEXES</codeph> (but not <codeph>UNIQUE CONSTRAINTS</codeph>) are enforced on a
-              part basis within a partitioned table. They guarantee the uniqueness of the key within
-              each part or sub-part.</p></li>
-          <li id="ik264592"><codeph>VOLATILE</codeph> or <codeph>STABLE</codeph> functions cannot
-            execute on the segments, and so are generally limited to being passed literal values as
-            the arguments to their parameters.</li>
-          <li id="ik264601">Triggers are not supported since they typically rely on the use of
-              <codeph>VOLATILE</codeph> functions.</li>
-          <li id="ik264621">Referential integrity constraints (foreign keys) are not enforced in
-            Greenplum Database. Users can declare foreign keys and this information is kept in the
-            system catalog, however.</li>
-          <li id="ik264690">Sequence manipulation functions <codeph>CURRVAL</codeph> and
-              <codeph>LASTVAL</codeph>.</li>
+          <li id="ik264434">有些设置在<codeph>EXISTS</codeph>或<codeph>NOT EXISTS</codeph>子句中返回子查询，Greenplum的并行优化器不能将之重写为到连接之中。
+            </li>
+          <li id="ik264484">向后回滚游标，包括<codeph>FETCH PRIOR</codeph>，<codeph>FETCH FIRST</codeph>，<codeph>FETCH ABSOLUTE</codeph>，和<codeph>FETCH RELATIVE</codeph>操作的使用。
+            </li>
+          <li id="ik264507">在<codeph>CREATE TABLE</codeph>语句上（哈希分布表）：<codeph>UNIQUE</codeph>或<codeph>PRIMARY KEY</codeph>子句必须包括分布键列的所有值，或者是其超集。
+            因为这个限制，在<codeph>CREATE TABLE</codeph>的语句中，仅允许一个<codeph>UNIQUE</codeph>子句或者<codeph>PRIMARY KEY</codeph>子句。
+            <codeph>UNIQUE</codeph>或<codeph>PRIMARY KEY</codeph>子句不允许出现在随机分布的表中。
+            </li>
+          <li id="ik264567"><codeph>CREATE UNIQUE INDEX</codeph>语句不包含分布键的列的所有值或者为其超集。
+            <codeph>CREATE UNIQUE INDEX</codeph>不允许使用在随机分布的表上。
+            <p>注意<codeph>UNIQUE INDEXES</codeph>（但是不是<codeph>UNIQUE CONSTRAINTS</codeph>）在分布表的单个部分上执行，它们保证每个部分或者子部分内的键值的唯一性。
+              </p></li>
+          <li id="ik264592"><codeph>VOLATILE</codeph>或<codeph>STABLE</codeph>函数不能在segment上执行，因此通常仅限于传递文字值作为其参数的参数。
+            </li>
+          <li id="ik264601">触发器是不支持的，因为他么通常依赖于<codeph>VOLATILE</codeph>函数的使用。
+            </li>
+          <li id="ik264621">引用完整性约束（外键）不会再Greenplum数据库中实施。
+            用户可以声明外键，但是这些信息保存在系统catalog中。
+            </li>
+          <li id="ik264690">序列操纵函数<codeph>CURRVAL</codeph>和<codeph>LASTVAL</codeph>。</li>
         </ol>
       </body>
     </topic>
     <topic id="topic4" xml:lang="en">
-      <title>SQL 1992 Conformance</title>
+      <title>SQL 1992 一致性</title>
       <body>
-        <p>The following features of SQL 1992 are not supported in Greenplum Database:</p>
+        <p>以下 SQL 1992 的特性在Greenplum数据库中不支持：</p>
         <ol>
-          <li id="ik264838"><codeph>NATIONAL CHARACTER</codeph> (<codeph>NCHAR</codeph>) and
-              <codeph>NATIONAL CHARACTER VARYING</codeph> (<codeph>NVARCHAR</codeph>). Users can
-            declare the <codeph>NCHAR</codeph> and <codeph>NVARCHAR</codeph> types, however they are
-            just synonyms for <codeph>CHAR</codeph> and <codeph>VARCHAR</codeph> in Greenplum
-            Database.</li>
-          <li id="ik264839"><codeph>CREATE ASSERTION</codeph> statement.</li>
-          <li id="ik264840"><codeph>INTERVAL</codeph> literals are supported in Greenplum Database,
-            but do not conform to the standard.</li>
-          <li id="ik264841"><codeph>GET DIAGNOSTICS</codeph> statement.</li>
-          <li id="ik264843"><codeph>GLOBAL TEMPORARY TABLE</codeph>s and <codeph>LOCAL TEMPORARY
-              TABLE</codeph>s. Greenplum <codeph>TEMPORARY TABLE</codeph>s do not conform to the SQL
-            standard, but many commercial database systems have implemented temporary tables in the
-            same way. Greenplum temporary tables are the same as <codeph>VOLATILE TABLE</codeph>s in
-            Teradata.</li>
-          <li id="ik264844"><codeph>UNIQUE</codeph> predicate.</li>
-          <li id="ik264845"><codeph>MATCH PARTIAL</codeph> for referential integrity checks (most
-            likely will not be implemented in Greenplum Database).</li>
+          <li id="ik264838"><codeph>NATIONAL CHARACTER</codeph>（<codeph>NCHAR</codeph>）和<codeph>NATIONAL CHARACTER VARYING</codeph> (<codeph>NVARCHAR</codeph>)。
+            用户可以声明<codeph>NCHAR</codeph>和<codeph>NVARCHAR</codeph>类型，但是它们只是Greenplum数据库中<codeph>CHAR</codeph>和<codeph>VARCHAR</codeph>的同义词。
+            </li>
+          <li id="ik264839"><codeph>CREATE ASSERTION</codeph>语句。</li>
+          <li id="ik264840"><codeph>INTERVAL</codeph>文字在Greenplum数据库中是支持的，但是不符合标准。</li>
+          <li id="ik264841"><codeph>GET DIAGNOSTICS</codeph>语句。</li>
+          <li id="ik264843"><codeph>GLOBAL TEMPORARY TABLE</codeph>和<codeph>LOCAL TEMPORARY TABLE</codeph>。
+            Greenplum <codeph>TEMPORARY TABLE</codeph>不符合SQL标准，但许多商业数据库系统以相同的方式实现了临时表。
+            Greenplum临时表与Teradata中的<codeph>VOLATILE TABLE</codeph>相同。
+            </li>
+          <li id="ik264844"><codeph>UNIQUE</codeph>断言。</li>
+          <li id="ik264845">引用完整性检查的<codeph>MATCH PARTIAL</codeph>（很可能不会在Greenplum数据库中实现）。</li>
         </ol>
       </body>
     </topic>
     <topic id="topic5" xml:lang="en">
-      <title>SQL 1999 Conformance</title>
+      <title>SQL 1999 一致性</title>
       <body>
-        <p>The following features of SQL 1999 are not supported in Greenplum Database:</p>
+        <p>以下SQL 1999的功能在Greenplum数据库中不支持：</p>
         <ol>
-          <li id="ik265010">Large Object data types: <codeph>BLOB</codeph>, <codeph>CLOB</codeph>,
-              <codeph>NCLOB</codeph>. However, the <codeph>BYTEA</codeph> and <codeph>TEXT</codeph>
-            columns can store very large amounts of data in Greenplum Database (hundreds of
-            megabytes).</li>
-          <li id="ik265012"><codeph>MODULE</codeph> (SQL client modules).</li>
-          <li id="ik265013"><codeph>CREATE PROCEDURE</codeph> (<codeph>SQL/PSM</codeph>). This can
-            be worked around in Greenplum Database by creating a <codeph>FUNCTION</codeph> that
-            returns <codeph>void</codeph>, and invoking the function as
-            follows:<codeblock>SELECT <i>myfunc</i>(<i>args</i>);
-</codeblock></li>
-          <li id="ik265014">The PostgreSQL/Greenplum function definition language
-              (<codeph>PL/PGSQL</codeph>) is a subset of Oracle's <codeph>PL/SQL</codeph>, rather
-            than being compatible with the <codeph>SQL/PSM</codeph> function definition language.
-            Greenplum Database also supports function definitions written in Python, Perl, Java, and
-            R.</li>
-          <li id="ik265110"><codeph>BIT</codeph> and <codeph>BIT VARYING</codeph> data types
-            (intentionally omitted). These were deprecated in SQL 2003, and replaced in SQL
-            2008.</li>
-          <li id="ik265123">Greenplum supports identifiers up to 63 characters long. The SQL
-            standard requires support for identifiers up to 128 characters long. </li>
-          <li id="ik265143">Prepared transactions (<codeph>PREPARE TRANSACTION</codeph>,
-              <codeph>COMMIT PREPARED</codeph>, <codeph>ROLLBACK PREPARED</codeph>). This also means
-            Greenplum does not support <codeph>XA</codeph> Transactions (2 phase commit coordination
-            of database transactions with external transactions).</li>
-          <li id="ik265148"><codeph>CHARACTER SET</codeph> option on the definition of
-              <codeph>CHAR()</codeph> or <codeph>VARCHAR()</codeph> columns. </li>
-          <li id="ik265159">Specification of <codeph>CHARACTERS</codeph> or <codeph>OCTETS</codeph>
-              (<codeph>BYTES</codeph>) on the length of a <codeph>CHAR()</codeph> or
-              <codeph>VARCHAR()</codeph> column. For example, <codeph>VARCHAR(15
-              CHARACTERS)</codeph> or <codeph>VARCHAR(15 OCTETS)</codeph> or <codeph>VARCHAR(15
-              BYTES)</codeph>.</li>
-          <li id="ik265020"><codeph>CURRENT_SCHEMA</codeph> function.</li>
-          <li id="ik265021"><codeph>CREATE DISTINCT TYPE </codeph>statement. <codeph>CREATE
-              DOMAIN</codeph> can be used as a work-around in Greenplum.</li>
-          <li id="ik265210">The <i>explicit table</i> construct.</li>
+          <li id="ik265010">Large Object数据类型：<codeph>BLOB</codeph>, <codeph>CLOB</codeph>, <codeph>NCLOB</codeph>。
+            但是，Grennplum数据库中该<codeph>BYTEA</codeph>和<codeph>TEXT</codeph>列可以存储大量的数据（数百兆字节）。
+            </li>
+          <li id="ik265012"><codeph>MODULE</codeph>（SQL 客户端模块）。
+            </li>
+          <li id="ik265013"><codeph>CREATE PROCEDURE</codeph> (<codeph>SQL/PSM</codeph>)。
+            这可通过创建返回值为<codeph>void</codeph>的<codeph>FUNCTION</codeph>在Greenplum数据库中进行操作，如下调用函数：
+            <codeblock>SELECT <i>myfunc</i>(<i>args</i>);</codeblock>
+            </li>
+          <li id="ik265014">该PostgreSQL/Greenplum函数定义语言（<codeph>PL/PGSQL</codeph>）是Oracle的<codeph>PL/SQL</codeph>的子集，而不是和<codeph>SQL/PSM</codeph>函数定义语言的兼容。
+            Greenplum数据库还支持使用Python，Perl，Java和R定义函数。
+            </li>
+          <li id="ik265110"><codeph>BIT</codeph>和<codeph>BIT VARYING</codeph>数据类型（故意忽略）。
+            这些在SQL 2003中被弃用，并且在SQL 2008中被替代。
+            </li>
+          <li id="ik265123">Greenplum支持63个字符长的标识符。
+            该SQL标准要求支持达到128个字符长的标识符。
+            </li>
+          <li id="ik265143">准备好的事务（<codeph>PREPARE TRANSACTION</codeph>，<codeph>COMMIT PREPARED</codeph>，<codeph>ROLLBACK PREPARED</codeph>）。
+            这也意味着Greenplum不支持<codeph>XA</codeph>事务（数据库事务和外部事务2个阶段的提交的协调）。
+            </li>
+          <li id="ik265148"><codeph>CHAR()</codeph>或<codeph>VARCHAR()</codeph>列定义的<codeph>CHARACTER SET</codeph>选项。
+            </li>
+          <li id="ik265159">指明<codeph>CHARACTERS</codeph>或<codeph>OCTETS</codeph>(<codeph>BYTES</codeph>)关于<codeph>CHAR()</codeph>或<codeph>VARCHAR()</codeph>列的长度。
+            例如，<codeph>VARCHAR(15 CHARACTERS)</codeph>或<codeph>VARCHAR(15 OCTETS)</codeph>或<codeph>VARCHAR(15 BYTES)</codeph>。
+            </li>
+          <li id="ik265020"><codeph>CURRENT_SCHEMA</codeph>函数。</li>
+          <li id="ik265021"><codeph>CREATE DISTINCT TYPE</codeph>语句。
+            <codeph>CREATE DOMAIN</codeph>可以用作Greenplum中的一种解决方案。
+            </li>
+          <li id="ik265210"><i>explicit table</i>构造。</li>
         </ol>
       </body>
     </topic>
     <topic id="topic6" xml:lang="en">
-      <title>SQL 2003 Conformance</title>
+      <title>SQL 2003 一致性</title>
       <body>
-        <p>The following features of SQL 2003 are not supported in Greenplum Database:</p>
+        <p>以下SQL 2003的功能在Greenplum数据库中不支持：</p>
         <ol>
-          <li id="ik268864"><codeph>MERGE</codeph> statements.</li>
-          <li id="ik265705"><codeph>IDENTITY</codeph> columns and the associated <codeph>GENERATED
-              ALWAYS/GENERATED BY DEFAULT</codeph> clause. The <codeph>SERIAL</codeph> or
-              <codeph>BIGSERIAL</codeph> data types are very similar to <codeph>INT</codeph> or
-              <codeph>BIGINT GENERATED BY DEFAULT AS IDENTITY</codeph>.</li>
-          <li id="ik265706"><codeph>MULTISET</codeph> modifiers on data types.</li>
-          <li id="ik265707"><codeph>ROW</codeph> data type.</li>
-          <li id="ik265708">Greenplum Database syntax for using sequences is non-standard. For
-            example, <codeph>nextval('</codeph><codeph>seq</codeph><codeph>')</codeph> is used in
-            Greenplum instead of the standard <codeph>NEXT VALUE FOR
-            </codeph><codeph>seq</codeph>.</li>
-          <li id="ik265709"><codeph>GENERATED ALWAYS AS </codeph>columns. Views can be used as a
-            work-around.</li>
-          <li id="ik265710">The sample clause (<codeph>TABLESAMPLE</codeph>) on
-              <codeph>SELECT</codeph> statements. The <codeph>random()</codeph> function can be used
-            as a work-around to get random samples from tables.</li>
-          <li id="ik265712">The <i>partitioned join tables</i> construct (<codeph>PARTITION
-              BY</codeph> in a join).</li>
-          <li id="ik265714">For <codeph>CREATE TABLE x (LIKE(y))</codeph> statements, Greenplum does
-            not support the
-              <codeph>[INCLUDING|EXCLUDING]</codeph><codeph>[DEFAULTS|CONSTRAINTS|INDEXES]</codeph>
-            clauses.</li>
-          <li id="ik265715">Greenplum array data types are almost SQL standard compliant with some
-            exceptions. Generally customers should not encounter any problems using them.</li>
+          <li id="ik268864"><codeph>MERGE</codeph>语句。</li>
+          <li id="ik265705"><codeph>IDENTITY</codeph>列和相关的<codeph>GENERATED ALWAYS/GENERATED BY DEFAULT</codeph>子句。
+            该<codeph>SERIAL</codeph>或<codeph>BIGSERIAL</codeph>数据类型与<codeph>INT</codeph>或<codeph>BIGINT GENERATED BY DEFAULT AS IDENTITY</codeph>非常相似。
+            </li>
+          <li id="ik265706">数据类型的<codeph>MULTISET</codeph>修饰符。</li>
+          <li id="ik265707"><codeph>ROW</codeph>数据类型。</li>
+          <li id="ik265708">Greenplum使用序列的语法是非标准的。
+            例如，在Greenplum中使用<codeph>nextval('</codeph><codeph>seq</codeph><codeph>')</codeph>来替代标准的<codeph>NEXT VALUE FOR</codeph> <codeph>seq</codeph>。
+            </li>
+          <li id="ik265709"><codeph>GENERATED ALWAYS AS</codeph>列。
+            视图可以用作解决方法。
+            </li>
+          <li id="ik265710"><codeph>SELECT</codeph>语句上的示例子句（<codeph>TABLESAMPLE</codeph>）。
+            该<codeph>random()</codeph>函数可以用解决从表中获取随机样本的方法。
+            </li>
+          <li id="ik265712">该<i>partitioned join tables</i>结构（连接中的<codeph>PARTITION BY</codeph>）。
+            </li>
+          <li id="ik265714">对<codeph>CREATE TABLE x (LIKE(y))</codeph>语句，Greenplum不支持<codeph>[INCLUDING|EXCLUDING]</codeph><codeph>[DEFAULTS|CONSTRAINTS|INDEXES]</codeph>语句。
+            </li>
+          <li id="ik265715">Greenplum数组数据类型几乎符合SQL标准，但是有一些例外。
+            通常，用户不应该遇到使用它们的问题。
+            </li>
         </ol>
       </body>
     </topic>
     <topic id="topic7" xml:lang="en">
-      <title>SQL 2008 Conformance</title>
+      <title>SQL 2008 一致性</title>
       <body>
-        <p>The following features of SQL 2008 are not supported in Greenplum Database:</p>
+        <p>以下SQL 2008的特性在Greenplum数据库中不支持：</p>
         <ol>
-          <li id="ik265320"><codeph>BINARY</codeph> and <codeph>VARBINARY</codeph> data types.
-              <codeph>BYTEA</codeph> can be used in place of <codeph>VARBINARY</codeph> in Greenplum
-            Database.</li>
-          <li id="ik265321"><codeph>FETCH FIRST</codeph> or <codeph>FETCH NEXT</codeph> clause for
-              <codeph>SELECT</codeph>, for
-              example:<codeblock>SELECT id, name FROM tab1 ORDER BY id OFFSET 20 ROWS FETCH 
-NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
-              has <codeph>LIMIT</codeph> and <codeph>LIMIT OFFSET</codeph> clauses instead.</p></li>
-          <li id="ik265322">The <codeph>ORDER BY</codeph> clause is ignored in views and subqueries
-            unless a <codeph>LIMIT</codeph> clause is also used. This is intentional, as the
-            Greenplum optimizer cannot determine when it is safe to avoid the sort, causing an
-            unexpected performance impact for such <codeph>ORDER BY</codeph> clauses. To work
-            around, you can specify a really large <codeph>LIMIT</codeph>. For example:
-              <codeph>SELECT * FROM </codeph><codeph>mytable</codeph><codeph> ORDER BY 1 LIMIT
-              9999999999</codeph></li>
-          <li id="ik265583">The <i>row subquery</i> construct is not supported.</li>
-          <li id="ik265586"><codeph>TRUNCATE TABLE</codeph> does not accept the <codeph>CONTINUE
-              IDENTITY</codeph> and <codeph>RESTART IDENTITY</codeph> clauses.</li>
+          <li id="ik265320"><codeph>BINARY</codeph>和<codeph>VARBINARY</codeph>数据类型。
+            在Greenplum数据库中，<codeph>BYTEA</codeph>可以用来替代<codeph>VARBINARY</codeph>。
+            </li>
+          <li id="ik265321"><codeph>FETCH FIRST</codeph>或<codeph>FETCH NEXT</codeph>子句对<codeph>SELECT</codeph>，例如：
+            <codeblock>SELECT id, name FROM tab1 ORDER BY id OFFSET 20 ROWS FETCH
+NEXT 10 ROWS ONLY; </codeblock>
+            <p>Greenplum有<codeph>LIMIT</codeph>和<codeph>LIMIT OFFSET</codeph>子句可以用来替代。
+              </p></li>
+          <li id="ik265322">除非还使用<codeph>LIMIT</codeph>子句，否则在视图和子查询中将忽略<codeph>ORDER BY</codeph>子句。
+            这是有意的，因为Greenplum优化器无法确定何时避免排序是安全的，从而对此类<codeph>ORDER BY</codeph>子句造成意外的性能影响。
+            要解决这个问题，用户可以指定一个非常大的<codeph>LIMIT</codeph>。
+            例如：<codeph>SELECT * FROM </codeph><codeph>mytable</codeph><codeph> ORDER BY 1 LIMIT 9999999999</codeph>
+            </li>
+          <li id="ik265583"><i>row subquery</i>结构是不支持的。</li>
+          <li id="ik265586"><codeph>TRUNCATE TABLE</codeph>不接受<codeph>CONTINUE IDENTITY</codeph>和<codeph>RESTART IDENTITY</codeph>子句。
+            </li>
         </ol>
       </body>
     </topic>
   </topic>
   <topic id="topic8" xml:lang="en">
-    <title id="ik264019">Greenplum and PostgreSQL Compatibility</title>
+    <title id="ik264019">Greenplum和PostgreSQL兼容性</title>
     <body>
-      <p>Greenplum Database is based on PostgreSQL 9.4. To support the distributed nature and
-        typical workload of a Greenplum Database system, some SQL commands have been added or
-        modified, and there are a few PostgreSQL features that are not supported. Greenplum has also
-        added features not found in PostgreSQL, such as physical data distribution, parallel query
-        optimization, external tables, resource queues, and enhanced table partitioning. For full
-        SQL syntax and references, see the <xref href="sql_commands/sql_ref.xml#topic1" type="topic"
-          format="dita"/>.<note>Greenplum Database does not support the PostgreSQL <xref
-            href="https://www.postgresql.org/docs/9.4/largeobjects.html" format="html"
-            scope="external">large object facility</xref> for streaming user data that is stored in
-          large-object structures.</note></p>
+      <p>Greenplum数据库基于PostgreSQL 9.4。
+        为了支持Greenplum数据库系统的分布式特性和典型工作负载，添加或修改了一些SQL命令，并且有一些不受支持的PostgreSQL功能。
+        Greenplum还添加了PostgreSQL中没有的功能，例如物理数据分发，并行查询优化，外部表，资源队列和增强的表分区。
+        有关完整的SQL语法和参考，请参阅<xref href="sql_commands/sql_ref.xml#topic1" type="topic" format="dita"/>。
+        <note>Greenplum数据库不支持PostgreSQL<xref href="https://www.postgresql.org/docs/9.4/largeobjects.html" format="html" scope="external">大对象工具</xref>，用于流式传输存储在大型对象结构中的用户数据。
+          </note></p>
       <table id="ik213423">
-        <title>SQL Support in Greenplum Database</title>
+        <title>Greenplum数据库中的SQL支持</title>
         <tgroup cols="3">
           <colspec colnum="1" colname="col1" colwidth="143pt"/>
           <colspec colnum="2" colname="col2" colwidth="73pt"/>
           <colspec colnum="3" colname="col3" colwidth="233pt"/>
           <thead>
             <row>
-              <entry colname="col1">SQL Command</entry>
-              <entry colname="col2">Supported in Greenplum</entry>
-              <entry colname="col3">Modifications, Limitations, Exceptions</entry>
+              <entry colname="col1">SQL命令</entry>
+              <entry colname="col2">Greenplum是否支持</entry>
+              <entry colname="col3">修改，限制，例外</entry>
             </row>
           </thead>
           <tbody>
@@ -245,8 +217,7 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>ALTER EXTENSION</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">Changes the definition of a Greenplum Database extension - based
-                on PostgreSQL 9.6. </entry>
+              <entry colname="col3">更改Greenplum数据库扩展的定义 - 基于PostgreSQL 9.6。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>ALTER FUNCTION</codeph></entry>
@@ -256,8 +227,7 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>ALTER GROUP</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">An alias for <xref href="sql_commands/ALTER_ROLE.xml#topic1"
-                  type="topic" format="dita"/></entry>
+              <entry colname="col3"><xref href="sql_commands/ALTER_ROLE.xml#topic1" type="topic" format="dita"/>的别名</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>ALTER INDEX</codeph></entry>
@@ -292,13 +262,12 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>ALTER RESOURCE QUEUE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">Greenplum Database resource management feature - not in
-                PostgreSQL.</entry>
+              <entry colname="col3">Greenplum数据库资源管理特性 - 不在PostgreSQL中。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>ALTER ROLE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Greenplum Database Clauses:</b><p><codeph>RESOURCE QUEUE
+              <entry colname="col3"><b>Greenplum数据库子句：</b><p><codeph>RESOURCE QUEUE
                     </codeph><i>queue_name</i><codeph> | none</codeph></p></entry>
             </row>
             <row>
@@ -319,9 +288,9 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>ALTER TABLE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Unsupported Clauses / Options:</b><p><codeph>CLUSTER
-                    ON</codeph></p><p><codeph>ENABLE/DISABLE TRIGGER</codeph></p><p><b>Greenplum
-                    Database Clauses:</b></p><p><codeph>ADD | DROP | RENAME | SPLIT | EXCHANGE
+              <entry colname="col3"><b>不支持的子句/选项：</b><p><codeph>CLUSTER
+                    ON</codeph></p><p><codeph>ENABLE/DISABLE TRIGGER</codeph></p>
+                    <p><b>Greenplum数据库子句：</b></p><p><codeph>ADD | DROP | RENAME | SPLIT | EXCHANGE
                     PARTITION | SET SUBPARTITION TEMPLATE | SET WITH
                     </codeph><codeph>(REORGANIZE=true | false) | SET DISTRIBUTED
                 BY</codeph></p></entry>
@@ -339,14 +308,13 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>ALTER TYPE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Greenplum Database Clauses:</b><p><codeph>SET DEFAULT
+              <entry colname="col3"><b>Greenplum数据库子句：</b><p><codeph>SET DEFAULT
                     ENCODING</codeph></p></entry>
             </row>
             <row>
               <entry colname="col1"><codeph>ALTER USER</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">An alias for <xref href="sql_commands/ALTER_ROLE.xml#topic1"
-                  type="topic" format="dita"/></entry>
+              <entry colname="col3"><xref href="sql_commands/ALTER_ROLE.xml#topic1" type="topic" format="dita"/>的别名</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>ALTER VIEW</codeph></entry>
@@ -396,18 +364,18 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>COPY</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Modified Clauses:</b><p><codeph>ESCAPE [ AS ]
-                    '</codeph><i>escape</i><codeph>' | 'OFF'</codeph></p><p><b>Greenplum Database
-                    Clauses:</b></p><p><codeph>[LOG ERRORS] SEGMENT REJECT LIMIT
+              <entry colname="col3"><b>修改的子句：</b><p><codeph>ESCAPE [ AS ]
+                    '</codeph><i>escape</i><codeph>' | 'OFF'</codeph></p>
+                    <p><b>Greenplum数据库子句：</b></p><p><codeph>[LOG ERRORS] SEGMENT REJECT LIMIT
                     </codeph><i>count</i><codeph> [ROWS|PERCENT]</codeph></p></entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE AGGREGATE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Unsupported Clauses / Options:</b><p><codeph>[ , SORTOP =
-                    </codeph><i>sort_operator</i><codeph> ]</codeph></p><p><b>Greenplum Database
-                    Clauses:</b></p><p><codeph>[ , COMBINEFUNC = </codeph><i>combinefunc</i><codeph>
-                    ]</codeph></p><p><b>Limitations:</b></p><p>The functions used to implement the
+              <entry colname="col3"><b>不支持的子句/选项：</b><p><codeph>[ , SORTOP =
+                    </codeph><i>sort_operator</i><codeph> ]</codeph></p>
+                    <p><b>Greenplum数据库子句：</b></p><p><codeph>[ , COMBINEFUNC = </codeph><i>combinefunc</i><codeph>
+                    ]</codeph></p><p><b>限制：</b></p><p>The functions used to implement the
                   aggregate must be <codeph>IMMUTABLE</codeph> functions.</p></entry>
             </row>
             <row>
@@ -438,41 +406,36 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>CREATE EXTENSION</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">Loads a new extension into Greenplum Database - based on
-                PostgreSQL 9.6.</entry>
+              <entry colname="col3">将新扩展加载到Greenplum数据库 - 基于PostgreSQL 9.6。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE EXTERNAL TABLE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">Greenplum Database parallel ETL feature - not in PostgreSQL
-                9.4.</entry>
+              <entry colname="col3">Greenplum数据库并行ETL特性 - 不在PostgreSQL 9.4中。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE FUNCTION</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Limitations:</b><p>Functions defined as
-                    <codeph>STABLE</codeph> or <codeph>VOLATILE</codeph> can be executed in
-                  Greenplum Database provided that they are executed on the master only.
-                    <codeph>STABLE</codeph> and <codeph>VOLATILE</codeph> functions cannot be used
-                  in statements that execute at the segment level. </p></entry>
+              <entry colname="col3"><b>限制：</b>
+                  <p>定义为<codeph>STABLE</codeph>或<codeph>VOLATILE</codeph>的函数可以在Greenplum数据库中执行，只要它们仅在master上执行即可。
+                    <codeph>STABLE</codeph>和<codeph>VOLATILE</codeph>函数不能在segment级别执行的语句中使用。
+                    </p></entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE GROUP</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">An alias for <xref href="sql_commands/CREATE_ROLE.xml#topic1"
-                  type="topic" format="dita"/></entry>
+              <entry colname="col3"><xref href="sql_commands/CREATE_ROLE.xml#topic1" type="topic" format="dita"/>的别名</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE INDEX</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Greenplum Database Clauses:</b><p><codeph>USING
+              <entry colname="col3"><b>Greenplum数据库子句：</b><p><codeph>USING
                     bitmap</codeph> (bitmap
-                    indexes)</p><p><b>Limitations:</b></p><p><codeph>UNIQUE</codeph> indexes are
-                  allowed only if they contain all of (or a superset of) the Greenplum distribution
-                  key columns. On partitioned tables, a unique index is only supported within an
-                  individual partition - not across all
-                    partitions.</p><p><codeph>CONCURRENTLY</codeph> keyword not supported in
-                  Greenplum.</p></entry>
+                    indexes)</p>
+                  <p><b>限制：</b></p>
+                  <p>仅当<codeph>UNIQUE</codeph>索引包含Greenplum分发键列的所有（或超集）时，才允许使用。
+                    在分区表上，仅在单个分区内支持唯一索引 - 而不是跨所有分区。
+                    </p><p>Greenplum不支持<codeph>CONCURRENTLY</codeph>关键字。</p></entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE LANGUAGE</codeph></entry>
@@ -482,14 +445,12 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry><codeph>CREATE MATERIALIZED VIEW</codeph></entry>
               <entry>NO</entry>
-              <entry>Greenplum Database does not support materialized views (a PostgreSQL
-                extension).</entry>
+              <entry>Greenplum数据库不支持物化视图（PostgreSQL扩展）。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE OPERATOR</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Limitations:</b><p>The function used to implement the
-                  operator must be an <codeph>IMMUTABLE</codeph> function.</p></entry>
+              <entry colname="col3"><b>限制：</b><p>用于实现运算符的函数必须是<codeph>IMMUTABLE</codeph>函数。</p></entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE OPERATOR CLASS</codeph></entry>
@@ -509,13 +470,12 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>CREATE RESOURCE QUEUE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">Greenplum Database resource management feature - not in
-                PostgreSQL 9.4.</entry>
+              <entry colname="col3">Greenplum数据库资源管理功能 - 不在PostgreSQL 9.4中。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE ROLE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Greenplum Database Clauses:</b><p><codeph>RESOURCE QUEUE
+              <entry colname="col3"><b>Greenplum数据库子句：</b><p><codeph>RESOURCE QUEUE
                     </codeph><i>queue_name</i><codeph> | none</codeph></p></entry>
             </row>
             <row>
@@ -531,23 +491,21 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>CREATE SEQUENCE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Limitations:</b><p>The <codeph>lastval()</codeph> and
-                    <codeph>currval()</codeph> functions are not supported.</p><p>The
-                    <codeph>setval()</codeph> function is only allowed in queries that do not
-                  operate on distributed data.</p></entry>
+              <entry colname="col3"><b>限制：</b>
+                    <p>不支持<codeph>lastval()</codeph>和<codeph>currval()</codeph>函数。</p>
+                    <p><codeph>setval()</codeph>函数仅在不对分布式数据进行操作的查询中允许。</p>
+              </entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE TABLE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Unsupported Clauses / Options:</b><p><codeph>[GLOBAL |
+              <entry colname="col3"><b>不支持的子句/选项：</b><p><codeph>[GLOBAL |
                     LOCAL]</codeph></p><p><codeph>REFERENCES</codeph></p><p><codeph>FOREIGN
                     KEY</codeph></p><p><codeph>[DEFERRABLE | NOT DEFERRABLE]
-                    </codeph></p><p><b>Limited Clauses:</b></p><p><codeph>UNIQUE</codeph> or
-                    <codeph>PRIMARY KEY </codeph>constraints are only allowed on hash-distributed
-                  tables (<codeph>DISTRIBUTED BY</codeph>), and the constraint columns must be the
-                  same as or a superset of the distribution key columns of the table and must
-                  include all the distribution key columns of the partitioning
-                    key.</p><p><b>Greenplum Database Clauses:</b></p><p><codeph>DISTRIBUTED BY
+                    </codeph></p><p><b>限制子句：</b></p>
+                    <p><codeph>UNIQUE</codeph>或<codeph>PRIMARY KEY</codeph>约束仅允许在哈希分布式表（<codeph>DISTRIBUTED BY</codeph>）上使用，
+                      并且约束列必须与表的分发键列相同或超集，并且必须包括分区键的所有分发键列。
+                      </p><p><b>Greenplum数据库子句：</b></p><p><codeph>DISTRIBUTED BY
                       (<i>column</i>, [ ... ] ) |</codeph></p><p><codeph>DISTRIBUTED
                     RANDOMLY</codeph></p><p><codeph>PARTITION BY <i>type</i> (<i>column</i> [, ...])
                        ( <i>partition_specification</i>, [...] )</codeph></p><p><codeph>WITH
@@ -557,14 +515,13 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>CREATE TABLE AS</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">See <xref href="sql_commands/CREATE_TABLE.xml#topic1"
+              <entry colname="col3">参考<xref href="sql_commands/CREATE_TABLE.xml#topic1"
                   type="topic" format="dita"/></entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE TABLESPACE</codeph></entry>
               <entry colname="col2"><b otherprops="red">YES</b></entry>
-              <entry colname="col3"><b>Greenplum Database Clauses:</b><p>Specify host file system
-                  locations for specific segment instances.</p><p><codeph>WITH
+              <entry colname="col3"><b>Greenplum数据库子句：</b><p>为特定的segment实例指定主机文件系统位置。</p><p><codeph>WITH
                       (content<varname>ID_1</varname>='<varname>/path/to/dir1</varname>...)</codeph></p></entry>
             </row>
             <row>
@@ -575,16 +532,15 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>CREATE TYPE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Greenplum Database Clauses:</b><p><codeph>COMPRESSTYPE |
-                    COMPRESSLEVEL | BLOCKSIZE</codeph></p><p><b>Limitations:</b></p><p>The functions
-                  used to implement a new base type must be <codeph>IMMUTABLE</codeph>
-                  functions.</p></entry>
+              <entry colname="col3"><b>Greenplum数据库子句：</b><p><codeph>COMPRESSTYPE |
+                    COMPRESSLEVEL | BLOCKSIZE</codeph></p><p><b>限制：</b></p>
+                  <p>用于实现新基类型的函数必须是<codeph>IMMUTABLE</codeph>函数。</p>
+              </entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE USER</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">An alias for <xref href="sql_commands/CREATE_ROLE.xml#topic1"
-                  type="topic" format="dita"/></entry>
+              <entry colname="col3"><xref href="sql_commands/CREATE_ROLE.xml#topic1" type="topic" format="dita"/>的别名</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>CREATE VIEW</codeph></entry>
@@ -599,11 +555,10 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>DECLARE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Unsupported Clauses /
-                  Options:</b><p><codeph>SCROLL</codeph></p><p><codeph>FOR UPDATE [ OF column [,
-                    ...] ]</codeph></p><p><b>Limitations:</b></p><p>Cursors cannot be
-                  backward-scrolled. Forward scrolling is supported.</p><p>PL/pgSQL does not have
-                  support for updatable cursors. </p></entry>
+              <entry colname="col3"><b>不支持的子句/选项：</b><p><codeph>SCROLL</codeph></p><p><codeph>FOR UPDATE [ OF column [,
+                    ...] ]</codeph></p><p><b>限制：</b></p><p>游标不能向后滚动。支持向前滚动。</p>
+                  <p>PL/pgSQL不支持可更新游标。</p>
+              </entry>
             </row>
             <row>
               <entry colname="col1"><codeph>DELETE</codeph></entry>
@@ -618,7 +573,7 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>DO</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">PostgreSQL 9.0 feature</entry>
+              <entry colname="col3">PostgreSQL 9.0特性</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>DROP AGGREGATE</codeph></entry>
@@ -648,14 +603,12 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>DROP EXTENSION</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">Removes an extension from Greenplum Database – based on
-                PostgreSQL 9.6.</entry>
+              <entry colname="col3">从Greenplum数据库中删除扩展 - 基于PostgreSQL 9.6。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>DROP EXTERNAL TABLE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">Greenplum Database parallel ETL feature - not in PostgreSQL
-                9.4.</entry>
+              <entry colname="col3">Greenplum数据库并行ETL功能 - 不在PostgreSQL 9.4中。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>DROP FUNCTION</codeph></entry>
@@ -665,8 +618,7 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>DROP GROUP</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">An alias for <xref href="sql_commands/DROP_ROLE.xml#topic1"
-                /></entry>
+              <entry colname="col3"><xref href="sql_commands/DROP_ROLE.xml#topic1"/>的别名</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>DROP INDEX</codeph></entry>
@@ -706,8 +658,7 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>DROP RESOURCE QUEUE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">Greenplum Database resource management feature - not in
-                PostgreSQL 9.4.</entry>
+              <entry colname="col3">Greenplum数据库资源管理功能 - 不在PostgreSQL 9.4中。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>DROP ROLE</codeph></entry>
@@ -752,8 +703,7 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>DROP USER</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">An alias for <xref href="sql_commands/DROP_ROLE.xml#topic1"
-                /></entry>
+              <entry colname="col3"><xref href="sql_commands/DROP_ROLE.xml#topic1"/>的别名</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>DROP VIEW</codeph></entry>
@@ -778,10 +728,9 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>FETCH</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Unsupported Clauses /
-                  Options:</b><p><codeph>LAST</codeph></p><p><codeph>PRIOR</codeph></p><p><codeph>BACKWARD</codeph></p><p><codeph>BACKWARD
-                    ALL</codeph></p><p><b>Limitations:</b></p><p>Cannot fetch rows in a
-                  nonsequential fashion; backward scan is not supported.</p></entry>
+              <entry colname="col3"><b>不支持的子句/选项：</b><p><codeph>LAST</codeph></p><p><codeph>PRIOR</codeph></p><p><codeph>BACKWARD</codeph></p><p><codeph>BACKWARD
+                    ALL</codeph></p><p><b>限制：</b></p><p>无法以非顺序方式获取行;不支持向后扫描。</p>
+              </entry>
             </row>
             <row>
               <entry colname="col1"><codeph>GRANT</codeph></entry>
@@ -816,7 +765,7 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>MOVE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">See <xref href="sql_commands/FETCH.xml#topic1"/></entry>
+              <entry colname="col3">参考<xref href="sql_commands/FETCH.xml#topic1"/></entry>
             </row>
             <row>
               <entry colname="col1"><codeph>NOTIFY</codeph></entry>
@@ -841,8 +790,7 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry><codeph>REFRESH MATERIALIZED VIEW</codeph></entry>
               <entry>NO</entry>
-              <entry>Greenplum Database does not support materialized views (a PostgreSQL
-                extension).</entry>
+              <entry>Greenplum数据库不支持物化视图（PostgreSQL扩展）。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>REINDEX</codeph></entry>
@@ -887,22 +835,23 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>SELECT</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Limitations:</b><p>Limited use of <codeph>VOLATILE</codeph>
-                  and <codeph>STABLE</codeph> functions in <codeph>FROM</codeph> or
-                    <codeph>WHERE</codeph> clauses</p><p>Text search (<codeph>Tsearch2</codeph>) is
-                  not supported</p><p><codeph>FETCH FIRST</codeph> or <codeph>FETCH NEXT</codeph>
-                  clauses not supported </p><p><b>Greenplum Database Clauses
-                    (OLAP):</b></p><p><codeph>[GROUP BY </codeph><i>grouping_element</i><codeph> [,
+              <entry colname="col3"><b>限制：</b>
+                  <p>在<codeph>FROM</codeph>或<codeph>WHERE</codeph>子句中有限使用<codeph>VOLATILE</codeph>和<codeph>STABLE</codeph>函数
+                    </p>
+                  <p>不支持文本搜索（<codeph>Tsearch2</codeph>）</p>
+                  <p><codeph>FETCH FIRST</codeph>或<codeph>FETCH NEXT</codeph>子句不受支持</p>
+                  <p><b>Greenplum数据库子句(OLAP):</b></p>
+                  <p><codeph>[GROUP BY </codeph><i>grouping_element</i><codeph> [,
                     ...]]</codeph></p><p><codeph>[WINDOW </codeph><i>window_name</i><codeph> AS
                     (</codeph><i>window_specification</i><codeph>)]</codeph></p><p><codeph>[FILTER
-                    (WHERE </codeph><i>condition</i><codeph>)]</codeph> applied to an aggregate
-                  function in the <codeph>SELECT</codeph> list</p></entry>
+                    (WHERE </codeph><i>condition</i><codeph>)]</codeph>应用于<codeph>SELECT</codeph>列表中的聚合函数
+                  </p>
+              </entry>
             </row>
             <row>
               <entry colname="col1"><codeph>SELECT INTO</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">See <xref href="sql_commands/SELECT.xml#topic1" type="topic"
-                  format="dita"/></entry>
+              <entry colname="col3">参考<xref href="sql_commands/SELECT.xml#topic1" type="topic" format="dita"/></entry>
             </row>
             <row>
               <entry colname="col1"><codeph>SET</codeph></entry>
@@ -912,8 +861,7 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>SET CONSTRAINTS</codeph></entry>
               <entry colname="col2"><b otherprops="red">NO</b></entry>
-              <entry colname="col3">In PostgreSQL, this only applies to foreign key constraints,
-                which are currently not enforced in Greenplum Database.</entry>
+              <entry colname="col3">在PostgreSQL中，这仅适用于外键约束，这些约束目前未在Greenplum数据库中实施。</entry>
             </row>
             <row>
               <entry colname="col1"><codeph>SET ROLE</codeph></entry>
@@ -923,15 +871,14 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>SET SESSION AUTHORIZATION</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3">Deprecated as of PostgreSQL 8.1 - see <xref
-                  href="sql_commands/SET_ROLE.xml#topic1" type="topic" format="dita"/></entry>
+              <entry colname="col3">从PostgreSQL 8.1开始不推荐 - 请参阅<xref href="sql_commands/SET_ROLE.xml#topic1" type="topic" format="dita"/>
+                </entry>
             </row>
             <row>
               <entry colname="col1"><codeph>SET TRANSACTION</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Limitations:</b><p><codeph>DEFERRABLE</codeph> clause has no
-                  effect.</p><p><codeph>SET TRANSACTION SNAPSHOT</codeph> command is not
-                  supported.</p></entry>
+              <entry colname="col3"><b>限制：</b><p><codeph>DEFERRABLE</codeph>子句无效。</p>
+                <p><codeph>SET TRANSACTION SNAPSHOT</codeph>命令不支持。</p></entry>
             </row>
             <row>
               <entry colname="col1"><codeph>SHOW</codeph></entry>
@@ -956,14 +903,15 @@ NEXT 10 ROWS ONLY; </codeblock><p>Greenplum
             <row>
               <entry colname="col1"><codeph>UPDATE</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Limitations:</b><p><codeph>SET</codeph> not allowed for
-                  Greenplum distribution key columns.</p></entry>
+              <entry colname="col3"><b>限制：</b>
+                  <p>不允许<codeph>SET</codeph>为Greenplum分发键列。</p>
+              </entry>
             </row>
             <row>
               <entry colname="col1"><codeph>VACUUM</codeph></entry>
               <entry colname="col2">YES</entry>
-              <entry colname="col3"><b>Limitations:</b><p><codeph>VACUUM FULL</codeph> is not
-                  recommended in Greenplum Database.</p></entry>
+              <entry colname="col3"><b>限制：</b>
+                <p>Greenplum数据库不推荐使用<codeph>VACUUM FULL</codeph>。</p></entry>
             </row>
             <row>
               <entry colname="col1"><codeph>VALUES</codeph></entry>
