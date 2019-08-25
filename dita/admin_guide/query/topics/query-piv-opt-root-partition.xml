@@ -1,72 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_djz_rmn_wbb">
-  <title>Collecting Root Partition Statistics</title>
-  <shortdesc>For a partitioned table, GPORCA uses statistics of the table root partition to generate
-    query plans. These statistics are used for determining the join order, for splitting and joining
-    aggregate nodes, and for costing the query steps. In contrast, the Postgres planner uses the
-    statistics of each leaf partition.</shortdesc>
+  <title>收集根分区统计信息</title>
+  <shortdesc>对于分区表，GPORCA使用表根分区的统计信息来生成查询计划。这些统计信息用于确定联接顺序、拆分和联接聚合节点以及计算查询步骤的成本。相比之下，Postgres规划器使用每个叶分区的统计信息。</shortdesc>
   <body>
-    <p>If you execute queries on partitioned tables, you should collect statistics on the root
-      partition and periodically update those statistics to ensure that GPORCA can generate optimal
-      query plans. If the root partition statistics are not up-to-date or do not exist, GPORCA still
-      performs dynamic partition elimination for queries against the table. However, the query plan
-      might not be optimal. </p>
+    <p>如果在分区表上执行查询，应收集根分区的统计信息，并定期更新这些统计信息，以确保gporca能够生成最佳查询计划。如果根分区统计信息不是最新的或不存在，gporca仍然对表的查询执行动态分区消除。但是，查询计划可能不是最佳的。</p>
   </body>
   <topic id="topic_w1y_srn_wbb">
-    <title>Running ANALYZE</title>
+    <title>运行ANALYZE</title>
     <body>
-      <p>By default, running the <codeph>ANALYZE</codeph> command on the root partition of a
-        partitioned table samples the leaf partition data in the table, and stores the statistics
-        for the root partition. <codeph>ANALYZE</codeph> collects statistics on the root and leaf
-        partitions, including HyperLogLog (HLL) statistics on the leaf partitions. <codeph>ANALYZE
-          ROOTPARTITION</codeph> collects statistics only on the root partition. The server
-        configuration parameter <codeph><xref
-            href="../../../ref_guide/config_params/guc-list.xml#optimizer_analyze_root_partition"
-            >optimizer_analyze_root_partition</xref></codeph> controls whether the
-          <codeph>ROOTPARTITION</codeph> keyword is required to collect root statistics for the root
-        partition of a partitioned table. See the <codeph><xref
-            href="../../../ref_guide/sql_commands/ANALYZE.xml#topic1">ANALYZE</xref></codeph>
-        command for information about collecting statistics on partitioned tables.</p>
-      <p>Keep in mind that <codeph>ANALYZE</codeph> always scans the entire table before updating
-        the root partition statistics. If your table is very large, this operation can take a
-        significant amount of time. <codeph>ANALYZE ROOTPARTITION</codeph> also uses an
-          <codeph>ACCESS SHARE</codeph> lock that prevents certain operations, such as
-          <codeph>TRUNCATE</codeph> and <codeph>VACUUM</codeph> operations, during execution. For
-        these reasons, you should schedule <codeph>ANALYZE</codeph> operations periodically, or when
-        there are significant changes to leaf partition data.</p>
-      <p>Follow these best practices for running <codeph>ANALYZE</codeph> or <codeph>ANALYZE
-          ROOTPARTITION</codeph> on partitioned tables in your system:<ul id="ul_vm4_fsn_wbb">
-          <li>Run <codeph>ANALYZE &lt;<varname>root_partition</varname>></codeph> on a new
-            partitioned table after adding initial data. Run <codeph>ANALYZE
-                &lt;<varname>leaf_partition</varname>></codeph> on a new leaf partition or a leaf
-            partition where data has changed. By default, running the command on a leaf partition
-            updates the root partition statistics if the other leaf partitions have statistics.</li>
-          <li>Update root partition statistics when you observe query performance regression in
-              <codeph>EXPLAIN</codeph> plans against the table, or after significant changes to leaf
-            partition data. For example, if you add a new leaf partition at some point after
-            generating root partition statistics, consider running <codeph>ANALYZE</codeph> or
-              <codeph>ANALYZE ROOTPARTITION</codeph> to update root partition statistics with the
-            new tuples inserted from the new leaf partition.</li>
-          <li>For very large tables, run <codeph>ANALYZE</codeph> or <codeph>ANALYZE
-              ROOTPARTITION</codeph> only weekly, or at some interval longer than daily.</li>
-          <li>Avoid running <codeph>ANALYZE</codeph> with no arguments, because doing so executes
-            the command on all database tables including partitioned tables. With large databases,
-            these global <codeph>ANALYZE</codeph> operations are difficult to monitor, and it can be
-            difficult to predict the time needed for completion.</li>
-          <li>Consider running multiple <codeph>ANALYZE &lt;<varname>table_name</varname>></codeph>
-            or <codeph>ANALYZE ROOTPARTITION &lt;<varname>table_name</varname>></codeph> operations
-            in parallel to speed the operation of statistics collection, if your I/O throughput can
-            support the load.</li>
-          <li>You can also use the Greenplum Database utility <codeph>analyzedb</codeph> to update
-            table statistics. Using <codeph>analyzedb</codeph> ensures that tables that were
-            previously analzyed are not re-analyzed if no modifications were made to the leaf
-            partition.</li>
+      <p>默认情况下，在分区表的根分区上运行analyze命令将对表中的叶分区数据进行采样，
+        并存储根分区的统计信息。<codeph>ANALYZE</codeph> 收集根分区和叶分区的统计信息，包括HyperLogLog (HLL)统计信息。<codeph>ANALYZE
+          ROOTPARTITION</codeph> 只收集根分区上的统计信息。服务器配置参数<codeph><xref
+                href="../../../ref_guide/config_params/guc-list.xml#optimizer_analyze_root_partition"
+        >optimizer_analyze_root_partition</xref></codeph>控制是否需要rootpartition关键字来收集分区表根分区的根统计信息。有关收集分区表统计信息的信息，请参阅analyze<codeph><xref
+                href="../../../ref_guide/sql_commands/ANALYZE.xml#topic1">ANALYZE</xref></codeph>命令。
+       .</p>
+      <p>记住，在更新根分区统计信息之前，<codeph>ANALYZE</codeph>总是扫描整个表。如果您的表非常大，则此操作可能需要大量时间。<codeph>ANALYZE ROOTPARTITION</codeph> 还使用一个访问<codeph>ACCESS SHARE</codeph>锁，用于在执行期间阻止某些操作，如codeph>TRUNCATE</codeph> 和<codeph>VACUUM</codeph>操作 。
+      出于这些原因，您应该定期进行<codeph>ANALYZE</codeph> 操作，或者当叶分区数据发生重大更改时。</p>
+      <p>按照以下最佳实践在系统中分区表上运行<codeph>ANALYZE</codeph> 或 <codeph>ANALYZE
+          ROOTPARTITION</codeph> ：<ul id="ul_vm4_fsn_wbb">
+          <li>运行<codeph>ANALYZE &lt;<varname>root_partition</varname>></codeph> 在一个新的分区表中添加初始数据后。 运行 <codeph>ANALYZE
+                &lt;<varname>leaf_partition</varname>></codeph> 在新的叶分区或数据已更改的叶分区上。 默认情况下，如果其他叶分区具有统计信息，则在叶分区上运行命令将更新根分区统计信息。</li>
+          <li>当您在表的<codeph>EXPLAIN</codeph>查询计划中发现询性能衰退，或者在叶分区数据发生重大更改之后，更新根分区统计信息。
+            例如，如果在生成根分区统计信息之后，添加了一个新的叶分区，请考虑运行运行<codeph>ANALYZE</codeph>或<codeph>ANALYZE ROOTPARTITION</codeph> 更新根分区统计信息,以使用从新叶分区插入的新元组。
+          </li>
+          <li>对于非常大的表，只每周运行 <codeph>ANALYZE</codeph> or <codeph>ANALYZE
+              ROOTPARTITION</codeph> , 或者以长于每天更新的时间间隔运行</li>
+          <li>避免在没有参数的情况下运行analyze，因为这样做会对所有数据库表（包括分区表）执行命令。对于大型数据库，这些全局分析操作很难监控，并且很难预测完成所需的时间。</li>
+          <li> 如果您的I/O吞吐量能够支持负载，可以考虑并行运行多个 <codeph>ANALYZE &lt;<varname>table_name</varname>></codeph>或<codeph>ANALYZE ROOTPARTITION &lt;<varname>table_name</varname>></codeph>操作来加速统计数据收集的操作。</li>
+          <li>还可以使用greenplum数据库实用程序analyzedb更新表统计信息。使用analyzedb确保如果没有对叶分区进行任何修改，则不会重新分析以前分析过的表。</li>
         </ul></p>
     </body>
   </topic>
   <topic id="topic_h2x_hks_wbb">
-    <title>GPORCA and Leaf Partition Statistics</title>
+    <title>GPORCA和叶分区统计信息</title>
     <body>
       <p>Although creating and maintaining root partition statistics is crucial for GPORCA query
         performance with partitioned tables, maintaining leaf partition statistics is also

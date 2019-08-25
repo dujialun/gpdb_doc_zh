@@ -1,82 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title>Considerations when Using GPORCA</title>
+  <title>使用GPORCA时的考虑</title>
   <abstract>
-    <shortdesc> To execute queries optimally with GPORCA, query criteria to consider. </shortdesc>
+    <shortdesc> 用GPORCA最优化执行查询需要考虑的查询条件。</shortdesc>
   </abstract>
   <body>
-    <p>Ensure the following criteria are met:<ul id="ul_bpd_4rb_kr">
-        <li>The table does not contain multi-column partition keys.</li>
-        <li>The multi-level partitioned table is a uniform multi-level partitioned table. See <xref
+    <p>确保满足下列条件：<ul id="ul_bpd_4rb_kr">
+        <li>表不含有多列分区键。</li>
+        <li>多级分区表是一个统一多级分区表。请见<xref
             href="query-piv-uniform-part-tbl.xml#topic1"/>.</li>
-        <li>The server configuration parameter <codeph>optimizer_enable_master_only_queries</codeph>
-          is set to <codeph>on</codeph> when running against master only tables such as the system
-          table <i>pg_attribute</i>. For information about the parameter, see the <cite>Greenplum
-            Database Reference Guide</cite>.<note>Enabling this parameter decreases performance of
-            short running catalog queries. To avoid this issue, set this parameter only for a
-            session or a query. </note></li>
-        <li>Statistics have been collected on the root partition of a partitioned table.</li>
+        <li>在针对只存在于Master的表（例如系统表pg_attribute）运行时，服务器配置参数optimizer_enable_master_only_queries被设置为on。有关该参数的信息，请见Greenplum数据库参考指南。
+    <note>启用这一参数会降低短期目录查询的性能。为了避免这一问题，只对会话或者查询设置这一参数。 </note></li>
+        <li>已经在分区表的根分区上收集统计信息。</li>
       </ul></p>
-    <p>If the partitioned table contains more than 20,000 partitions, consider a redesign of the
-      table schema. </p>
-    <p>These server configuration parameters affect GPORCA query processing.</p>
+    <p>如果分区表包含超过20,000个分区，考虑重新设计该表的模式。</p>
+    <p>这些服务器配置参数影响GPORCA查询处理。</p>
     <ul id="ul_jt3_nnq_1y">
-      <li><codeph>optimizer_cte_inlining_bound</codeph> controls the amount of inlining performed
-        for common table expression (CTE) queries (queries that contain a <codeph>WHERE</codeph>
-        clause).</li>
-      <li><codeph>optimizer_force_multistage_agg</codeph> forces GPORCA to choose a 3 stage
-        aggregate plan for a scalar distinct qualified aggregate. </li>
-      <li><codeph>optimizer_force_three_stage_scalar_dqa</codeph> forces GPORCA to choose a plan
-        with multistage aggregates when such a plan alternative is generated. </li>
-      <li><codeph>optimizer_join_order</codeph> sets the query optimization level for join ordering
-        by specifying which types of join ordering alternatives to evaluate.</li>
-      <li><codeph>optimizer_join_order_threshold</codeph> specifies the maximum number of join
-        children for which GPORCA uses the dynamic programming-based join ordering algorithm.</li>
-      <li><codeph>optimizer_nestloop_factor</codeph> controls nested loop join cost factor to apply
-        to during query optimization.</li>
-      <li><codeph>optimizer_parallel_union</codeph> controls the amount of parallelization that
-        occurs for queries that contain a <codeph>UNION</codeph> or <codeph>UNION ALL</codeph>
-        clause. When the value is <codeph>on</codeph>, GPORCA can generate a query plan the child
-        operations of a <codeph>UNION</codeph> or <codeph>UNION ALL</codeph> operation execute in
-        parallel on segment instances. </li>
-      <li><codeph>optimizer_sort_factor</codeph> controls the cost factor that GPORCA applies to
-        sorting operations during query optimization. The cost factor can be adjusted for queries
-        when data skew is present. </li>
-      <li><codeph>gp_enable_relsize_collection</codeph> controls how GPORCA (and the Postgres query
-        optimizer) handle a table without statistics. By default, GPORCA uses a default value to
-        estimate the number of rows if statistics are not available. When this value is
-          <codeph>on</codeph>, GPORCA uses the estimated size of a table if there are no statistics
-        for the table. <p>This parameter is ignored for a root partition of a partitioned table. If
-          the root partition does not have statistics, GPORCA always uses the default value. You can
-          use <codeph>ANALZYE ROOTPARTITION</codeph> to collect statistics on the root partition.
-          See <codeph><xref href="../../../ref_guide/sql_commands/ANALYZE.xml"/></codeph>.</p></li>
+      <li><codeph>optimizer_cte_inlining_bound</codeph> 控制对公共表表达式（CTE）查询（含有WHERE子句的查询）执行的内联量。</li>
+      <li><codeph>optimizer_force_multistage_agg</codeph> 强制GPORCA为标量区分限制聚集选择一种3阶段聚集计划。 </li>
+      <li><codeph>optimizer_force_three_stage_scalar_dqa</codeph> 强制GPORCA在生成了带有多阶段聚集的计划时选择它。 </li>
+      <li><codeph>optimizer_join_order</codeph>为连接排序设置查询优化级别，通过指定要评估哪些类型的连接排序选项。</li>
+      <li><codeph>optimizer_join_order_threshold</codeph>指定GPORCA在连接子女数量达到多少时使用基于动态规划的连接排序算法。</li>
+      <li><codeph>optimizer_nestloop_factor</codeph>控制查询优化时应用到嵌套循环连接的代价因子。</li>
+      <li><codeph>optimizer_parallel_union</codeph> 控制对于含有UNION或者UNION ALL子句的查询发生的并行量。当该值为on时，GPORCA可以生成一个查询计划，其中UNION或者UNION ALL操作的子操作在Segment实例上并行执行。</li>
+      <li><codeph>optimizer_sort_factor</codeph> 控制GPORCA在查询优化时应用于排序操作的代价因子。当出现数据倾斜时可以为查询调整代价因子。</li>
+      <li><codeph>gp_enable_relsize_collection</codeph>控制GPORCA（和传统查询优化器）处理一个没有统计信息的表的方式。 默认情况下，如果统计信息不可用，GPORCA使用默认值估计行数。当该值为<codeph>on<codeph>，GPORCA使用表的估计大小（如果没有统计数据）
+<p>对于分区表的根分区，此参数将被忽略。如果根分区没有统计信息，gporca总是使用默认值。你可以使用<codeph>ANALZYE ROOTPARTITION<codeph>收集根分区的统计信息。
+          请见<codeph><xref href="../../../ref_guide/sql_commands/ANALYZE.xml"/></codeph>.</p></li>
     </ul>
-    <p>These server configuration parameters control the display and logging of information.</p>
+    <p>这些服务器配置参数控制信息的显示和记录。</p>
     <ul id="ul_t3j_fhw_xz">
-      <li><codeph>optimizer_print_missing_stats</codeph> controls the display of column information
-        about columns with missing statistics for a query (default is <codeph>true</codeph>)</li>
-      <li><codeph>optimizer_print_optimization_stats</codeph> controls the logging of GPORCA query
-        optimization metrics for a query (default is <codeph>off</codeph>)</li>
+      <li><codeph>optimizer_print_missing_stats</codeph>控制有关对查询缺失统计信息的列的信息显示（默认是true）</li>
+      <li><codeph>optimizer_print_optimization_stats</codeph>控制GPORCA查询优化度量对于查询的记录（默认为off）</li>
     </ul>
-    <p> For information about the parameters, see the <cite>Greenplum Database Reference
-        Guide</cite>.</p>
-    <p>GPORCA generates minidumps to describe the optimization context for a given query. <ph
-        otherprops="pivotal">The minidump files are used by Pivotal support to analyze Greenplum
-        Database issues. </ph>The information in the file is not in a format that can be easily used
-      for debugging or troubleshooting. The minidump file is located under the master data directory
-      and uses the following naming format:</p>
+    <p> 有关这些参数的信息请见<cite>Greenplum数据库参考指南</cite>。</p>
+    <p>GPORCA生成minidump来描述一个给定查询的优化上下文。该文件中的信息不太容易被用于调试或者排错。minidump文件位于Master的数据目录中并且使用下面的命名格式：</p>
     <p>
       <codeph>Minidump_<varname>date</varname>_<varname>time</varname>.mdp</codeph>
     </p>
-    <p>For information about the minidump file, see the server configuration parameter
-        <codeph>optimizer_minidump</codeph> in the <cite>Greenplum Database Reference
-      Guide</cite>.</p>
-    <p>When the <codeph>EXPLAIN ANALYZE</codeph> command uses GPORCA, the <codeph>EXPLAIN</codeph>
-      plan shows only the number of partitions that are being eliminated. The scanned partitions are
-      not shown. To show the name of the scanned partitions in the segment logs set the server
-      configuration parameter <codeph>gp_log_dynamic_partition_pruning</codeph> to
-        <codeph>on</codeph>. This example <codeph>SET</codeph> command enables the parameter.</p>
+    <p>有关minidump文件的信息，请见Greenplum数据库参考指南中的服务器配置参数
+        <codeph>optimizer_minidump</codeph> 。</p>
+    <p>当<codeph>EXPLAIN ANALYZE</codeph> 命令使用GPORCA时，EXPLAIN计划只显示被消除的分区数。被扫描的分区不被显示。
+      要在Segment日志中显示被扫描分区的名字，可设置服务器配置参数gp_log_dynamic_partition_pruning为on。
+      下面这个SET命令的例子启用该参数。</p>
     <p>
       <codeblock>SET gp_log_dynamic_partition_pruning = on;</codeblock>
     </p>
