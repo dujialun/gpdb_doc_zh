@@ -2,18 +2,16 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic_zhs_r1s_w1b">
-  <title>WITH Queries (Common Table Expressions)</title>
-  <shortdesc>The <codeph>WITH</codeph> clause provides a way to use subqueries or perform a data
-    modifying operation in a larger <codeph>SELECT</codeph> query. You can also use the
-      <codeph>WITH</codeph> clause in an <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or
-      <codeph>DELETE</codeph> command. </shortdesc>
+  <title>WITH查询（公用表表达式）</title>
+  <shortdesc><codeph>WITH</codeph> 子句提供在一个更大的<codeph>SELECT</codeph>查询中子查询查询或执行数据修改操作的方式，你可以使用
+      <codeph>WITH</codeph>子句在 <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, 或
+      <codeph>DELETE</codeph> 命令中 </shortdesc>
   <body>
-    <p>See <xref href="#topic_xyn_dgh_5gb" format="dita"/> for information about using
-        <codeph>SELECT</codeph> in a <codeph>WITH</codeph> clause.</p>
-    <p>See <xref href="#topic_zg3_bgh_5gb" format="dita"/>, for information about using
-        <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or <codeph>DELETE</codeph> in a
-        <codeph>WITH</codeph> clause. </p>
-    <note>These are limitations for using a <codeph>WITH</codeph> clause.<ul id="ul_rfx_brf_wgb">
+    <p>See <xref href="#topic_xyn_dgh_5gb" format="dita"/>
+        在<codeph>WITH</codeph>子句中使用<codeph>SELECT</codeph>的相关信息</p>
+    <p>See <xref href="#topic_zg3_bgh_5gb" format="dita"/>,
+        在<codeph>WITH</codeph>子句中使用<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or <codeph>DELETE</codeph> </p>
+    <note>这些是使用<codeph>WITH</codeph>子句的限制。<ul id="ul_rfx_brf_wgb">
         <li>For a <codeph>SELECT</codeph> command that includes a <codeph>WITH</codeph> clause, the
           clause can contain at most a single clause that modifies table data
             (<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or <codeph>DELETE</codeph>
