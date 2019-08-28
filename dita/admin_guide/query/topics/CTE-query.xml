@@ -3,53 +3,33 @@
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic_zhs_r1s_w1b">
   <title>WITH查询（公用表表达式）</title>
-  <shortdesc><codeph>WITH</codeph> 子句提供在一个更大的<codeph>SELECT</codeph>查询中子查询查询或执行数据修改操作的方式，你可以使用
-      <codeph>WITH</codeph>子句在 <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, 或
-      <codeph>DELETE</codeph> 命令中 </shortdesc>
+  <shortdesc><codeph>WITH</codeph> 子句提供在一个更大的<codeph>SELECT</codeph>查询中，使用子查询或执行数据修改操作的方式。你可以在<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, 或
+      <codeph>DELETE</codeph> 命令中使用<codeph>WITH</codeph>子句 </shortdesc>
   <body>
-    <p>See <xref href="#topic_xyn_dgh_5gb" format="dita"/>
+    <p><xref href="#topic_xyn_dgh_5gb" format="dita"/>
         在<codeph>WITH</codeph>子句中使用<codeph>SELECT</codeph>的相关信息</p>
-    <p>See <xref href="#topic_zg3_bgh_5gb" format="dita"/>,
+    <p><xref href="#topic_zg3_bgh_5gb" format="dita"/>,
         在<codeph>WITH</codeph>子句中使用<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or <codeph>DELETE</codeph> </p>
     <note>这些是使用<codeph>WITH</codeph>子句的限制。<ul id="ul_rfx_brf_wgb">
-        <li>For a <codeph>SELECT</codeph> command that includes a <codeph>WITH</codeph> clause, the
-          clause can contain at most a single clause that modifies table data
-            (<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or <codeph>DELETE</codeph>
-          command).</li>
-        <li>For a data-modifying command (<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or
-            <codeph>DELETE</codeph>) that includes a <codeph>WITH</codeph> clause, the clause can
-          only contain a <codeph>SELECT</codeph> command, the <codeph>WITH</codeph> clause cannot
-          contain a data-modifying command.</li>
+        <li>对于包含WITH子句的<codeph>SELECT</codeph>命令，该子句最多只能包含一个修改表数据的子句（<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, 或 <codeph>DELETE</codeph>命令）。</li>
+        <li>对于包含WITH子句的数据修改命令（<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, 或 <codeph>DELETE</codeph>），该子句只能包含<codeph>SELECT</codeph>命令，WITH子句不能包含数据修改命令。
+            </li>
       </ul></note>
-    <p>By default, the <codeph>RECURSIVE</codeph> keyword for the <codeph>WITH</codeph> clause is
-      enabled. <codeph>RECURSIVE</codeph> can be disabled by setting the server configuration
-      parameter <codeph><xref
+    <p>默认情况下，将启用WITH子句的<codeph>RECURSIVE</codeph>关键字。通过将服务器配置参数gp“recursive”设置为false，可以禁用递归。By default, the <codeph>RECURSIVE</codeph> keyword for the <codeph>WITH</codeph> clause is
+      enabled. 通过将服务器配置参数<codeph><xref
           href="../../../ref_guide/config_params/guc-list.xml#gp_recursive_cte"/></codeph>
-      to <codeph>false</codeph>.</p>
+      设置为<codeph>false</codeph>，<codeph>WITH</codeph>子句的<codeph>RECURSIVE</codeph>关键字被禁用。</p>
   </body>
   <topic id="topic_xyn_dgh_5gb">
-    <title>SELECT in a WITH Clause</title>
+    <title>在WITH子句中的查询</title>
     <body>
-      <p>The subqueries, which are often referred to as Common Table Expressions or CTEs, can be
-        thought of as defining temporary tables that exist just for the query. These examples show
-        the <codeph>WITH</codeph> clause being used with a <codeph>SELECT</codeph> command. The
-        example <codeph>WITH</codeph> clauses can be used the same way with <codeph>INSERT</codeph>,
-          <codeph>UPDATE</codeph>, or <codeph>DELETE</codeph>. In each case, the
-          <codeph>WITH</codeph> clause effectively provides temporary tables that can be referred to
-        in the main command.</p>
-      <p>A <codeph>SELECT</codeph> command in the <codeph>WITH</codeph> clause is evaluated only
-        once per execution of the parent query, even if it is referred to more than once by the
-        parent query or sibling <codeph>WITH</codeph> clauses. Thus, expensive calculations that are
-        needed in multiple places can be placed within a <codeph>WITH</codeph> clause to avoid
-        redundant work. Another possible application is to prevent unwanted multiple evaluations of
-        functions with side-effects. However, the other side of this coin is that the optimizer is
-        less able to push restrictions from the parent query down into a <codeph>WITH</codeph> query
-        than an ordinary sub-query. The <codeph>WITH</codeph> query will generally be evaluated as
-        written, without suppression of rows that the parent query might discard afterwards.
-        However, evaluation might stop early if the references to the query demand only a limited
-        number of rows.</p>
-      <p> One use of this feature is to break down complicated queries into simpler parts. This
-        example query displays per-product sales totals in only the top sales regions:</p>
+      <p>子查询通常被称为公共表表达式或CTE，可以认为是为查询定义临时表。这些示例显示了与<codeph>SELECT</codeph>命令一起使用的<codeph>WITH</codeph>子句。带<codeph>WITH</codeph>子句的示例可以以插入、更新或删除的相同方式使用。在每种情况下，WITH子句都有效地提供了可以在主命令中引用的临时表。
+      </p>
+      <p>
+          <codeph>WITH</codeph>子句中的<codeph>SELECT</codeph>命令在每次执行父查询时只计算一次，即使父查询或WITH子句的同级多次引用了该命令。因此，需要在多个地方进行的昂贵计算可以放在WITH子句中，以避免重复工作。另一个可能的应用是防止对具有副作用的函数进行不必要的多次计算。然而，这种情况的另一方面是，与普通的子查询相比，优化器无法将来自父查询的限制向下推送到WITH查询中。
+          WITH查询通常将按写入方式进行计算，而不禁止父查询随后可能丢弃的行。但是，如果对查询的引用只需要有限的行数，则计算可能会提前停止。
+          </p>
+      <p> 此功能的一个用途是将复杂的查询分解为简单的部分。此示例查询仅在顶部销售区域中显示每个产品的销售总额：</p>
       <codeblock>WITH regional_sales AS (
      SELECT region, SUM(amount) AS total_sales
      FROM orders
@@ -67,14 +47,10 @@ FROM orders
 WHERE region IN (SELECT region FROM top_regions)
 GROUP BY region, product;
 </codeblock>
-      <p>The query could have been written without the <codeph>WITH</codeph> clause, but would have
-        required two levels of nested sub-SELECTs. It is easier to follow with the
-          <codeph>WITH</codeph> clause.</p>
-      <p>When the optional <codeph>RECURSIVE</codeph> keyword is enabled, the <codeph>WITH</codeph>
-        clause can accomplish things not otherwise possible in standard SQL. Using
-          <codeph>RECURSIVE</codeph>, a query in the <codeph>WITH</codeph> clause can refer to its
-        own output. This is a simple example that computes the sum of integers from 1 through
-        100:</p>
+      <p>可以不使用WITH子句编写查询，但需要两级嵌套子选择。跟<codeph>WITH</codeph>子句比较容易。</p>
+      <p>
+          当启用可选递归关键字时，WITH子句可以完成标准SQL中不可能完成的事情。使用递归，WITH子句中的查询可以引用自己的输出。这是一个简单的例子，它计算从1到100的整数之和：
+        </p>
       <codeblock>WITH RECURSIVE t(n) AS (
     VALUES (1)
   UNION ALL
@@ -82,34 +58,21 @@ GROUP BY region, product;
 )
 SELECT sum(n) FROM t;
 </codeblock>
-      <p>The general form of a recursive <codeph>WITH</codeph> clause (a <codeph>WITH</codeph>
-        clause that uses a the <codeph>RECURSIVE</codeph> keyword) is a <i>non-recursive term</i>,
-        followed by a <codeph>UNION</codeph> (or <codeph>UNION ALL</codeph>), and then a
-          <i>recursive term</i>, where only the <i>recursive term</i> can contain a reference to the
-        query output.
+      <p>递归WITH子句（使用递归关键字的<codeph>WITH</codeph>子句）的一般形式是一个非递归术语，后跟一个UNION（或UNION ALL），然后是一个递归术语，其中只有递归术语可以包含对查询输出的引用。
         <codeblock><varname>non_recursive_term</varname> UNION [ ALL ] <varname>recursive_term</varname></codeblock></p>
       <p>A recursive <codeph>WITH</codeph> query that contains a <codeph> UNION [ ALL ]</codeph> is
-        executed as follows:</p>
+        executed as follows:包含<codeph> UNION [ ALL ]</codeph>的递归WITH查询执行如下：</p>
       <ol id="ol_a3s_r1s_w1b">
-        <li>Evaluate the non-recursive term. For <codeph>UNION</codeph> (but not <codeph>UNION
-            ALL</codeph>), discard duplicate rows. Include all remaining rows in the result of the
-          recursive query, and also place them in a temporary <i>working table</i>.</li>
-        <li>As long as the working table is not empty, repeat these steps:<ol id="ol_b3s_r1s_w1b">
-            <li>Evaluate the recursive term, substituting the current contents of the working table
-              for the recursive self-reference. For <codeph>UNION</codeph> (but not <codeph>UNION
-                ALL</codeph>), discard duplicate rows and rows that duplicate any previous result
-              row. Include all remaining rows in the result of the recursive query, and also place
-              them in a temporary <i>intermediate table</i>.</li>
-            <li>Replace the contents of the <i>working table</i> with the contents of the
-                <i>intermediate table</i>, then empty the <i>intermediate table</i>.</li>
+        <li>计算非递归项。对于<codeph>UNION</codeph> （而不是<codeph>UNION ALL</codeph>），丢弃重复的行。包括递归查询结果中的所有剩余行，并将它们放在临时工作表中。
+             </li>
+        <li>只要工作台不是空的，重复以下步骤：<ol id="ol_b3s_r1s_w1b">
+            <li>计算递归项，将工作表的当前内容替换为递归自引用。对于union（而不是union all），放弃重复的行和复制任何先前结果行的行。在递归查询的结果中包含所有剩余的行，并将它们放在临时中间表中。</li>
+            <li>将工作表的内容替换为中间表的内容，然后清空中间表。</li>
           </ol></li>
       </ol>
-      <note>Strictly speaking, the process is iteration not recursion, but
-          <codeph>RECURSIVE</codeph> is the terminology chosen by the SQL standards
-        committee.</note>
-      <p>Recursive <codeph>WITH</codeph> queries are typically used to deal with hierarchical or
-        tree-structured data. An example is this query to find all the direct and indirect sub-parts
-        of a product, given only a table that shows immediate inclusions:</p>
+      <note>严格来说，过程是迭代而不是递归的，但是<codeph>RECURSIVE</codeph>是由SQL标准委员会选择的术语。
+    </note>
+      <p>递归查询通常用于处理层次结构或树结构数据。例如，该查询查找产品的所有直接和间接子部分，只给出一个显示直接包含内容的表：</p>
       <codeblock>WITH RECURSIVE included_parts(sub_part, part, quantity) AS (
     SELECT sub_part, part, quantity FROM parts WHERE part = 'our_product'
   UNION ALL
@@ -121,19 +84,11 @@ SELECT sub_part, SUM(quantity) as total_quantity
 FROM included_parts
 GROUP BY sub_part ;
 </codeblock>
-      <p>When working with recursive <codeph>WITH</codeph> queries, you must ensure that the
-        recursive part of the query eventually returns no tuples, or else the query loops
-        indefinitely. In the example that computes the sum of integers, the working table contains a
-        single row in each step, and it takes on the values from 1 through 100 in successive steps.
-        In the 100th step, there is no output because of the <codeph>WHERE</codeph> clause, and the
-        query terminates.</p>
-      <p>For some queries, using <codeph>UNION</codeph> instead of <codeph>UNION ALL</codeph> can
-        ensure that the recursive part of the query eventually returns no tuples by discarding rows
-        that duplicate previous output rows. However, often a cycle does not involve output rows
-        that are complete duplicates: it might be sufficient to check just one or a few fields to
-        see if the same point has been reached before. The standard method for handling such
-        situations is to compute an array of the visited values. For example, consider the following
-        query that searches a table graph using a link field:</p>
+      <p>使用递归查询时，必须确保查询的递归部分最终不会返回元组，否则查询将无限期循环。
+          在计算整数和的示例中，工作表在每个步骤中包含一行，并在连续步骤中接受从1到100的值。
+          在第100步中，由于WHERE子句没有输出，查询终止。</p>
+      <p>对于某些查询，使用union而不是union all可以通过丢弃重复以前输出行的行来确保查询的递归部分最终不返回元组。然而，一个循环通常不涉及完全重复的输出行：只检查一个或几个字段就足够了，以查看以前是否达到了相同的点。处理这种情况的标准方法是计算访问值的数组。
+          例如，考虑使用链接字段搜索表图形的以下查询：</p>
       <codeblock>WITH RECURSIVE search_graph(id, link, data, depth) AS (
         SELECT g.id, g.link, g.data, 1
         FROM graph g
@@ -144,12 +99,9 @@ GROUP BY sub_part ;
 )
 SELECT * FROM search_graph;
 </codeblock>
-      <p>This query loops if the link relationships contain cycles. Because the query requires a
-          <codeph>depth</codeph> output, changing <codeph>UNION ALL</codeph> to
-          <codeph>UNION</codeph> does not eliminate the looping. Instead the query needs to
-        recognize whether it has reached the same row again while following a particular path of
-        links. This modified query adds two columns, <codeph>path</codeph> and
-          <codeph>cycle</codeph>, to the loop-prone query:</p>
+      <p>如果链接关系包含循环，则此查询将循环。因为查询需要深度输出，所以将union all更改为union不会消除循环。
+          相反，查询需要在遵循特定的链接路径时,识别它是否再次到达同一行。此修改后的查询将路径和循环两列添加到容易循环的查询中：
+       </p>
       <codeblock>WITH RECURSIVE search_graph(id, link, data, depth, path, cycle) AS (
         SELECT g.id, g.link, g.data, 1,
           ARRAY[g.id],
@@ -164,11 +116,8 @@ SELECT * FROM search_graph;
 )
 SELECT * FROM search_graph;
 </codeblock>
-      <p>Aside from detecting cycles, the array value of <codeph>path</codeph> is useful in its own
-        right since it represents the path taken to reach any particular row.</p>
-      <p>In the general case where more than one field needs to be checked to recognize a cycle, an
-        array of rows can be used. For example, if we needed to compare fields <codeph>f1</codeph>
-        and <codeph>f2</codeph>:</p>
+      <p>除了检测循环之外，路径的数组值本身也很有用，因为它表示到达任何特定行所需的路径。</p>
+      <p>在一般情况下，需要检查多个字段才能识别循环，可以使用一个行数组。例如，如果需要比较字段f1和f2：</p>
       <codeblock>WITH RECURSIVE search_graph(id, link, data, depth, path, cycle) AS (
         SELECT g.id, g.link, g.data, 1,
           ARRAY[ROW(g.f1, g.f2)],
@@ -183,44 +132,25 @@ SELECT * FROM search_graph;
 )
 SELECT * FROM search_graph;
 </codeblock>
-      <note type="tip">Omit the <codeph>ROW()</codeph> syntax in the case where only one field needs
-        to be checked to recognize a cycle. This uses a simple array rather than a composite-type
-        array, gaining efficiency.</note>
-      <note type="tip">The recursive query evaluation algorithm produces its output in breadth-first
-        search order. You can display the results in depth-first search order by making the outer
-        query <codeph>ORDER BY</codeph> a path column constructed in this way.</note>
-      <p>A helpful technique for testing a query when you are not certain if it might loop
-        indefinitely is to place a <codeph>LIMIT</codeph> in the parent query. For example, this
-        query would loop forever without the <codeph>LIMIT</codeph> clause:</p>
+      <note type="tip">如果只需要检查一个字段来识别循环，则省略row（）语法。它使用简单的数组而不是复合类型的数组，从而提高了效率。</note>
+      <note type="tip">递归查询评估算法按广度优先搜索顺序生成输出。通过按这种方式构造的路径列对外部查询进行排序，可以按深度优先搜索顺序显示结果。</note>
+      <p>当您不确定查询是否可能无限循环时，测试查询的一种有用技术是在父查询中设置限制。例如，如果不使用limit子句，则此查询将永远循环：</p>
       <codeblock>WITH RECURSIVE t(n) AS (
     SELECT 1
   UNION ALL
     SELECT n+1 FROM t
 )
 SELECT n FROM t LIMIT 100;</codeblock>
-      <p>The technique works because the recursive <codeph>WITH</codeph> implementation evaluates
-        only as many rows of a <codeph>WITH</codeph> query as are actually fetched by the parent
-        query. Using this technique in production is not recommended, because other systems might
-        work differently. Also, the technique might not work if the outer query sorts the recursive
-          <codeph>WITH</codeph> results or join the results to another table.</p>
+      <p>该技术之所以有效，是因为递归WITH实现只计算WITH查询中实际由父查询提取的行数。不建议在生产中使用此技术，因为其他系统的工作方式可能不同。
+          另外，如果外部查询使用结果对递归进行排序或将结果连接到另一个表，则该技术可能不起作用。</p>
     </body>
   </topic>
   <topic id="topic_zg3_bgh_5gb">
-    <title>Data-Modifying Statements in a WITH clause</title>
+    <title><codeph>WITH</codeph>子句中的数据修改语句</title>
     <body>
-      <p>For a <codeph>SELECT</codeph> command, you can use the data-modifying commands
-          <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or <codeph>DELETE</codeph> in a
-          <codeph>WITH</codeph> clause. This allows you to perform several different operations in
-        the same query. </p>
-      <p>A data-modifying statement in a <codeph>WITH</codeph> clause is executed exactly once, and
-        always to completion, independently of whether the primary query reads all (or indeed any)
-        of the output. This is different from the rule when using <codeph>SELECT</codeph> in a
-          <codeph>WITH</codeph> clause, the execution of a <codeph>SELECT</codeph> continues only as
-        long as the primary query demands its output.</p>
-      <p>This simple CTE query deletes rows from <codeph>products</codeph>. The
-          <codeph>DELETE</codeph> in the <codeph>WITH</codeph> clause deletes the specified rows
-        from products, returning their contents by means of its <codeph>RETURNING</codeph>
-        clause.</p>
+      <p>对于select命令，可以在WITH子句中使用数据修改命令insert、update或delete。这允许您在同一查询中执行几个不同的操作</p>
+      <p> WITH子句中的数据修改语句只执行一次，并且始终执行到完成，这与主查询是否读取所有（或任何）输出无关。这与在WITH子句中使用SELECT时的规则不同，只有在主查询要求输出时，才会继续执行SELECT。</p>
+      <p>这个简单的CTE查询从产品中删除行。WITH子句中的DELETE从产品中删除指定的行，并通过其返回子句返回其内容。</p>
       <codeblock>WITH deleted_rows AS (
     DELETE FROM products
     WHERE
@@ -229,16 +159,8 @@ SELECT n FROM t LIMIT 100;</codeblock>
     RETURNING *
 )
 SELECT * FROM deleted_rows;</codeblock>
-      <p>Data-modifying statements in a <codeph>WITH</codeph> clause must have
-          <codeph>RETURNING</codeph> clauses, as shown in the previous example. It is the output of
-        the <codeph>RETURNING</codeph> clause, not the target table of the data-modifying statement,
-        that forms the temporary table that can be referred to by the rest of the query. If a
-        data-modifying statement in a <codeph>WITH</codeph> lacks a <codeph>RETURNING</codeph>
-        clause, an error is returned. </p>
-      <p>If the optional <codeph>RECURSIVE</codeph> keyword is enabled, recursive self-references in
-        data-modifying statements are not allowed. In some cases it is possible to work around this
-        limitation by referring to the output of a recursive <codeph>WITH</codeph>. For example,
-        this query would remove all direct and indirect subparts of a product.</p>
+      <p>WITH子句中的数据修改语句必须有返回子句，如前一个示例所示。它是返回子句的输出，而不是数据修改语句的目标表，形成了可以被查询的其余部分引用的临时表。如果WITH中的数据修改语句缺少返回子句，则返回错误。 </p>
+      <p>如果启用可选的RECURSIVE关键字，则不允许在数据修改语句中进行递归自引用。在某些情况下，可以通过引用递归的输出来绕过这个限制。例如，此查询将删除产品的所有直接和间接子部分。</p>
       <codeblock>WITH RECURSIVE included_parts(sub_part, part) AS (
     SELECT sub_part, part FROM parts WHERE part = 'our_product'
   UNION ALL
@@ -248,30 +170,20 @@ SELECT * FROM deleted_rows;</codeblock>
   )
 DELETE FROM parts
   WHERE part IN (SELECT part FROM included_parts);</codeblock>
-      <p>The sub-statements in a <codeph>WITH</codeph> clause are executed concurrently with each
-        other and with the main query. Therefore, when using a data-modifying statement in a
-          <codeph>WITH</codeph>, the statement is executed in a <i>snapshot</i>. The effects of the
-        statement are not visible on the target tables. The <codeph>RETURNING</codeph> data is the
-        only way to communicate changes between different <codeph>WITH</codeph> sub-statements and
-        the main query. In this example, the outer <codeph>SELECT</codeph> returns the original
-        prices before the action of the <codeph>UPDATE</codeph> in the <codeph>WITH</codeph> clause. </p>
+      <p>WITH子句中的子语句与主查询同时执行。因此，在WITH中使用数据修改语句时，将在快照中执行该语句。语句的效果在目标表上不可见。返回的数据是在不同子语句和主查询之间传递更改的唯一方法。在本例中，外部select返回WITH子句中update操作之前的原始价格。</p>
       <codeblock>WITH t AS (
     UPDATE products SET price = price * 1.05
     RETURNING *
 )
 SELECT * FROM products;</codeblock>
-      <p>In this example the outer <codeph>SELECT</codeph> returns the updated data.</p>
+      <p>在本例中，外部<codeph>SELECT</codeph>返回更新的数据。</p>
       <codeblock>WITH t AS (
     UPDATE products SET price = price * 1.05
     RETURNING *
 )
 SELECT * FROM t;</codeblock>
-      <p>Updating the same row twice in a single statement is not supported. The effects of such a
-        statement will not be predictable. Only one of the modifications takes place, but it is not
-        easy (and sometimes not possible) to predict which modification occurs. </p>
-      <p>Any table used as the target of a data-modifying statement in a <codeph>WITH</codeph>
-        clause must not have a conditional rule, or an <codeph>ALSO</codeph> rule, or an
-          <codeph>INSTEAD</codeph> rule that expands to multiple statements.</p>
+      <p>不支持在单个语句中更新同一行两次。这种语句的效果是不可预测的。只有一个修改发生了，但是不容易（有时也不可能）预测哪一个发生修改。 </p>
+      <p>在WITH子句中用作数据修改语句目标的任何表都不能有条件规则、也不能有条件规则或扩展为多个语句的INSTEAD规则。</p>
     </body>
   </topic>
 </topic>
