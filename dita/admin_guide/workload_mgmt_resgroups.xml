@@ -189,24 +189,24 @@
     <title>CPU限制</title>
     <body>
       <p>通过将特定CPU核心分配给组，或通过标识要分配给组的分段CPU资源的百分比，可以配置要为段主机上的资源组保留的CPU资源份额。 Greenplum数据库使用<codeph>CPUSET</codeph>和<codeph>CPU_RATE_LIMIT</codeph>资源组限制来标识CPU资源分配模式。 配置资源组时，必须仅指定其中一个限制。</p>
-      <p>您可以在Greenplum数据库群集中同时使用两种CPU资源分配模式。 您还可以在运行时更改资源组的CPU资源分配模式。</p>
+      <p>用户可以在Greenplum数据库群集中同时使用两种CPU资源分配模式。 用户还可以在运行时更改资源组的CPU资源分配模式。</p>
       <p><codeph><xref
             href="../ref_guide/config_params/guc-list.xml#gp_resource_group_cpu_limit" type="topic"/></codeph>服务器配置参数标识要分配给每个Greenplum数据库段主机上的资源组的系统CPU资源的最大百分比。 无论为组配置的CPU分配模式如何，此限制都将控制段主机上所有资源组的最大CPU使用率。 剩余的未预留CPU资源用于OS内核和Greenplum数据库辅助守护进程。 默认的<codeph>gp_resource_group_cpu_limit</codeph>值为.9（90％）。</p>
-      <note>如果您在Greenplum数据库群集节点上运行其他工作负载，则默认的<codeph>gp_resource_group_cpu_limit</codeph>值可能不会留下足够的CPU资源，因此请务必相应地调整此服务器配置参数。</note>
+      <note>如果用户在Greenplum数据库群集节点上运行其他工作负载，则默认的<codeph>gp_resource_group_cpu_limit</codeph>值可能不会留下足够的CPU资源，因此请务必相应地调整此服务器配置参数。</note>
       <note type="warning">避免将<codeph>gp_resource_group_cpu_limit</codeph>设置为高于.9的值。 这样做可能会导致高工作负载查询接近所有CPU资源，可能使Greenplum数据库辅助进程匮乏。</note>
     </body>
     <topic id="cpuset" xml:lang="en">
       <title>按核心数分配CPU资源</title>
       <body>
-        <p>您可以使用<codeph>CPUSET</codeph>属性标识要为资源组保留的CPU核心。 您指定的CPU核心必须在系统中可用，并且不能与为其他资源组保留的任何CPU核心重叠。 （尽管Greenplum数据库使用您专门为该组分配给资源组的核心，但请注意，系统中的非Greenplum进程也可以使用这些CPU核心。）</p>
+        <p>用户可以使用<codeph>CPUSET</codeph>属性标识要为资源组保留的CPU核心。 用户指定的CPU核心必须在系统中可用，并且不能与为其他资源组保留的任何CPU核心重叠。 （尽管Greenplum数据库使用用户专门为该组分配给资源组的核心，但请注意，系统中的非Greenplum进程也可以使用这些CPU核心。）</p>
         <p>配置<codeph>CPUSET</codeph>时，请指定以逗号分隔的单核数字或数字间隔列表。必须将核心数字/间隔用单引号括起来，例如“1,3-4”。</p>
         <p>将CPU核心分配给<codeph>CPUSET</codeph>组时，请考虑以下事项：<ul>
             <li>使用<codeph>CPUSET</codeph>创建的资源组仅使用指定的核心。如果组中没有正在运行的查询，则保留的核心处于空闲状态，并且其他资源组中的查询无法使用这些核心。 请考虑最小化<codeph>CPUSET</codeph>组的数量以避免浪费系统CPU资源。</li>
             <li>CPU核心0未分配：在以下情况下，CPU核心0用作回退机制：<ul>
-                <li><codeph>admin_group</codeph>和<codeph>default_group</codeph>至少需要一个CPU核心。 保留所有CPU内核后，Greenplum Database会将CPU内核0分配给这些默认组。 在这种情况下，您为其分配CPU核心0的资源组与<codeph>admin_group</codeph>和<codeph>default_group</codeph>共享核心。</li>
+                <li><codeph>admin_group</codeph>和<codeph>default_group</codeph>至少需要一个CPU核心。 保留所有CPU内核后，Greenplum Database会将CPU内核0分配给这些默认组。 在这种情况下，用户为其分配CPU核心0的资源组与<codeph>admin_group</codeph>和<codeph>default_group</codeph>共享核心。</li>
                 <li>如果通过一个节点替换重新启动Greenplum数据库集群，并且节点没有足够的内核来为所有<codeph>CPUSET</codeph>资源组提供服务，则会自动为这些组分配CPU核心0以避免系统启动失败。</li>
               </ul></li>
-            <li>将核心分配给资源组时，请使用尽可能少的核心编号。 如果替换Greenplum数据库节点并且新节点的CPU核心数少于原始节点，或者备份数据库并希望在具有较少CPU核心的节点的群集上还原它，则操作可能会失败。 例如，如果您的Greenplum数据库群集有16个核心，则分配核心1-7是最佳选择。 如果创建资源组并将CPU核心9分配给该组，则数据库还原到8核心节点将失败。</li>
+            <li>将核心分配给资源组时，请使用尽可能少的核心编号。 如果替换Greenplum数据库节点并且新节点的CPU核心数少于原始节点，或者备份数据库并希望在具有较少CPU核心的节点的群集上还原它，则操作可能会失败。 例如，如果用户的Greenplum数据库群集有16个核心，则分配核心1-7是最佳选择。 如果创建资源组并将CPU核心9分配给该组，则数据库还原到8核心节点将失败。</li>
           </ul></p>
         <p>使用<codeph>CPUSET</codeph>配置的资源组在CPU资源上具有更高的优先级。 在段主机上配置了<codeph>CPUSET</codeph>的所有资源组的最大CPU资源使用百分比是保留的CPU核心数除以所有CPU核心数乘以100。</p>
         <p>为资源组配置<codeph>CPUSET</codeph>时，Greenplum数据库会禁用组的<codeph>CPU_RATE_LIMIT</codeph>并将值设置为-1。</p>
@@ -231,7 +231,7 @@
   <topic id="topic8339717" xml:lang="en">
     <title>内存限制</title>
     <body>
-      <p>启用资源组后，将在Greenplum数据库节点，段和资源组级别管理内存使用情况。您还可以使用角色资源组在事务级别管理内存。</p>
+      <p>启用资源组后，将在Greenplum数据库节点，段和资源组级别管理内存使用情况。用户还可以使用角色资源组在事务级别管理内存。</p>
       <p><codeph><xref
             href="../ref_guide/config_params/guc-list.xml#gp_resource_group_memory_limit"
             type="topic"/></codeph>服务器配置参数标识要分配给每个Greenplum数据库段主机上的资源组的系统内存资源的最大百分比。默认的<codeph>gp_resource_group_memory_limit</codeph>值为.7（70％）。</p>
@@ -241,7 +241,7 @@
 rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_memory_limit) / num_active_primary_segments</codeblock>
       </p>
       <p>每个资源组保留用于资源管理的段内存的百分比。用户可以通过在创建资源组时指定的<codeph>MEMORY_LIMIT</codeph>值来标识此百分比。用户可以为资源组指定的最小<codeph>MEMORY_LIMIT</codeph>百分比为1，最大值为100。</p>
-      <p>为您在Greenplum数据库群集中定义的所有资源组指定的<codeph>MEMORY_LIMIT</codeph>总和不得超过100。</p>
+      <p>在Greenplum数据库群集中定义的所有资源组指定的<codeph>MEMORY_LIMIT</codeph>总和不得超过100。</p>
     </body>
     <topic id="mem_roles" xml:lang="en">
       <title>于角色的资源组的附加内存限制</title>
@@ -274,7 +274,7 @@ rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_
         <title>查询运算符内存</title>
         <body>
           <p>大多数查询运算符都是非内存密集型的; 也就是说，在处理过程中，Greenplum数据库可以将其数据保存在已分配的内存中。当内存密集型查询运算符（如连接和排序）处理的数据多于可以保存在内存中的数据时，数据会溢出到磁盘。</p>
-          <p><codeph><xref href="../ref_guide/config_params/guc-list.xml#gp_resgroup_memory_policy"type="topic"/></codeph>服务器配置参数控制所有查询运算符的内存分配和分配算法。Greenplum数据库支持<codeph>eager-free</codeph>（默认）和资源组的<codeph>自动</codeph>内存策略。当您指定自动策略时，Greenplum数据库使用资源组内存限制在查询运算符之间分配内存，为非内存密集型运算符分配固定大小的内存，其余为内存密集型运算符。当<codeph>eager_free</codeph>策略到位时，Greenplum数据库通过在稍后的查询阶段将已完成处理的运算符释放的内存重新分配给运算符，从而更好地在运算符之间分配内存。</p>
+          <p><codeph><xref href="../ref_guide/config_params/guc-list.xml#gp_resgroup_memory_policy" type="topic"/></codeph>服务器配置参数控制所有查询运算符的内存分配和分配算法。Greenplum数据库支持<codeph>eager-free</codeph>（默认）和资源组的<codeph>自动</codeph>内存策略。当用户指定自动策略时，Greenplum数据库使用资源组内存限制在查询运算符之间分配内存，为非内存密集型运算符分配固定大小的内存，其余为内存密集型运算符。当<codeph>eager_free</codeph>策略到位时，Greenplum数据库通过在稍后的查询阶段将已完成处理的运算符释放的内存重新分配给运算符，从而更好地在运算符之间分配内存。</p>
           <p><codeph>MEMORY_SPILL_RATIO</codeph>标识事务中内存密集型运算符的内存使用阈值。达到此阈值时，事务将溢出到磁盘。Greenplum数据库使用<codeph>MEMORY_SPILL_RATIO</codeph>来确定要分配给事务的初始内存。</p>
           <p>可以为资源组指定的最小<codeph>MEMORY_SPILL_RATIO</codeph>百分比为0.最大值为100.默认<codeph>MEMORY_SPILL_RATIO</codeph>为20。	</p>
           <p>在为角色创建资源组时定义<codeph>MEMORY_SPILL_RATIO</codeph>，用户可以使用<codeph><xref href="../ref_guide/config_params/guc-list.xml#memory_spill_ratio" type="topic"/></codeph>服务器配置参数在会话级别基于每个查询选择性地设置此限制。</p>
@@ -307,7 +307,7 @@ rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_
   <topic id="topic71717999" xml:lang="en">
     <title>使用资源组</title>
     <body>
-      <note type="important">在RedHat 6.x和CentOS 6.x系统上启用基于资源组的工作负载管理时，已观察到显着的Greenplum数据库性能下降。此问题是由Linux cgroup内核错误引起的。这个内核错误已在CentOS 7.x和Red Hat 7.x系统中修复。<p>如果您使用RedHat 6并且资源组的性能对于您的用例是可接受的，请将您的内核升级到版本2.6.32-696或更高版本，以便从cgroups实现的其他修复程序中受益。</p></note>
+      <note type="important">在RedHat 6.x和CentOS 6.x系统上启用基于资源组的工作负载管理时，已观察到显着的Greenplum数据库性能下降。此问题是由Linux cgroup内核错误引起的。这个内核错误已在CentOS 7.x和Red Hat 7.x系统中修复。<p>如果用户使用RedHat 6并且资源组的性能对于用户的用例是可接受的，请将用户的内核升级到版本2.6.32-696或更高版本，以便从cgroups实现的其他修复程序中受益。</p></note>
       <section id="topic833" xml:lang="en">
         <title>条件</title>
         <p>Greenplum数据库资源组使用Linux控制组（cgroup）来管理CPU资源。Greenplum数据库还使用cgroup来管理外部组件的资源组的内存。使用cgroups，Greenplum将Greenplum进程的CPU和外部组件内存使用与节点上的其他进程隔离开来。这允许Greenplum在每个资源组的基础上支持CPU和外部组件内存使用限制。</p>
@@ -317,7 +317,7 @@ rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_
           <li>如果用户在Greenplum数据库群集节点上运行SuSE 11+操作系统，则必须在每个节点上启用交换记帐并重新启动Greenplum数据库群集。<codeph>swapaccount</codeph>内核引导参数控制SuSE 11+系统上的交换记帐设置。设置此引导参数后，必须重新引导系统。有关详细信息，请参阅SuSE 11发行说明中的​​<xref
               href="https://www.suse.com/releasenotes/x86_64/SUSE-SLES/11-SP2/#fate-310471"
               format="html" scope="external">Cgroup交换控制</xref>讨论。用户必须是超级用户或具有<codeph>sudo</codeph>访问权限才能配置内核引导参数和重新引导系统。</li>
-          <li>创建Greenplum数据库cgroups配置文件<codeph>/etc/cgconfig.d/gpdb.conf</codeph>。您必须是超级用户或具有<codeph>sudo</codeph>访问权限才能创建此文件：
+          <li>创建Greenplum数据库cgroups配置文件<codeph>/etc/cgconfig.d/gpdb.conf</codeph>。用户必须是超级用户或具有<codeph>sudo</codeph>访问权限才能创建此文件：
             <codeblock>sudo vi /etc/cgconfig.d/gpdb.conf</codeblock>
           </li>
           <li>将以下配置信息添加到
@@ -343,7 +343,7 @@ rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_
 } </codeblock>
             <p>此内容配置由<codeph>gpadmin</codeph>用户管理的CPU，CPU计算，CPU核心集和内存控制组。Greenplum数据库仅将内存控制组用于使用<codeph>cgroup</codeph><codeph>MEMORY_AUDITOR</codeph>创建的资源组。</p>
           </li>
-          <li>如果尚未安装并正在运行，请安装Control Groups操作系统软件包，并在每个Greenplum Database节点上启动cgroups服务。您运行以执行这些任务的命令将根据节点上安装的操作系统而有所不同。您必须是超级用户或具有<codeph>sudo</codeph>访问权限才能运行这些命令：<ul>
+          <li>如果尚未安装并正在运行，请安装Control Groups操作系统软件包，并在每个Greenplum Database节点上启动cgroups服务。用户运行以执行这些任务的命令将根据节点上安装的操作系统而有所不同。用户必须是超级用户或具有<codeph>sudo</codeph>访问权限才能运行这些命令：<ul>
               <li> Redhat/CentOS 7.x 系统：
                 <codeblock>sudo yum install libcgroup-tools
 sudo cgconfigparser -l /etc/cgconfig.d/gpdb.conf </codeblock>
@@ -362,12 +362,12 @@ sudo cgconfigparser -l /etc/cgconfig.d/gpdb.conf </codeblock>
               <codeblock>grep cgroup /proc/mounts</codeblock>
 			  <p>第一行输出标识<codeph>cgroup</codeph>挂载点。</p>
           </li>
-          <li>通过运行以下命令验证是否正确设置了Greenplum Database cgroups配置。将&lt;cgroup_mount_point&gt; 替换为您在上一步中标识的安装点：
+          <li>通过运行以下命令验证是否正确设置了Greenplum Database cgroups配置。将&lt;cgroup_mount_point&gt; 替换为用户在上一步中标识的安装点：
 			  <codeblock>ls -l &lt;cgroup_mount_point&gt;/cpu/gpdb
 ls -l &lt;cgroup_mount_point&gt;/cpuacct/gpdb
 ls -l &lt;cgroup_mount_point&gt;/cpuset/gpdb
 ls -l &lt;cgroup_mount_point&gt;/memory/gpdb</codeblock>
-            <p>如果这些目录存在且由<codeph>gpadmin:gpadmin</codeph>拥有，则您已成功为Greenplum数据库CPU资源管理配置了cgroup。</p>
+            <p>如果这些目录存在且由<codeph>gpadmin:gpadmin</codeph>拥有，则用户已成功为Greenplum数据库CPU资源管理配置了cgroup。</p>
           </li>
           <li>要在系统重新启动时自动重新创建Greenplum数据库所需的cgroup层次结构和参数，请将系统配置为启用Linux cgroup服务守护程序<codeph>cgconfig.service</codeph>（Redhat / CentOS 7.x和SuSE 11+）或<codeph>cgconfig</codeph>（Redhat / CentOS 6.x） ）节点启动时。例如，在首选服务自动启动工具中配置以下cgroup服务命令之一：<ul>
               <li> Redhat/CentOS 7.x 和 SuSE11+ 系统：
@@ -375,13 +375,13 @@ ls -l &lt;cgroup_mount_point&gt;/memory/gpdb</codeblock>
               </li>
               <li> Redhat/CentOS 6.x systems: <codeblock>sudo chkconfig cgconfig on</codeblock></li>
             </ul>
-            <p>您可以选择其他方法来重新创建Greenplum数据库资源组cgroup层次结构。</p>
+            <p>用户可以选择其他方法来重新创建Greenplum数据库资源组cgroup层次结构。</p>
           </li>
         </ol>
       </section>
       <section id="topic8339191" xml:lang="en">
         <title>程序</title>
-        <p>要在Greenplum数据库群集中使用资源组，您需要：</p>
+        <p>要在Greenplum数据库群集中使用资源组，用户需要：</p>
         <ol>
           <li><xref href="#topic8" type="topic" format="dita">为Greenplum数据库群集启用资源组</xref>。</li>
           <li><xref href="#topic10" type="topic" format="dita">创建资源组</xref>。</li>
@@ -462,13 +462,13 @@ gpstart
           </tbody>
         </tgroup>
       </table>
-      <p>请记住，默认资源组admin_group和default_group的<codeph>CPU_RATE_LIMIT</codeph>和<codeph>MEMORY_LIMIT</codeph>值对分段主机上的总百分比有贡献。在创建Greenplum数据库部署并将新资源组添加到Greenplum数据库部署时，您可能会发现需要为<codeph>admin_group</codeph>和/或<codeph>default_group</codeph>调整这些限制。</p>
+      <p>请记住，默认资源组admin_group和default_group的<codeph>CPU_RATE_LIMIT</codeph>和<codeph>MEMORY_LIMIT</codeph>值对分段主机上的总百分比有贡献。在创建Greenplum数据库部署并将新资源组添加到Greenplum数据库部署时，用户可能会发现需要为<codeph>admin_group</codeph>和/或<codeph>default_group</codeph>调整这些限制。</p>
     </body>
   </topic>
   <topic id="topic10" xml:lang="en">
     <title id="iz139857">创建资源组</title>
     <body>
-      <p><i>为角色创建资源组时</i>可以提供名称，CPU资源分配模式和内存限制。您可以选择提供并发事务限制和内存共享配额和溢出比率。使用<codeph><xref
+      <p><i>为角色创建资源组时</i>可以提供名称，CPU资源分配模式和内存限制。用户可以选择提供并发事务限制和内存共享配额和溢出比率。使用<codeph><xref
             href="../ref_guide/sql_commands/CREATE_RESOURCE_GROUP.xml#topic1" type="topic"
             format="dita"/></codeph>命令创建新资源组。</p>
       <p id="iz152723">为角色创建资源组时，必须提供<codeph>CPU_RATE_LIMIT</codeph>或<codeph>CPUSET</codeph>和<codeph>MEMORY_LIMIT</codeph>限制值。这些限制标识要分配给此资源组的Greenplum数据库资源的百分比。例如，要创建名为<i>rgroup1</i>的资源组，其CPU限制为20，内存限制为25：</p>
@@ -477,7 +477,7 @@ gpstart
 </codeblock>
       </p>
       <p>CPU限制为20由<codeph>rgroup1</codeph>分配到的每个角色共享。同样，内存限制为25由<codeph>rgroup1</codeph>分配到的每个角色共享。<codeph>rgroup1</codeph>使用默认的<codeph>MEMORY_AUDITOR</codeph><codeph>vmtracker</codeph>和默认的<codeph>CONCURRENCY</codeph>设置为20。</p>
-      <p id="iz1527231"><i>为外部组件创建资源组时</i>，必须提供<codeph>CPU_RATE_LIMIT</codeph>或<codeph>CPUSET</codeph>和<codeph>MEMORY_LIMIT</codeph>限制值。您还必须提供<codeph>MEMORY_AUDITOR</codeph>并将<codeph>CONCURRENCY</codeph>显式设置为零（0）。例如，要创建名为<i>rgroup_extcomp</i>的资源组，请为其保留CPU核心1并指定内存限制为15：</p>
+      <p id="iz1527231"><i>为外部组件创建资源组时</i>，必须提供<codeph>CPU_RATE_LIMIT</codeph>或<codeph>CPUSET</codeph>和<codeph>MEMORY_LIMIT</codeph>限制值。用户还必须提供<codeph>MEMORY_AUDITOR</codeph>并将<codeph>CONCURRENCY</codeph>显式设置为零（0）。例如，要创建名为<i>rgroup_extcomp</i>的资源组，请为其保留CPU核心1并指定内存限制为15：</p>
       <p>
         <codeblock>=# CREATE RESOURCE GROUP <i>rgroup_extcomp</i> WITH (MEMORY_AUDITOR=cgroup, CONCURRENCY=0,
      CPUSET='1', MEMORY_LIMIT=15);
@@ -491,7 +491,7 @@ gpstart
 =# ALTER RESOURCE GROUP <i>rgroup1</i> SET CPUSET '2,4';
 </codeblock>
       </p>
-      <note>您无法将<codeph>admin_group</codeph>的<codeph>CONCURRENCY</codeph>值设置或更改为零（0）。</note>
+      <note>用户无法将<codeph>admin_group</codeph>的<codeph>CONCURRENCY</codeph>值设置或更改为零（0）。</note>
       <p><codeph><xref href="../ref_guide/sql_commands/DROP_RESOURCE_GROUP.xml#topic1"
             type="topic" format="dita"/></codeph>命令会删除资源组。要删除角色的资源组，不能将该组分配给任何角色，也不能在资源组中激活或等待任何事务。删除正在运行的实例的外部组件的资源组会导致正在运行的实例。</p>
       <p>删除资源组：</p>
@@ -549,7 +549,7 @@ gpstart
       <body>
         <p>The <codeph><xref href="../ref_guide/system_catalogs/gp_resgroup_config.xml" type="topic"
               format="dita"/></codeph>
-          <codeph>gp_toolkit</codeph>系统视图显示资源组的当前和建议限制。当您更改限制时，建议的限制与当前限制不同，但不能立即应用新值。如果要查看所有资源组的限制：</p>
+          <codeph>gp_toolkit</codeph>系统视图显示资源组的当前和建议限制。当用户更改限制时，建议的限制与当前限制不同，但不能立即应用新值。如果要查看所有资源组的限制：</p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_resgroup_config;
 </codeblock>
@@ -572,7 +572,7 @@ gpstart
         <body>
           <p>通过<codeph><xref href="../ref_guide/gp_toolkit.xml#perhost" type="topic" format="dita"
             /></codeph>
-          <codeph>gp_toolkit</codeph>系统视图，您可以基于每个主机查看资源组的实时CPU和内存使用情况。要查看此信息：</p>
+          <codeph>gp_toolkit</codeph>系统视图，用户可以基于每个主机查看资源组的实时CPU和内存使用情况。要查看此信息：</p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_resgroup_status_per_host;
 </codeblock>
@@ -584,7 +584,7 @@ gpstart
         <body>
           <p>通过<codeph><xref href="../ref_guide/gp_toolkit.xml#perseg" type="topic" format="dita"
             /></codeph>
-          <codeph>gp_toolkit</codeph>系统视图，您可以按每个段，每个主机查看资源组的实时CPU和内存使用情况。要查看此信息：</p>
+          <codeph>gp_toolkit</codeph>系统视图，用户可以按每个段，每个主机查看资源组的实时CPU和内存使用情况。要查看此信息：</p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_resgroup_status_per_segment;
 </codeblock>

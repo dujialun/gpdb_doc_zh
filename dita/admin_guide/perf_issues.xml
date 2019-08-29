@@ -145,7 +145,7 @@
                 <entry colname="col2">1 GB</entry>
               </row>
               <row>
-                <entry colname="col1">每个表的行/entry>
+                <entry colname="col1">每个表的行<entry>
                 <entry colname="col2">281474976710656 (2^48)</entry>
               </row>
               <row>

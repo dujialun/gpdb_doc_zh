@@ -218,7 +218,7 @@
           <li id="iz169478">下列参数与内存利用有关：<ul
               id="ul_ehc_w3c_34">
               <li id="iz172344"><codeph>gp_resqueue_memory_policy</codeph> - 启用Greenplum数据库的内存管理特性。
-在<p>Greenplum数据库4.2<ph>和其后的版本中，分布算法<codeph>eager_free</codeph> 会利用并非所有操作符都会同时执行这一事实。查询计划被划分成阶段并且Greenplum数据库会饥渴地在上一阶段执行结束时释放分配给上一阶段的内存，然后将释放出来的内存饥渴地分配给新的阶段。</p><p><ph>当被设置为<codeph>none</codeph>时，内存管理与4.1之前Greenplum数据库发行版相同。</ph>当被设置为<codeph>auto</codeph>时，查询内存使用由<codeph>statement_mem</codeph>和资源队列内存限制所控制。</p></li>
+在<p>Greenplum数据库4.2<ph>和其后的版本中，</ph>分布算法<codeph>eager_free</codeph> 会利用并非所有操作符都会同时执行这一事实。查询计划被划分成阶段并且Greenplum数据库会饥渴地在上一阶段执行结束时释放分配给上一阶段的内存，然后将释放出来的内存饥渴地分配给新的阶段。</p><p><ph>当被设置为<codeph>none</codeph>时，内存管理与4.1之前Greenplum数据库发行版相同。</ph>当被设置为<codeph>auto</codeph>时，查询内存使用由<codeph>statement_mem</codeph>和资源队列内存限制所控制。</p></li>
               <li id="iz172366"><codeph>statement_mem</codeph>和<codeph>max_statement_mem</codeph> - 被用来在运行时给一个特定查询分配内存（覆盖资源队列指派的默认分配）。<codeph>max_statement_mem</codeph>被数据库超级用户设置以防止常规数据库用户过度分配。</li>
               <li id="iz169494"><codeph>gp_vmem_protect_limit</codeph> - 设置所有查询处理能消耗的上界并且不应超过Segment主机的物理内存量。当一台Segment主机在查询执行时达到这一限制，导致超过限制的查询将被取消。</li>
               <li id="iz169556"><codeph>gp_vmem_idle_resource_timeout</codeph>和<codeph>gp_vmem_protect_segworker_cache_limit</codeph> -被用来释放Segment主机上由闲置数据库进程持有的内存。管理员可能想要在有大量并发的系统上调整这些设置。</li>
