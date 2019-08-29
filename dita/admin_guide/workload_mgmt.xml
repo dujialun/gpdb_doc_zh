@@ -4,17 +4,17 @@
 <topic id="topic1" xml:lang="en">
   <title id="iz173472">Using Resource Queues</title>
   <body>
-    <p>使用Greenplum数据库的工作负载管理根据业务需求对查询按照优先级分配资源，并且在资源不可用时阻止查询开始。</p>
+    <p>使用Greenplum数据库的工作负载管理根据业务需求对查询按照优先权分配资源，并且在资源不可用时阻止查询开始。</p>
     <p>资源队列是用来管理Greenplum数据库系统中并行的程度的工具。你可以使用<codeph>CREATE RESOURCE
-        QUEUE</codeph>SQL声明创建资源队列这一数据库对象，你可以用资源队列来管理可能并行执行的活跃查询，
+        QUEUE</codeph>SQL声明创建资源队列这一数据库对象，你可以用资源队列来管理可能并行执行的活动查询，
 		控制它们的内存使用量，以及队列中的相对排序。资源队列同时也可以防止查询消耗太多资源进而降低系统性能。</p>
     <p>每个数据库角色都与一个单个资源队列关联；多个角色可以共享同一个资源队列，使用<codeph>RESOURCE QUEUE</codeph>
 	中的<codeph>CREATE ROLE</codeph>或<codeph>ALTER ROLE</codeph>来将角色分配到资源队列中。如果没有指定资源队列，
 	则角色将会自动被关联到默认资源队列<codeph>pg_default</codeph>。</p>
     <p>当用户提交了一个要执行的查询时，资源队列会根据其限制对查询进行评估，若该查询所需的资源没有超过限制，
-	它将会立即执行；若超过了限制（例如，如果目前所有活跃声明槽位都已被占用），该查询则必须等到队列资源有
-	空闲时才能执行。对查询的评估将遵从先进先出的原则。如果启用了查询优先级，则将会预估系统当前的负载并根据
-	查询优先级（参考<xref href="#priorities" format="dita"/>）进行资源分配。拥有<codeph>SUPERUSER</codeph>属性
+	它将会立即执行；若超过了限制（例如，如果目前所有活动声明槽位都已被占用），该查询则必须等到队列资源有
+	空闲时才能执行。对查询的评估将遵从先进先出的原则。如果启用了查询优先权，则将会预估系统当前的负载并根据
+	查询优先权（参考<xref href="#priorities" format="dita"/>）进行资源分配。拥有<codeph>SUPERUSER</codeph>属性
 	的角色将会不受资源队列限制的限制，无论何时，超级用户的查询都会无视其所在资源队列的限制并立即执行。
 	</p>
     <fig id="iz153477">
@@ -43,9 +43,9 @@
         <plentry>
           <pt>PRIORITY</pt>
           <pd>查询使用的相对CPU使用量，可以设置为以下级别：<codeph>LOW</codeph>、<codeph>MEDIUM</codeph>、<codeph>HIGH</codeph>
-              和<codeph>MAX</codeph>。默认级别是<codeph>MEDIUM</codeph>，查询优先级的机制会监控系统中所有正在运行的查询的CPU使用量，
-			  并根据其优先级别来调整其CPU使用量。例如，你可以为<codeph>执行</codeph>资源队列设置<codeph>MAX</codeph>优先级，为其他
-			  查询设置<codeph>MEDIUM</codeph>优先级，确保执行查询可以获得比较多的CPU资源。</pd>
+              和<codeph>MAX</codeph>。默认级别是<codeph>MEDIUM</codeph>，查询优先权的机制会监控系统中所有正在运行的查询的CPU使用量，
+			  并根据其优先权别来调整其CPU使用量。例如，你可以为<codeph>执行</codeph>资源队列设置<codeph>MAX</codeph>优先权，为其他
+			  查询设置<codeph>MEDIUM</codeph>优先权，确保执行查询可以获得比较多的CPU资源。</pd>
         </plentry>
         <plentry>
           <pt>MAX_COST</pt>
@@ -60,7 +60,7 @@
         </plentry>
       </parml></p>
     <p>Greenplum数据库系统默认配置有一个默认资源队列，名为<codeph>pg_default</codeph>，<codeph>pg_default</codeph>资源队列的<codeph>ACTIVE_STATEMENTS</codeph>
-	设置数值为20，没有<codeph>MEMORY_LIMIT</codeph>和<codeph>MAX_COST</codeph>，<codeph>PRIORITY</codeph>为中。这意味所有查询都会被接受并立即执行，没有优先级划分
+	设置数值为20，没有<codeph>MEMORY_LIMIT</codeph>和<codeph>MAX_COST</codeph>，<codeph>PRIORITY</codeph>为中。这意味所有查询都会被接受并立即执行，没有优先权划分
 	和内存限制；但是并行的查询最多是20个。</p>
     <p>一个资源队列所允许的并行查询的数量由是否有设置<codeph>MEMORY_LIMIT</codeph>决定：</p>
     <ul id="ul_p5p_jxp_wq">
@@ -78,7 +78,7 @@
   <topic id="topic111" xml:lang="en">
     <title>资源队列示例</title>
     <body>
-      <p>默认资源队列<codeph>pg_default</codeph>允许最多20个活跃查询平分内存以并行执行。一般来说这是不足以满足生产环境下的资源需求的。为了确保系统能够满足性能期望，用户可以定义查询的组并
+      <p>默认资源队列<codeph>pg_default</codeph>允许最多20个活动查询平分内存以并行执行。一般来说这是不足以满足生产环境下的资源需求的。为了确保系统能够满足性能期望，用户可以定义查询的组并
 	  对其分配拥有相应的并行量、内存以及CPU的资源队列。</p>
       <p>如下展示了一个示例Greenplum数据库系统（<codeph>gp_vmem_protect_limit</codeph>为8GB）的资源队列的配置：<fig
           id="fig_p3y_mg5_1q">
@@ -94,7 +94,7 @@
             <thead>
               <row>
                 <entry>资源队列名</entry>
-                <entry>活跃声明</entry>
+                <entry>活动声明</entry>
                 <entry>内存限制</entry>
                 <entry>每个查询的内存</entry>
               </row>
@@ -123,252 +123,125 @@
         </table></p>
       <p>队列所分配的内存总量为6.4GB，也就是说<codeph>gp_vmem_protect_limit</codeph>服务器配置参数所定义的总Segment内存的80%。剩余的20%是为了那些可能会需要更多内存的
 	  运算符和查询所预留的。</p>
-      <p>
-		  See the <codeph>CREATE RESOURCE QUEUE</codeph> and <codeph>CREATE/ALTER ROLE</codeph>
-        statements in the <cite>Greenplum Database Reference Guide</cite> for help with command
-        syntax and detailed reference information.</p>
+      <p>关于命令语法帮助和详细参考信息请见<cite>Greenplum数据库参考指南</cite>中的<codeph>CREATE RESOURCE QUEUE</codeph>和<codeph>CREATE/ALTER ROLE</codeph>语句。</p>
     </body>
   </topic>
   <topic id="topic113" xml:lang="en">
-    <title>How Memory Limits Work</title>
+    <title>内存限制如何工作
+</title>
     <body>
-      <p>Setting <codeph>MEMORY_LIMIT</codeph> on a resource queue sets the maximum amount of memory
-        that all active queries submitted through the queue can consume for a segment instance. The
-        amount of memory allotted to a query is the queue memory limit divided by the active
-        statement limit. (Use the memory limits in conjunction with statement-based queues rather
-        than cost-based queues.) For example, if a queue has a memory limit of 2000MB and an active
-        statement limit of 10, each query submitted through the queue is allotted 200MB of memory by
-        default. The default memory allotment can be overridden on a per-query basis using the
-          <codeph>statement_mem</codeph> server configuration parameter (up to the queue memory
-        limit). Once a query has started executing, it holds its allotted memory in the queue until
-        it completes, even if during execution it actually consumes less than its allotted amount of
-        memory.</p>
-      <p>You can use the <codeph>statement_mem</codeph> server configuration parameter to override
-        memory limits set by the current resource queue. At the session level, you can increae
-          <codeph>statement_mem</codeph> up to the resource queue's <codeph>MEMORY_LIMIT</codeph>.
-        This will allow an individual query to use all of the memory allocated for the entire queue
-        without affecting other resource queues.</p>
-      <p>The value of <codeph>statement_mem</codeph> is capped using the
-          <codeph>max_statement_mem</codeph> configuration parameter (a superuser parameter). For a
-        query in a resource queue with <codeph>MEMORY_LIMIT</codeph> set, the maximum value for
-          <codeph>statement_mem</codeph> is <codeph>min(MEMORY_LIMIT, max_statement_mem)</codeph>.
-        When a query is admitted, the memory allocated to it is subtracted from
-          <codeph>MEMORY_LIMIT</codeph>. If <codeph>MEMORY_LIMIT</codeph> is exhausted, new queries
-        in the same resource queue must wait. This happens even if
-          <codeph>ACTIVE_STATEMENTS</codeph> has not yet been reached. Note that this can happen
-        only when <codeph>statement_mem</codeph> is used to override the memory allocated by the
-        resource queue.</p>
-      <p>For example, consider a resource queue named <codeph>adhoc</codeph> with the following
-          settings:<ul id="ul_dpr_vnd_dq">
-          <li><codeph>MEMORY_LIMIT</codeph> is 1.5GB </li>
-          <li><codeph>ACTIVE_STATEMENTS</codeph> is 3</li>
+      <p>一个资源队列上的<codeph>MEMORY_LIMIT</codeph>为一个Segment实例设置通过该队列提交的所有活动查询可以消耗的最大内存量。拨给一个查询的内存量是队列内存限制除以活动语句限制（将内存限制与基于语句的队列而不是基于代价的队列）。例如，如果一个队列的内存限制是2000MB而活动语句限制是10，每个通过该队列提交的查询会默认拿到200MB内存。可以以每个查询为基础使用<codeph>statement_mem</codeph>服务器配置参数覆盖默认的内存分配（最高到队列内存限制）。一旦一个查询开始执行，它会在队列中保持分拨给它的内存直至完成，即便在执行中它实际消耗的内存比分配到的内存少也是如此。</p>
+      <p>用户可以使用<codeph>statement_mem</codeph> 服务器配置参数来覆盖当前资源队列设置的内存限制。在会话级别，用户可以增加<codeph>statement_mem</codeph>，最高到资源队列的<codeph>MEMORY_LIMIT</codeph>。这将允许个别查询使用分配给整个队列的所有内存而不影响其他资源队列。</p>
+      <p><codeph>statement_mem</codeph>的值会被<codeph>max_statement_mem</codeph>配置参数（是一个超级用户参数）覆盖。对于一个设置有<codeph>MEMORY_LIMIT</codeph>的资源队列中的查询，<codeph>statement_mem</codeph>的最大值是<codeph>min(MEMORY_LIMIT, max_statement_mem)</codeph>。当一个查询被允许进入时，分配给它的内存会被从MEMORY_LIMIT中减去。如果<codeph>MEMORY_LIMIT</codeph>被耗尽，同一个资源队列中的新查询必须等待。即使<codeph>ACTIVE_STATEMENTS</codeph>还没有达到时也会发生这种事情。注意只有当<codeph>statement_mem</codeph>被用来覆盖资源队列分配的内存时才会发生这种情况。</p>
+      <p>例如，考虑一个名为<codeph>adhoc</codeph>的队列，它有下列设置：<ul id="ul_dpr_vnd_dq">
+          <li><codeph>MEMORY_LIMIT</codeph> 为 1.5GB </li>
+          <li><codeph>ACTIVE_STATEMENTS</codeph> 为 3</li>
         </ul>
       </p>
-      <p>By default each statement submitted to the queue is allocated 500MB of memory. Now consider
-        the following series of events:<ol id="ol_hjq_14d_dq">
-          <li>User <codeph>ADHOC_1</codeph> submits query <codeph>Q1</codeph>,
-              overriding<codeph>STATEMENT_MEM</codeph> to 800MB. The <codeph>Q1</codeph> statement
-            is admitted into the system. </li>
-          <li>User <codeph>ADHOC_2</codeph> submits query <codeph>Q2</codeph>, using the default
-            500MB.</li>
-          <li>With <codeph>Q1</codeph> and <codeph>Q2</codeph> still running, user
-              <codeph>ADHOC3</codeph> submits query <codeph>Q3</codeph>, using the default
-            500MB.</li>
+      <p>默认每个被提交到队列的语句会被分配500MB内存。现在考虑下列一系列事件：<ol id="ol_hjq_14d_dq">
+          <li>用户<codeph>ADHOC_1</codeph>提交查询<codeph>Q1</codeph>，并且把<codeph>STATEMENT_MEM</codeph>覆盖为800MB。<codeph>Q1</codeph>语句被准许进入系统。</li>
+          <li>用户<codeph>ADHOC_2</codeph>提交查询<codeph>Q2</codeph>，使用默认的500MB。</li>
+          <li>当<codeph>Q1</codeph>和<codeph>Q2</codeph>仍在运行时，用户<codeph>ADHOC3</codeph>提交查询<codeph>Q3</codeph>，使用默认的500MB。</li>
         </ol></p>
-      <p>Queries <codeph>Q1</codeph> and <codeph>Q2</codeph> have used 1300MB of the queue's 1500MB.
-        Therefore, <codeph>Q3</codeph> must wait for <codeph>Q1</codeph> or <codeph>Q2</codeph> to
-        complete before it can run. </p>
-      <p>If <codeph>MEMORY_LIMIT</codeph> is not set on a queue, queries are admitted until all of
-        the <codeph>ACTIVE_STATEMENTS</codeph> slots are in use, and each query can set an
-        arbitrarily high <codeph>statement_mem</codeph>. This could lead to a resource queue using
-        unbounded amounts of memory.</p>
-      <p>For more information on configuring memory limits on a resource queue, and other memory
-        utilization controls, see <xref href="#topic12" type="topic" format="dita"/>.</p>
+      <p>查询<codeph>Q1</codeph>和<codeph>Q2</codeph>已经用掉了队列的1500MB中的1300MB。因此，<codeph>Q3</codeph>在能运行前必须等待<codeph>Q1</codeph>或<codeph>Q2</codeph>完成。</p>
+      <p>如果在一个队列上没有设置<codeph>MEMORY_LIMIT</codeph>，查询都被准许进入，直到所有的<codeph>ACTIVE_STATEMENTS</codeph>槽被用尽，并且每个查询可以设置一个任意高的<codeph>statement_mem</codeph>这可能导致资源队列使用无限量的内存。</p>
+      <p>更多有关在资源队列上配置内存限制以及其他内存利用控制的信息，请见<xref href="#topic12" type="topic" format="dita"/>.</p>
     <section id="topic113x" xml:lang="en">
-      <title>statement_mem and Low Memory Queries</title>
-        <p>A low <codeph>statement_mem</codeph> setting (for example, in the 
-          1-3MB range) has been shown
-          to increase the performance of queries with low memory requirements. Use
-          the <codeph>statement_mem</codeph> server configuration parameter to
-          override the setting on a per-query basis. For example:
-          <codeblock>SET statement_mem='2MB';</codeblock></p>
+      <title>statement_mem和低内存查询</title>
+        <p>经实践发现设置了低<codeph>statement_mem</codeph>参数（比如1-3MB的范围内）的低内存需求的查询会有更好的性能表现。在单个查询的基础上使用<codeph>statement_mem</codeph>服务器配置参数来覆盖队列的设置。例如：
+		<codeblock>SET statement_mem='2MB';</codeblock></p>
     </section>
     </body>
   </topic>
   <topic id="priorities">
-    <title>How Priorities Work</title>
+    <title>优先权如何起作用</title>
     <body>
-      <p>The <codeph>PRIORITY</codeph> setting for a resource queue differs from the
-          <codeph>MEMORY_LIMIT</codeph> and <codeph>ACTIVE_STATEMENTS</codeph> settings, which
-        determine whether a query will be admitted to the queue and eventually executed. The
-          <codeph>PRIORITY</codeph> setting applies to queries after they become active. Active
-        queries share available CPU resources as determined by the priority settings for its
-        resource queue. When a statement from a high-priority queue enters the group of actively
-        running statements, it may claim a greater share of the available CPU, reducing the share
-        allocated to already-running statements in queues with a lesser priority setting.</p>
-      <p>The comparative size or complexity of the queries does not affect the allotment of CPU. If
-        a simple, low-cost query is running simultaneously with a large, complex query, and their
-        priority settings are the same, they will be allocated the same share of available CPU
-        resources. When a new query becomes active, the CPU shares will be recalculated, but queries
-        of equal priority will still have equal amounts of CPU. </p>
-      <p>For example, an administrator creates three resource queues: <i>adhoc</i> for ongoing
-        queries submitted by business analysts, <i>reporting</i> for scheduled reporting jobs, and
-          <i>executive</i> for queries submitted by executive user roles. The administrator wants to
-        ensure that scheduled reporting jobs are not heavily affected by unpredictable resource
-        demands from ad-hoc analyst queries. Also, the administrator wants to make sure that queries
-        submitted by executive roles are allotted a significant share of CPU. Accordingly, the
-        resource queue priorities are set as shown:<ul id="ul_ppy_3cy_wq">
-          <li id="iz160250"><i>adhoc</i> — Low priority</li>
-          <li id="iz161065"><i>reporting</i> — High priority</li>
-          <li id="iz161070"><i>executive</i> — Maximum priority</li>
+      <p>资源队列的<codeph>PRIORITY</codeph>设置与<codeph>MEMORY_LIMIT</codeph>和<codeph>ACTIVE_STATEMENTS</codeph>设置不同，后两者决定一个查询是否将被准许进入该队列并且最终被执行。<codeph>PRIORITY</codeph>设置对于活动查询适用。活动查询会按照其所在资源队列的优先权设置来共享可用的CPU资源。当一个来自高优先权队列的语句进入到活动运行语句分组中时，它可以得到可用CPU中较高的份额，同时也降低了具有较低优先权设置队列中已经在运行的语句得到的份额。</p>
+      <p>查询的相对尺寸或复杂度不影响CPU的分配。如果一个简单的低代价的查询与一个大型的复杂查询同时运行，并且它们的优先权设置相同，它们将被分配同等份额的可用CPU资源。当一个新的查询变成活动时，CPU份额将会被重新计算，但是优先权相等的查询仍将得到等量的CPU。</p>
+      <p>例如，管理员创建三个资源队列：<i>adhoc</i>用于业务分析师提交的正在进行的查询，<i>reporting</i>用于计划的报表任务，而<i>executive</i>用于行政用户角色递交的查询。由于分析师可能临时提交查询，而这些查询的资源需求是不可预测的，管理员想要确保计划的报表任务不会受到这类查询的严重影响。还有，管理员想要确保行政角色递交的查询会被分配相当份额的CPU。相应地，资源队列的优先权被设置如下：<ul id="ul_ppy_3cy_wq">
+          <li id="iz160250"><i>adhoc</i> — 低优先权</li>
+          <li id="iz161065"><i>reporting</i> — 高优先权</li>
+          <li id="iz161070"><i>executive</i> — 最大优先权</li>
         </ul></p>
-      <p>At runtime, the CPU share of active statements is determined by these priority settings. If
-        queries 1 and 2 from the reporting queue are running simultaneously, they have equal shares
-        of CPU. When an ad-hoc query becomes active, it claims a smaller share of CPU. The exact
-        share used by the reporting queries is adjusted, but remains equal due to their equal
-        priority setting:</p>
+      <p>在运行时，活动语句的CPU份额由这些这些优先权设置决定。如果来自报表队列的查询1和2同时运行，它们有相等份额的CPU。当一个临时查询变成活动时，它会索取一个较小份额的CPU。报表查询所使用的准确份额会被调整，但仍然保持相等，因为它们的优先权设置相等：
+
+</p>
       <fig id="iz173993">
-        <title>CPU share readjusted according to priority</title>
+        <title>根据优先权重新调整CPU份额 </title>
         <image href="graphics/gp_query_priority1.png" placement="break" width="432px" height="298px"
           id="image_lgv_lcy_wq"/>
       </fig>
       <note type="note">
-        <p>The percentages shown in these illustrations are approximate. CPU usage between high, low
-          and maximum priority queues is not always calculated in precisely these proportions.</p>
+        <p>这些图中显示的百分数都是近似值。高、低和中优先权队列的CPU使用并不总是准确地用这些比例计算出来。</p>
       </note>
-      <p>When an executive query enters the group of running statements, CPU usage is adjusted to
-        account for its maximum priority setting. It may be a simple query compared to the analyst
-        and reporting queries, but until it is completed, it will claim the largest share of
-        CPU.</p>
+      <p>当一个行政查询进入到运行语句组中时，CPU使用会被调整以说明其最大优先权设置。它可能是一个堪比分析师和报表查询的简单查询，但直到它完成前，它都将要求最大份额的CPU。</p>
       <fig id="iz160829">
-        <title>CPU share readjusted for maximum priority query</title>
+        <title>为最大优先权查询重新调整CPU份额 </title>
         <image href="graphics/gp_query_priority2.png" placement="break" width="194px" height="305px"
           id="image_lrr_ddy_wq"/>
       </fig>
-      <p>For more information about commands to set priorities, see <xref href="#topic16"
+      <p>更多有关设置优先权的命令的信息，请见<xref href="#topic16"
           type="topic" format="dita"/>.</p>
     </body>
   </topic>
 
   <topic id="topic8" xml:lang="en">
-    <title id="iz153124">Steps to Enable Resource Management</title>
+    <title id="iz153124">启用负载管理的步骤</title>
     <body>
-      <p>Enabling and using resource management in Greenplum Database involves the following
-        high-level tasks:</p>
+      <p>在Greenplum数据库中启用并且使用负载管理涉及下列高层任务：</p>
       <ol id="ol_ec5_4dy_wq">
-        <li>Configure resource management. See <xref href="#topic9" format="dita"/>.</li>
-        <li id="iz153167">Create the resource queues and set limits on them. See <xref
+        <li>配置负载管理，见<xref href="#topic9" format="dita"/>.</li>
+        <li id="iz153167">创建资源队列并且在其上设置限制。见<xref
             href="#topic10" type="topic" format="dita"/> and <xref href="#topic19" format="dita"
           />.</li>
-        <li id="iz153172">Assign a queue to one or more user roles. See <xref href="#topic17"
+        <li id="iz153172">把队列分派给一个或者更多用户角色。见<xref href="#topic17"
             type="topic" format="dita"/>.</li>
-        <li id="iz153188">Use the resource management system views to monitor and manage the
-          resource queues. See <xref href="#topic22" type="topic" format="dita"/>.</li>
+        <li id="iz153188">使用负载管理系统视图来监控并且管理资源队列。见<xref href="#topic22" type="topic" format="dita"/>.</li>
       </ol>
     </body>
   </topic>
   <topic id="topic9" xml:lang="en">
-    <title id="iz139711">Configuring Resource Management</title>
+    <title id="iz139711">配置负载管理</title>
     <body>
-      <p>Resource scheduling is enabled by default when you install Greenplum Database, and is
-        required for all roles. The default resource queue, <codeph>pg_default</codeph>, has an
-        active statement limit of 20, no memory limit, and a medium priority setting. Create
-        resource queues for the various types of workloads.</p>
+      <p>在安装Greenplum数据库时默认会启用资源调度，资源调度对所有角色都是必需的。默认的资源队列<codeph>pg_default</codeph>的活动语句限制是20，没有内存限制和中等的优先权设置。为各种类型的负载创建资源队列。</p>
       <section id="iz169600">
-        <title>To configure resource management</title>
+        <title>配置负载管理</title>
         <ol>
-          <li id="iz169263">The following parameters are for the general configuration of resource
-              queues:<ul id="ul_gln_v3c_34">
-              <li id="iz152506"><codeph>max_resource_queues</codeph> - Sets the maximum number of
-                resource queues.</li>
-              <li id="iz153405"><codeph>max_resource_portals_per_transaction</codeph> - Sets the
-                maximum number of simultaneously open cursors allowed per transaction. Note that an
-                open cursor will hold an active query slot in a resource queue.</li>
-              <li id="iz154513"><codeph>resource_select_only</codeph> - If set to <i>on</i>, then
-                  <codeph>SELECT</codeph>, <codeph>SELECT INTO</codeph>, <codeph>CREATE TABLE
-                  AS</codeph><codeph>SELECT</codeph>, and <codeph>DECLARE CURSOR</codeph> commands
-                are evaluated. If set to <i>off</i><codeph>INSERT</codeph><ph>,
-                    <codeph>UPDATE</codeph>, and <codeph>DELETE</codeph></ph> commands will be
-                evaluated as well.</li>
-              <li id="iz157925"><codeph>resource_cleanup_gangs_on_wait</codeph> - Cleans up idle
-                segment worker processes before taking a slot in the resource queue.</li>
-              <li id="iz156657"><codeph>stats_queue_level</codeph> - Enables statistics collection
-                on resource queue usage, which can then be viewed by querying the pg_stat_resqueues
-                system view.</li>
+          <li id="iz169263">下列参数用于资源队列的一般配置：<ul id="ul_gln_v3c_34">
+              <li id="iz152506"><codeph>max_resource_queues</codeph> - 设置资源队列的最大数量。</li>
+              <li id="iz153405"><codeph>max_resource_portals_per_transaction</codeph> - S设置每个事务允许同时打开的游标的最大数量。注意一个打开的游标将在资源队列中占有一个活动查询槽。</li>
+              <li id="iz154513"><codeph>resource_select_only</codeph> - 如果被设置为<i>on</i>，那么<codeph>SELECT</codeph>，<codeph>SELECT INTO</codeph>，<codeph>CREATE TABLE
+                  AS</codeph><codeph>SELECT</codeph>和<codeph>DECLARE CURSOR</codeph>命令会被评估。如果被设置为<i>off</i>，<codeph>INSERT</codeph><ph>，                    <codeph>UPDATE</codeph>和<codeph>DELETE</codeph></ph>也将被评估。</li>
+              <li id="iz157925"><codeph>resource_cleanup_gangs_on_wait</codeph> - 在资源队列中取得一个槽之前清除空转的Segment工作者进程。</li>
+              <li id="iz156657"><codeph>stats_queue_level</codeph> - 在资源队列使用上启用统计信息收集，然后可以通过查询pg_stat_resqueues系统视图来查看收集到的信息。</li>
             </ul></li>
-          <li id="iz169478">The following parameters are related to memory utilization:<ul
+          <li id="iz169478">下列参数与内存利用有关：<ul
               id="ul_ehc_w3c_34">
-              <li id="iz172344"><codeph>gp_resqueue_memory_policy</codeph> - Enables Greenplum
-                Database memory management features. <p>In Greenplum Database<ph> 4.2 and
-                  later</ph>, the distribution algorithm <codeph>eager_free</codeph> takes advantage
-                  of the fact that not all operators execute at the same time. The query plan is
-                  divided into stages and Greenplum Database eagerly frees memory allocated to a
-                  previous stage at the end of that stage's execution, then allocates the eagerly
-                  freed memory to the new stage.</p><p><ph>When set to <codeph>none</codeph>, memory
-                    management is the same as in Greenplum Database releases prior to 4.1. </ph>When
-                  set to <codeph>auto</codeph>, query memory usage is controlled by
-                    <codeph>statement_mem</codeph> and resource queue memory limits. </p></li>
-              <li id="iz172366"><codeph>statement_mem</codeph> and
-                  <codeph>max_statement_mem</codeph> - Used to allocate memory to a particular query
-                at runtime (override the default allocation assigned by the resource queue).
-                  <codeph>max_statement_mem</codeph> is set by database superusers to prevent
-                regular database users from over-allocation.</li>
-              <li id="iz169494"><codeph>gp_vmem_protect_limit</codeph> - Sets the upper boundary
-                that all query processes can consume and should not exceed the amount of physical
-                memory of a segment host. When a segment host reaches this limit during query
-                execution, the queries that cause the limit to be exceeded will be cancelled. </li>
-              <li id="iz169556"><codeph>gp_vmem_idle_resource_timeout</codeph> and
-                  <codeph>gp_vmem_protect_segworker_cache_limit</codeph> - used to free memory on
-                segment hosts held by idle database processes. Administrators may want to adjust
-                these settings on systems with lots of concurrency.</li>
-              <li><codeph>shared_buffers</codeph> - Sets the amount of memory a Greenplum server
-                instance uses for shared memory buffers. This setting must be at least 128 kilobytes
-                and at least 16 kilobytes times <codeph>max_connections</codeph>. The value must not
-                exceed the operating system shared memory maximum allocation request size,
-                  <codeph>shmmax</codeph> on Linux. See the <i>Greenplum Database Installation
-                  Guide</i> for recommended OS memory settings for your platform.</li>
+              <li id="iz172344"><codeph>gp_resqueue_memory_policy</codeph> - 启用Greenplum数据库的内存管理特性。
+在<p>Greenplum数据库4.2<ph>和其后的版本中，分布算法<codeph>eager_free</codeph> 会利用并非所有操作符都会同时执行这一事实。查询计划被划分成阶段并且Greenplum数据库会饥渴地在上一阶段执行结束时释放分配给上一阶段的内存，然后将释放出来的内存饥渴地分配给新的阶段。</p><p><ph>当被设置为<codeph>none</codeph>时，内存管理与4.1之前Greenplum数据库发行版相同。</ph>当被设置为<codeph>auto</codeph>时，查询内存使用由<codeph>statement_mem</codeph>和资源队列内存限制所控制。</p></li>
+              <li id="iz172366"><codeph>statement_mem</codeph>和<codeph>max_statement_mem</codeph> - 被用来在运行时给一个特定查询分配内存（覆盖资源队列指派的默认分配）。<codeph>max_statement_mem</codeph>被数据库超级用户设置以防止常规数据库用户过度分配。</li>
+              <li id="iz169494"><codeph>gp_vmem_protect_limit</codeph> - 设置所有查询处理能消耗的上界并且不应超过Segment主机的物理内存量。当一台Segment主机在查询执行时达到这一限制，导致超过限制的查询将被取消。</li>
+              <li id="iz169556"><codeph>gp_vmem_idle_resource_timeout</codeph>和<codeph>gp_vmem_protect_segworker_cache_limit</codeph> -被用来释放Segment主机上由闲置数据库进程持有的内存。管理员可能想要在有大量并发的系统上调整这些设置。</li>
+              <li><codeph>shared_buffers</codeph> - 设置Greenplum服务器实例用作共享内存缓冲区的内存量。这个设置必须至少为128千字节并且至少为16千字节乘以<codeph>max_connections</codeph>。该值不能超过操作系统共享内存最大分配请求尺寸，该尺寸由Linux上的<codeph>shmmax</codeph>控制。推荐的OS内存设置请见 <i>Greenplum 数据库安装指南</i>。</li>
             </ul></li>
-          <li id="iz169487">The following parameters are related to query prioritization. Note that
-            the following parameters are all <i>local</i> parameters, meaning they must be set in
-            the <codeph>postgresql.conf</codeph> files of the master and all segments:<ul
+          <li id="iz169487">下列参数与查询优先有关。注意下列参数都是<i>本地</i>参数，意味着它们必须在Master和所有Segment的<codeph>postgresql.conf</codeph>文件中设置：<ul
               id="ul_lm2_x3c_34">
-              <li id="iz158643"><codeph>gp_resqueue_priority</codeph> - The query prioritization
-                feature is enabled by default.</li>
-              <li id="iz158644"><codeph>gp_resqueue_priority_sweeper_interval</codeph> - Sets the
-                interval at which CPU usage is recalculated for all active statements. The default
-                value for this parameter should be sufficient for typical database operations. </li>
+              <li id="iz158643"><codeph>gp_resqueue_priority</codeph> - 查询优先特性默认被启用。</li>
+              <li id="iz158644"><codeph>gp_resqueue_priority_sweeper_interval</codeph> - 设置所有活动语句重新计算CPU使用的时间间隔。这个参数的默认值应该足够用于通常的数据库操作。</li>
               <li id="iz174445"><codeph>gp_resqueue_priority_cpucores_per_segment</codeph> -
-                Specifies the number of CPU cores allocated per segment instance. The default value
-                is 4 for the master and segments. For Greenplum Data Computing Appliance Version 2,
-                the default value is 4 for segments and 25 for the master. <p>Each host checks its
-                  own <codeph>postgresql.conf</codeph> file for the value of this parameter. This
-                  parameter also affects the master node, where it should be set to a value
-                  reflecting the higher ratio of CPU cores. For example, on a cluster that has 10
-                  CPU cores per host and 4 segments per host, you would specify these values for
-                    <codeph>gp_resqueue_priority_cpucores_per_segment</codeph>:</p><p>10 for the
-                  master and standby master. Typically, only the master instance is on the master
-                  host.</p><p>2.5 for segment instances on the segment hosts. </p><p>If the
-                  parameter value is not set correctly, either the CPU might not be fully utilized,
-                  or query prioritization might not work as expected. For example, if the Greenplum
-                  Database cluster has fewer than one segment instance per CPU core on your segment
-                  hosts, make sure you adjust this value accordingly. </p><p>Actual CPU core
-                  utilization is based on the ability of Greenplum Database to parallelize a query
-                  and the resources required to execute the query. </p><p>Note: Any CPU core that is
-                  available to the operating system is included in the number of CPU cores. For
-                  example, virtual CPU cores are included in the number of CPU cores.</p></li>
+                指定每个Segment实例分配的CPU核数。Master和Segment的默认值是4。对于Greenplum Data Computing Appliance Version 2，Segment的默认值是4而Master默认值是25。<p>每台主机会在其自己的<codeph>postgresql.conf</codeph>文件中检查这个参数的值。这个参数也影响Master节点，在Master节点上它应该被设置为一个反映CPU核数更高比率的值。例如，在每台主机有10个CPU核以及4个Segment的集群上，用户可以为<codeph>gp_resqueue_priority_cpucores_per_segment</codeph>指定这些值：</p><p>为Master和后备Master指定10。通常，在Master主机上只有Master实例。</p><p>为Segment主机上的每个Segment实例指定2.5。</p><p>如果参数值未被设置正确，要么是CPU可能不会被完全利用，要么是查询优先可能无法按照预期工作。例如，如果Greenplum数据库集群在Segment主机上每个CPU核低于一个Segment实例，确保要相应地调整这个值。</p><p>实际的CPU核利用取决于Greenplum数据库并行化查询的能力以及执行查询要求的资源。</p><p>注意：操作系统任何可用的CPU核都会被包括在CPU核数中。例如，虚拟CPU核会被包括在CPU核数中。</p></li>
             </ul></li>
-          <li id="iz171977">If you wish to view or change any of the resource management parameter
-            values, you can use the <codeph>gpconfig</codeph> utility. </li>
-          <li id="iz169849">For example, to see the setting of a particular parameter:<p>
+          <li id="iz171977">如果用户希望查看或者更改任何负载管理参数值，可以使用<codeph>gpconfig</codeph> 工具。</li>
+          <li id="iz169849">例如，要查看一个特定参数的设置：<p>
               <codeblock>$ gpconfig --show gp_vmem_protect_limit
 </codeblock>
             </p></li>
-          <li id="iz169838">For example, to set one value on all segment instances and a different
-            value on the master:<p>
+          <li id="iz169838">例如，要在所有的Segment实例上设置一个值并且在Master上设置一个不同的值：
+<p>
               <codeblock>$ gpconfig -c gp_resqueue_priority_cpucores_per_segment -v 2 -m 8
 </codeblock>
             </p></li>
-          <li id="iz169522">Restart Greenplum Database to make the configuration changes effective:<p>
+          <li id="iz169522">重启Greenplum数据库让配置更改生效：<p>
               <codeblock>$ gpstop -r
 </codeblock>
             </p></li>
@@ -377,126 +250,77 @@
     </body>
   </topic>
   <topic id="topic10" xml:lang="en">
-    <title id="iz139857">Creating Resource Queues</title>
+    <title id="iz139857">创建资源队列</title>
     <body>
-      <p>Creating a resource queue involves giving it a name, setting an active query limit, and
-        optionally a query priority on the resource queue. Use the <codeph>CREATE RESOURCE
-          QUEUE</codeph> command to create new resource queues. </p>
+      <p>创建一个资源队列涉及到给它一个名称、设置一个活动查询限制并且可选地在该资源队列上设置一个查询优先权。使用<codeph>CREATE RESOURCE QUEUE</codeph>命令来创建新的资源队列。</p>
     </body>
     <topic id="topic11" xml:lang="en">
-      <title>Creating Queues with an Active Query Limit</title>
+      <title>创建带有活动查询限制的队列</title>
       <body>
-        <p id="iz152723">Resource queues with an <codeph>ACTIVE_STATEMENTS</codeph> setting limit
-          the number of queries that can be executed by roles assigned to that queue. For example,
-          to create a resource queue named <i>adhoc</i> with an active query limit of three:</p>
+        <p id="iz152723">带有<codeph>ACTIVE_STATEMENTS</codeph>设置的资源队列会限制指派给该队列的角色所执行的查询数量。例如，要创建一个名为<i>adhoc</i>且活动查询限制为3的资源队列：</p>
         <p>
           <codeblock>=# CREATE RESOURCE QUEUE adhoc WITH (ACTIVE_STATEMENTS=3);
 </codeblock>
         </p>
-        <p>This means that for all roles assigned to the <i>adhoc</i> resource queue, only three
-          active queries can be running on the system at any given time. If this queue has three
-          queries running, and a fourth query is submitted by a role in that queue, that query must
-          wait until a slot is free before it can run.</p>
+        <p>这意味着对于所有被分配到<i>adhoc</i>资源队列的角色，在任意给定时刻只能有三个活动查询被运行在这个系统上。如果这个队列已经有三个查询在运行并且一个角色在该队列中提交第四个查询，则第四个查询只有等到一个槽被释放出来后才能运行。
+
+</p>
       </body>
     </topic>
     <topic id="topic12" xml:lang="en">
-      <title id="iz162725">Creating Queues with Memory Limits</title>
+      <title id="iz162725">创建带有内存限制的队列</title>
       <body>
-        <p>Resource queues with a <codeph>MEMORY_LIMIT</codeph><ph> setting control the amount of
-            memory for all the queries submitted through the queue. The total memory should not
-            exceed the physical memory available per-segment. Set </ph><codeph>MEMORY_LIMIT</codeph>
-          to 90% of memory available on a per-segment basis. For example, if a host has 48 GB of
-          physical memory and 6 segment instances, then the memory available per segment instance is
-          8 GB. You can calculate the recommended <codeph>MEMORY_LIMIT</codeph> for a single queue
-          as 0.90*8=7.2 GB. If there are multiple queues created on the system, their total memory
-          limits must also add up to 7.2 GB.</p>
-        <p>When used in conjunction with <codeph>ACTIVE_STATEMENTS</codeph>, the default amount of
-          memory allotted per query is: <codeph>MEMORY_LIMIT</codeph><codeph> /
-            </codeph><codeph>ACTIVE_STATEMENTS</codeph>. When used in conjunction with
-            <codeph>MAX_COST</codeph>, the default amount of memory allotted per query is:
-            <codeph>MEMORY_LIMIT * (query_cost <codeph>/ </codeph>MAX_COST)</codeph>. Use
-            <codeph>MEMORY_LIMIT</codeph> in conjunction with <codeph>ACTIVE_STATEMENTS</codeph>
-          rather than with <codeph>MAX_COST</codeph>.</p>
-        <p>For example, to create a resource queue with an active query limit of 10 and a total
-          memory limit of 2000MB (each query will be allocated 200MB of segment host memory at
-          execution time): </p>
+        <p>带有<codeph>MEMORY_LIMIT</codeph><ph>设置的资源队列控制所有通过该队列提交的查询的总内存。总内存不应超过每个Segment可用的物理内存。以每个Segment为基础，设置</ph><codeph>MEMORY_LIMIT</codeph>为90%的可用内存。例如，如果一台主机有48GB物理内存和6个Segment实例，那么每个Segment实例可用的内存是8GB。可以为单个队列按照0.90*8=7.2 GB来计算推荐的<codeph>MEMORY_LIMIT</codeph>。如果在系统上创建有多个队列，它们的总内存限制加起来也必须为7.2 GB。</p>
+        <p>在与<codeph>ACTIVE_STATEMENTS</codeph>联合使用时，每个查询被分配的默认内存量为：<codeph>MEMORY_LIMIT</codeph><codeph> /</codeph><codeph>ACTIVE_STATEMENTS</codeph>。在与<codeph>MAX_COST</codeph>联合使用时，每个查询被分配的默认内存量为：<codeph>MEMORY_LIMIT * (query_cost <codeph>/ </codeph>MAX_COST)</codeph>。将
+            <codeph>MEMORY_LIMIT</codeph>与<codeph>ACTIVE_STATEMENTS</codeph>而不是与<codeph>MAX_COST</codeph>一起使用。</p>
+        <p>例如，要创建一个活动查询限制为10且总内存限制为2000MB的资源队列（每个查询将在执行时被分配200MB的Segment主机内存）：</p>
         <p>
           <codeblock>=# CREATE RESOURCE QUEUE myqueue WITH (ACTIVE_STATEMENTS=20, 
 MEMORY_LIMIT='2000MB');
 </codeblock>
         </p>
-        <p>The default memory allotment can be overridden on a per-query basis using the
-            <codeph>statement_mem</codeph> server configuration parameter, provided that
-            <codeph>MEMORY_LIMIT</codeph> or <codeph>max_statement_mem</codeph> is not exceeded. For
-          example, to allocate more memory to a particular query:</p>
+        <p>可以使用<codeph>statement_mem</codeph>服务器配置参数针对每个查询覆盖默认的内存分配，前提是没有超过<codeph>MEMORY_LIMIT</codeph>或者<codeph>max_statement_mem</codeph> 。例如，要对一个特定查询分配更多内存：</p>
         <codeblock>=&gt; SET statement_mem='2GB';
 =&gt; SELECT * FROM my_big_table WHERE column='value' ORDER BY id;
 =&gt; RESET statement_mem;
 </codeblock>
-        <p>As a general guideline, <codeph>MEMORY_LIMIT</codeph> for all of your resource queues
-          should not exceed the amount of physical memory of a segment host. If workloads are
-          staggered over multiple queues, it may be OK to oversubscribe memory allocations, keeping
-          in mind that queries may be cancelled during execution if the segment host memory limit
-            (<codeph>gp_vmem_protect_limit</codeph>) is exceeded.</p>
+        <p>作为一种一般性的指导方针，对于所有资源队列的<codeph>MEMORY_LIMIT</codeph>不应超过一台Segment主机的物理内存量。如果负载在多个队列之间交错安排，超额分配一些内存可能是OK的，但要记住，如果执行期间Segment主机的内存限制（<codeph>gp_vmem_protect_limit</codeph>）被超过，查询可能会被取消。</p>
       </body>
     </topic>
     <topic id="topic16" xml:lang="en">
-      <title id="iz158491">Setting Priority Levels</title>
+      <title id="iz158491">设置优先级</title>
       <body>
-        <p>To control a resource queue's consumption of available CPU resources, an administrator
-          can assign an appropriate priority level. When high concurrency causes contention for CPU
-          resources, queries and statements associated with a high-priority resource queue will
-          claim a larger share of available CPU than lower priority queries and statements. </p>
-        <p>Priority settings are created or altered using the <codeph>WITH</codeph> parameter of the
-          commands <codeph>CREATE RESOURCE QUEUE</codeph> and <codeph>ALTER RESOURCE QUEUE</codeph>.
-          For example, to specify priority settings for the <i>adhoc</i> and <i>reporting</i>
-          queues, an administrator would use the following commands: </p>
+        <p>为了控制一个资源队列对可用CPU资源的消耗，管理员可以指派一个合适的优先级。当高并发导致对CPU资源的竞争时，与较高优先权资源队列相关的查询和语句将会比较低优先权的查询和语句得到更大份额的可用CPU。</p>
+        <p>优先权设置使用命令<codeph>CREATE RESOURCE QUEUE</codeph>和<codeph>ALTER RESOURCE QUEUE</codeph>的<codeph>WITH</codeph>参数创建或修改。例如，要为<i>adhoc</i>和<i>reporting</i>队列指定优先权设置，管理员会使用下列命令：</p>
         <codeblock>=# ALTER RESOURCE QUEUE adhoc WITH (PRIORITY=LOW);
 =# ALTER RESOURCE QUEUE reporting WITH (PRIORITY=HIGH);</codeblock>
-        <p>To create the <i>executive</i> queue with maximum priority, an administrator would use
-          the following command:</p>
+        <p>要以最大优先权创建<i>executive</i>队列，管理员可以使用下列命令：</p>
         <codeblock>=# CREATE RESOURCE QUEUE executive WITH (ACTIVE_STATEMENTS=3, PRIORITY=MAX);</codeblock>
-        <p>When the query prioritization feature is enabled, resource queues are given a
-            <codeph>MEDIUM</codeph> priority by default if not explicitly assigned. For more
-          information on how priority settings are evaluated at runtime, see <xref
+        <p>当查询优先特性被启用时，如果没有显式地指派，默认会为资源队列给出一个<codeph>MEDIUM</codeph>优先权。更多有关运行时如何评估优先权设置的信息，请见<xref
             href="#priorities" type="topic" format="dita"/>.</p>
-        <note type="important">In order for resource queue priority levels to be enforced on the
-          active query workload, you must enable the query prioritization feature by setting the
-          associated server configuration parameters. See <xref href="#topic9" type="topic"
+        <note type="important">为了在活动查询负载上实施资源队列优先级，用户必须通过设置相关服务器配置参数来启用查询优先特性。请见<xref href="#topic9" type="topic"
             format="dita"/>.</note>
       </body>
     </topic>
   </topic>
   <topic id="topic17" xml:lang="en">
-    <title id="iz172210">Assigning Roles (Users) to a Resource Queue</title>
+    <title id="iz172210">指派角色（用户）到资源队列</title>
     <body>
-      <p id="iz172211">Once a resource queue is created, you must assign roles (users) to their
-        appropriate resource queue. If roles are not explicitly assigned to a resource queue, they
-        will go to the default resource queue, <codeph>pg_default</codeph>. The default resource
-        queue has an active statement limit of 20, no cost limit, and a medium priority setting.</p>
-      <p>Use the <codeph>ALTER ROLE</codeph> or <codeph>CREATE ROLE</codeph> commands to assign a
-        role to a resource queue. For example:</p>
+      <p id="iz172211">一旦创建了一个资源队列，用户必须把角色（用户）指派到它们合适的资源队列。如果没有显式地把角色指派给资源队列，它们将进入默认资源队列<codeph>pg_default</codeph>。默认资源队列的活动语句限制是20，没有代价限制，优先权设置是中等。</p>
+      <p>使用<codeph>ALTER ROLE</codeph>或者<codeph>CREATE ROLE</codeph>命令来指派角色到资源队列。例如：</p>
       <p>
         <codeblock>=# ALTER ROLE <codeph>name</codeph> RESOURCE QUEUE <codeph>queue_name</codeph>;
 =# CREATE ROLE <codeph>name</codeph> WITH LOGIN RESOURCE QUEUE <codeph>queue_name</codeph>;
 </codeblock>
       </p>
-      <p>A role can only be assigned to one resource queue at any given time, so you can use the
-          <codeph>ALTER ROLE</codeph> command to initially assign or change a role's resource queue. </p>
-      <p>Resource queues must be assigned on a user-by-user basis. If you have a role hierarchy (for
-        example, a group-level role) then assigning a resource queue to the group does not propagate
-        down to the users in that group.</p>
-      <p id="iz153606">Superusers are always exempt from resource queue limits. Superuser queries
-        will always run regardless of the limits set on their assigned queue.</p>
+      <p>任一给定时间，一个角色只能被指派给一个资源队列，因此用户可以使用<codeph>ALTER ROLE</codeph>命令来初始指派角色的资源队列或者更改角色的资源队列。</p>
+      <p>资源队列必须按逐用户的方式指派。如果有一个角色层次（例如，组级别角色），那么把资源队列指派给组将不会传播到组中的用户。</p>
+      <p id="iz153606">超级用户总是被免除资源队列限制。超级用户查询将总是被运行，而不管它们被指派的队列上的限制。</p>
     </body>
     <topic id="topic18" xml:lang="en">
-      <title id="iz153619">Removing a Role from a Resource Queue</title>
+      <title id="iz153619">从资源队列移除角色</title>
       <body>
-        <p>All users <i>must</i> be assigned to a resource queue. If not explicitly assigned to a
-          particular queue, users will go into the default resource queue,
-            <codeph>pg_default</codeph>. If you wish to remove a role from a resource queue and put
-          them in the default queue, change the role's queue assignment to <codeph>none</codeph>.
-          For example:</p>
+        <p>所有用户都<i>必须</i>被指派到资源队列。如果没有被显式指派到一个特定队列，用户将会进入到默认的资源队列<codeph>pg_default</codeph>。如果用户想要从一个资源队列移除一个角色并且把它们放在默认队列中，可以将该角色的队列指派改成<codeph>none</codeph>。例如：</p>
         <p>
           <codeblock>=# ALTER ROLE <codeph>role_name</codeph> RESOURCE QUEUE none;
 </codeblock>
@@ -505,34 +329,25 @@ MEMORY_LIMIT='2000MB');
     </topic>
   </topic>
   <topic id="topic19" xml:lang="en">
-    <title id="iz151541">Modifying Resource Queues</title>
+    <title id="iz151541">修改资源队列</title>
     <body>
-      <p>After a resource queue has been created, you can change or reset the queue limits using the
-          <codeph>ALTER RESOURCE QUEUE</codeph> command. You can remove a resource queue using the
-          <codeph>DROP RESOURCE QUEUE</codeph> command. To change the roles (users) assigned to a
-        resource queue, <xref href="#topic17" type="topic" format="dita"/>.</p>
+      <p>在资源队列被创建后，用户可以使用<codeph>ALTER RESOURCE QUEUE</codeph>命令更改或者重置队列限制。用户可以使用<codeph>DROP RESOURCE QUEUE</codeph>命令移除一个资源队列。要更改指派到资源队列的用户，请见<xref href="#topic17" type="topic" format="dita"/>.</p>
     </body>
     <topic id="topic20" xml:lang="en">
-      <title>Altering a Resource Queue</title>
+      <title>修改资源队列</title>
       <body>
-        <p>The <codeph>ALTER RESOURCE QUEUE</codeph> command changes the limits of a resource queue.
-          To change the limits of a resource queue, specify the new values you want for the queue.
-          For example:</p>
+        <p><codeph>ALTER RESOURCE QUEUE</codeph>命令更改资源队列的限制。要更改一个资源队列的限制，可以为该队列指定想要的新值。例如：</p>
         <p>
           <codeblock>=# ALTER RESOURCE QUEUE <i>adhoc</i> WITH (ACTIVE_STATEMENTS=5);
 =# ALTER RESOURCE QUEUE <i>exec</i> WITH (PRIORITY=MAX);
 </codeblock>
         </p>
-        <p>To reset active statements or memory limit to no limit, enter a value of
-            <codeph>-1</codeph>. To reset the maximum query cost to no limit, enter a value of
-            <codeph>-1.0</codeph>. For example:</p>
+        <p>要重置活动语句或者内存限制为没有限制，输入值<codeph>-1</codeph>。要重置最大查询代价为无限制，输入值<codeph>-1.0</codeph>。例如：</p>
         <p>
           <codeblock>=# ALTER RESOURCE QUEUE <i>adhoc</i> WITH (MAX_COST=-1.0, MEMORY_LIMIT='2GB');
 </codeblock>
         </p>
-        <p>You can use the <codeph>ALTER RESOURCE QUEUE</codeph> command to change the priority of
-          queries associated with a resource queue. For example, to set a queue to the minimum
-          priority level:</p>
+        <p>用户可以使用<codeph>ALTER RESOURCE QUEUE</codeph>命令更改一个资源队列相关查询的优先权。例如，要把一个队列设置为中等优先级：</p>
         <p>
           <codeblock>ALTER RESOURCE QUEUE <i>webuser</i> WITH (PRIORITY=MIN);
 </codeblock>
@@ -540,13 +355,11 @@ MEMORY_LIMIT='2000MB');
       </body>
     </topic>
     <topic id="topic21" xml:lang="en">
-      <title>Dropping a Resource Queue</title>
+      <title>删除资源队列</title>
       <body>
-        <p>The <codeph>DROP RESOURCE QUEUE</codeph> command drops a resource queue. To drop a
-          resource queue, the queue cannot have any roles assigned to it, nor can it have any
-          statements waiting in the queue. See <xref href="#topic18" type="topic" format="dita"/>
-          and <xref href="#topic27" type="topic" format="dita"/> for instructions on emptying a
-          resource queue. To drop a resource queue:</p>
+        <p><codeph>DROP RESOURCE QUEUE</codeph>命令可以删除资源队列。要删除一个资源队列，该队列不能有指派给它的角色，也不能有任何语句在其中等待。关于清空一个资源队列的指导请见<xref href="#topic18" type="topic" format="dita"/>和<xref href="#topic27" type="topic" format="dita"/>。要删除一个资源队列：
+
+</p>
         <p>
           <codeblock>=# DROP RESOURCE QUEUE <i>name</i>;
 </codeblock>
@@ -555,9 +368,9 @@ MEMORY_LIMIT='2000MB');
     </topic>
   </topic>
   <topic id="topic22" xml:lang="en">
-    <title id="iz151530">Checking Resource Queue Status</title>
+    <title id="iz151530">检查资源队列状态</title>
     <body>
-      <p>Checking resource queue status involves the following tasks:</p>
+      <p>检查资源队列状态涉及下列任务：</p>
       <ul>
         <li id="iz153671">
           <xref href="#topic23" type="topic" format="dita"/>
@@ -584,13 +397,9 @@ MEMORY_LIMIT='2000MB');
     </body>
 
     <topic id="topic23" xml:lang="en">
-      <title id="iz151568">Viewing Queued Statements and Resource Queue Status</title>
+      <title id="iz151568">查看队列中的语句和资源队列状态</title>
       <body>
-        <p>The <codeph>gp_toolkit.gp_resqueue_status</codeph> view allows administrators to see
-          status and activity for a resource queue. It shows how many queries
-          are waiting to run and how many queries are currently active in the system from a
-          particular resource queue. To see the resource queues created in the system, their limit
-          attributes, and their current status:</p>
+        <p>The <codeph>gp_toolkit.gp_resqueue_status</codeph>视图允许管理员查看一个负载管理资源队列的状态和活动。对于一个特定资源队列，它展示有多少查询在等待运行以及系统中当前有多少查询是活动的。要查看系统中创建的资源队列、它们的限制属性和当前状态：</p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_resqueue_status;
 </codeblock>
@@ -598,47 +407,35 @@ MEMORY_LIMIT='2000MB');
       </body>
     </topic>
     <topic id="topic24" xml:lang="en">
-      <title id="iz156744">Viewing Resource Queue Statistics</title>
+      <title id="iz156744">查看资源队列统计信息</title>
       <body>
-        <p>If you want to track statistics and performance of resource queues over time, you can
-          enable statistics collecting for resource queues. This is done by setting the following
-          server configuration parameter in your master <codeph>postgresql.conf</codeph> file:</p>
+        <p>如果想要持续跟踪资源队列的统计信息和性能，可以为资源队列启用统计收集。这可以通过在Master的<codeph>postgresql.conf</codeph>文件中设置下列服务器配置参数实现：</p>
         <p>
           <codeblock>stats_queue_level = on
 </codeblock>
         </p>
-        <p>Once this is enabled, you can use the <codeph>pg_stat_resqueues</codeph> system view to
-          see the statistics collected on resource queue usage. Note that enabling this feature does
-          incur slight performance overhead, as each query submitted through a resource queue must
-          be tracked. It may be useful to enable statistics collecting on resource queues for
-          initial diagnostics and administrative planning, and then disable the feature for
-          continued use.</p>
-        <p>See the Statistics Collector section in the PostgreSQL documentation for more information
-          about collecting statistics in Greenplum Database.</p>
+        <p>一旦统计收集被启用，用户可以使用<codeph>pg_stat_resqueues</codeph>系统视图来查看在资源队列使用上收集的统计信息。注意启用这一特性确实会引发一点点性能开销，因为每个通过资源队列提交的查询都必须被跟踪。可以先在资源队列上启用统计收集用于初始的诊断和管理规划，然后再连续使用中禁用该特性。</p>
+        <p>更多有关Greenplum数据库中收集统计信息的内容，可参考PostgreSQL文档中的统计收集器部分。</p>
       </body>
     </topic>
     <topic id="topic25" xml:lang="en">
-      <title id="iz152239">Viewing the Roles Assigned to a Resource Queue</title>
+      <title id="iz152239">查看指派到资源队列的角色</title>
       <body>
-        <p>To see the roles assigned to a resource queue, perform the following query of the
-            <codeph>pg_roles</codeph> and
-            <codeph>gp_toolkit.</codeph><codeph>gp_resqueue_status</codeph> system catalog
-          tables:</p>
+        <p>要查看指派给资源队列的角色，执行下列在<codeph>pg_roles</codeph>和<codeph>gp_toolkit.</codeph><codeph>gp_resqueue_status</codeph>系统目录表上的查询：</p>
         <p>
           <codeblock>=# SELECT rolname, rsqname FROM pg_roles, 
           gp_toolkit.gp_resqueue_status 
    WHERE pg_roles.rolresqueue=gp_toolkit.gp_resqueue_status.queueid;
 </codeblock>
         </p>
-        <p>You may want to create a view of this query to simplify future inquiries. For
-          example:</p>
+        <p>用户可能想用这个查询创建一个视图来简化未来的查询。例如：</p>
         <p>
           <codeblock>=# CREATE VIEW role2queue AS
    SELECT rolname, rsqname FROM pg_roles, pg_resqueue 
    WHERE pg_roles.rolresqueue=gp_toolkit.gp_resqueue_status.queueid;
 </codeblock>
         </p>
-        <p>Then you can just query the view:</p>
+        <p>然后就可以只查询该视图：</p>
         <p>
           <codeblock>=# SELECT * FROM role2queue;
 </codeblock>
@@ -646,35 +443,21 @@ MEMORY_LIMIT='2000MB');
       </body>
     </topic>
     <topic id="topic26" xml:lang="en">
-      <title id="iz151577">Viewing the Waiting Queries for a Resource Queue</title>
+      <title id="iz151577">查看资源队列的等待查询</title>
       <body>
-        <p>When a slot is in use for a resource queue, it is recorded in the
-            <codeph>pg_locks</codeph> system catalog table. This is where you can see all of the
-          currently active and waiting queries for all resource queues. To check that statements are
-          being queued (even statements that are not waiting), you can also use the
-            <codeph>gp_toolkit</codeph>.gp_locks_on_resqueue view. For example:</p>
+        <p>当资源队列的一个槽被使用时，它被记录在<codeph>pg_locks</codeph>系统目录表中。在其中用户可以看到所有资源队列的所有当前活跃的以及在等待的查询。要检查被放入队列中的语句（甚至不在等待的语句），用户还可以使用<codeph>gp_toolkit</codeph>.gp_locks_on_resqueue视图。例如：</p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_locks_on_resqueue WHERE lorwaiting='true';
 </codeblock>
         </p>
-        <p>If this query returns no results, then that means there are currently no statements
-          waiting in a resource queue.</p>
+        <p>如果这个查询不返回结果，那就意味着当前没有语句在资源队列中等待。</p>
       </body>
     </topic>
     <topic id="topic27" xml:lang="en">
-      <title id="iz153732">Clearing a Waiting Statement From a Resource Queue</title>
+      <title id="iz153732">从资源队列清除等待语句</title>
       <body>
-        <p>In some cases, you may want to clear a waiting statement from a resource queue. For
-          example, you may want to remove a query that is waiting in the queue but has not been
-          executed yet. You may also want to stop a query that has been started if it is taking too
-          long to execute, or if it is sitting idle in a transaction and taking up resource queue
-          slots that are needed by other users. To do this, you must first identify the statement
-          you want to clear, determine its process id (pid), and then, use
-            <codeph>pg_cancel_backend</codeph> with the process id to end that process, as shown
-          below. An optional message to the process can be passed as the second parameter, to
-          indicate to the user why the process was cancelled.</p>
-        <p>For example, to see process information about all statements currently active or waiting
-          in all resource queues, run the following query:</p>
+        <p>在某些情况下，用户可能想要从资源队列中清除等待的语句。例如，用户可能想移除在队列中等待但还未被执行的语句。用户可能还想停止已经被启动但是执行时间太久的查询，或者是在事务中闲置并且占据其他用户所需的资源队列槽的查询。要做到这一点，用户必须标识出想要清除的语句，确定它的进程ID（pid），然后使用<codeph>pg_cancel_backend</codeph>和进程ID来结束该进程（如下所示）。可以选择对被结束的进程发送一个消息来告诉用户原因，该消息作为第二个参数传入。</p>
+        <p>例如，要查看在所有资源队列中当前活动的或者在等待的语句，运行下列查询：</p>
         <p>
           <codeblock>=# SELECT rolname, rsqname, pid, granted,
           current_query, datname 
@@ -686,64 +469,43 @@ MEMORY_LIMIT='2000MB');
    AND pg_stat_activity.usename=pg_roles.rolname;
 </codeblock>
         </p>
-        <p>If this query returns no results, then that means there are currently no statements in a
-          resource queue. A sample of a resource queue with two statements in it looks something
-          like this:</p>
+        <p>如果这个查询不返回结果，那就意味着当前没有语句在资源队列中等待。例如，下面的资源队列在结果中有两个语句：</p>
         <codeblock>rolname | rsqname |  pid  | granted |     current_query      | datname 
 ----------------------------------------------------------------------- 
   sammy | webuser | 31861 | t       | &lt;IDLE&gt; in transaction  | namesdb
   daria | webuser | 31905 | f       | SELECT * FROM topten;  | namesdb</codeblock>
-        <p>Use this output to identify the process id (pid) of the statement you want to clear from
-          the resource queue. To clear the statement, you would then open a terminal window (as the
-            <codeph>gpadmin</codeph> database superuser or as root) on the master host and cancel
-          the corresponding process. For example:</p>
+        <p>使用这一输出来标识出想要从资源队列中清除的语句的进程ID（pid）。要清除语句，用户可以在Master主机上打开一个终端窗口（作为<codeph>gpadmin</codeph>数据库超级用户或者root）并且取消对应的进程。例如：</p>
         <p>
           <codeblock>=# pg_cancel_backend(31905)
 </codeblock>
         </p>
         <note type="note">
-          <p>Do not use any operating system <codeph>KILL</codeph> command.</p>
+          <p>不要使用任何的操作系统<codeph>KILL</codeph>命令。</p>
         </note>
       </body>
     </topic>
     <topic id="topic28" xml:lang="en">
-      <title id="iz164264">Viewing the Priority of Active Statements</title>
+      <title id="iz164264">查看活动语句的优先权</title>
       <body>
-        <p>The <i>gp_toolkit</i> administrative schema has a view called
-            <i>gp_resq_priority_statement</i>, which lists all statements currently being executed
-          and provides the priority, session ID, and other information.</p>
-        <p>This view is only available through the <codeph>gp_toolkit</codeph> administrative
-          schema. <ph>See the <i>Greenplum Database Reference Guide</i> for more
-          information.</ph></p>
+        <p><i>gp_toolkit</i>管理方案有一个名为<i>gp_resq_priority_statement</i>的视图，它列出了当前正在被执行的语句并且提供优先权、会话ID和其他信息。</p>
+        <p>T这个视图只有通过<codeph>gp_toolkit</codeph>管理方案才可用。<ph>更多信息请见<i>Greenplum数据库参考指南</i>。</ph></p>
       </body>
     </topic>
     <topic id="topic29" xml:lang="en">
-      <title id="iz166568">Resetting the Priority of an Active Statement</title>
+      <title id="iz166568">重置活动语句的优先权</title>
       <body>
-        <p>Superusers can adjust the priority of a statement currently being executed using the
-          built-in function <codeph>gp_adjust_priority(session_id, statement_count,
-            priority)</codeph>. Using this function, superusers can raise or lower the priority of
-          any query. For example:</p>
+        <p>超级用户可以使用内建函数<codeph>gp_adjust_priority(session_id,statement_count,priority)</codeph>调整当前正在被执行的语句的优先权。使用这个函数，超级用户可以提升或者降低任意查询的优先权。例如：</p>
         <p>
           <codeph>=# SELECT gp_adjust_priority(752, 24905, 'HIGH')</codeph>
         </p>
-        <p>To obtain the session ID and statement count parameters required by this function,
-          superusers can use the <codeph>gp_toolkit</codeph> administrative schema view,
-            <i>gp_resq_priority_statement</i>. From the view, use these values for the function
-          parameters.</p>
+        <p>为了获得这个函数所需的会话ID和语句计数参数，超级用户可以使用<codeph>gp_toolkit</codeph>管理方案的视图<i>gp_resq_priority_statement</i>。从该视图用户可以把这些值用作该函数的参数。</p>
         <ul>
-          <li id="iz174657">The value of the <codeph>rqpsession</codeph> column for the
-              <codeph>session_id</codeph> parameter</li>
-          <li id="iz174658">The value of the <codeph>rqpcommand</codeph> column for the
-              <codeph>statement_count</codeph> parameter</li>
-          <li id="iz174659">The value of <codeph>rqppriority</codeph> column is the current
-            priority. You can specify a string value of <codeph>MAX</codeph>, <codeph>HIGH</codeph>,
-              <codeph>MEDIUM</codeph>, or <codeph>LOW</codeph> as the <codeph>priority</codeph>.
+          <li id="iz174657"><codeph>rqpsession</codeph>列的值用作<codeph>session_id</codeph>参数</li>
+          <li id="iz174658"><codeph>rqpcommand</codeph>列的值用作<codeph>statement_count</codeph>参数</li>
+          <li id="iz174659"><codeph>rqppriority</codeph>列的值是当前优先权。可以指定字符串值<codeph>MAX</codeph>，<codeph>HIGH</codeph>，<codeph>MEDIUM</codeph>或者<codeph>LOW</codeph>作为<codeph>priority</codeph>。
           </li>
         </ul>
-        <note type="note">The <codeph>gp_adjust_priority()</codeph> function affects only the
-          specified statement. Subsequent statements in the same resource queue are executed using
-          the queue's normally assigned priority.</note>
+        <note type="note"><codeph>gp_adjust_priority()</codeph>函数只影响指定的语句。同一资源队列中后续的语句还是使用该队列正常指派的优先权执行。</note>
       </body>
     </topic>
   </topic>
