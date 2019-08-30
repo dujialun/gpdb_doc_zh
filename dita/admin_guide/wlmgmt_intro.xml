@@ -2,190 +2,102 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="iz173472">Greenplum Database Memory Overview</title>
-    <shortdesc>Memory is a key resource for a Greenplum Database system and, when used efficiently,
-      can ensure high performance and throughput. This topic describes how segment host memory is
-      allocated between segments and the options available to administrators to configure
-      memory.</shortdesc>
+  <title id="iz173472">Greenplum数据库内存总览</title>
+    <shortdesc>在Greenplum数据库系统中，内存是一项关键的资源，对其的高效使用可以保证优秀的性能和输出，这一节描述了Segment主机内存是在Segment之间的分配方式，以及管理员可用的配置方法。</shortdesc>
     <body id="body_bk2_fvw_wq">
-      <p>A Greenplum Database segment host runs multiple PostgreSQL instances, all sharing the
-        host's memory. The segments have an identical configuration and they consume similar amounts
-        of memory, CPU, and disk IO simultaneously, while working on queries in parallel. </p>
-      <p>For best query throughput, the memory configuration should be managed carefully. There are
-        memory configuration options at every level in Greenplum Database, from operating system
-        parameters, to managing resources with resource queues and resource groups, to setting the amount of memory
-        allocated to an individual query.</p>
+      <p>Greenplum数据库的每个Segment主机都会运行多个PostgreSQL的实例，它们会共享主机的内存。Segment在同时进行查询时都会使用同一个配置，并同时消耗相近的量的内存，CPU和磁盘输入/输出。 </p>
+      <p>为了得到最佳的查询输出，内存配置需要精细的管理。在Greenplum数据库中，从操作系统参数，到利用资源队列和资源组管理资源，每个层级都有对应的内存配置，可以设置单个查询分配到的内存大小。</p>
       <section>
-        <title>Segment Host Memory</title>
-        <p>On a Greenplum Database segment host, the available host memory is shared among all the
-          processes executing on the computer, including the operating system, Greenplum Database
-          segment instances, and other application processes. Administrators must determine what
-          Greenplum Database and non-Greenplum Database processes share the hosts' memory and
-          configure the system to use the memory efficiently. It is equally important to monitor
-          memory usage regularly to detect any changes in the way host memory is consumed by
-          Greenplum Database or other processes.</p>
-        <p>The following figure illustrates how memory is consumed on a Greenplum Database segment
-            host when resource queue-based resource management is active.<fig id="fig_py5_1sl_zp">
-            <title>Greenplum Database Segment Host Memory</title>
+        <title>Segment主机内存</title>
+        <p>在Greenplum数据库的Segment主机上，所有正在运行的进程会共享可用的主机内存，其中包括了操作系统、Greenplum数据库Segment实例，以及其他应用进程。管理员必须要判断并有效地分配Greenplum数据库进程和非Greenplum数据库进程使用的内存大小。与此同时，监控Greenplum数据库或其他进程是否有异常的内存消耗行为也是很重要的。</p>
+        <p>以下图例显示了Greenplum数据库的Segment主机是启用基于资源队列的资源管理时是如何消耗内存的。<fig id="fig_py5_1sl_zp">
+            <title>Greenplum数据库Segment主机内存</title>
             <image href="graphics/memory.png" id="image_iqn_dsl_zp"/>
           </fig></p>
-        <p>Beginning at the bottom of the illustration, the line labeled <i>A</i> represents the
-          total host memory. The line directly above line <i>A</i> shows that the total host memory
-          comprises both physical RAM and swap space. </p>
-        <p>The line labelled <i>B</i> shows that the total memory available must be shared by
-          Greenplum Database and all other processes on the host. Non-Greenplum Database processes
-          include the operating system and any other applications, for example system monitoring
-          agents. Some applications may use a significant portion of memory and, as a result, you
-          may have to adjust the number of segments per Greenplum Database host or the amount of
-          memory per segment.</p>
-        <p>The segments (<i>C</i>) each get an equal share of the Greenplum Database Memory
-            (<i>B</i>). </p>
-        <p>Within a segment, the currently active resource management scheme, <i>Resource Queues</i>
-        or <i>Resource Groups</i>, governs how memory is allocated to execute a SQL statement. These
-        constructs allow you to translate business requirements into execution policies in your
-        Greenplum Database system and to guard against queries that could degrade performance. For
-        an overview of resource groups and resource queues, refer to <xref href="wlmgmt.xml#topic1"
-          type="topic" format="dita"/>.</p>
+        <p>让我们从下往上看，标记了<i>A</i>的一行表示总主机内存，<i>A</i>行上面的一行表示总主机内存被分成了物理RAM和Swap空间。</p>
+        <p>标记了<i>B</i>表示所有内存会由Greenplum数据库和其他进程共享，非Greenplum数据的进程包括操作系统以及其他应用，例如系统监控Agent。一些应用会使用大量内存，以至于用户可能不得不调整每个Greenplum数据主机所运行的Segment数量，或是每个Segment消耗的内存量。</p>
+        <p>每个Segment(<i>C</i>)将会使用等量
+            (<i>B</i>)。 </p>
+        <p>每个Segment中的当前资源管理模式——<i>资源队列</i>或<i>资源组</i>——控制了运行一个SQL表达式所使用的的内存，这样的配置使得用户可以将业务需求转化为Greenplum数据库系统中的决策策略，以防止可能造成性能下降的查询行为，关于资源组和资源队列的详情，请参阅<xref href="wlmgmt.xml#topic1"
+          type="topic" format="dita"/>。</p>
       </section>
       <section>
-        <title>Options for Configuring Segment Host Memory</title>
-        <p>Host memory is the total memory shared by all applications on the segment host. You
-          can configure the amount of host memory using any of the following methods:<ul
+        <title>配置Segment主机内存的选项</title>
+        <p>主机内存将会由Segment主机上所有的应用共享。你可以通过以下方式来配置主机内存的分配方式：<ul
             id="ul_y5m_xzs_zp">
-            <li>Add more RAM to the nodes to increase the physical memory.</li>
-            <li>Allocate swap space to increase the size of virtual memory.</li>
-            <li>Set the kernel parameters <varname>vm.overcommit_memory</varname> and
-                <varname>vm.overcommit_ratio</varname> to configure how the operating system handles
-              large memory allocation requests.</li>
+            <li>增加节点的RAM以增加物理内存。</li>
+            <li>配置Swap空间来增加虚拟内存。</li>
+            <li>设置核心参数<varname>vm.overcommit_memory</varname>和<varname>vm.overcommit_ratio</varname>以配置操作系统处理对内存需求量较大的请求时的方法。</li>
           </ul></p>
-        <p>The physical RAM and OS configuration are usually managed by the platform team and system
-          administrators. <ph>See the <cite>Greenplum Database Installation
-              Guide</cite> for the recommended kernel parameter settings.</ph>
-        </p>
-        <p>The amount of memory to reserve for the operating system and other processes is workload
-          dependent. The minimum recommendation for operating system memory is 32GB, but if there is
-          much concurrency in Greenplum Database, increasing to 64GB of reserved memory may be
-          required. The largest user of operating system memory is SLAB, which increases as
-          Greenplum Database concurrency and the number of sockets used increases.</p>
-        <p>The <codeph>vm.overcommit_memory</codeph> kernel parameter should always be set to 2, the
-          only safe value for Greenplum Database.</p>
-        <p>The <codeph>vm.overcommit_ratio</codeph> kernel parameter sets the percentage of RAM that
-          is used for application processes, the remainder reserved for the operating system. The
-          default for Red Hat is 50 (50%). Setting this parameter too high may result in
-          insufficient memory reserved for the operating system, which can cause segment host
-          failure or database failure. Leaving the setting at the default of 50 is generally safe,
-          but conservative. Setting the value too low reduces the amount of concurrency and the
-          complexity of queries you can run at the same time by reducing the amount of memory available to
-          Greenplum Database. When increasing <codeph>vm.overcommit_ratio</codeph>, it is important
-          to remember to always reserve some memory for operating system activities.</p>
+        <p>物理RAM和操作系统的配置通常由平台团队和系统管理员管理。<ph>有关推荐的核心参数请参考<cite>Greenplum 数据库安装指南</cite></ph></p>
+        <p>预留给操作系统和其他进程的内存量是取决于你的负载。推荐的操作台系统内存大小是32GB，但如果Greenplum数据库中存在太多的并发的话，可将内存增加到64GB。SLAB是使用最多操作系统内存的进程，其内存使用量也会随着Greenplum数据库并发和使用的套接字数量的增加而增加。</p>
+        <p><codeph>vm.overcommit_memory</codeph>核心参数应该保持为2，这是对Greenplum来说最安全的数值。</p>
+        <p><codeph>vm.overcommit_ratio</codeph>核心参数设置了应用进程能够使用的RAM的百分比，剩下的内存就会留给操作系统。Red Hat系统默认的值是50（50%），如果将该参数设置得过高，可能会导致Segment主机失效或数据库失效，一般来说比较保险的默认数值是50。该参数如果设置得过低会减少并发数，以及以减少Greenplum数据可用内存为代价来同时处理的查询行为的复杂程度。 在增加<codeph>vm.overcommit_ratio</codeph>的数值的时候，要记住还要为操作系统的活动保留一定量的内存。</p>
 
       <sectiondiv>
-        <p><b>Configuring vm.overcommit_ratio when Resource Group-Based Resource Management is Active</b></p>
-        <p>When resource group-based resource management is active, the operating system <codeph>vm.overcommit_ratio</codeph> default value is a good starting point. Tune as necessary. If your memory utilization is too low, increase the value; if your memory or swap usage is too high, decrease the setting.</p>
+        <p><b>在启用了基于资源组的资源管理时，对vm.overcommit_ratio的配置方法</b></p>
+        <p>当启用了基于资源组的资源管理时，操作系统的<codeph>vm.overcommit_ratio</codeph>默认数值其实就已经比较合适了，如非必要，可以不改动。如果你的内存使用率太低了，那么就增加该参数，反之亦然。</p>
       </sectiondiv>
       <sectiondiv>
-        <p><b>Configuring vm.overcommit_ratio when Resource Queue-Based Resource Management is Active</b></p>
-        <p>To calculate a safe value for <codeph>vm.overcommit_ratio</codeph> when resource queue-based resource management is active, first determine the
-          total memory available to Greenplum Database processes, <codeph>gp_vmem_rq</codeph>,
-          with this
-          formula:<codeblock>gp_vmem_rq = ((SWAP + RAM) – (7.5GB + 0.05 * RAM)) / 1.7</codeblock></p>
-        <p>where <codeph>SWAP</codeph> is the swap space on the host in GB, and <codeph>RAM</codeph>
-          is the number of GB of RAM installed on the host. When resource queue-based resource management is active, use <codeph>gp_vmem_rq</codeph> to calculate the <codeph>vm.overcommit_ratio</codeph> value with this
-          formula:<codeblock>vm.overcommit_ratio = (RAM - 0.026 * gp_vmem_rq) / RAM</codeblock></p>
+        <p><b>在启用了基于资源队列的资源管理时，对vm.overcommit_ratio的配置方法</b></p>
+        <p>计算在启用了基于资源组的资源管理下<codeph>vm.overcommit_ratio</codeph>的数值需要几个数据，首先要用<codeph>gp_vmem_rq</codeph>，确认Greenplum数据库进程可用的内存，计算规则如下：
+		<codeblock>gp_vmem_rq = ((SWAP + RAM) – (7.5GB + 0.05 * RAM)) / 1.7</codeblock></p>
+        <p>此处的 <codeph>SWAP</codeph> 是主机上的Swap空间，以GB为单位，而<codeph>RAM</codeph>则是主机上安装的RAM，以GB为单位。当启用了基于资源队列的资源管理系统时，使用<codeph>gp_vmem_rq</codeph>来计算 <codeph>vm.overcommit_ratio</codeph>的数值，计算规则如下：
+		<codeblock>vm.overcommit_ratio = (RAM - 0.026 * gp_vmem_rq) / RAM</codeblock></p>
       </sectiondiv>
       </section>
       <section id="section_nfn_q5r_bs">
-        <title>Configuring Greenplum Database Memory</title>
-        <p>Greenplum Database Memory is the amount of memory available to all Greenplum Database
-          segment instances. </p>
-        <p>When you set up the Greenplum Database cluster, you determine the number of primary
-          segments to run per host and the amount of memory to allocate for each segment. Depending
-          on the CPU cores, amount of physical RAM, and workload characteristics, the number of
-          segments is usually a value between 4 and 8. With segment mirroring enabled, it is
-          important to allocate memory for the maximum number of primary segments executing on a
-          host during a failure. For example, if you use the default grouping mirror configuration,
-          a segment host failure doubles the number of acting primaries on the host that has the
-          failed host's mirrors. Mirror configurations that spread each host's mirrors over multiple
-          other hosts can lower the maximum, allowing more memory to be allocated for each segment.
-          For example, if you use a block mirroring configuration with 4 hosts per block and 8
-          primary segments per host, a single host failure would cause other hosts in the block to
-          have a maximum of 11 active primaries, compared to 16 for the default grouping mirror
-          configuration.</p>
+        <title>配置Greenplum数据库内存</title>
+        <p>Greenplum数据库内存指的是所有Greenplum数据库Segment实例可用的内存大小。</p>
+        <p>在你搭建Greenplum数据库集群时，你需要确认每个主机运行的主Segment数量，以及每个Segment消耗的内存大小。基于不同的CPU核心数、物理RAM大小以及负载特性，通常一台主机上会运行4到8个Segment。在启用了Segment镜像的情况下，内存必须按照该主机上可运行的最大主Segment数量来分配，以防出现系统故障。当你使用默认分组镜像的配置时，一台Segment主机故障将会加倍其镜像Segment所在的主机上的活跃主Segment数量。将每台主机上的镜像分散到其他主机上的镜像配置可以降低最大值，允许每台Segment分配到更多的可用内存。例如，如果你使用了区组（block）镜像配置，每个区组有4个主机，每个主机上有8个主Segment，单个主机的故障会导致区组中其他主机出现最多11个活跃主Segment，而使用默认组镜像配置的话则会产生最多16个。</p>
       <sectiondiv>
-        <p><b>Configuring Segment Memory when Resource Group-Based Resource Management is Active</b></p>
-        <p>When resource group-based resource management is active, the amount of memory allocated
-          to each segment on a segment host is the memory available to Greenplum Database multiplied by the
-          <varname>gp_resource_group_memory_limit</varname> server configuration parameter and
-          divided by the number of active primary segments on the host. Use the following
-          formula to calculate segment memory when using resource groups for
-          resource management.</p>
+        <p><b>在启用了基于资源组的资源管理系统下分配Segment内存</b></p>
+        <p>当启用了基于资源组的管理系统时，每个Segment主机上的每个Segment所分配到的内存等于Greenplum可用的内存乘以<varname>gp_resource_group_memory_limit</varname>服务器配置参数，然后除以主机上活跃的主Segment数量，以下方程式就是在启用了基于资源组的资源管理系统时计算Segment内存的方式。</p>
         <p><codeblock>
 rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_memory_limit) / num_active_primary_segments</codeblock></p>
-        <p>Resource groups expose additional configuration parameters that
-           enable you to further control and refine the amount of memory allocated for queries.</p>
+        <p>资源组带来的额外配置参数使用户可以进一步控制和精炼查询行为所分配到的内存大小。</p>
       </sectiondiv>
       <sectiondiv>
-        <p><b>Configuring Segment Memory when Resource Queue-Based Resource Management is Active</b></p>
-        <p>When resource queue-based resource management is active, the <varname>gp_vmem_protect_limit</varname> server configuration parameter value 
-          identifies the amount of memory to allocate to
-          each segment. This value is estimated by calculating the memory available for all Greenplum
-          Database processes and dividing by the maximum number of primary segments during a
-          failure. If <varname>gp_vmem_protect_limit</varname> is set too high, queries can
-          fail. Use the following formula to calculate a safe value for
-          <varname>gp_vmem_protect_limit</varname>; provide the <codeph>gp_vmem_rq</codeph>
-          value that you calculated earlier.</p><p><codeblock>
-gp_vmem_protect_limit = gp_vmem_rq / max_acting_primary_segments</codeblock></p>
-          <p>where <codeph>max_acting_primary_segments</codeph> is the maximum number of
-          primary segments that could be running on a host when mirror segments are activated
-          due to a host or segment failure.</p>
-        <p><varname>gp_vmem_protect_limit</varname> does not affect segment memory when using 
-          resource groups for Greenplum Database resource management.</p>
-        <p>Resource queues expose additional configuration parameters that
-           enable you to further control and refine the amount of memory allocated for queries.</p>
+        <p><b>在启用了基于资源队列的资源管理系统下分配Segment内存</b></p>
+        <p>当启用了基于资源队列的资源管理系统时，<varname>gp_vmem_protect_limit</varname>服务器配置参数数值表示了每个Segment分配到的内存大小，该数值的预估值是通过计算所有Greenplum数据库进程可用的内存大小除以在发生故障时最大的主Segment数量得出，如果<varname>gp_vmem_protect_limit</varname>的数值设置得过高，则查询可能会失败，使用以下方程式来计算<varname>gp_vmem_protect_limit</varname>的安全值，其中<codeph>gp_vmem_rq</codeph>是你刚刚计算得出的数值。</p>
+		<p><codeblock>gp_vmem_protect_limit = gp_vmem_rq / max_acting_primary_segments</codeblock></p>
+          <p>其中 <codeph>max_acting_primary_segments</codeph> 是指在有主机或Segment发生故障时触发镜像Segment时的最大主Segment数量。</p>
+        <p>在使用基于资源组的Greenplum数据库资源管理系统时，<varname>gp_vmem_protect_limit</varname>是不会影响Segment内存大小的。</p>
+        <p>资源队列带来的额外配置参数使用户可以进一步控制和精炼查询行为所分配到的内存大小。</p>
       </sectiondiv>
       </section>
       <section id="section_example">
-        <title>Example Memory Configuration Calculations</title>
-        <p>This section provides example memory calculations for resource queues and
-          resource groups for a Greenplum Database system with the following specifications:</p>
+        <title>内存配置计算示例Example Memory Configuration Calculations</title>
+        <p>该小节将会展示以下配置的Greenplum数据库系统的资源队列和资源组的内存计算示例：</p>
         <ul id="ul_q4x_g1g_zt">
-          <li>Total RAM = 256GB </li>
+          <li>总RAM = 256GB </li>
           <li>Swap = 64GB </li>
-          <li>8 primary segments and 8 mirror segments per host, in blocks of 4 hosts</li>
-          <li>Maximum number of primaries per host during failure is 11</li>
+          <li>一个区组（block）4个主机，每个主机8个主Segment和8个镜像Segment</li>
+          <li>发生故障时每个主机的最大活跃主Segment数量为11</li>
         </ul>
       <sectiondiv>
-        <p><b>Resource Group Example</b></p>
-          <p>When resource group-based resource management is active in Greenplum
-            Database, the usable memory available on a host is a function of 
-            the amount of RAM and swap space configured for the system, as well as the
-            <codeph>vm.overcommit_ratio</codeph> system parameter setting:</p>
+        <p><b>资源组示例</b></p>
+          <p>当Greenplum数据库启用了基于资源组的资源管理系统时，一个主机上可用的内存由系统配置的RAM和Swap空间，以及<codeph>vm.overcommit_ratio</codeph>的系统参数设置决定：</p>
             <codeblock>
 total_node_usable_memory = RAM * (vm.overcommit_ratio / 100) + Swap
                          = 256GB * (50/100) + 64GB
                          = 192GB</codeblock>
-          <p>Assuming the default <codeph>gp_resource_group_memory_limit</codeph> value (.7),
-            the memory allocated to a Greenplum Database host with the example configuration is:</p>
+          <p>假设默认的<codeph>gp_resource_group_memory_limit</codeph>数值(.7)，示例中的Greenplum数据库分配到的内存大小就是：</p>
         <codeblock>
 total_gp_memory = total_node_usable_memory * gp_resource_group_memory_limit
                 = 192GB * .7
                 = 134.4GB</codeblock>
-          <p>The memory available to a Greenplum Database segment on a segment host is a function
-            of the memory reserved for Greenplum on the host and the number of active primary
-            segments on the host. On cluster startup:</p>
+          <p>在Greenplum数据库的Segment主机上的一个Segment可用的内存由主机上为Greenplum预留的内存和主机上活跃的主Segment数量组成，在集群启动时：</p>
         <codeblock>
 gp_seg_memory = total_gp_memory / number_of_active_primary_segments
               = 134.4GB / 8
               = 16.8GB</codeblock>
-          <p>Note that when 3 mirror segments switch to primary segments, the per-segment
-            memory is still 16.8GB. Total memory usage on the segment host may approach:
+          <p>注意，当三个镜像Segment切换为主Segment时，每个Segment的内存仍然是16.8GB，Segment主机使用的总内存大小预计为：
             <codeblock>total_gp_memory_with_primaries = 16.8GB * 11 = 184.8GB</codeblock></p>
       </sectiondiv>
       <sectiondiv>
-        <p><b>Resource Queue Example</b></p>
-        <p>The <codeph>vm.overcommit_ratio</codeph>
-          calculation for the example system when resource queue-based resource management
-          is active in Greenplum Database follows:</p>
+        <p><b>资源队列示例</b></p>
+        <p>在启用了基于资源队列的资源管理系统下的Greenplum示例数据库中，<codeph>vm.overcommit_ratio</codeph>的计算遵循以下方程式：</p>
         <codeblock>
 gp_vmem_rq = ((SWAP + RAM) – (7.5GB + 0.05 * RAM)) / 1.7
         = ((64 + 256) - (7.5 + 0.05 * 256)) / 1.7
@@ -194,17 +106,15 @@ gp_vmem_rq = ((SWAP + RAM) – (7.5GB + 0.05 * RAM)) / 1.7
 vm.overcommit_ratio = (RAM - (0.026 * gp_vmem_rq)) / RAM
                     = (256 - (0.026 * 176)) / 256
                     = .982</codeblock>
-        <p>You would set <codeph>vm.overcommit_ratio</codeph> of the example system to 98. </p>
-        <p>The <codeph>gp_vmem_protect_limit</codeph> calculation when resource queue-based
-        resource management is active in Greenplum Database:</p>
+        <p>你可以将示例系统中的<codeph>vm.overcommit_ratio</codeph>数值设置为98。 </p>
+        <p>在启用了基于资源队列的资源管理系统下的Greenplum数据库中，<codeph>gp_vmem_protect_limit</codeph>的计算方式如下：</p>
         <codeblock>
 gp_vmem_protect_limit = gp_vmem_rq / maximum_acting_primary_segments
                       = 176 / 11
                       = 16GB
                       = 16384MB
 </codeblock>
-        <p>You would set the <codeph>gp_vmem_protect_limit</codeph> server configuration
-          parameter on the example system to 16384.</p>
+        <p>你可以将示例系统中的<codeph>gp_vmem_protect_limit</codeph>服务器配置参数数值设置为16384.</p>
       </sectiondiv>
       </section>
 
