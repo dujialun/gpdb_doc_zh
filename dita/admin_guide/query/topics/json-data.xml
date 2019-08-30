@@ -39,46 +39,34 @@
       <section>
         <title>关于JSON数据中的Unicode字符</title>
         <p>The <xref href="http://rfc7159.net/rfc7159" format="html" scope="external">RFC
-            7159</xref>文档允许JSON字符串包含表示为\uXXXX的<codeph>\u<varname>XXXX</varname></codeph>Unicode转义序列。However, Greenplum对每一个数据库只允许一种字符集编码。
+            7159</xref>文档允许JSON字符串包含表示为\uXXXX的<codeph>\u<varname>XXXX</varname></codeph>Unicode转义序列。不过, Greenplum对每一个数据库只允许一种字符集编码。
           除非数据库编码为UTF8，<codeph>json</codeph>类型不可能严格地符合JSON说明。尝试包括数据库编码中无法表示的字符将会失败。允许可在数据库编码中表示但不在UTF8中的字符。</p>
         <p>
           <ul id="ul_ejw_ppf_pfb">
-            <li>The Greenplum Database input function for the <codeph>json</codeph> data type allows
-              Unicode escapes regardless of the database encoding and checks Unicode escapes only
-              for syntactic correctness (a <codeph>\u</codeph> followed by four hex digits). </li>
-            <li>The Greenplum Database input function for the <codeph>jsonb</codeph> data type is
-              more strict. It does not allow Unicode escapes for non-ASCII characters (those above
-                <codeph>U+007F</codeph>) unless the database encoding is UTF8. It also rejects
-                <codeph>\u0000</codeph>, which cannot be represented in the Greenplum Database
-                <codeph>text</codeph> type, and it requires that any use of Unicode surrogate pairs
-              to designate characters outside the Unicode Basic Multilingual Plane be correct. Valid
-              Unicode escapes, except for <codeph>\u0000</codeph>, are converted to the equivalent
-              ASCII or UTF8 character for storage; this includes folding surrogate pairs into a
-              single character.</li>
+            <li><codeph>json</codeph>数据类型的greenplum数据库输入函数允许unicode转义，而无论是什么数据库编码，只检查unicode转义的语法正确性（a <codeph>\u</codeph>后跟四个十六进制数字）。
+              </li>
+            <li><codeph>jsonb</codeph>数据类型的greenplum数据库输入函数更严格。它不允许非ASCII字符（<codeph>U+007F</codeph>以上的字符）使用Unicode转义，除非数据库编码是UTF8。它还拒绝<codeph>\u0000</codeph>，它不能在greenplum数据库<codeph>text</codeph>类型中表示，并且它要求使用unicode代理项对指定unicode基本多语言平面之外的字符是正确的。有效的Unicode转义符（除了<codeph>\u0000</codeph>）转换为等效的ASCII或UTF8字符进行存储；这包括将代理项对折叠为单个字符。
+              </li>
           </ul>
         </p>
-        <note>Many of the JSON processing functions described in <xref href="#topic_gn4_x3w_mq"
-            format="dita">JSON Functions and Operators</xref> convert Unicode escapes to regular
-          characters. The functions throw an error for characters that cannot be represented in the
-          database encoding. You should avoid mixing Unicode escapes in JSON with a non-UTF8
-          database encoding, if possible.</note>
+        <note> <xref href="#topic_gn4_x3w_mq" format="dita">JSON函数和运算符</xref>中描述的许多JSON处理函数将Unicode转义转换为常规字符。函数对数据库编码中无法表示的字符抛出错误。如果可能的话，应该避免将JSON中的Unicode转义与非UTF8数据库编码混合在一起。</note>
       </section>
       <section>
-        <title>Mapping JSON Data Types to Greenplum Data Types</title>
+        <title>将JSON数据类型映射到Greenplum数据类型</title>
         <p>When converting JSON text input into <codeph>jsonb</codeph> data, the primitive data
           types described by RFC 7159 are effectively mapped onto native Greenplum Database data
           types, as shown in the following table.</p>
         <table id="table_spm_m3w_mq">
-          <title>JSON Primitive Types and Corresponding Greenplum Database Data Types</title>
+          <title>将JSON数据类型映射到Greenplum数据类型</title>
           <tgroup cols="3">
             <colspec colnum="1" colname="col1"/>
             <colspec colnum="2" colname="col2"/>
             <colspec colnum="3" colname="col3"/>
             <thead>
               <row>
-                <entry>JSON primitive data type</entry>
-                <entry>Greenplum Database data type</entry>
-                <entry>Notes</entry>
+                <entry>JSON原始数据类型</entry>
+                <entry>Greenplum数据库数据类型</entry>
+                <entry>注意</entry>
               </row>
             </thead>
             <tbody>
@@ -87,36 +75,34 @@
                 </entry>
                 <entry><codeph>text</codeph>
                 </entry>
-                <entry><codeph>\u0000</codeph> is not allowed. Non-ASCII Unicode escapes are allowed
-                  only if database encoding is UTF8</entry>
+                <entry>不允许使用<codeph>\u0000</codeph>。只有当数据库编码为utf8时，才允许使用非ASCII Unicode转义。</entry>
               </row>
               <row>
                 <entry><codeph>number</codeph>
                 </entry>
                 <entry><codeph>numeric</codeph>
                 </entry>
-                <entry><codeph>NaN</codeph> and <codeph>infinity</codeph> values are
-                  disallowed</entry>
+                <entry>不允许使用<codeph>NaN</codeph>和<codeph>infinity</codeph>值
+         </entry>
               </row>
               <row>
                 <entry><codeph>boolean</codeph>
                 </entry>
                 <entry><codeph>boolean</codeph>
                 </entry>
-                <entry>Only lowercase <codeph>true</codeph> and <codeph>false</codeph> spellings are
-                  accepted</entry>
+                <entry>只接受小写的正误拼写</entry>
               </row>
               <row>
                 <entry><codeph>null</codeph>
                 </entry>
                 <entry>(none)</entry>
-                <entry>The JSON <codeph>null</codeph> primitive type is different than the SQL
-                    <codeph>NULL</codeph>.</entry>
+                <entry>The JSON <codeph>null</codeph> 原始类型不同于<codeph>NULL</codeph>。</entry>
               </row>
             </tbody>
           </tgroup>
         </table>
-        <p>There are some minor constraints on what constitutes valid <codeph>jsonb</codeph> data
+        <p>对于有效的JSONB数据的构成有一些次要的约束，这些约束既不适用于JSON数据类型，也不适用于抽象的JSON，对应于基础数据类型所能表示的限制。值得注意的是，当将数据转换为JSONB数据类型时，超出Greenplum数据库numeric数据类型范围的数字将被拒绝，而JSON数据类型不会拒绝这些数字。
+          There are some minor constraints on what constitutes valid <codeph>jsonb</codeph> data
           that do not apply to the <codeph>json</codeph> data type, nor to JSON in the abstract,
           corresponding to limits on what can be represented by the underlying data type. Notably,
           when converting data to the <codeph>jsonb</codeph> data type, numbers that are outside the
