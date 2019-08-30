@@ -1,144 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="ih135496">Working with XML Data</title>
-  <shortdesc>Greenplum Database supports the <codeph>xml</codeph> data type that stores XML data. </shortdesc>
+  <title id="ih135496">使用XML数据</title>
+  <shortdesc>Greenplum数据库支持存储XML数据的<codeph>xml</codeph>数据类型。 </shortdesc>
   <body>
-    <p>The <codeph>xml</codeph> data type checks the input values for well-formedness, providing an
-      advantage over simply storing XML data in a text field. Additionally, support functions allow
-      you to perform type-safe operations on this data; refer to <xref href="#topic_gn4_x3w_mq"
-        format="dita"/>, below. </p>
-    <p otherprops="oss-only">Use of this data type requires the installation to have been built with
-        <codeph>configure --with-libxml</codeph>. </p>
-    <p>The <codeph>xml</codeph> type can store well-formed "documents", as defined by the XML
-      standard, as well as "content" fragments, which are defined by the production
-        <codeph>XMLDecl?</codeph> content in the XML standard. Roughly, this means that content
-      fragments can have more than one top-level element or character node. The expression
-          <codeph><varname>xmlvalue</varname> IS DOCUMENT</codeph> can be used to evaluate whether a
-      particular <codeph>xml</codeph> value is a full document or only a content fragment.</p>
+    <p><codeph>xml</codeph>数据类型会检查输入值的结构良好性，提供了在文本域中简单地存储XML数据的便利。
+        此外，支持函数允许用户在这种数据上执行类型安全的操作，请参考下文的XML函数参考<xref href="#topic_gn4_x3w_mq"
+        format="dita"/>。 </p>
+    <p otherprops="oss-only">使用这种数据类型要求编译时指定<codeph>configure --with-libxml</codeph>。</p>
+    <p><codeph>xml</codeph>类型可以存储结构良好（按照XML标准的定义）的“文档”，以及“内容”片段（按照XML标准中生产XMLDecl?内容定义）。
+        大致上，这意味着内容片段可以有多于一个顶层元素或者字符节点。表达式<codeph><varname>xmlvalue</varname> IS DOCUMENT</codeph> 可以被用来评估一个特定的 <codeph>xml</codeph>值是一个完整文档或者只是一个内容片段。</p>
     <p>This section contains the following topics:<ul id="ul_sjd_hsr_fz">
         <li><xref href="#topic_upc_tcs_fz" format="dita"/></li>
       <li><xref href="#topic_eyt_3tw_mq" format="dita"/></li>
       <li><xref href="#topic_kxv_4gq_vz" format="dita"/></li>
       <li><xref href="#topic_a4k_w33_xz" format="dita"/></li>
       <li><xref href="#topic_ucn_mkp_xz" format="dita"/></li>
-      <li><xref href="#topic_gn4_x3w_mq" format="dita"> Using XML Functions and
-          Expressions</xref></li>
+      <li><xref href="#topic_gn4_x3w_mq" format="dita">使用XML函数和表达式</xref></li>
       </ul></p>
   </body>
   <topic id="topic_upc_tcs_fz">
-    <title>Creating XML Values</title>
+    <title>创建XML值</title>
     <body>
-      <p>To produce a value of type <codeph>xml</codeph> from character data, use the function
-          <codeph>xmlparse</codeph>:<codeblock>xmlparse ( { DOCUMENT | CONTENT } value)</codeblock>For
-        example:<codeblock>XMLPARSE (DOCUMENT '&lt;?xml version="1.0"?>&lt;book>&lt;title>Manual&lt;/title>&lt;chapter>...&lt;/chapter>&lt;/book>')
+      <p>要从字符数据产生一个xml类型的值，使用函数<codeph>xmlparse</codeph>：<codeblock>xmlparse ( { DOCUMENT | CONTENT } value)</codeblock>
+          例如：<codeblock>XMLPARSE (DOCUMENT '&lt;?xml version="1.0"?>&lt;book>&lt;title>Manual&lt;/title>&lt;chapter>...&lt;/chapter>&lt;/book>')
 XMLPARSE (CONTENT 'abc&lt;foo>bar&lt;/foo>&lt;bar>foo&lt;/bar>')</codeblock></p>
-      <p>The above method  converts character strings into XML values according to the SQL standard,
-        but you can also use Greenplum Database syntax like the
-        following:<codeblock>xml '&lt;foo>bar&lt;/foo>'
+      <p>上面的方法把字符串根据SQL标准转换成XML值，但是也可以使用如下的Greenplum数据库语法：
+         <codeblock>xml '&lt;foo>bar&lt;/foo>'
 '&lt;foo>bar&lt;/foo>'::xml</codeblock></p>
-      <p>The <codeph>xml</codeph> type does not validate input values against a document type
-        declaration (DTD), even when the input value specifies a DTD. There is also currently no
-        built-in support for validating against other XML schema languages such as XML schema.</p>
-      <p>The inverse operation, producing a character string value from <codeph>xml</codeph>, uses
-        the function
-        <codeph>xmlserialize</codeph>:<codeblock>xmlserialize ( { DOCUMENT | CONTENT } <varname>value</varname> AS <varname>type</varname> )</codeblock></p>
-      <p><varname>type</varname> can be <codeph>character</codeph>, <codeph>character
-          varying</codeph>, or <codeph>text</codeph> (or an alias for one of those). Again,
-        according to the SQL standard, this is the only way to convert between type
-          <codeph>xml</codeph> and character types, but Greenplum Database also allows you to simply
-        cast the value.</p>
-      <p>When a character string value is cast to or from type <codeph>xml</codeph> without going
-        through <codeph>XMLPARSE</codeph> or <codeph>XMLSERIALIZE</codeph>, respectively, the choice
-        of <codeph>DOCUMENT</codeph> versus <codeph>CONTENT</codeph> is determined by the
-          <codeph>XML OPTION</codeph> session configuration parameter, which can be set using the
-        standard command:<codeblock>SET XML OPTION { DOCUMENT | CONTENT };
+      <p>即便输入值指定了一个文档类型声明（DTD），xml类型也不会按DTD验证输入值。当前也没有内建的支持来根据其他XML模式语言（例如XML模式）来进行验证。</p>
+      <p>从<codeph>xml</codeph>产生字符串值的逆操作，可以使用函数<codeph>xmlserialize</codeph>：
+          <codeblock>xmlserialize ( { DOCUMENT | CONTENT } <varname>value</varname> AS <varname>type</varname> )</codeblock></p>
+      <p> <varname>type</varname> 可以是 <codeph>character</codeph>, <codeph>character
+          varying</codeph>, 或 <codeph>text</codeph>（或者这些类型的一种别名）。同样，根据SQL标准，这是唯一一种在<codeph>xml</codeph>类型和字符类型见转换的方法，但是Greenplum数据库也允许用户简单地造型该值。</p>
+      <p>当一个字符串值与类型<codeph>xml</codeph>之间的转换没有使<codeph>XMLPARSE</codeph>或者<codeph>XMLSERIALIZE</codeph>时，选择<codeph>
+          DOCUMENT</codeph>还是<codeph>CONTENT</codeph>由 <codeph>XML OPTION</codeph> 会话配置参数决定，该参数可以使用标准命令设置：
+         <codeblock>SET XML OPTION { DOCUMENT | CONTENT };
 </codeblock></p>
-      <p>or simply like Greenplum
-        Database:<codeblock>SET XML OPTION TO { DOCUMENT | CONTENT };</codeblock></p>
-      <p>The default is CONTENT, so all forms of XML data are allowed.</p>
+      <p>或者用Greenplum数据库的风格：<codeblock>SET XML OPTION TO { DOCUMENT | CONTENT };</codeblock></p>
+      <p>默认值是CONTENT，这样所有形式的XML数据都被允许。</p>
       <note>
-        <p>With the default XML option setting, you cannot directly cast character strings to type
-            <codeph>xml</codeph> if they contain a document type declaration, because the definition
-          of XML content fragment does not accept them. If you need to do that, either use
-            <codeph>XMLPARSE</codeph> or change the <codeph>XML</codeph> option.</p>
+        <p>在设置了默认的<codeph>xml</codeph>选项后，如果字符串中含有一个文档类型声明，则用户不能直接将字符串转换成类型<codeph>xml</codeph>，因为XML内容片段的定义不接受文档类型声明。如果真的需要做这样的转换，可以使用<codeph>XMLPARSE</codeph>或者更改XML选项。
+         </p>
       </note>
     </body>
   </topic>
   <topic id="topic_eyt_3tw_mq">
-    <title>Encoding Handling</title>
+    <title>编码处理</title>
     <body>
-      <p>Be careful when dealing with multiple character encodings on the client, server, and in the
-        XML data passed through them. When using the text mode to pass queries to the server and
-        query results to the client (which is the normal mode), Greenplum Database converts all
-        character data passed between the client and the server, and vice versa, to the character
-        encoding of the respective endpoint; see <xref
-          href="../../../ref_guide/character_sets.xml#topic1/ig167937">Character Set Support</xref>.
-        This includes string representations of XML values, such as in the above examples.
-        Ordinarily, this means that encoding declarations contained in XML data can become invalid,
-        as the character data is converted to other encodings while travelling between client and
-        server, because the embedded encoding declaration is not changed. To cope with this
-        behavior, encoding declarations contained in character strings presented for input to the
-          <codeph>xml</codeph> type are ignored, and content is assumed to be in the current server
-        encoding. Consequently, for correct processing, character strings of XML data must be sent
-        from the client in the current client encoding. It is the responsibility of the client to
-        either convert documents to the current client encoding before sending them to the server,
-        or to adjust the client encoding appropriately. On output, values of type
-          <codeph>xml</codeph> will not have an encoding declaration, and clients should assume all
-        data is in the current client encoding.</p>
-      <p>When using binary mode to pass query parameters to the server and query results back to the
-        client, no character set conversion is performed, so the situation is different. In this
-        case, an encoding declaration in the XML data will be observed, and if it is absent, the
-        data will be assumed to be in UTF-8 (as required by the XML standard; note that Greenplum
-        Database does not support UTF-16). On output, data will have an encoding declaration
-        specifying the client encoding, unless the client encoding is UTF-8, in which case it will
-        be omitted.</p>
+      <p>在处理客户端、服务器以及流经它们的XML数据上的多种字符编码时要多加小心。在使用文本模式向服务器传递查询以及向客户端传递查询结果（这是通常的模式）时，Greenplum数据库会把转换所有在客户端和服务器之间传递的字符数据为相应端点的字符编码，请见字符集支持
+          <xref
+          href="../../../ref_guide/character_sets.xml#topic1/ig167937">字符集支持</xref>。
+          这包括XML值的字符串表示，如上面的例子所示。通常，这意味着XML数据中包含的编码声明可能会变得无效，由于字符数据会在客户端和服务器之间进行传输时被转换成其他编码，而内嵌的编码声明却不会改变。为了应对这种行为，提供给xml类型输入的字符串中包含的编码声明会被忽略，而内容会被假定为当前的服务器编码。随后，为了正确的处理，XML数据的字符串必须被从客户端以当前的客户端编码发出。客户端应该负责在把文档发送到服务器之前将它们转换成当前的客户端编码，或者适当地调整客户端编码。
+          在输出上，类型xml的值将不会有编码声明，并且客户端应该假定所有数据都处于当前的客户端编码。
+       </p>
+      <p>在使用二进制模式向服务器传递查询参数并且向客户端传回查询结果时，不会执行字符集转换，因此情况有所不同。在这种情况下，XML数据中的编码声明会被注意到，并且在缺少编码声明时假定数据是UTF-8（按XML标准的要求，注意Greenplum数据库不支持UTF-16）。在输出上，数据将有编码声明来指定客户端编码，除非客户端编码为UTF-8，那种情况下编码声明将被省略。</p>
       <note>
-        <p>Processing XML data with Greenplum Database will be less error-prone and more efficient
-          if the XML data encoding, client encoding, and server encoding are the same. Because XML
-          data is internally processed in UTF-8, computations will be most efficient if the server
-          encoding is also UTF-8.</p>
+        <p>如果XML数据编码、客户端编码和服务器编码都相同，用Greenplum数据库处理XML数据会很少碰到错误并且更加高效。由于XML数据在内部是以UTF-8的形式处理，所以在服务器编码也是UTF-8时计算效率最高。</p>
       </note>
     </body>
   </topic>
   <topic id="topic_kxv_4gq_vz">
-    <title>Accessing XML Values</title>
+    <title>访问XML值</title>
     <body>
-      <p>The <codeph>xml</codeph> data type is unusual in that it does not provide any comparison
-        operators. This is because there is no well-defined and universally useful comparison
-        algorithm for XML data. One consequence of this is that you cannot retrieve rows by
-        comparing an <codeph>xml</codeph> column against a search value. XML values should therefore
-        typically be accompanied by a separate key field such as an ID. An alternative solution for
-        comparing XML values is to convert them to character strings first, but note that character
-        string comparison has little to do with a useful XML comparison method.</p>
-      <p>Because there are no comparison operators for the <codeph>xml</codeph> data type, it is not
-        possible to create an index directly on a column of this type. If speedy searches in XML
-        data are desired, possible workarounds include casting the expression to a character string
-        type and indexing that, or indexing an XPath expression. Of course, the actual query would
-        have to be adjusted to search by the indexed expression.</p>
+      <p>xml数据类型是与众不同的，在其中没有提供任何比较操作符。这是因为对于XML数据没有良好定义的并且通用的比较算法。其后果之一就是无法通过比较一个xml列和一个搜索值来检索行。因此XML值应该通常伴随着一个独立的键域，例如ID。比较XML值的一种可选方案是将它们先转换成字符串，但是要注意字符串比较并不是一种有用的XML比较方法。</p>
+      <p>正因为没有用于xml数据类型的比较操作符，所以不能直接在这种类型的列上创建索引。如果想要在XML数据中的快速搜索，可能的解决方案包括将表达式转换成字符串类型并且建立索引，或者索引一个XPath表达式。当然，要用被索引的表达式进行搜索，实际的查询也必须被调整。</p>
     </body>
   </topic>
   <topic id="topic_a4k_w33_xz">
-    <title>Processing XML</title>
+    <title>处理XML</title>
     <body>
-      <p>To process values of data type <codeph>xml</codeph>, Greenplum Database offers the
-        functions <codeph>xpath</codeph> and <codeph>xpath_exists</codeph>, which evaluate XPath 1.0
-        expressions.<codeblock>xpath(<varname>xpath</varname>, <varname>xml</varname> [, <varname>nsarray</varname>])
+      <p>为了处理数据类型xml的值，Greenplum数据库提供了函数<varname>xpath</varname>和<codeph>xpath_exists</codeph>，它们可以计算XPath 1.0表达式。
+       <codeblock>xpath(, <varname>xml</varname> [, <varname>nsarray</varname>])
 </codeblock></p>
-      <p>The function <codeph>xpath</codeph> evaluates the XPath expression
-            <codeph><varname>xpath</varname></codeph> (a text value) against the XML value
-            <codeph><varname>xml</varname></codeph>. It returns an array of XML values corresponding
-        to the node set produced by the XPath expression.</p>
-      <p>The second argument must be a well formed XML document. In particular, it must have a
-        single root node element.</p>
-      <p>The optional third argument of the function is an array of namespace mappings. This array
-        should be a two-dimensional text array with the length of the second axis being equal to 2
-        (i.e., it should be an array of arrays, each of which consists of exactly 2 elements). The
-        first element of each array entry is the namespace name (alias), the second the namespace
-        URI. It is not required that aliases provided in this array be the same as those being used
-        in the XML document itself (in other words, both in the XML document and in the
-          <codeph>xpath</codeph> function context, aliases are local).</p>
-      <p>Example:<codeblock>SELECT xpath('/my:a/<varname>text</varname>()', '&lt;my:a xmlns:my="http://example.com">test&lt;/my:a>',
+      <p>函数xpath对XML值xml计算XPath表达式<codeph><varname>xpath</varname></codeph>（一个文本值）。它返回一个XML值的数组，它对应于XPath表达式产生的节点集合。</p>
+      <p>第二个参数必须是一个结构良好的XML文档。特别是它必须有一个单一的根节点元素。</p>
+      <p>该函数可选的第三个参数是一个名字空间映射的数组。这个数组应该是一个二维文本数组，其第二轴线的长度等于2（即，它应该是一个数组的数组，每一个元素数组由刚好两个元素组成）。每个数组项的第一个元素是名字空间名称（别名），第二个元素是名字空间的URI。不要求这个数组中提供的别名与XML文档本身中使用的别名相同（换句话说，在XML文档和xpath函数上下文中，别名都是本地的）。</p>
+      <p>例子：<codeblock>SELECT xpath('/my:a/<varname>text</varname>()', '&lt;my:a
+          xmlns:my="http://example.com">test&lt;/my:a>',
              ARRAY[ARRAY['my', 'http://example.com']]);
 
  xpath  
@@ -146,8 +85,7 @@ XMLPARSE (CONTENT 'abc&lt;foo>bar&lt;/foo>&lt;bar>foo&lt;/bar>')</codeblock></p>
  {test}
 (1 row)
 </codeblock></p>
-      <p>To deal with default (anonymous) namespaces, do something like
-        this:<codeblock>SELECT xpath('//mydefns:b/<varname>text</varname>()', '&lt;a xmlns="http://example.com">&lt;b>test&lt;/b>&lt;/a>',
+      <p>为了处理默认（匿名）名字空间，可以这样做：<codeblock>SELECT xpath('//mydefns:b/<varname>text</varname>()', '&lt;a xmlns="http://example.com">&lt;b>test&lt;/b>&lt;/a>',
              ARRAY[ARRAY['mydefns', 'http://example.com']]);
 
  xpath
@@ -156,12 +94,10 @@ XMLPARSE (CONTENT 'abc&lt;foo>bar&lt;/foo>&lt;bar>foo&lt;/bar>')</codeblock></p>
 (1 row)
 </codeblock><codeblock>xpath_exists(<varname>xpath</varname>, <varname>xml</varname> [, <varname>nsarray</varname>])
 </codeblock></p>
-      <p>The function <codeph>xpath_exists</codeph> is a specialized form of the
-          <codeph>xpath</codeph> function. Instead of returning the individual XML values that
-        satisfy the XPath, this function returns a Boolean indicating whether the query was
-        satisfied or not. This function is equivalent to the standard <codeph>XMLEXISTS</codeph>
-        predicate, except that it also offers support for a namespace mapping argument.</p>
-      <p>Example:<codeblock>SELECT xpath_exists('/my:a/<varname>text</varname>()', '&lt;my:a xmlns:my="http://example.com">test&lt;/my:a>',
+      <p>函数<codeph>xpath_exists</codeph>是<codeph>xpath</codeph>函数的一种特殊形式。与返回满足该XPath的个体XML值不同，这个函数返回一个布尔值来表示该查询是否被满足。这个函数等效于标准的<codeph>XMLEXISTS</codeph>谓词，不过它还提供了对名字空间映射参数的支持。
+        </p>
+      <p>例子：<codeblock>SELECT xpath_exists('/my:a/<varname>text</varname>()', '&lt;my:a
+          xmlns:my="http://example.com">test&lt;/my:a>',
                      ARRAY[ARRAY['my', 'http://example.com']]);
 
  xpath_exists  
@@ -171,26 +107,19 @@ XMLPARSE (CONTENT 'abc&lt;foo>bar&lt;/foo>&lt;bar>foo&lt;/bar>')</codeblock></p>
     </body>
   </topic>
   <topic id="topic_ucn_mkp_xz">
-    <title>Mapping Tables to XML</title>
+    <title>将表映射到XML</title>
     <body>
-      <p>The following functions map the contents of relational tables to XML values. They can be
-        thought of as XML export
-        functionality:<codeblock>table_to_xml(tbl regclass, nulls boolean, tableforest boolean, targetns text)
+      <p>下列函数把关系表的内容映射到XML值。它们可以被认为是XML导出功能：
+          <codeblock>table_to_xml(tbl regclass, nulls boolean, tableforest boolean, targetns text)
 query_to_xml(query <varname>text</varname>, nulls boolean, tableforest boolean, targetns text)
 cursor_to_xml(cursor refcursor, count int, nulls boolean,
               tableforest boolean, targetns text)
 </codeblock></p>
-      <p>The return type of each function is <codeph>xml</codeph>.</p>
-      <p><codeph>table_to_xml</codeph> maps the content of the named table, passed as parameter
-          <codeph>tbl</codeph>. The <codeph>regclass</codeph> type accepts strings identifying
-        tables using the usual notation, including optional schema qualifications and double quotes.
-          <codeph>query_to_xml</codeph> executes the query whose text is passed as parameter query
-        and maps the result set. <codeph>cursor_to_xml</codeph> fetches the indicated number of rows
-        from the cursor specified by the parameter cursor. This variant is recommended if large
-        tables have to be mapped, because the result value is built up in memory by each
-        function.</p>
-      <p>If <codeph>tableforest</codeph> is false, then the resulting XML document looks like
-        this:<codeblock>&lt;tablename>
+      <p>每个函数的返回类型都是<codeph>xml</codeph>。</p>
+      <p><codeph>table_to_xml</codeph>映射由参数tbl指定的表的内容。<codeph>regclass</codeph>类型接受使用通常记法标识表的字符串，包括可选的方案限定和双引号。<codeph>query_to_xml</codeph>执行文本作为参数query传入的查询并且映射结果集。cursor_to_xml从参数cursor指定的游标中取出指定数目的行。
+          如果不得不映射大型表，推荐使用这种变体，因为每个函数都会在内存中构建结果值。
+      </p>
+      <p>如果<codeph>tableforest</codeph>为假，那么得到的结果XML文档看起来像这样：<codeblock>&lt;tablename>
   &lt;row>
     &lt;columnname1>data&lt;/columnname1>
     &lt;columnname2>data&lt;/columnname2>
@@ -203,9 +132,7 @@ cursor_to_xml(cursor refcursor, count int, nulls boolean,
   ...
 &lt;/tablename>
 </codeblock></p>
-      <p>If <codeph>tableforest</codeph> is true, the result is an XML content fragment that looks
-        like
-        this:<codeblock>&lt;tablename>
+      <p>如果<codeph>tableforest</codeph>为真，结果会是一个这样的XML内容片段：<codeblock>&lt;tablename>
   &lt;columnname1>data&lt;/columnname1>
   &lt;columnname2>data&lt;/columnname2>
 &lt;/tablename>
@@ -216,41 +143,28 @@ cursor_to_xml(cursor refcursor, count int, nulls boolean,
 
 ...
 </codeblock></p>
-      <p>If no table name is available, that is, when mapping a query or a cursor, the string
-          <codeph>table</codeph> is used in the first format, <codeph>row</codeph> in the second
-        format.</p>
-      <p>The choice between these formats is up to the user. The first format is a proper XML
-        document, which will be important in many applications. The second format tends to be more
-        useful in the <codeph>cursor_to_xml</codeph> function if the result values are to be later
-        reassembled into one document. The functions for producing XML content discussed above, in
-        particular <codeph>xmlelement</codeph>, can be used to alter the results as desired.</p>
-      <p>The data values are mapped in the same way as described for the function
-          <codeph>xmlelement</codeph>, above.</p>
-      <p>The parameter nulls determines whether null values should be included in the output. If
-        true, null values in columns are represented
-        as:<codeblock>&lt;columnname xsi:nil="true"/></codeblock></p>
-      <p>where <codeph>xsi</codeph> is the XML namespace prefix for XML schema Instance. An
-        appropriate namespace declaration will be added to the result value. If false, columns
-        containing null values are simply omitted from the output.</p>
-      <p>The parameter <codeph>targetns</codeph> specifies the desired XML namespace of the result.
-        If no particular namespace is wanted, an empty string should be passed.</p>
-      <p>The following functions return XML schema documents describing the mappings performed by
-        the corresponding functions
-        above:<codeblock>able_to_xmlschema(tbl regclass, nulls boolean, tableforest boolean, targetns text)
+      <p>如果没有表名可用，也就是说映射一个查询或者游标时，会以第一种格式使用<codeph>table</codeph>，而以第二种格式使用<codeph>row</codeph>。
+        </p>
+      <p>对这些格式的选择取决于用户。第一种格式是一种正确的XML文档，它在很多应用中都很重要。如果结果值后面会被重新组装到一个文档中，第二种格式在<codeph>cursor_to_xml</codeph>函数中更有用。
+          上面讨论的产生XML内容的函数（尤其是<codeph>xmlelement</codeph>）可以被用来按照要求修改结果。
+      </p>
+      <p>数据值会按照函数<codeph>xmlelement</codeph>所描述的相同方式来映射。</p>
+      <p>参数nulls决定空值是否应该被包括在输出中。如果为真，列中的空值会被表示为：<codeblock>&lt;columnname xsi:nil="true"/></codeblock></p>
+      <p>其中<codeph>xsi</codeph>是XML模式实例的XML名字空间前缀。一个合适的名字空间声明将被加入到结果值中。如果为假，包含空值的列会被从输出中省略。
+      </p>
+      <p>参数<codeph>targetns</codeph> 指定想要的结果XML名字空间。如果没有特定的名字空间想要，应该传递一个空字符串。</p>
+      <p>下列函数返回XML模式文档，它描述由上述对应函数执行的映射：
+          <codeblock>able_to_xmlschema(tbl regclass, nulls boolean, tableforest boolean, targetns text)
 query_to_xmlschema(query <varname>text</varname>, nulls boolean, tableforest boolean, targetns text)
 cursor_to_xmlschema(cursor refcursor, nulls boolean, tableforest boolean, targetns text)
 </codeblock></p>
-      <p>It is essential that the same parameters are passed in order to obtain matching XML data
-        mappings and XML schema documents.</p>
-      <p>The following functions produce XML data mappings and the corresponding XML schema in one
-        document (or <codeph>forest</codeph>), linked together. They can be useful where
-        self-contained and self-describing results are
-        desired:<codeblock>table_to_xml_and_xmlschema(tbl regclass, nulls boolean, tableforest boolean, targetns text)
+      <p>关键的一点是，应该传递相同的参数来获得相匹配的XML数据映射以及XML模式文档。</p>
+      <p>下面的函数在一个文档（或者<codeph>forest</codeph>）中产生XML数据映射和相应的XML模式，它们会被链接在一起。如果想要自包含和自描述的结果，它们会很有用：
+          <codeblock>table_to_xml_and_xmlschema(tbl regclass, nulls boolean, tableforest boolean, targetns text)
 query_to_xml_and_xmlschema(query <varname>text</varname>, nulls boolean, tableforest boolean, targetns text)
 </codeblock></p>
-      <p>In addition, the following functions are available to produce analogous mappings of entire
-        schemas or the entire current
-        database:<codeblock>schema_to_xml(schema name, nulls boolean, tableforest boolean, targetns text)
+      <p>此外，下面的函数可以用来产生整个方案或者整个当前数据库的类似映射：
+          <codeblock>schema_to_xml(schema name, nulls boolean, tableforest boolean, targetns text)
 schema_to_xmlschema(schema name, nulls boolean, tableforest boolean, targetns text)
 schema_to_xml_and_xmlschema(schema name, nulls boolean, tableforest boolean, targetns text)
 
@@ -258,11 +172,9 @@ database_to_xml(nulls boolean, tableforest boolean, targetns text)
 database_to_xmlschema(nulls boolean, tableforest boolean, targetns text)
 database_to_xml_and_xmlschema(nulls boolean, tableforest boolean, targetns text)
 </codeblock></p>
-      <p>Note that these potentially produce large amounts of data, which needs to be built up in
-        memory. When requesting content mappings of large schemas or databases, consider mapping the
-        tables separately instead, possibly even through a cursor.</p>
-      <p>The result of a schema content mapping looks like
-        this:<codeblock>&lt;schemaname>
+      <p>注意这些函数可能会产生大量需要在内存中构建的数据。在请求大型方案或者数据库的内容映射时，应考虑分别映射表，甚至可能通过游标来映射。</p>
+      <p>模式内容映射的结果可能像这样：
+         <codeblock>&lt;schemaname>
 
 table1-mapping
 
@@ -272,10 +184,10 @@ table2-mapping
 
 &lt;/schemaname>
 </codeblock></p>
-      <p>where the format of a table mapping depends on the <codeph>tableforest</codeph> parameter,
-        as explained above.</p>
-      <p>The result of a database content mapping looks like
-        this:<codeblock>&lt;dbname>
+      <p>其中表映射的格式取决于<codeph>tableforest</codeph>参数，如前所释。
+        </p>
+      <p>数据库内容映射的结果可能像这样：
+          <codeblock>&lt;dbname>
 
 &lt;schema1name>
   ...
@@ -289,13 +201,9 @@ table2-mapping
 
 &lt;/dbname>
 </codeblock></p>
-      <p>where the schema mapping is as above.</p>
-      <p>The example below demonstrates using the output produced by these functions, The example
-        shows an XSLT stylesheet that converts the output of
-          <codeph>table_to_xml_and_xmlschema</codeph> to an HTML document containing a tabular
-        rendition of the table data. In a similar manner, the results from these functions can be
-        converted into other XML-based
-        formats.<codeblock>&lt;?xml version="1.0"?>
+      <p>其中模式映射和前面一样。</p>
+      <p>下面的例子展示了对这些函数产生的输出的使用。该例子展示了一个XLST样式表，它把<codeph>table_to_xml_and_xmlschema</codeph>的输出转换成一个含有表数据表格化呈现的HTML文档。以类似的方式，来自这些函数的结果可以被转换成其基于XML的格式。
+        <codeblock>&lt;?xml version="1.0"?>
 &lt;xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -342,22 +250,18 @@ table2-mapping
     </body>
   </topic>
   <topic id="topic_gn4_x3w_mq">
-    <title>XML Function Reference</title>
+    <title>XML函数参考</title>
     <body>
-      <p>The functions described in this section operate on values of type <codeph>xml</codeph>. The
-        section <xref href="#topic_zpg_jl2_wz" format="dita"/>also contains information about the
-          <codeph>xml</codeph> functions and function-like expressions.</p>
+      <p>这一节中描述的函数在类型<codeph>xml</codeph>的值上操作。小节 <xref href="#topic_zpg_jl2_wz" format="dita"/>XML谓词也包含有关xml函数和类函数表达式的信息。</p>
       <p><b>Function:</b></p>
       <p><codeph><cmdname>xmlcomment</cmdname></codeph></p>
       <p><b>Synopsis:</b></p>
       <p>
         <codeblock>xmlcomment(<varname>text</varname>)</codeblock>
       </p>
-      <p>The function <codeph>xmlcomment</codeph> creates an XML value containing an XML comment
-        with the specified text as content. The text cannot contain "--" or end with a "-" so that
-        the resulting construct is a valid XML comment. If the argument is null, the result is
-        null.</p>
-      <p>Example:<codeblock>SELECT xmlcomment('hello');
+      <p>函数<codeph>xmlcomment</codeph>创建一个XML值，它含有一个以指定文本作为内容的XML注释。文本中不能包含"--"或者以一个"-"结尾，这样得到的结果结构才是一个合法的XML注释。如果该参数是空，结果也是空。
+       </p>
+      <p>例子：<codeblock>SELECT xmlcomment('hello');
 
   xmlcomment
 --------------
@@ -368,43 +272,34 @@ table2-mapping
       <p>
         <codeblock>xmlconcat(xml[, …])</codeblock>
       </p>
-      <p>The function <codeph>xmlconcat</codeph> concatenates a list of individual XML values to
-        create a single value containing an XML content fragment. Null values are omitted; the
-        result is only null if there are no nonnull arguments.</p>
+      <p>函数<codeph>xmlconcat</codeph>把一个列表中的个体XML值串接以创建一个包含XML内容片段的单值。空值会被忽略，只有在没有非空参数的情况下结果才为空。</p>
       <p>Example:<codeblock>SELECT xmlconcat('&lt;abc/>', '&lt;bar>foo&lt;/bar>');
 
       xmlconcat
 ----------------------
  &lt;abc/>&lt;bar>foo&lt;/bar></codeblock></p>
-      <p>XML declarations, if present, are combined as follows:</p>
+      <p>XML声明（如果存在）会按下列方式组合：</p>
       <p><ul id="ul_i3n_my2_wz">
-          <li>If all argument values have the same XML version declaration, that version is used in
-            the result, else no version is used.</li>
-          <li>If all argument values have the standalone declaration value "yes", then that value is
-            used in the result.</li>
-          <li>If all argument values have a standalone declaration value and at least one is "no",
-            then that is used in the result. Otherwise, the result will have no standalone
-            declaration. </li>
-          <li>If the result is determined to require a standalone declaration but no version
-            declaration, a version declaration with version 1.0 will be used because XML requires an
-            XML declaration to contain a version declaration.</li>
-        </ul>Encoding declarations are ignored and removed in all cases.</p>
-      <p>Example:
+          <li>如果所有参数值都有相同的XML版本声明，结果中也会用那个版本，不会使用别的版本。</li>
+          <li>如果所有参数值都有单独的声明值"yes"，那么该值会被用在结果中。</li>
+          <li>如果所有参数值都有单独的声明值且至少有一个为"no"，那么那一个会被用在结果中。否则，结果将没有单独的声明。</li>
+          <li>如果结果被判定为有一个单独声明但没有版本声明，那么将使用版本1.0的版本声明，因为XML要求XML声明包含版本声明。</li>
+        </ul>在所有情况下编码声明都会被忽略并且移除。</p>
+      <p>例子：
         <codeblock>SELECT xmlconcat('&lt;?xml version="1.1"?>&lt;foo/>', '&lt;?xml version="1.1" standalone="no"?>&lt;bar/>');
 
              xmlconcat
 -----------------------------------
  &lt;?xml version="1.1"?>&lt;foo/>&lt;bar/></codeblock></p>
-      <p><b>Function:</b></p>
+      <p><b>函数：</b></p>
       <p><codeph><cmdname>xmlelement</cmdname></codeph>
       </p>
-      <p><b>Synopsis:</b></p>
+      <p><b>概要：</b></p>
       <p>
         <codeblock>xmlelement(name name [, xmlattributes(value [AS attname] [, ... ])] [, content, ...])</codeblock>
       </p>
-      <p>The <codeph>xmlelement</codeph> expression produces an XML element with the given name,
-        attributes, and content.</p>
-      <p>Examples:<codeblock>SELECT xmlelement(name foo);
+      <p>The <codeph>xmlelement</codeph>表达式产生一个有给定名称、属性和内容的XML元素。</p>
+      <p>例子：<codeblock>SELECT xmlelement(name foo);
 
  xmlelement
 ------------
@@ -421,25 +316,20 @@ SELECT xmlelement(name foo, xmlattributes(current_date as bar), 'cont', 'ent');
              xmlelement
 -------------------------------------
  &lt;foo bar="2017-01-26">content&lt;/foo></codeblock></p>
-      <p>Element and attribute names that are not valid XML names are escaped by replacing the
-        offending characters by the sequence <codeph>_x<varname>HHHH</varname>_</codeph>, where
-          <varname>HHHH</varname> is the character's Unicode codepoint in hexadecimal notation. For
-        example:<codeblock>SELECT xmlelement(name "foo$bar", xmlattributes('xyz' as "a&amp;b"));
+      <p>没有合法XML名称的元素和属性名会被转义，转义的方式是将不合法的字符用序列<codeph>_x<varname>HHHH</varname>_</codeph>替换，其中<varname>HHHH</varname> 是该字符以16进制表达的Unicode代码点。例如：
+         <codeblock>SELECT xmlelement(name "foo$bar", xmlattributes('xyz' as "a&amp;b"));
 
             xmlelement
 ----------------------------------
  &lt;foo_x0024_bar a_x0026_b="xyz"/></codeblock></p>
-      <p>An explicit attribute name need not be specified if the attribute value is a column
-        reference, in which case the column's name will be used as the attribute name by default. In
-        other cases, the attribute must be given an explicit name. So this example is
-        valid:<codeblock>CREATE TABLE test (a xml, b xml);
+      <p>如果属性值是一个列引用，则不需要指定显式的属性名，这种情况下默认将把列名用作该属性的名字。在其他情况下，必须给该属性一个显式的命名。因此这个例子是合法的：
+         <codeblock>CREATE TABLE test (a xml, b xml);
 SELECT xmlelement(name test, xmlattributes(a, b)) FROM test;</codeblock></p>
-      <p>But these are
-        not:<codeblock>SELECT xmlelement(name test, xmlattributes('constant'), a, b) FROM test;
+      <p>但这些就不合法：
+          <codeblock>SELECT xmlelement(name test, xmlattributes('constant'), a, b) FROM test;
 SELECT xmlelement(name test, xmlattributes(func(a, b))) FROM test;</codeblock></p>
-      <p>Element content, if specified, will be formatted according to its data type. If the content
-        is itself of type <codeph>xml</codeph>, complex XML documents can be constructed. For
-        example:<codeblock>SELECT xmlelement(name foo, xmlattributes('xyz' as bar),
+      <p>元素内容（如果指定）将被根据其数据类型进行格式化。如果内容本身是类型<codeph>xml</codeph>，则会构建复杂的XML文档。例如：
+        <codeblock>SELECT xmlelement(name foo, xmlattributes('xyz' as bar),
                             xmlelement(name abc),
                             xmlcomment('test'),
                             xmlelement(name xyz));
@@ -447,25 +337,19 @@ SELECT xmlelement(name test, xmlattributes(func(a, b))) FROM test;</codeblock></
                   xmlelement
 ----------------------------------------------
  &lt;foo bar="xyz">&lt;abc/>&lt;!--test-->&lt;xyz/>&lt;/foo></codeblock></p>
-      <p>Content of other types will be formatted into valid XML character data. This means in
-        particular that the characters <codeph>&lt;</codeph>, <codeph>></codeph>, and
-          <codeph>&amp;</codeph> will be converted to entities. Binary data (data type
-          <codeph>bytea</codeph>) will be represented in base64 or hex encoding, depending on the
-        setting of the configuration parameter <xref
-          href="https://www.postgresql.org/docs/9.1/runtime-config-client.html#GUC-XMLBINARY"
-          format="html" scope="external">xmlbinary</xref>. The particular behavior for individual
-        data types is expected to evolve in order to align the SQL and Greenplum Database data types
-        with the XML schema specification, at which point a more precise description will
-        appear.</p>
-      <p><b>Function:</b></p>
+      <p>其他类型的内容将被格式化为合法的XML字符数据。这意味着特别的字符 <codeph>&lt;</codeph>, <codeph>></codeph>以及<codeph>&amp;</codeph>将会被转换成实体。二进制数据（数据类型<codeph>bytea</codeph>）将被表示为base64或者十六进制编码，具体取决于配置参数<xref
+              href="https://www.postgresql.org/docs/9.1/runtime-config-client.html#GUC-XMLBINARY"
+              format="html" scope="external">xmlbinary</xref>。为了将SQL和Greenplum数据库数据类型与XML模式说明一致，用于个别数据类型的特殊行为也预计会逐步出现，届时会有更精确的描述。
+       </p>
+      <p><b>函数：</b></p>
       <p><codeph><cmdname>xmlforest</cmdname></codeph></p>
-      <p><b>Synopsis:</b></p>
+      <p><b>概要：</b></p>
       <p>
         <codeblock>xmlforest(<varname>content</varname> [AS <varname>name</varname>] [, ...])</codeblock>
       </p>
-      <p>The <codeph>xmlforest</codeph> expression produces an XML forest (sequence) of elements
-        using the given names and content.</p>
-      <p>Examples:</p>
+      <p><codeph>xmlforest</codeph>表达式产生一个使用给定名称和内容的元素的XML森林（序列）。
+          </p>
+      <p>例子：</p>
       <codeblock>SELECT xmlforest('abc' AS foo, 123 AS bar);
 
           xmlforest
@@ -481,57 +365,48 @@ WHERE table_schema = 'pg_catalog';
 -------------------------------------------------------------------------------------------
  &lt;table_name>pg_authid&lt;/table_name>&lt;column_name>rolname&lt;/column_name>
  &lt;table_name>pg_authid&lt;/table_name>&lt;column_name>rolsuper&lt;/column_name></codeblock>
-      <p>As seen in the second example, the element name can be omitted if the content value is a
-        column reference, in which case the column name is used by default. Otherwise, a name must
-        be specified.</p>
-      <p>Element names that are not valid XML names are escaped as shown for
-          <codeph>xmlelement</codeph> above. Similarly, content data is escaped to make valid XML
-        content, unless it is already of type <codeph>xml</codeph>.</p>
-      <p>Note that XML forests are not valid XML documents if they consist of more than one element,
-        so it might be useful to wrap <codeph>xmlforest</codeph> expressions in
-          <codeph>xmlelement</codeph>.</p>
-      <p><b>Function:</b></p>
+      <p>如在第二个例子中所见，如果内容值是一个列引用，则列名可以被省略，那种情况下默认会使用列名。否则，必须指定一个列名。
+        </p>
+      <p>不是合法XML名称的元素名会按照前述对xmlelement的方式转义。类似地，内容数据也会被转义来得到合法的<codeph>xml</codeph>内容，除非它已经是类型xml。
+          </p>
+      <p>注意如果XML森林由多于一个元素组成，它们就不是合法的XML文档，因此将<codeph>xmlforest</codeph>表达式包裹在<codeph>xmlelement</codeph>中可能会有用。Note that XML forests are not valid XML documents if they consist of more than one element,
+      </p>
+      <p><b>函数：</b></p>
       <p><codeph><cmdname>xmlpi</cmdname></codeph></p>
-      <p><b>Synopsis:</b></p>
+      <p><b>概要：</b></p>
       <p>
         <codeblock>xmlpi(name <varname>target</varname> [, <varname>content</varname>])</codeblock>
       </p>
-      <p>The <codeph>xmlpi</codeph> expression creates an XML processing instruction. The content,
-        if present, must not contain the character sequence <codeph>?></codeph>.</p>
-      <p>Example:<codeblock>SELECT xmlpi(name php, 'echo "hello world";');
+      <p><codeph>xmlpi</codeph>表达式创建一个XML处理指令。内容（如果存在）不能包含字符序列 <codeph>?></codeph>。
+        </p>
+      <p>例如：<codeblock>SELECT xmlpi(name php, 'echo "hello world";');
 
             xmlpi
 -----------------------------
  &lt;?php echo "hello world";?></codeblock></p>
       <p><b>Function:</b></p>
       <p><codeph><cmdname>xmlroot</cmdname></codeph></p>
-      <p><b>Synopsis:</b></p>
+      <p><b>概要：</b></p>
       <p>
         <codeblock>xmlroot(<varname>xml</varname>, version <varname>text</varname> | no value [, standalone yes|no|no value])</codeblock>
       </p>
-      <p>The <codeph>xmlroot</codeph> expression alters the properties of the root node of an XML
-        value. If a version is specified, it replaces the value in the root node's version
-        declaration; if a standalone setting is specified, it replaces the value in the root node's
-        standalone
-        declaration.<codeblock>SELECT xmlroot(xmlparse(document '&lt;?xml version="1.1"?>&lt;content>abc&lt;/content>'),
+      <p><codeph>xmlroot</codeph>表达式修改一个XML值的根节点属性。如果指定了一个版本，它会替换掉根节点版本声明中的值；如果指定了一个单独的设置，它会替换掉根节点的单独声明的值。
+       <codeblock>SELECT xmlroot(xmlparse(document '&lt;?xml version="1.1"?>&lt;content>abc&lt;/content>'),
                version '1.0', standalone yes);
 
                 xmlroot
 ----------------------------------------
  &lt;?xml version="1.0" standalone="yes"?>
  &lt;content>abc&lt;/content></codeblock></p>
-      <p><b>Function:</b></p>
+      <p><b>函数：</b></p>
       <p><codeph><cmdname>xmlagg</cmdname></codeph></p>
       <p>
         <codeblock>xmlagg (<varname>xml</varname>)</codeblock>
       </p>
-      <p>The function <codeph>xmlagg</codeph> is, unlike the other functions described here, an
-        aggregate function. It concatenates the input values to the aggregate function call, much
-        like <codeph>xmlconcat</codeph> does, except that concatenation occurs across rows rather
-        than across expressions in a single row. See <xref
-          href="functions-operators.xml#topic26/in151167">Using Functions and Operators</xref> for
-        additional information about aggregate functions.</p>
-      <p>Example:</p>
+      <p>和这里描述的其他函数不同，函数<codeph>xmlagg</codeph>是一个聚集函数。它把输入值串接到一个聚集函数调用中（很像<codeph>xmlconcat</codeph> 的做法），不过串接发生在行之间而不是单个行的表达式之间。有关聚集函数的更多信息
+       请见 <xref
+          href="functions-operators.xml#topic26/in151167">使用函数和操作符</xref> 。</p>
+      <p>例子：</p>
       <codeblock>CREATE TABLE test (y int, x xml);
 INSERT INTO test VALUES (1, '&lt;foo>abc&lt;/foo>');
 INSERT INTO test VALUES (2, '&lt;bar/>');
@@ -539,57 +414,49 @@ SELECT xmlagg(x) FROM test;
         xmlagg
 ----------------------
  &lt;foo>abc&lt;/foo>&lt;bar/></codeblock>
-      <p>To determine the order of the concatenation, an <codeph>ORDER BY</codeph> clause may be
-        added to the aggregate call. For example:</p>
+      <p>为了决定串接的顺序，<codeph>ORDER BY</codeph>子句可能会被增加到聚集调用上。例如：
+       </p>
       <codeblock>SELECT xmlagg(x ORDER BY y DESC) FROM test;
         xmlagg
 ----------------------
  &lt;bar/>&lt;foo>abc&lt;/foo></codeblock>
-      <p>The following non-standard approach used to be recommended in previous versions, and may
-        still be useful in specific
-        cases:<codeblock>SELECT xmlagg(x) FROM (SELECT * FROM test ORDER BY y DESC) AS tab;
+      <p>下面的非标准方法在之前的版本中常常会被推荐，它们在特定情况下可能仍然能发挥作用：<codeblock>SELECT xmlagg(x) FROM (SELECT * FROM test ORDER BY y DESC) AS tab;
         xmlagg
 ----------------------
  &lt;bar/>&lt;foo>abc&lt;/foo></codeblock></p>
     </body>
   </topic>
   <topic id="topic_zpg_jl2_wz">
-    <title>XML Predicates</title>
+    <title>XML谓词</title>
     <body>
-      <p>The expressions described in this section check properties of <codeph>xml</codeph>
-        values.</p>
-      <p><b>Expression:</b></p>
+      <p>这一节中描述的表达式会检查xml值的属性。</p>
+      <p><b>表达式：</b></p>
       <p><codeph><cmdname>IS DOCUMENT</cmdname></codeph></p>
-      <p><b>Synopsis:</b></p>
+      <p><b>概要：</b></p>
       <p>
         <codeblock><varname>xml</varname> IS DOCUMENT</codeblock>
       </p>
-      <p>The expression <codeph>IS DOCUMENT</codeph> returns true if the argument XML value is a
-        proper XML document, false if it is not (that is, it is a content fragment), or null if the
-        argument is null.</p>
-      <p><b>Expression:</b></p>
+      <p>如果参数XML值是一个正确的XML文档，表达式<codeph>IS DOCUMENT</codeph>会返回真，如果不是正确的XML文档（即是一个内容片段）就会返回假，如果参数为空则返回空。
+ </p>
+      <p><b>表达式：</b></p>
       <p><codeph><cmdname>XMLEXISTS</cmdname></codeph></p>
-      <p><b>Synopsis:</b></p>
+      <p><b>概要：</b></p>
       <p>
         <codeblock>XMLEXISTS(<varname>text</varname> PASSING [BY REF] <varname>xml</varname> [BY REF])</codeblock>
       </p>
-      <p>The function <codeph>xmlexists</codeph> returns true if the XPath expression in the first
-        argument returns any nodes, and false otherwise. (If either argument is null, the result is
-        null.)</p>
-      <p>Example:<codeblock>SELECT xmlexists('//town[<varname>text</varname>() = ''Toronto'']' PASSING BY REF '&lt;towns>&lt;town>Toronto&lt;/town>&lt;town>Ottawa&lt;/town>&lt;/towns>');
+      <p>如果第一个参数中的XPath表达式返回任何节点，则函数<codeph>xmlexists</codeph>返回真，否则返回假（只要有一个参数为空，结果也为空）。
+         </p>
+      <p>例子：<codeblock>SELECT xmlexists('//town[<varname>text</varname>() = ''Toronto'']' PASSING BY REF
+          '&lt;towns>&lt;town>Toronto&lt;/town>&lt;town>Ottawa&lt;/town>&lt;/towns>');
 
  xmlexists
 ------------
  t
 (1 row)
 </codeblock></p>
-      <p>The <codeph>BY REF</codeph> clauses have no effect in Greenplum Database, but are allowed
-        for SQL conformance and compatibility with other implementations. Per SQL standard, the
-        first <codeph>BY REF</codeph> is required, the second is optional. Also note that the SQL
-        standard specifies the <codeph>xmlexists</codeph> construct to take an XQuery expression as
-        first argument, but Greenplum Database currently only supports XPath, which is a subset of
-        XQuery.</p>
-      <p><b>Expression:</b></p>
+      <p><codeph>BY REF</codeph>子句在Greenplum数据库中没有效果，但是为了与其他实现的SQL符合性和兼容性还是允许使用它。每一种SQL标准都要求第一个<codeph>BY REF</codeph>，而第二个是可选的。还要注意SQL标准指定<codeph>xmlexists</codeph>结构需要一个XQuery表达式作为第一个参数，但Greenplum数据库当前只支持XPath，它只是XQuery的一个子集。
+         </p>
+      <p><b>表达式：</b></p>
       <p><codeph><cmdname>xml_is_well_formed</cmdname></codeph></p>
       <p><b>Synopsis:</b></p>
       <p>
@@ -597,16 +464,11 @@ SELECT xmlagg(x) FROM test;
 xml_is_well_formed_document(<varname>text</varname>)
 xml_is_well_formed_content(<varname>text</varname>)</codeblock>
       </p>
-      <p>These functions check whether a text string is well-formed XML, returning a Boolean result.
-          <codeph>xml_is_well_formed_document</codeph> checks for a well-formed document, while
-          <codeph>xml_is_well_formed_content</codeph>  checks for well-formed content.
-          <codeph>xml_is_well_formed</codeph> does the former if the <codeph>xmloption</codeph>
-        configuration parameter is set to <codeph>DOCUMENT</codeph>, or the latter if it is set to
-          <codeph>CONTENT</codeph>. This means that <codeph>xml_is_well_formed</codeph> is useful
-        for seeing whether a simple cast to type <codeph>xml</codeph> will succeed, whereas the
-        other two functions are useful for seeing whether the corresponding variants of
-          <codeph>XMLPARSE</codeph> will succeed.</p>
-      <p>Examples:</p>
+      <p>这些函数检查一个文本字符串是否为结构良好的XML，返回一个布尔结果。<codeph>xml_is_well_formed_document</codeph>检查一个结构良好的文档，
+          而<codeph>xml_is_well_formed_document</codeph>检查结构良好的内容。
+          如果xmloption配置参数被设置为DOCUMENT，xml_is_well_formed会做前者；如果设置为CONTENT，则xml_is_well_formed会做后者。这意味着xml_is_well_formed对查看一个到类型xml的简单造型是否会成功很有用，而其他两个函数则可用于查看XMLPARSE的相应变体是否会成功。
+         </p>
+      <p>例子：</p>
       <p>
         <codeblock>SET xmloption TO DOCUMENT;
 SELECT xml_is_well_formed('&lt;>');
@@ -640,8 +502,7 @@ SELECT xml_is_well_formed_document('&lt;pg:foo xmlns:pg="http://postgresql.org/s
  f
 (1 row)</codeblock>
       </p>
-      <p>The last example shows that the checks include whether namespaces are correctly
-        matched.</p>
+      <p>最后一个例子展示了包括名字空间是否正确匹配在内的检查。</p>
     </body>
   </topic>
 </topic>
