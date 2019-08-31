@@ -97,52 +97,37 @@
                 </entry>
                 <entry>(none)</entry>
                 <entry>The JSON <codeph>null</codeph> 原始类型不同于<codeph>NULL</codeph>。</entry>
-              </row>
+              </row><codeph>numeric</codeph>
             </tbody>
           </tgroup>
         </table>
-        <p>对于有效的JSONB数据的构成有一些次要的约束，这些约束既不适用于JSON数据类型，也不适用于抽象的JSON，对应于基础数据类型所能表示的限制。值得注意的是，当将数据转换为JSONB数据类型时，超出Greenplum数据库numeric数据类型范围的数字将被拒绝，而JSON数据类型不会拒绝这些数字。
-          There are some minor constraints on what constitutes valid <codeph>jsonb</codeph> data
-          that do not apply to the <codeph>json</codeph> data type, nor to JSON in the abstract,
-          corresponding to limits on what can be represented by the underlying data type. Notably,
-          when converting data to the <codeph>jsonb</codeph> data type, numbers that are outside the
-          range of the Greenplum Database <codeph>numeric</codeph> data type are rejected, while the
-            <codeph>json</codeph> data type does not reject such numbers. </p>
-        <p>Such implementation-defined restrictions are permitted by RFC 7159. However, in practice
-          such problems might occur in other implementations, as it is common to represent the JSON
-            <codeph>number</codeph> primitive type as IEEE 754 double precision floating point
-          (which RFC 7159 explicitly anticipates and allows for). </p>
-        <p>When using JSON as an interchange format with other systems, be aware of the possibility
-          of losing numeric precision compared to data originally stored by Greenplum Database.</p>
-        <p>Also, as noted in the previous table, there are some minor restrictions on the input
-          format of JSON primitive types that do not apply to the corresponding Greenplum Database
-          data types.</p>
+        <p>对于有效的<codeph>jsonb</codeph> 数据的构成有一些次要的约束，这些约束既不适用于<codeph>json</codeph> 数据类型，也不适用于抽象的JSON，对应于基础数据类型所能表示的限制。值得注意的是，当将数据转换为<codeph>jsonb</codeph>数据类型时，超出Greenplum数据库<codeph>numeric</codeph>数据类型范围的数字将被拒绝，而<codeph>json/codeph>数据类型不会拒绝这些数字。
+        </p>
+        <p>RFC 7159允许这种实施定义的限制。然而，在实践中，这些问题可能会出现在其他实现中，因为通常将JSON原始类型 <codeph>number</codeph>表示为IEEE 754双精度浮点（RFC7159明确预测并允许）。
+          </p>
+        <p>当使用JSON作为与其他系统的交换格式时，请注意与Greenplum数据库最初存储的数据相比，数字精度可能会降低。</p>
+        <p>另外，正如上表中所指出的，对于JSON原语类型的输入格式，存在一些小的限制，这些限制不适用于相应的Greenplum数据库数据类型。 .</p>
       </section>
     </body>
   </topic>
   <topic id="topic_isn_ltw_mq">
-    <title>JSON Input and Output Syntax</title>
+    <title>JSON输入和输出语法</title>
     <body>
-      <p>The input and output syntax for the <codeph>json</codeph> data type is as specified in RFC
-        7159.</p>
-      <p>The following are all valid <codeph>json</codeph> expressions:</p>
-      <codeblock>-- Simple scalar/primitive value
--- Primitive values can be numbers, quoted strings, true, false, or null
-SELECT '5'::json;
+      <p> <codeph>json</codeph>数据类型的输入和输出语法如RFC 7159中所述。</p>
+      <p>下列都是合法的<codeph>json</codeph>表达式：</p>
+      <codeblock>-- 简单标量/原始值
+-- 原始值值可以是数字、带引号的字符串、true、false或者null SELECT '5'::json;
 
--- Array of zero or more elements (elements need not be of same type)
-SELECT '[1, 2, "foo", null]'::json;
+-- 零个或者更多个元素的数组（元素类型可以不同）
+          SELECT '[1, 2, "foo", null]'::json;
 
--- Object containing pairs of keys and values
--- Note that object keys must always be quoted strings
+-- 含有键/值对的对象
+-- 注意对象的键必须总是带引号的字符串
 SELECT '{"bar": "baz", "balance": 7.77, "active": false}'::json;
 
--- Arrays and objects can be nested arbitrarily
+-- 数组和对象可以任意嵌套
 SELECT '{"foo": [true, "bar"], "tags": {"a": 1, "b": null}}'::json;</codeblock>
-      <p>As previously stated, when a JSON value is input and then printed without any additional
-        processing, the <codeph>json</codeph> data type outputs the same text that was input, while
-        the <codeph>jsonb</codeph> data type does not preserve semantically-insignificant details
-        such as whitespace. For example, note the differences here:</p>
+      <p>如前所述，当输入JSON值，然后在不进行任何附加处理的情况下打印时，<codeph>json</codeph>数据类型输出的文本与输入的文本相同，而<codeph>jsonb</codeph>数据类型不保留语义上不重要的细节，如空白。例如，请注意这里的区别：</p>
       <codeblock>SELECT '{"bar": "baz", "balance": 7.77, "active":false}'::json;
                       json                       
 -------------------------------------------------
@@ -154,153 +139,111 @@ SELECT '{"bar": "baz", "balance": 7.77, "active":false}'::jsonb;
 --------------------------------------------------
  {"bar": "baz", "active": false, "balance": 7.77}
 (1 row)</codeblock>
-      <p>One semantically-insignificant detail worth noting is that with the <codeph>jsonb</codeph>
-        data type, numbers will be printed according to the behavior of the underlying numeric type.
-        In practice, this means that numbers entered with E notation will be printed without it, for
-        example:</p>
+      <p>值得注意的一个语义上不重要的细节是，对于<codeph>jsonb</codeph>数据类型，将根据基础数字类型的行为打印数字。在实践中，这意味着使用e符号输入的数字将不使用e符号打印，例如：
+         </p>
       <codeblock>SELECT '{"reading": 1.230e-5}'::json, '{"reading": 1.230e-5}'::jsonb;
          json          |          jsonb          
 -----------------------+-------------------------
  {"reading": 1.230e-5} | {"reading": 0.00001230}
 (1 row)</codeblock>
-      <p>However, the <codeph>jsonb</codeph> data type preserves trailing fractional zeroes, as seen
-        in previous example, even though those are semantically insignificant for purposes such as
-        equality checks.</p>
+      <p>然而, <codeph>jsonb</codeph>数据类型保留了尾随的小数零，如前一个示例中所示，即使这些小数零在语义上对于诸如相等性检查之类的是无关紧要的。</p>
     </body>
   </topic>
   <topic id="topic_eyt_3tw_mq">
-    <title>Designing JSON documents</title>
+    <title>设计JSON文档</title>
     <body>
-      <p>Representing data as JSON can be considerably more flexible than the traditional relational
-        data model, which is compelling in environments where requirements are fluid. It is quite
-        possible for both approaches to co-exist and complement each other within the same
-        application. However, even for applications where maximal flexibility is desired, it is
-        still recommended that JSON documents have a somewhat fixed structure. The structure is
-        typically unenforced (though enforcing some business rules declaratively is possible), but
-        having a predictable structure makes it easier to write queries that usefully summarize a
-        set of JSON documents (datums) in a table.</p>
-      <p>JSON data is subject to the same concurrency-control considerations as any other data type
-        when stored in a table. Although storing large documents is practicable, keep in mind that
-        any update acquires a row-level lock on the whole row. Consider limiting JSON documents to a
-        manageable size in order to decrease lock contention among updating transactions. Ideally,
-        JSON documents should each represent an atomic datum that business rules dictate cannot
-        reasonably be further subdivided into smaller datums that could be modified
-        independently.</p>
+      <p>将数据表示为JSON比传统关系数据模型要更灵活，在需求变化的环境中表现得尤其明显。在同一个应用中很可能两种方法会共存并且成为彼此的互补。不过，即便是对于要求最大灵活性的应用中，我们仍然推荐JSON有些许固定的结构。这种结构是非强制的（尽管可能会强制一些业务规则），但是如果有可预测的结构会让编写有效汇总表中一组“文档”（数据）的查询更容易。</p>
+      <p>在表中存储时，JSON数据服从和其他任何数据类型一样的并发控制考虑。尽管存储大型文档格式可行的，但要记住任何更新都要求整个行上的一个行级锁。为了降低更新事务之间的锁竞争，请考虑限制JSON文档为一个可管理的尺寸。理想上，每个JSON文档应该表示业务规则规定的一个原子数据，并且不能进一步地被分解为更小的可以独立修改的数据。
+    </p>
     </body>
   </topic>
   <topic id="topic_isx_2tw_mq">
-    <title>jsonb Containment and Existence</title>
+    <title>jsonb容器与存在</title>
     <body>
-      <p>Testing <i>containment</i> is an important capability of <codeph>jsonb</codeph>. There is
-        no parallel set of facilities for the <codeph>json</codeph> type. Containment tests whether
-        one <codeph>jsonb</codeph> document has contained within it another one. These examples
-        return true except as noted:</p>
-      <codeblock>-- Simple scalar/primitive values contain only the identical value:
+      <p>测试容器是<codeph>jsonb</codeph>的一项重要功能。 <codeph>json</codeph>类型没有并行的设施集。容器测试一个<codeph>jsonb</codeph> 文档中是否包含了另一个<codeph>jsonb</codeph> 文档。这些例子返回true，除非另有标注：
+    </p>
+      <codeblock>--简单标量/原始数值仅包含相同的值：
 SELECT '"foo"'::jsonb @> '"foo"'::jsonb;
 
--- The array on the right side is contained within the one on the left:
+-- 右边的数组包含在左边的数组中：
 SELECT '[1, 2, 3]'::jsonb @> '[1, 3]'::jsonb;
 
--- Order of array elements is not significant, so this is also true:
+--数组元素的顺序并不重要，因此这也是正确的：
 SELECT '[1, 2, 3]'::jsonb @> '[3, 1]'::jsonb;
 
--- Duplicate array elements don't matter either:
+-- 重复的数组元素也不重要：
 SELECT '[1, 2, 3]'::jsonb @> '[1, 2, 2]'::jsonb;
 
--- The object with a single pair on the right side is contained
--- within the object on the left side:
+-- 右侧只有一对的对象包含在左侧的对象中:
 SELECT '{"product": "Greenplum", "version": "6.0.0", "jsonb":true}'::jsonb @> '{"version":"6.0.0"}'::jsonb;
 
--- The array on the right side is <b>not</b> considered contained within the
--- array on the left, even though a similar array is nested within it:
+--右侧的数组被认为不包含在左侧的数组中，即使其中嵌套了类似的数组：
 SELECT '[1, 2, [1, 3]]'::jsonb @> '[1, 3]'::jsonb;  -- yields false
 
--- But with a layer of nesting, it is contained:
+--但是，通过一层嵌套，它包含：
 SELECT '[1, 2, [1, 3]]'::jsonb @> '[[1, 3]]'::jsonb;
 
--- Similarly, containment is not reported here:
+--同样，此处未报告遏制：
 SELECT '{"foo": {"bar": "baz", "zig": "zag"}}'::jsonb @> '{"bar": "baz"}'::jsonb; -- yields false
 
--- But with a layer of nesting, it is contained:
+-- 但是，通过一层嵌套，它包含：
 SELECT '{"foo": {"bar": "baz", "zig": "zag"}}'::jsonb @> '{"foo": {"bar": "baz"}}'::jsonb;</codeblock>
-      <p>The general principle is that the contained object must match the containing object as to
-        structure and data contents, possibly after discarding some non-matching array elements or
-        object key/value pairs from the containing object. For containment, the order of array
-        elements is not significant when doing a containment match, and duplicate array elements are
-        effectively considered only once.</p>
-      <p>As an exception to the general principle that the structures must match, an array may
-        contain a primitive value:</p>
-      <codeblock>-- This array contains the primitive string value:
+      <p>一般原则是，所包含的对象必须在结构和数据内容方面与包含的对象匹配，可能是在从包含的对象中丢弃一些不匹配的数组元素或对象键/值对之后。
+          对于容器，在进行容器匹配时，数组元素的顺序并不重要，重复的数组元素只被有效地考虑一次。
+         </p>
+      <p>作为结构必须匹配的一般原则的例外，数组可以包含原始值：</p>
+      <codeblock>-- 此数组包含原始字符串值：:
 SELECT '["foo", "bar"]'::jsonb @> '"bar"'::jsonb;
 
--- This exception is not reciprocal -- non-containment is reported here:
+-- 这个异常不是相互的——这里报告了非包容：:
 SELECT '"bar"'::jsonb @> '["bar"]'::jsonb;  -- yields false</codeblock>
-      <p><codeph>jsonb</codeph> also has an <i>existence</i> operator, which is a variation on the
-        theme of containment: it tests whether a string (given as a text value) appears as an object
-        key or array element at the top level of the <codeph>jsonb</codeph> value. These examples
-        return true except as noted:</p>
-      <codeblock>-- String exists as array element:
+      <p><codeph>jsonb</codeph> 还有一个<i>existence</i>操作符，它是容器主题的变体：它测试字符串（作为文本值给出）是否作为对象键或数组元素出现在<codeph>jsonb</codeph> 值的顶层。这些示例返回true，，除非另有标注：
+       </p>
+      <codeblock>-- 字符串作为数组元素存在：
 SELECT '["foo", "bar", "baz"]'::jsonb ? 'bar';
 
--- String exists as object key:
+-- 字符串作为对象键存在：
 SELECT '{"foo": "bar"}'::jsonb ? 'foo';
 
--- Object values are not considered:
+-- 不考虑对象值：
 SELECT '{"foo": "bar"}'::jsonb ? 'bar';  -- yields false
 
--- As with containment, existence must match at the top level:
+-- 与容器一样，存在必须在顶层匹配：
 SELECT '{"foo": {"bar": "baz"}}'::jsonb ? 'bar'; -- yields false
 
--- A string is considered to exist if it matches a primitive JSON string:
+-- 如果字符串与原始JSON字符串匹配，则认为该字符串存在：
 SELECT '"foo"'::jsonb ? 'foo';</codeblock>
-      <p>JSON objects are better suited than arrays for testing containment or existence when there
-        are many keys or elements involved, because unlike arrays they are internally optimized for
-        searching, and do not need to be searched linearly.</p>
-      <p>The various containment and existence operators, along with all other JSON operators and
-        functions are documented in <xref href="#topic_gn4_x3w_mq" format="dita"/>.</p>
-      <p>Because JSON containment is nested, an appropriate query can skip explicit selection of
-        sub-objects. As an example, suppose that we have a doc column containing objects at the top
-        level, with most objects containing tags fields that contain arrays of sub-objects. This
-        query finds entries in which sub-objects containing both <codeph>"term":"paris"</codeph> and
-          <codeph>"term":"food"</codeph> appear, while ignoring any such keys outside the tags
-        array:</p>
+      <p>当涉及到许多键或元素时，JSON对象比数组更适合测试包含性或存在性，因为与数组不同，JSON对象在内部针对搜索进行了优化，不需要进行线性搜索。</p>
+      <p>各种容器和存在操作符以及所有其他JSON操作符和函数都记录在JSON函数和操作符<xref href="#topic_gn4_x3w_mq" format="dita"/>中。</p>
+      <p>因为JSON容器是嵌套的，所以适当的查询可以跳过子对象的显式选择。例如，假设我们有一个包含顶级对象的doc列，其中大多数对象包含子对象数组的标记字段。此查询查找包含<codeph>"term":"paris"</codeph>和<codeph>"term":"food"</codeph>的子对象出现的条目，同时忽略标记数组之外的任何此类键：
+        </p>
       <codeblock>SELECT doc->'site_name' FROM websites
   WHERE doc @> '{"tags":[{"term":"paris"}, {"term":"food"}]}';</codeblock>
-      <p>The query with this predicate could accomplish the same thing.</p>
+      <p>使用这个谓词的查询可以完成相同的事情。</p>
       <codeblock>SELECT doc->'site_name' FROM websites
   WHERE doc->'tags' @> '[{"term":"paris"}, {"term":"food"}]';</codeblock>
-      <p>However, the second approach is less flexible and is often less efficient as well.</p>
-      <p>On the other hand, the JSON existence operator is not nested: it will only look for the
-        specified key or array element at top level of the JSON value.</p>
+      <p>然而，第二种方法的灵活性较低，而且效率通常也较低。</p>
+      <p>另一方面，json存在操作符不是嵌套的：它只在json值的顶层查找指定的键或数组元素。</p>
     </body>
   </topic>
   <topic id="topic_aqt_1tw_mq">
-    <title>jsonb Indexing</title>
+    <title>jsonb索引</title>
     <body>
-      <p>The Greenplum Database <codeph>jsonb</codeph> data type, supports GIN, btree, and hash
-          indexes.<ul id="ul_mqh_pq2_rfb">
+      <p>Greenplum数据库<codeph>jsonb</codeph>数据类型，支持GIN, btree,和hash索引。<ul id="ul_mqh_pq2_rfb">
           <li><xref href="#topic_yjx_dq2_rfb" format="dita"/></li>
           <li><xref href="#topic_ahb_5ly_wq" format="dita"/></li>
         </ul></p>
     </body>
     <topic id="topic_yjx_dq2_rfb">
-      <title>GIN Indexes on jsonb Data</title>
+      <title>jsonb数据上的GIN索引/title>
       <body>
-        <p>GIN indexes can be used to efficiently search for keys or key/value pairs occurring
-          within a large number of <codeph>jsonb</codeph> documents (datums). Two GIN operator
-          classes are provided, offering different performance and flexibility trade-offs.</p>
-        <p>The default GIN operator class for <varname>jsonb</varname> supports queries with the
-            <codeph>@></codeph>, <codeph>?</codeph>, <codeph>?&amp;</codeph> and <codeph>?|</codeph>
-          operators. (For details of the semantics that these operators implement, see the table
-            <xref href="#topic_o5y_14w_2z/table_dcb_y3w_mq" format="dita"/>.) An example of creating
-          an index with this operator class is:</p>
+        <p>可以使用GIN索引有效地搜索出现在大量<codeph>jsonb</codeph>文档（基准）中的键或键/值对。两个GIN操作符类，提供不同的性能和灵活性权衡。</p>
+        <p><varname>jsonb</varname>的默认GIN操作符类支持带<codeph>@></codeph>, <codeph>?</codeph>, <codeph>?&amp;</codeph> 和 <codeph>?|</codeph>操作符的查询。（有关这些运算符实现的语义的详细信息，请参见表 <xref href="#topic_o5y_14w_2z/table_dcb_y3w_mq" format="dita"/>
+            ）。使用此操作符类创建索引的示例如下：</p>
         <codeblock>CREATE INDEX idxgin ON api USING gin (jdoc);</codeblock>
-        <p>The non-default GIN operator class <codeph>jsonb_path_ops</codeph> supports indexing the
-            <codeph>@></codeph> operator only. An example of creating an index with this operator
-          class is:</p>
+        <p>非默认的GIN运算符类<codeph>jsonb_path_ops</codeph>仅支持为<codeph>@></codeph>运算符编制索引。使用此运算符类创建索引的示例如下：</p>
         <pre>CREATE INDEX idxginp ON api USING gin (jdoc jsonb_path_ops);</pre>
-        <p>Consider the example of a table that stores JSON documents retrieved from a third-party
-          web service, with a documented schema definition. This is a typical document:</p>
+        <p>考虑一个表的示例，该表存储从第三方Web服务检索到的JSON文档，并且具有文档化的模式定义。这是一个典型的文档：</p>
         <codeblock>{
     "guid": "9c36adc1-7fb5-4d5b-83b4-90356a46061a",
     "name": "Angela Barton",
@@ -316,24 +259,19 @@ SELECT '"foo"'::jsonb ? 'foo';</codeblock>
         "qui"
     ]
 }</codeblock>
-        <p>The JSON documents are stored a table named <codeph>api</codeph>, in a
-            <codeph>jsonb</codeph> column named <codeph>jdoc</codeph>. If a GIN index is created on
-          this column, queries like the following can make use of the index:</p>
-        <codeblock>-- Find documents in which the key "company" has value "Magnafone"
+        <p>JSON文档存储在<codeph>jsonb</codeph>列中的一个名为API的表中。如果在此列上创建了GIN索引，则以下查询可以使用该索引：
+           </p>
+        <codeblock>-- 查找关键词“公司”具有“magnafone”价值的文档：
 SELECT jdoc->'guid', jdoc->'name' FROM api WHERE jdoc @> '{"company": "Magnafone"}';</codeblock>
-        <p>However, the index could not be used for queries like the following. The operator
-            <codeph>?</codeph> is indexable, however, the comparison is not applied directly to the
-          indexed column <codeph>jdoc</codeph>:</p>
+        <p>但是，索引不能用于以下查询。操作符<codeph>?</codeph> 是可索引的，但是，比较不会直接应用于索引列<codeph>jdoc</codeph>:
+           </p>
         <codeblock>-- Find documents in which the key "tags" contains key or array element "qui"
 SELECT jdoc->'guid', jdoc->'name' FROM api WHERE jdoc -> 'tags' ? 'qui';</codeblock>
-        <p>With appropriate use of expression indexes, the above query can use an index. If querying
-          for particular items within the <codeph>tags</codeph> key is common, defining an index
-          like this might be worthwhile:</p>
+        <p>通过适当地使用表达式索引，上述查询可以使用索引。如果在<codeph>tags</codeph> 键中查询特定项是常见的，那么定义这样的索引可能是值得的：
+            </p>
         <codeblock>CREATE INDEX idxgintags ON api USING gin ((jdoc -> 'tags'));</codeblock>
-        <p>Now, the <codeph>WHERE</codeph> clause <codeph>jdoc -> 'tags' ? 'qui'</codeph> is
-          recognized as an application of the indexable operator <codeph>?</codeph> to the indexed
-          expression <codeph>jdoc -> 'tags'</codeph>. For information about expression indexes, see
-            <xref href="../../ddl/ddl-index.xml#topic_tfz_3vz_4fb"/>.</p>
+        <p>现在，<codeph>WHERE</codeph>子句 <codeph>jdoc -> 'tags' ? 'qui'</codeph>被认为是可索引运算符的应用<codeph>?</codeph> 到索引表达式<codeph>jdoc -> 'tags'</codeph>。有关表达式索引的信息，请参阅表达式索引
+            <xref href="../../ddl/ddl-index.xml#topic_tfz_3vz_4fb"/>。</p>
         <p>Another approach to querying JSON documents is to exploit containment, for example:</p>
         <pre>-- Find documents in which the key "tags" contains array element "qui"
 SELECT jdoc->'guid', jdoc->'name' FROM api WHERE jdoc @> '{"tags": ["qui"]}';
