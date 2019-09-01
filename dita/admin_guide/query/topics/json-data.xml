@@ -272,99 +272,68 @@ SELECT jdoc->'guid', jdoc->'name' FROM api WHERE jdoc -> 'tags' ? 'qui';</codebl
         <codeblock>CREATE INDEX idxgintags ON api USING gin ((jdoc -> 'tags'));</codeblock>
         <p>现在，<codeph>WHERE</codeph>子句 <codeph>jdoc -> 'tags' ? 'qui'</codeph>被认为是可索引运算符的应用<codeph>?</codeph> 到索引表达式<codeph>jdoc -> 'tags'</codeph>。有关表达式索引的信息，请参阅表达式索引
             <xref href="../../ddl/ddl-index.xml#topic_tfz_3vz_4fb"/>。</p>
-        <p>Another approach to querying JSON documents is to exploit containment, for example:</p>
-        <pre>-- Find documents in which the key "tags" contains array element "qui"
-SELECT jdoc->'guid', jdoc->'name' FROM api WHERE jdoc @> '{"tags": ["qui"]}';
+        <p>查询JSON文档的另一种方法是利用包含性，例如：</p>
+        <pre>-- 查找键“tags”包含数组元素"qui"的文档
+            SELECT jdoc->'guid', jdoc->'name' FROM api WHERE jdoc @> '{"tags": ["qui"]}';
 </pre>
-        <p>A simple GIN index on the <codeph>jdoc</codeph> column can support this query. However,
-          the index will store copies of every key and value in the <codeph>jdoc</codeph> column,
-          whereas the expression index of the previous example stores only data found under the tags
-          key. While the simple-index approach is far more flexible (since it supports queries about
-          any key), targeted expression indexes are likely to be smaller and faster to search than a
-          simple index.</p>
-        <p>Although the <codeph>jsonb_path_ops</codeph> operator class supports only queries with
-          the <codeph>@></codeph> operator, it has performance advantages over the default operator
-          class <codeph>jsonb_ops</codeph>. A <codeph>jsonb_path_ops</codeph> index is usually much
-          smaller than a <codeph>jsonb_ops</codeph> index over the same data, and the specificity of
-          searches is better, particularly when queries contain keys that appear frequently in the
-          data. Therefore search operations typically perform better than with the default operator
-          class.</p>
-        <p>The technical difference between a <codeph>jsonb_ops</codeph> and a
-            <codeph>jsonb_path_ops</codeph> GIN index is that the former creates independent index
-          items for each key and value in the data, while the latter creates index items only for
-          each value in the data.</p>
-        <note>For this discussion, the term <i>value</i> includes array elements, though JSON
-          terminology sometimes considers array elements distinct from values within objects.</note>
-        <p>Basically, each <codeph>jsonb_path_ops</codeph> index item is a hash of the value and the
-          key(s) leading to it; for example to index <codeph>{"foo": {"bar": "baz"}}</codeph>, a
-          single index item would be created incorporating all three of <codeph>foo</codeph>,
-            <codeph>bar</codeph>, and <codeph>baz</codeph> into the hash value. Thus a containment
-          query looking for this structure would result in an extremely specific index search; but
-          there is no way at all to find out whether <codeph>foo</codeph> appears as a key. On the
-          other hand, a <codeph>jsonb_ops</codeph> index would create three index items representing
-            <codeph>foo</codeph>, <codeph>bar</codeph>, and <codeph>baz</codeph> separately; then to
-          do the containment query, it would look for rows containing all three of these items.
-          While GIN indexes can perform such an <codeph>AND</codeph> search fairly efficiently, it
-          will still be less specific and slower than the equivalent <codeph>jsonb_path_ops</codeph>
-          search, especially if there are a very large number of rows containing any single one of
-          the three index items.</p>
-        <p>A disadvantage of the <codeph>jsonb_path_ops</codeph> approach is that it produces no
-          index entries for JSON structures not containing any values, such as <codeph>{"a":
-            {}}</codeph>. If a search for documents containing such a structure is requested, it
-          will require a full-index scan, which is quite slow. <codeph>jsonb_path_ops</codeph> is
-          ill-suited for applications that often perform such searches.</p>
+        <p><codeph>jdoc</codeph>列上的一个简单的GIN索引可以支持这个查询。但是，索引将在<codeph>jdoc</codeph>列中存储每个键和值的副本，而前一个示例的表达式索引只存储标记键下的数据。虽然简单索引方法要灵活得多（因为它支持关于任何键的查询），但是目标表达式索引可能比简单索引更小，搜索速度更快。
+           </p>
+        <p>尽管 <codeph>jsonb_path_ops</codeph>类只支持带<codeph>@></codeph> 运算符的查询，但它比默认的jsonb_operator类具有性能优势。对于相同的数据， <codeph>jsonb_path_ops</codeph>索引通常比jsonb_ops索引小得多，搜索的特殊性更好，尤其是当查询包含频繁出现在数据中的键时。因此，搜索操作通常比默认的operator类执行得更好。
+          </p>
+        <p> <codeph>jsonb_ops</codeph> 和 <codeph>jsonb-path-ops-gin</codeph> 索引的技术区别在于前者为数据中的每个键和值创建独立的索引项，而后者仅为数据中的每个值创建索引项。
+     </p>
+        <note>对于这个讨论，术语<i>value</i>包括数组元素，尽管JSON术语有时考虑数组元素不同于对象中的值。
+          </note>
+        <p>基本上，每个<codeph>jsonb_path_ops</codeph>索引项都是值的散列和指向该值的键；例如，要索引<codeph>{"foo": {"bar": "baz"}}</codeph>，将创建一个索引项，将<codeph>foo</codeph>,
+            <codeph>bar</codeph>, 和<codeph>baz</codeph> 中的三个都合并到散列值中。因此，查找此结构的包含查询将导致极其具体的索引搜索；但根本无法确定foo是否显示为键。另一方面，<codeph>jsonb_ops</codeph> 索引将分别创建三个表示codeph>foo</codeph>,
+          <codeph>bar</codeph>, 和<codeph>baz</codeph> 的索引项；然后，为了执行包含性查询，它将查找包含这三个项的行。虽然GIN索引可以相当有效地执行这样的搜索，但是它仍然比同等的<codeph>jsonb_path_ops</codeph>搜索更不具体和更慢，特别是如果有大量的行包含三个索引项中的任何一个。
+           </p>
+        <p><codeph>jsonb_path_ops</codeph>方法的一个缺点是它不会为不包含任何值的json结构生成索引项，例如<codeph>{"a":{}}</codeph>：。如果请求搜索包含此类结构的文档，则需要进行完全索引扫描，这非常慢。<codeph>jsonb_path_ops</codeph>不适合经常执行这种搜索的应用程序。
+   </p>
       </body>
     </topic>
     <topic id="topic_ahb_5ly_wq">
-      <title>Btree and Hash Indexes on jsonb Data</title>
+      <title>jsonb数据上的树索引和哈希索引</title>
       <body>
-        <p><codeph>jsonb</codeph> also supports <codeph>btree</codeph> and <codeph>hash</codeph>
-          indexes. These are usually useful only when it is important to check the equality of
-          complete JSON documents. </p>
-        <p>For completeness the <codeph>btree</codeph> ordering for <codeph>jsonb</codeph> datums
-          is:</p>
+        <p><codeph>jsonb</codeph>还支持<codeph>btree</codeph>和<codeph>hash</codeph>索引。只有在检查完整JSON文档的相等性很重要时，这些方法才有用。
+           </p>
+        <p>为完整起见，<codeph>josonb</codeph> 基准的<codeph>btree</codeph> 排序是：
+           </p>
         <pre>Object > Array > Boolean > Number > String > Null
 
 Object with n pairs > object with n - 1 pairs
 
 Array with n elements > array with n - 1 elements</pre>
-        <p>Objects with equal numbers of pairs are compared in the order:</p>
+        <p>相等键值数的对象按以下顺序进行比较：</p>
         <pre>key-1, value-1, key-2 ...</pre>
-        <p>Object keys are compared in their storage order. In particular, since shorter keys are
-          stored before longer keys, this can lead to orderings that might not be intuitive, such
-          as:</p>
+        <p>对象键按存储顺序进行比较。特别是，由于较短的键存储在较长的键之前，这可能导致顺序不直观，例如：
+           </p>
         <pre>{ "aa": 1, "c": 1} > {"b": 1, "d": 1}</pre>
-        <p>Similarly, arrays with equal numbers of elements are compared in the order:</p>
+        <p>同样，元素数目相等的数组按以下顺序进行比较：</p>
         <pre>element-1, element-2 ...</pre>
-        <p>Primitive JSON values are compared using the same comparison rules as for the underlying
-          Greenplum Database data type. Strings are compared using the default database
-          collation.</p>
+        <p>使用与底层Greenplum数据库数据类型相同的比较规则来比较原始JSON值。使用默认数据库排序规则比较字符串。
+            </p>
       </body>
     </topic>
   </topic>
   <topic id="topic_gn4_x3w_mq">
-    <title>JSON Functions and Operators</title>
+    <title>JSON函数和操作符</title>
     <body>
-      <p>Greenplum Database includes built-in functions and operators that create and manipulate
-        JSON data.<ul id="ul_ypx_f4w_2z">
+      <p>Greenplum数据库包含创建和操作JSON数据的内置函数和运算符。<ul id="ul_ypx_f4w_2z">
           <li><xref href="#topic_o5y_14w_2z" format="dita"/></li>
           <li><xref href="#topic_u4s_wnw_2z" format="dita"/></li>
           <li><xref href="#topic_rvp_lk3_sfb" format="dita"/></li>
           <li><xref href="#topic_z5d_snw_2z" format="dita"/></li>
         </ul></p>
-      <note>For <codeph>json</codeph> data type values, all key/value pairs are kept even if a JSON
-        object contains duplicate keys. For duplicate keys, JSON processing functions consider the
-        last value as the operative one. For the <codeph>jsonb</codeph> data type, duplicate object
-        keys are not kept. If the input includes duplicate keys, only the last value is kept. See
-          <xref href="#topic_upc_tcs_fz" format="dita"/>.</note>
+      <note>对于<codeph>json</codeph>数据类型值，即使JSON对象包含重复的键，也会保留所有键/值对。对于重复的键，JSON处理函数将最后一个值视为可操作的值。对于JSONB数据类型，不保留重复的对象键。如果输入包含重复键，则只保留最后一个值。请参见<xref href="#topic_upc_tcs_fz" format="dita"/>。</note>
     </body>
     <topic id="topic_o5y_14w_2z">
-      <title>JSON Operators</title>
+      <title>JSON操作符</title>
       <body>
-        <p>This table describes the operators that are available for use with the
-            <codeph>json</codeph> and <codeph>jsonb</codeph> data types.</p>
+        <p>这个表格描述了可以用于<codeph>json</codeph> 和 <codeph>jsonb</codeph> 数据类型的操作符。
+        </p>
         <table id="table_e41_y3w_mq">
-          <title><varname>json</varname> and <codeph>jsonb</codeph> Operators</title>
+          <title><varname>json</varname> 和 <codeph>jsonb</codeph> 操作符</title>
           <tgroup cols="5">
             <colspec colnum="1" colname="col1" colwidth="1*"/>
             <colspec colnum="2" colname="col2" colwidth="1.17*"/>
@@ -373,11 +342,11 @@ Array with n elements > array with n - 1 elements</pre>
             <colspec colnum="5" colname="col5" colwidth="1.92*"/>
             <thead>
               <row>
-                <entry>Operator</entry>
-                <entry>Right Operand Type</entry>
-                <entry>Description</entry>
-                <entry>Example</entry>
-                <entry>Example Result</entry>
+                <entry>操作符</entry>
+                <entry>右操作数类型</entry>
+                <entry>描述</entry>
+                <entry>例子</entry>
+                <entry>例子结果</entry>
               </row>
             </thead>
             <tbody>
@@ -388,7 +357,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>int</codeph>
                 </entry>
-                <entry>Get the JSON array element (indexed from zero).</entry>
+                <entry>获得JSON数组元素（索引从零开始）。</entry>
                 <entry>
                   <codeph>'[{"a":"foo"},{"b":"bar"},{"c":"baz"}]'::json->2</codeph>
                 </entry>
@@ -403,7 +372,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>text</codeph>
                 </entry>
-                <entry>Get the JSON object field by key.</entry>
+                <entry>根据键获得JSON对象的域。</entry>
                 <entry>
                   <codeph>'{"a": {"b":"foo"}}'::json->'a'</codeph>
                 </entry>
@@ -418,7 +387,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>int</codeph>
                 </entry>
-                <entry>Get the JSON array element as <codeph>text</codeph>.</entry>
+                <entry>	获得JSON数组元素的文本形式。</entry>
                 <entry>
                   <codeph>'[1,2,3]'::json->>2</codeph>
                 </entry>
@@ -433,7 +402,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>text</codeph>
                 </entry>
-                <entry>Get the JSON object field as <codeph>text</codeph>.</entry>
+                <entry>获得JSON对象域的文本形式。</entry>
                 <entry>
                   <codeph>'{"a":1,"b":2}'::json->>'b'</codeph>
                 </entry>
@@ -448,7 +417,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>text[]</codeph>
                 </entry>
-                <entry>Get the JSON object at specified path.</entry>
+                <entry>获得在指定路径上的JSON对象。</entry>
                 <entry><codeph>'{"a": {"b":{"c": "foo"}}}'::json#>'{a,b}</codeph>'</entry>
                 <entry>
                   <codeph>{"c": "foo"}</codeph>
@@ -461,7 +430,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>text[]</codeph>
                 </entry>
-                <entry>Get the JSON object at specified path as <codeph>text</codeph>.</entry>
+                <entry>获得在指定路径上的JSON对象的文本形式。</entry>
                 <entry>
                   <codeph>'{"a":[1,2,3],"b":[4,5,6]}'::json#>>'{a,2}'</codeph>
                 </entry>
