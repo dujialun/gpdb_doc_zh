@@ -441,23 +441,13 @@ Array with n elements > array with n - 1 elements</pre>
             </tbody>
           </tgroup>
         </table>
-        <note>There are parallel variants of these operators for both the <codeph>json</codeph> and
-            <codeph>jsonb</codeph> data types. The field, element, and path extraction operators
-          return the same data type as their left-hand input (either <codeph>json</codeph> or
-            <codeph>jsonb</codeph>), except for those specified as returning <codeph>text</codeph>,
-          which coerce the value to <codeph>text</codeph>. The field, element, and path extraction
-          operators return <codeph>NULL</codeph>, rather than failing, if the JSON input does not
-          have the right structure to match the request; for example if no such element
-          exists.</note>
-        <p>Operators that require the <codeph>jsonb</codeph> data type as the left operand are
-          described in the following table. Many of these operators can be indexed by
-            <codeph>jsonb</codeph> operator classes. For a full description of
-            <codeph>jsonb</codeph> containment and existence semantics, see <xref
-            href="#topic_isx_2tw_mq" format="dita"/>. For information about how these operators can
-          be used to effectively index <codeph>jsonb</codeph> data, see <xref
-            href="#topic_aqt_1tw_mq" format="dita"/>.</p>
+        <note>对于JSON和JSONB数据类型，这些运算符都有并行变体。字段、元素和路径提取运算符返回的数据类型与其左侧输入（JSON或JSONB）相同，但指定为返回<codeph>text</codeph>的数据类型除外，后者将值强制为<codeph>text</codeph>。如果JSON输入没有与请求匹配的正确结构，则字段、元素和路径提取运算符返回<codeph>NULL</codeph>，而不是失败；例如，如果不存在这样的元素。
+          </note>
+        <p>下表描述了需要JSONB数据类型作为左操作数的运算符。这些运算符中的许多都可以通过JSONB运算符类进行索引。有关JSONB包含和存在语义的完整描述，请参见<xref
+                href="#topic_isx_2tw_mq" format="dita"/>。有关如何使用这些运算符有效地索引JSONB数据的信息，请参阅<xref
+                href="#topic_aqt_1tw_mq" format="dita"/>。</p>
         <table id="table_dcb_y3w_mq">
-          <title><codeph>jsonb</codeph> Operators</title>
+          <title><codeph>jsonb</codeph> 操作符</title>
           <tgroup cols="4">
             <colspec colnum="1" colname="col1" colwidth="1*"/>
             <colspec colnum="2" colname="col2" colwidth="1.94*"/>
@@ -465,10 +455,10 @@ Array with n elements > array with n - 1 elements</pre>
             <colspec colnum="4" colname="col4" colwidth="2.5*"/>
             <thead>
               <row>
-                <entry>Operator</entry>
-                <entry>Right Operand Type</entry>
-                <entry>Description</entry>
-                <entry>Example</entry>
+                <entry>操作符</entry>
+                <entry>右操作数类型</entry>
+                <entry>描述</entry>
+                <entry>例子</entry>
               </row>
             </thead>
             <tbody>
@@ -479,7 +469,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>jsonb</codeph>
                 </entry>
-                <entry>Does the left JSON value contain within it the right value?</entry>
+                <entry>左边的json值包含右边的值吗？</entry>
                 <entry>
                   <codeph>'{"a":1, "b":2}'::jsonb @> '{"b":2}'::jsonb</codeph>
                 </entry>
@@ -491,7 +481,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>jsonb</codeph>
                 </entry>
-                <entry>Is the left JSON value contained within the right value?</entry>
+                <entry>左JSON值是否包含在右值中？</entry>
                 <entry>
                   <codeph>'{"b":2}'::jsonb &lt;@ '{"a":1, "b":2}'::jsonb</codeph>
                 </entry>
@@ -503,7 +493,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>text</codeph>
                 </entry>
-                <entry>Does the key/element string exist within the JSON value?</entry>
+                <entry>键/元素字符串是否存在于JSON值中？</entry>
                 <entry>
                   <codeph>'{"a":1, "b":2}'::jsonb ? 'b'</codeph>
                 </entry>
@@ -515,7 +505,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>text[]</codeph>
                 </entry>
-                <entry>Do any of these key/element strings exist?</entry>
+                <entry>是否存在这些键/元素字符串？</entry>
                 <entry>
                   <codeph>'{"a":1, "b":2, "c":3}'::jsonb ?| array['b', 'c']</codeph>
                 </entry>
@@ -527,7 +517,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>text[]</codeph>
                 </entry>
-                <entry>Do all of these key/element strings exist?</entry>
+                <entry>所有这些键/元素字符串都存在吗？</entry>
                 <entry>
                   <codeph>'["a", "b"]'::jsonb ?&amp; array['a', 'b']</codeph>
                 </entry>
@@ -535,19 +525,17 @@ Array with n elements > array with n - 1 elements</pre>
             </tbody>
           </tgroup>
         </table>
-        <p>The standard comparison operators in the following table are available only for the
-            <codeph>jsonb</codeph> data type, not for the <codeph>json</codeph> data type. They
-          follow the ordering rules for B-tree operations described in <xref
-            href="#topic_aqt_1tw_mq" format="dita"/>.</p>
+        <p>下表中的标准比较运算符仅适用于JSONB数据类型，而不适用于JSON数据类型。它们遵循JSONB索引<xref
+                href="#topic_aqt_1tw_mq" format="dita"/>中描述的B树操作的排序规则。</p>
         <table id="table_j4w_z5n_vq">
-          <title><codeph>jsonb</codeph> Comparison Operators</title>
+          <title><codeph>jsonb</codeph> 比较运算符</title>
           <tgroup cols="2">
             <colspec colnum="1" colname="col1"/>
             <colspec colnum="2" colname="col2"/>
             <thead>
               <row>
-                <entry>Operator</entry>
-                <entry>Description</entry>
+                <entry>操作符</entry>
+                <entry>描述</entry>
               </row>
             </thead>
             <tbody>
@@ -555,52 +543,50 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>&lt;</codeph>
                 </entry>
-                <entry>less than</entry>
+                <entry>小于</entry>
               </row>
               <row>
                 <entry>
                   <codeph>></codeph>
                 </entry>
-                <entry>greater than</entry>
+                <entry>大于</entry>
               </row>
               <row>
                 <entry>
                   <codeph>&lt;=</codeph>
                 </entry>
-                <entry>less than or equal to</entry>
+                <entry>小于或等于</entry>
               </row>
               <row>
                 <entry>
                   <codeph>>=</codeph>
                 </entry>
-                <entry>greater than or equal to</entry>
+                <entry>大于或等于</entry>
               </row>
               <row>
                 <entry>
                   <codeph>=</codeph>
                 </entry>
-                <entry>equal</entry>
+                <entry>等于</entry>
               </row>
               <row>
-                <entry><codeph>&lt;></codeph> or <codeph>!=</codeph></entry>
-                <entry>not equal</entry>
+                <entry><codeph>&lt;></codeph>或者<codeph>!=</codeph></entry>
+                <entry>不等于</entry>
               </row>
             </tbody>
           </tgroup>
         </table>
-        <note>The <codeph>!=</codeph> operator is converted to <codeph>&lt;></codeph> in the parser
-          stage. It is not possible to implement <codeph>!=</codeph> and <codeph>&lt;></codeph>
-          operators that do different things.</note>
+        <note>这个<codeph>!=</codeph>运算符在解析阶段转换为 <codeph>&lt;></codeph>。无法执行 <codeph>!=</codeph>和<codeph>&lt;></codeph>来执行不同操作的运算符。
+           </note>
       </body>
     </topic>
     <topic id="topic_u4s_wnw_2z">
-      <title>JSON Creation Functions</title>
+      <title>JSON创建函数</title>
       <body>
-        <p>This table describes the functions that create <codeph>json</codeph> data type values.
-          (Currently, there are no equivalent functions for <codeph>jsonb</codeph>, but you can cast
-          the result of one of these functions to <codeph>jsonb</codeph>.)</p>
+        <p>此表描述了创建 <codeph>json</codeph>数据类型值的函数。（目前， <codeph>jsonb</codeph>没有等价的函数，但是您可以将其中一个函数的结果强制转换为 <codeph>jsonb</codeph>。）
+      </p>
         <table id="table_sqb_y3w_mb">
-          <title>JSON Creation Functions </title>
+          <title>JSON创建函数</title>
           <tgroup cols="4">
             <colspec colnum="1" colname="col1"/>
             <colspec colnum="2" colname="col2"/>
@@ -608,10 +594,10 @@ Array with n elements > array with n - 1 elements</pre>
             <colspec colnum="4" colname="col4"/>
             <thead>
               <row>
-                <entry>Function</entry>
-                <entry>Description</entry>
-                <entry>Example</entry>
-                <entry>Example Result</entry>
+                <entry>函数</entry>
+                <entry>描述</entry>
+                <entry>例子</entry>
+                <entry>例子结果</entry>
               </row>
             </thead>
             <tbody>
@@ -619,12 +605,9 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>to_json(anyelement)</codeph>
                 </entry>
-                <entry>Returns the value as a JSON object. Arrays and composites are processed
-                  recursively and are converted to arrays and objects. If the input contains a cast
-                  from the type to <codeph>json</codeph>, the cast function is used to perform the
-                  conversion; otherwise, a JSON scalar value is produced. For any scalar type other
-                  than a number, a Boolean, or a null value, the text representation will be used,
-                  properly quoted and escaped so that it is a valid JSON string.</entry>
+                <entry>返回该值作为一个合法的JSON对象。
+                    数组和组合会被递归处理并且转换成数组和对象。如果输入包含一个从该类型到json的造型，会使用该cast函数来执行转换，否则将会产生一个JSON标量值。对于任何非数字、布尔值或空值的标量类型，会使用其文本表示，并且加上适当的引号和转义让它变成一个合法的JSON字符串。
+                   </entry>
                 <entry>
                   <codeph>to_json('Fred said "Hi."'::text)</codeph>
                 </entry>
@@ -636,9 +619,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>array_to_json(anyarray [, pretty_bool])</codeph>
                 </entry>
-                <entry>Returns the array as a JSON array. A multidimensional array becomes a JSON
-                  array of arrays. <p>Line feeds will be added between dimension-1 elements if
-                      <codeph>pretty_bool</codeph> is true.</p></entry>
+                <entry>返回该数组为一个JSON数组。一个Greenplum数据库多维数组会变成一个JSON数组的数组。<p>如果pretty_bool为true，在第一维元素之间会增加换行。</p></entry>
                 <entry>
                   <codeph>array_to_json('{{1,5},{99,100}}'::int[])</codeph>
                 </entry>
@@ -650,8 +631,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>row_to_json(record [, pretty_bool])</codeph>
                 </entry>
-                <entry>Returns the row as a JSON object. <p>Line feeds will be added between level-1
-                    elements if <codeph>pretty_bool</codeph> is true.</p></entry>
+                <entry>返回该行为一个JSON对象。 <p>如果pretty_bool为true，在第一级别元素之间会增加换行。</p></entry>
                 <entry>
                   <codeph>row_to_json(row(1,'foo'))</codeph>
                 </entry>
@@ -661,8 +641,8 @@ Array with n elements > array with n - 1 elements</pre>
               </row>
               <row>
                 <entry><codeph>json_build_array(VARIADIC "any"</codeph>)</entry>
-                <entry>Builds a possibly-heterogeneously-typed JSON array out of a
-                    <codeph>VARIADIC</codeph> argument list.</entry>
+                <entry>从<codeph>VARIADIC</codeph> 参数列表构建一个可能是异种类型的JSON数组。
+                   </entry>
                 <entry>
                   <codeph>json_build_array(1,2,'3',4,5)</codeph>
                 </entry>
@@ -674,8 +654,8 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>json_build_object(VARIADIC "any")</codeph>
                 </entry>
-                <entry>Builds a JSON object out of a <codeph>VARIADIC</codeph> argument list. The
-                  argument list is taken in order and converted to a set of key/value pairs.</entry>
+                <entry>从<codeph>VARIADIC</codeph>参数列表构建JSON对象。参数列表按顺序获取，并转换为一组键/值对。
+                   </entry>
                 <entry>
                   <codeph>json_build_object('foo',1,'bar',2)</codeph>
                 </entry>
@@ -687,11 +667,8 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>json_object(text[])</codeph>
                 </entry>
-                <entry>Builds a JSON object out of a text array. The array must be either a one or a
-                  two dimensional array.<p>The one dimensional array must have an even number of
-                    elements. The elements are taken as key/value pairs. </p><p>For a two
-                    dimensional array, each inner array must have exactly two elements, which are
-                    taken as a key/value pair.</p></entry>
+                <entry>从文本数组构建JSON对象。数组必须是一维或二维数组。
+                 <p>一维数组必须有偶数个元素。元素作为键/值对。</p><p>对于二维数组，每个内部数组必须恰好有两个元素，作为键/值对。</p></entry>
                 <entry>
                   <p>
                     <codeph>json_object('{a, 1, b, "def", c, 3.5}')</codeph>
@@ -708,9 +685,8 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>json_object(keys text[], values text[])</codeph>
                 </entry>
-                <entry>Builds a JSON object out of a text array. This form of
-                    <codeph>json_object</codeph> takes keys and values pairwise from two separate
-                  arrays. In all other respects it is identical to the one-argument form.</entry>
+                <entry>从文本阵列中创建JSON对象。这一形式的<codeph>json_object</codeph>对象从两个分隔阵列中选择了键和值对。在所有其他方面，它与一个论据形式相同。
+                  </entry>
                 <entry>
                   <codeph>json_object('{a, b}', '{1,2}')</codeph>
                 </entry>
@@ -721,24 +697,19 @@ Array with n elements > array with n - 1 elements</pre>
             </tbody>
           </tgroup>
         </table>
-        <note><codeph>array_to_json</codeph> and <codeph>row_to_json</codeph> have the same behavior
-          as <codeph>to_json</codeph> except for offering a pretty-printing option. The behavior
-          described for <codeph>to_json</codeph> likewise applies to each individual value converted
-          by the other JSON creation functions.</note>
-        <note>The <xref href="../../../ref_guide/modules/hstore.xml#topic_vcn_jkq_1bb">hstore
-            module</xref> contains functions that cast from <codeph>hstore</codeph> to
-            <codeph>json</codeph>, so that <codeph>hstore</codeph> values converted via the JSON
-          creation functions will be represented as JSON objects, not as primitive string
-          values.</note>
+        <note><codeph>array_to_json</codeph>和<codeph>row_to_json</codeph>的行为与<codeph>to_json</codeph> 相同，只是提供了一个打印漂亮的选项。to_json描述的行为同样适用于其他JSON创建函数转换的每个单独的值。
+ </note>
+        <note><xref href="../../../ref_guide/modules/hstore.xml#topic_vcn_jkq_1bb">hstore模块包含从<codeph>hstore</codeph>转换为<codeph>json</codeph>的函数，因此通过<codeph>json</codeph>创建函数转换的hstore值将被表示为json对象，而不是原始字符串值。
+        </note>
       </body>
     </topic>
     <topic id="topic_rvp_lk3_sfb">
-      <title>JSON Aggregate Functions</title>
+      <title>JSON聚合函数</title>
       <body>
-        <p>This table shows the functions aggregate records to an array of JSON objects and pairs of
-          values to a JSON object </p>
+        <p>此表显示函数将记录聚合到一个JSON对象数组和一对JSON对象的值。
+   </p>
         <table id="table_kkr_mk3_sfb">
-          <title>JSON Aggregate Functions</title>
+          <title>JSON聚合函数</title>
           <tgroup cols="4">
             <colspec colnum="1" colname="col1"/>
             <colspec colnum="2" colname="col2"/>
@@ -746,10 +717,10 @@ Array with n elements > array with n - 1 elements</pre>
             <colspec colnum="4" colname="col4"/>
             <thead>
               <row>
-                <entry>Function</entry>
-                <entry>Argument Types</entry>
-                <entry>Return Type</entry>
-                <entry>Description</entry>
+                <entry>函数</entry>
+                <entry>参数类型</entry>
+                <entry>返回类型</entry>
+                <entry>描述</entry>
               </row>
             </thead>
             <tbody>
@@ -763,7 +734,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>json</codeph>
                 </entry>
-                <entry>Aggregates records as a JSON array of objects.</entry>
+                <entry>将记录聚合为对象的JSON数组。</entry>
               </row>
               <row>
                 <entry>
@@ -775,7 +746,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>json</codeph>
                 </entry>
-                <entry>Aggregates name/value pairs as a JSON object.</entry>
+                <entry>将名称/值对聚合为JSON对象。</entry>
               </row>
             </tbody>
           </tgroup>
@@ -783,17 +754,14 @@ Array with n elements > array with n - 1 elements</pre>
       </body>
     </topic>
     <topic id="topic_z5d_snw_2z">
-      <title>JSON Processing Functions</title>
+      <title>JSON处理函数</title>
       <body>
-        <p>This table shows the functions that are available for processing <codeph>json</codeph>
-          and <codeph>jsonb</codeph> values.</p>
-        <p>Many of these processing functions and operators convert Unicode escapes in JSON strings
-          to the appropriate single character. This is a not an issue if the input data type is
-            <codeph>jsonb</codeph>, because the conversion was already done. However, for
-            <codeph>json</codeph> data type input, this might result in an error being thrown. See
-            <xref href="#topic_upc_tcs_fz" format="dita"/>.</p>
+        <p>这个表描述处理<codeph>json</codeph>
+          和 <codeph>jsonb</codeph>值的函数。</p>
+        <p>许多处理函数和运算符将JSON字符串中的Unicode转义符转换为适当的单个字符。如果输入数据类型是JSONB，这不是问题，因为转换已经完成。但是，对于JSON数据类型输入，这可能导致抛出错误。请参见关于
+            <xref href="#topic_upc_tcs_fz" format="dita"/>。</p>
         <table id="table_wfc_y3w_mb">
-          <title>JSON Processing Functions</title>
+          <title>JSON处理函数</title>
           <tgroup cols="5">
             <colspec colnum="1" colname="col1" colwidth="1.08*"/>
             <colspec colnum="2" colname="col2" colwidth="1*"/>
@@ -802,11 +770,11 @@ Array with n elements > array with n - 1 elements</pre>
             <colspec colnum="5" colname="col5" colwidth="1.01*"/>
             <thead>
               <row>
-                <entry>Function</entry>
-                <entry>Return Type</entry>
-                <entry>Description</entry>
-                <entry>Example</entry>
-                <entry>Example Result</entry>
+                <entry>函数</entry>
+                <entry>返回类型</entry>
+                <entry>描述</entry>
+                <entry>例子</entry>
+                <entry>例子结果</entry>
               </row>
             </thead>
             <tbody>
@@ -818,7 +786,7 @@ Array with n elements > array with n - 1 elements</pre>
                   </p></entry>
                 <entry><codeph>int</codeph>
                 </entry>
-                <entry>Returns the number of elements in the outermost JSON array.</entry>
+                <entry>返回最外层JSON数组中的元素数。</entry>
                 <entry><codeph>json_array_length('[1,2,3,{"f1":1,"f2":[5,6]},4]')</codeph>
                 </entry>
                 <entry>
@@ -833,7 +801,7 @@ Array with n elements > array with n - 1 elements</pre>
                   <p><codeph>setof key text, value jsonb</codeph>
                   </p>
                 </entry>
-                <entry>Expands the outermost JSON object into a set of key/value pairs.</entry>
+                <entry>将最外层的JSON对象展开为一组键/值对。</entry>
                 <entry><codeph>select * from json_each('{"a":"foo", "b":"bar"}')</codeph>
                 </entry>
                 <entry>
@@ -851,8 +819,7 @@ Array with n elements > array with n - 1 elements</pre>
                 </entry>
                 <entry><codeph>setof key text, value text</codeph>
                 </entry>
-                <entry>Expands the outermost JSON object into a set of key/value pairs. The returned
-                  values will be of type <codeph>text</codeph>.</entry>
+                <entry>把最外层的JSON对象展开成键/值对的集合。返回值的类型是<codeph>text</codeph>。</entry>
                 <entry><codeph>select * from json_each_text('{"a":"foo", "b":"bar"}')</codeph>
                 </entry>
                 <entry>
@@ -875,8 +842,8 @@ Array with n elements > array with n - 1 elements</pre>
                   <p><codeph>jsonb</codeph>
                   </p>
                 </entry>
-                <entry>Returns the JSON value pointed to by <codeph>path_elems</codeph> (equivalent
-                  to <codeph>#></codeph> operator).</entry>
+                <entry>	返回path_elems指定的JSON值。等效于#>操作符。
+               </entry>
                 <entry><codeph>json_extract_path('{"f2":{"f3":1},"f4":{"f5":99,"f6":"foo"}}','f4')</codeph>
                 </entry>
                 <entry>
@@ -886,13 +853,11 @@ Array with n elements > array with n - 1 elements</pre>
               <row>
                 <entry><codeph>json_extract_path_text(from_json json, VARIADIC path_elems
                     text[])</codeph>
-                  <p><codeph>jsonb_extract_path_text(from_json jsonb, VARIADIC path_elems
-                      text[])</codeph>
+                  <p><codeph>返回path_elems指定的JSON值为文本。等效于#>>操作符。</codeph>
                   </p></entry>
                 <entry><codeph>text</codeph>
                 </entry>
-                <entry>Returns the JSON value pointed to by <codeph>path_elems</codeph> as text.
-                  Equivalent to <codeph>#>></codeph> operator.</entry>
+                <entry>返回最外层JSON对象中的键集合。</entry>
                 <entry><codeph>json_extract_path_text('{"f2":{"f3":1},"f4":{"f5":99,"f6":"foo"}}','f4',
                     'f6')</codeph>
                 </entry>
@@ -906,7 +871,7 @@ Array with n elements > array with n - 1 elements</pre>
                   </p></entry>
                 <entry><codeph>setof text</codeph>
                 </entry>
-                <entry>Returns set of keys in the outermost JSON object.</entry>
+                <entry>返回最外层JSON对象中的键集合。</entry>
                 <entry><codeph>json_object_keys('{"f1":"abc","f2":{"f3":"a", "f4":"b"}}')</codeph>
                 </entry>
                 <entry>
@@ -924,9 +889,8 @@ Array with n elements > array with n - 1 elements</pre>
                   </p></entry>
                 <entry><codeph>anyelement</codeph>
                 </entry>
-                <entry>Expands the object in <codeph>from_json</codeph> to a row whose columns match
-                  the record type defined by base. See <xref href="#topic_z5d_snw_2z/json_proc_1"
-                    format="dita">Note 1</xref>.</entry>
+                <entry>把<codeph>from_json</codeph>的对象展开成一行，其中的列匹配由base定义的记录类型。请见注解<xref href="#topic_z5d_snw_2z/json_proc_1"
+                    format="dita">Note 1</xref>。</entry>
                 <entry><codeph>select * from json_populate_record(null::myrowtype,
                     '{"a":1,"b":2}')</codeph>
                 </entry>
@@ -943,8 +907,8 @@ Array with n elements > array with n - 1 elements</pre>
                   </p></entry>
                 <entry><codeph>setof anyelement</codeph>
                 </entry>
-                <entry>Expands the outermost array of objects in <codeph>from_json</codeph> to a set
-                  of rows whose columns match the record type defined by base. See <xref
+                <entry>将<codeph>from_json</codeph>的最外层数组从\ujson扩展到一组行，这些行的列与基定义的记录类型匹配。见
+               <xref
                     href="#topic_z5d_snw_2z/json_proc_1" format="dita">Note 1</xref>.</entry>
                 <entry><codeph>select * from json_populate_recordset(null::myrowtype,
                     '[{"a":1,"b":2},{"a":3,"b":4}]')</codeph>
@@ -1000,9 +964,8 @@ Array with n elements > array with n - 1 elements</pre>
                   </p></entry>
                 <entry><codeph>text</codeph>
                 </entry>
-                <entry>Returns the type of the outermost JSON value as a text string. Possible types
-                  are <codeph>object</codeph>, <codeph>array</codeph>, <codeph>string</codeph>,
-                    <codeph>number</codeph>, <codeph>boolean</codeph>, and <codeph>null</codeph>.
+                <entry>以文本字符串形式返回最外面的JSON值的类型。可能的类型包括<codeph>object</codeph>, <codeph>array</codeph>, <codeph>string</codeph>,
+                    <codeph>number</codeph>, <codeph>boolean</codeph>, 和 <codeph>null</codeph>.
                   See <xref href="#topic_z5d_snw_2z/json_proc_2" format="dita">Note
                   2</xref>.</entry>
                 <entry><codeph>json_typeof('-123.4')</codeph>
@@ -1016,7 +979,9 @@ Array with n elements > array with n - 1 elements</pre>
                   </p></entry>
                 <entry><codeph>record</codeph>
                 </entry>
-                <entry>Builds an arbitrary record from a JSON object. See <xref
+                <entry>与所有返回记录的函数一样，调用方必须使用as子句显式定义记录的结构。
+                    选择*从json_到_记录集（“[”a“：1”，b“：”foo“”，”a“：”2”，c“：”bar“]”）作为x（a int，b te）
+                    从JSON对象生成任意记录。可见 <xref
                     href="#topic_z5d_snw_2z/json_proc_1" format="dita">Note 1</xref>. <p>As with all
                     functions returning record, the caller must explicitly define the structure of
                     the record with an <codeph>AS</codeph> clause.</p></entry>
@@ -1036,10 +1001,11 @@ Array with n elements > array with n - 1 elements</pre>
                   </p></entry>
                 <entry><codeph>setof record</codeph>
                 </entry>
-                <entry>Builds an arbitrary set of records from a JSON array of objects See <xref
-                    href="#topic_z5d_snw_2z/json_proc_1" format="dita">Note 1</xref>. <p>As with all
-                    functions returning record, the caller must explicitly define the structure of
-                    the record with an <codeph>AS</codeph> clause.</p></entry>
+                <entry>从JSON对象数组生成任意记录集，可见 <xref
+                    href="#topic_z5d_snw_2z/json_proc_1" format="dita">Note 1</xref>. <p>
+                    与所有返回记录的函数一样，调用方必须使用<codeph>AS</codeph> clause子句显式定义记录的结构。
+                    选择*从json_到_记录集（“[”a“：1”，b“：”foo“”，”a“：”2”，“c”：“bar”]）作为x（a int，b
+                 </p></entry>
                 <entry><codeph>select * from
                     json_to_recordset('[{"a":1,"b":"foo"},{"a":"2","c":"bar"}]') as x(a int, b
                     text);</codeph>
@@ -1057,25 +1023,12 @@ Array with n elements > array with n - 1 elements</pre>
         </table>
         <note id="json_record">
           <ol id="ol_umc_2sg_pfb">
-            <li id="json_proc_1">The examples for the functions
-                <codeph>json_populate_record()</codeph>, <codeph>json_populate_recordset()</codeph>,
-                <codeph>json_to_record()</codeph> and <codeph>json_to_recordset()</codeph> use
-              constants. However, the typical use would be to reference a table in the
-                <codeph>FROM</codeph> clause and use one of its <codeph>json</codeph> or
-                <codeph>jsonb</codeph> columns as an argument to the function. The extracted key
-              values can then be referenced in other parts of the query. For example the value can
-              be referenced in <codeph>WHERE</codeph> clauses and target lists. Extracting multiple
-              values in this way can improve performance over extracting them separately with
-              per-key operators.<p>JSON keys are matched to identical column names in the target row
-                type. JSON type coercion for these functions might not result in desired values for
-                some types. JSON fields that do not appear in the target row type will be omitted
-                from the output, and target columns that do not match any JSON field will be
-                  <codeph>NULL</codeph>.</p></li>
-            <li id="json_proc_2">The <codeph>json_typeof</codeph> function null return value of
-                <codeph>null</codeph> should not be confused with a SQL <codeph>NULL</codeph>. While
-              calling <codeph>json_typeof('null'::json)</codeph> will return <codeph>null</codeph>,
-              calling <codeph>json_typeof(NULL::json)</codeph> will return a SQL
-                <codeph>NULL</codeph>.</li>
+            <li id="json_proc_1">函数<codeph>json_populate_record()</codeph>, <codeph>json_populate_recordset()</codeph>,
+                <codeph>json_to_record()</codeph> 和 <codeph>json_to_recordset()</codeph>的示例使用常量。
+                但是，典型的用法是引用FROM子句中的表，并使用它的JSON或JSONB列之一作为函数的参数。然后可以在查询的其他部分中引用提取的键值。例如，可以在WHERE子句和目标列表中引用该值。以这种方式提取多个值可以提高性能，而不是使用每个键操作符分别提取多个值。
+               <p>JSON键与目标行类型中相同的列名匹配。这些函数的JSON类型强制可能不会产生某些类型所需的值。目标行类型中未出现的JSON字段将从输出中省略，不匹配任何JSON字段的目标列将为空。</p></li>
+            <li id="json_proc_2"><codeph>json_typeof</codeph>函数NULL返回值 <codeph>null</codeph>不应与SQL<codeph>NULL</codeph>混淆。当调用<codeph>json_typeof('null'::json)</codeph>将返回<codeph>null</codeph>时，调用<codeph>json_typeof(NULL::json)</codeph>将返回SQL<codeph>NULL</codeph>。
+               </li>
           </ol>
         </note>
       </body>
