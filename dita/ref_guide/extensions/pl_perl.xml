@@ -2,9 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-    <title id="px216155">Greenplum PL/Perl Language Extension</title>
+    <title id="px216155">Greenplum的PL/Perl语言扩展</title>
     <body>
-        <p>This chapter includes the following information:</p>
+        <p>本章包含了如下信息：</p>
         <ul>
             <li id="px220017">
                 <xref href="#topic2" type="topic" format="dita"/>
@@ -22,37 +22,35 @@
     </body>
 
     <topic id="topic2" xml:lang="en">
-        <title id="px216140">About Greenplum PL/Perl</title>
+        <title id="px216140">关于Greenplum的PL/Perl</title>
         <body>
-            <p> With the Greenplum Database PL/Perl extension, you can write user-defined functions
-                in Perl that take advantage of its advanced string manipulation operators and
-                functions. PL/Perl provides both trusted and untrusted variants of the language. </p>
-            <p> PL/Perl is embedded in your Greenplum Database distribution. Greenplum Database
-                PL/Perl requires Perl to be installed on the system of each database host. </p>
-            <p> Refer to the <xref href="https://www.postgresql.org/docs/9.4/plperl.html"
-                    scope="external" format="html"> PostgreSQL PL/Perl documentation </xref> for
-                additional information. </p>
+            <p>通过Greenplum数据库的PL/Perl扩展，用户可以用Perl写用户定义的函数，可以利用Perl先进的字符串处理操作和函数。
+                PL/Perl同时提供了可信和不可信的语言变体。
+                </p>
+            <p>PL/Perl内嵌在用户的Greenplum数据库发布中。
+                Greenplum数据库的PL/Perl要求系统中每台数据库主机都要事先装好Perl。
+                </p>
+            <p>参考<xref href="https://www.postgresql.org/docs/9.4/plperl.html"
+                    scope="external" format="html">PostgreSQL PL/Perl文档</xref>获取额外信息。
+                </p>
         </body>
     </topic>
 
     <topic id="topic3" xml:lang="en">
-        <title>Greenplum Database PL/Perl Limitations</title>
+        <title>Greenplum数据库中PL/Perl限制</title>
         <body>
-            <p> Limitations of the Greenplum Database PL/Perl language include: <ul>
-                    <li>Greenplum Database does not support PL/Perl triggers.</li>
-                    <li>PL/Perl functions cannot call each other directly.</li>
-                    <li>SPI is not yet fully implemented.</li>
-                    <li>If you fetch very large data sets using <codeph>spi_exec_query()</codeph>,
-                        you should be aware that these will all go into memory. You can avoid this
-                        problem by using <codeph>spi_query()/spi_fetchrow()</codeph>. A similar
-                        problem occurs if a set-returning function passes a large set of rows back
-                        to Greenplum Database via a <codeph>return</codeph> statement. Use
-                            <codeph>return_next</codeph> for each row returned to avoid this
-                        problem.</li>
-                    <li>When a session ends normally, not due to a fatal error, PL/Perl executes any
-                            <codeph>END</codeph> blocks that you have defined. No other actions are
-                        currently performed. (File handles are not automatically flushed and objects
-                        are not automatically destroyed.)</li>
+            <p>Greenplum数据库PL/Perl的限制包括：<ul>
+                    <li>Greenplum数据库不支持PL/Perl触发器。</li>
+                    <li>PL/Perl函数不能直接相互调用。</li>
+                    <li>SPI还没有完全的实现。</li>
+                    <li>如果用户使用<codeph>spi_exec_query()</codeph>获取非常大的数据集，用户应该要意识到它们都将进入内存中。
+                        用户可以通过使用<codeph>spi_query()/spi_fetchrow()</codeph>来防止这个问题的发生。
+                        一个相似的问题也可能发生，当集合返回函数通过一个<codeph>return</codeph>语句传递一个大量行的数据集到Greenplum数据库中。
+                        对每一返回行使用<codeph>return_next</codeph>能够避免该问题的出现。
+                        </li>
+                    <li>当一个会话正常结束而不是由于一个致命错误结束时，PL/Perl会执行用户定义好的任何<codeph>END</codeph>块。
+                        当前没有其它的动作执行（文件处理不会被自动地刷写并且对象也不会被自动销毁）。
+                        </li>
                 </ul>
             </p>
         </body>
@@ -60,106 +58,99 @@
 
 
     <topic id="topic31" xml:lang="en">
-        <title>Trusted/Untrusted Language</title>
+        <title>可信/不可信语言</title>
         <body>
-            <p> PL/Perl includes trusted and untrusted language variants. </p>
-            <p> The PL/Perl trusted language is named <codeph>plperl</codeph>. The trusted PL/Perl
-                language restricts file system operations, as well as <codeph>require</codeph>,
-                    <codeph>use</codeph>, and other statements that could potentially interact with
-                the operating system or database server process. With these restrictions in place,
-                any Greenplum Database user can create and execute functions in the trusted
-                    <codeph>plperl</codeph> language. </p>
-            <p> The PL/Perl untrusted language is named <codeph>plperlu</codeph>. You cannot
-                restrict the operation of functions you create with the <codeph>plperlu</codeph>
-                untrusted language. Only database superusers have privileges to create untrusted
-                PL/Perl user-defined functions. And only database superusers and other database
-                users that are explicitly granted the permissions can execute untrusted PL/Perl
-                user-defined functions. </p>
-            <p> PL/Perl has limitations with respect to communication between interpreters and the
-                number of interpreters running in a single process. Refer to the PostgreSQL <xref
-                    href="https://www.postgresql.org/docs/9.4/plperl-trusted.html"
-                    scope="external" format="html">Trusted and Untrusted PL/Perl</xref>
-                documentation for additional information. </p>
+            <p>PL/Perl 包含了可信和不可信两种语言的变体。</p>
+            <p>PL/Perl可信语言被命名为<codeph>plperl</codeph>。
+                可信PL/Perl语言限制文件系统操作，和<codeph>require</codeph>、<codeph>use</codeph>以及其它可能同操作系统或者数据库服务进程进行交互的语句。
+                有了这些限制，任何Greenplum用户能够创建和执行可信的<codeph>plperl</codeph>语言的函数。
+                </p>
+            <p>PL/Perl不可信语言被命名为<codeph>plperlu</codeph>。
+                您不能使用<codeph>plperlu</codeph>不受信任的语言限制您创建的函数的操作。
+                只有数据库的超级用户才有权限创建有不可信PL/Perl语言的用户定义函数。
+                同时只有数据库的超级用户以及其他被显式授予特权的用户能够执行不可信PL/Perl的用户定义函数。
+                </p>
+            <p>在解释器以及运行在单个进程中的多个解释器之间的通信方面，PL/Perl有限制。
+                请参考 PostgreSQL的<xref
+                        href="https://www.postgresql.org/docs/9.4/plperl-trusted.html"
+                        scope="external" format="html">可信与不可信PL/Perl</xref>PL/Perl文档获取更多的信息。
+                </p>
         </body>
     </topic>
 
     <topic id="topic6" xml:lang="en">
-        <title>Enabling and Removing PL/Perl Support</title>
+        <title>启用和移除PL/Perl支持</title>
         <body>
-            <p> You must register the PL/Perl language with a database before you can create and
-                execute a PL/Perl user-defined function within that database. To remove PL/Perl
-                support, you must explicitly remove the extension from each database in which it was
-                registered. You must be a database superuser or owner to register or remove trusted
-                languages in Greenplum databases. </p>
-            <note>Only database superusers may register or remove support for the <i>untrusted</i>
-                PL/Perl language <codeph>plperlu</codeph>.</note>
-            <p> Before you enable or remove PL/Perl support in a database, ensure that: <ul>
-                    <li>Your Greenplum Database is running.</li>
-                    <li>You have sourced <codeph>greenplum_path.sh</codeph>.</li>
-                    <li>You have set the <codeph>$MASTER_DATA_DIRECTORY</codeph> and
-                            <codeph>$GPHOME</codeph> environment variables.</li>
+            <p>在用户能在数据库中创建以及执行一个PL/Perl的用户定义函数前，必须要在该数据库上注册PL/Perl语言。
+                要实现移除PL/Perl，用户必须显式的从每一个它注册的数据库中移除扩展。
+                您必须是数据库超级用户或所有者才能在Greenplum数据库中注册或删除受信任的语言。
+                </p>
+            <note>只用数据库超级用户可能注册或者移除对不可信PL/Perl语言<codeph>plperlu</codeph>的支持。
+                </note>
+            <p>在用户在数据库中开启或者移除PL/Perl支持之前，确保：
+                <ul>
+                    <li>用户的Greenplum数据库正在运行。</li>
+                    <li>用户已经执行（source）了<codeph>greenplum_path.sh</codeph>。</li>
+                    <li>用户已经设置了<codeph>$MASTER_DATA_DIRECTORY</codeph>和<codeph>$GPHOME</codeph>环境变量。
+                        </li>
                 </ul>
             </p>
         </body>
         <topic id="topic61" xml:lang="en">
-            <title>Enabling PL/Perl Support</title>
+            <title>开启PL/Perl支持</title>
             <body>
-                <p> For each database in which you want to enable PL/Perl, register the language
-                    using the SQL <codeph><xref href="../sql_commands/CREATE_EXTENSION.xml">CREATE
-                            EXTENSION</xref></codeph> command. For example, run the following
-                    command as the <codeph>gpadmin</codeph> user to register the trusted PL/Perl
-                    language for the database named <codeph>testdb</codeph>: </p>
+                <p>对于要在其中启用PL/Perl的每个数据库，请使用SQL <codeph><xref href="../sql_commands/CREATE_EXTENSION.xml">CREATE
+                    EXTENSION</xref></codeph>命令注册该语言。
+                    例如，以<codeph>gpadmin</codeph>用户身份运行以下命令，为名为<codeph>testdb</codeph>的数据库注册可信PL/Perl语言：
+                    </p>
                 <codeblock>$ psql -d testdb -c 'CREATE EXTENSION plperl;'</codeblock>
             </body>
         </topic>
         <topic id="topic62" xml:lang="en">
-            <title>Removing PL/Perl Support</title>
+            <title>移除PL/Perl</title>
             <body>
-                <p> To remove support for PL/Perl from a database, run the SQL <codeph><xref
-                            href="../sql_commands/DROP_EXTENSION.xml">DROP EXTENSION</xref></codeph>
-                    command. For example, run the following command as the <codeph>gpadmin</codeph>
-                    user to remove support for the trusted PL/Perl language from the database named
-                        <codeph>testdb</codeph>: </p>
+                <p>要从数据库中删除对PL/Perl的支持，请运行SQL <codeph><xref
+                        href="../sql_commands/DROP_EXTENSION.xml">DROP EXTENSION</xref></codeph>命令。
+                    例如，以<codeph>gpadmin</codeph>用户身份运行以下命令，从名为<codeph>testdb</codeph>的数据库中删除对可信PL/Perl语言的支持：
+                    </p>
                 <codeblock>$ psql -d testdb -c 'DROP EXTENSION plperl;'</codeblock>
-                <p> The default command fails if any existing objects (such as functions) depend on
-                    the language. Specify the <codeph>CASCADE</codeph> option to also drop all
-                    dependent objects, including functions that you created with PL/Perl. </p>
+                <p>如果任何现有对象（如函数）依赖于语言，则默认命令将失败。
+                    指定<codeph>CASCADE</codeph>选项也可以删除所有依赖对象，包括使用PL/Perl创建的函数。
+                    </p>
             </body>
         </topic>
     </topic>
 
     <topic id="topic33" xml:lang="en">
-        <title>Developing Functions with PL/Perl</title>
+        <title>用PL/Perl开发函数</title>
         <body>
-            <p> You define a PL/Perl function using the standard SQL <codeph><xref
-                        href="../sql_commands/CREATE_FUNCTION.xml#topic1">CREATE
-                    FUNCTION</xref></codeph> syntax. The body of a PL/Perl user-defined function is
-                ordinary Perl code. The PL/Perl interpreter wraps this code inside a Perl
-                subroutine. </p>
-            <p> You can also create an anonymous code block with PL/Perl. An anonymous code block,
-                called with the SQL <codeph><xref href="../sql_commands/DO.xml#topic1"
-                    >DO</xref></codeph> command, receives no arguments, and whatever value it might
-                return is discarded. Otherwise, a PL/Perl anonymous code block behaves just like a
-                function. Only database superusers create an anonymous code block with the untrusted
-                    <codeph>plperlu</codeph> language. </p>
-            <p> The syntax of the <codeph>CREATE FUNCTION</codeph> command requires that you write
-                the PL/Perl function body as a string constant. While it is more convenient to use
-                dollar-quoting, you can choose to use escape string syntax (<codeph>E''</codeph>)
-                provided that you double any single quote marks and backslashes used in the body of
-                the function. </p>
-            <p> PL/Perl arguments and results are handled as they are in Perl. Arguments you pass in
-                to a PL/Perl function are accessed via the <codeph>@_</codeph> array. You return a
-                result value with the <codeph>return</codeph> statement, or as the last expression
-                evaluated in the function. A PL/Perl function cannot directly return a non-scalar
-                type because you call it in a scalar context. You can return non-scalar types such
-                as arrays, records, and sets in a PL/Perl function by returning a reference. </p>
-            <p> PL/Perl treats null argument values as "undefined". Adding the
-                    <codeph>STRICT</codeph> keyword to the <codeph>LANGUAGE</codeph> subclause
-                instructs Greenplum Database to immediately return null when any of the input
-                arguments are null. When created as <codeph>STRICT</codeph>, the function itself
-                need not perform null checks. </p>
-            <p>The following PL/Perl function utilizes the <codeph>STRICT</codeph> keyword to return
-                the greater of two integers, or null if any of the inputs are null: </p>
+            <p>您可以使用标准SQL <codeph><xref
+                    href="../sql_commands/CREATE_FUNCTION.xml#topic1">CREATE
+                FUNCTION</xref></codeph>语法定义PL/Perl函数。
+                PL/Perl用户定义函数的主体是普通的Perl代码。
+                PL/Perl解释器将此代码包装在Perl子例程中。
+                </p>
+            <p>您还可以使用PL/Perl创建匿名代码块。
+                使用SQL <codeph><xref href="../sql_commands/DO.xml#topic1"
+                >DO</xref></codeph>命令调用的匿名代码块不接收任何参数，并且丢弃它可能返回的任何值。
+                否则，PL/Perl匿名代码块的行为就像一个函数。
+                只有数据库超级用户使用不受信任的<codeph>plperlu</codeph>语言创建匿名代码块。
+                </p>
+            <p><codeph>CREATE FUNCTION</codeph>命令的语法要求您将PL/Perl函数体写为字符串常量。
+                虽然使用美元引用更方便，但您可以选择使用转义字符串语法（<codeph>E''</codeph>），前提是您将函数体中使用的任何单引号和反斜杠加倍。
+                </p>
+            <p>PL/Perl参数和结果在Perl中处理。
+                传递给PL/Perl函数的参数可通过<codeph>@_</codeph>数组访问。
+                使用<codeph>return</codeph>语句返回结果值，或者作为函数中计算的最后一个表达式返回结果值。
+                PL/Perl函数不能直接返回非标量类型，因为您在标量上下文中调用它。
+                您可以通过返回引用来返回PL/Perl函数中的非标量类型（如数组，记录和集）。
+                </p>
+            <p>PL/Perl将null参数值视为“未定义”。
+                将<codeph>STRICT</codeph>关键字添加到<codeph>LANGUAGE</codeph>子句指示Greenplum数据库在任何输入参数为null时立即返回null。
+                当创建为<codeph>STRICT</codeph>时，函数本身不需要执行null检查。
+                </p>
+            <p>以下PL/Perl函数使用<codeph>STRICT</codeph>关键字返回两个整数中的较大者，如果任何输入为null，则返回null：
+                </p>
             <codeblock>
 CREATE FUNCTION perl_max (integer, integer) RETURNS integer AS $$
     if ($_[0] > $_[1]) { return $_[0]; }
@@ -179,34 +170,28 @@ SELECT perl_max( 1, null );
 (1 row)
 </codeblock>
 
-            <p> PL/Perl considers anything in a function argument that is not a reference to be a
-                string, the standard Greenplum Database external text representation. The argument
-                values supplied to a PL/Perl function are simply the input arguments converted to
-                text form (just as if they had been displayed by a <codeph>SELECT</codeph>
-                statement). In cases where the function argument is not an ordinary numeric or text
-                type, you must convert the Greenplum Database type to a form that is more usable by
-                Perl. Conversely, the <codeph>return</codeph> and <codeph>return_next</codeph>
-                statements accept any string that is an acceptable input format for the function's
-                declared return type. </p>
-            <p> Refer to the PostgreSQL <xref
+            <p>PL/Perl认为函数参数中的任何内容都不是对字符串的引用，即标准的Greenplum数据库外部文本表示。
+                提供给PL/Perl函数的参数值只是转换为文本形式的输入参数（就像它们已经被<codeph>SELECT</codeph>语句显示一样）。
+                如果函数参数不是普通的数字或文本类型，则必须将Greenplum数据库类型转换为Perl更易使用的形式。
+                相反，<codeph>return</codeph>和<codeph>return_next</codeph>语句接受任何字符串，该字符串是函数声明的返回类型的可接受输入格式。
+                </p>
+            <p>有关其他信息，请参阅PostgreSQL <xref
                     href="https://www.postgresql.org/docs/9.4/plperl-funcs.html"
-                    scope="external" format="html">PL/Perl Functions and Arguments</xref>
-                documentation for additional information, including composite type and result set
-                manipulation. </p>
+                    scope="external" format="html">PL/Perl函数和参数</xref>文档，包括复合类型和结果集操作。
+                </p>
 
         </body>
 
         <topic id="topic3311" xml:lang="en">
-            <title>Built-in PL/Perl Functions</title>
+            <title>内置PL/Perl函数</title>
             <body>
-                <p>PL/Perl includes built-in functions to access the database, including those to
-                    prepare and perform queries and manipulate query results. The language also
-                    includes utility functions for error logging and string manipulation. </p>
-                <p> The following example creates a simple table with an integer and a text column.
-                    It creates a PL/Perl user-defined function that takes an input string argument
-                    and invokes the <codeph>spi_exec_query()</codeph> built-in function to select
-                    all columns and rows of the table. The function returns all rows in the query
-                    results where the <codeph>v</codeph> column includes the function input string. </p>
+                <p>PL/Perl包含用于访问数据库的内置函数，包括用于准备和执行查询以及操作查询结果的函数。
+                    该语言还包括用于错误记录和字符串操作的实用程序函数。
+                    </p>
+                <p>以下示例创建一个包含整数和文本列的简单表。
+                    它创建一个PL/Perl用户定义函数，该函数接受输入字符串参数并调用<codeph>spi_exec_query()</codeph>内置函数来选择表的所有列和行。
+                    该函数返回查询结果中的所有行，其中<codeph>v</codeph>列包含函数输入字符串。
+                    </p>
                 <codeblock>
 CREATE TABLE test (
     i int,
@@ -248,21 +233,19 @@ SELECT return_match( 'iff' );
  (4,different)
 (1 row)
 </codeblock>
-                <p> Refer to the PostgreSQL PL/Perl <xref
+                <p>有关可用函数的详细讨论，请参阅PostgreSQL PL/Perl<xref
                         href="https://www.postgresql.org/docs/9.4/plperl-builtins.html"
-                        scope="external" format="html">Built-in Functions</xref> documentation for a
-                    detailed discussion of available functions. </p>
+                        scope="external" format="html">内置函数文档</xref>。
+                    </p>
             </body>
         </topic>
         <topic id="topic331" xml:lang="en">
-            <title>Global Values in PL/Perl</title>
+            <title>PL/Perl中的全局值</title>
             <body>
-                <p> You can use the global hash map <codeph>%_SHARED</codeph> to share data,
-                    including code references, between PL/Perl function calls for the lifetime of
-                    the current session. </p>
-                <p> The following example uses <codeph>%_SHARED</codeph> to share data between the
-                    user-defined <codeph>set_var()</codeph> and <codeph>get_var()</codeph> PL/Perl
-                    functions: </p>
+                <p>您可以使用全局哈希映射<codeph>%_SHARED</codeph>在当前会话的生命周期内在PL/Perl函数调用之间共享数据，包括代码引用。
+                    </p>
+                <p>以下示例使用<codeph>%_SHARED</codeph>在用户定义的<codeph>set_var()</codeph>和<codeph>get_var()</codeph> PL/Perl函数之间共享数据：
+                    </p>
                 <codeblock>
 CREATE OR REPLACE FUNCTION set_var(name text, val text) RETURNS text AS $$
     if ($_SHARED{$_[0]} = $_[1]) {
@@ -288,35 +271,32 @@ SELECT get_var('key1');
  value1
 (1 row)
 </codeblock>
-                <p> For security reasons, PL/Perl creates a separate Perl interpreter for each role.
-                    This prevents accidental or malicious interference by one user with the behavior
-                    of another user's PL/Perl functions. Each such interpreter retains its own value
-                    of the <codeph>%_SHARED</codeph> variable and other global state. Two PL/Perl
-                    functions share the same value of <codeph>%_SHARED</codeph> if and only if they
-                    are executed by the same SQL role. </p>
-                <p> There are situations where you must take explicit steps to ensure that PL/Perl
-                    functions can share data in <codeph>%_SHARED</codeph>. For example, if an
-                    application executes under multiple SQL roles (via <codeph>SECURITY
-                        DEFINER</codeph> functions, use of <codeph>SET ROLE</codeph>, etc.) in a
-                    single session, make sure that functions that need to communicate are owned by
-                    the same user, and mark these functions as <codeph>SECURITY DEFINER</codeph>.
-                </p>
+                <p>出于安全原因，PL/Perl为每个角色创建一个单独的Perl解释器。
+                    这可以防止一个用户对另一个用户的PL/Perl函数的行为进行意外或恶意干扰。
+                    每个这样的解释器都保留其自己的<codeph>%_SHARED</codeph>变量值和其他全局状态。
+                    当且仅当它们由相同的SQL角色执行时，两个PL/Perl函数共享相同的<codeph>%_SHARED</codeph>值。
+                    </p>
+                <p>在某些情况下，您必须采取明确的步骤来确保PL/Perl函数可以在<codeph>%_SHARED</codeph>中共享数据。
+                    例如，如果应用程序在单个会话中在多个SQL角色（通过<codeph>SECURITY DEFINER</codeph>函数，使用<codeph>SET ROLE</codeph>等）下执行，
+                    请确保需要通信的函数由同一用户拥有，并将这些函数标记为<codeph>SECURITY DEFINER</codeph>。
+                    </p>
             </body>
         </topic>
 
         <topic id="topic335" xml:lang="en">
-            <title>Notes</title>
+            <title>备注</title>
             <body>
-                <p> Additional considerations when developing PL/Perl functions: <ul>
-                        <li>PL/Perl internally utilizes the UTF-8 encoding. It converts any
-                            arguments provided in other encodings to UTF-8, and converts return
-                            values from UTF-8 back to the original encoding.</li>
-                        <li>Nesting named PL/Perl subroutines retains the same dangers as in
-                            Perl.</li>
-                        <li>Only the untrusted PL/Perl language variant supports module import. Use
-                                <codeph>plperlu</codeph> with care.</li>
-                        <li>Any module that you use in a <codeph>plperlu</codeph> function must be
-                            available from the same location on all Greenplum Database hosts.</li>
+                <p>在开发PL/Perl函数其它要考虑的：<ul>
+                        <li>PL/Perl内部使用UTF-8编码。
+                            它将其他编码中提供的任何参数转换为UTF-8，并将UTF-8的返回值转换回原始编码。
+                            </li>
+                        <li>嵌套命名的PL/Perl子例程保留了与Perl相同的危险。
+                            </li>
+                        <li>只有不受信任的PL/Perl语言变体支持模块导入。
+                            小心使用<codeph>plperlu</codeph>。
+                            </li>
+                        <li>您在<codeph>plperlu</codeph>函数中使用的任何模块都必须在所有Greenplum数据库主机上的相同位置可用。
+                            </li>
                     </ul>
                 </p>
             </body>
