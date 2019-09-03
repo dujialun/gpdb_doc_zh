@@ -1,75 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title>GPORCA Limitations</title>
+  <title>GPORCA的限制</title>
   <abstract>
-    <shortdesc>There are limitations in Greenplum Database when using the default GPORCA optimizer.
-      GPORCA and the Postgres query optimizer currently coexist in Greenplum Database because GPORCA
-      does not support all Greenplum Database features. </shortdesc>
+    <shortdesc>在Greenplum数据库中使用默认的GPORCA优化器时有一些限制。GPORCA和传统的查询优化器当前并存于Greenplum数据库中，因为GPORCA不支持所有的Greenplum数据库特性。</shortdesc>
   </abstract>
   <body>
-    <p>This section describes the limitations. <ul id="ul_a3q_pbm_vp">
+    <p>这一节描述这些限制。 <ul id="ul_a3q_pbm_vp">
         <li><xref href="#topic_kgn_vxl_vp" format="dita"/></li>
         <li><xref href="#topic_u4t_vxl_vp" format="dita"/></li>
       </ul></p>
   </body>
   <topic id="topic_kgn_vxl_vp">
-    <title>Unsupported SQL Query Features</title>
+    <title>不支持的SQL查询特性</title>
     <body>
-      <p>These are unsupported features when GPORCA is enabled (the default): <ul id="ul_ndm_gyl_vp">
-          <li>Indexed expressions (an index defined as expression based on one or more columns of
-            the table)</li>
-          <li>GIN indexing method. GPORCA supports only B-tree, bitmap, and GiST indexes. GPORCA
-            ignores indexes created with unsupported methods.</li>
-          <li>External parameters</li>
-          <li>These types of partitioned tables:<ul id="ul_v2m_mmc_bt">
-              <li>Non-uniform partitioned tables.</li>
-              <li>Partitioned tables that have been altered to use an external table as a leaf child
-                partition.</li>
+      <p>下面这些是GPORCA被启用时（默认启用）不支持的特性： <ul id="ul_ndm_gyl_vp">
+          <li>索引表达式（在基于表的一个或者更多列的表达式上定义的索引）</li>
+          <li>GIN索引方法。GPORCA只支持B树、位图和Gist索引。GPORCA忽略使用不支持的方法创建的索引。</li>
+          <li>外部参数</li>
+          <li>这些类型的分区表：<ul id="ul_v2m_mmc_bt">
+              <li>非统一分区表。</li>
+              <li>被修改为用一个外部表作为叶子子分区的分区表。</li>
             </ul></li>
           <li>SortMergeJoin (SMJ).</li>
-          <li>Ordered aggregations.</li>
-          <li>These analytics extensions:<ul id="ul_iwr_3yl_vp">
+          <li>有序聚集</li>
+          <li>这些分析扩展：<ul id="ul_iwr_3yl_vp">
               <li>CUBE</li>
-              <li>Multiple grouping sets</li>
+              <li>多分组集</li>
             </ul></li>
-          <li>These scalar operators:<ul id="ul_nd2_kyl_vp">
+          <li>这些标量操作符：<ul id="ul_nd2_kyl_vp">
               <li><cmdname>ROW</cmdname></li>
               <li><cmdname>ROWCOMPARE</cmdname></li>
               <li><cmdname>FIELDSELECT</cmdname></li>
             </ul></li>
-          <li>Aggregate functions that take set operators as input arguments.</li>
-          <li><cmdname>percentile_*</cmdname> window functions (Greenplum Database does not support
-            ordered-set aggregate functions).</li>
-          <li>Inverse distribution functions.</li>
-          <li>Queries that execute functions that are defined with the <codeph>ON MASTER</codeph> or
-              <codeph>ON ALL SEGMENTS</codeph> attribute.</li>
-          <li>Queries that contain UNICODE characters in metadata names, such as table names, and
-            the characters are not compatible with the host system locale.</li>
-          <li><codeph>SELECT</codeph>, <codeph>UPDATE</codeph>, and <codeph>DELETE</codeph> commands
-            where a table name is qualified by the <codeph>ONLY</codeph> keyword.</li>
-          <li>Per-column collation. GPORCA supports collation only when all columns in the query use
-            the same collation. If columns in the query use different collations, then Greenplum
-            uses the Postgres query planner.</li>
+          <li>将集合运算符作为输入参数的聚合函数。</li>
+          <li><cmdname>percentile_*</cmdname>窗口函数（Greenplum数据库不支持有序集聚合函数）。</li>
+          <li>逆分布函数</li>
+          <li>执行用<codeph>ON MASTER</codeph>或
+              <codeph>ON ALL SEGMENTS</codeph>属性定义的函数的查询。</li>
+          <li>在元数据名称（如表名）中包含Unicode字符的查询，以及字符与主机系统区域设置不兼容。</li>
+          <li>表名由关键字<codeph>ONLY</codeph>指定的<codeph>SELECT</codeph>，<codeph>UPDATE</codeph>和<codeph>DELETE</codeph>命令。</li>
+          <li>按列排序规则。只有当查询中的所有列都使用时，GPORCA才支持排序规则相同的排序规则。如果查询中的列使用不同的排序规则，Greenplum则使用传统查询计划器。</li>
         </ul></p>
     </body>
   </topic>
   <topic id="topic_u4t_vxl_vp">
-    <title>Performance Regressions</title>
+    <title>性能衰退</title>
     <body>
-      <p>The following features are known performance regressions that occur with GPORCA enabled:<ul
+      <p>启用GPORCA时，已知下列特性会发生性能衰退：<ul
           id="ul_zp2_4yl_vp">
-          <li>Short running queries - For GPORCA, short running queries might encounter additional
-            overhead due to GPORCA enhancements for determining an optimal query execution
-            plan.</li>
-          <li><cmdname>ANALYZE</cmdname> - For GPORCA, the <cmdname>ANALYZE</cmdname> command
-            generates root partition statistics for partitioned tables. For the Postgres optimizer,
-            these statistics are not generated.</li>
-          <li>DML operations - For GPORCA, DML enhancements including the support of updates on
-            partition and distribution keys might require additional overhead. </li>
+          <li>短查询 - 对于GPORCA，短查询可能会因为GPORCA对于判断最优查询执行计划的增强而遇到额外的负担。</li>
+          <li><cmdname>ANALYZE</cmdname> - 对于GPORCA，ANALYZE命令为分区表生成根分区的统计信息。对于传统优化器，这些统计信息不会被生成。</li>
+          <li>DML操作 - 对于GPORCA，DML增强包括在分区和分布键上的更新支持，这可能会产生额外的负担。 </li>
         </ul></p>
-      <p>Also, enhanced functionality of the features from previous versions could result in
-        additional time required when GPORCA executes SQL statements with the features. </p>
+      <p>此外，GPORCA使用这些特性执行SQL语句时，以前版本特性的增强功能可能会导致额外的时间。</p>
     </body>
   </topic>
 </topic>
