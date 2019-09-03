@@ -2,15 +2,10 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic101">
-   <title>Escaping in CSV Formatted Files</title>
+   <title>在CSV格式的文件中转义</title>
    <body>
-      <p>By default, the escape character is a <codeph>"</codeph> (double quote) for CSV-formatted
-         files. If you want to use a different escape character, use the <codeph>ESCAPE</codeph>
-         clause of <codeph>COPY</codeph>, <codeph>CREATE EXTERNAL TABLE</codeph> or
-            <codeph>gpload</codeph> to declare a different escape character. In cases where your
-         selected escape character is present in your data, you can use it to escape itself.</p>
-      <p>For example, suppose you have a table with three columns and you want to load the following
-         three fields:</p>
+      <p>默认情况下，对于CSV格式的文件，转义字符是一个<codeph>"</codeph>（双引号）。如果用户想用一个不同的转义字符，使用<codeph>COPY</codeph>、<codeph>CREATE EXTERNAL TABLE</codeph>或者<codeph>gpload</codeph>的<codeph>ESCAPE</codeph>子句来声明一个不同的转义字符。在用户选择的转义字符出现在数据的情况中，用户可以使用它来转义自身。</p>
+      <p>例如，假定用户有一个带有三列的表并且用户想载入下列的三个域：</p>
       <ul>
          <li id="du174962">
             <codeph>Free trip to A,B</codeph>
@@ -22,27 +17,18 @@
             <codeph>Special rate "1.79"</codeph>
          </li>
       </ul>
-      <p>Your designated delimiter character is <codeph>,</codeph> (comma), and your designated
-         escape character is <codeph>"</codeph> (double quote). The formatted row in your data file
-         looks like this:</p>
+      <p>用户指派的定界符是<codeph>,</codeph>（逗号），并且用户指派的转义字符是<codeph>"</codeph>（双引号）。用户的数据文件中的已格式化行看起来像这样：</p>
       <codeblock>
          <codeph>"</codeph>Free trip to A,B<codeph>"</codeph>,<codeph>"</codeph>5.89<codeph>"</codeph>,<codeph>"</codeph>Special rate <codeph>""</codeph>1.79<codeph>"""
 </codeph>
       </codeblock>
-      <p>The data value with a comma character that is part of the data is enclosed in double
-         quotes. The double quotes that are part of the data are escaped with a double quote even
-         though the field value is enclosed in double quotes. </p>
-      <p>Embedding the entire field inside a set of double quotes guarantees preservation of leading
-         and trailing whitespace characters:</p>
+      <p>带有一个作为数据一部分的逗号字符的数据值被包裹在双引号中。作为数据一部分的双引号被用一个双引号转义，即使该域值已经被双引号包裹也应如此。 </p>
+      <p>在一组双引号内嵌入整个域确保能保留下前导和拖尾的空白字符：</p>
       <p>
          <codeph>"</codeph>Free trip to A,B <codeph>"</codeph>,<codeph>"</codeph>5.89
             <codeph>"</codeph>,<codeph>"</codeph>Special rate <codeph>""</codeph>1.79<codeph>""
             "</codeph>
       </p>
-      <note type="note">In CSV mode, all characters are significant. A quoted value surrounded by
-         white space, or any characters other than <codeph>DELIMITER</codeph>, includes those
-         characters. This can cause errors if you import data from a system that pads CSV lines with
-         white space to some fixed width. In this case, preprocess the CSV file to remove the
-         trailing white space before importing the data into Greenplum Database.</note>
+      <note type="note">在CSV模式中，所有字符都是有意义的。一个被空白或者任何不同于<codeph>DELIMITER</codeph>的字符包围的引用值包括这些字符在内。如果用户导入的数据来自于一个会在CSV行中用空白填充到某种固定宽度的系统，这可能会导致错误。在这种情况下，可预处理CSV文件，在把该数据导入到Greenplum数据之前移除拖尾的空白。</note>
    </body>
 </topic>

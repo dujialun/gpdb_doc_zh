@@ -4,7 +4,10 @@
 <topic xml:lang="en" id="topic1">
   <title>pg_user_mapping</title>
   <body>
-    <p>The system catalog table <codeph>pg_user_mapping</codeph> stores the mappings from local user to remote user. You must have administrator privileges to view this catalog. Access to this catalog is restricted from normal users, use the <codeph>pg_user_mappings</codeph> view instead.</p>
+    <p>系统目录表<codeph>pg_user_mapping</codeph>存储从本地用户到远程用户的映射。
+      您必须具有管理员权限才能查看此目录。
+      普通用户仅限访问此目录，请改用<codeph>pg_user_mappings</codeph>视图。
+      </p>
     <table id="table_zgy_xfx_tz">
       <title>pg_catalog.pg_user_mapping</title>
       <tgroup cols="4">
@@ -14,10 +17,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -25,19 +28,19 @@
             <entry colname="col1"><codeph>umuser</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">OID of the local role being mapped, 0 if the user mapping is public.</entry>
+            <entry colname="col4">要映射的本地角色的OID，如果用户映射是公共的，则为0。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>umserver</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_foreign_server.oid</entry>
-            <entry colname="col4">OID of the foreign server that contains this mapping.</entry>
+            <entry colname="col4">包含此映射的外部服务器的OID。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>umoptions</codeph></entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">User mapping-specific options, as "keyword=value" strings.</entry>
+            <entry colname="col4">特定于用户映射的选项，作为“keyword = value”字符串。</entry>
           </row>
         </tbody>
       </tgroup>

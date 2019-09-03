@@ -2,17 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic98">
-    <title>Representing NULL Values</title>
+    <title>表示NULL值</title>
     <body>
         <p>
-            <codeph>NULL</codeph> represents an unknown piece of data in a column or field. Within
-            your data files you can designate a string to represent null values. The default string
-            is <codeph>\N</codeph> (backslash-N) in <codeph>TEXT</codeph> mode, or an empty value
-            with no quotations in <codeph>CSV</codeph> mode. You can also declare a different string
-            using the <codeph>NULL</codeph> clause of <codeph>COPY</codeph>, <codeph>CREATE EXTERNAL
-                TABLE </codeph>or <codeph>gpload</codeph> when defining your data format. For
-            example, you can use an empty string if you do not want to distinguish nulls from empty
-            strings. When using the Greenplum Database loading tools, any data item
-            that matches the designated null string is considered a null value.</p>
+            <codeph>NULL</codeph>标识列或者域中一片未知的数据。在用户的数据文件中，用户可以指定一个字符串来表示空值。在<codeph>TEXT</codeph>模式中默认的字符串是<codeph>\N</codeph>（反斜线加上N），在<codeph>CSV</codeph>模式中是一个没有引用的空值。用户也可以在定义数据格式时用<codeph>COPY</codeph>、<codeph>CREATE EXTERNAL TABLE</codeph> 或者<codeph>gpload</codeph>的<codeph>NULL</codeph>子句声明一个不同的字符串。例如，如果用户不想区分空值和空字符串，用户可以使用一个空字符串。在使用Greenplum数据库的装载工具时，任何匹配指定的空值串的数据项都会被认为是一个空值。</p>
     </body>
 </topic>

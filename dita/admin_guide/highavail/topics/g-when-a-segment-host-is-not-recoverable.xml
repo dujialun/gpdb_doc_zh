@@ -2,27 +2,22 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic15">
-      <title>When a segment host is not recoverable</title>
+      <title>当一台Segment主机不可恢复时</title>
       <body>
-            <p>If a host is nonoperational, for example, due to hardware failure, recover the
-                  segments onto a spare set of hardware resources. If mirroring is enabled, you can
-                  recover a segment instance from its mirror onto an alternate host using the
-                              <codeph><xref
-                              href="../../../utility_guide/admin_utilities/gprecoverseg.xml"
-                              >gprecoverseg</xref></codeph> utility. For example:</p>
+            <p>如果一台主机是不可操作的（例如由于硬件失效导致），就需要把那些Segment恢复到备用的硬件资源上。
+                  如果启用了镜像，可以使用<codeph><xref href="../../../utility_guide/admin_utilities/gprecoverseg.xml"
+                                    >gprecoverseg</xref></codeph>工具从segment的镜像把它恢复到另一台主机上。例如：</p>
             <codeblock>$ gprecoverseg -i <i>recover_config_file</i>
       </codeblock>
-            <p>Where the format of the <codeph><i>recover_config_file</i></codeph> file is:</p>
+            <p>其中<codeph><i>recover_config_file</i></codeph>的格式是：</p>
             <codeblock>&lt;<varname>failed_host</varname>&gt;:&lt;<varname>port</varname>&gt;:&lt;<varname>data_dir</varname>&gt;[ &lt;<varname>recovery_host</varname>&gt;:&lt;<varname>port</varname>&gt;:&lt;<varname>recovery_data_dir</varname>&gt;]
 </codeblock>
-            <p>For example, to recover to a different host than the failed host without additional
-                  tablespaces configured (besides the default <i>pg_system</i> tablespace):</p>
+            <p>例如，要恢复到不同于失效主机的另一主机上且该没有额外的文件空间配置， (除默认的<i>pg_system</i>文件空间外）：</p>
             <codeblock>sdw1-1:50001:/data1/mirror/gpseg16 sdw4-1:50001:/data1/recover1/gpseg16
 </codeblock>
-            <p>For information about creating a segment instance recovery file, see <codeph><xref
+            <p>有关创建segment实例恢复文件的详细信息，请见<codeph><xref
                               href="../../../utility_guide/admin_utilities/gprecoverseg.xml"
-                              >gprecoverseg</xref></codeph>.</p>
-            <p>The new recovery segment host must be pre-installed with the Greenplum Database
-                  software and configured exactly as the existing segment hosts.</p>
+                              >gprecoverseg</xref></codeph>。</p>
+            <p>新恢复的Segment主机必须预装好Greenplum数据库软件并且按照现有Segment主机相同的方式配置。</p>
       </body>
 </topic>

@@ -4,8 +4,8 @@
 <topic id="topic1" xml:lang="en">
   <title id="gn143896">pg_exttable</title>
   <body>
-    <p>The <codeph>pg_exttable</codeph> system catalog table is used to track external tables and
-      web tables created by the <codeph>CREATE EXTERNAL TABLE</codeph> command.</p>
+    <p><codeph>pg_exttable</codeph>系统目录表用来追踪由<codeph>CREATE EXTERNAL TABLE</codeph>命令创建的外部表和Web表。
+      </p>
     <table id="gn143898">
       <title>pg_catalog.pg_exttable</title>
       <tgroup cols="4">
@@ -15,10 +15,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -26,79 +26,74 @@
             <entry colname="col1"><codeph>reloid</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">The OID of this external table.</entry>
+            <entry colname="col4">该外部表的OID。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>urilocation</codeph></entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The URI location(s) of the external table files.</entry>
+            <entry colname="col4">外部表文件的URI地址。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>execlocation</codeph></entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The ON segment locations defined for the external table.</entry>
+            <entry colname="col4">为外部表定义的ON Segment位置。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>fmttype</codeph></entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Format of the external table files: <codeph>t</codeph> for text,
-              or <codeph>c</codeph> for csv.</entry>
+            <entry colname="col4">外部表文件的格式：<codeph>t</codeph>是文本，<codeph>c</codeph>是csv。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>fmtopts</codeph></entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Formatting options of the external table files, such as the field
-              delimiter, null string, escape character, etc.</entry>
+            <entry colname="col4">外部表文件的格式化选项，如字段定界符、空字符串、转义字符等。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>options</codeph></entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The options defined for the external table.</entry>
+            <entry colname="col4">为外部表定义的选项。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>command</codeph></entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The OS command to execute when the external table is
-              accessed.</entry>
+            <entry colname="col4">访问外部表所执行的OS命令。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>rejectlimit</codeph></entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The per segment reject limit for rows with errors, after which the
-              load will fail.</entry>
+            <entry colname="col4">每个Segment拒绝错误行的限制，之后装载将失败。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>rejectlimittype</codeph></entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Type of reject limit threshold: <codeph>r</codeph> for number of
-              rows.</entry>
+            <entry colname="col4">拒绝限制的阀值类型：<codeph>r</codeph>表示行数。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>logerrors</codeph></entry>
             <entry colname="col2">bool</entry>
 	    <entry colname="col3"/>
-	    <entry colname="col4"><codeph>1</codeph> to log errors, <codeph>0</codeph> to not.</entry>
+	    <entry colname="col4"><codeph>1</codeph>记录错误，<codeph>0</codeph>不记录。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>encoding</codeph></entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The client encoding.</entry>
+            <entry colname="col4">客户端编码。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>writable</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4"><codeph>0</codeph> for readable external tables,
-                <codeph>1</codeph> for writable external tables.</entry>
+            <entry colname="col4"><codeph>0</codeph>表示可读外部表，
+                <codeph>1</codeph>表示可写外部表。</entry>
           </row>
         </tbody>
       </tgroup>

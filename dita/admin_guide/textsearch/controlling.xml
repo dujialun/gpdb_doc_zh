@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="controlling">
-  <title>Controlling Text Search</title>
-  <shortdesc>This topic shows how to create search and query vectors, how to
-    rank search results, and how to highlight search terms in the results of
-    text search queries. </shortdesc>
+  <title>控制文本搜索</title>
+  <shortdesc>本主题说明如何创建搜索和查询向量，如何对搜索结果进行排名，以及如何在文本搜索查询的结果中突出显示搜索词。
+    </shortdesc>
   <body>
-    <p>To implement full text searching there must be a function to create a
-        <codeph>tsvector</codeph> from a document and a <codeph>tsquery</codeph> from a user query.
-      Also, we need to return results in a useful order, so we need a function that compares
-      documents with respect to their relevance to the query. It's also important to be able to
-      display the results nicely. Greenplum Database provides support for all of these
-      functions.</p>
-    <p>This topic contains the following subtopics:</p>
+    <p>要实现全文搜索，必须有一个函数来从文档创建<codeph>tsvector</codeph>和从用户查询创建<codeph>tsquery</codeph>。
+        此外，我们需要以有用的顺序返回结果，因此我们需要一个函数来比较文档与查询的相关性。
+        能够很好地显示结果也很重要。
+        Greenplum数据库为所有这些功能提供支持。
+      </p>
+    <p>本主题包含以下子主题：</p>
     <ul id="ul_pnw_xxw_4fb">
       <li><xref href="#controlling/parsing-documents" format="dita"/></li>
       <li><xref href="#controlling/parsing-queries" format="dita"/></li>
@@ -20,152 +18,124 @@
       <li><xref href="#controlling/highlighting" format="dita"/></li>
     </ul>
     <section id="parsing-documents">
-      <title>Parsing Documents</title>
-      <p>Greenplum Database provides the function <codeph>to_tsvector</codeph> for converting a
-        document to the <codeph>tsvector</codeph> data type.</p>
+      <title>解析文件</title>
+      <p>Greenplum数据库提供了<codeph>to_tsvector</codeph>函数，用于将文档转换为<codeph>tsvector</codeph>数据类型。
+        </p>
       <codeblock>to_tsvector([<i>config</i> regconfig, ] <i>document</i> text) returns tsvector</codeblock>
-      <p><codeph>to_tsvector</codeph> parses a textual document into tokens, reduces the tokens to
-        lexemes, and returns a <codeph>tsvector</codeph> which lists the lexemes together with their
-        positions in the document. The document is processed according to the specified or default
-        text search configuration. Here is a simple example:</p>
+      <p><codeph>to_tsvector</codeph>将文本文档解析为token，将token缩减为词位，并返回一个<codeph>tsvector</codeph>，其中列出了词位及其在文档中的位置。
+          根据指定或默认文本搜索配置处理文档。
+          这是一个简单的例子：
+        </p>
       <codeblock>SELECT to_tsvector('english', 'a fat  cat sat on a mat - it ate a fat rats');
                   to_tsvector
 -----------------------------------------------------
  'ate':9 'cat':3 'fat':2,11 'mat':7 'rat':12 'sat':4</codeblock>
-      <p>In the example above we see that the resulting tsvector does not contain the words
-          <codeph>a</codeph>, <codeph>on</codeph>, or <codeph>it</codeph>, the word
-          <codeph>rats</codeph> became <codeph>rat</codeph>, and the punctuation sign
-          <codeph>-</codeph> was ignored.</p>
-      <p>The <codeph>to_tsvector</codeph> function internally calls a parser
-        which breaks the document text into tokens and assigns a type to each
-        token. For each token, a list of dictionaries (<xref
-          href="dictionaries.xml#dictionaries"/>) is consulted, where the list
-        can vary depending on the token type. The first dictionary that
-          <i>recognizes</i> the token emits one or more normalized
-          <i>lexemes</i> to represent the token. For example,
-          <codeph>rats</codeph> became <codeph>rat</codeph> because one of the
-        dictionaries recognized that the word <codeph>rats</codeph> is a plural
-        form of <codeph>rat</codeph>. Some words are recognized as <i>stop
-          words</i>, which causes them to be ignored since they occur too
-        frequently to be useful in searching. In our example these are
-          <codeph>a</codeph>, <codeph>on</codeph>, and <codeph>it</codeph>. If
-        no dictionary in the list recognizes the token then it is also ignored.
-        In this example that happened to the punctuation sign <codeph>-</codeph>
-        because there are in fact no dictionaries assigned for its token type
-          (<codeph>Space symbols</codeph>), meaning space tokens will never be
-        indexed. The choices of parser, dictionaries and which types of tokens
-        to index are determined by the selected text search configuration (<xref
-          href="configuration.xml#configuration"/>). It is possible to have many
-        different configurations in the same database, and predefined
-        configurations are available for various languages. In our example we
-        used the default configuration <codeph>english</codeph> for the English
-        language.</p>
-      <p>The function <codeph>setweight</codeph> can be used to label the entries of a
-          <codeph>tsvector</codeph> with a given <i>weight</i>, where a weight is one of the letters
-          <codeph>A</codeph>, <codeph>B</codeph>, <codeph>C</codeph>, or <codeph>D</codeph>. This is
-        typically used to mark entries coming from different parts of a document, such as
-          <codeph>title</codeph> versus <codeph>body</codeph>. Later, this information can be used
-        for ranking of search results.</p>
-      <p>Because <codeph>to_tsvector(NULL)</codeph> will return <codeph>NULL</codeph>, it is
-        recommended to use <codeph>coalesce</codeph> whenever a field might be null. Here is the
-        recommended method for creating a tsvector from a structured document:</p>
+      <p>在上面的例子中，我们看到生成的tsvector不包含单词<codeph>a</codeph>，<codeph>on</codeph>或<codeph>it</codeph>，
+          单词<codeph>rats</codeph>变成<codeph>rat</codeph>，标点符号 <codeph>-</codeph> 被忽略。
+        </p>
+      <p><codeph>to_tsvector</codeph>函数在内部调用解析器，该解析器将文档文本分解为token并为每个token分配类型。
+          对于每个token，查阅字典列表（<xref href="dictionaries.xml#dictionaries"/>），其中列表可以根据token类型而变化。
+          识别token的第一个字典发出一个或多个规范化的词位来表示token。
+          例如，<codeph>rats</codeph>变成<codeph>rat</codeph>，因为其中一个词典认识到单词<codeph>rats</codeph>是复数形式的<codeph>rat</codeph>。
+          有些单词被识别为<i>停止词</i>，这会导致它们被忽略，因为它们过于频繁而无法用于搜索。
+          在我们的例子中，这些是<codeph>a</codeph>，<codeph>on</codeph>和<codeph>it</codeph>。
+          如果列表中没有字典识别出token，那么它也会被忽略。
+          在这个标点符号发生的例子中 <codeph>-</codeph> 因为实际上没有为其token类型（空间符号）分配字典，这意味着空间token永远不会被索引。
+          解析器，字典和要索引的token类型的选择由所选文本搜索配置（<xref href="configuration.xml#configuration"/>）确定。
+          可以在同一数据库中具有许多不同的配置，并且可以为各种语言提供预定义的配置。
+          在我们的示例中，我们使用英语的默认配置<codeph>english</codeph>。
+        </p>
+      <p>函数<codeph>setweight</codeph>可用于标记具有给定权重的<codeph>tsvector</codeph>的条目，其中权重是字母<codeph>A</codeph>，<codeph>B</codeph>，<codeph>C</codeph>或<codeph>D</codeph>之一。
+          这通常用于标记来自文档的不同部分的条目，如<codeph>title</codeph>与<codeph>body</codeph>。
+          之后，此信息可用于搜索结果的排名。
+        </p>
+      <p>因为<codeph>to_tsvector(NULL)</codeph>将返回NULL，所以只要字段可能为null，建议使用<codeph>coalesce</codeph>。
+          以下是从结构化文档创建tsvector的推荐方法：
+        </p>
       <codeblock>UPDATE tt SET ti = setweight(to_tsvector(coalesce(title,'')), 'A') 
   || setweight(to_tsvector(coalesce(keyword,'')), 'B') 
   || setweight(to_tsvector(coalesce(abstract,'')), 'C') 
   || setweight(to_tsvector(coalesce(body,'')), 'D');</codeblock>
-      <p id="p_xn1_lqb_lfb">Here we have used <codeph>setweight</codeph> to
-        label the source of each lexeme in the finished
-          <codeph>tsvector</codeph>, and then merged the labeled
-          <codeph>tsvector</codeph> values using the <codeph>tsvector</codeph>
-        concatenation operator <codeph>||</codeph>. (<xref
-          href="features.xml#features"/> gives details about these
-        operations.)</p>
+      <p id="p_xn1_lqb_lfb">这里我们使用<codeph>setweight</codeph>标记完成的<codeph>tsvector</codeph>中每个词位的来源，
+          然后使用<codeph>tsvector</codeph>连接运算符<codeph>||</codeph>合并标记的<codeph>tsvector</codeph>值。
+          （<xref href="features.xml#features"/>提供有关这些操作的详细信息。）
+        </p>
     </section>
     <section id="parsing-queries">
-      <title>Parsing Queries</title>
-      <p>Greenplum Database provides the functions <codeph>to_tsquery</codeph> and
-          <codeph>plainto_tsquery</codeph> for converting a query to the <codeph>tsquery</codeph>
-        data type. <codeph>to_tsquery</codeph> offers access to more features than
-          <codeph>plainto_tsquery</codeph>, but is less forgiving about its input.</p>
+      <title>解析查询</title>
+      <p>Greenplum数据库提供了<codeph>to_tsquery</codeph>和<codeph>plainto_tsquery</codeph>函数，用于将查询转换为<codeph>tsquery</codeph>数据类型。
+          <codeph>to_tsquery</codeph>提供了比<codeph>plainto_tsquery</codeph>更多功能的访问权限，但对其输入的宽容度较低。
+        </p>
       <codeblock>to_tsquery([<i>config</i> regconfig, ] <i>querytext</i> text) returns tsquery</codeblock>
-      <p><codeph>to_tsquery</codeph> creates a <codeph>tsquery</codeph> value from <i>querytext</i>,
-        which must consist of single tokens separated by the Boolean operators
-          <codeph>&amp;</codeph> (AND), <codeph>|</codeph> (OR) and <codeph>!</codeph>(NOT). These
-        operators can be grouped using parentheses. In other words, the input to
-          <codeph>to_tsquery</codeph> must already follow the general rules for
-          <codeph>tsquery</codeph> input, as described in <xref
-          href="../../ref_guide/datatype-textsearch.xml"/>. The difference is that while basic
-          <codeph>tsquery</codeph> input takes the tokens at face value, <codeph>to_tsquery</codeph>
-        normalizes each token to a lexeme using the specified or default configuration, and discards
-        any tokens that are stop words according to the configuration. For example:</p>
+      <p><codeph>to_tsquery</codeph>从<i>querytext</i>创建一个<codeph>tsquery</codeph>值，
+          该值必须由布尔运算符<codeph>&amp;</codeph> (AND), <codeph>|</codeph> (OR) 和 <codeph>!</codeph>(NOT)分隔的单个token组成。
+          可以使用括号对这些运算符进行分组。
+          换句话说，<codeph>to_tsquery</codeph>的输入必须已经遵循<codeph>tsquery</codeph>输入的一般规则，如<xref href="../../ref_guide/datatype-textsearch.xml"/>中所述。
+          不同之处在于，虽然基本的<codeph>tsquery</codeph>输入将token置于面值，但<codeph>to_tsquery</codeph>使用指定或默认配置将每个token规范化为一个词位，并根据配置丢弃任何停止词的标记。
+          例如：
+          </p>
       <codeblock>SELECT to_tsquery('english', 'The &amp; Fat &amp; Rats');
   to_tsquery   
 ---------------
  'fat' &amp; 'rat'</codeblock>
-      <p>As in basic <codeph>tsquery</codeph> input, weight(s) can be attached to each lexeme to
-        restrict it to match only <codeph>tsvector</codeph> lexemes of those weight(s). For
-        example:</p>
+      <p>与基本的<codeph>tsquery</codeph>输入一样，权重可以附加到每个词位，以限制它仅匹配那些权重的<codeph>tsvector</codeph>词位。
+          例如：
+        </p>
       <codeblock>SELECT to_tsquery('english', 'Fat | Rats:AB');
     to_tsquery    
 ------------------
  'fat' | 'rat':AB</codeblock>
-      <p>Also, <codeph>*</codeph> can be attached to a lexeme to specify prefix matching:</p>
+      <p>此外，<codeph>*</codeph>可以附加到词位以指定前缀匹配：</p>
       <codeblock>SELECT to_tsquery('supern:*A &amp; star:A*B');
         to_tsquery        
 --------------------------
  'supern':*A &amp; 'star':*AB</codeblock>
-      <p>Such a lexeme will match any word in a <codeph>tsvector</codeph> that begins with the given
-        string.</p>
-      <p><codeph>to_tsquery</codeph> can also accept single-quoted phrases. This is primarily useful
-        when the configuration includes a thesaurus dictionary that may trigger on such phrases. In
-        the example below, a thesaurus contains the rule <codeph>supernovae stars : sn</codeph>:</p>
+      <p>这样的词位将匹配以给定字符串开头的<codeph>tsvector</codeph>中的任何单词。</p>
+      <p><codeph>to_tsquery</codeph>也可以接受单引号短语。
+          当配置包括可能触发此类短语的同义词词典时，这是非常有用的。
+          在下面的例子中，同义词库包含规则<codeph>supernovae stars : sn</codeph>：
+        </p>
       <codeblock>SELECT to_tsquery('''supernovae stars'' &amp; !crab');
   to_tsquery
 ---------------
  'sn' &amp; !'crab'</codeblock>
-      <p>Without quotes, <codeph>to_tsquery</codeph> will generate a syntax error for tokens that
-        are not separated by an AND or OR operator.</p>
+      <p>如果没有引号，<codeph>to_tsquery</codeph>将为未被AND或OR运算符分隔的标记生成语法错误。
+        </p>
       <codeblock>plainto_tsquery([ <i>config</i> regconfig, ] <i>querytext</i> ext) returns tsquery</codeblock>
-      <p><codeph>plainto_tsquery</codeph> transforms unformatted text
-          <codeph><i>querytext</i></codeph> to <codeph>tsquery</codeph>. The text is parsed and
-        normalized much as for <codeph>to_tsvector</codeph>, then the <codeph>&amp;</codeph> (AND)
-        Boolean operator is inserted between surviving words.</p>
-      <p>Example:</p>
+      <p><codeph>plainto_tsquery</codeph>未格式化的文本<codeph><i>querytext</i></codeph>转换为<codeph>tsquery</codeph>。
+          对于<codeph>to_tsvector</codeph>，文本被解析和规范化，然后在残存的单词之间插入<codeph>&amp;</codeph>（AND）布尔运算符。
+        </p>
+      <p>示例：</p>
       <codeblock>SELECT plainto_tsquery('english', 'The Fat Rats');
  plainto_tsquery 
 -----------------
  'fat' &amp; 'rat'</codeblock>
-      <p>Note that <codeph>plainto_tsquery</codeph> cannot recognize Boolean operators, weight
-        labels, or prefix-match labels in its input:</p>
+      <p>请注意，<codeph>plainto_tsquery</codeph>无法在其输入中识别布尔运算符，权重标签或前缀匹配标签：
+        </p>
       <codeblock>SELECT plainto_tsquery('english', 'The Fat &amp; Rats:C');
    plainto_tsquery   
 ---------------------
  'fat' &amp; 'rat' &amp; 'c'</codeblock>
-      <p>Here, all the input punctuation was discarded as being space symbols.</p>
+      <p>这里，所有输入标点符号都被丢弃为空格符号。</p>
     </section>
     <section id="ranking">
-      <title>Ranking Search Results</title>
-      <p>Ranking attempts to measure how relevant documents are to a particular
-        query, so that when there are many matches the most relevant ones can be
-        shown first. Greenplum Database provides two predefined ranking
-        functions, which take into account lexical, proximity, and structural
-        information; that is, they consider how often the query terms appear in
-        the document, how close together the terms are in the document, and how
-        important is the part of the document where they occur. However, the
-        concept of relevancy is vague and very application-specific. Different
-        applications might require additional information for ranking, e.g.,
-        document modification time. The built-in ranking functions are only
-        examples. You can write your own ranking functions and/or combine their
-        results with additional factors to fit your specific needs.</p>
-      <p>The two ranking functions currently available are:</p>
+      <title>排名搜索结果</title>
+      <p>排名尝试测量相关文档对特定查询的影响，以便在存在多个匹配时，可以首先显示最相关的匹配。
+          Greenplum数据库提供两个预定义的排名功能，其中考虑了词位，接近度和结构信息;
+          也就是说，他们会考虑查询term在文档中出现的频率，term在文档中的接近程度，以及文档中出现的部分的重要程度。
+          然而，相关性的概念是模糊的并且非常特定于应用程序。
+          不同的应用程序可能需要用于排名的附加信息，例如文档修改时间。
+          内置排名功能仅是示例。
+          您可以编写自己的排名功能和/或将其结果与其他因素结合起来，以满足您的特定需求。
+          </p>
+      <p>目前可用的两个排名功能是：</p>
       <dl>
         <dlentry>
           <dt><codeph>ts_rank([ <i>weights</i> float4[], ] <i>vector</i>
               tsvector, <i>query</i> tsquery [, <i>normalization</i> integer ])
               returns float4</codeph></dt>
           <dd>
-            <p>Ranks vectors based on the frequency of their matching
-              lexemes.</p>
+            <p>根据匹配词位的频率对矢量进行排名。</p>
           </dd>
         </dlentry>
         <dlentry>
@@ -173,64 +143,44 @@
               tsvector, <i>query</i> tsquery [, <i>normalization</i> integer ])
               returns float4</codeph></dt>
           <dd>
-            <p>This function computes the <i>cover density</i> ranking for the
-              given document vector and query, as described in Clarke, Cormack,
-              and Tudhope's "Relevance Ranking for One to Three Term Queries" in
-              the journal "Information Processing and Management", 1999. Cover
-              density is similar to <codeph>ts_rank</codeph> ranking except that
-              the proximity of matching lexemes to each other is taken into
-              consideration.</p>
-            <p>This function requires lexeme positional information to perform
-              its calculation. Therefore, it ignores any "stripped" lexemes in
-              the <codeph>tsvector</codeph>. If there are no unstripped lexemes
-              in the input, the result will be zero. (See <xref
-                href="features.xml#features/manipulating-documents"/> for more
-              information about the <codeph>strip</codeph> function and
-              positional information in <codeph>tsvector</codeph>s.)</p>
+            <p>此函数计算给定文档向量和查询的盖度排名，如Clarke，Cormack和Tudhope在1999年的“信息处理和管理”杂志中的“一至三期查询的相关性排名”中所述。
+                除了考虑到匹配词位之间的接近程度，盖度类似<codeph>ts_rank</codeph>排名。
+                </p>
+            <p>此函数需要词位位置信息来执行其计算。
+                因此，它忽略了<codeph>tsvector</codeph>中的任何“stripped”词位。
+                如果输入中没有未提取的词位，则结果为零。
+                （有关<codeph>tsvector</codeph>中<codeph>strip</codeph>函数和位置信息的更多信息，请参阅<xref href="features.xml#features/manipulating-documents"/>。）
+                </p>
           </dd>
         </dlentry>
       </dl>
-      <p>For both these functions, the optional <codeph><i>weights</i></codeph>
-        argument offers the ability to weigh word instances more or less heavily
-        depending on how they are labeled. The weight arrays specify how heavily
-        to weigh each category of word, in the order:</p>
+      <p>对于这两个函数，可选的权重参数提供了对字实例进行或多或少权衡的能力，具体取决于它们的标注方式。
+          权重数组按以下顺序指定对每个单词类别进行称重的程度：
+          </p>
       <codeblock>{D-weight, C-weight, B-weight, A-weight}</codeblock>
-      <p>If no <codeph><i>weights</i></codeph> are provided, then these defaults
-        are used:</p>
+      <p>如果未提供权重，则使用以下默认值：</p>
       <codeblock>{0.1, 0.2, 0.4, 1.0}</codeblock>
-      <p>Typically weights are used to mark words from special areas of the
-        document, like the title or an initial abstract, so they can be treated
-        with more or less importance than words in the document body.</p>
-      <p>Since a longer document has a greater chance of containing a query term
-        it is reasonable to take into account document size, e.g., a
-        hundred-word document with five instances of a search word is probably
-        more relevant than a thousand-word document with five instances. Both
-        ranking functions take an integer <codeph><i>normalization</i></codeph>
-        option that specifies whether and how a document's length should impact
-        its rank. The integer option controls several behaviors, so it is a bit
-        mask: you can specify one or more behaviors using <codeph>|</codeph>
-        (for example, <codeph>2|4</codeph>).</p>
+      <p>通常，权重用于标记文档特殊区域中的单词，如标题或初始摘要，因此可以比文档正文中的单词更重要或更不重视它们。
+        </p>
+      <p>由于较长的文档更有可能包含查询词语，因此考虑文档大小是合理的，例如，具有五个搜索字实例的百字文档可能比具有五个实例的千字文档更相关。
+          两个排名函数都采用整数规范化选项，该选项指定文档的长度是否以及如何影响其排名。
+          整数选项控制多个行为，因此它是一个位掩码：您可以使用<codeph>|</codeph>指定一个或多个行为（例如，<codeph>2|4</codeph>）。
+        </p>
       <ul id="ul_zbv_y25_kfb">
-        <li>0 (the default) ignores the document length</li>
-        <li>1 divides the rank by 1 + the logarithm of the document length</li>
-        <li>2 divides the rank by the document length</li>
-        <li>4 divides the rank by the mean harmonic distance between extents
-          (this is implemented only by <codeph>ts_rank_cd</codeph>)</li>
-        <li>8 divides the rank by the number of unique words in document</li>
-        <li>16 divides the rank by 1 + the logarithm of the number of unique
-          words in document</li>
-        <li>32 divides the rank by itself + 1</li>
+        <li>0（默认值）忽略文档长度</li>
+        <li>1 将等级除以(1 + 文档长度的对数)</li>
+        <li>2 将等级除以文件长度</li>
+        <li>4 将等级除以范围之间的平均谐波距离（这仅由<codeph>ts_rank_cd</codeph>实现）</li>
+        <li>8 将等级除以文档中唯一单词的数量</li>
+        <li>16 将等级除以(1 +文档中唯一字数的对数)</li>
+        <li>32 将等级除以(等级 + 1)</li>
       </ul>
-      <p>If more than one flag bit is specified, the transformations are applied
-        in the order listed.</p>
-      <p>It is important to note that the ranking functions do not use any
-        global information, so it is impossible to produce a fair normalization
-        to 1% or 100% as sometimes desired. Normalization option <codeph>32
-          (rank/(rank+1))</codeph> can be applied to scale all ranks into the
-        range zero to one, but of course this is just a cosmetic change; it will
-        not affect the ordering of the search results.</p>
-      <p>Here is an example that selects only the ten highest-ranked
-        matches:</p>
+      <p>如果指定了多个标志位，则按列出的顺序应用转换。</p>
+      <p>重要的是要注意，排名函数不使用任何全局信息，因此不可能像有时期望的那样产生1％或100％的公平标准化。
+          归一化选项<codeph>32(rank/(rank+1))</codeph>可用于将所有等级缩放到0到1的范围内，但当然这只是一个表面的变化;
+          它不会影响搜索结果的排序。
+        </p>
+      <p>以下示例仅选择排名最高的十个匹配项：</p>
       <codeblock>SELECT title, ts_rank_cd(textsearch, query) AS rank
 FROM apod, to_tsquery('neutrino|(dark &amp; matter)') query
 WHERE query @@ textsearch
@@ -248,7 +198,7 @@ LIMIT 10;
  Hot Gas and Dark Matter                       |   1.6123
  Ice Fishing for Cosmic Neutrinos              |      1.6
  Weak Lensing Distorts the Universe            | 0.818218</codeblock>
-      <p>This is the same example using normalized ranking:</p>
+      <p>这是使用标准化排名的相同示例：</p>
       <codeblock>SELECT title, ts_rank_cd(textsearch, query, 32 /* rank/(rank+1) */ ) AS rank
 FROM apod, to_tsquery('neutrino|(dark &amp; matter)') query
 WHERE  query @@ textsearch
@@ -266,62 +216,57 @@ LIMIT 10;
  Hot Gas and Dark Matter                       | 0.617195790024749
  Ice Fishing for Cosmic Neutrinos              | 0.615384618911517
  Weak Lensing Distorts the Universe            | 0.450010798361481</codeblock>
-      <p>Ranking can be expensive since it requires consulting the tsvector of
-        each matching document, which can be I/O bound and therefore slow.
-        Unfortunately, it is almost impossible to avoid since practical queries
-        often result in large numbers of matches.</p>
+      <p>排名代价可能很高，因为它需要查询每个匹配文档的tsvector，这可能是I/O相关的，因此很慢。
+          不幸的是，几乎不可能避免，因为实际的查询经常导致大量的匹配。
+        </p>
     </section>
     <section id="highlighting">
-      <title>Highlighting Results</title>
-      <p>To present search results it is ideal to show a part of each document
-        and how it is related to the query. Usually, search engines show
-        fragments of the document with marked search terms. Greenplum Database
-        provides a function <codeph>ts_headline</codeph> that implements this
-        functionality.</p>
+      <title>突出显示结果</title>
+      <p>要显示搜索结果，最好显示每个文档的一部分以及它与查询的关联方式。
+          通常，搜索引擎会显示带有标记搜索词的文档片段。
+          Greenplum数据库提供了一个实现此功能的函数<codeph>ts_headline</codeph>。
+        </p>
       <codeblock>ts_headline([<i>config</i> regconfig, ] <i>document</i> text, <i>query</i> tsquery [, <i>options</i> text ]) returns text</codeblock>
-      <p><codeph>ts_headline</codeph> accepts a document along with a query, and
-        returns an excerpt from the document in which terms from the query are
-        highlighted. The configuration to be used to parse the document can be
-        specified by <codeph><i>config</i></codeph>; if
-          <codeph><i>config</i></codeph> is omitted, the
-          <codeph>default_text_search_config</codeph> configuration is used.</p>
-      <p>If an <codeph><i>options</i></codeph> string is specified it must
-        consist of a comma-separated list of one or more
-            <codeph><i>option=value</i></codeph> pairs. The available options
-        are:</p>
+      <p><codeph>ts_headline</codeph>接受文档和查询，并返回文档中的摘录，其中突出显示查询中的术语。
+          可以通过<codeph><i>config</i></codeph>指定用于解析文档的配置;
+          如果省略<codeph><i>config</i></codeph>，则使用<codeph>default_text_search_config</codeph>配置。
+        </p>
+      <p>如果指定了<codeph><i>options</i></codeph>字符串，则它必须包含一个或多个逗号分隔的<codeph><i>option=value</i></codeph>列表对。
+          可用选项包括：
+        </p>
       <ul id="ul_ndr_bh5_kfb">
-        <li><codeph>StartSel</codeph>, <codeph>StopSel</codeph>: the strings
-          with which to delimit query words appearing in the document, to
-          distinguish them from other excerpted words. You must double-quote
-          these strings if they contain spaces or commas.</li>
-        <li><codeph>MaxWords</codeph>, <codeph>MinWords</codeph>: these numbers
-          determine the longest and shortest headlines to output.</li>
-        <li><codeph>ShortWord</codeph>: words of this length or less will be
-          dropped at the start and end of a headline. The default value of three
-          eliminates common English articles.</li>
-        <li><codeph>HighlightAll</codeph>: Boolean flag; if
-            <codeph>true</codeph> the whole document will be used as the
-          headline, ignoring the preceding three parameters.</li>
-        <li><codeph>MaxFragments</codeph>: maximum number of text excerpts or
-          fragments to display. The default value of zero selects a
-          non-fragment-oriented headline generation method. A value greater than
-          zero selects fragment-based headline generation. This method finds
-          text fragments with as many query words as possible and stretches
-          those fragments around the query words. As a result query words are
-          close to the middle of each fragment and have words on each side. Each
-          fragment will be of at most <codeph>MaxWords</codeph> and words of
-          length <codeph>ShortWord</codeph> or less are dropped at the start and
-          end of each fragment. If not all query words are found in the
-          document, then a single fragment of the first
-            <codeph>MinWords</codeph> in the document will be displayed.</li>
-        <li><codeph>FragmentDelimiter</codeph>: When more than one fragment is
-          displayed, the fragments will be separated by this string.</li>
+        <li><codeph>StartSel</codeph>, <codeph>StopSel</codeph>:
+            用于分隔出现在文档中的查询单词的字符串，以区别于其他摘录的单词。
+            如果这些字符串包含空格或逗号，则必须双引号。
+            </li>
+        <li><codeph>MaxWords</codeph>, <codeph>MinWords</codeph>:
+            这些数字决定了输出的最长和最短标题。
+            </li>
+        <li><codeph>ShortWord</codeph>:
+            这个长度或更短的单词将在标题的开头和结尾处删除。
+            默认值为3消除了常见的英文文章。
+            </li>
+        <li><codeph>HighlightAll</codeph>:
+            布尔标志; 如果为<codeph>true</codeph>，则整个文档将用作标题，忽略前面的三个参数。
+            </li>
+        <li><codeph>MaxFragments</codeph>:
+            要显示的最大文本摘要或片段数。
+            默认值零选择非面向片段的标题生成方法。
+            大于零的值选择基于片段的标题生成。
+            此方法查找具有尽可能多的查询字的文本片段，并在查询字周围拉伸这些片段。
+            结果，查询单词接近每个片段的中间并且每侧都有单词。
+            每个片段最多为<codeph>MaxWords</codeph>，并且在每个片段的开始和结束处删除长度为<codeph>ShortWord</codeph>或更短的单词。
+            如果不是在文档中找到所有查询词，则将显示文档中第一个<codeph>MinWords</codeph>的单个片段。
+            </li>
+        <li><codeph>FragmentDelimiter</codeph>:
+            当显示多个片段时，片段将被此字符串分隔。
+            </li>
       </ul>
-      <p>Any unspecified options receive these defaults:</p>
+      <p>任何未指定的选项都会收到以下默认值：</p>
       <codeblock>StartSel=&lt;b>, StopSel=&lt;/b>,
 MaxWords=35, MinWords=15, ShortWord=3, HighlightAll=FALSE,
 MaxFragments=0, FragmentDelimiter=" ... "</codeblock>
-      <p>For example:</p>
+      <p>示例：</p>
       <codeblock>SELECT ts_headline('english',
   'The most common type of search
 is to find all documents containing given query terms
@@ -346,12 +291,10 @@ query.',
  containing given &lt;query> terms
  and return them in order of their &lt;similarity> to the
  &lt;query>.</codeblock>
-      <p><codeph>ts_headline</codeph> uses the original document, not a
-          <codeph>tsvector</codeph> summary, so it can be slow and should be
-        used with care. A typical mistake is to call
-          <codeph>ts_headline</codeph> for <i>every</i> matching document when
-        only ten documents are to be shown. SQL subqueries can help; here is an
-        example:</p>
+      <p><codeph>ts_headline</codeph>使用原始文档，而不是<codeph>tsvector</codeph>摘要，因此它可能很慢，应谨慎使用。
+          一个典型的错误是当只显示十个文档时，为每个匹配的文档调用<codeph>ts_headline</codeph>。
+          SQL子查询可以提供帮助; 这是一个例子：
+        </p>
       <codeblock>SELECT id, ts_headline(body, q), rank
 FROM (SELECT id, body, q, ts_rank_cd(ti, q) AS rank
       FROM apod, to_tsquery('stars') q

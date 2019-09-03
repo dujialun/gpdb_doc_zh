@@ -2,42 +2,14 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic68">
-    <title>Defining a File-Based Writable External Table</title>
+    <title>定义基于文件的可写外部表</title>
     <body>
-        <p>Writable external tables that output data to files can use the Greenplum parallel file server program,
-                <cmdname>gpfdist</cmdname>, or the Greenplum Platform Extension Framework
-          (PXF), Greenplum's interface to Hadoop. </p>
-        <p>Use the <codeph>CREATE WRITABLE EXTERNAL TABLE</codeph> command to define the external
-            table and specify the location and format of the output files. <ph>See <xref
-                    href="../../external/g-using-the-greenplum-parallel-file-server--gpfdist-.xml#topic13"
-                /> for instructions on setting up <cmdname>gpfdist</cmdname> for use with an
-                external table and <xref href="../../external/pxf-overview.xml" format="dita" scope="peer">Accessing External Data with PXF</xref>
-                for instructions on setting up PXF for use with an external table</ph></p>
+        <p>使用Greenplum并行文件服务器程序<cmdname>gpfdist</cmdname>或者Greenplum平台扩展框架PXF（Greenplum与Hadoop的接口）输出数据到文件的可写外部表。</p>
+        <p>使用<codeph>CREATE WRITABLE EXTERNAL TABLE</codeph>命令定义外部表并且指定输出文件的位置和格式。为配合外部表使用，设置<cmdname>gpfdist</cmdname>的指导可见<xref href="../../external/g-using-the-greenplum-parallel-file-server--gpfdist-.xml#topic13"/> 以及设置PXF以与外部表一起使用的指导可见<xref href="../../external/pxf-overview.xml" format="dita" scope="peer"/></p>
         <ul>
-            <li id="du175508">With a writable external table using the <cmdname>gpfdist</cmdname>
-                protocol, the Greenplum segments send their data to
-                    <cmdname>gpfdist</cmdname>, which writes the data to the named file.
-                    <cmdname>gpfdist</cmdname> must run on a host that the Greenplum segments can access over the network.
-                    <cmdname>gpfdist</cmdname> points to a file location on the output host and
-                writes data received from the Greenplum segments to the
-                file. To divide the output data among multiple files, list multiple
-                    <cmdname>gpfdist</cmdname> URIs in your writable external table definition.</li>
-            <li id="du218710">A writable external web table sends data to an application as a stream
-                of data. For example, unload data from Greenplum Database and send it
-                to an application that connects to another database or ETL tool to load the data
-                elsewhere. Writable external web tables use the <codeph>EXECUTE</codeph> clause to
-                specify a shell command, script, or application to run on the segment hosts and
-                accept an input stream of data. See <xref
-                    href="g-defining-a-command-based-writable-external-web-table.xml#topic71"/> for
-                more information about using <codeph>EXECUTE</codeph> commands in a writable
-                external table definition.</li>
+            <li id="du175508">对于一个使用<cmdname>gpfdist</cmdname>协议的可写外部表，Greenplum的Segment把它们的数据发送到<cmdname>gpfdist</cmdname>，后者会把数据写到指定的文件中。<cmdname>gpfdist</cmdname>必须运行在一个Greenplum的Segment能够通过网络访问的主机上。<cmdname>gpfdist</cmdname>指向一个输出主机上的位置并且把从Greenplum的Segment接收的数据写到该文件中。要把输出数据划分到多个文件之间，在用户的可写外部表定义中列出多个<cmdname>gpfdist</cmdname> URI。</li>
+            <li id="du218710">一个可写外部Web表把数据当作数据流发送给一个应用。例如，从Greenplum数据库卸载数据并且把它发送到一个连接到另一数据的应用或者把该数据装载到其他地方的ETL工具。可写外部Web表使用<codeph>EXECUTE</codeph>子句来指定一个shell命令、脚本或者应用运行在Segment主机上并且接受一个输入数据流。更多有关在可写外部表定义中使用<codeph>EXECUTE</codeph>的信息请见<xref href="g-defining-a-command-based-writable-external-web-table.xml#topic71"/></li>
         </ul>
-        <p>You can optionally declare a distribution policy for your writable external tables. By
-            default, writable external tables use a random distribution policy. If the source table
-            you are exporting data from has a hash distribution policy, defining the same
-            distribution key column(s) for the writable external table improves unload performance
-            by eliminating the requirement to move rows over the interconnect. If you unload data
-            from a particular table, you can use the <codeph>LIKE</codeph> clause to copy the column
-            definitions and distribution policy from the source table.</p>
+        <p>用户可以有选择地为用户的可写外部表声明一个分布策略。默认情况下，可写外部表使用一种随机分布策略。如果从中导出数据的源表具有一种哈希分布策略，为可写外部表定义相同的分布键列可以提高卸载性能，因为这消除了在Interconnect之上移动行的需求。如果用户从一个特定表卸载数据，用户可以使用<codeph>LIKE</codeph>子句从源表复制列定义和分布策略。</p>
     </body>
 </topic>

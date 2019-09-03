@@ -1,151 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_yrr_hqw_sbb">
-  <title>Parallel Backup with gpbackup and gprestore</title>
+  <title>使用gpbackup和gprestore并行备份</title>
   <body>
-    <p><codeph>gpbackup</codeph> and <codeph>gprestore</codeph> are Greenplum Database utilities
-      that create and restore backup sets for Greenplum Database. By default,
-        <codeph>gpbackup</codeph> stores only the object metadata files and DDL files for a backup
-      in the Greenplum Database master data directory. Greenplum Database segments use the
-        <codeph>COPY ... ON SEGMENT</codeph> command to store their data for backed-up tables in
-      compressed CSV data files, located in each segment's <filepath>backups</filepath>
-      directory.</p>
-    <p>The backup metadata files contain all of the information that <codeph>gprestore</codeph>
-      needs to restore a full backup set in parallel. Backup metadata also provides the framework
-      for restoring only individual objects in the data set, along with any dependent objects, in
-      future versions of <codeph>gprestore</codeph>. (See <xref href="#topic_xnj_b4c_tbb"
-        format="dita"/> for more information.) Storing the table data in CSV files also provides
-      opportunities for using other restore utilities, such as <codeph>gpload</codeph>, to load the
-      data either in the same cluster or another cluster. By default, one file is created for each
-      table on the segment. You can specify the <codeph>--leaf-partition-data</codeph> option with
-        <codeph>gpbackup</codeph> to create one data file per leaf partition of a partitioned table,
-      instead of a single file. This option also enables you to filter backup sets by leaf
-      partitions.</p>
-    <p>Each <codeph>gpbackup</codeph> task uses a single transaction in Greenplum Database. During
-      this transaction, metadata is backed up on the master host, and data for each table on each
-      segment host is written to CSV backup files using <codeph>COPY ... ON SEGMENT</codeph>
-      commands in parallel. The backup process acquires an <codeph>ACCESS SHARE</codeph> lock on
-      each table that is backed up.</p>
-    <p>For information about the <codeph>gpbackup</codeph> and <codeph>gprestore</codeph> utility
-      options, see <xref href="../../utility_guide/admin_utilities/gpbackup.xml">gpbackup</xref> and
-        <xref href="../../utility_guide/admin_utilities/gprestore.xml">gprestore</xref>.</p>
+    <p><codeph>gpbackup</codeph>和<codeph>gprestore</codeph>是Greenplum数据库工具，可为Greenplum数据库创建和恢复备份集。
+        默认情况下，<codeph>gpbackup</codeph>仅在Greenplum数据库master数据目录中存储备份的对象元数据文件和DDL文件。
+        Greenplum数据库节点使用<codeph>COPY ... ON SEGMENT</codeph>命令将备份表的数据存储在位于每个节点的<filepath>backups</filepath>目录中的压缩CSV数据文件中。
+        </p>
+    <p>元数据备份文件包含<codeph>gprestore</codeph>并行恢复完整备份集所需的所有信息。
+        备份元数据还提供了在<codeph>gprestore</codeph>的未来版本中仅用于还原数据集中的单个对象以及任何依赖对象的框架。
+        （参考<xref href="#topic_xnj_b4c_tbb" format="dita"/>获取更新信息。）
+        将表数据存储在CSV文件中还提供了使用其他恢复工具（如<codeph>gpload</codeph>）在同一群集或其他群集中加载数据的机会。
+        默认情况下，为节点上的每个表创建一个文件。
+        您可以使用<codeph>gpbackup</codeph>指定<codeph>--leaf-partition-data</codeph>选项，以便为分区表的每个叶子分区创建一个数据文件，而不是单个文件。
+        此选项还允许您按叶分区筛选备份集。
+        </p>
+    <p>每个<codeph>gpbackup</codeph>任务都使用Greenplum数据库中的单个事务。
+        在此事务期间，元数据将在master主机上备份，并且每个节点主机上的每个表的数据将使用<codeph>COPY ... ON SEGMENT</codeph>命令并行写入CSV备份文件。
+        备份进程在备份的每个表上获取<codeph>ACCESS SHARE</codeph>锁。
+        </p>
+    <p>关于<codeph>gpbackup</codeph>和<codeph>gprestore</codeph>工具的更多选项，
+      参考<xref href="../../utility_guide/admin_utilities/gpbackup.xml">gpbackup</xref>和
+        <xref href="../../utility_guide/admin_utilities/gprestore.xml">gprestore</xref>。</p>
   </body>
   <topic id="topic_vh5_1hd_tbb">
-    <title>Requirements and Limitations</title>
+    <title>需求和限制</title>
     <body>
-      <p>The <codeph>gpbackup</codeph> and <codeph>gprestore</codeph> utilities are available with
-        Greenplum Database 5.5.0 and later. </p>
-      <p><codeph>gpbackup</codeph> and <codeph>gprestore</codeph> have the following limitations:<ul
+      <p><codeph>gpbackup</codeph>和<codeph>gprestore</codeph>工具在Greenplum数据库5.5.0和之后的版本可用。</p>
+      <p><codeph>gpbackup</codeph>和<codeph>gprestore</codeph>有如下限制：<ul
           id="ul_uqh_hhd_tbb">
-          <li>If you create an index on a parent partitioned table, <codeph>gpbackup</codeph> does
-            not back up that same index on child partitioned tables of the parent, as creating the
-            same index on a child would cause an error. However, if you exchange a partition,
-              <codeph>gpbackup</codeph> does not detect that the index on the exchanged partition is
-            inherited from the new parent table. In this case, <codeph>gpbackup</codeph> backs up
-            conflicting <codeph>CREATE INDEX</codeph> statements, which causes an error when you
-            restore the backup set.</li>
-          <li>You can execute multiple instances of <codeph>gpbackup</codeph>, but each execution
-            requires a distinct timestamp.</li>
-          <li>Database object filtering is currently limited to schemas and tables.</li>
-          <li>If you use the <codeph>gpbackup --single-data-file</codeph> option to combine table
-            backups into a single file per segment, you cannot perform a parallel restore operation
-            with <codeph>gprestore</codeph> (cannot set <codeph>--jobs</codeph> to a value higher
-            than 1).</li>
-          <li>You cannot use the <codeph>--exclude-table-file</codeph> with
-              <codeph>--leaf-partition-data</codeph>. Although you can specify leaf partition names
-            in a file specified with <codeph>--exclude-table-file</codeph>,
-              <codeph>gpbackup</codeph> ignores the partition names.</li>
-          <li>Backing up a database with <codeph>gpbackup</codeph> while simultaneously running DDL
-            commands might cause <codeph>gpbackup</codeph> to fail, in order to ensure consistency
-            within the backup set. For example, if a table is dropped after the start of the backup
-            operation, <codeph>gpbackup</codeph> exits and displays the error message <codeph>ERROR:
-              relation &lt;<varname>schema.table</varname>> does not
-                exist</codeph>.<p><codeph>gpbackup</codeph> might fail when a table is dropped
-              during a backup operation due to table locking issues. <codeph>gpbackup</codeph>
-              generates a list of tables to back up and acquires an <codeph>ACCESS SHARED</codeph>
-              lock on the tables. If an <codeph>EXCLUSIVE LOCK</codeph> is held on a table,
-                <codeph>gpbackup</codeph> acquires the <codeph>ACCESS SHARED</codeph> lock after the
-              existing lock is released. If the table no longer exists when
-                <codeph>gpbackup</codeph> attempts to acquire a lock on the table,
-                <codeph>gpbackup</codeph> exits with the error message. </p><p>For tables that might
-              be dropped during a backup, you can exclude the tables from a backup with a
-                <codeph>gpbackup</codeph> table filtering option such as
-                <codeph>--exclude-table</codeph> or <codeph>--exclude-schema</codeph>.</p></li>
-          <li>A backup created with <codeph>gpbackup</codeph> can only be restored to a Greenplum
-            Database cluster with the same number of segment instances as the source cluster. If you
-            run <codeph>gpexpand</codeph> to add segments to the cluster, backups you made before
-            starting the expand cannot be restored after the expansion has completed.</li>
+          <li>如果在父分区表上创建索引，则<codeph>gpbackup</codeph>不会在父分区的子分区表上备份相同的索引，因为在子分区上创建相同的索引会导致错误。
+              但是，如果您交换分区，则<codeph>gpbackup</codeph>不会检测到交换分区上的索引是从新父表继承的。
+              在这种情况下，<codeph>gpbackup</codeph>备份冲突的<codeph>CREATE INDEX</codeph>语句，这会在还原备份集时导致错误。
+              </li>
+          <li>您可以执行<codeph>gpbackup</codeph>的多个实例，但每次执行都需要不同的时间戳。</li>
+          <li>数据库对象过滤目前仅限于schema和表。</li>
+          <li>如果使用<codeph>gpbackup --single-data-file</codeph>选项将表备份组合到每个节点的单个文件中，
+              则无法使用<codeph>gprestore</codeph>执行并行还原操作（无法将<codeph>--jobs</codeph>设置为大于1的值）。
+              </li>
+          <li>您不能将<codeph>--exclude-table-file</codeph>与<codeph>--leaf-partition-data</codeph>一起使用。
+              虽然您可以在使用<codeph>--exclude-table-file</codeph>指定的文件中指定叶子分区名称，但<codeph>gpbackup</codeph>会忽略分区名称。
+              </li>
+          <li>在运行DDL命令的同时使用<codeph>gpbackup</codeph>备份数据库可能会导致<codeph>gpbackup</codeph>失败，以确保备份集内的一致性。
+              例如，如果在备份操作开始后删除了表，则<codeph>gpbackup</codeph>将退出并显示错误消息<codeph>ERROR:
+                  relation &lt;<varname>schema.table</varname>> does not exist</codeph>。
+              <p>由于表锁定问题，在备份操作期间删除表时，<codeph>gpbackup</codeph>可能会失败。
+                  <codeph>gpbackup</codeph>生成要备份的表列表，并在表上获取<codeph>ACCESS SHARED</codeph>锁。
+                  如果表上保留了<codeph>EXCLUSIVE LOCK</codeph>，则<codeph>gpbackup</codeph>会在释放现有锁后获取<codeph>ACCESS SHARED</codeph>锁。
+                  如果<codeph>gpbackup</codeph>尝试获取表上的锁时表不再存在，则<codeph>gpbackup</codeph>将退出并显示错误消息。
+                  </p>
+              <p>对于可能在备份期间删除的表，可以使用<codeph>gpbackup</codeph>表过滤选项（例如<codeph>--exclude-table</codeph>或<codeph>--exclude-schema</codeph>）从备份中排除表。
+                  </p></li>
+          <li>使用<codeph>gpexpand</codeph>创建的备份只能还原到与源集群具有相同数量的节点实例的Greenplum数据库集群。
+              如果运行gpexpand将节点添加到集群，则在扩容完成后无法恢复在扩容之前所做的备份。
+              </li>
         </ul></p>
     </body>
   </topic>
   <topic id="topic_x3s_lqj_tbb">
-    <title>Objects Included in a Backup or Restore</title>
+    <title>备份或还原中包含的对象</title>
     <body>
-      <p>The following table lists the objects that are backed up and restored with
-          <codeph>gpbackup</codeph> and <codeph>gprestore</codeph>. Database objects are backed up
-        for the database you specify with the <codeph>--dbname</codeph> option. Global objects
-        (Greenplum Database system objects) are also backed up by default, but they are restored
-        only if you include the <codeph>--with-globals</codeph> option to
-          <codeph>gprestore</codeph>.<table frame="all" rowsep="1" colsep="1" id="table_vqq_3rj_tbb">
-          <title>Objects that are backed up and restored</title>
+      <p>下表列出了使用<codeph>gpbackup</codeph>和<codeph>gprestore</codeph>备份和还原的对象。
+          使用<codeph>--dbname</codeph>选项为您指定备份的数据库对象。
+          默认情况下也会备份全局对象（Greenplum数据库系统对象），但只有在<codeph>gprestore</codeph>中包含<codeph>--with-globals</codeph>选项时才会还原它们。
+          <table frame="all" rowsep="1" colsep="1" id="table_vqq_3rj_tbb">
+          <title>备份和还原的对象</title>
           <tgroup cols="2">
             <colspec colname="c1" colnum="1" colwidth="1.0*"/>
             <colspec colname="c2" colnum="2" colwidth="1.0*"/>
             <thead>
               <row>
-                <entry>Database (for database specified with <codeph>--dbname</codeph>)</entry>
-                <entry>Global (requires the <codeph>--with-globals</codeph> option to
-                  restore)</entry>
+                <entry>数据库(使用<codeph>--dbname</codeph>指定的数据库)</entry>
+                <entry>全局(需要指定<codeph>--with-globals</codeph>选项来还原)</entry>
               </row>
             </thead>
             <tbody>
               <row>
                 <entry>
                   <ul id="ul_kpk_yrj_tbb">
-                    <li>Session-level configuration parameter settings (GUCs)</li>
-                    <li>Schemas, see <xref href="#topic_x3s_lqj_tbb/schema_note" format="dita"
-                        >Note</xref></li>
-                    <li>Procedural language extensions</li>
-                    <li>Sequences</li>
-                    <li dir="ltr">Comments</li>
-                    <li dir="ltr">Tables</li>
+                    <li>会话级别的配置参数设置(GUCs)</li>
+                    <li>Schemas，参考<xref href="#topic_x3s_lqj_tbb/schema_note" format="dita">Note</xref></li>
+                    <li>过程语言扩展</li>
+                    <li>序列</li>
+                    <li dir="ltr">注释</li>
+                    <li dir="ltr">表</li>
                     <li>Indexes</li>
-                    <li dir="ltr">Owners</li>
-                    <li dir="ltr">Writable External Tables (DDL only) </li>
-                    <li dir="ltr">Readable External Tables (DDL only) </li>
-                    <li dir="ltr">Functions</li>
-                    <li dir="ltr">Aggregates</li>
-                    <li dir="ltr">Casts</li>
-                    <li dir="ltr">Types</li>
-                    <li dir="ltr">Views</li>
-                    <li dir="ltr">Protocols</li>
-                    <li dir="ltr">Triggers. (While Greenplum Database does not support triggers, any
-                      trigger definitions that are present are backed up and restored.)</li>
-                    <li dir="ltr">Rules</li>
-                    <li dir="ltr">Domains</li>
-                    <li dir="ltr">Operators, operator families, and operator classes</li>
-                    <li dir="ltr">Conversions</li>
-                    <li>Extensions</li>
-                    <li dir="ltr">Text search parsers, dictionaries, templates, and
-                      configurations</li>
+                    <li dir="ltr">所有者</li>
+                    <li dir="ltr">可写外部表(DDL only) </li>
+                    <li dir="ltr">可读外部表(DDL only) </li>
+                    <li dir="ltr">函数</li>
+                    <li dir="ltr">聚合</li>
+                    <li dir="ltr">类型转换</li>
+                    <li dir="ltr">类型</li>
+                    <li dir="ltr">视图</li>
+                    <li dir="ltr">协议</li>
+                    <li dir="ltr">触发器。（虽然Greenplum数据库不支持触发器，但会备份和恢复任何存在的触发器定义。）</li>
+                    <li dir="ltr">规则</li>
+                    <li dir="ltr">域</li>
+                    <li dir="ltr">运算符，运算符族和运算符类</li>
+                    <li dir="ltr">转换</li>
+                    <li>扩展</li>
+                    <li dir="ltr">文本搜索解析器，词典，模板和配置</li>
                   </ul>
                 </entry>
                 <entry>
                   <ul id="ul_d2t_wrj_tbb">
-                    <li>Tablespaces</li>
-                    <li>Databases</li>
-                    <li>Database-wide configuration parameter settings (GUCs)</li>
-                    <li>Resource group definitions</li>
-                    <li>Resource queue definitions</li>
-                    <li>Roles</li>
-                    <li><codeph>GRANT</codeph> assignments of roles to databases</li>
+                    <li>表空间</li>
+                    <li>数据库</li>
+                    <li>数据库范围的配置参数设置(GUCs)</li>
+                    <li>Resource group定义</li>
+                    <li>Resource queue定义</li>
+                    <li>角色</li>
+                    <li><codeph>GRANT</codeph>分配给数据库的角色</li>
                   </ul>
                 </entry>
               </row>
             </tbody>
           </tgroup>
         </table></p>
-      <note id="schema_note">These schemas are not included in a backup.<ul id="ul_xly_1jv_bdb">
+      <note id="schema_note">这些schemas不包含在备份中。<ul id="ul_xly_1jv_bdb">
           <li><codeph>gp_toolkit</codeph></li>
           <li><codeph>information_schema</codeph></li>
           <li><codeph>pg_aoseg</codeph></li>
@@ -153,24 +126,19 @@
           <li><codeph>pg_catalog</codeph></li>
           <li><codeph>pg_toast*</codeph></li>
           <li><codeph>pg_temp*</codeph></li>
-        </ul><p>When restoring to an existing database, <codeph>gprestore</codeph> assumes the
-            <codeph>public</codeph> schema exists when restoring objects to the
-            <codeph>public</codeph> schema. When restoring to a new database (with the
-            <codeph>--create-db</codeph> option), <codeph>gprestore</codeph> creates the
-            <codeph>public</codeph> schema automatically when creating a database with the
-            <codeph>CREATE DATABASE</codeph> command. The command uses the
-            <codeph>template0</codeph> database that contains the <codeph>public</codeph>
-          schema.</p></note>
-      <p>See also <xref href="#topic_xnj_b4c_tbb" format="dita"/>.</p>
+        </ul><p>还原到已存在数据库时，<codeph>gprestore</codeph>假定在将对象还原到<codeph>public</codeph> schema时存在<codeph>public</codeph> schema。
+          还原到新数据库（使用<codeph>--create-db</codeph>选项）时，<codeph>gprestore</codeph>会在使用<codeph>CREATE DATABASE</codeph>命令创建数据库时自动创建<codeph>public</codeph> schema。
+          该命令使用包含<codeph>public</codeph> schema的<codeph>template0</codeph>数据库。
+          </p></note>
+      <p>也可以参考<xref href="#topic_xnj_b4c_tbb" format="dita"/>。</p>
     </body>
   </topic>
   <topic id="topic_qgj_b3d_tbb">
-    <title>Performing Basic Backup and Restore Operations</title>
+    <title>执行基本备份和还原操作</title>
     <body>
-      <p>To perform a complete backup of a database, as well as Greenplum Database system metadata,
-        use the command: <codeblock>$ gpbackup --dbname &lt;database_name></codeblock></p>
-      <p>For
-        example:<codeblock>$ <b>gpbackup --dbname demo</b>
+      <p>要执行数据库的完整备份以及Greenplum数据库系统元数据，请使用以下命令：
+          <codeblock>$ gpbackup --dbname &lt;database_name></codeblock></p>
+      <p>例如：<codeblock>$ <b>gpbackup --dbname demo</b>
 20180105:11:27:54 gpbackup:gpadmin:centos6.localdomain:002182-[INFO]:-Starting backup of database demo
 20180105:11:27:54 gpbackup:gpadmin:centos6.localdomain:002182-[INFO]:-Backup Timestamp = 20180105112754
 20180105:11:27:54 gpbackup:gpadmin:centos6.localdomain:002182-[INFO]:-Backup Database = demo
@@ -191,21 +159,18 @@ Tables backed up:  3 / 3 [======================================================
 20180105:11:27:54 gpbackup:gpadmin:centos6.localdomain:002182-[INFO]:-Found neither /usr/local/greenplum-db/./bin/gp_email_contacts.yaml nor /home/gpadmin/gp_email_contacts.yaml
 20180105:11:27:54 gpbackup:gpadmin:centos6.localdomain:002182-[INFO]:-Email containing gpbackup report /gpmaster/seg-1/backups/20180105/20180105112754/gpbackup_20180105112754_report will not be sent
 20180105:11:27:55 gpbackup:gpadmin:centos6.localdomain:002182-[INFO]:-Backup completed successfully</codeblock></p>
-      <p>The above command creates a file that contains global and database-specific metadata on the
-        Greenplum Database master host in the default directory,
-          <codeph>$MASTER_DATA_DIRECTORY/backups/&lt;YYYYMMDD>/&lt;YYYYMMDDHHMMSS>/</codeph>. For
-        example:<codeblock>$ <b>ls /gpmaster/gpsne-1/backups/20180105/20180105112754</b>
+      <p>上面的命令在Greenplum数据库master主机的默认目录中创建一个包含全局和数据库特定元数据的文件，
+          <codeph>$MASTER_DATA_DIRECTORY/backups/&lt;YYYYMMDD>/&lt;YYYYMMDDHHMMSS>/</codeph>。
+          例如：<codeblock>$ <b>ls /gpmaster/gpsne-1/backups/20180105/20180105112754</b>
 gpbackup_20180105112754_config.yaml   gpbackup_20180105112754_report
 gpbackup_20180105112754_metadata.sql  gpbackup_20180105112754_toc.yaml</codeblock></p>
-      <p>By default, each segment stores each table's data for the backup in a separate compressed
-        CSV file in
-        <codeph>&lt;seg_dir>/backups/&lt;YYYYMMDD>/&lt;YYYYMMDDHHMMSS>/</codeph>:<codeblock>$ <b>ls /gpdata1/gpsne0/backups/20180105/20180105112754/</b>
+      <p>默认情况下，每个节点用一个独立的压缩CSV文件在<codeph>&lt;seg_dir>/backups/&lt;YYYYMMDD>/&lt;YYYYMMDDHHMMSS>/</codeph>存储备份的每个表的数据：
+          <codeblock>$ <b>ls /gpdata1/gpsne0/backups/20180105/20180105112754/</b>
 gpbackup_0_20180105112754_17166.gz  gpbackup_0_20180105112754_26303.gz
 gpbackup_0_20180105112754_21816.gz</codeblock></p>
-      <p>To consolidate all backup files into a single directory, include the
-          <codeph>--backup-dir</codeph> option. Note that you must specify an absolute path with
-        this
-        option:<codeblock>$ <b>gpbackup --dbname demo --backup-dir /home/gpadmin/backups</b>
+      <p>要将所有备份文件合并到一个目录中，请包含<codeph>--backup-dir</codeph>选项。
+          请注意，您必须使用此选项指定绝对路径：
+          <codeblock>$ <b>gpbackup --dbname demo --backup-dir /home/gpadmin/backups</b>
 20171103:15:31:56 gpbackup:gpadmin:0ee2f5fb02c9:017586-[INFO]:-Starting backup of database demo
 ...
 20171103:15:31:58 gpbackup:gpadmin:0ee2f5fb02c9:017586-[INFO]:-Backup completed successfully
@@ -220,16 +185,14 @@ $ <b>find /home/gpadmin/backups/ -type f</b>
 /home/gpadmin/backups/gpseg-1/backups/20171103/20171103153156/gpbackup_20171103153156_postdata.sql
 /home/gpadmin/backups/gpseg-1/backups/20171103/20171103153156/gpbackup_20171103153156_report
 /home/gpadmin/backups/gpseg-1/backups/20171103/20171103153156/gpbackup_20171103153156_toc.yaml</codeblock></p>
-      <p>When performing a backup operation, you can use the <codeph>--single-data-file</codeph> in
-        situations where the additional overhead of multiple files might be prohibitive. For
-        example, if you use a third party storage solution such as Data Domain with back ups.</p>
+      <p>执行备份操作时，可以在多个文件的额外开销可能过高的情况下使用<codeph>--single-data-file</codeph>。
+          例如，如果您使用第三方存储解决方案，例如带备份的Data Domain。
+          </p>
       <section>
-        <title>Restoring from Backup</title>
-        <p>To use <codeph>gprestore</codeph> to restore from a backup set, you must use the
-            <codeph>--timestamp</codeph> option to specify the exact timestamp value
-            (<codeph>YYYYMMDDHHMMSS</codeph>) to restore. Include the <codeph>--create-db</codeph>
-          option if the database does not exist in the cluster. For
-          example:<codeblock>$ <b>dropdb demo</b>
+        <title>从备份恢复</title>
+        <p>使用<codeph>gprestore</codeph>从备份集合恢复，必须使用<codeph>--timestamp</codeph>选项指定准确的时间戳值(<codeph>YYYYMMDDHHMMSS</codeph>)。
+            包括<codeph>--create-db</codeph>选项，如果数据库未在集群中创建。
+            例如：<codeblock>$ <b>dropdb demo</b>
 $ <b>gprestore --timestamp 20171103152558 --create-db</b>
 20171103:15:45:30 gprestore:gpadmin:0ee2f5fb02c9:017714-[INFO]:-Restore Key = 20171103152558
 20171103:15:45:31 gprestore:gpadmin:0ee2f5fb02c9:017714-[INFO]:-Creating database
@@ -240,52 +203,45 @@ $ <b>gprestore --timestamp 20171103152558 --create-db</b>
 20171103:15:45:45 gprestore:gpadmin:0ee2f5fb02c9:017714-[INFO]:-Data restore complete
 20171103:15:45:45 gprestore:gpadmin:0ee2f5fb02c9:017714-[INFO]:-Restoring post-data metadata from /gpmaster/gpsne-1/backups/20171103/20171103152558/gpbackup_20171103152558_postdata.sql
 20171103:15:45:45 gprestore:gpadmin:0ee2f5fb02c9:017714-[INFO]:-Post-data metadata restore complete</codeblock></p>
-        <p>If you specified a custom <codeph>--backup-dir</codeph> to consolidate the backup files,
-          include the same <codeph>--backup-dir</codeph> option when using
-            <codeph>gprestore</codeph> to locate the backup
-          files:<codeblock>$ <b>dropdb demo</b>
+        <p>如果指定自定义的<codeph>--backup-dir</codeph>来合并备份文件，使用<codeph>gprestore</codeph>时指定相同的<codeph>--backup-dir</codeph>选项来定位备份文件：
+          <codeblock>$ <b>dropdb demo</b>
 $ <b>gprestore --backup-dir /home/gpadmin/backups/ --timestamp 20171103153156 --create-db</b>
 20171103:15:51:02 gprestore:gpadmin:0ee2f5fb02c9:017819-[INFO]:-Restore Key = 20171103153156
 ...
 20171103:15:51:17 gprestore:gpadmin:0ee2f5fb02c9:017819-[INFO]:-Post-data metadata restore complete</codeblock></p>
-        <p><codeph>gprestore</codeph> does not attempt to restore global metadata for the Greenplum
-          System by default. If this is required, include the <codeph>--with-globals</codeph>
-          argument.</p>
-        <p>By default, <codeph>gprestore</codeph> uses 1 connection to restore table data and
-          metadata. If you have a large backup set, you can improve performance of the restore by
-          increasing the number of parallel connections with the <codeph>--jobs</codeph> option. For
-          example:<codeblock>$ <b>gprestore --backup-dir /home/gpadmin/backups/ --timestamp 20171103153156 --create-db --jobs 8</b></codeblock></p>
-        <p>Test the number of parallel connections with your backup set to determine the ideal
-          number for fast data recovery. </p>
-        <note>You cannot perform a parallel restore operation with <codeph>gprestore</codeph> if the
-          backup combined table backups into a single file per segment with the
-            <codeph>gpbackup</codeph> option <codeph>--single-data-file</codeph>.</note>
+        <p><codeph>gprestore</codeph>默认不会为Greenplum系统尝试恢复全局元数据。
+            如果这个是必须的，需要<codeph>--with-globals</codeph>参数。
+            </p>
+        <p>默认情况下，<codeph>gprestore</codeph>使用一个连接去恢复表数据和元数据。
+            如果备份集非常大，可以使用<codeph>--jobs</codeph>选项来提高并发连接数从而提升恢复性能。
+            例如：<codeblock>$ <b>gprestore --backup-dir /home/gpadmin/backups/ --timestamp 20171103153156 --create-db --jobs 8</b></codeblock></p>
+        <p>测试备份集的并行连接数，以确定快速数据恢复的理想数量。</p>
+        <note>如果备份使用<codeph>gpbackup</codeph>的<codeph>--single-data-file</codeph>选项将表备份组合到每个节点的单个文件中，则无法使用<codeph>gprestore</codeph>执行并行还原操作。
+            </note>
       </section>
-      <section id="report_files"><title>Report Files</title><p>When performing a backup or restore
-          operation, <codeph>gpbackup</codeph> and <codeph>gprestore</codeph> generate a report
-          file. When email notification is configured, the email sent contains the contents of the
-          report file. For information about email notification, see <xref href="#topic_qwd_d5d_tbb"
-            format="dita"/>. </p><p>The report file is placed in the Greenplum Database master
-          backup directory. The report file name contains the timestamp of the operation. These are
-          the formats of the <codeph>gpbackup</codeph> and <codeph>gprestore</codeph> report file
-          names.</p><codeblock>gpbackup_&lt;backup_timestamp>_report
-gprestore_&lt;backup_timestamp>_&lt;restore_timesamp>_report</codeblock>For
-        these example report file names, <codeph>20180213114446</codeph> is the timestamp of the
-        backup and <codeph>20180213115426</codeph> is the timestamp of the restore
-          operation.<codeblock>gpbackup_20180213114446_report
-gprestore_20180213114446_20180213115426_report</codeblock><p>This
-          backup directory on a Greenplum Database master host contains both a
-            <codeph>gpbackup</codeph> and <codeph>gprestore</codeph> report
-          file.</p><codeblock>$ <b>ls -l /gpmaster/seg-1/backups/20180213/20180213114446</b>
+      <section id="report_files"><title>报告文件</title>
+          <p>当执行备份和恢复操作时，<codeph>gpbackup</codeph>和<codeph>gprestore</codeph>会生成一个报告文件。
+              当配置了邮件通知，发送的邮件内容会包含报告文件。
+              关于邮件通知的信息，参考<xref href="#topic_qwd_d5d_tbb" format="dita"/>。</p>
+          <p>报告文件在Greenplum数据库master的备份目录中。
+              报告文件名包含操作的时间戳。
+              这些是<codeph>gpbackup</codeph>和<codeph>gprestore</codeph>报告文件名的格式。
+              </p><codeblock>gpbackup_&lt;backup_timestamp>_report
+gprestore_&lt;backup_timestamp>_&lt;restore_timesamp>_report</codeblock>
+                对于这些报告文件名的样例，<codeph>20180213114446</codeph>是备份的时间戳，<codeph>20180213115426</codeph>是恢复操作的时间戳。
+          <codeblock>gpbackup_20180213114446_report
+gprestore_20180213114446_20180213115426_report</codeblock>
+          <p>这个在Greenplum数据库master主机上的备份目录包含了<codeph>gpbackup</codeph>和<codeph>gprestore</codeph>的报告文件。
+              </p><codeblock>$ <b>ls -l /gpmaster/seg-1/backups/20180213/20180213114446</b>
 total 36
 -r--r--r--. 1 gpadmin gpadmin  295 Feb 13 11:44 gpbackup_20180213114446_config.yaml
 -r--r--r--. 1 gpadmin gpadmin 1855 Feb 13 11:44 gpbackup_20180213114446_metadata.sql
 -r--r--r--. 1 gpadmin gpadmin 1402 Feb 13 11:44 gpbackup_20180213114446_report
 -r--r--r--. 1 gpadmin gpadmin 2199 Feb 13 11:44 gpbackup_20180213114446_toc.yaml
--r--r--r--. 1 gpadmin gpadmin  404 Feb 13 11:54 gprestore_20180213114446_20180213115426_report</codeblock><p>The
-          contents of the report files are similar. This is an example of the contents of a
-            <codeph>gprestore</codeph> report
-        file.</p><codeblock>Greenplum Database Restore Report
+-r--r--r--. 1 gpadmin gpadmin  404 Feb 13 11:54 gprestore_20180213114446_20180213115426_report</codeblock>
+          <p>报告文件的内容类似。
+              这是<codeph>gprestore</codeph>报告文件内容的示例。
+              </p><codeblock>Greenplum Database Restore Report
 
 Timestamp Key: 20180213114446
 GPDB Version: 5.4.1+dev.8.g9f83645 build commit:9f836456b00f855959d52749d5790ed1c6efc042
@@ -300,90 +256,71 @@ Duration: 0:00:05
 
 Restore Status: Success</codeblock></section>
       <section>
-        <title>History File</title>
-        <p>When performing a backup operation, <codeph>gpbackup</codeph> appends backup information
-          in the gpbackup history file, <codeph>gpbackup_history.yaml</codeph>, in the Greenplum
-          Database master data directory. The file contains the backup timestamp, information about
-          the backup options, and backup set information for incremental backups. This file is not
-          backed up by <codeph>gpbackup</codeph>.</p>
-        <p><codeph>gpbackup</codeph> uses the information in the file to find a matching backup for
-          an incremental backup when you run <codeph>gpbackup</codeph> with the
-            <codeph>--incremental</codeph> option and do not specify the
-            <codeph>--from-timesamp</codeph> option to indicate the backup that you want to use as
-          the latest backup in the incremental backup set. For information about incremental
-          backups, see <xref href="backup-gpbackup-incremental.xml"/>.</p>
+        <title>历史文件</title>
+        <p>执行备份操作时，<codeph>gpbackup</codeph>会将备份信息附加到Greenplum数据库master数据目录中的gpbackup历史文件<codeph>gpbackup_history.yaml</codeph>中。
+            该文件包含备份时间戳，有关备份选项的信息以及增量备份的备份集信息。
+            <codeph>gpbackup</codeph>不备份此文件。
+            </p>
+        <p>使用<codeph>--incremental</codeph>选项运行<codeph>gpbackup</codeph>时，
+            <codeph>gpbackup</codeph>使用文件中的信息查找增量备份的匹配备份，
+            并且不指定<codeph>--from-timesamp</codeph>选项以指示要用作最新备份的备份在增量备份集中。
+            有关增量备份的信息，参考<xref href="backup-gpbackup-incremental.xml"/>。</p>
       </section>
       <section>
-        <title>Return Codes</title>
-        <p>One of these codes is returned after <codeph>gpbackup</codeph> or
-            <codeph>gprestore</codeph> completes.<ul id="ul_hhb_sqp_n4">
-            <li><b>0</b> – Backup or restore completed with no problems </li>
-            <li><b>1</b> – Backup or restore completed with non-fatal errors. See log file for more
-              information.</li>
-            <li><b>2</b> – Backup or restore failed with a fatal error. See log file for more
-              information.</li>
+        <title>返回值</title>
+        <p>在<codeph>gpbackup</codeph>或<codeph>gprestore</codeph>完成时会返回下面的一个返回值。
+            <ul id="ul_hhb_sqp_n4">
+            <li><b>0</b> – 备份或恢复完成没有问题</li>
+            <li><b>1</b> – 备份或恢复完成，但有非致命错误。查看日志文件获取更多信息。</li>
+            <li><b>2</b> – 备份或恢复因为致命错误失败。查看日志文件获取更多信息。</li>
           </ul></p>
       </section>
     </body>
   </topic>
   <topic id="topic_et4_b5d_tbb">
-    <title>Filtering the Contents of a Backup or Restore</title>
+    <title>过滤备份或恢复的内容</title>
     <body>
-      <p><codeph>gpbackup</codeph> backs up all schemas and tables in the specified database, unless
-        you exclude or include individual schema or table objects with schema level or table level
-        filter options.</p>
-      <p> The schema level options are <codeph>--include-schema</codeph> or
-          <codeph>--exclude-schema</codeph> command-line options to <codeph>gpbackup</codeph>. For
-        example, if the "demo" database includes only two schemas, "wikipedia" and "twitter," both
-        of the following commands back up only the "wikipedia"
-        schema:<codeblock>$ <b>gpbackup --dbname demo --include-schema wikipedia</b>
+      <p><codeph>gpbackup</codeph>备份指定数据库中的所有schema和表，除非您使用schema级别或表级别过滤器选项排除或包含单个schema或表对象。</p>
+      <p>schema级别选项是<codeph>--include-schema</codeph>或<codeph>--exclude-schema</codeph>命令行选项到<codeph>gpbackup</codeph>。
+          例如，如果“demo”数据库仅包含两个schema “wikipedia”和“twitter”，则以下两个命令仅备份“wikipedia” schema：
+          <codeblock>$ <b>gpbackup --dbname demo --include-schema wikipedia</b>
 $ <b>gpbackup --dbname demo --exclude-schema twitter</b></codeblock></p>
-      <p>You can include multiple <codeph>--include-schema</codeph> options in a
-          <codeph>gpbackup</codeph>
-        <i>or</i> multiple <codeph>--exclude-schema</codeph> options. For
-        example:<codeblock>$ <b>gpbackup --dbname demo --include-schema wikipedia --include-schema twitter</b></codeblock></p>
-      <p>To filter the individual tables that are included in a backup set, or excluded from a
-        backup set, specify individual tables with the <codeph>--include-table</codeph> option or
-        the <codeph>--exclude-table</codeph> option. The table must be schema qualified,
-          <codeph>&lt;schema-name>.&lt;table-name></codeph>. The individual table filtering options
-        can be specified multiple times. However, <codeph>--include-table</codeph> and
-          <codeph>--exclude-table</codeph> cannot both be used in the same command. </p>
-      <p>You can create a list of qualified table names in a text file. When listing tables in a
-        file, each line in the text file must define a single table using the format
-          <codeph>&lt;schema-name>.&lt;table-name></codeph>. The file must not include trailing
-        lines. For example:<codeblock>wikipedia.articles
+      <p>你可以在<codeph>gpbackup</codeph>中包含多个<codeph>--include-schema</codeph>选项，或多个<codeph>--exclude-schema</codeph>选项。
+          例如：<codeblock>$ <b>gpbackup --dbname demo --include-schema wikipedia --include-schema twitter</b></codeblock></p>
+      <p>要筛选包含在备份集中的表或从备份集中排除表，请使用<codeph>--include-table</codeph>选项或<codeph>--exclude-table</codeph>选项指定各个表。
+          该表必须是限定schema的，<codeph>&lt;schema-name>.&lt;table-name></codeph>。
+          可以多次指定各个表过滤选项。
+          但是，<codeph>--include-table</codeph>和<codeph>--exclude-table</codeph>不能同时用于同一命令。
+        </p>
+      <p>您可以在文本文件中创建指定的表名称列表。
+          列出文件中的表时，文本文件中的每一行都必须使用格式<codeph>&lt;schema-name>.&lt;table-name></codeph>定义单个表。
+          该文件不得包含尾随行。 例如：
+          <codeblock>wikipedia.articles
 twitter.message</codeblock></p>
-      <p>If a table or schema name uses any character other than a lowercase letter, number, or an
-        underscore character, then you must include that name in double quotes. For
-        example:<codeblock>beer."IPA"
+      <p>如果表或schema名称使用小写字母，数字或下划线字符以外的任何字符，则必须在双引号中包含该名称。例如：
+          <codeblock>beer."IPA"
 "Wine".riesling
 "Wine"."sauvignon blanc"
 water.tonic</codeblock></p>
-      <p>After creating the file, you can use it either to include or exclude tables with the
-          <codeph>gpbackup</codeph> options <codeph>--include-table-file</codeph> or
-          <codeph>--exclude-table-file</codeph>. For
-        example:<codeblock>$ <b>gpbackup --dbname demo --include-table-file /home/gpadmin/table-list.txt</b></codeblock></p>
-      <p>You can combine <codeph>-include schema</codeph> with <codeph>--exclude-table</codeph> or
-          <codeph>--exclude-table-file</codeph> for a backup. This example uses
-          <codeph>--include-schema</codeph> with <codeph>--exclude-table</codeph> to back up a
-        schema except for a single table. </p>
+      <p>创建文件后，您可以使用<codeph>gpbackup</codeph>选项<codeph>--include-table-file</codeph>或<codeph>--exclude-table-file</codeph>来包含或排除表。例如：
+          <codeblock>$ <b>gpbackup --dbname demo --include-table-file /home/gpadmin/table-list.txt</b></codeblock></p>
+      <p>您可以将<codeph>-include schema</codeph>与<codeph>--exclude-table</codeph>或<codeph>--exclude-table-file</codeph>结合使用以进行备份。
+          此示例使用<codeph>--include-schema</codeph>和<codeph>--exclude-table</codeph>来备份除单个表之外的schema。
+          </p>
       <codeblock>$ <b>gpbackup --dbname demo --include-schema mydata --exclude-table mydata.addresses</b></codeblock>
-      <p>You cannot combine <codeph>--include-schema</codeph> with <codeph>--include-table</codeph>
-        or <codeph>--include-table-file</codeph>, and you cannot combine
-          <codeph>--exclude-schema</codeph> with any table filtering option such as
-          <codeph>--exclude-table</codeph> or <codeph>--include-table</codeph>.</p>
-      <p>When you use <codeph>--include-table</codeph> or <codeph>--include-table-file</codeph>
-        dependent objects are not automatically backed up or restored, you must explicitly specify
-        the dependent objects that are required. For example, if you back up or restore a view, you
-        must also specify the tables that the view uses. If you backup or restore a table that uses
-        a sequence, you must also specify the sequence.</p>
-      <section id="section_ddf_gyn_5bb"><title>Filtering by Leaf Partition</title><p>By default,
-            <codeph>gpbackup</codeph> creates one file for each table on a segment. You can specify
-          the <codeph>--leaf-partition-data</codeph> option to create one data file per leaf
-          partition of a partitioned table, instead of a single file. You can also filter backups to
-          specific leaf partitions by listing the leaf partition names in a text file to include.
-          For example, consider a table that was created using the
-          statement:<codeblock>demo=# <b>CREATE TABLE sales (id int, date date, amt decimal(10,2))
+      <p>您不能将<codeph>--include-schema</codeph>与<codeph>--include-table</codeph>或<codeph>--include-table-file</codeph>结合使用，
+          并且不能将<codeph>--exclude-schema</codeph>与任何表过滤选项（如<codeph>--exclude-table</codeph>或<codeph>--include-table</codeph>）结合使用。
+          </p>
+      <p>使用<codeph>--include-table</codeph>或<codeph>--include-table-file</codeph>时，不会自动备份或还原依赖对象，您必须显式指定所需的依赖对象。
+          例如，如果备份或还原视图，则还必须指定视图使用的表。
+          如果备份或还原使用序列的表，则还必须指定序列。
+          </p>
+      <section id="section_ddf_gyn_5bb"><title>根据叶子分区过滤</title>
+          <p>默认情况下，<codeph>gpbackup</codeph>为节点上的每个表创建一个文件。
+              您可以指定<codeph>--leaf-partition-data</codeph>选项，以便为分区表的每个叶子分区创建一个数据文件，而不是单个文件。
+              您还可以通过在包含的文本文件中列出叶子分区名称来过滤备份特定叶子分区。
+              例如，考虑使用以下语句创建的表：
+              <codeblock>demo=# <b>CREATE TABLE sales (id int, date date, amt decimal(10,2))
 DISTRIBUTED BY (id)
 PARTITION BY RANGE (date)
 ( PARTITION Jan17 START (date '2017-01-01') INCLUSIVE ,
@@ -411,97 +348,77 @@ NOTICE:  CREATE TABLE will create partition "sales_1_prt_sep17" for table "sales
 NOTICE:  CREATE TABLE will create partition "sales_1_prt_oct17" for table "sales"
 NOTICE:  CREATE TABLE will create partition "sales_1_prt_nov17" for table "sales"
 NOTICE:  CREATE TABLE will create partition "sales_1_prt_dec17" for table "sales"
-CREATE TABLE</codeblock></p><p>To
-          back up only data for the last quarter of the year, first create a text file that lists
-          those leaf partition names instead of the full table
-          name:<codeblock>public.sales_1_prt_oct17
+CREATE TABLE</codeblock></p>
+          <p>要仅备份一年中最后一个季度的数据，首先要创建一个文本文件，列出那些叶子分区名称而不是完整的表名称：
+              <codeblock>public.sales_1_prt_oct17
 public.sales_1_prt_nov17
-public.sales_1_prt_dec17 </codeblock></p><p>Then
-          specify the file with the <codeph>--include-table-file</codeph> option to generate one
-          data file per leaf
-          partition:<codeblock>$ <b>gpbackup --dbname demo --include-table-file last-quarter.txt --leaf-partition-data</b></codeblock></p>When
-        you specify <codeph>--leaf-partition-data</codeph>, <codeph>gpbackup</codeph> generates one
-        data file per leaf partition when backing up a partitioned table. For example, this command
-        generates one data file for each leaf
-          partition:<codeblock>$ <b>gpbackup --dbname demo --include-table public.sales --leaf-partition-data</b></codeblock><p>When
-          leaf partitions are backed up, the leaf partition data is backed up along with the
-          metadata for the entire partitioned table.</p>
-        <note>You cannot use the <codeph>--exclude-table-file</codeph> option with
-            <codeph>--leaf-partition-data</codeph>. Although you can specify leaf partition names in
-          a file specified with <codeph>--exclude-table-file</codeph>, <codeph>gpbackup</codeph>
-          ignores the partition names.</note></section>
+public.sales_1_prt_dec17 </codeblock></p>
+          <p>然后使用<codeph>--include-table-file</codeph>选项指定文件，以便为每个叶子分区生成一个数据文件：
+              <codeblock>$ <b>gpbackup --dbname demo --include-table-file last-quarter.txt --leaf-partition-data</b></codeblock>
+          </p>指定<codeph>--leaf-partition-data</codeph>时，<codeph>gpbackup</codeph>在备份分区表时为每个叶子分区生成一个数据文件。
+            例如，此命令为每个叶子分区生成一个数据文件：
+          <codeblock>$ <b>gpbackup --dbname demo --include-table public.sales --leaf-partition-data</b></codeblock>
+          <p>备份叶子分区时，将备份叶子分区数据以及整个分区表的元数据。</p>
+        <note>您不能将<codeph>--exclude-table-file</codeph>选项与<codeph>--leaf-partition-data</codeph>一起使用。
+            虽然您可以在使用<codeph>--exclude-table-file</codeph>指定的文件中指定叶子分区名称，但<codeph>gpbackup</codeph>会忽略分区名称。
+            </note></section>
       <section>
-        <title>Filtering with gprestore</title>
-        <p>After creating a backup set with <codeph>gpbackup</codeph>, you can filter the schemas
-          and tables that you want to restore from the backup set using the
-            <codeph>gprestore</codeph>
-          <codeph>--include-schema</codeph> and <codeph>--include-table-file</codeph> options. These
-          options work in the same way as their <codeph>gpbackup</codeph> counterparts, but have the
-          following restrictions:<ul id="ul_hts_clc_ccb">
-            <li>The tables that you attempt to restore must not already exist in the database.</li>
-            <li>If you attempt to restore a schema or table that does not exist in the backup set,
-              the <codeph>gprestore</codeph> does not execute.</li>
-            <li>If you use the <codeph>--include-schema</codeph> option, <codeph>gprestore</codeph>
-              cannot restore objects that have dependencies on multiple schemas.</li>
-            <li>If you use the <codeph>--include-table-file</codeph> option,
-                <codeph>gprestore</codeph> does not create roles or set the owner of the tables. The
-              utility restores table indexes and rules. Triggers are also restored but are not
-              supported in Greenplum Database.</li>
-            <li>The file that you specify with <codeph>--include-table-file</codeph> cannot include
-              a leaf partition name, as it can when you specify this option with
-                <codeph>gpbackup</codeph>. If you specified leaf partitions in the backup set,
-              specify the partitioned table to restore the leaf partition data. <p>When restoring a
-                backup set that contains data from some leaf partitions of a partitioned table, the
-                partitioned table is restored along with the data for the leaf partitions. For
-                example, you create a backup with the <codeph>gpbackup</codeph> option
-                  <codeph>--include-table-file</codeph> and the text file lists some leaf partitions
-                of a partitioned table. Restoring the backup creates the partitioned table and
-                restores the data only for the leaf partitions listed in the file. </p></li>
+        <title>使用gprestore过滤</title>
+        <p>使用<codeph>gpbackup</codeph>创建备份集后，
+            可以使用<codeph>gprestore</codeph>的<codeph>--include-schema</codeph>和<codeph>--include-table-file</codeph>选项过滤要从备份集还原的schema和表。
+            这些选项的工作方式与其<codeph>gpbackup</codeph>对应方式相同，但具有以下限制：
+            <ul id="ul_hts_clc_ccb">
+            <li>您尝试还原的表不能存在于数据库中。</li>
+            <li>如果尝试还原备份集中不存在的schema或表，则<codeph>gprestore</codeph>不会执行。</li>
+            <li>如果使用<codeph>--include-schema</codeph>选项，则<codeph>gprestore</codeph>无法还原对多个schema具有依赖性的对象。</li>
+            <li>如果使用<codeph>--include-table-file</codeph>选项，则<codeph>gprestore</codeph>不会创建角色或设置表的所有者。
+                该工具恢复表索引和规则。
+                触发器也被恢复，但Greenplum数据库不支持。
+                </li>
+            <li>使用<codeph>--include-table-file</codeph>指定的文件不能包含叶子分区名称，因为在使用<codeph>gpbackup</codeph>指定此选项时可以使用该名称。
+                如果在备份集中指定了叶子分区，请指定分区表以还原叶子分区数据。
+                <p>还原包含来自分区表的某些叶子分区的数据的备份集时，将恢复分区表以及叶子分区的数据。
+                    例如，使用<codeph>gpbackup</codeph>选项<codeph>--include-table-file</codeph>创建备份，文本文件列出分区表的一些叶子分区。
+                    还原备份会创建分区表，并仅为文件中列出的叶分区还原数据。
+                    </p></li>
           </ul></p>
       </section>
     </body>
   </topic>
   <topic id="topic_qwd_d5d_tbb">
-    <title>Configuring Email Notifications</title>
+    <title>配置邮件通知</title>
     <body>
-      <p><codeph>gpbackup</codeph> and <codeph>gprestore</codeph> can send email notifications after
-        a back up or restore operation completes. </p>
-      <p>To have <codeph>gpbackup</codeph> or <codeph>gprestore</codeph> send out status email
-        notifications, you must place a file named <codeph>gp_email_contacts.yaml</codeph> in the
-        home directory of the user running <codeph>gpbackup</codeph> or <codeph>gprestore</codeph> in
-        the same directory as the utilities (<codeph>$GPHOME/bin</codeph>). A utility issues a
-        message if it cannot locate a <codeph>gp_email_contacts.yaml</codeph> file in either
-        location. If both locations contain a <codeph>.yaml</codeph> file, the utility uses the file
-        in user <codeph>$HOME</codeph>. </p>
-      <p>The email subject line includes the utility name, timestamp, status, and the name of the
-        Greenplum Database master. This is an example subject line for a <codeph>gpbackup</codeph>
-        email.</p>
+      <p><codeph>gpbackup</codeph>和<codeph>gprestore</codeph>可以在备份或还原完成后发送邮件通知。</p>
+      <p>要让<codeph>gpbackup</codeph>或<codeph>gprestore</codeph>发送状态电子邮件通知，
+          您必须将名为<codeph>gp_email_contacts.yaml</codeph>的文件放在运行<codeph>gpbackup</codeph>或<codeph>gprestore</codeph>的用户的主目录中，
+          与工具（<codeph>$GPHOME/bin</codeph>）位于同一目录中。
+          如果工具无法在任一位置找到<codeph>gp_email_contacts.yaml</codeph>文件，则会发出消息。
+          如果两个位置都包含<codeph>.yaml</codeph>文件，则该工具将使用用户<codeph>$HOME</codeph>中的文件。
+        </p>
+      <p>电子邮件主题行包括工具名称，时间戳，状态和Greenplum数据库master的名称。
+          这是<codeph>gpbackup</codeph>电子邮件的示例主题行。
+        </p>
       <p>
         <codeblock>gpbackup 20180202133601 on gp-master completed</codeblock>
       </p>
-      <p>The email contains summary information about the operation including options, duration, and
-        number of objects backed up or restored. For information about the contents of a
-        notification email, see <xref href="#topic_qgj_b3d_tbb/report_files" format="dita"/>.</p>
-      <note>The UNIX mail utility must be running on the Greenplum Database host and must be
-        configured to allow the Greenplum superuser (<codeph>gpadmin</codeph>) to send email.
-        Also ensure that the mail program executable is locatable via the
-        <codeph>gpadmin</codeph> user's <codeph>$PATH</codeph>.</note>
+      <p>该电子邮件包含有关操作的摘要信息，包括选项，持续时间以及备份或还原的对象数。
+          有关通知电子邮件内容的信息，参考<xref href="#topic_qgj_b3d_tbb/report_files" format="dita"/>。</p>
+      <note>UNIX邮件实用程序必须在Greenplum数据库主机上运行，并且必须配置为允许Greenplum超级用户（<codeph>gpadmin</codeph>）发送电子邮件。
+          还要确保通过<codeph>gpadmin</codeph>用户的<codeph>$PATH</codeph>可以找到邮件程序可执行文件。</note>
     </body>
     <topic id="topic_uq5_v5v_scb">
-      <title>gpbackup and gprestore Email File Format </title>
+      <title>gpbackup和gprestore邮件文件格式</title>
       <body>
-        <p>The <codeph>gpbackup</codeph> and <codeph>gprestore</codeph> email notification YAML file
-            <codeph>gp_email_contacts.yaml</codeph> uses indentation (spaces) to determine the
-          document hierarchy and the relationships of the sections to one another. The use of white
-          space is significant. White space should not be used simply for formatting purposes, and
-          tabs should not be used at all.</p>
-        <note>If the <codeph>status</codeph> parameters are not specified correctly, the utility
-          does not issue a warning. For example, if the <codeph>success</codeph> parameter is
-          misspelled and is set to <codeph>true</codeph>, a warning is not issued and an email is
-          not sent to the email address after a successful operation. To ensure email notification
-          is configured correctly, run tests with email notifications configured.</note>
-        <p>This is the format of the <codeph>gp_email_contacts.yaml</codeph> YAML file for
-            <codeph>gpbackup</codeph> email notifications: </p>
+        <p><codeph>gpbackup</codeph>和<codeph>gprestore</codeph>电子邮件通知的YAML文件<codeph>gp_email_contacts.yaml</codeph>使用缩进（空格）来确定文档层次结构以及这些部分之间的关系。
+            使用空白区域非常重要。
+            不应仅将白色空间用于格式化目的，并且根本不应使用制表符。
+            </p>
+        <note>如果未正确指定<codeph>status</codeph>参数，则工具不会发出警告。
+            例如，如果<codeph>success</codeph>参数拼写错误并设置为true，则不会发出警告，并且在成功操作后不会向电子邮件地址发送电子邮件。
+            要确保正确配置电子邮件通知，请运行配置了电子邮件通知的测试。
+            </note>
+        <p>这是<codeph>gpbackup</codeph>电子邮件通知的<codeph>gp_email_contacts.yaml</codeph> YAML文件的格式：
+            </p>
         <codeblock><xref href="#topic_uq5_v5v_scb/contacts_yml" format="dita">contacts</xref>:
   <xref href="#topic_uq5_v5v_scb/gpbackup_yml" format="dita">gpbackup</xref>:
   - <xref href="#topic_uq5_v5v_scb/address_yml" format="dita">address</xref>: <varname>user</varname>@<varname>domain</varname>
@@ -516,53 +433,48 @@ public.sales_1_prt_dec17 </codeblock></p><p>Then
          <xref href="#topic_uq5_v5v_scb/success1_yml" format="dita">success_with_errors</xref>: [true | false]
          <xref href="#topic_uq5_v5v_scb/failure_yml" format="dita">failure</xref>: [true | false]</codeblock>
         <section>
-          <title>Email YAML File Sections</title>
+          <title>电子邮件YAML文件部分</title>
           <parml>
             <plentry>
               <pt id="contacts_yml"><b>contacts</b></pt>
-              <pd>Required. The section that contains the <codeph>gpbackup</codeph> and
-                  <codeph>gprestore</codeph> sections. The YAML file can contain a
-                  <codeph>gpbackup</codeph> section, a <codeph>gprestore</codeph> section, or one of
-                each.</pd>
+              <pd>必须的。包含<codeph>gpbackup</codeph>和<codeph>gprestore</codeph>部分的部分。
+                  YAML文件可以包含<codeph>gpbackup</codeph>部分，<codeph>gprestore</codeph>部分或每个部分中的一个。
+                  </pd>
             </plentry>
             <plentry>
               <pt id="gpbackup_yml"><b>gpbackup</b></pt>
-              <pd>Optional. Begins the <codeph>gpbackup</codeph> email section. <parml>
+              <pd>可选的。 开始<codeph>gpbackup</codeph>电子邮件部分。<parml>
                   <plentry>
                     <pt id="address_yml"><b>address</b></pt>
-                    <pd>Required. At least one email address must be specified. Multiple email
-                        <codeph>address</codeph> parameters can be specified. Each
-                        <codeph>address</codeph> requires a <codeph>status</codeph> section.</pd>
-                    <pd><varname>user</varname>@<varname>domain</varname> is a single, valid email
-                      address.</pd>
+                    <pd>必须的。必须至少指定一个电子邮件地址。可以指定多个电子邮件地址参数。每个地址都需要一个<codeph>status</codeph>部分。</pd>
+                    <pd><varname>user</varname>@<varname>domain</varname>是一个有效的电子邮件地址。</pd>
                   </plentry>
                   <plentry>
                     <pt><b>status</b></pt>
-                    <pd>Required. Specify when the utility sends an email to the specified email
-                      address. The default is to not send email notification.</pd>
-                    <pd>You specify sending email notifications based on the completion status of a
-                      backup or restore operation. At least one of these parameters must be
-                      specified and each parameter can appear at most once. <parml>
+                    <pd>必须的。指定工具何时向指定的电子邮件地址发送电子邮件。默认设置是不发送电子邮件通知。</pd>
+                    <pd>您可以根据备份或还原操作的完成状态指定发送电子邮件通知。
+                        必须至少指定其中一个参数，每个参数最多只能出现一次。
+                        <parml>
                         <plentry>
                           <pt><b>success</b></pt>
-                          <pd>Optional. Specify if an email is sent if the operation completes
-                            without errors. If the value is <codeph>true</codeph>, an email is sent
-                            if the operation completes without errors. If the value is
-                              <codeph>false</codeph> (the default), an email is not sent. </pd>
+                          <pd>可选的。如果操作完成且没有错误，请指定是否发送电子邮件。
+                              如果值为<codeph>true</codeph>，则在操作完成且没有错误的情况下发送电子邮件。
+                              如果值为<codeph>false</codeph>（默认值），则不会发送电子邮件。
+                            </pd>
                         </plentry>
                         <plentry>
                           <pt><b>success_with_errors</b></pt>
-                          <pd>Optional. Specify if an email is sent if the operation completes with
-                            errors. If the value is <codeph>true</codeph>, an email is sent if the
-                            operation completes with errors. If the value is <codeph>false</codeph>
-                            (the default), an email is not sent. </pd>
+                          <pd>可选的。如果操作完成但有错误，请指定是否发送电子邮件。
+                              如果值为<codeph>true</codeph>，则在操作完成且出错时将发送电子邮件。
+                              如果值为<codeph>false</codeph>（默认值），则不会发送电子邮件。
+                            </pd>
                         </plentry>
                         <plentry>
                           <pt><b>failure</b></pt>
-                          <pd>Optional. Specify if an email is sent if the operation fails. If the
-                            value is <codeph>true</codeph>, an email is sent if the operation fails.
-                            If the value is <codeph>false</codeph> (the default), an email is not
-                            sent. </pd>
+                          <pd>可选的。指定操作失败时是否发送电子邮件。
+                              如果值为<codeph>true</codeph>，则在操作失败时发送电子邮件。
+                              如果值为<codeph>false</codeph>（默认值），则不会发送电子邮件。
+                            </pd>
                         </plentry>
                       </parml></pd>
                   </plentry>
@@ -570,24 +482,19 @@ public.sales_1_prt_dec17 </codeblock></p><p>Then
             </plentry>
             <plentry>
               <pt id="gprestore_yml"><b>gprestore</b></pt>
-              <pd>Optional. Begins the <codeph>gprestore</codeph> email section. This section
-                contains the <codeph><xref href="#topic_uq5_v5v_scb/address_yml" format="dita"
-                    >address</xref></codeph> and <codeph><xref href="#topic_uq5_v5v_scb/status_yml"
-                    format="dita">status</xref></codeph> parameters that are used to send an email
-                notification after a <codeph>gprestore</codeph> operation. The syntax is the same as
-                the <codeph><xref href="#topic_uq5_v5v_scb/gpbackup_yml" format="dita"
-                    >gpbackup</xref></codeph> section.</pd>
+              <pd>可选的。开始<codeph>gprestore</codeph>电子邮件部分。
+                  此部分包含用于在gprestore操作后发送电子邮件通知的<codeph><xref href="#topic_uq5_v5v_scb/address_yml" format="dita">address</xref></codeph>和<codeph><xref href="#topic_uq5_v5v_scb/status_yml" format="dita">status</xref></codeph>参数。
+                  语法与<codeph><xref href="#topic_uq5_v5v_scb/gpbackup_yml" format="dita">gpbackup</xref></codeph>部分相同。
+                </pd>
             </plentry>
           </parml>
         </section>
         <section>
-          <title>Examples</title>
-          <p>This example YAML file specifies sending email to email addresses depending on the
-            success or failure of an operation. For a backup operation, an email is sent to a
-            different address depending on the success or failure of the backup operation. For a
-            restore operation, an email is sent to <codeph>gpadmin@example.com</codeph> only when
-            the operation succeeds or completes with
-            errors.<codeblock>contacts:
+          <title>示例</title>
+          <p>此示例YAML文件指定根据操作的成功或失败向电子邮件地址发送电子邮件。
+              对于备份操作，根据备份操作的成功或失败，将电子邮件发送到不同的地址。
+              对于还原操作，仅当操作成功或带错完成时才会向<codeph>gpadmin@example.com</codeph>发送电子邮件。
+              <codeblock>contacts:
   gpbackup:
   - address: gpadmin@example.com
     status:
@@ -606,144 +513,124 @@ public.sales_1_prt_dec17 </codeblock></p><p>Then
     </topic>
   </topic>
   <topic id="topic_xnj_b4c_tbb">
-    <title>Understanding Backup Files</title>
+    <title>理解备份文件</title>
     <body>
-      <note type="warning">All <codeph>gpbackup</codeph> metadata files are created with read-only
-        permissions. Never delete or modify the metadata files for a <codeph>gpbackup</codeph>
-        backup set. Doing so will render the backup files non-functional.</note>
-      <p>A complete backup set for <codeph>gpbackup</codeph> includes multiple metadata files,
-        supporting files, and CSV data files, each designated with the timestamp at which the backup
-        was created.</p>
-      <p>By default, metadata and supporting files are stored on the Greenplum Database master host
-        in the directory
-          <filepath>$MASTER_DATA_DIRECTORY/backups/YYYYMMDD/YYYYMMDDHHMMSS/</filepath>. If you
-        specify a custom backup directory, this same file path is created as a subdirectory of the
-        backup directory. The following table describes the names and contents of the metadata and
-        supporting files.<table frame="all" rowsep="1" colsep="1" id="table_nrz_4gj_tbb">
-          <title>gpbackup Metadata Files (master)</title>
+      <note type="warning">所有<codeph>gpbackup</codeph>元数据文件都是使用只读权限创建的。
+          切勿删除或修改<codeph>gpbackup</codeph>备份集的元数据文件。
+          这样做会使备份文件无法正常运行。
+        </note>
+      <p><codeph>gpbackup</codeph>的完整备份集包括多个元数据文件，支持文件和CSV数据文件，每个文件都指定了创建备份的时间戳。
+          </p>
+      <p>默认情况下，元数据和支持文件存储在Greenplum数据库master主机上<filepath>$MASTER_DATA_DIRECTORY/backups/YYYYMMDD/YYYYMMDDHHMMSS/</filepath>目录中。
+          如果指定自定义备份目录，则会将此相同文件路径创建为备份目录的子目录。
+          下表描述了元数据和支持文件的名称和内容。
+          <table frame="all" rowsep="1" colsep="1" id="table_nrz_4gj_tbb">
+          <title>gpbackup元文件(master)</title>
           <tgroup cols="2">
             <colspec colname="c1" colnum="1" colwidth="1.0*"/>
             <colspec colname="c2" colnum="2" colwidth="1.0*"/>
             <thead>
               <row>
-                <entry>File name</entry>
-                <entry>Description</entry>
+                <entry>文件名</entry>
+                <entry>描述</entry>
               </row>
             </thead>
             <tbody>
               <row>
                 <entry><filepath>gpbackup_&lt;YYYYMMDDHHMMSS>_metadata.sql</filepath></entry>
-                <entry>Contains global and database-specific metadata:<ul id="ul_l2c_dtv_scb">
-                    <li>DDL for objects that are global to the Greenplum Database cluster, and not
-                      owned by a specific database within the cluster.</li>
-                    <li>DDL for objects in the backed-up database (specified with
-                        <codeph>--dbname)</codeph> that must be created <i>before</i> to restoring
-                      the actual data, and DDL for objects that must be created <i>after</i>
-                      restoring the data.</li>
-                  </ul>Global objects include:<ul id="ul_f1b_dhj_tbb">
-                    <li>Tablespaces</li>
-                    <li>Databases</li>
-                    <li>Database-wide configuration parameter settings (GUCs)</li>
-                    <li>Resource group definitions</li>
-                    <li>Resource queue definitions</li>
+                <entry>包含全局和数据库特定的元数据：<ul id="ul_l2c_dtv_scb">
+                    <li>用于Greenplum数据库集群全局对象的DDL，不属于集群中的特定数据库。</li>
+                    <li>用于备份数据库中的对象的DDL（使用<codeph>--dbname指定</codeph>），必须在还原实际数据之前创建，以及在还原数据后必须创建的对象的DDL。</li>
+                  </ul>全局对象包括：<ul id="ul_f1b_dhj_tbb">
+                    <li>表空间</li>
+                    <li>数据库</li>
+                    <li>数据库范围的配置参数设置(GUCs)</li>
+                    <li>Resource group定义</li>
+                    <li>Resource queue定义</li>
                     <li>Roles</li>
-                    <li><codeph>GRANT</codeph> assignments of roles to databases</li>
-                  </ul><p><b>Note:</b> Global metadata is not restored by default. You must include
-                    the <codeph>--with-globals</codeph> option to the <codeph>gprestore</codeph>
-                    command to restore global metadata.</p>Database-specific objects that must be
-                  created <i>before</i> to restoring the actual data include:<ul id="ul_vqn_vsv_scb">
-                    <li>Session-level configuration parameter settings (GUCs)</li>
+                    <li><codeph>GRANT</codeph>分配给数据库的角色</li>
+                  </ul><p><b>Note:</b>默认情况下不会还原全局元数据。
+                    必须在<codeph>gprestore</codeph>命令中包含<codeph>--with-globals</codeph>选项才能还原全局元数据。
+                    </p>在还原实际数据之前必须创建的数据库特定的对象包括：<ul id="ul_vqn_vsv_scb">
+                    <li>Session级别的配置参数设置(GUCs)</li>
                     <li>Schemas</li>
-                    <li>Procedural language extensions</li>
-                    <li>Types</li>
-                    <li>Sequences</li>
-                    <li>Functions</li>
-                    <li>Tables</li>
-                    <li>Protocols</li>
-                    <li>Operators and operator classes</li>
-                    <li>Conversions</li>
-                    <li>Aggregates</li>
-                    <li>Casts</li>
-                    <li>Views</li>
-                    <li>Constraints</li>
-                  </ul>Database-specific objects that must be created <i>after</i> restoring the
-                  actual data include:<ul id="ul_br4_wsv_scb">
-                    <li dir="ltr">Indexes</li>
-                    <li dir="ltr">Rules</li>
-                    <li dir="ltr">Triggers. (While Greenplum Database does not support triggers, any
-                      trigger definitions that are present are backed up and restored.)</li>
+                    <li>过程语言扩展</li>
+                    <li>类型</li>
+                    <li>序列</li>
+                    <li>函数</li>
+                    <li>表</li>
+                    <li>协议</li>
+                    <li>操作符和操作符类</li>
+                    <li>转换</li>
+                    <li>聚合</li>
+                    <li>类型转换</li>
+                    <li>视图</li>
+                    <li>约束</li>
+                  </ul>在还原实际数据之后必须创建的数据库特定的对象包括：<ul id="ul_br4_wsv_scb">
+                    <li dir="ltr">索引</li>
+                    <li dir="ltr">规则</li>
+                    <li dir="ltr">触发器。(虽然Greenplum数据库不支持触发器，但会备份和恢复任何存在的触发器定义。)</li>
                   </ul></entry>
               </row>
               <row>
                 <entry><filepath>gpbackup_&lt;YYYYMMDDHHMMSS>_toc.yaml</filepath></entry>
-                <entry>Contains metadata for locating object DDL in the
-                    <filepath>_predata.sql</filepath> and <filepath>_postdata.sql</filepath> files.
-                  This file also contains the table names and OIDs used for locating the
-                  corresponding table data in CSV data files that are created on each segment. See
-                    <xref href="#topic_xnj_b4c_tbb/section_oys_cpj_tbb" format="dita"/>.</entry>
+                <entry>包含用于在<filepath>_predata.sql</filepath>和<filepath>_postdata.sql</filepath>文件中查找对象DDL的元数据。
+                    此文件还包含用于在每个节点上创建的CSV数据文件中查找相应表数据的表名和OID。
+                    参考<xref href="#topic_xnj_b4c_tbb/section_oys_cpj_tbb" format="dita"/>。</entry>
               </row>
               <row>
                 <entry><filepath>gpbackup_&lt;YYYYMMDDHHMMSS>_report</filepath></entry>
-                <entry>Contains information about the backup operation that is used to populate the
-                  email notice (if configured) that is sent after the backup completes. This file
-                  contains information such as:<ul id="ul_bjr_2kj_tbb">
-                    <li>Command-line options that were provided</li>
-                    <li>Database that was backed up</li>
-                    <li>Database version</li>
-                    <li>Backup type</li>
-                  </ul>See <xref href="#topic_qwd_d5d_tbb" format="dita"/>.</entry>
+                <entry>包含有关用于填充备份完成后发送的电子邮件通知（如果已配置）的备份操作的信息。
+                    此文件包含以下信息：
+                    <ul id="ul_bjr_2kj_tbb">
+                    <li>提供的命令行选项</li>
+                    <li>备份的数据库</li>
+                    <li>数据库版本</li>
+                    <li>备份类型</li>
+                  </ul>参考<xref href="#topic_qwd_d5d_tbb" format="dita"/>。</entry>
               </row>
               <row>
                 <entry><filepath>gpbackup_&lt;YYYYMMDDHHMMSS>_config.yaml</filepath></entry>
-                <entry>Contains metadata about the execution of the particular backup task,
-                  including: <ul id="ul_ids_vgj_tbb">
-                    <li dir="ltr"><codeph>gpbackup</codeph> version</li>
-                    <li dir="ltr">Database name</li>
-                    <li dir="ltr">Greenplum Database version</li>
-                    <li dir="ltr">Additional option settings such as
+                <entry>包含有关特定备份任务执行的元数据，包括：
+                    <ul id="ul_ids_vgj_tbb">
+                    <li dir="ltr"><codeph>gpbackup</codeph>版本</li>
+                    <li dir="ltr">数据库名称</li>
+                    <li dir="ltr">Greenplum数据库版本</li>
+                    <li dir="ltr">附加选项配置，如
                         <codeph>--no-compression</codeph>, <codeph>--compression-level</codeph>,
-                        <codeph>--metadata-only</codeph>, <codeph>--data-only</codeph>, and
-                        <codeph>--with-stats</codeph>.</li>
+                        <codeph>--metadata-only</codeph>, <codeph>--data-only</codeph>和
+                        <codeph>--with-stats</codeph>。</li>
                   </ul></entry>
               </row>
               <row>
                 <entry><filepath>gpbackup_history.yaml</filepath></entry>
-                <entry>Contains information about options that were used when creating a backup with
-                    <codeph>gpbackup</codeph>, and information about incremental backups.<p>Stored
-                    on the Greenplum Database master host in the Greenplum Database master data
-                    directory.</p><p>This file is not backed up by <codeph>gpbackup</codeph>.</p><p>
-                    For information about incremental backups, see <xref
-                      href="backup-gpbackup-incremental.xml"/>.</p></entry>
+                <entry>包含有关使用<codeph>gpbackup</codeph>创建备份时使用的选项的信息，以及有关增量备份的信息。
+                    <p>存储在Greenplum数据库master数据目录中的Greenplum数据库主机上。</p>
+                    <p>这个文件不是通过<codeph>gpbackup</codeph>备份的。</p>
+                    <p>关于增量备份的信息，参考<xref href="backup-gpbackup-incremental.xml"/>。</p></entry>
               </row>
             </tbody>
           </tgroup>
         </table></p>
       <section id="section_oys_cpj_tbb">
-        <title>Segment Data Files</title>
-        <p>By default, each segment creates one compressed CSV file for each table that is backed up
-          on the segment. You can optionally specify the <codeph>--single-data-file</codeph> option
-          to create a single data file on each segment. The files are stored in
-            <filepath>&lt;seg_dir>/backups/YYYYMMDD/YYYYMMDDHHMMSS/</filepath>. </p>
-        <p>If you specify a custom backup directory, segment data files are copied to this same file
-          path as a subdirectory of the backup directory. If you include the
-            <codeph>--leaf-partition-data</codeph> option, <codeph>gpbackup</codeph> creates one
-          data file for each leaf partition of a partitioned table, instead of just one table for
-          file.</p>
-        <p>Each data file uses the file name format
-            <filepath>gpbackup_&lt;content_id>_&lt;YYYYMMDDHHMMSS>_&lt;oid>.gz</filepath> where:<ul
+        <title>节点数据文件</title>
+        <p>默认情况下，每个节点为在节点上备份的每个表创建一个压缩CSV文件。
+            您可以选择指定<codeph>--single-data-file</codeph>选项，以在每个节点上创建单个数据文件。
+            文件存储在<filepath>&lt;seg_dir>/backups/YYYYMMDD/YYYYMMDDHHMMSS/</filepath>。</p>
+        <p>如果指定自定义备份目录，则节点数据文件将复制到与备份目录的子目录相同的文件路径中。
+            如果包含<codeph>--leaf-partition-data</codeph>选项，则<codeph>gpbackup</codeph>为分区表的每个叶子分区创建一个数据文件，而不是为表创建一个文件。
+            </p>
+        <p>每个数据文件使用文件吗格式
+            <filepath>gpbackup_&lt;content_id>_&lt;YYYYMMDDHHMMSS>_&lt;oid>.gz</filepath>，其中：<ul
             id="ul_cdb_jpj_tbb">
-            <li><filepath>&lt;content_id></filepath> is the content ID of the segment.</li>
-            <li><filepath>&lt;YYYYMMDDHHMMSS></filepath> is the timestamp of the
-                <codeph>gpbackup</codeph> operation.</li>
-            <li><filepath>&lt;oid></filepath> is the object ID of the table. The metadata file
-                <filepath>gpbackup_&lt;YYYYMMDDHHMMSS>_toc.yaml</filepath> references this
-                <filepath>&lt;oid></filepath> to locate the data for a specific table in a
-              schema.</li>
+            <li><filepath>&lt;content_id></filepath>是节点的content ID。</li>
+            <li><filepath>&lt;YYYYMMDDHHMMSS></filepath>是<codeph>gpbackup</codeph>操作的时间戳。</li>
+            <li><filepath>&lt;oid></filepath>是表的object ID。
+                元数据文件<filepath>gpbackup_&lt;YYYYMMDDHHMMSS>_toc.yaml</filepath>引用此<filepath>&lt;oid></filepath>以查找schema中特定的表的数据。</li>
           </ul></p>
-        <p>You can optionally specify the gzip compression level (from 1-9) using the
-            <codeph>--compression-level</codeph> option, or disable compression entirely with
-            <codeph>--no-compression</codeph>. If you do not specify a compression level,
-            <codeph>gpbackup</codeph> uses compression level 1 by default.</p>
+        <p>您可以选择使用<codeph>--compression-level</codeph>选项指定gzip压缩级别（1-9），或使用<codeph>--no-compression</codeph>完全禁用压缩。
+            如果未指定压缩级别，则<codeph>gpbackup</codeph>默认使用压缩级别1。
+            </p>
       </section>
     </body>
   </topic>

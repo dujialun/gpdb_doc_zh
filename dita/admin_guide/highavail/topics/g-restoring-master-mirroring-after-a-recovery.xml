@@ -2,75 +2,64 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic17">
-  <title>Restoring Master Mirroring After a Recovery</title>
+  <title>在恢复后还原Master镜像</title>
   <body>
-    <p>After you activate a standby master for recovery, the standby master becomes the primary
-      master. You can continue running that instance as the primary master if it has the same
-      capabilities and dependability as the original master host. </p>
-    <p>You must initialize a new standby master to continue providing master mirroring unless you
-      have already done so while activating the prior standby master. Run <codeph><xref
+    <p>在激活一台后备Master进行恢复后，该后备Master会成为主Master。如果后备Master具有和原始Master主机
+      相同的能力和可靠性，可以继续把该实例当作主Master。</p>
+    <p>必须初始化一个新的后备Master继续提供Master的镜像，除非在激活前一个后备Master时已经这样做了。
+      在活动的Master主机上运行<codeph><xref
           href="../../../utility_guide/admin_utilities/gpinitstandby.xml"
-        >gpinitstandby</xref></codeph> on the active master host to configure a new standby master.
-      See <xref href="g-enabling-master-mirroring.xml#topic8"/>.</p>
-    <p>You can restore the primary and standby master instances on the original hosts. This process
-      swaps the roles of the primary and standby master hosts, and it should be performed only if
-      you strongly prefer to run the master instances on the same hosts they occupied prior to the
-      recovery scenario. </p>
-    <note type="important">Restoring the primary and standby master instances to their original
-      hosts is not an online operation. The master host must be stopped to perform the
-      operation.</note>
-    <p>For information about the Greenplum Database utilities, see the <cite>Greenplum Database
-        Utility Guide</cite>.</p>
+        >gpinitstandby</xref></codeph>来配置一个新的standby Master，
+      详见<xref href="g-enabling-master-mirroring.xml#topic8"/>。</p>
+    <p>可以在原来的主机上恢复主Master和后备Master。这个过程会交换主Master主机和后备Master主机的角色，
+      只有强烈希望在恢复之前的相同主机上运行Master实例时才执行这样的操作。</p>
+    <note type="important">恢复primary master和standby master实例到他们原始主机并不是一个在线的
+      操作。执行该操作时，master主机必须被停止。</note>
+    <p>更多有关Greenplum数据库工具的信息，请见<cite>Greenplum数据库工具指南</cite>。</p>
     <section id="ki160986">
-      <title>To restore the master and standby instances on original hosts (optional)</title>
+      <title>在原来的主机上恢复Master和后备Master（可选）</title>
       <ol>
-        <li id="ki160936">Ensure the original master host is in dependable running condition; ensure
-          the cause of the original failure is fixed.</li>
-        <li>On the original master host, move or remove the data directory,
-          <codeph>gpseg-1</codeph>. This example moves the directory to
-            <codeph>backup_gpseg-1</codeph>:<codeblock>$ mv /data/master/gpseg-1 /data/master/backup_gpseg-1</codeblock><p>You
-            can remove the backup directory once the standby is successfully configured.</p></li>
-        <li id="ki160940">Initialize a standby master on the original master host. For example, run
-          this command from the current master host,
-          smdw:<codeblock>$ gpinitstandby -s mdw</codeblock></li>
-        <li>After the initialization completes, check the status of standby master, mdw. Run
+        <li id="ki160936">确认原来的Master主机有可靠的运行条件，确保以前的失效原因已被修复。</li>
+        <li>O在原来的Master主机上，移动或者移除数据目录<codeph>gpseg-1</codeph>。这个例子把该目录
+          移动到<codeph>backup_gpseg-1</codeph>：
+          <codeblock>$ mv /data/master/gpseg-1 /data/master/backup_gpseg-1</codeblock>
+          <p>一旦后备被成功地配置，就可以移除备份目录。</p></li>
+        <li id="ki160940">在原来的Master主机上初始化一个后备Master。例如，从当前的Master主机
+          （smdw）运行这个命令：<codeblock>$ gpinitstandby -s mdw</codeblock></li>
+        <li>在初始化完成后，检查后备Master（mdw）的状态，运行
               <codeph><xref href="../../../utility_guide/admin_utilities/gpstate.xml#topic1"
-              type="topic" format="dita"/></codeph> with the <codeph>-f</codeph> option to check the
-          standby master status:<codeblock>$ gpstate -f</codeblock> The standby master status should
-          be <codeph>passive</codeph>, and the WAL sender state should be
-          <codeph>streaming</codeph>.</li>
-        <li>Stop the Greenplum Database master instance on the standby master. For
-          example:<codeblock>$ gpstop -m</codeblock></li>
-        <li id="ki160961">Run the <codeph>gpactivatestandby</codeph> utility from the original
-          master host, mdw, that is currently a standby master. For
-            example:<codeblock>$ gpactivatestandby -d $MASTER_DATA_DIRECTORY</codeblock><p>Where the
-              <codeph>-d</codeph> option specifies the data directory of the host you are
-            activating.</p></li>
-        <li id="ki165618">After the utility completes, run <codeph>gpstate</codeph> with the
-            <codeph>-b</codeph> option to display a summary of the system
-            status:<codeblock>$ gpstate -b</codeblock><p>The master instance status should be
-              <codeph>Active</codeph>. When a standby master is not configured, the command displays
-              <codeph>No master standby configured</codeph> for the standby master state.</p></li>
-        <li>On the standby master host, move or remove the data directory, <codeph>gpseg-1</codeph>.
-          This example moves the
-            directory:<codeblock>$ mv /data/master/gpseg-1 /data/master/backup_gpseg-1</codeblock><p>You
-            can remove the backup directory once the standby is successfully configured.</p></li>
-        <li id="ki165609">After the original master host runs the primary Greenplum Database master,
-          you can initialize a standby master on the original standby master host. For
-            example:<codeblock>$ gpinitstandby -s smdw</codeblock><p>After the command completes,
-            you can run the <codeph>gpstate -f</codeph> command on the primary master host, to check
-            the standby master status. </p></li>
+              type="topic" format="dita"/></codeph>工具带有<codeph>-f</codeph>选项来检查standby 
+          master状态：
+          <codeblock>$ gpstate -f</codeblock> 
+          standby master 状态应该是<codeph>passive</codeph>，WAL sender状态应该是<codeph>streaming</codeph>。</li>
+        <li>在后备Master上停止Greenplum数据库的Master实例。例如：<codeblock>$ gpstop -m</codeblock></li>
+        <li id="ki160961">从原始的Master主机mdw运行<codeph>gpactivatestandby</codeph>工具，
+          该主机当前是一个后备Master。例如：
+          <codeblock>$ gpactivatestandby -d $MASTER_DATA_DIRECTORY</codeblock>
+          <p>其中<codeph>-d</codeph>选项指定正在激活的主机的数据目录。</p></li>
+        <li id="ki165618">在该工具完成后，运行<codeph>gpstate</codeph>工具带有-b选项来检查状态：
+          <codeblock>$ gpstate -b</codeblock>
+          <p>验证原来的主Master状态为<i>Active</i>。当没有配置一个后备Master时，
+            该命令显示<codeph>No master standby configured</codeph>并且该消息表示没有配置一个后备Master实例。
+               </p></li>
+        <li>在后备Master主机上，移动或者移除数据目录<codeph>gpseg-1</codeph>。
+          这个例子移动该目录：
+            <codeblock>$ mv /data/master/gpseg-1 /data/master/backup_gpseg-1</codeblock>
+          <p>一旦standby master配置成功后便可以移除该备份目录。</p></li>
+        <li id="ki165609">在原来的Master主机运行主Greenplum数据库Master之后，可以在原来的后备Master
+          主机上初始化一个后备Master。例如：
+          <codeblock>$ gpinitstandby -s smdw</codeblock><p>命令完成后，可以字primary master
+            主机上运行<codeph>gpstate -f</codeph>命令，来检查standby master的状态。</p></li>
       </ol>
     </section>
     <section>
-      <title>To check the status of the master mirroring process (optional)</title>
-      <p>You can run the <codeph>gpstate</codeph> utility with the <codeph>-f</codeph> option to
-        display details of the standby master host. <codeblock>$ gpstate -f</codeblock></p>
-      <p>The standby master status should be <codeph>passive</codeph>, and the WAL sender state
-        should be <codeph>streaming</codeph>.</p>
-      <p>For information about the <codeph><xref
+      <title>检查主Master镜像进程状态（可选）</title>
+      <p>可以通过运行<codeph>gpstate</codeph>工具带有<codeph>-f</codeph>选项来显示standby master主机
+        的详细信息。<codeblock>$ gpstate -f</codeblock></p>
+      <p>standby master状态应该是<codeph>passive</codeph>，WAL sender的状态应该是<codeph>streaming</codeph>。</p>
+      <p>更多有关<codeph><xref
             href="../../../utility_guide/admin_utilities/gpstate.xml" type="topic" format="dita"
-          /></codeph> utility, see the <cite>Greenplum Database Utility Guide</cite>.</p>
+      /></codeph>工具的信息详见<cite>Greenplum数据库工具指南</cite>。</p>
     </section>
   </body>
 </topic>

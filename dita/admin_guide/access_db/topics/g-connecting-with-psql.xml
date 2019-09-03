@@ -2,34 +2,30 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic5">
-   <title>Connecting with psql</title>
+   <title>用psql连接</title>
    <body>
-      <p>Depending on the default values used or the environment variables you have set, the
-         following examples show how to access a database via <codeph>psql</codeph>:</p>
+      <p>依靠用户使用的默认值或者已经设置的环境变量，下面的例子展示了如何通过<codeph>psql</codeph>
+         来访问数据库：</p>
       <p>
          <codeblock>$ psql -d gpdatabase -h master_host -p 5432 -U <codeph>gpadmin</codeph>
          </codeblock>
          <codeblock>$ psql gpdatabase</codeblock>
          <codeblock>$ psql</codeblock>
       </p>
-      <p>If a user-defined database has not yet been created, you can access the system by
-         connecting to the <codeph>postgres</codeph> database. For
-         example:<codeblock>$ psql postgres</codeblock>
+      <p>如果还没有创建一个用户定义的数据库，用户可以通过连接到<codeph>postgres</codeph>数据库来
+         访问系统。例如：<codeblock>$ psql postgres</codeblock>
       </p>
-      <p>After connecting to a database, <codeph>psql</codeph> provides a prompt with the name of
-         the database to which <codeph>psql</codeph> is currently connected, followed by the string
-            <codeph>=&gt;</codeph> (or <codeph>=#</codeph> if you are the database superuser). For
-         example:</p>
+      <p>在连接到一个数据库后，<codeph>psql</codeph>提供了一个提示符，提示符由<codeph>psql</codeph>
+         当前连接的数据库名后面加上<codeph>=&gt;</codeph> (如果用户是数据库超级用户则会是<codeph>=#</codeph>)
+         构成。例如：</p>
       <p>
          <codeblock>gpdatabase=&gt;</codeblock>
       </p>
-      <p>At the prompt, you may type in SQL commands. A SQL command must end with a
-            <codeph>;</codeph> (semicolon) in order to be sent to the server and executed. For
-         example:</p>
+      <p>在提示符处，用户可以输入SQL命令。为了能把一个SQL命令发送到服务器并且执行，SQL命令必须以一个
+         <codeph>;</codeph>（分号）结束。例如：</p>
       <p>
          <codeblock>=&gt; SELECT * FROM mytable;</codeblock>
       </p>
-      <p>See the <i>Greenplum Reference Guide</i> for information about using the
-            <codeph>psql</codeph> client application and SQL commands and syntax.</p>
+      <p>有关使用<codeph>psql</codeph>客户端应用以及SQL命令及语法的信息请见<i>Greenplum数据库参考指南</i>。</p>
    </body>
 </topic>

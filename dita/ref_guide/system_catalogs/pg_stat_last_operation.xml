@@ -1,10 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="hr138336">pg_stat_last_operation</title><body><p>The pg_stat_last_operation table contains metadata tracking information
-about database objects (tables, views, etc.).</p><table id="hr138428"><title>pg_catalog.pg_stat_last_operation</title><tgroup cols="4"><colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="100pt"/><colspec colnum="3" colname="col3" colwidth="82pt"/><colspec colnum="4" colname="col4" colwidth="136pt"/><thead><row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row></thead><tbody><row><entry colname="col1"><codeph id="hr138551">classid</codeph></entry><entry colname="col2">oid</entry><entry colname="col3">pg_class.oid</entry><entry colname="col4">OID of the system catalog containing the object.
-</entry></row><row><entry colname="col1"><codeph id="hr138559">objid</codeph></entry><entry colname="col2">oid</entry><entry colname="col3">any OID column</entry><entry colname="col4">OID of the object within its system catalog.</entry></row><row><entry colname="col1"><codeph id="hr138567">staactionname</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">The action that was taken on the object.</entry></row><row><entry colname="col1"><codeph id="hr138575">stasysid</codeph></entry><entry colname="col2">oid</entry><entry colname="col3">pg_authid.oid</entry><entry colname="col4">A foreign key to pg_authid.oid.</entry></row><row><entry colname="col1"><codeph id="hr138583">stausename</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">The name of the role that performed the operation
-on this object.</entry></row><row><entry colname="col1"><codeph id="hr138447">stasubtype</codeph></entry><entry colname="col2">text</entry><entry colname="col3"/><entry colname="col4">The type of object operated on or the subclass
-of operation performed.</entry></row><row><entry colname="col1"><codeph id="hr138456">statime</codeph></entry><entry colname="col2">timestamp with timezone</entry><entry colname="col3"/><entry colname="col4">The timestamp of the operation. This is the same timestamp that is written to
-              the Greenplum Database server log files in case you need to look up more
-              detailed information about the operation in the logs.</entry></row></tbody></tgroup></table></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1" xml:lang="en">
+    <title id="hr138336">pg_stat_last_operation</title>
+    <body>
+        <p>pg_stat_last_operation表包含关于数据库对象（表、视图等）的元数据跟踪信息。
+        </p>
+        <table id="hr138428">
+            <title>pg_catalog.pg_stat_last_operation</title>
+            <tgroup cols="4">
+                <colspec colnum="1" colname="col1" colwidth="131pt"/>
+                <colspec colnum="2" colname="col2" colwidth="100pt"/>
+                <colspec colnum="3" colname="col3" colwidth="82pt"/>
+                <colspec colnum="4" colname="col4" colwidth="136pt"/>
+                <thead>
+                    <row>
+                        <entry colname="col1">列</entry>
+                        <entry colname="col2">类型</entry>
+                        <entry colname="col3">参考</entry>
+                        <entry colname="col4">描述</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry colname="col1">
+                            <codeph id="hr138551">classid</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3">pg_class.oid</entry>
+                        <entry colname="col4">包含对象的系统目录的OID。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph id="hr138559">objid</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3">any OID column</entry>
+                        <entry colname="col4">对象在其系统目录内的对象OID。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph id="hr138567">staactionname</codeph>
+                        </entry>
+                        <entry colname="col2">name</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">在一个对象上采取的动作。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph id="hr138575">stasysid</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3">pg_authid.oid</entry>
+                        <entry colname="col4">pg_authid.oid的外键。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph id="hr138583">stausename</codeph>
+                        </entry>
+                        <entry colname="col2">name</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">在该对象上执行操作的角色的名称。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph id="hr138447">stasubtype</codeph>
+                        </entry>
+                        <entry colname="col2">text</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">被执行操作的对象的类型或者被执行操作的子类。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph id="hr138456">statime</codeph>
+                        </entry>
+                        <entry colname="col2">timestamp with timezone</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">操作的时间戳。
+                            这和写到Greenplum数据库服务器日志文件的时间戳是相同的，以便在日志中查询更多关于操作细节的信息。
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </body>
+</topic>

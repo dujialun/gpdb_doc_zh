@@ -2,7 +2,7 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic70">
-   <title>Example 2—Hadoop file server (pxf)</title>
+   <title>例 2—Hadoop文件系统(pxf)</title>
    <body>
       <p>
          <codeblock>=# CREATE WRITABLE EXTERNAL TABLE unload_expenses 
@@ -12,7 +12,6 @@
  DISTRIBUTED BY (exp_id);
 </codeblock>
       </p>
-      <p>You specify an HDFS directory for a writable external table that you create
-        with the <codeph>pxf</codeph> protocol.</p>
+      <p>用户为使用<codeph>pxf</codeph>协议创建的可写外部表指定HDFS目录。</p>
    </body>
 </topic>

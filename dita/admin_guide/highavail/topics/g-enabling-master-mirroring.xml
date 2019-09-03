@@ -2,41 +2,38 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic8">
-  <title>Enabling Master Mirroring</title>
+  <title>启用Master镜像</title>
   <body>
-    <p>You can configure a new Greenplum Database system with a standby master using
-        <codeph>gpinitsystem</codeph> or enable it later using <codeph>gpinitstandby</codeph>. This
-      topic assumes you are adding a standby master to an existing system that was initialized
-      without one.</p>
-    <p>For information about the utilities <codeph><xref
+    <p>可以用<codeph>gpinitsystem</codeph>来配置一个带有后备Master的新Greenplum数据库系统，
+      或者以后用<codeph>gpinitstandby</codeph>来启用后备Master。这个主题假定现有系统初始化时没有
+      后备Master，现在要向其中加入一个后备Master。</p>
+    <p>有关工具<codeph><xref
           href="../../../utility_guide/admin_utilities/gpinitsystem.xml" type="topic" format="dita"
-        /></codeph> and <codeph><xref
+        /></codeph>和<codeph><xref
           href="../../../utility_guide/admin_utilities/gpinitstandby.xml" type="topic" format="dita"
-        /></codeph>, see the <cite>Greenplum Database Utility Guide</cite>.</p>
+        /></codeph>的详细信息，请见<cite>Greenplum数据库工具指南</cite>.</p>
     <section id="ki160203">
-      <title>To add a standby master to an existing system</title>
+      <title>要向一个现有系统增加一个standby master</title>
       <ol id="ol_x55_3gs_rcb">
-        <li id="ki160206">Ensure the standby master host is installed and configured:
-            <codeph>gpadmin</codeph> system user created, Greenplum Database binaries installed,
-          environment variables set, SSH keys exchanged, and that the data directories and
-          tablespace directories, if needed, are created.</li>
-        <li id="ki155475">Run the <codeph>gpinitstandby</codeph> utility on the currently active
-            <i>primary</i> master host to add a standby master host to your Greenplum Database
-          system. For example:<codeblock>$ gpinitstandby -s smdw</codeblock> Where
-            <codeph>-s</codeph> specifies the standby master host name. </li>
+        <li id="ki160206">确保standby Master主机已经被安装且配置好Greenplum数据库：
+          <codeph>gpadmin</codeph>系统用户已创建、Greenplum数据库二进制文件已安装、
+          环境变量已设置、SSH密钥已交换并且数据目录和表空间已创建。</li>
+        <li id="ki155475">在当前活动的<i>primary</i>master主机上运行<codeph>gpinitstandby</codeph>
+          工具向Greenplum数据库系统增加一个standby master主机。例如：
+         <codeblock>$ gpinitstandby -s smdw</codeblock>
+          这里<codeph>-s</codeph>指定后备Master主机的名称。</li>
       </ol>
-      <p>To switch operations to a standby master, see <xref
-          href="g-recovering-a-failed-master.xml#topic16"/>.</p>
+      <p>要把操作切换到standby master上，请见<xref
+          href="g-recovering-a-failed-master.xml#topic16"/>。</p>
     </section>
     <section>
-      <title>To check the status of the master mirroring process (optional)</title>
-      <p>You can run the <codeph>gpstate</codeph> utility with the <codeph>-f</codeph> option to
-        display details of the standby master host. <codeblock>$ gpstate -f</codeblock></p>
-      <p>The standby master status should be passive, and the WAL sender state should be
-        streaming.</p>
-      <p>For information about the <codeph><xref
+      <title>检查Master镜像进程状态（可选）</title>
+      <p>可以通过运行<codeph>gpstate</codeph>工具并带有<codeph>-f</codeph>选项来显示standby master
+        主机的详细信息。<codeblock>$ gpstate -f</codeblock></p>
+      <p>standby master的状态应该是passive，WAL sender状态应该是streaming。</p>
+      <p>有关<codeph><xref
             href="../../../utility_guide/admin_utilities/gpstate.xml" type="topic" format="dita"
-          /></codeph> utility, see the <cite>Greenplum Database Utility Guide</cite>.</p>
+          /></codeph>工具的详细信息，请见<cite>Greenplum数据库工具指南</cite>。</p>
     </section>
   </body>
 </topic>

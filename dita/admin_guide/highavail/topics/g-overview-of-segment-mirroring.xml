@@ -2,83 +2,64 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic3">
-    <title>Overview of Segment Mirroring</title>
+    <title>Segment镜像概述</title>
     <body>
-        <p>When Greenplum Database High Availability is enabled, there are two types of segment
-            instances: <i>primary</i> and <i>mirror</i>. Each primary segment has one corresponding
-            mirror segment. A primary segment instance receives requests from the master to make
-            changes to the segment data and then replicates those changes to the corresponding
-            mirror. If Greenplum Database detects that a primary segment has failed or become
-            unavailable, it changes the role of its mirror segment to primary segment and the role
-            of the unavailable primary segment to mirror segment. Transactions in progress when the
-            failure occurred roll back and must be restarted. The administrator must then recover
-            the mirror segment, allow the mirror to syncronize with the current primary segment, and
-            then exchange the primary and mirror segments so they are in their preferred roles.</p>
-        <p>If segment mirroring is not enabled, the Greenplum Database system shuts down if a
-            segment instance fails. Administrators must manually recover all failed segments before
-            Greenplum Database operations can resume.</p>
-        <p>When segment mirroring is enabled for an existing system, the primary segment instances
-            continue to provide service to users while a snapshot of the primary segments are taken.
-            While the snapshots are taken and deployed on the mirror segment instances, changes to
-            the primary segment are also recorded. After the snapshot has been deployed on the
-            mirror segment, the mirror segment is synchronized and kept current using Write-Ahead
-            Logging (WAL)-based streaming replication. Greenplum Database WAL replication uses the
-                <codeph>walsender</codeph> and <codeph>walreceiver</codeph> replication processes.
-            The <codeph>walsender</codeph> process is a primary segment process. The
-                <codeph>walreceiver</codeph> is a mirror segment process. </p>
-        <p>When database changes occur, the logs that capture the changes are streamed to the mirror
-            segment to keep it current with the corresponding primary segments. During WAL
-            replication, database changes are written to the logs before being applied, to ensure
-            data integrity for any in-process operations. </p>
-        <p>When Greenplum Database detects a primary segment failure, the WAL replication process
-            stops and the mirror segment automatically starts as the active primary segment. If a
-            mirror segment fails or becomes inaccessible while the primary is active, the primary
-            segment tracks database changes in logs that are applied to the mirror when it is
-            recovered. For information about segment fault detection and the recovery process, see
-                <xref href="g-detecting-a-failed-segment.xml#topic9"/>. </p>
-        <p>These Greenplum Database system catalog tables contain mirroring and replication
-            information. <ul id="ul_nn3_yjm_rdb">
-                <li>The catalog table <codeph><xref
+        <p>当Greenplum数据库高可用性被启用时，有两种类型的Segment：<i>primary</i>Segment
+            和<i>mirror</i>Segment。每个主Segment都有一个对应的镜像Segment。主Segment从
+            Master接收请求来对该Segment的数据库做更改并且接着把那些更改复制到对应的镜像。
+            如果主Segment变成不可用，镜像segment会切换为主segment，不可用的主segment会切换为
+            镜像segment。故障出现时正在进行的事务会回滚并且必须重启数据库。接下来管理员必须恢复镜像segment，并
+            允许镜像segment与当前主segment进行同步，最后需要交换主segment和镜像segment的角色，让他们处于自己
+            最佳的角色状态。</p>
+        <p>如果segment镜像未启用，当出现segment实例故障时，Greenplum数据库系统会关闭。管理员必须手工恢复所有
+            失败的segment实例然后才能重新启动数据库。</p>
+        <p>如果现有系统已经启用了segment镜像，当主segment实例正在生成一个快照时，主segment实例继续为用户提供服务。
+            当主segment快照完成并向镜像segment实例部署时，主segment的变化也会被记录。当快照完全部署到镜像segment
+            后，镜像segment会同步这些变化并采用WAL流复制的方式与主segment保持一致。Greenplum数据库的WAL复制使用
+            <codeph>walsender</codeph>和<codeph>walreceiver</codeph>复制进程。
+           <codeph>walsender</codeph>进程是主segment的进程。<codeph>walreceiver</codeph>进程是镜像segment
+        的进程。</p>
+        <p>当数据库变化出现时，日志捕获到该变化然后将变化流向镜像segment，以保证镜像与其对应的主segment一致。在WAL
+            复制期间，数据库变化在被应用之前先写入日志中，以确保任何正在处理的数据的完整性。</p>
+        <p>当Greenplum数据库检测到主segment故障时，WAL复制进程停止，镜像segment自动接管成为活动主segment。如果
+            主segment活动时，镜像segment故障或变得不可访问，主segment会追踪数据库变化并记录在日志中，当镜像恢复后
+            应用到镜像节点。有关segment故障检测和故障处理的详细信息，请见
+                <xref href="g-detecting-a-failed-segment.xml#topic9"/>。</p>
+        <p>Greenplum数据库系统表包含镜像和复制的详细信息。
+           <ul id="ul_nn3_yjm_rdb">
+                <li>系统表 <codeph><xref
                             href="../../../ref_guide/system_catalogs/gp_segment_configuration.xml#topic1"
-                        /></codeph> contains the current configuration and state of primary and
-                    mirror segment instances and the master and standby master instance. </li>
-                <li>The catalog view <codeph><xref
+                        /></codeph>包含主segment、镜像segment、主master和standby master实例的当前配置和
+                    状态信息。</li>
+                <li>系统视图<codeph><xref
                             href="../../../ref_guide/system_catalogs/gp_stat_replication.xml#topic1"
-                        /></codeph> contains replication statistics of the
-                        <codeph>walsender</codeph> processes that are used for Greenplum Database
-                    master and segment mirroring.</li>
+                /></codeph>包含Greenplum数据库master和segment镜像功能使用的<codeph>walsender</codeph>
+                    进程的复制状态统计信息。</li>
             </ul></p>
         <section>
-            <title>About Segment Mirroring Configurations</title>
-            <p>Mirror segment instances can be placed on hosts in the cluster in different
-                configurations. As a best practice, a primary segment and the corresponding mirror
-                are placed on different hosts. Each host must have the same number of primary and
-                mirror segments. When you create segment mirrors with the Greenplum Database
-                utilities <codeph><xref
-                        href="../../../utility_guide/admin_utilities/gpinitsystem.xml"/></codeph> or
+            <title>关于Segment镜像配置</title>
+            <p>镜像segment实例可以根据配置的不同在集群主机中按不同的方式分布。作为最佳实践，主segment和它对应的镜像
+                放在不同的主机上。每台主机必须有相同的主和镜像segment。当你使用Greenplum工具<codeph><xref
+                        href="../../../utility_guide/admin_utilities/gpinitsystem.xml"/></codeph>或
                         <codeph><xref href="../../../utility_guide/admin_utilities/gpaddmirrors.xml"
-                    /></codeph> you can specify the segment mirror configuration, group mirroring
-                (the default) or spread mirroring. With <codeph>gpaddmirrors</codeph>, you can
-                create custom mirroring configurations with a <codeph>gpaddmirrors</codeph>
-                configuration file and specify the file on the command line.</p>
-            <p><i>Group mirroring</i> is the default mirroring configuration. The mirror segments
-                for each host's primary segments are placed on one other host. If a single host
-                fails, the number of active primary segments doubles on the host that backs the
-                failed host. The diagram <xref href="#topic3/fig_rrr_nt2_xt" format="dita"/>
-                illustrates a group mirroring configuration. </p>
+                        /></codeph>创建segment镜像时，可以设定segment镜像方式：以分组的方式镜像（默认）或
+                以打散的方式镜像。采用<codeph>gpaddmirrors</codeph>命令时，可以先创建<codeph>gpaddmirrors</codeph>
+                配置文件，然后将文件放在命令行读取执行。</p>
+            <p><i>以分组的方式镜像</i>是默认的镜像方式。该方式每台主机的主segment对应的镜像都整体放在另一台主机上，
+                如果有一台主机故障，另外一台接管该主机服务的镜像所在的机器的活动segment数量便会翻倍。
+                图表 <xref href="#topic3/fig_rrr_nt2_xt" format="dita"/>
+                显示了以分组的方式配置segment镜像。</p>
             <!--<fig id="ki169754"><image href="../../graphics/mirrorsegs.png" placement="break" width="485px" height="135px"/></fig>-->
             <fig id="fig_rrr_nt2_xt">
-                <title>Group Segment Mirroring in Greenplum Database</title>
+                <title>以分组的方式在Greenplum数据库中分布镜像</title>
                 <image href="../../graphics/group-mirroring.png" id="image_crm_pt2_xt"/>
             </fig>
-            <p><i>Spread mirroring</i> spreads each host's mirrors over multiple hosts so that if
-                any single host fails, no other host will have more than one mirror promoted to an
-                active primary segment. Spread mirroring is possible only if there are more hosts
-                than segments per host. The diagram <xref href="#topic3/fig_ew1_qgg_xt"
-                    format="dita"/> illustrates the placement of mirrors in a spread segment
-                mirroring configuration.</p>
+            <p><i>以打散的方式镜像</i> 将每一个主机的镜像分散到多台主机上，保证每一个机器上至多只有一个
+                镜像提升为主segment，这种方式可以防止单台主机故障后，另外的主机压力骤增。以打散方式镜像
+                分布要求集群主机数量多于每台主机上segment的数量。图表<xref href="#topic3/fig_ew1_qgg_xt"
+                    format="dita"/>显示了如何以打散的方式配置segment镜像。</p>
             <fig id="fig_ew1_qgg_xt">
-                <title>Spread Segment Mirroring in Greenplum Database</title>
+                <title>以打散的方式在Greenplum数据库中分布镜像</title>
                 <image href="../../graphics/spread-mirroring.png" id="image_zjm_wgg_xt"/>
             </fig>
         </section>

@@ -2,11 +2,10 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-   <title>Configuring the Greenplum Database System</title>
-   <abstract><shortdesc>Server configuration parameters affect the behavior of Greenplum Database.
-      </shortdesc>They are part of the PostgreSQL "Grand Unified Configuration" system, so they are
-      sometimes called "GUCs." Most of the Greenplum Database server configuration parameters are
-      the same as the PostgreSQL configuration parameters, but some are
-      Greenplum-specific.</abstract>
+  <title>配置Greenplum数据库系统</title>
+  <abstract><shortdesc>服务器配置参数会影响Greenplum数据库的行为。
+  </shortdesc>它们是PostgreSQL的“大统一配置”系统的一部分，因此它们有时
+    也被称为“GUC”。大部分的Greenplum数据库服务器配置参数和PostgreSQL的配置参数相同，但是也有一些是
+    Greenplum所特有的。</abstract>
    <body/>
 </topic>

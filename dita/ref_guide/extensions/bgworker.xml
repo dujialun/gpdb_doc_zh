@@ -2,30 +2,23 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
- <title>Background Worker Processes</title>
+ <title>后台工作进程</title>
  <body>
-  <p> Greenplum Database can be extended to run user-supplied code in separate processes. Such
-   processes are started, stopped, and monitored by <codeph>postgres</codeph>, which permits them to
-   have a lifetime closely linked to the server's status. These processes have the option to attach
-   to Greenplum Database's shared memory area and to connect to databases internally; they can also
-   run multiple transactions serially, just like a regular client-connected server process. Also, by
-   linking to <codeph>libpq</codeph> they can connect to the server and behave like a regular client
-   application. </p>
-  <note type="warning"> There are considerable robustness and security risks in using background
-   worker processes because, being written in the <codeph>C</codeph> language, they have
-   unrestricted access to data. Administrators wishing to enable modules that include background
-   worker processes should exercise extreme caution. Only carefully audited modules should be
-   permitted to run background worker processes.</note>
-  <p> Background workers can be initialized at the time that Greenplum Database is started by
-   including the module name in the <varname>shared_preload_libraries</varname> server configuration
-   parameter. A module wishing to run a background worker can register it by calling
-    <codeph>RegisterBackgroundWorker(BackgroundWorker *worker)</codeph> from its
-    <codeph>_PG_init()</codeph>. Background workers can also be started after the system is up and
-   running by calling the function <codeph>RegisterDynamicBackgroundWorker(BackgroundWorker *worker,
-    BackgroundWorkerHandle **handle)</codeph>. Unlike <codeph>RegisterBackgroundWorker</codeph>,
-   which can only be called from within the <codeph>postmaster</codeph>,
-    <codeph>RegisterDynamicBackgroundWorker</codeph> must be called from a regular backend. </p>
-  <p> The structure <codeph>BackgroundWorker</codeph> is defined thus:  </p>
+  <p>可以扩展Greenplum数据库以在单独的进程中运行用户提供的代码。
+      这些进程由<codeph>postgres</codeph>启动，停止和监视，这使得它们的生命周期与服务器的状态紧密相关。
+      这些进程可以选择连接到Greenplum数据库的共享内存区域并在内部连接到数据库; 它们还可以串行运行多个事务，就像常规的客户端连接服务器进程一样。
+      此外，通过链接到<codeph>libpq</codeph>，它们可以连接到服务器，并且行为类似于常规客户端应用程序。
+      </p>
+  <note type="warning">使用后台工作进程存在相当大的稳健性和安全性风险，因为使用<codeph>C</codeph>语言编写时，它们可以不受限制地访问数据。
+      希望启用包含后台工作进程的模块的管理员应该格外小心。
+      只允许经过仔细审核的模块运行后台工作进程。
+      </note>
+  <p>通过在<varname>shared_preload_libraries</varname>服务器配置参数中包含模块名称，可以在启动Greenplum数据库时初始化后台工作程序。
+      希望运行后台工作程序的模块可以通过从<codeph>_PG_init()</codeph>调用<codeph>RegisterBackgroundWorker(BackgroundWorker *worker)</codeph>来注册它。
+      通过调用函数<codeph>RegisterDynamicBackgroundWorker(BackgroundWorker *worker, BackgroundWorkerHandle **handle)</codeph>，系统启动并运行后，也可以启动后台工作程序。
+      与只能在<codeph>postmaster</codeph>中调用的<codeph>RegisterBackgroundWorker</codeph>不同，必须从常规后端调用<codeph>RegisterDynamicBackgroundWorker</codeph>。
+      </p>
+  <p>因此定义了<codeph>BackgroundWorker</codeph>结构：</p>
   <codeblock>
 typedef void (*bgworker_main_type)(Datum main_arg);
 typedef struct BackgroundWorker
@@ -41,110 +34,72 @@ typedef struct BackgroundWorker
     int         bgw_notify_pid;
 } BackgroundWorker;
 </codeblock>
-  <p>
-   <codeph>bgw_name</codeph> is a string to be used in log messages, process listings and similar
-   contexts. </p>
-  <p>
-   <codeph>bgw_flags</codeph> is a bitwise-or'd bit mask indicating the capabilities that the module
-   wants. Possible values are <codeph>BGWORKER_SHMEM_ACCESS</codeph> (requesting shared memory
-   access) and <codeph>BGWORKER_BACKEND_DATABASE_CONNECTION</codeph> (requesting the ability to
-   establish a database connection, through which it can later run transactions and queries). A
-   background worker using <codeph>BGWORKER_BACKEND_DATABASE_CONNECTION</codeph> to connect to a
-   database must also attach shared memory using <codeph>BGWORKER_SHMEM_ACCESS</codeph>, or worker
-   start-up will fail. </p>
-  <p>
-   <codeph>bgw_start_time</codeph> is the server state during which <codeph>postgres</codeph> should
-   start the process; it can be one of <codeph>BgWorkerStart_PostmasterStart</codeph> (start as soon
-   as <codeph>postgres</codeph> itself has finished its own initialization; processes requesting
-   this are not eligible for database connections), <codeph>BgWorkerStart_ConsistentState</codeph>
-   (start as soon as a consistent state has been reached in a hot standby, allowing processes to
-   connect to databases and run read-only queries), and
-    <codeph>BgWorkerStart_RecoveryFinished</codeph> (start as soon as the system has entered normal
-   read-write state). Note the last two values are equivalent in a server that's not a hot standby.
-   Note that this setting only indicates when the processes are to be started; they do not stop when
-   a different state is reached. </p>
-  <p>
-   <codeph>bgw_restart_time</codeph> is the interval, in seconds, that <codeph>postgres</codeph>
-   should wait before restarting the process, in case it crashes. It can be any positive value, or
-    <codeph>BGW_NEVER_RESTART</codeph>, indicating not to restart the process in case of a crash. </p>
-  <p>
-   <codeph>bgw_main</codeph> is a pointer to the function to run when the process is started. This
-   function must take a single argument of type <codeph>Datum</codeph> and return
-    <codeph>void</codeph>. <codeph>bgw_main_arg</codeph> will be passed to it as its only argument.
-   Note that the global variable <codeph>MyBgworkerEntry</codeph> points to a copy of the
-    <codeph>BackgroundWorker</codeph> structure passed at registration time.
-    <codeph>bgw_main</codeph> may be NULL; in that case, <codeph>bgw_library_name</codeph> and
-    <codeph>bgw_function_name</codeph> will be used to determine the entry point. This is useful for
-   background workers launched after postmaster startup, where the postmaster does not have the
-   requisite library loaded. </p>
-  <p>
-   <codeph>bgw_library_name</codeph> is the name of a library in which the initial entry point for
-   the background worker should be sought. It is ignored unless <codeph>bgw_main</codeph> is NULL.
-   But if <codeph>bgw_main</codeph> is NULL, then the named library will be dynamically loaded by
-   the worker process and <codeph>bgw_function_name</codeph> will be used to identify the function
-   to be called. </p>
-  <p>
-   <codeph>bgw_function_name</codeph> is the name of a function in a dynamically loaded library
-   which should be used as the initial entry point for a new background worker. It is ignored unless
-    <codeph>bgw_main</codeph> is NULL. </p>
-  <p>
-   <codeph>bgw_notify_pid</codeph> is the PID of a Greenplum Database backend process to which the
-   postmaster should send <codeph>SIGUSR1</codeph> when the process is started or exits. It should
-   be 0 for workers registered at postmaster startup time, or when the backend registering the
-   worker does not wish to wait for the worker to start up. Otherwise, it should be initialized to
-    <codeph>MyProcPid</codeph>. </p>
-  <p>Once running, the process can connect to a database by calling
-     <codeph>BackgroundWorkerInitializeConnection(<codeph>char *dbname</codeph>, <codeph>char
-     *username</codeph>)</codeph>. This allows the process to run transactions and queries using the
-    <codeph>SPI</codeph> interface. If <varname>dbname</varname> is NULL, the session is not
-   connected to any particular database, but shared catalogs can be accessed. If
-    <varname>username</varname> is NULL, the process will run as the superuser created during
-    <codeph>initdb</codeph>. BackgroundWorkerInitializeConnection can only be called once per
-   background process, it is not possible to switch databases. </p>
-  <p> Signals are initially blocked when control reaches the <codeph>bgw_main</codeph> function, and
-   must be unblocked by it; this is to allow the process to customize its signal handlers, if
-   necessary. Signals can be unblocked in the new process by calling
-    <codeph>BackgroundWorkerUnblockSignals</codeph> and blocked by calling
-    <codeph>BackgroundWorkerBlockSignals</codeph>. </p>
-  <p> If <codeph>bgw_restart_time</codeph> for a background worker is configured as
-    <codeph>BGW_NEVER_RESTART</codeph>, or if it exits with an exit code of 0 or is terminated by
-    <codeph>TerminateBackgroundWorker</codeph>, it will be automatically unregistered by the
-   postmaster on exit. Otherwise, it will be restarted after the time period configured via
-    <codeph>bgw_restart_time</codeph>, or immediately if the postmaster reinitializes the cluster
-   due to a backend failure. Backends which need to suspend execution only temporarily should use an
-   interruptible sleep rather than exiting; this can be achieved by calling
-    <codeph>WaitLatch()</codeph>. Make sure the <codeph>WL_POSTMASTER_DEATH</codeph> flag is set
-   when calling that function, and verify the return code for a prompt exit in the emergency case
-   that <codeph>postgres</codeph> itself has terminated. </p>
-  <p> When a background worker is registered using the
-    <codeph>RegisterDynamicBackgroundWorker</codeph> function, it is possible for the backend
-   performing the registration to obtain information regarding the status of the worker. Backends
-   wishing to do this should pass the address of a <codeph>BackgroundWorkerHandle *</codeph> as the
-   second argument to <codeph>RegisterDynamicBackgroundWorker</codeph>. If the worker is
-   successfully registered, this pointer will be initialized with an opaque handle that can
-   subsequently be passed to <codeph>GetBackgroundWorkerPid(<codeph>BackgroundWorkerHandle
-     *</codeph>, <codeph>pid_t *</codeph>)</codeph> or
-     <codeph>TerminateBackgroundWorker(<codeph>BackgroundWorkerHandle *</codeph>)</codeph>.
-    <codeph>GetBackgroundWorkerPid</codeph> can be used to poll the status of the worker: a return
-   value of <codeph>BGWH_NOT_YET_STARTED</codeph> indicates that the worker has not yet been started
-   by the postmaster; <codeph>BGWH_STOPPED</codeph> indicates that it has been started but is no
-   longer running; and <codeph>BGWH_STARTED</codeph> indicates that it is currently running. In this
-   last case, the PID will also be returned via the second argument.
-    <codeph>TerminateBackgroundWorker</codeph> causes the postmaster to send
-    <codeph>SIGTERM</codeph> to the worker if it is running, and to unregister it as soon as it is
-   not. </p>
-  <p> In some cases, a process which registers a background worker may wish to wait for the worker
-   to start up. This can be accomplished by initializing <codeph>bgw_notify_pid</codeph> to
-    <codeph>MyProcPid</codeph> and then passing the <codeph>BackgroundWorkerHandle *</codeph>
-   obtained at registration time to
-     <codeph>WaitForBackgroundWorkerStartup(<codeph>BackgroundWorkerHandle *handle</codeph>,
-     <codeph>pid_t *</codeph>)</codeph> function. This function will block until the postmaster has
-   attempted to start the background worker, or until the postmaster dies. If the background runner
-   is running, the return value will <codeph>BGWH_STARTED</codeph>, and the PID will be written to
-   the provided address. Otherwise, the return value will be <codeph>BGWH_STOPPED</codeph> or
-    <codeph>BGWH_POSTMASTER_DIED</codeph>. </p>
-  <p> The <codeph>worker_spi</codeph> contrib module contains a working example, which demonstrates
-   some useful techniques. </p>
-  <p> The maximum number of registered background workers is limited by max-worker-processes. </p>
+  <p><codeph>bgw_name</codeph>是一个在日志消息，进程列表和类似上下文中使用的字符串。
+    </p>
+  <p><codeph>bgw_flags</codeph>是一个按位或位掩码，表示模块想要的功能。
+      可能的值是<codeph>BGWORKER_SHMEM_ACCESS</codeph>（请求共享内存访问）和<codeph>BGWORKER_BACKEND_DATABASE_CONNECTION</codeph>（请求建立数据库连接的能力，以后可以通过它运行事务和查询）。
+      使用<codeph>BGWORKER_BACKEND_DATABASE_CONNECTION</codeph>连接到数据库的后台工作进程还必须使用<codeph>BGWORKER_SHMEM_ACCESS</codeph>附加共享内存，否则工作进程将启动失败。
+    </p>
+  <p><codeph>bgw_start_time</codeph>是<codeph>postgres</codeph>应该启动进程的服务器状态;
+      它可以是<codeph>BgWorkerStart_PostmasterStart</codeph>之一（一旦<codeph>postgres</codeph>完成自己的初始化就开始;请求它的进程不符合数据库连接的条件），
+      <codeph>BgWorkerStart_ConsistentState</codeph>（一旦在热备份中达到一致状态就开始，允许进程连接到数据库并运行只读查询）和<codeph>BgWorkerStart_RecoveryFinished</codeph>（系统进入正常读写状态后立即启动）。
+      请注意，最后两个值在不是热备份的服务器中是等效的。
+      请注意，此设置仅指示何时启动进程; 当达到不同的状态时，它们不会停止。
+    </p>
+  <p><codeph>bgw_restart_time</codeph>是<codeph>postgres</codeph>在重新启动进程之前应该等待的时间间隔（以秒为单位），以防它崩溃。
+      它可以是任何正值，或<codeph>BGW_NEVER_RESTART</codeph>，表示在发生崩溃时不重启进程。
+    </p>
+  <p><codeph>bgw_main</codeph>是指向启动进程时要运行的函数的指针。
+      此函数必须采用<codeph>Datum</codeph>类型的单个参数并返回<codeph>void</codeph>。
+      <codeph>bgw_main_arg</codeph>将作为唯一参数传递给它。
+      请注意，全局变量<codeph>MyBgworkerEntry</codeph>指向在注册时传递的<codeph>BackgroundWorker</codeph>结构的副本。
+      <codeph>bgw_main</codeph>可能为NULL; 在这种情况下，将使用<codeph>bgw_library_name</codeph>和<codeph>bgw_function_name</codeph>来确定入口点。
+      这对postmaster启动后启动的后台工作进程很有用，其中postmaster没有加载必需的库。
+    </p>
+  <p><codeph>bgw_library_name</codeph>是库的名称，在该库中应该寻找后台工作程序的初始入口点。
+      除非<codeph>bgw_main</codeph>为NULL，否则它将被忽略。
+      但是如果<codeph>bgw_main</codeph>为NULL，则命名库将由工作进程动态加载，<codeph>bgw_function_name</codeph>将用于标识要调用的函数。
+    </p>
+  <p><codeph>bgw_function_name</codeph>是动态加载库中函数的名称，该库应该用作新后台工作程序的初始入口点。
+      除非<codeph>bgw_main</codeph>为NULL，否则它将被忽略。
+    </p>
+  <p><codeph>bgw_notify_pid</codeph>是一个Greenplum数据库后端进程的PID，postmaster应该在进程启动或退出时向其发送<codeph>SIGUSR1</codeph>。
+      对于在postmaster启动时注册的工作进程，或者注册工作进程的后端不希望等待工作进程启动时，应该为0。
+      否则，它应该初始化为<codeph>MyProcPid</codeph>。
+    </p>
+  <p>一旦运行，该进程可以通过调用<codeph>BackgroundWorkerInitializeConnection(<codeph>char *dbname</codeph>, <codeph>char *username</codeph>)</codeph>连接到数据库。
+      这允许进程使用<codeph>SPI</codeph>接口运行事务和查询。
+      如果<varname>dbname</varname>为NULL，则会话未连接到任何特定数据库，但可以访问共享目录。
+      如果<varname>username</varname>为NULL，则进程将以<codeph>initdb</codeph>期间创建的超级用户身份运行。
+      BackgroundWorkerInitializeConnection只能在每个后台进程中调用一次，无法切换数据库。
+      </p>
+  <p>当控制到达<codeph>bgw_main</codeph>函数时，信号最初被阻止，并且必须被它解除阻塞; 这是为了允许进程在必要时自定义其信号处理程序。
+      通过调用<codeph>BackgroundWorkerUnblockSignals</codeph>可以在新进程中取消阻止信号，并通过调用<codeph>BackgroundWorkerBlockSignals</codeph>来阻止信号。
+      </p>
+  <p>如果后台工作程序的<codeph>bgw_restart_time</codeph>配置为<codeph>BGW_NEVER_RESTART</codeph>，
+      或者退出时退出代码为0或由<codeph>TerminateBackgroundWorker</codeph>终止，则退出时将由postmaster自动取消注册。
+      否则，它将在通过<codeph>bgw_restart_time</codeph>配置的时间段之后重新启动，或者如果postmaster由于后端故障而重新初始化群集时立即重新启动。
+      需要暂时暂停执行的后端应该使用可中断的睡眠而不是退出; 这可以通过调用<codeph>WaitLatch()</codeph>来实现。
+      确保在调用该函数时设置<codeph>WL_POSTMASTER_DEATH</codeph>标志，并在<codeph>postgres</codeph>本身已终止的紧急情况下验证返回代码以提示退出。
+      </p>
+  <p>当使用<codeph>RegisterDynamicBackgroundWorker</codeph>函数注册后台工作程序时，执行注册的后端可以获得有关工作进程状态的信息。
+      希望这样做的后端应该将<codeph>BackgroundWorkerHandle *</codeph>的地址作为<codeph>RegisterDynamicBackgroundWorker</codeph>的第二个参数传递。
+      如果工作程序已成功注册，则此指针将使用不透明句柄进行初始化，
+      该句柄随后可以传递给<codeph>GetBackgroundWorkerPid(<codeph>BackgroundWorkerHandle *</codeph>, <codeph>pid_t *</codeph>)</codeph>或<codeph>TerminateBackgroundWorker(<codeph>BackgroundWorkerHandle *</codeph>)</codeph>。
+      <codeph>GetBackgroundWorkerPid</codeph>可用于轮询工作进程的状态：返回值<codeph>BGWH_NOT_YET_STARTED</codeph>表示工作进程尚未由postmaster启动;
+      <codeph>BGWH_STOPPED</codeph>表示它已经启动但不再运行; 和<codeph>BGWH_STARTED</codeph>表示它当前正在运行。
+      在最后一种情况下，PID也将通过第二个参数返回。
+      <codeph>TerminateBackgroundWorker</codeph>使postmaster在运行时将<codeph>SIGTERM</codeph>发送给worker，并在它不运行时立即取消注册。
+    </p>
+  <p>在某些情况下，注册后台工作进程的进程可能希望等待工作进程启动。
+      这可以通过将<codeph>bgw_notify_pid</codeph>初始化为<codeph>MyProcPid</codeph>，
+      然后将在注册时获得的<codeph>BackgroundWorkerHandle *</codeph>传递给<codeph>WaitForBackgroundWorkerStartup(<codeph>BackgroundWorkerHandle *handle</codeph>,<codeph>pid_t *</codeph>)</codeph>函数来实现。
+      此函数将阻塞，直到postmaster尝试启动后台工作程序，或直到postmaster死亡。
+      如果后台运行器正在运行，则返回值将为<codeph>BGWH_STARTED</codeph>，并且PID将被写入提供的地址。
+      否则，返回值将为<codeph>BGWH_STOPPED</codeph>或<codeph>BGWH_POSTMASTER_DIED</codeph>。
+      </p>
+  <p><codeph>worker_spi</codeph>模块包含一个工作示例，演示了一些有用的技术。
+    </p>
+  <p>注册后台工作进程的最大数量受max-worker-processes限制。</p>
  </body>
 </topic>

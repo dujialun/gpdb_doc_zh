@@ -2,18 +2,14 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic73">
-   <title>Unloading Data Using a Writable External Table</title>
+   <title>使用可写外部表卸载数据</title>
    <body>
-      <p>Writable external tables allow only <codeph>INSERT</codeph> operations. You must grant
-            <codeph>INSERT</codeph> permission on a table to enable access to users who are not the
-         table owner or a superuser. For example:</p>
+      <p>可写外部表只允许<codeph>INSERT</codeph>操作。不是表拥有者或者超级用户的用户必须被授予表上的<codeph>INSERT</codeph>权限。例如：</p>
       <p>
          <codeblock>GRANT INSERT ON writable_ext_table TO admin;
 </codeblock>
       </p>
-      <p>To unload data using a writable external table, select the data from the source table(s)
-         and insert it into the writable external table. The resulting rows are output to the
-         writable external table. For example:</p>
+      <p>要使用可写外部表卸载数据，从源表选择数据并且将它插入到可写外部表中。结果行被输出到可写外部表。例如：</p>
       <p>
          <codeblock>INSERT INTO writable_ext_table SELECT * FROM regular_table;
 </codeblock>

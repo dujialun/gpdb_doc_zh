@@ -2,23 +2,12 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="iz173472">Using Resource Groups</title>
+  <title id="iz173472">用资源组进行工作负载管理</title>
   <body>
-    <p>You use resource groups to set and enforce CPU, memory, and concurrent transaction limits in
-      Greenplum Database. After you define a resource group, you can then assign the group to one or
-      more Greenplum Database roles, or to an external component such as PL/Container, in order to
-      control the resources used by those roles or components.</p>
-    <p>When you assign a resource group to a role (a role-based resource group), the resource limits
-      that you define for the group apply to all of the roles to which you assign the group. For
-      example, the memory limit for a resource group identifies the maximum memory usage for all
-      running transactions submitted by Greenplum Database users in all roles to which you assign
-      the group.</p>
-    <p>Similarly, when you assign a resource group to an external component, the group limits apply
-      to all running instances of the component. For example, if you create a resource group for a
-      PL/Container external component, the memory limit that you define for the group specifies the
-      maximum memory usage for all running instances of each PL/Container runtime to which you
-      assign the group.</p>
-    <p>This topic includes the following subtopics:</p>
+    <p>用户可以使用资源组在Greenplum数据库中设置和实施CPU，内存和并发事务限制。定义资源组后，可以将该组分配给一个或多个Greenplum数据库角色，或分配给外部组件（如PL /Container），以便控制这些角色或组件使用的资源。</p>
+    <p>当用户将资源组分配到角色（基于角色的资源组），用户定义该组的资源限制应用于所有的该组的所有角色。例如，对于一个资源组的内存限制标识了该组所有Greenplum数据库用户提交的运行事务的最大内存使用量。</p>
+    <p>同样，将资源组分配给外部组件时，组限制将应用于组件的所有正在运行的实例。 例如，如果为PL/Container外部组件创建资源组，则为组定义的内存限制将指定为其分配组的每个PL/Container运行时的所有正在运行的实例的最大内存使用量。</p>
+    <p>该章节包含以下小节</p>
     <ul id="ul_wjf_1wy_sp">
       <li id="im168064">
         <xref href="#topic8339intro" type="topic" format="dita"/>
@@ -63,125 +52,78 @@
     </ul>
   </body>
   <topic id="topic8339intro" xml:lang="en">
-    <title>Understanding Role and Component Resource Groups</title>
+    <title>理解角色和组件资源组</title>
     <body>
-      <p>Greenplum Database supports two types of resource groups: groups that manage resources for
-        roles, and groups that manage resources for external components such as PL/Container.</p>
-      <p>The most common application for resource groups is to manage the number of active queries
-        that different roles may execute concurrently in your Greenplum Database cluster. You can
-        also manage the amount of CPU and memory resources that Greenplum allocates to each
-        query.</p>
-      <p>Resource groups for roles use Linux control groups (cgroups) for CPU resource management.
-        Greenplum Database tracks virtual memory internally for these resource groups using a memory
-        auditor referred to as <codeph>vmtracker</codeph>.</p>
-      <p>When the user executes a query, Greenplum Database evaluates the query against a set of
-        limits defined for the resource group. Greenplum Database executes the query immediately if
-        the group's resource limits have not yet been reached and the query does not cause the group
-        to exceed the concurrent transaction limit. If these conditions are not met, Greenplum
-        Database queues the query. For example, if the maximum number of concurrent transactions for
-        the resource group has already been reached, a subsequent query is queued and must wait
-        until other queries complete before it runs. Greenplum Database may also execute a pending
-        query when the resource group's concurrency and memory limits are altered to large enough
-        values.</p>
-      <p>Within a resource group for roles, transactions are evaluated on a first in, first out
-        basis. Greenplum Database periodically assesses the active workload of the system,
-        reallocating resources and starting/queuing jobs as necessary.</p>
-      <p>You can also use resource groups to manage the CPU and memory resources of external
-        components such as PL/Container. Resource groups for external components use Linux cgroups
-        to manage both the total CPU and total memory resources for the component.</p>
-      <note>Containerized deployments of Greenplum Database, such as Greenplum for Kubernetes, might
-        create a hierarchical set of nested cgroups to manage host system resources. The nesting of
-        cgroups affects the Greenplum Database resource group limits for CPU percentage, CPU cores,
-        and memory (except for Greenplum Database external components). The Greenplum Database
-        resource group system resource limit is based on the quota for the parent group.<p>For
-          example, Greenplum Database is running in a cgroup demo, and the Greenplum Database cgroup
-          is nested in the cgroup demo. If the cgroup demo is configured with a CPU limit of 60% of
-          system CPU resources and the Greenplum Database resource group CPU limit is set 90%, the
-          Greenplum Database limit of host system CPU resources is 54% (0.6 x 0.9).</p><p>Nested
-          cgroups do not affect memory limits for Greenplum Database external components such as
-          PL/Container. Memory limits for external components can only be managed if the cgroup that
-          is used to manage Greenplum Database resources is not nested, the cgroup is configured as
-          a top-level cgroup.</p><p>For information about configuring cgroups for use by resource
-          groups, see <xref href="#topic71717999" format="dita"/>.</p></note>
+      <p>Greenplum数据库支持两类型型的资源组：管理角色资源的组，以及管理外部组件（如PL/Container）资源的组。</p>
+      <p>资源组的最常见应用程序是管理不同角色可以在Greenplum数据库群集中并发执行的活动查询的数量。 用户还可以管理Greenplum为每个查询分配的CPU和内存资源量。</p>
+      <p>角色的资源组使用Linux控制组（cgroup）进行CPU资源管理。Greenplum数据库使用称为<codeph>vmtracker</codeph>的内存审计器在内部为这些资源组跟踪虚拟内存。</p>
+      <p>当用户执行查询时，Greenplum数据库会根据为资源组定义的一组限制来评估查询。如果尚未达到组的资源限制并且查询不会导致组超过并发事务限制，Greenplum数据库会立即执行查询。如果不满足这些条件，Greenplum数据库会对查询进行排队。例如，如果已达到资源组的最大并发事务数，则后续查询将排队，并且必须等待其他查询在运行之前完成。当资源组的并发和内存限制被更改为足够大的值时，Greenplum数据库也可以执行挂起的查询。</p>
+      <p>在角色的资源组中，事务以先进先出的方式进行评估。 Greenplum数据库定期评估系统的活动工作负载，根据需要重新分配资源和启动/排队作业。</p>
+      <p>用户还可以使用资源组来管理外部组件（如PL/Container）的CPU和内存资源。 外部组件的资源组使用Linux cgroup来管理组件的总CPU和总内存资源。</p>
+      <note>Greenplum数据库的容器化部署（例如Greenplum for Kubernetes）可能会创建一组嵌套的cgroup，以管理主机系统资源。 嵌套cgroup会影响Greenplum数据库资源组对CPU百分比，CPU核心和内存的限制（Greenplum数据库外部组件除外）。 Greenplum数据库资源组系统资源限制基于父组的配额。
+		  <p>例如，Greenplum数据库在cgroup演示中运行，Greenplum Database cgroup嵌套在cgroup演示中。 如果cgroup演示配置CPU限制为系统CPU资源的60％且Greenplum数据库资源组CPU限制设置为90％，则主机系统CPU资源的Greenplum数据库限制为54％（0.6 x 0.9）。</p><p>嵌套的cgroup不会影响Greenplum数据库外部组件（如PL/Container）的内存限制。 仅当用于管理Greenplum数据库资源的cgroup未嵌套时，才能管理外部组件的内存限制，cgroup配置为顶级cgroup。</p><p>有关配置cgroup以供资源组使用的信息，请参阅<xref href="#topic71717999" format="dita"/>.</p></note>
     </body>
   </topic>
   <topic id="topic8339introattrlim" xml:lang="en">
-    <title>Resource Group Attributes and Limits</title>
+    <title>资源组的参数和限制</title>
     <body>
-      <p>When you create a resource group, you:</p>
+      <p>当用户创建一个资源组时，请注意以下几点：</p>
       <ul>
-        <li>Specify the type of resource group by identifying how memory for the group is
-          audited.</li>
-        <li>Provide a set of limits that determine the amount of CPU and memory resources available
-          to the group.</li>
+        <li>通过识别该组存储器是如何审核指定资源组的类型。</li>
+        <li>提供一组限制，用于确定组可用的CPU和内存资源量。</li>
       </ul>
-      <p>Resource group attributes and limits:</p>
+      <p>资源组的参数和限制：</p>
       <table id="resgroup_limit_descriptions">
         <tgroup cols="3">
           <colspec colnum="1" colname="col1" colwidth="1*"/>
           <colspec colnum="2" colname="col2" colwidth="1*"/>
           <thead>
             <row>
-              <entry colname="col1">Limit Type</entry>
-              <entry colname="col2">Description</entry>
+              <entry colname="col1">限制类型</entry>
+              <entry colname="col2">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">MEMORY_AUDITOR</entry>
-              <entry colname="col2">The memory auditor in use for the resource group.
-                  <codeph>vmtracker</codeph> (the default) is required if you want to assign the
-                resource group to roles. Specify <codeph>cgroup</codeph> to assign the resource
-                group to an external component.</entry>
+              <entry colname="col2">用于资源组的内存审计器。 如果要将资源组分配给角色，则需要<codeph>vmtracker</codeph>缺省值）。 指定<codeph>cgroup</codeph>以将资源组分配给外部组件。</entry>
             </row>
             <row>
               <entry colname="col1">CONCURRENCY</entry>
-              <entry colname="col2">The maximum number of concurrent transactions, including active
-                and idle transactions, that are permitted in the resource group.</entry>
+              <entry colname="col2">资源组中允许的最大并发事务数，包括活动和空闲事务。</entry>
             </row>
             <row>
               <entry colname="col1">CPU_RATE_LIMIT</entry>
-              <entry colname="col2">The percentage of CPU resources available to this resource
-                group.</entry>
+              <entry colname="col2">此资源组可用的CPU资源百分比。</entry>
             </row>
             <row>
               <entry colname="col1">CPUSET</entry>
-              <entry colname="col2">The CPU cores to reserve for this resource group.</entry>
+              <entry colname="col2">为该资源组保留的CPU核心数</entry>
             </row>
             <row>
               <entry colname="col1">MEMORY_LIMIT</entry>
-              <entry colname="col2">The percentage of memory resources available to this resource
-                group.</entry>
+              <entry colname="col2">该资源组可用的内存资源百分比。</entry>
             </row>
             <row>
               <entry colname="col1">MEMORY_SHARED_QUOTA</entry>
-              <entry colname="col2">The percentage of memory to share across transactions submitted
-                in this resource group.</entry>
+              <entry colname="col2">提交到该资源组的事务之间共享的内存资源百分比</entry>
             </row>
             <row>
               <entry colname="col1">MEMORY_SPILL_RATIO</entry>
-              <entry colname="col2">The memory usage threshold for memory-intensive transactions.
-                When a transaction reaches this threshold, it spills to disk.</entry>
+              <entry colname="col2">内存密集型事务的内存使用阈值。当事务达到此阈值时，它将溢出到磁盘。</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
-      <note>Resource limits are not enforced on <codeph>SET</codeph>, <codeph>RESET</codeph>, and
-          <codeph>SHOW</codeph> commands.</note>
+      <note>不对<codeph>SET</codeph>，<codeph>RESET</codeph>和<codeph>SHOW</codeph>命令强制执行资源限制。</note>
     </body>
   </topic>
   <topic id="topic8339777" xml:lang="en">
-    <title>Memory Auditor</title>
+    <title>内存审计器</title>
     <body>
-      <p>The <codeph>MEMORY_AUDITOR</codeph> attribute specifies the type of resource group by
-        identifying the memory auditor for the group. A resource group that specifies the
-          <codeph>vmtracker</codeph>
-        <codeph>MEMORY_AUDITOR</codeph> identifies a resource group for roles. A resource group
-        specifying the <codeph>cgroup</codeph>
-        <codeph>MEMORY_AUDITOR</codeph> identifies a resource group for external components.</p>
-      <p>The default <codeph>MEMORY_AUDITOR</codeph> is <codeph>vmtracker</codeph>.</p>
-      <p>The <codeph>MEMORY_AUDITOR</codeph> that you specify for a resource group determines if and
-        how Greenplum Database uses the limit attributes to manage CPU and memory resources:</p>
+      <p><codeph>MEMORY_AUDITOR</codeph>属性通过标识组的内存审计器来指定资源组的类型。 指定<codeph>vmtracker</codeph><codeph>MEMORY_AUDITOR</codeph>的资源组标识角色的资源组。 指定<codeph>cgroup</codeph><codeph>MEMORY_AUDITOR</codeph>的资源组标识外部组件的资源组。</p>
+      <p>默认的<codeph>MEMORY_AUDITOR</codeph>是<codeph>vmtracker</codeph>。</p>
+      <p>用户为资源组指定的<codeph>MEMORY_AUDITOR</codeph>确定Greenplum数据库是否以及如何使用限制属性来管理CPU和内存资源：</p>
       <table id="resgroup_limit_descriptions">
         <tgroup cols="3">
           <colspec colnum="1" colname="col1" colwidth="1*"/>
@@ -189,41 +131,41 @@
           <colspec colnum="3" colname="col3" colwidth="1*"/>
           <thead>
             <row>
-              <entry colname="col1">Limit Type</entry>
-              <entry colname="col2">Resource Group for Roles</entry>
-              <entry colname="col3">Resource Group for External Components</entry>
+              <entry colname="col1">限制类型</entry>
+              <entry colname="col2">角色资源组</entry>
+              <entry colname="col3">外部组件资源组</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">CONCURRENCY</entry>
-              <entry colname="col2">Yes</entry>
-              <entry colname="col3">No; must be zero (0)</entry>
+              <entry colname="col2">是</entry>
+              <entry colname="col3">否；必须为零（0）。</entry>
             </row>
             <row>
               <entry colname="col1">CPU_RATE_LIMIT</entry>
-              <entry colname="col2">Yes</entry>
-              <entry colname="col3">Yes</entry>
+              <entry colname="col2">是</entry>
+              <entry colname="col3">是</entry>
             </row>
             <row>
               <entry colname="col1">CPUSET</entry>
-              <entry colname="col2">Yes</entry>
-              <entry colname="col3">Yes</entry>
+              <entry colname="col2">是</entry>
+              <entry colname="col3">是</entry>
             </row>
             <row>
               <entry colname="col1">MEMORY_LIMIT</entry>
-              <entry colname="col2">Yes</entry>
+              <entry colname="col2">是</entry>
               <entry colname="col3">Yes</entry>
             </row>
             <row>
               <entry colname="col1">MEMORY_SHARED_QUOTA</entry>
-              <entry colname="col2">Yes</entry>
-              <entry colname="col2">Component-specific</entry>
+              <entry colname="col2">是</entry>
+              <entry colname="col2">视组件决定</entry>
             </row>
             <row>
               <entry colname="col1">MEMORY_SPILL_RATIO</entry>
-              <entry colname="col2">Yes</entry>
-              <entry colname="col2">Component-specific</entry>
+              <entry colname="col2">是</entry>
+              <entry colname="col2">视组件决定</entry>
             </row>
           </tbody>
         </tgroup>
@@ -231,326 +173,154 @@
     </body>
   </topic>
   <topic id="topic8339717179" xml:lang="en">
-    <title>Transaction Concurrency Limit</title>
+    <title>事务并行限制</title>
     <body>
-      <p>The <codeph>CONCURRENCY</codeph> limit controls the maximum number of concurrent
-        transactions permitted for a resource group for roles.
-        <note>The <codeph>CONCURRENCY</codeph> limit is not applicable to resource groups for
-          external components and must be set to zero (0) for such groups.</note></p>
-      <p>Each resource group for roles is logically divided into a fixed number of slots equal to
-        the <codeph>CONCURRENCY</codeph> limit. Greenplum Database allocates these slots an equal,
-        fixed percentage of memory resources.</p>
-      <p>The default <codeph>CONCURRENCY</codeph> limit value for a resource group for roles is
-        20.</p>
-      <p>Greenplum Database queues any transactions submitted after the resource group reaches its
-          <codeph>CONCURRENCY</codeph> limit. When a running transaction completes, Greenplum
-        Database un-queues and executes the earliest queued transaction if sufficient memory
-        resources exist.</p>
-      <p>You can set the server configuration parameter <codeph><xref
+      <p><codeph>CONCURRENCY</codeph>限制控制角色资源组允许的最大并发事务数。
+        <note><codeph>CONCURRENCY</codeph>限制不适用于外部组件的资源组，对于此类组必须设置为零（0）。</note></p>
+      <p>角色的每个资源组在逻辑上被划分为等于<codeph>CONCURRENCY</codeph>限制的固定数量的槽。 Greenplum数据库为这些插槽分配相等，固定百分比的内存资源。</p>
+      <p>角色资源组的默认<codeph>CONCURRENCY</codeph>限制值为20。</p>
+      <p>Greenplum数据库将资源组达到<codeph>CONCURRENCY</codeph>限制后提交的任何事务排队。 当正在运行的事务完成时，如果存在足够的内存资源，Greenplum Database将排队并执行最早的排队事务。</p>
+      <p>用户可以设置服务器配置参数<codeph><xref
             href="../ref_guide/config_params/guc-list.xml#gp_resource_group_bypass" type="section"
-            scope="peer">gp_resource_group_bypass</xref></codeph> to bypass a resource group
-        concurrency limit.</p>
+            scope="peer">gp_resource_group_bypass</xref></codeph>来绕过资源组的并行限制。</p>
     </body>
   </topic>
   <topic id="topic833971717" xml:lang="en">
-    <title>CPU Limits</title>
+    <title>CPU限制</title>
     <body>
-      <p>You configure the share of CPU resources to reserve for a resource group on a segment host
-        by assigning specific CPU core(s) to the group, or by identifying the percentage of segment
-        CPU resources to allocate to the group. Greenplum Database uses the <codeph>CPUSET</codeph>
-        and <codeph>CPU_RATE_LIMIT</codeph> resource group limits to identify the CPU resource
-        allocation mode. You must specify only one of these limits when you configure a resource
-        group.</p>
-      <p>You may employ both modes of CPU resource allocation simultaneously in your Greenplum
-        Database cluster. You may also change the CPU resource allocation mode for a resource group
-        at runtime.</p>
-      <p>The <codeph><xref
-            href="../ref_guide/config_params/guc-list.xml#gp_resource_group_cpu_limit" type="topic"
-          /></codeph> server configuration parameter identifies the maximum percentage of system CPU
-        resources to allocate to resource groups on each Greenplum Database segment host. This limit
-        governs the maximum CPU usage of all resource groups on a segment host regardless of the CPU
-        allocation mode configured for the group. The remaining unreserved CPU resources are used
-        for the OS kernel and the Greenplum Database auxiliary daemon processes. The default
-          <codeph>gp_resource_group_cpu_limit</codeph> value is .9 (90%).</p>
-      <note>The default <codeph>gp_resource_group_cpu_limit</codeph> value may not leave sufficient
-        CPU resources if you are running other workloads on your Greenplum Database cluster nodes,
-        so be sure to adjust this server configuration parameter accordingly.</note>
-      <note type="warning">Avoid setting <codeph>gp_resource_group_cpu_limit</codeph> to a value
-        higher than .9. Doing so may result in high workload queries taking near all CPU resources,
-        potentially starving Greenplum Database auxiliary processes.</note>
+      <p>通过将特定CPU核心分配给组，或通过标识要分配给组的分段CPU资源的百分比，可以配置要为段主机上的资源组保留的CPU资源份额。 Greenplum数据库使用<codeph>CPUSET</codeph>和<codeph>CPU_RATE_LIMIT</codeph>资源组限制来标识CPU资源分配模式。 配置资源组时，必须仅指定其中一个限制。</p>
+      <p>用户可以在Greenplum数据库群集中同时使用两种CPU资源分配模式。 用户还可以在运行时更改资源组的CPU资源分配模式。</p>
+      <p><codeph><xref
+            href="../ref_guide/config_params/guc-list.xml#gp_resource_group_cpu_limit" type="topic"/></codeph>服务器配置参数标识要分配给每个Greenplum数据库段主机上的资源组的系统CPU资源的最大百分比。 无论为组配置的CPU分配模式如何，此限制都将控制段主机上所有资源组的最大CPU使用率。 剩余的未预留CPU资源用于OS内核和Greenplum数据库辅助守护进程。 默认的<codeph>gp_resource_group_cpu_limit</codeph>值为.9（90％）。</p>
+      <note>如果用户在Greenplum数据库群集节点上运行其他工作负载，则默认的<codeph>gp_resource_group_cpu_limit</codeph>值可能不会留下足够的CPU资源，因此请务必相应地调整此服务器配置参数。</note>
+      <note type="warning">避免将<codeph>gp_resource_group_cpu_limit</codeph>设置为高于.9的值。 这样做可能会导致高工作负载查询接近所有CPU资源，可能使Greenplum数据库辅助进程匮乏。</note>
     </body>
     <topic id="cpuset" xml:lang="en">
-      <title>Assigning CPU Resources by Core</title>
+      <title>按核心数分配CPU资源</title>
       <body>
-        <p>You identify the CPU cores that you want to reserve for a resource group with the
-            <codeph>CPUSET</codeph> property. The CPU cores that you specify must be available in
-          the system and cannot overlap with any CPU cores that you reserved for other resource
-          groups. (Although Greenplum Database uses the cores that you assign to a resource group
-          exclusively for that group, note that those CPU cores may also be used by non-Greenplum
-          processes in the system.)</p>
-        <p>Specify a comma-separated list of single core numbers or number intervals when you
-          configure <codeph>CPUSET</codeph>. You must enclose the core numbers/intervals in single
-          quotes, for example, '1,3-4'.</p>
-        <p>When you assign CPU cores to <codeph>CPUSET</codeph> groups, consider the following:<ul>
-            <li>A resource group that you create with <codeph>CPUSET</codeph> uses the specified
-              cores exclusively. If there are no running queries in the group, the reserved cores
-              are idle and cannot be used by queries in other resource groups. Consider minimizing
-              the number of <codeph>CPUSET</codeph> groups to avoid wasting system CPU
-              resources.</li>
-            <li>Consider keeping CPU core 0 unassigned. CPU core 0 is used as a fallback mechanism
-              in the following cases:<ul>
-                <li><codeph>admin_group</codeph> and <codeph>default_group</codeph> require at least
-                  one CPU core. When all CPU cores are reserved, Greenplum Database assigns CPU core
-                  0 to these default groups. In this situation, the resource group to which you
-                  assigned CPU core 0 shares the core with <codeph>admin_group</codeph> and
-                    <codeph>default_group</codeph>.</li>
-                <li>If you restart your Greenplum Database cluster with one node replacement and the
-                  node does not have enough cores to service all <codeph>CPUSET</codeph> resource
-                  groups, the groups are automatically assigned CPU core 0 to avoid system start
-                  failure.</li>
+        <p>用户可以使用<codeph>CPUSET</codeph>属性标识要为资源组保留的CPU核心。 用户指定的CPU核心必须在系统中可用，并且不能与为其他资源组保留的任何CPU核心重叠。 （尽管Greenplum数据库使用用户专门为该组分配给资源组的核心，但请注意，系统中的非Greenplum进程也可以使用这些CPU核心。）</p>
+        <p>配置<codeph>CPUSET</codeph>时，请指定以逗号分隔的单核数字或数字间隔列表。必须将核心数字/间隔用单引号括起来，例如“1,3-4”。</p>
+        <p>将CPU核心分配给<codeph>CPUSET</codeph>组时，请考虑以下事项：<ul>
+            <li>使用<codeph>CPUSET</codeph>创建的资源组仅使用指定的核心。如果组中没有正在运行的查询，则保留的核心处于空闲状态，并且其他资源组中的查询无法使用这些核心。 请考虑最小化<codeph>CPUSET</codeph>组的数量以避免浪费系统CPU资源。</li>
+            <li>CPU核心0未分配：在以下情况下，CPU核心0用作回退机制：<ul>
+                <li><codeph>admin_group</codeph>和<codeph>default_group</codeph>至少需要一个CPU核心。 保留所有CPU内核后，Greenplum Database会将CPU内核0分配给这些默认组。 在这种情况下，用户为其分配CPU核心0的资源组与<codeph>admin_group</codeph>和<codeph>default_group</codeph>共享核心。</li>
+                <li>如果通过一个节点替换重新启动Greenplum数据库集群，并且节点没有足够的内核来为所有<codeph>CPUSET</codeph>资源组提供服务，则会自动为这些组分配CPU核心0以避免系统启动失败。</li>
               </ul></li>
-            <li>Use the lowest possible core numbers when you assign cores to resource groups. If
-              you replace a Greenplum Database node and the new node has fewer CPU cores than the
-              original, or if you back up the database and want to restore it on a cluster with
-              nodes with fewer CPU cores, the operation may fail. For example, if your Greenplum
-              Database cluster has 16 cores, assigning cores 1-7 is optimal. If you create a
-              resource group and assign CPU core 9 to this group, database restore to an 8 core node
-              will fail.</li>
+            <li>将核心分配给资源组时，请使用尽可能少的核心编号。 如果替换Greenplum数据库节点并且新节点的CPU核心数少于原始节点，或者备份数据库并希望在具有较少CPU核心的节点的群集上还原它，则操作可能会失败。 例如，如果用户的Greenplum数据库群集有16个核心，则分配核心1-7是最佳选择。 如果创建资源组并将CPU核心9分配给该组，则数据库还原到8核心节点将失败。</li>
           </ul></p>
-        <p>Resource groups that you configure with <codeph>CPUSET</codeph> have a higher priority on
-          CPU resources. The maximum CPU resource usage percentage for all resource groups
-          configured with <codeph>CPUSET</codeph> on a segment host is the number of CPU cores
-          reserved divided by the number of all CPU cores, multiplied by 100.</p>
-        <p>When you configure <codeph>CPUSET</codeph> for a resource group, Greenplum Database
-          disables <codeph>CPU_RATE_LIMIT</codeph> for the group and sets the value to -1.</p>
-        <note>You must configure <codeph>CPUSET</codeph> for a resource group <i>after</i> you have
-          enabled resource group-based resource management for your Greenplum Database
-          cluster.</note>
+        <p>使用<codeph>CPUSET</codeph>配置的资源组在CPU资源上具有更高的优先级。 在段主机上配置了<codeph>CPUSET</codeph>的所有资源组的最大CPU资源使用百分比是保留的CPU核心数除以所有CPU核心数乘以100。</p>
+        <p>为资源组配置<codeph>CPUSET</codeph>时，Greenplum数据库会禁用组的<codeph>CPU_RATE_LIMIT</codeph>并将值设置为-1。</p>
+        <note>在为Greenplum数据库群集启用基于资源组的资源管理<i>后</i>，必须为资源组配置<codeph>CPUSET</codeph>。</note>
       </body>
     </topic>
     <topic id="cpu_rate_limit" xml:lang="en">
-      <title>Assigning CPU Resources by Percentage</title>
+      <title>按百分比分配CPU资源</title>
       <body>
-        <p>The Greenplum Database node CPU percentage is divided equally among each segment on the
-          Greenplum node. Each resource group that you configure with a
-            <codeph>CPU_RATE_LIMIT</codeph> reserves the specified percentage of the segment CPU for
-          resource management.</p>
-        <p>The minimum <codeph>CPU_RATE_LIMIT</codeph> percentage you can specify for a resource
-          group is 1, the maximum is 100.</p>
-        <p>The sum of <codeph>CPU_RATE_LIMIT</codeph>s specified for all resource groups that you
-          define in your Greenplum Database cluster must not exceed 100.</p>
-        <p>The maximum CPU resource usage for all resource groups configured with a
-            <codeph>CPU_RATE_LIMIT</codeph> on a segment host is the minimum of:<ul>
-            <li>The number of non-reserved CPU cores divided by the number of all CPU cores,
-              multiplied by 100, and</li>
-            <li>The <codeph>gp_resource_group_cpu_limit</codeph> value.</li>
+        <p>Greenplum数据库节点CPU百分比在Greenplum节点上的每个段之间平均分配。 使用<codeph>CPU_RATE_LIMIT</codeph>配置的每个资源组都保留用于资源管理的段CPU的指定百分比。</p>
+        <p>用户可以为资源组指定的最小<codeph>CPU_RATE_LIMIT</codeph>百分比为1，最大值为100。</p>
+        <p>在Greenplum数据库群集中定义的所有资源组指定的<codeph>CPU_RATE_LIMIT</codeph>的总和不得超过100。</p>
+        <p>使用<codeph>CPU_RATE_LIMIT</codeph>在段主机上配置的所有资源组的最大CPU资源使用量是以下值中的最小值：<ul>
+            <li>非保留CPU核心数除以所有CPU核心数乘以100，和</li>
+            <li><codeph>gp_resource_group_cpu_limit</codeph>值。</li>
           </ul></p>
-        <p>CPU resource assignment for resource groups configured with a
-            <codeph>CPU_RATE_LIMIT</codeph> is elastic in that Greenplum Database may allocate the
-          CPU resources of an idle resource group to a busier one(s). In such situations, CPU
-          resources are re-allocated to the previously idle resource group when that resource group
-          next becomes active. If multiple resource groups are busy, they are allocated the CPU
-          resources of any idle resource groups based on the ratio of their
-            <codeph>CPU_RATE_LIMIT</codeph>s. For example, a resource group created with a
-            <codeph>CPU_RATE_LIMIT</codeph> of 40 will be allocated twice as much extra CPU resource
-          as a resource group that you create with a <codeph>CPU_RATE_LIMIT</codeph> of 20.</p>
-        <p>When you configure <codeph>CPU_RATE_LIMIT</codeph> for a resource group, Greenplum
-          Database disables <codeph>CPUSET</codeph> for the group and sets the value to -1.</p>
+        <p>配置有<codeph>CPU_RATE_LIMIT</codeph>的资源组的CPU资源分配是弹性的，因为Greenplum数据库可以将空闲资源组的CPU资源分配给更繁忙的资源组。在这种情况下，当该资源组接下来变为活动时，CPU资源被重新分配给先前空闲的资源组。如果多个资源组繁忙，则根据其<codeph>CPU_RATE_LIMIT</codeph>的比率为它们分配任何空闲资源组的CPU资源。例如，使用<codeph>CPU_RATE_LIMIT</codeph>为40创建的资源组将分配两倍于使用<codeph>CPU_RATE_LIMIT</codeph> 为20创建的资源组的额外CPU资源。</p>
+        <p>为资源组配置<codeph>CPU_RATE_LIMIT</codeph>时，Greenplum数据库会禁用组的<codeph>CPUSET</codeph>并将值设置为-1。</p>
       </body>
     </topic>
   </topic>
   <topic id="topic8339717" xml:lang="en">
-    <title>Memory Limits</title>
+    <title>内存限制</title>
     <body>
-      <p>When resource groups are enabled, memory usage is managed at the Greenplum Database node,
-        segment, and resource group levels. You can also manage memory at the transaction level with
-        a resource group for roles.</p>
-      <p>The <codeph><xref
+      <p>启用资源组后，将在Greenplum数据库节点，段和资源组级别管理内存使用情况。用户还可以使用角色资源组在事务级别管理内存。</p>
+      <p><codeph><xref
             href="../ref_guide/config_params/guc-list.xml#gp_resource_group_memory_limit"
-            type="topic"/></codeph> server configuration parameter identifies the maximum percentage
-        of system memory resources to allocate to resource groups on each Greenplum Database segment
-        host. The default <codeph>gp_resource_group_memory_limit</codeph> value is .7 (70%).</p>
-      <p>The memory resource available on a Greenplum Database node is further divided equally among
-        each segment on the node. When resource group-based resource management is active, the
-        amount of memory allocated to each segment on a segment host is the memory available to
-        Greenplum Database multiplied by the <codeph>gp_resource_group_memory_limit</codeph> server
-        configuration parameter and divided by the number of active primary segments on the
-        host:</p>
+            type="topic"/></codeph>服务器配置参数标识要分配给每个Greenplum数据库段主机上的资源组的系统内存资源的最大百分比。默认的<codeph>gp_resource_group_memory_limit</codeph>值为.7（70％）。</p>
+      <p>Greenplum数据库节点上可用的内存资源在节点上的每个段之间进一步平均分配。当基于资源组的资源管理处于活动状态时，分配给段主机上每个段的内存量是Greenplum数据库可用的内存乘以<codeph>gp_resource_group_memory_limit</codeph>服务器配置参数，并除以主机上活动主段的数量：</p>
       <p>
         <codeblock>
 rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_memory_limit) / num_active_primary_segments</codeblock>
       </p>
-      <p>Each resource group reserves a percentage of the segment memory for resource management.
-        You identify this percentage via the <codeph>MEMORY_LIMIT</codeph> value that you specify
-        when you create the resource group. The minimum <codeph>MEMORY_LIMIT</codeph> percentage you
-        can specify for a resource group is 1, the maximum is 100.</p>
-      <p>The sum of <codeph>MEMORY_LIMIT</codeph>s specified for all resource groups that you define
-        in your Greenplum Database cluster must not exceed 100.</p>
+      <p>每个资源组保留用于资源管理的段内存的百分比。用户可以通过在创建资源组时指定的<codeph>MEMORY_LIMIT</codeph>值来标识此百分比。用户可以为资源组指定的最小<codeph>MEMORY_LIMIT</codeph>百分比为1，最大值为100。</p>
+      <p>在Greenplum数据库群集中定义的所有资源组指定的<codeph>MEMORY_LIMIT</codeph>总和不得超过100。</p>
     </body>
     <topic id="mem_roles" xml:lang="en">
-      <title>Additional Memory Limits for Role-based Resource Groups</title>
+      <title>于角色的资源组的附加内存限制</title>
       <body>
-        <p>The memory reserved by a resource group for roles is further divided into fixed and
-          shared components. The <codeph>MEMORY_SHARED_QUOTA</codeph> value that you specify when
-          you create the resource group identifies the percentage of reserved resource group memory
-          that may be shared among the currently running transactions. This memory is allotted on a
-          first-come, first-served basis. A running transaction may use none, some, or all of the
-            <codeph>MEMORY_SHARED_QUOTA</codeph>.</p>
-        <p>The minimum <codeph>MEMORY_SHARED_QUOTA</codeph> that you can specify is 0, the maximum
-          is 100. The default <codeph>MEMORY_SHARED_QUOTA</codeph> is 20.</p>
-        <p>As mentioned previously, <codeph>CONCURRENCY</codeph> identifies the maximum number of
-          concurrently running transactions permitted in a resource group for roles. The fixed
-          memory reserved by a resource group is divided into <codeph>CONCURRENCY</codeph> number of
-          transaction slots. Each slot is allocated a fixed, equal amount of resource group memory.
-          Greenplum Database guarantees this fixed memory to each transaction. <fig
+        <p>资源组为角色保留的内存进一步分为固定和共享组件。创建资源组时指定的<codeph>MEMORY_SHARED_QUOTA</codeph>值标识可在当前运行的事务之间共享的预留资源组内存的百分比。此记忆按先到先得的原则分配。正在运行的事务可以使用<codeph>MEMORY_SHARED_QUOTA</codeph>中的任何一个，一些或全部。</p>
+        <p>用户可以指定的最小<codeph>MEMORY_SHARED_QUOTA</codeph>为0，最大值为100.默认<codeph>MEMORY_SHARED_QUOTA</codeph>为20。</p>
+        <p>如前所述，<codeph>CONCURRENCY</codeph>标识角色资源组中允许的最大并发运行事务数。由资源组保留的固定存储器被分成<codeph>CONCURRENCY</codeph>个事务槽数。每个插槽分配一个固定的，相等数量的资源组内存。Greenplum数据库会保证每个事务的固定内存。<fig
             id="fig_py5_1sl_wlrg">
-            <title>Resource Group Memory Allotments</title>
+            <title>资源组内存分配</title>
             <image href="graphics/resgroupmem.png" id="image_iqn_dsl_wlrg" align="left" scale="72"
               placement="break"/>
           </fig></p>
-        <p>When a query's memory usage exceeds the fixed per-transaction memory usage amount,
-          Greenplum Database allocates available resource group shared memory to the query. The
-          maximum amount of resource group memory available to a specific transaction slot is the
-          sum of the transaction's fixed memory and the full resource group shared memory
-          allotment.</p>
+        <p>当查询的内存使用量超过固定的每事务内存使用量时，Greenplum数据库会将可用的资源组共享内存分配给查询。特定事务槽可用的最大资源组内存量是事务的固定内存和完整资源组共享内存分配的总和。</p>
       </body>
       <topic id="topic833glob" xml:lang="en">
-        <title>Global Shared Memory</title>
+        <title>全局共享内存</title>
         <body>
-          <p>The sum of the <codeph>MEMORY_LIMIT</codeph>s configured for all resource groups
-            (including the default <codeph>admin_group</codeph> and <codeph>default_group</codeph>
-            groups) identifies the percentage of reserved resource group memory. If this sum is less
-            than 100, Greenplum Database allocates any unreserved memory to a resource group global
-            shared memory pool.</p>
-          <p>Resource group global shared memory is available only to resource groups that you
-            configure with the <codeph>vmtracker</codeph> memory auditor.</p>
-          <p>When available, Greenplum Database allocates global shared memory to a transaction
-            after first allocating slot and resource group shared memory. Greenplum Database
-            allocates resource group global shared memory to transactions on a first-come
-            first-served basis.</p>
-          <note>Greenplum Database tracks, but does not actively monitor, transaction memory usage
-            in resource groups. If the memory usage for a resource group exceeds its fixed memory
-            allotment, a transaction in the resource group fails when <i>all</i> of these conditions
-            are met:<ul>
-              <li>No available resource group shared memory exists.</li>
-              <li>No available global shared memory exists.</li>
-              <li>The transaction requests additional memory.</li>
+          <p>为所有资源组（包括默认<codeph>admin_group</codeph>和<codeph>default_group</codeph>组）配置的<codeph>MEMORY_LIMIT</codeph>的总和标识预留资源组内存的百分比。如果此总和小于100，则Greenplum数据库会将任何未预留的内存分配给资源组全局共享内存池。</p>
+          <p>资源组全局共享内存仅适用于使用<codeph>vmtracker</codeph>内存审计器配置的资源组。</p>
+          <p>在可用时，Greenplum数据库在首次分配插槽和资源组共享内存后为事务分配全局共享内存。Greenplum数据库以先到先得的方式为事务分配资源组全局共享内存。</p>
+          <note>Greenplum数据库跟踪但不主动监视资源组中的事务内存使用情况。如果资源组的内存使用量超过其固定内存分配，则在满足以下<i>所有</i>条件时，资源组中的事务将失败：<ul>
+              <li>没有可用的资源组共享内存。</li>
+              <li>没有可用的全局共享内存。</li>
+              <li>该事务请求额外的内存。</li>
             </ul></note>
-          <p>Greenplum Database uses resource group memory more efficiently when you leave some
-            memory (for example, 10-20%) unallocated for the global shared memory pool. The
-            availability of global shared memory also helps to mitigate the failure of
-            memory-consuming or unpredicted queries.</p>
+          <p>当用户为全局共享内存池保留一些未分配的内存（例如，10-20％）时，Greenplum数据库会更有效地使用资源组内存。全局共享内存的可用性还有助于缓解内存消耗或不可预测的查询失败。</p>
         </body>
       </topic>
       <topic id="topic833sp" xml:lang="en">
-        <title>Query Operator Memory</title>
+        <title>查询运算符内存</title>
         <body>
-          <p>Most query operators are non-memory-intensive; that is, during processing, Greenplum
-            Database can hold their data in allocated memory. When memory-intensive query operators
-            such as join and sort process more data than can be held in memory, data is spilled to
-            disk.</p>
-          <p>The <codeph><xref
-                href="../ref_guide/config_params/guc-list.xml#gp_resgroup_memory_policy"
-                type="topic"/></codeph> server configuration parameter governs the memory allocation
-            and distribution algorithm for all query operators. Greenplum Database supports
-              <codeph>eager-free</codeph> (the default) and <codeph>auto</codeph> memory policies
-            for resource groups. When you specify the <codeph>auto</codeph> policy, Greenplum
-            Database uses resource group memory limits to distribute memory across query operators,
-            allocating a fixed size of memory to non-memory-intensive operators and the rest to
-            memory-intensive operators. When the <codeph>eager_free</codeph> policy is in place,
-            Greenplum Database distributes memory among operators more optimally by re-allocating
-            memory released by operators that have completed their processing to operators in a
-            later query stage.</p>
-          <p><codeph>MEMORY_SPILL_RATIO</codeph> identifies the memory usage threshold for
-            memory-intensive operators in a transaction. When this threshold is reached, a
-            transaction spills to disk. Greenplum Database uses the
-              <codeph>MEMORY_SPILL_RATIO</codeph> to determine the initial memory to allocate to a
-            transaction.</p>
-          <p> The minimum <codeph>MEMORY_SPILL_RATIO</codeph> percentage that you can specify for a
-            resource group is 0. The maximum is 100. The default <codeph>MEMORY_SPILL_RATIO</codeph>
-            is 20.</p>
-          <p>You define the <codeph>MEMORY_SPILL_RATIO</codeph> when you create a resource group for
-            roles. You can selectively set this limit on a per-query basis at the session level with
-            the <codeph><xref href="../ref_guide/config_params/guc-list.xml#memory_spill_ratio"
-                type="topic"/></codeph> server configuration parameter.</p>
+          <p>大多数查询运算符都是非内存密集型的; 也就是说，在处理过程中，Greenplum数据库可以将其数据保存在已分配的内存中。当内存密集型查询运算符（如连接和排序）处理的数据多于可以保存在内存中的数据时，数据会溢出到磁盘。</p>
+          <p><codeph><xref href="../ref_guide/config_params/guc-list.xml#gp_resgroup_memory_policy" type="topic"/></codeph>服务器配置参数控制所有查询运算符的内存分配和分配算法。Greenplum数据库支持<codeph>eager-free</codeph>（默认）和资源组的<codeph>自动</codeph>内存策略。当用户指定自动策略时，Greenplum数据库使用资源组内存限制在查询运算符之间分配内存，为非内存密集型运算符分配固定大小的内存，其余为内存密集型运算符。当<codeph>eager_free</codeph>策略到位时，Greenplum数据库通过在稍后的查询阶段将已完成处理的运算符释放的内存重新分配给运算符，从而更好地在运算符之间分配内存。</p>
+          <p><codeph>MEMORY_SPILL_RATIO</codeph>标识事务中内存密集型运算符的内存使用阈值。达到此阈值时，事务将溢出到磁盘。Greenplum数据库使用<codeph>MEMORY_SPILL_RATIO</codeph>来确定要分配给事务的初始内存。</p>
+          <p>可以为资源组指定的最小<codeph>MEMORY_SPILL_RATIO</codeph>百分比为0.最大值为100.默认<codeph>MEMORY_SPILL_RATIO</codeph>为20。	</p>
+          <p>在为角色创建资源组时定义<codeph>MEMORY_SPILL_RATIO</codeph>，用户可以使用<codeph><xref href="../ref_guide/config_params/guc-list.xml#memory_spill_ratio" type="topic"/></codeph>服务器配置参数在会话级别基于每个查询选择性地设置此限制。</p>
           <section id="topic833low" xml:lang="en">
-            <title>memory_spill_ratio and Low Memory Queries </title>
-            <p>A low <codeph>memory_spill_ratio</codeph> setting (for example, in the 0-2% range)
-              has been shown to increase the performance of queries with low memory requirements.
-              Use the <codeph>memory_spill_ratio</codeph> server configuration parameter to override
-              the setting on a per-query basis. For example:
+            <title>memory_spill_ratio和低内存查询</title>
+            <p>	低<codeph>memory_spill_ratio</codeph>设置（例如，在0-2％范围内）已被证明可以提高具有低内存要求的查询的性能。使用<codeph>memory_spill_ratio</codeph>服务器配置参数可以基于每个查询覆盖该设置。例如：
               <codeblock>SET memory_spill_ratio=0;</codeblock></p>
           </section>
         </body>
       </topic>
     </topic>
     <topic id="topic833cons" xml:lang="en">
-      <title>Other Memory Considerations</title>
+      <title>其他内存注意事项</title>
       <body>
-        <p>Resource groups for roles track all Greenplum Database memory allocated via the
-            <codeph>palloc()</codeph> function. Memory that you allocate using the Linux
-            <codeph>malloc()</codeph> function is not managed by these resource groups. To ensure
-          that resource groups for roles are accurately tracking memory usage, avoid using
-            <codeph>malloc()</codeph> to allocate large amounts of memory in custom Greenplum
-          Database user-defined functions.</p>
+        <p>角色的资源组跟踪通过<codeph>palloc()</codeph>函数分配的所有Greenplum数据库内存。使用Linux<codeph>palloc()</codeph>函数分配的内存不受这些资源组的管理。要确保角色的资源组准确跟踪内存使用情况，请避免使用<codeph>malloc()</codeph>在自定义Greenplum数据库用户定义函数中分配大量内存。</p>
       </body>
     </topic>
   </topic>
   <topic id="topic999" otherprops="pivotal" xml:lang="en">
-    <title>Using Greenplum Command Center to Manage Resource Groups</title>
+    <title>使用Greenplum控制中心管理资源组</title>
     <body>
-      <p>Using Pivotal Greenplum Command Center, an administrator can create and manage resource
-        groups, change roles' resource groups, and create workload management rules. </p>
-      <p>Workload management rules are defined in Command Center and stored in Greenplum Database.
-        When a transaction is submitted, Greenplum Database calls the workload management database
-        extension to evaluate and apply the rules. </p>
-      <p>Workload management assignment rules assign transactions to different resource groups based
-        on user-defined criteria. If no assignment rule is matched, Greenplum Database assigns the
-        transaction to the role's default resource group. Workload management idle session kill
-        rules set the maximum number of seconds that sessions managed by a resource group can remain
-        idle before they are terminated.</p>
-      <p>Refer to the <xref href="http://gpcc.docs.pivotal.io/latest" format="html" scope="external"
-          >Greenplum Command Center documentation</xref> for more information about creating and
-        managing resource groups and workload management rules. </p>
+      <p>使用Pivotal Greenplum控制中心可以创建和管理资源组，修改角色的资源组以及创建负载管理规则。 </p>
+      <p>控制中心定义工作负载管理规则并存储在Greenplum数据库中。提交事务时，Greenplum数据库会调用工作负载管理数据库评估和应用规则的扩展。</p>
+      <p>
+工作负载管理分配规则根据用户定义的标准将事务分配给不同的资源组。如果没有匹配的分配规则，Greenplum数据库会分配 事务到角色的默认资源组。工作负载管理空闲会话终止规则设置资源组管理的会话可以保留的最大秒数。</p>
+      <p>参考 <xref href="http://gpcc.docs.pivotal.io/latest" format="html" scope="external"
+          >Greenplum控制中心文档</xref>，获取更多相关创建/管理资源组以及工作负载管理规则的信息。</p>
     </body>
   </topic>
   <topic id="topic71717999" xml:lang="en">
-    <title>Using Resource Groups</title>
+    <title>使用资源组</title>
     <body>
-      <note type="important">Significant Greenplum Database performance degradation has been
-        observed when enabling resource group-based workload management on RedHat 6.x and CentOS 6.x
-        systems. This issue is caused by a Linux cgroup kernel bug. This kernel bug has been fixed
-        in CentOS 7.x and Red Hat 7.x systems. <p>If you use RedHat 6 and the performance with
-          resource groups is acceptable for your use case, upgrade your kernel to version 2.6.32-696
-          or higher to benefit from other fixes to the cgroups implementation. </p></note>
+      <note type="important">在RedHat 6.x和CentOS 6.x系统上启用基于资源组的工作负载管理时，已观察到显着的Greenplum数据库性能下降。此问题是由Linux cgroup内核错误引起的。这个内核错误已在CentOS 7.x和Red Hat 7.x系统中修复。<p>如果用户使用RedHat 6并且资源组的性能对于用户的用例是可接受的，请将用户的内核升级到版本2.6.32-696或更高版本，以便从cgroups实现的其他修复程序中受益。</p></note>
       <section id="topic833" xml:lang="en">
-        <title>Prerequisite</title>
-        <p>Greenplum Database resource groups use Linux Control Groups (cgroups) to manage CPU
-          resources. Greenplum Database also uses cgroups to manage memory for resource groups for
-          external components. With cgroups, Greenplum isolates the CPU and external component
-          memory usage of your Greenplum processes from other processes on the node. This allows
-          Greenplum to support CPU and external component memory usage restrictions on a
-          per-resource-group basis.</p>
-        <p>For detailed information about cgroups, refer to the Control Groups documentation for
-          your Linux distribution.</p>
-        <p>Complete the following tasks on each node in your Greenplum Database cluster to set up
-          cgroups for use with resource groups:</p>
+        <title>条件</title>
+        <p>Greenplum数据库资源组使用Linux控制组（cgroup）来管理CPU资源。Greenplum数据库还使用cgroup来管理外部组件的资源组的内存。使用cgroups，Greenplum将Greenplum进程的CPU和外部组件内存使用与节点上的其他进程隔离开来。这允许Greenplum在每个资源组的基础上支持CPU和外部组件内存使用限制。</p>
+        <p>有关cgroup的详细信息，请参阅Linux发行版的控制组文档。</p>
+        <p>在Greenplum数据库群集中的每个节点上完成以下任务，以设置用于资源组的cgroup：</p>
         <ol>
-          <li>If you are running the SuSE 11+ operating system on your Greenplum Database cluster
-            nodes, you must enable swap accounting on each node and restart your Greenplum Database
-            cluster. The <codeph>swapaccount</codeph> kernel boot parameter governs the swap
-            accounting setting on SuSE 11+ systems. After setting this boot parameter, you must
-            reboot your systems. For details, refer to the <xref
+          <li>如果用户在Greenplum数据库群集节点上运行SuSE 11+操作系统，则必须在每个节点上启用交换记帐并重新启动Greenplum数据库群集。<codeph>swapaccount</codeph>内核引导参数控制SuSE 11+系统上的交换记帐设置。设置此引导参数后，必须重新引导系统。有关详细信息，请参阅SuSE 11发行说明中的​​<xref
               href="https://www.suse.com/releasenotes/x86_64/SUSE-SLES/11-SP2/#fate-310471"
-              format="html" scope="external">Cgroup Swap Control</xref> discussion in the SuSE 11
-            release notes. You must be the superuser or have <codeph>sudo</codeph> access to
-            configure kernel boot parameters and reboot systems. </li>
-          <li>Create the Greenplum Database cgroups configuration file
-              <codeph>/etc/cgconfig.d/gpdb.conf</codeph>. You must be the superuser or have
-              <codeph>sudo</codeph> access to create this file:
+              format="html" scope="external">Cgroup交换控制</xref>讨论。用户必须是超级用户或具有<codeph>sudo</codeph>访问权限才能配置内核引导参数和重新引导系统。</li>
+          <li>创建Greenplum数据库cgroups配置文件<codeph>/etc/cgconfig.d/gpdb.conf</codeph>。用户必须是超级用户或具有<codeph>sudo</codeph>访问权限才能创建此文件：
             <codeblock>sudo vi /etc/cgconfig.d/gpdb.conf</codeblock>
           </li>
-          <li>Add the following configuration information to
+          <li>将以下配置信息添加到
               <codeph>/etc/cgconfig.d/gpdb.conf</codeph>: <codeblock>group gpdb {
      perm {
          task {
@@ -571,17 +341,10 @@ rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_
      memory {
      }
 } </codeblock>
-            <p>This content configures CPU, CPU accounting, CPU core set, and memory control groups
-              managed by the <codeph>gpadmin</codeph> user. Greenplum Database uses the memory
-              control group only for those resource groups created with the <codeph>cgroup</codeph>
-              <codeph>MEMORY_AUDITOR</codeph>.</p>
+            <p>此内容配置由<codeph>gpadmin</codeph>用户管理的CPU，CPU计算，CPU核心集和内存控制组。Greenplum数据库仅将内存控制组用于使用<codeph>cgroup</codeph><codeph>MEMORY_AUDITOR</codeph>创建的资源组。</p>
           </li>
-          <li>If not already installed and running, install the Control Groups operating system
-            package and start the cgroups service on each Greenplum Database node. The commands that
-            you run to perform these tasks will differ based on the operating system installed on
-            the node. You must be the superuser or have <codeph>sudo</codeph> access to run these
-            commands: <ul>
-              <li> Redhat/CentOS 7.x systems:
+          <li>如果尚未安装并正在运行，请安装Control Groups操作系统软件包，并在每个Greenplum Database节点上启动cgroups服务。用户运行以执行这些任务的命令将根据节点上安装的操作系统而有所不同。用户必须是超级用户或具有<codeph>sudo</codeph>访问权限才能运行这些命令：<ul>
+              <li> Redhat/CentOS 7.x 系统：
                 <codeblock>sudo yum install libcgroup-tools
 sudo cgconfigparser -l /etc/cgconfig.d/gpdb.conf </codeblock>
               </li>
@@ -595,82 +358,59 @@ sudo cgconfigparser -l /etc/cgconfig.d/gpdb.conf </codeblock>
               </li>
             </ul>
           </li>
-          <li>Identify the <codeph>cgroup</codeph> directory mount point for the node:
-              <codeblock>grep cgroup /proc/mounts</codeblock><p>The first line of output identifies
-              the <codeph>cgroup</codeph> mount point.</p>
+          <li>标识节点的<codeph>cgroup</codeph>目录安装点：
+              <codeblock>grep cgroup /proc/mounts</codeblock>
+			  <p>第一行输出标识<codeph>cgroup</codeph>挂载点。</p>
           </li>
-          <li>Verify that you set up the Greenplum Database cgroups configuration correctly by
-            running the following commands. Replace &lt;cgroup_mount_point&gt; with the mount point
-            that you identified in the previous step: <codeblock>ls -l &lt;cgroup_mount_point&gt;/cpu/gpdb
+          <li>通过运行以下命令验证是否正确设置了Greenplum Database cgroups配置。将&lt;cgroup_mount_point&gt; 替换为用户在上一步中标识的安装点：
+			  <codeblock>ls -l &lt;cgroup_mount_point&gt;/cpu/gpdb
 ls -l &lt;cgroup_mount_point&gt;/cpuacct/gpdb
 ls -l &lt;cgroup_mount_point&gt;/cpuset/gpdb
 ls -l &lt;cgroup_mount_point&gt;/memory/gpdb</codeblock>
-            <p>If these directories exist and are owned by <codeph>gpadmin:gpadmin</codeph>, you
-              have successfully configured cgroups for Greenplum Database CPU resource
-              management.</p>
+            <p>如果这些目录存在且由<codeph>gpadmin:gpadmin</codeph>拥有，则用户已成功为Greenplum数据库CPU资源管理配置了cgroup。</p>
           </li>
-          <li>To automatically recreate Greenplum Database required cgroup hierarchies and
-            parameters when your system is restarted, configure your system to enable the Linux
-            cgroup service daemon <codeph>cgconfig.service</codeph> (Redhat/CentOS 7.x and SuSE 11+)
-            or <codeph>cgconfig</codeph> (Redhat/CentOS 6.x) at node start-up. For example,
-            configure one of the following cgroup service commands in your preferred service
-            auto-start tool: <ul>
-              <li> Redhat/CentOS 7.x and SuSE11+ systems:
+          <li>要在系统重新启动时自动重新创建Greenplum数据库所需的cgroup层次结构和参数，请将系统配置为启用Linux cgroup服务守护程序<codeph>cgconfig.service</codeph>（Redhat / CentOS 7.x和SuSE 11+）或<codeph>cgconfig</codeph>（Redhat / CentOS 6.x） ）节点启动时。例如，在首选服务自动启动工具中配置以下cgroup服务命令之一：<ul>
+              <li> Redhat/CentOS 7.x 和 SuSE11+ 系统：
                 <codeblock>sudo systemctl enable cgconfig.service</codeblock>
               </li>
               <li> Redhat/CentOS 6.x systems: <codeblock>sudo chkconfig cgconfig on</codeblock></li>
             </ul>
-            <p>You may choose a different method to recreate the Greenplum Database resource group
-              cgroup hierarchies.</p>
+            <p>用户可以选择其他方法来重新创建Greenplum数据库资源组cgroup层次结构。</p>
           </li>
         </ol>
       </section>
       <section id="topic8339191" xml:lang="en">
-        <title>Procedure</title>
-        <p>To use resource groups in your Greenplum Database cluster, you:</p>
+        <title>程序</title>
+        <p>要在Greenplum数据库群集中使用资源组，用户需要：</p>
         <ol>
-          <li><xref href="#topic8" type="topic" format="dita">Enable resource groups for your
-              Greenplum Database cluster</xref>.</li>
-          <li><xref href="#topic10" type="topic" format="dita">Create resource groups</xref>.</li>
-          <li><xref href="#topic17" type="topic" format="dita">Assign the resource groups to one or
-              more roles</xref>.</li>
-          <li><xref href="#topic22" type="topic" format="dita">Use resource management system views
-              to monitor and manage the resource groups</xref>.</li>
+          <li><xref href="#topic8" type="topic" format="dita">为Greenplum数据库群集启用资源组</xref>。</li>
+          <li><xref href="#topic10" type="topic" format="dita">创建资源组</xref>。</li>
+          <li><xref href="#topic17" type="topic" format="dita">将资源组分配给一个或多个角色</xref>。</li>
+          <li><xref href="#topic22" type="topic" format="dita">使用资源管理系统视图来监视和管理资源组</xref>。</li>
         </ol>
       </section>
     </body>
   </topic>
   <topic id="topic8" xml:lang="en">
-    <title id="iz153124">Enabling Resource Groups</title>
+    <title id="iz153124">启用资源组</title>
     <body>
-      <p>When you install Greenplum Database, resource queues are enabled by default. To use
-        resource groups instead of resource queues, you must set the <codeph><xref
+      <p>安装Greenplum Database时，默认情况下会启用资源队列。要使用资源组而不是资源队列，必须设置<codeph><xref
             href="../ref_guide/config_params/guc-list.xml#gp_resource_manager" type="topic"
-          /></codeph> server configuration parameter.</p>
+          /></codeph>服务器配置参数。	</p>
       <ol id="ol_ec5_4dy_wq">
-        <li>Set the <codeph>gp_resource_manager</codeph> server configuration parameter to the value
-            <codeph>"group"</codeph>:
+        <li>将<codeph>gp_resource_manager</codeph>服务器配置参数设置为值<codeph>"group"</codeph>：
           <codeblock>gpconfig -s gp_resource_manager
 gpconfig -c gp_resource_manager -v "group"
 </codeblock>
         </li>
-        <li>Restart Greenplum Database: <codeblock>gpstop
+        <li>重启Greenplum 数据库： <codeblock>gpstop
 gpstart
 </codeblock>
         </li>
       </ol>
-      <p>Once enabled, any transaction submitted by a role is directed to the resource group
-        assigned to the role, and is governed by that resource group's concurrency, memory, and CPU
-        limits. Similarly, CPU and memory usage by an external component is governed by the CPU and
-        memory limits configured for the resource group assigned to the component.</p>
-      <p>Greenplum Database creates two default resource groups for roles named
-          <codeph>admin_group</codeph> and <codeph>default_group</codeph>. When you enable resources
-        groups, any role that was not explicitly assigned a resource group is assigned the default
-        group for the role's capability. <codeph>SUPERUSER</codeph> roles are assigned the
-          <codeph>admin_group</codeph>, non-admin roles are assigned the group named
-          <codeph>default_group</codeph>.</p>
-      <p>The default resource groups <codeph>admin_group</codeph> and <codeph>default_group</codeph>
-        are created with the following resource limits:</p>
+      <p>启用后，角色提交的任何事务都将定向到分配给该角色的资源组，并受该资源组的并发，内存和CPU限制的约束。同样，外部组件的CPU和内存使用量由为分配给组件的资源组配置的CPU和内存限制控制。</p>
+      <p>Greenplum数据库为名为<codeph>admin_group</codeph>和<codeph>default_group</codeph>的角色创建两个默认资源组。启用资源组时，将为未明确分配资源组的任何角色分配角色功能的默认组。<codeph>SUPERUSER</codeph>角色分配了<codeph>admin_group</codeph>，非管理员角色分配了名为<codeph>default_group</codeph>的组。</p>
+      <p>使用以下资源限制创建默认资源组<codeph>admin_group</codeph>和<codeph>default_group</codeph>：</p>
       <table id="default_resgroup_limits">
         <tgroup cols="3">
           <colspec colnum="1" colname="col1" colwidth="1*"/>
@@ -678,7 +418,7 @@ gpstart
           <colspec colnum="3" colname="col3" colwidth="1*"/>
           <thead>
             <row>
-              <entry colname="col1">Limit Type</entry>
+              <entry colname="col1">限制类型</entry>
               <entry colname="col2">admin_group</entry>
               <entry colname="col3">default_group</entry>
             </row>
@@ -722,98 +462,60 @@ gpstart
           </tbody>
         </tgroup>
       </table>
-      <p>Keep in mind that the <codeph>CPU_RATE_LIMIT</codeph> and <codeph>MEMORY_LIMIT</codeph>
-        values for the default resource groups <codeph>admin_group</codeph> and
-          <codeph>default_group</codeph> contribute to the total percentages on a segment host. You
-        may find that you need to adjust these limits for <codeph>admin_group</codeph> and/or
-          <codeph>default_group</codeph> as you create and add new resource groups to your Greenplum
-        Database deployment.</p>
+      <p>请记住，默认资源组admin_group和default_group的<codeph>CPU_RATE_LIMIT</codeph>和<codeph>MEMORY_LIMIT</codeph>值对分段主机上的总百分比有贡献。在创建Greenplum数据库部署并将新资源组添加到Greenplum数据库部署时，用户可能会发现需要为<codeph>admin_group</codeph>和/或<codeph>default_group</codeph>调整这些限制。</p>
     </body>
   </topic>
   <topic id="topic10" xml:lang="en">
-    <title id="iz139857">Creating Resource Groups</title>
+    <title id="iz139857">创建资源组</title>
     <body>
-      <p><i>When you create a resource group for a role</i>, you provide a name, a CPU resource
-        allocation mode, and memory limit. You can optionally provide a concurrent transaction limit
-        and memory shared quota and spill ratio. Use the <codeph><xref
+      <p><i>为角色创建资源组时</i>可以提供名称，CPU资源分配模式和内存限制。用户可以选择提供并发事务限制和内存共享配额和溢出比率。使用<codeph><xref
             href="../ref_guide/sql_commands/CREATE_RESOURCE_GROUP.xml#topic1" type="topic"
-            format="dita"/></codeph> command to create a new resource group. </p>
-      <p id="iz152723">When you create a resource group for a role, you must provide
-          <codeph>CPU_RATE_LIMIT</codeph> or <codeph>CPUSET</codeph> and
-          <codeph>MEMORY_LIMIT</codeph> limit values. These limits identify the percentage of
-        Greenplum Database resources to allocate to this resource group. For example, to create a
-        resource group named <i>rgroup1</i> with a CPU limit of 20 and a memory limit of 25:</p>
+            format="dita"/></codeph>命令创建新资源组。</p>
+      <p id="iz152723">为角色创建资源组时，必须提供<codeph>CPU_RATE_LIMIT</codeph>或<codeph>CPUSET</codeph>和<codeph>MEMORY_LIMIT</codeph>限制值。这些限制标识要分配给此资源组的Greenplum数据库资源的百分比。例如，要创建名为<i>rgroup1</i>的资源组，其CPU限制为20，内存限制为25：</p>
       <p>
         <codeblock>=# CREATE RESOURCE GROUP <i>rgroup1</i> WITH (CPU_RATE_LIMIT=20, MEMORY_LIMIT=25);
 </codeblock>
       </p>
-      <p>The CPU limit of 20 is shared by every role to which <codeph>rgroup1</codeph> is assigned.
-        Similarly, the memory limit of 25 is shared by every role to which <codeph>rgroup1</codeph>
-        is assigned. <codeph>rgroup1</codeph> utilizes the default <codeph>MEMORY_AUDITOR</codeph>
-        <codeph>vmtracker</codeph> and the default <codeph>CONCURRENCY</codeph> setting of 20.</p>
-      <p id="iz1527231"><i>When you create a resource group for an external component</i>, you must
-        provide <codeph>CPU_RATE_LIMIT</codeph> or <codeph>CPUSET</codeph> and
-          <codeph>MEMORY_LIMIT</codeph> limit values. You must also provide the
-          <codeph>MEMORY_AUDITOR</codeph> and explicitly set <codeph>CONCURRENCY</codeph> to zero
-        (0). For example, to create a resource group named <i>rgroup_extcomp</i> for which you
-        reserve CPU core 1 and assign a memory limit of 15:</p>
+      <p>CPU限制为20由<codeph>rgroup1</codeph>分配到的每个角色共享。同样，内存限制为25由<codeph>rgroup1</codeph>分配到的每个角色共享。<codeph>rgroup1</codeph>使用默认的<codeph>MEMORY_AUDITOR</codeph><codeph>vmtracker</codeph>和默认的<codeph>CONCURRENCY</codeph>设置为20。</p>
+      <p id="iz1527231"><i>为外部组件创建资源组时</i>，必须提供<codeph>CPU_RATE_LIMIT</codeph>或<codeph>CPUSET</codeph>和<codeph>MEMORY_LIMIT</codeph>限制值。用户还必须提供<codeph>MEMORY_AUDITOR</codeph>并将<codeph>CONCURRENCY</codeph>显式设置为零（0）。例如，要创建名为<i>rgroup_extcomp</i>的资源组，请为其保留CPU核心1并指定内存限制为15：</p>
       <p>
         <codeblock>=# CREATE RESOURCE GROUP <i>rgroup_extcomp</i> WITH (MEMORY_AUDITOR=cgroup, CONCURRENCY=0,
      CPUSET='1', MEMORY_LIMIT=15);
 </codeblock>
       </p>
       <p>The <codeph><xref href="../ref_guide/sql_commands/ALTER_RESOURCE_GROUP.xml#topic1"
-            type="topic" format="dita"/></codeph> command updates the limits of a resource group. To
-        change the limits of a resource group, specify the new values that you want for the group.
-        For example:</p>
+            type="topic" format="dita"/></codeph> 命令更新资源组的限制。要更改资源组的限制，请指定组所需的新值。例如：</p>
       <p>
         <codeblock>=# ALTER RESOURCE GROUP <i>rg_role_light</i> SET CONCURRENCY 7;
 =# ALTER RESOURCE GROUP <i>exec</i> SET MEMORY_LIMIT 25;
 =# ALTER RESOURCE GROUP <i>rgroup1</i> SET CPUSET '2,4';
 </codeblock>
       </p>
-      <note>You cannot set or alter the <codeph>CONCURRENCY</codeph> value for the
-          <codeph>admin_group</codeph> to zero (0).</note>
-      <p>The <codeph><xref href="../ref_guide/sql_commands/DROP_RESOURCE_GROUP.xml#topic1"
-            type="topic" format="dita"/></codeph> command drops a resource group. To drop a resource
-        group for a role, the group cannot be assigned to any role, nor can there be any
-        transactions active or waiting in the resource group. Dropping a resource group for an
-        external component in which there are running instances kills the running instances.</p>
-      <p>To drop a resource group:</p>
+      <note>用户无法将<codeph>admin_group</codeph>的<codeph>CONCURRENCY</codeph>值设置或更改为零（0）。</note>
+      <p><codeph><xref href="../ref_guide/sql_commands/DROP_RESOURCE_GROUP.xml#topic1"
+            type="topic" format="dita"/></codeph>命令会删除资源组。要删除角色的资源组，不能将该组分配给任何角色，也不能在资源组中激活或等待任何事务。删除正在运行的实例的外部组件的资源组会导致正在运行的实例。</p>
+      <p>删除资源组：</p>
       <p>
         <codeblock>=# DROP RESOURCE GROUP <i>exec</i>; </codeblock>
       </p>
     </body>
   </topic>
   <topic id="topic17" xml:lang="en">
-    <title id="iz172210">Assigning a Resource Group to a Role</title>
+    <title id="iz172210">将资源组分配给角色</title>
     <body>
-      <p id="iz172211">When you create a resource group with the default
-          <codeph>MEMORY_AUDITOR</codeph>
-        <codeph>vmtracker</codeph>, the group is available for assignment to one or more roles
-        (users). You assign a resource group to a database role using the <codeph>RESOURCE
-          GROUP</codeph> clause of the <codeph><xref
+      <p id="iz172211">使用默认<codeph>MEMORY_AUDITOR</codeph><codeph>vmtracker</codeph>创建资源组时，该组可用于分配给一个或多个角色（用户）。使用<codeph><xref
             href="../ref_guide/sql_commands/CREATE_ROLE.xml#topic1" type="topic" format="dita"
-          /></codeph> or <codeph><xref href="../ref_guide/sql_commands/ALTER_ROLE.xml#topic1"
-            type="topic" format="dita"/></codeph> commands. If you do not specify a resource group
-        for a role, the role is assigned the default group for the role's capability.
-          <codeph>SUPERUSER</codeph> roles are assigned the <codeph>admin_group</codeph>, non-admin
-        roles are assigned the group named <codeph>default_group</codeph>.</p>
-      <p>Use the <codeph>ALTER ROLE</codeph> or <codeph>CREATE ROLE</codeph> commands to assign a
-        resource group to a role. For example:</p>
+          /></codeph>或<codeph><xref href="../ref_guide/sql_commands/ALTER_ROLE.xml#topic1"
+            type="topic" format="dita"/></codeph>命令的<codeph>RESOURCE GROUP</codeph>子句将资源组分配给数据库角色。如果未为角色指定资源组，则会为角色分配角色功能的默认组。<codeph>SUPERUSER</codeph>角色分配了<codeph>admin_group</codeph>，非管理员角色分配了名为<codeph>default_group</codeph>的组。</p>
+      <p>使用<codeph>ALTER ROLE</codeph>或<codeph>CREATE ROLE</codeph>命令将资源组分配给角色。例如：	</p>
       <p>
         <codeblock>=# ALTER ROLE <i>bill</i> RESOURCE GROUP <i>rg_light</i>;
 =# CREATE ROLE <i>mary</i> RESOURCE GROUP <i>exec</i>;
 </codeblock>
       </p>
-      <p>You can assign a resource group to one or more roles. If you have defined a role hierarchy,
-        assigning a resource group to a parent role does not propagate down to the members of that
-        role group.</p>
-      <note>You cannot assign a resource group that you create for an external component to a
-        role.</note>
-      <p>If you wish to remove a resource group assignment from a role and assign the role the
-        default group, change the role's group name assignment to <codeph>NONE</codeph>. For
-        example:</p>
+      <p>用户可以将资源组分配给一个或多个角色。如果已定义角色层次结构，则将资源组分配给父角色不会向下传播到该角色组的成员。</p>
+      <note>用户无法将为外部组件创建的资源组分配给角色。</note>
+      <p>如果要从角色中删除资源组分配并将角色分配为默认组，请将角色的组名称分配更改为<codeph>NONE</codeph>。例如：</p>
       <p>
         <codeblock>=# ALTER ROLE <i>mary</i> RESOURCE GROUP NONE;
 </codeblock>
@@ -821,10 +523,9 @@ gpstart
     </body>
   </topic>
   <topic id="topic22" xml:lang="en">
-    <title id="iz152239">Monitoring Resource Group Status</title>
+    <title id="iz152239">监视资源组状态</title>
     <body>
-      <p>Monitoring the status of your resource groups and queries may involve the following
-        tasks:</p>
+      <p>监视资源组和查询的状态可能涉及以下任务：</p>
       <ul>
         <li id="iz153669">
           <xref href="#topic221" type="topic" format="dita"/>
@@ -844,14 +545,11 @@ gpstart
       </ul>
     </body>
     <topic id="topic221" xml:lang="en">
-      <title id="iz152239">Viewing Resource Group Limits</title>
+      <title id="iz152239">查看资源组限制</title>
       <body>
         <p>The <codeph><xref href="../ref_guide/system_catalogs/gp_resgroup_config.xml" type="topic"
               format="dita"/></codeph>
-          <codeph>gp_toolkit</codeph> system view displays the current and proposed limits for a
-          resource group. The proposed limit differs from the current limit when you alter the limit
-          but the new value can not be immediately applied. To view the limits of all resource
-          groups:</p>
+          <codeph>gp_toolkit</codeph>系统视图显示资源组的当前和建议限制。当用户更改限制时，建议的限制与当前限制不同，但不能立即应用新值。如果要查看所有资源组的限制：</p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_resgroup_config;
 </codeblock>
@@ -859,27 +557,22 @@ gpstart
       </body>
     </topic>
     <topic id="topic23" xml:lang="en">
-      <title id="iz152239">Viewing Resource Group Query Status and CPU/Memory Usage</title>
+      <title id="iz152239">查看资源组查询状态和CPU/内存使用情况</title>
       <body>
-        <p>The <codeph><xref href="../ref_guide/gp_toolkit.xml#topic31x" type="topic" format="dita"
+        <p><codeph><xref href="../ref_guide/gp_toolkit.xml#topic31x" type="topic" format="dita"
             /></codeph>
-          <codeph>gp_toolkit</codeph> system view enables you to view the status and activity of a
-          resource group. The view displays the number of running and queued transactions. It also
-          displays the real-time CPU and memory usage of the resource group. To view this
-          information:</p>
+          <codeph>gp_toolkit</codeph>系统视图可以查看资源组的状态和活动。该视图显示正在运行和排队的事务数。它还显示资源组的实时CPU和内存使用情况。要查看此信息：</p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_resgroup_status;
 </codeblock>
         </p>
       </body>
       <topic id="topic23a" xml:lang="en">
-        <title id="iz152239">Viewing Resource Group CPU/Memory Usage Per Host</title>
+        <title id="iz152239">查看每个主机的资源组CPU/内存使用情况</title>
         <body>
-          <p>The <codeph><xref href="../ref_guide/gp_toolkit.xml#perhost" type="topic" format="dita"
+          <p>通过<codeph><xref href="../ref_guide/gp_toolkit.xml#perhost" type="topic" format="dita"
             /></codeph>
-          <codeph>gp_toolkit</codeph> system view enables you to view the real-time CPU
-            and memory usage of a resource group on a per-host basis. To view this
-            information:</p>
+          <codeph>gp_toolkit</codeph>系统视图，用户可以基于每个主机查看资源组的实时CPU和内存使用情况。要查看此信息：</p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_resgroup_status_per_host;
 </codeblock>
@@ -887,13 +580,11 @@ gpstart
         </body>
       </topic>
       <topic id="topic23b" xml:lang="en">
-        <title id="iz152239">Viewing Resource Group CPU/Memory Usage Per Segment</title>
+        <title id="iz152239">查看每个段的资源组CPU/内存使用情况</title>
         <body>
-          <p>The <codeph><xref href="../ref_guide/gp_toolkit.xml#perseg" type="topic" format="dita"
+          <p>通过<codeph><xref href="../ref_guide/gp_toolkit.xml#perseg" type="topic" format="dita"
             /></codeph>
-          <codeph>gp_toolkit</codeph> system view enables you to view the real-time CPU
-            and memory usage of a resource group on a per-segment, per-host basis. To
-            view this information:</p>
+          <codeph>gp_toolkit</codeph>系统视图，用户可以按每个段，每个主机查看资源组的实时CPU和内存使用情况。要查看此信息：</p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_resgroup_status_per_segment;
 </codeblock>
@@ -902,13 +593,13 @@ gpstart
       </topic>
     </topic>
     <topic id="topic25" xml:lang="en">
-      <title id="iz152239">Viewing the Resource Group Assigned to a Role</title>
+      <title id="iz152239">查看分配给角色的资源组</title>
       <body>
-        <p>To view the resource group-to-role assignments, perform the following query on the
+        <p>要查看资源组到角色分配，请对
               <codeph><xref href="../ref_guide/system_catalogs/pg_roles.xml" type="topic"
-              format="dita"/></codeph> and <codeph><xref
+              format="dita"/></codeph> 和 <codeph><xref
               href="../ref_guide/system_catalogs/pg_resgroup.xml" type="topic" format="dita"
-            /></codeph> system catalog tables:</p>
+            /></codeph>系统目录表执行以下查询：</p>
         <p>
           <codeblock>=# SELECT rolname, rsgname FROM pg_roles, pg_resgroup
      WHERE pg_roles.rolresgroup=pg_resgroup.oid;
@@ -917,43 +608,26 @@ gpstart
       </body>
     </topic>
     <topic id="topic252525" xml:lang="en">
-      <title id="iz15223925">Viewing a Resource Group's Running and Pending Queries</title>
+      <title id="iz15223925">查看资源组的运行和待定查询</title>
       <body>
-        <p>To view a resource group's running queries, pending queries, and how long the pending
-          queries have been queued, examine the <codeph><xref
+        <p>要查看资源组的运行查询，挂起的查询以及挂起的查询排队的时间，请检查<codeph><xref
               href="../ref_guide/system_catalogs/pg_stat_activity.xml" type="topic" format="dita"
-            /></codeph> system catalog table:</p>
+            /></codeph>系统目录表：</p>
         <p>
           <codeblock>=# SELECT current_query, waiting, rsgname, rsgqueueduration 
      FROM pg_stat_activity;
 </codeblock>
         </p>
         <p>
-          <codeph>pg_stat_activity</codeph> displays information about the user/role that initiated
-          a query. A query that uses an external component such as PL/Container is composed of two
-          parts: the query operator that runs in Greenplum Database and the UDF that runs in a
-          PL/Container instance. Greenplum Database processes the query operators under the resource
-          group assigned to the role that initiated the query. A UDF running in a PL/Container
-          instance runs under the resource group assigned to the PL/Container runtime. The latter is
-          not represented in the <codeph>pg_stat_activity</codeph> view; Greenplum Database does not
-          have any insight into how external components such as PL/Container manage memory in
-          running instances. </p>
+          <codeph>pg_stat_activity</codeph>显示有关启动查询的用户/角色的信息。使用外部组件（如PL/Container）的查询由两部分组成：在Greenplum数据库中运行的查询运算符和在PL/Container实例中运行的UDF。Greenplum数据库处理分配给发起查询的角色的资源组下的查询运算符。在PL/Container实例中运行的UDF在分配给PL/Container运行时的资源组下运行。后者没有在<codeph>pg_stat_activity</codeph>中表示; Greenplum数据库无法深入了解PL/Container等外部组件如何在运行实例中管理内存。</p>
       </body>
     </topic>
     <topic id="topic27" xml:lang="en">
-      <title id="iz153732">Cancelling a Running or Queued Transaction in a Resource Group</title>
+      <title id="iz153732">取消资源组中的正在运行或已排队的事务</title>
       <body>
-        <p>There may be cases when you want to cancel a running or queued transaction in a resource
-          group. For example, you may want to remove a query that is waiting in the resource group
-          queue but has not yet been executed. Or, you may want to stop a running query that is
-          taking too long to execute, or one that is sitting idle in a transaction and taking up
-          resource group transaction slots that are needed by other users.</p>
-        <p>To cancel a running or queued transaction, you must first determine the process id (pid)
-          associated with the transaction. Once you have obtained the process id, you can invoke
-            <codeph>pg_cancel_backend()</codeph> to end that process, as shown below.</p>
-        <p>For example, to view the process information associated with all statements currently
-          active or waiting in all resource groups, run the following query. If the query returns no
-          results, then there are no running or queued transactions in any resource group.</p>
+        <p>在某些情况下，用户可能希望取消资源组中的正在运行或排队的事务。例如，用户可能希望删除在资源组队列中等待但尚未执行的查询。或者，用户可能希望停止执行时间太长的正在运行的查询，或者在事务中处于空闲状态并占用其他用户所需的资源组事务插槽的查询。</p>
+        <p>要取消正在运行或排队的事务，必须首先确定与事务关联的进程ID（pid）。获得进程ID后，可以调用<codeph>pg_cancel_backend()</codeph>来结束该进程，如下所示。</p>
+        <p>例如，要查看与当前活动或在所有资源组中等待的所有语句关联的进程信息，请运行以下查询。如果查询未返回任何结果，则任何资源组中都没有正在运行或排队的事务。</p>
         <p>
           <codeblock>=# SELECT rolname, g.rsgname, procpid, waiting, current_query, datname 
      FROM pg_roles, gp_toolkit.gp_resgroup_status g, pg_stat_activity 
@@ -961,98 +635,59 @@ gpstart
         AND pg_stat_activity.usename=pg_roles.rolname;
 </codeblock>
         </p>
-        <p>Sample partial query output:</p>
+        <p>示例部分查询输出：</p>
         <codeblock> rolname | rsgname  | procpid | waiting |     current_query     | datname 
 ---------+----------+---------+---------+-----------------------+---------
   sammy  | rg_light |  31861  |    f    | &lt;IDLE&gt; in transaction | testdb
   billy  | rg_light |  31905  |    t    | SELECT * FROM topten; | testdb</codeblock>
-        <p>Use this output to identify the process id (<codeph>procpid</codeph>) of the transaction
-          you want to cancel, and then cancel the process. For example, to cancel the pending query
-          identified in the sample output above:</p>
+        <p>使用此输出来标识要取消的事务的进程ID（<codeph>procpid</codeph>），然后取消该进程。例如，要取消上面示例输出中标识的待处理查询：</p>
         <p>
           <codeblock>=# SELECT pg_cancel_backend(31905);</codeblock>
         </p>
-        <p>You can provide an optional message in a second argument to
-            <codeph>pg_cancel_backend()</codeph> to indicate to the user why the process was
-          cancelled.</p>
+        <p>用户可以在<codeph>pg_cancel_backend()</codeph>的第二个参数中提供可选消息，以向用户指示进程被取消的原因。</p>
         <note type="note">
-          <p>Do not use an operating system <codeph>KILL</codeph> command to cancel any Greenplum
-            Database process.</p>
+          <p>不要使用操作系统<codeph>KILL</codeph>命令取消任何Greenplum数据库进程。</p>
         </note>
       </body>
     </topic>
   </topic>
   <topic id="topic777999" xml:lang="en">
-    <title>Resource Group Frequently Asked Questions</title>
+    <title>资源组常见问题解答</title>
     <body>
       <section id="topic791" xml:lang="en">
         <title>CPU</title>
         <ul>
-          <li><b>Why is CPU usage lower than the <codeph>CPU_RATE_LIMIT</codeph> configured for the
-              resource group?</b>
-            <p>You may run into this situation when a low number of queries and slices are running
-              in the resource group, and these processes are not utilizing all of the cores on the
-              system.</p></li>
-          <li><b>Why is CPU usage for the resource group higher than the configured
-                <codeph>CPU_RATE_LIMIT</codeph>?</b>
-            <p>This situation can occur in the following circumstances:<ul>
-                <li>A resource group may utilize more CPU than its <codeph>CPU_RATE_LIMIT</codeph>
-                  when other resource groups are idle. In this situation, Greenplum Database
-                  allocates the CPU resource of an idle resource group to a busier one. This
-                  resource group feature is called CPU burst.</li>
-                <li>The operating system CPU scheduler may cause CPU usage to spike, then drop down.
-                  If you believe this might be occurring, calculate the average CPU usage within a
-                  given period of time (for example, 5 seconds) and use that average to determine if
-                  CPU usage is higher than the configured limit.</li>
+          <li><b>为什么CPU使用率低于为资源组配置的<codeph>CPU_RATE_LIMIT</codeph>？</b>
+            <p>当资源组中运行的查询和片数较少时，您可能会遇到这种情况，并且这些进程未使用系统上的所有核心。</p></li>
+          <li><b>为什么资源组的CPU使用率高于配置的<codeph>CPU_RATE_LIMIT</codeph>？</b>
+            <p>在下列情况下可能会发生这种情况：<ul>
+                <li>当其他资源组空闲时，资源组可以使用比其<codeph>CPU_RATE_LIMIT</codeph>更多的CPU。在这种情况下，Greenplum数据库将空闲资源组的CPU资源分配给更繁忙的资源组。此资源组功能称为CPU突发。</li>
+                <li>操作系统CPU调度程序可能导致CPU使用率出现峰值，然后下降。如果您认为可能发生这种情况，请计算给定时间段内的平均CPU使用率（例如，5秒），并使用该平均值来确定CPU使用率是否高于配置的限制。</li>
               </ul></p></li>
         </ul>
         <p/>
       </section>
       <section id="topic795" xml:lang="en">
-        <title>Memory</title>
+        <title>内存</title>
         <ul>
-          <li><b>Why did my query return an "out of memory" error?</b>
-            <p>A transaction submitted in a resource group fails and exits when memory usage exceeds
-              its fixed memory allotment, no available resource group shared memory exists, and the
-              transaction requests more memory.</p></li>
-          <li><b>Why did my query return a "memory limit reached" error?</b>
-            <p>Greenplum Database automatically adjusts transaction and group memory to the new
-              settings when you use <codeph>ALTER RESOURCE GROUP</codeph> to change a resource
-              group's memory and/or concurrency limits. An "out of memory" error may occur if you
-              recently altered resource group attributes and there is no longer a sufficient amount
-              of memory available for a currently running query.</p></li>
-          <li><b>Why does the actual memory usage of my resource group exceed the amount configured
-              for the group?</b>
-            <p>The actual memory usage of a resource group may exceed the configured amount when one
-              or more queries running in the group is allocated memory from the global shared memory
-              pool. (If no global shared memory is available, queries fail and do not impact the
-              memory resources of other resource groups.)</p><p>When global shared memory is
-              available, memory usage may also exceed the configured amount when a transaction
-              spills to disk. Greenplum Database statements continue to request memory when they
-              start to spill to disk because:<ul>
-                <li>Spilling to disk requires extra memory to work.</li>
-                <li>Other operators may continue to request memory.</li>
-              </ul> Memory usage grows in spill situations; when global shared memory is available,
-              the resource group may eventually use up to 200-300% of its configured group memory
-              limit.</p></li>
+          <li><b>为什么我的查询返回“内存不足”错误？</b>
+            <p>在资源组中提交的事务失败并在内存使用超过其固定内存分配时退出，不存在可用资源组共享内存，并且事务请求更多内存。</p></li>
+          <li><b>为什么我的查询返回“达到内存限制”错误？</b>
+            <p>当您使用<codeph>ALTER RESOURCE GROUP</codeph>更改资源组的内存和/或并发限制时，Greenplum数据库会自动将事务和组内存调整为新设置。如果您最近更改了资源组属性并且当前正在运行的查询不再有足够的可用内存，则可能会出现“内存不足”错误。</p></li>
+          <li><b>为什么我的资源组的实际内存使用量超过为该组配置的数量？</b>
+            <p>当从组中运行的一个或多个查询从全局共享内存池分配内存时，资源组的实际内存使用量可能超过配置的量。（如果没有可用的全局共享内存，查询将失败，并且不会影响其他资源组的内存资源。）</p><p>当全局共享内存可用时，当事务溢出到磁盘时，内存使用量也可能超过配置的量。Greenplum数据库语句在开始溢出到磁盘时继续请求内存，因为：<ul>
+                <li>溢出到磁盘需要额外的内存才能工作。</li>
+                <li>其他运营商可能会继续请求内存。</li>
+              </ul> 泄漏情况下内存使用量增加;当全局共享内存可用时，资源组最终可能最多使用其配置的组内存限制的200-300％。</p></li>
         </ul>
       </section>
       <section id="topic797" xml:lang="en">
-        <title>Concurrency</title>
+        <title>并发</title>
         <ul>
-          <li><b>Why is the number of running transactions lower than the
-                <codeph>CONCURRENCY</codeph> limit configured for the resource group?</b>
-            <p>Greenplum Database considers memory availability before running a transaction, and
-              will queue the transaction if there is not enough memory available to serve it. If you
-              use <codeph>ALTER RESOURCE GROUP</codeph> to increase the <codeph>CONCURRENCY</codeph>
-              limit for a resource group but do not also adjust memory limits, currently running
-              transactions may be consuming all allotted memory resources for the group. When in
-              this state, Greenplum Database queues subsequent transactions in the resource
-              group.</p></li>
-          <li><b>Why is the number of running transactions in the resource group higher than the
-              configured <codeph>CONCURRENCY</codeph> limit?</b>
-            <p>The resource group may be running <codeph>SET</codeph> and <codeph>SHOW</codeph>
-              commands, which bypass resource group transaction checks.</p></li>
+          <li><b>为什么运行事务的数量低于为资源组配置的<codeph>CONCURRENCY</codeph>限制？</b>
+            <p>Greenplum数据库在运行事务之前考虑内存可用性，如果没有足够的内存可供服务，它将对事务进行排队。如果使用<codeph>ALTER RESOURCE GROUP</codeph>增加资源组的<codeph>CONCURRENCY</codeph>限制但不调整内存限制，则当前正在运行的事务可能会占用该组的所有分配的内存资源。处于此状态时，Greenplum数据库会对资源组中的后续事务进行排队。</p></li>
+          <li><b>为什么资源组中正在运行的事务数高于配置的<codeph>CONCURRENCY</codeph>限制？	</b>
+            <p>资源组可能正在运行<codeph>SET</codeph>和<codeph>SHOW</codeph>命令，这些命令会绕过资源组事务检查。</p></li>
         </ul>
       </section>
     </body>

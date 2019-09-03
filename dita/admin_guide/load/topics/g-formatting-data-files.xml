@@ -2,14 +2,8 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic95">
-   <title>Formatting Data Files</title>
+   <title>格式化数据文件</title>
    <body>
-      <p>When you use the Greenplum tools for loading and unloading data, you must specify how your
-         data is formatted. <codeph>COPY</codeph>, <codeph>CREATE EXTERNAL TABLE, </codeph>and
-            <codeph>gpload</codeph> have clauses that allow you to specify how your data is
-         formatted. Data can be delimited text (<codeph>TEXT</codeph>) or comma separated values
-            (<codeph>CSV</codeph>) format. External data must be formatted correctly to be read by
-         Greenplum Database. This topic explains the format of data files expected by Greenplum
-         Database.</p>
+      <p>在使用装载和卸载数据的Greenplum工具时，用户必须指定数据是怎么格式化的。<codeph>COPY</codeph>、<codeph>CREATE EXTERNAL TABLE</codeph>和<codeph>gpload</codeph>都有子句允许用户指定其数据的格式。数据可以是被划定的文本（<codeph>TEXT</codeph>）或者逗号分隔的值（<codeph>CSV</codeph>）格式。外部数据必须被正确地格式化以被Greenplum数据库读取。这一主题解释了Greenplum数据库所期待的数据文件的格式。</p>
    </body>
 </topic>

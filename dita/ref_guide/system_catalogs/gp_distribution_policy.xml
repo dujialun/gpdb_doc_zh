@@ -4,10 +4,9 @@
 <topic id="topic1" xml:lang="en">
   <title id="ey142834">gp_distribution_policy</title>
   <body>
-    <p>The <codeph>gp_distribution_policy</codeph> table contains information about Greenplum
-      Database tables and their policy for distributing table data across the segments. This table
-      is populated only on the master. This table is not globally shared, meaning each database has
-      its own copy of this table.</p>
+    <p><codeph>gp_distribution_policy</codeph>表包含有关Greenplum数据库表及其分布表数据的策略的信息。
+      该表仅在Master上填充。该表不是全局共享的，这意味着每个数据库都有自己的副本。
+      </p>
     <table id="ey142842">
       <title>pg_catalog.gp_distribution_policy</title>
       <tgroup cols="4">
@@ -17,10 +16,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -30,7 +29,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">The table object identifier (OID).</entry>
+            <entry colname="col4">表对象标识符（OID）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -38,19 +37,16 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The table distribution policy:<ul id="ul_a52_yj2_4gb">
-                <li><codeph>p</codeph> - Partitioned policy. Table data is distributed among segment
-                  instances. </li>
-                <li><codeph>r</codeph> - Replicated policy. Table data is replicated on each segment
-                  instance. </li>
+            <entry colname="col4">表分布策略：<ul id="ul_a52_yj2_4gb">
+                <li><codeph>p</codeph> - 分区策略。表数据在segment实例中分布。</li>
+                <li><codeph>r</codeph> - 复制策略。表数据在每个segment实例中冗余分布。</li>
               </ul></entry>
           </row>
           <row>
             <entry colname="col1"><codeph>numsegments</codeph></entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The number of segment instances on which the table data is
-              distributed.</entry>
+            <entry colname="col4">有表数据分布的节点数量。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -58,7 +54,7 @@
             </entry>
             <entry colname="col2">int2vector</entry>
             <entry colname="col3">pg_attribute.attnum</entry>
-            <entry colname="col4">The column number(s) of the distribution column(s).</entry>
+            <entry colname="col4">分布列的列编号。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -66,8 +62,7 @@
             </entry>
             <entry colname="col2">oidvector</entry>
             <entry colname="col3">pg_opclass.oid</entry>
-            <entry colname="col4">The operator class identifier(s) of the distribution
-              column(s).</entry>
+            <entry colname="col4">分布列的运算符类标识符。</entry>
           </row>
         </tbody>
       </tgroup>

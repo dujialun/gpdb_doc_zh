@@ -2,31 +2,16 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic65">
-    <title>Running COPY in Single Row Error Isolation Mode</title>
+    <title>在单行错误隔离模式中运行COPY</title>
     <body>
-        <p>By default, <codeph>COPY</codeph> stops an operation at the first error: if the data
-            contains an error, the operation fails and no data loads. If you run <codeph>COPY
-                FROM</codeph> in <i>single row error isolation mode</i>, Greenplum skips rows that
-            contain format errors and loads properly formatted rows. Single row error isolation mode
-            applies only to rows in the input file that contain format errors. If the data contains
-            a constraint error such as violation of a <codeph>NOT NULL</codeph>,
-                <codeph>CHECK</codeph>, or <codeph>UNIQUE</codeph> constraint, the operation fails
-            and no data loads.</p>
-        <p>Specifying <codeph>SEGMENT REJECT LIMIT</codeph> runs the <codeph>COPY</codeph> operation
-            in single row error isolation mode. Specify the acceptable number of error rows on each
-            segment, after which the entire <codeph>COPY FROM</codeph> operation fails and no rows
-            load. The error row count is for each Greenplum Database segment, not for the entire
-            load operation. </p>
-        <p>If the <codeph>COPY</codeph> operation does not reach the error limit, Greenplum loads
-            all correctly-formatted rows and discards the error rows. Use the <codeph>LOG
-                ERRORS</codeph> clause to capture data formatting errors internally in Greenplum
-            Database. For example:</p>
+        <p>默认情况下，<codeph>COPY</codeph>会在第一个错误处停止操作：如果数据包含一个错误，该操作失败并且没有数据被装载。如果用户在<i>单行错误隔离模式</i>中运行<codeph>COPY FROM</codeph>，Greenplum会跳过包含格式错误的行并且装载正确格式化的行。单行错误隔离模式只适用于包含格式错误的输入文件中的行。如果数据包含的是约束错误，例如违背<codeph>NOT NULL</codeph>，<codeph>CHECK</codeph>，或者 <codeph>UNIQUE</codeph>约束，操作还是会失败并且不会有数据被装载。</p>
+        <p>指定<codeph>SEGMENT REJECT LIMIT</codeph> 会把<codeph>COPY</codeph>操作运行在单行错误隔离模式中。指定每一个Segment上可接受的错误行数，在达到这个行数后整个<codeph>COPY FROM</codeph>操作失败并且不会有数据被装载。这个错误行计数是针对每个Greenplum数据库的Segment，而不是针对整个装载操作。</p>
+        <p>如果<codeph>COPY</codeph>操作没有达到操作限制，Greenplum会装载所有正确格式化的行并且丢弃错误行。使用<codeph>LOG ERRORS</codeph>子句可以捕获Greenplum数据库内部的数据格式化错误。例如：</p>
         <example>
             <codeblock>=&gt; COPY country FROM '/data/gpdb/country_data' 
    WITH DELIMITER '|' LOG ERRORS
    SEGMENT REJECT LIMIT 10 ROWS;</codeblock>
         </example>
-        <p>See <xref href="g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58"/> for
-            information about investigating error rows. </p>
+        <p>有关调查错误行的信息，请见<xref href="g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58"/>。</p>
     </body>
 </topic>

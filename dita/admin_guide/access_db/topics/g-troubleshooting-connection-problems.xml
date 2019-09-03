@@ -2,65 +2,57 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic14">
-  <title>Troubleshooting Connection Problems</title>
+  <title>连接问题的发现及解决</title>
   <body>
-    <p id="io140978">A number of things can prevent a client application from successfully
-      connecting to Greenplum Database. This topic explains some of the common causes
-      of connection problems and how to correct them.</p>
+    <p id="io140978">很多事情都可能阻止客户端应用成功地连接到Greenplum数据库。这个主题解释了一些常见的连接问题
+      的原因以及如何改正它们。</p>
     <table id="io140982">
-      <title>Common connection problems</title>
+      <title>常见连接问题</title>
       <tgroup cols="2">
         <colspec colnum="1" colname="col1" colwidth="1*"/>
         <colspec colnum="2" colname="col2" colwidth="4*"/>
         <thead>
           <row>
-            <entry colname="col1">Problem</entry>
-            <entry colname="col2">Solution</entry>
+            <entry colname="col1">问题</entry>
+            <entry colname="col2">解决方案</entry>
           </row>
         </thead>
         <tbody>
           <row>
-            <entry colname="col1">No <filepath>pg_hba.conf</filepath> entry for host or user</entry>
-            <entry colname="col2">To enable Greenplum Database to accept remote client
-              connections, you must configure your Greenplum Database master instance
-              so that connections are allowed from the client hosts and database users that will be
-              connecting to Greenplum Database. This is done by adding the appropriate
-              entries to the <filepath>pg_hba.conf</filepath> configuration file (located in the
-              master instance's data directory). For more detailed information, see <xref
-                href="../../client_auth.xml#topic2"/>.</entry>
+            <entry colname="col1">没有用于主机或者用户的<filepath>pg_hba.conf</filepath>配置</entry>
+            <entry colname="col2">要允许Greenplum数据库接受远程客户端连接，用户必须配置用户的Greenplum
+              数据库的Master实例，这样来自于客户端主机和数据库用户的连接才会被允许连接到Greenplum数据库。
+              这可以通过在<filepath>pg_hba.conf</filepath>配置文件（位于Master实例的数据目录中）中增加
+              合适的条目就能做到。更多详细的信息请见<xref
+                href="../../client_auth.xml#topic2"/>。</entry>
           </row>
           <row>
-            <entry colname="col1">Greenplum Database is not running</entry>
-            <entry colname="col2">If the Greenplum Database master instance is down,
-              users will not be able to connect. You can verify that the Greenplum Database system is up by running the <codeph>gpstate</codeph> utility
-              on the Greenplum master host.</entry>
+            <entry colname="col1">Greenplum数据库没有运行</entry>
+            <entry colname="col2">Greenplum数据库的Master实例没有运行，用户将无法连接。
+              用户可以通过在Greenplum的Master主机上运行<codeph>gpstate</codeph>工具来
+              验证Greenplum数据库系统是否正常运行。</entry>
           </row>
           <row>
-            <entry colname="col1">Network problems<p>Interconnect timeouts</p>
+            <entry colname="col1">网络问题<p>Interconnect 超时</p>
             </entry>
-            <entry colname="col2">If users connect to the Greenplum
-              master host from a remote client, network problems can prevent a connection (for
-              example, DNS host name resolution problems, the host system is down, and so on.). To
-              ensure that network problems are not the cause, connect to the Greenplum master host from the remote client host. For example:
+            <entry colname="col2">如果用户从一个远程客户端连接到Greenplum的Master主机，网络问题
+              可能阻止连接（例如，DNS主机名解析问题、主机系统没有运行等等）。为了确认网络问题不是原因，
+              可尝试从远程客户端主机连接到Greenplum的Master主机。例如：
                 <codeph>ping <i>hostname</i>
-              </codeph>. <p id="io141723">If the system cannot resolve the host names and IP
-                addresses of the hosts involved in Greenplum Database, queries and
-                connections will fail. For some operations, connections to the Greenplum Database master use <codeph>localhost</codeph> and others use the
-                actual host name, so you must be able to resolve both. If you encounter this error,
-                first make sure you can connect to each host in your Greenplum Database array from the master host over the network. In the <codeph>/etc/hosts</codeph>
-                file of the master and all segments, make sure you have the correct host names and
-                IP addresses for all hosts involved in the Greenplum Database array.
-                The <codeph>127.0.0.1</codeph> IP must resolve to <codeph>localhost</codeph>.</p>
+                </codeph>。 <p id="io141723">如果系统不能解析主机名和Greenplum数据库所涉及的主机的IP地址，查询和连接将会失败。
+                  对于某些操作，到Greenplum数据库Master的连接会使用<codeph>localhost</codeph>而其他连接使用真实
+                  的主机名，因此用户必须能解析两者。如果用户遇到这种错误，首先确认用户能够从Master主机通过网络连接到
+                  Greenplum数据库阵列中的每一台主机。在Master和所有Segment的<codeph>/etc/hosts</codeph>文件中，
+                  确认有Greenplum数据库阵列所涉及所有主机的正确的主机名和IP地址。IP <codeph>127.0.0.1</codeph>
+                  必须解析为<codeph>localhost</codeph>。</p>
             </entry>
           </row>
           <row>
-            <entry colname="col1">Too many clients already</entry>
-            <entry colname="col2">By default, Greenplum Database is configured to
-              allow a maximum of 250 concurrent user connections on the master and 750 on a segment.
-              A connection attempt that causes that limit to be exceeded will be refused. This limit
-              is controlled by the <codeph>max_connections</codeph> parameter in the
-                <codeph>postgresql.conf</codeph> configuration file of the Greenplum Database master. If you change this setting for the master, you must
-              also make appropriate changes at the segments.</entry>
+            <entry colname="col1">已有太多客户端连接</entry>
+            <entry colname="col2">默认情况下，Greenplum数据库被配置为在Master和每个Segment上分别允许最多250和
+              750个并发用户连接。导致该限制会被超过的连接尝试将被拒绝。这个限制由Greenplum数据库Master的
+              <codeph>postgresql.conf</codeph>配置文件中的<codeph>max_connections</codeph>参数控制。
+              如果用户为Master更改了这个设置，用户还必须在Segment上做出适当的更改。</entry>
           </row>
         </tbody>
       </tgroup>

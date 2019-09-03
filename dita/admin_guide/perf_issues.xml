@@ -2,230 +2,179 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="jb177957">Common Causes of Performance Issues</title>
-  <shortdesc>This section explains the troubleshooting processes for common performance issues and
-    potential solutions to these issues. </shortdesc>
+  <title id="jb177957">性能问题的常见原因</title>
+  <shortdesc>这一节解释了常见性能问题的排查以及对这些问题可能的解决方案。 </shortdesc>
   <body/>
   <topic id="topic2" xml:lang="en">
-    <title id="jb150555">Identifying Hardware and Segment Failures</title>
+    <title id="jb150555">识别硬件和Segment失效</title>
     <body>
-      <p>The performance of Greenplum Database depends on the hardware and IT
-        infrastructure on which it runs. Greenplum Database is comprised of several
-        servers (hosts) acting together as one cohesive system (array); as a first step in
-        diagnosing performance problems, ensure that all Greenplum Database segments
-        are online. Greenplum Database's performance will be as fast as the slowest
-        host in the array. Problems with CPU utilization, memory management, I/O processing, or
-        network load affect performance. Common hardware-related issues are:</p>
+      <p>Greenplum数据库的性能取决于它所运行的硬件和IT基础设施。Greenplum数据库由多台服务器（主机）构成，它们作为一个紧密的系统（阵列）一起工作。
+		  作为诊断性能的第一步，应确保所有的Greenplum数据库的Segment都在线。Greenplum数据库的性能将和阵列中最慢的那一台主机相同。
+		  CPU利用、内存管理、I/O处理或者网络负载方面的问题都会影响性能。常见的与硬件相关的问题有</p>
       <ul>
-        <li id="jb155623"><b>Disk Failure</b> – Although a single disk failure should not
-          dramatically affect database performance if you are using RAID, disk resynchronization
-          does consume resources on the host with failed disks. The <codeph>gpcheckperf</codeph>
-          utility can help identify segment hosts that have disk I/O issues.</li>
-        <li id="jb155625"><b>Host Failure</b> – When a host is offline, the segments on that host
-          are nonoperational. This means other hosts in the array must perform twice their usual
-          workload because they are running the primary segments and multiple mirrors. If mirrors
-          are not enabled, service is interrupted. Service is temporarily interrupted to recover
-          failed segments. The <codeph>gpstate</codeph> utility helps identify failed segments.</li>
-        <li id="jb155741"><b>Network Failure</b> – Failure of a network interface card, a switch, or
-          DNS server can bring down segments. If host names or IP addresses cannot be resolved
-          within your Greenplum array, these manifest themselves as
-          interconnect errors in Greenplum Database. The <codeph>gpcheckperf</codeph>
-          utility helps identify segment hosts that have network issues.</li>
-        <li id="jb155762"><b>Disk Capacity</b> – Disk capacity on your segment hosts should never
-          exceed 70 percent full. Greenplum Database needs some free space for runtime
-          processing. <ph>To reclaim disk space that deleted rows occupy, run
-              <codeph>VACUUM</codeph> after loads or updates. </ph>The <i>gp_toolkit</i>
-          administrative schema has many views for checking the size of distributed database
-          objects. <p>See the <i>Greenplum Database Reference Guide</i> for
-            information about checking database object sizes and disk space.</p></li>
+        <li id="jb155623"><b>磁盘失效</b> – 尽管在使用RAID时单一磁盘失效不会剧烈的影响数据库性能，但磁盘重新同步确实会在有失效磁盘的主机上消耗资源。
+		<codeph>gpcheckperf</codeph> 工具可以帮助发现有磁盘I/O问题的Segment主机。</li>
+        <li id="jb155625"><b>主机失效</b> – 当一台主机离线时，该主机上的Segment就不可操作。这意味着阵列中的其他主机必须执行两倍于它们通常的负载，因为它们运行着主要Segment和多个镜像。
+		如果没有启用镜像，服务就会中断。为恢复失效的Segment也需要临时中断服务。 <codeph>gpstate</codeph> 工具可以帮助发现失效的Segment。</li>
+        <li id="jb155741"><b>网络失效</b> – 一块网卡、一台交换机或者DNS服务器的失效都可能让Segment宕掉。
+		如果在Greenplum阵列中无法解析主机名或者IP地址，这就表明它们是Greenplum数据库中的Interconnect错误。 
+		<codeph>gpcheckperf</codeph>可以帮助发现出现网络问题的Segment主机。</li>
+        <li id="jb155762"><b>磁盘容量</b> – Segment主机上的磁盘容量应该永远不超过70%充满。Greenplum数据库需要一些空闲空间来做运行时处理。
+		<ph>要回收已删除行占用的磁盘空间，可以在装载或者更新后运行<codeph>VACUUM</codeph>。</ph> 
+		<i>gp_toolkit</i> 管理方案中有很多视图可用来检查分布式数据库对象的尺寸。<p>有关检查数据库对象尺寸和磁盘空间的信息请见 <i>Greenplum 数据库参考指南</i> 。</p></li>
       </ul>
     </body>
   </topic>
   <topic id="topic3" xml:lang="en">
-    <title id="jb155843">Managing Workload</title>
+    <title id="jb155843">管理负载</title>
     <body>
-      <p>A database system has a limited CPU capacity, memory, and disk I/O resources. When multiple
-        workloads compete for access to these resources, database performance suffers. Resource
-        management maximizes system throughput while meeting varied business requirements. Greenplum
-        Database provides resource queues and resource groups to help you manage these 
-        system resources.</p>
-      <p>Resource queues and resource groups limit resource usage and the total number of
-        concurrent queries executing in the particular queue or group. By assigning database roles
-        to the appropriate queue or group, administrators can control concurrent user queries
-         and prevent system overload. For more information about resource queues and resource
-         groups, including selecting the appropriate scheme for your Greenplum Database environment,
-         see 
+      <p>一个数据库系统的CPU容量、内存和磁盘I/O资源是有限的。当多个负载竞争访问这些资源时，数据库性能就会受到影响。
+		  负载管理能在符合多变的业务需求的同时最大化系统吞吐。Greenplum数据库提供了资源队列和资源组来协助管理这些系统资源。</p>
+      <p>资源队列和资源组限制了特定队列或组的资源使用量和并行查询总数，管理员可以控制并行用户查询，防止系通过载。
+		  更多有关资源队列和资源组的信息，包括如何选择合适的管理模式，请参见
           <xref href="./wlmgmt.xml#topic1" type="topic" format="dita"/>.</p>
-      <p>Greenplum Database administrators should run maintenance workloads such as
-        data loads and <codeph>VACUUM ANALYZE</codeph> operations after business hours. Do not
-        compete with database users for system resources; perform administrative tasks at low-usage
-        times.</p>
+      <p>Greenplum数据库管理员应该在业务时段之后运行维护负载，例如数据装载和 <codeph>VACUUM ANALYZE</codeph>操作，
+	  不要与数据库用户竞争系统资源，在低使用率时段执行管理任务。</p>
     </body>
   </topic>
   <topic id="topic4" xml:lang="en">
-    <title id="jb155291">Avoiding Contention</title>
+    <title id="jb155291">避免竞争</title>
     <body>
-      <p>Contention arises when multiple users or workloads try to use the system in a conflicting
-        way; for example, contention occurs when two transactions try to update a table
-        simultaneously. A transaction that seeks a table-level or row-level lock will wait
-        indefinitely for conflicting locks to be released. Applications should not hold transactions
-        open for long periods of time, for example, while waiting for user input.</p>
+      <p>当多个用户或者负载尝试以冲突的方式使用系统时，竞争就会发生。例如，当两个事务尝试同时更新一个表时会发生竞争。
+		  一个寻求表级或行级锁的事务将无限等待冲突的锁被释放。应用不应该保持事务打开很长时间，例如，在等待用户输入时。</p>
     </body>
   </topic>
   <topic id="topic5" xml:lang="en">
-    <title id="jb155292">Maintaining Database Statistics</title>
+    <title id="jb155292">维护数据库统计信息</title>
     <body>
-      <p>Greenplum Database uses a cost-based query optimizer that relies on database
-        statistics. Accurate statistics allow the query optimizer to better estimate the number of
-        rows retrieved by a query to choose the most efficient query plan. Without database
-        statistics, the query optimizer cannot estimate how many records will be returned. The
-        optimizer does not assume it has sufficient memory to perform certain operations such as
-        aggregations, so it takes the most conservative action and does these operations by reading
-        and writing from disk. This is significantly slower than doing them in memory.
-          <cmdname>ANALYZE</cmdname> collects statistics about the database that the query optimizer
-        needs.<note>When executing an SQL command with GPORCA, Greenplum Database issues a warning if the command performance could be improved by
-          collecting statistics on a column or set of columns referenced by the command. The warning
-          is issued on the command line and information is added to the Greenplum Database log file. For information about collecting statistics on table
-          columns, see the <cmdname>ANALYZE</cmdname> command in the <cite>Greenplum Database Reference Guide</cite></note></p>
+      <p>Greenplum数据库使用一种依赖于数据库统计信息的基于代价的查询优化器。准确的统计信息让查询优化器更好地估计一个查询检索的行数，
+		  以便选择最有效的查询计划。如果没有数据库统计信息，查询优化器就不能估计将返回多少记录。优化器并不假设它有足够多的内存来执行特定的操作，
+		  例如聚集，因此它会采取最保守的行动并且通过读写磁盘来做这些操作。这比在内存中做要慢很多。
+		  <cmdname>ANALYZE</cmdname> 会收集查询优化器需要的数据库相关的统计信息。
+		  <note>在使用GPORCA执行SQL命令时，如果通过在该命令引用的一列或者多列上收集统计信息可以改进命令的性能，Greenplum数据库会发出一个警告。
+			  该警告在命令行上发出并且信息会被加入到Greenplum数据库的日志文件中。
+			  有关在表列上收集统计信息的内容请见<cite>Greenplum Database 数据库参考指南</cite>中的<cmdname>ANALYZE</cmdname>命令</note></p>
     </body>
     <topic id="topic6" xml:lang="en">
-      <title>Identifying Statistics Problems in Query Plans</title>
+      <title>识别查询计划中的统计信息问题</title>
       <body>
-        <p>Before you interpret a query plan for a query using <ph>EXPLAIN</ph> or <codeph>EXPLAIN
-            ANALYZE</codeph>, familiarize yourself with the data to help identify possible
-          statistics problems. Check the plan for the following indicators of inaccurate
-          statistics:</p>
+        <p>在使用<ph>EXPLAIN</ph> 或 <codeph>EXPLAIN
+            ANALYZE</codeph>解释一个查询的计划之前，先熟悉一下有助于帮助发现统计信息问题的数据。在计划中检查下列不准确统计信息的指示器：</p>
         <ul>
-          <li id="jb176751"><b>Are the optimizer's estimates close to reality?</b> Run
-              <codeph>EXPLAIN ANALYZE</codeph> and see if the number of rows the optimizer estimated
-            is close to the number of rows the query operation returned .</li>
-          <li id="jb158716"><b>Are selective predicates applied early in the plan?</b> The most
-            selective filters should be applied early in the plan so fewer rows move up the plan
-            tree.</li>
-          <li id="jb158755"><b>Is the optimizer choosing the best join order?</b> When you have a
-            query that joins multiple tables, make sure the optimizer chooses the most selective
-            join order. Joins that eliminate the largest number of rows should be done earlier in
-            the plan so fewer rows move up the plan tree.</li>
+          <li id="jb176751"><b>优化器的估计接近于现实吗？</b> 运行
+              <codeph>EXPLAIN ANALYZE</codeph> 并且看看优化器估计的行数是否和查询操作返回的行数接近。</li>
+          <li id="jb158716"><b>计划中是否比较早地应用了选择性谓词？</b> 最具选择性的过滤条件应该在计划中早早地被应用，这样会有较少的行在计划树中向上移动。</li>
+          <li id="jb158755"><b>优化器是否选择了最好的连接顺序？</b> 在一个查询连接多个表时，确保优化器选择最具选择性的连接顺序。消除行数最多的连接应该在计划中被最早执行，这样会有较少的行在计划树中向上移动。</li>
         </ul>
-        <p>See <xref href="query/topics/query-profiling.xml#topic39"/> for more information about
-          reading query plans.</p>
+        <p>更多有关阅读查询计划的信息请见<xref href="query/topics/query-profiling.xml#topic39"/></p>
       </body>
     </topic>
     <topic id="topic7" xml:lang="en">
-      <title>Tuning Statistics Collection</title>
+      <title>调整统计收集</title>
       <body>
-        <p>The following configuration parameters control the amount of data sampled for statistics
-          collection:</p>
+        <p>下列配置参数控制统计信息收集采样的数据量：</p>
         <ul>
           <li id="jb158767">
             <codeph>default_statistics_target</codeph>
           </li>
         </ul>
-        <p>These parameters control statistics sampling at the system level. It is better to sample
-          only increased statistics for columns used most frequently in query predicates. You can
-          adjust statistics for a particular column using the command:</p>
+        <p>这些参数控制系统层面的统计信息采样。最好只对查询谓词中最频繁使用的列采样增加的统计信息。
+			用户可以对一个特定的列采用下面的命令调整统计信息：</p>
         <p>
           <codeph>ALTER TABLE...SET STATISTICS</codeph>
         </p>
-        <p>For example:</p>
+        <p>例如：</p>
         <p>
           <codeblock>ALTER TABLE sales ALTER COLUMN region SET STATISTICS 50;
 </codeblock>
         </p>
-        <p>This is equivalent to changing <codeph>default_statistics_target</codeph> for a
-          particular column. Subsequent <codeph>ANALYZE</codeph> operations will then gather more
-          statistics data for that column and produce better query plans as a result.</p>
+        <p>这等效于为特定列增加<codeph>default_statistics_target</codeph>。后续的<codeph>ANALYZE</codeph>操作接着将为该列收集更多统计数据并且结果就是会产生更好的查询计划。</p>
       </body>
     </topic>
   </topic>
   <topic id="topic8" xml:lang="en">
-    <title id="jb155293">Optimizing Data Distribution</title>
+    <title id="jb155293">优化数据分布</title>
     <body>
-      <p>When you create a table in Greenplum Database, you must declare a
-        distribution key that allows for even data distribution across all segments in the system.
-        Because the segments work on a query in parallel, Greenplum Database will
-        always be as fast as the slowest segment. If the data is unbalanced, the segments that have
-        more data will return their results slower and therefore slow down the entire system.</p>
+      <p>当用户在Greenplum数据库中创建一个表时，用户必须声明一个分布键，它允许在系统中所有的Segment上均匀地分布数据。
+		  因为Segment会以并行的方式工作在查询上，Greenplum数据库将总是和最慢的Segment速度相同。
+		  如果数据不平衡，拥有更多数据的Segment将更慢地返回它们的结果，因此会拖慢整个系统。</p>
     </body>
   </topic>
   <topic id="topic9" xml:lang="en">
-    <title id="jb155264">Optimizing Your Database Design</title>
+    <title id="jb155264">优化数据库设计</title>
     <body>
-      <p>Many performance issues can be improved by database design. Examine your database design
-        and consider the following: </p>
+      <p>很多性能问题可以通过数据库设计改进。检查用户的数据库设计并且考虑以下几点：</p>
       <ul>
-        <li id="jb155523">Does the schema reflect the way the data is accessed? </li>
-        <li id="jb155527">Can larger tables be broken down into partitions? </li>
-        <li id="jb155528">Are you using the smallest data type possible to store column values? </li>
-        <li id="jb155534">Are columns used to join tables of the same datatype? </li>
-        <li id="jb155543">Are your indexes being used?</li>
+        <li id="jb155523">模式是否反映了数据被访问的方式？</li>
+        <li id="jb155527">较大的表是否能被分解成分区？ </li>
+        <li id="jb155528">是否在使用尽可能小的数据类型来存储列值？ </li>
+        <li id="jb155534">用于连接表的列是否为相同的数据类型？ </li>
+        <li id="jb155543">索引有没有被使用？</li>
       </ul>
     </body>
     <topic id="topic10" xml:lang="en">
-      <title>Greenplum Database Maximum Limits</title>
+      <title>Greenplum数据库最大量限制</title>
       <body>
-        <p>To help optimize database design, review the maximum limits that Greenplum Database supports:</p>
+        <p>为了帮助优化数据库设计，回顾一下Greenplum数据库支持的最大量限制：</p>
         <table id="jb163544">
-          <title>Maximum Limits of Greenplum Database</title>
+          <title>Greenplum数据库的最大量限制</title>
           <tgroup cols="2">
             <colspec colnum="1" colname="col1" colwidth="180pt"/>
             <colspec colnum="2" colname="col2" colwidth="180pt"/>
             <thead>
               <row>
-                <entry colname="col1">Dimension</entry>
-                <entry colname="col2">Limit</entry>
+                <entry colname="col1">维度</entry>
+                <entry colname="col2">限制</entry>
               </row>
             </thead>
             <tbody>
               <row>
-                <entry colname="col1">Database Size</entry>
-                <entry colname="col2">Unlimited</entry>
+                <entry colname="col1">数据库尺寸</entry>
+                <entry colname="col2">无限</entry>
               </row>
               <row>
-                <entry colname="col1">Table Size</entry>
-                <entry colname="col2">Unlimited, 128 TB per partition per segment</entry>
+                <entry colname="col1">表尺寸</entry>
+                <entry colname="col2">无限，每个Segment的每个分区是128TB</entry>
               </row>
               <row>
-                <entry colname="col1">Row Size</entry>
-                <entry colname="col2">1.6 TB (1600 columns * 1 GB)</entry>
+                <entry colname="col1">行大小</entry>
+                <entry colname="col2">1.6 TB (1600 列 * 1 GB)</entry>
               </row>
               <row>
-                <entry colname="col1">Field Size</entry>
+                <entry colname="col1">域尺寸</entry>
                 <entry colname="col2">1 GB</entry>
               </row>
               <row>
-                <entry colname="col1">Rows per Table</entry>
+                <entry colname="col1">每个表的行</entry>
                 <entry colname="col2">281474976710656 (2^48)</entry>
               </row>
               <row>
-                <entry colname="col1">Columns per Table/View</entry>
+                <entry colname="col1">每个表/视图的列</entry>
                 <entry colname="col2">1600</entry>
               </row>
               <row>
-                <entry colname="col1">Indexes per Table</entry>
-                <entry colname="col2">Unlimited</entry>
+                <entry colname="col1">每个表的索引</entry>
+                <entry colname="col2">无限</entry>
               </row>
               <row>
-                <entry colname="col1">Columns per Index</entry>
+                <entry colname="col1">每个索引的列</entry>
                 <entry colname="col2">32</entry>
               </row>
               <row>
-                <entry colname="col1">Table-level Constraints per Table</entry>
-                <entry colname="col2">Unlimited</entry>
+                <entry colname="col1">每个表的表级约束</entry>
+                <entry colname="col2">无限</entry>
               </row>
               <row>
-                <entry colname="col1">Table Name Length</entry>
-                <entry colname="col2">63 Bytes (Limited by <i>name</i> data type)</entry>
+                <entry colname="col1">表明长度</entry>
+                <entry colname="col2">63 字节 (受<i>name</i>数据类型限制)</entry>
               </row>
             </tbody>
           </tgroup>
         </table>
-        <p>Dimensions listed as unlimited are not intrinsically limited by Greenplum Database. However, they are limited in practice to available disk space
-          and memory/swap space. Performance may suffer when these values are unusually large.</p>
+        <p>这里列出的“无限”维度本质上不受Greenplum数据库的限制。
+			不过，它们实际受限于可用的磁盘空间和内存/交换空间。当这些值异乎寻常地大时，性能可能会受到损害。</p>
         <note type="note">
-          <p>There is a maximum limit on the number of objects (tables<ph>,
-              indexes,</ph> and views, but not rows) that may exist at one time. This limit is
-            4294967296 (2^32).</p>
+          <p>可以同时存在的对象(表<ph>、索引</ph> 以及视图，但不包括行) 数有一个最大限制。该限制为4294967296 (2^32).</p>
         </note>
       </body>
     </topic>

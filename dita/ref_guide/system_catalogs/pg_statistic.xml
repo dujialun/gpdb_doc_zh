@@ -4,35 +4,27 @@
 <topic id="topic1" xml:lang="en">
   <title id="hv156255">pg_statistic</title>
   <body>
-    <p>The <codeph>pg_statistic</codeph> system catalog table stores statistical data about the
-      contents of the database. Entries are created by <codeph>ANALYZE</codeph> and subsequently
-      used by the query optimizer. There is one entry for each table column that has been analyzed.
-      Note that all the statistical data is inherently approximate, even assuming that it is
-      up-to-date.</p>
-    <p><codeph>pg_statistic</codeph> also stores statistical data about the values of index
-      expressions. These are described as if they were actual data columns; in particular,
-        <codeph>starelid</codeph> references the index. No entry is made for an ordinary
-      non-expression index column, however, since it would be redundant with the entry for the
-      underlying table column. Currently, entries for index expressions always have
-      <codeph>stainherit = false</codeph>.</p>
-    <p>When <codeph>stainherit = false</codeph>, there is normally one entry for each table column
-      that has been analyzed. If the table has inheritance children, Greenplum Database creates
-      a second entry with <codeph>stainherit = true</codeph>. This row represents the column's
-       statistics over the inheritance tree, for example, statistics for the data you would see
-        with <codeph>SELECT <varname>column</varname> FROM <varname>table</varname>*</codeph>,
-        whereas the <codeph>stainherit = false</codeph> row represents the results of
-        <codeph>SELECT <varname>column</varname> FROM ONLY <varname>table</varname></codeph>.</p>
-    <p>Since different kinds of statistics may be appropriate for different kinds of data,
-        <codeph>pg_statistic</codeph> is designed not to assume very much about what sort of
-      statistics it stores. Only extremely general statistics (such as nullness) are given dedicated
-      columns in <codeph>pg_statistic</codeph>. Everything else is stored in slots, which are groups
-      of associated columns whose content is identified by a code number in one of the slot's
-      columns.</p>
-    <p><codeph>pg_statistic</codeph> should not be readable by the public, since even statistical
-      information about a table's contents may be considered sensitive (for example: minimum and
-      maximum values of a salary column). <codeph>pg_stats</codeph> is a publicly readable view on
-        <codeph>pg_statistic</codeph> that only exposes information about those tables that are
-      readable by the current user.</p>
+    <p><codeph>pg_statistic</codeph>系统目录表存储有关数据库内容的统计数据。
+      其中的项由<codeph>ANALYZE</codeph>创建，查询规划器会使用这些数据来进行查询规划。
+      每个已经被分析的表列都有一项。注意所有的统计数据天然就是近似的，即使它刚刚被更新。
+      </p>
+    <p><codeph>pg_statistic</codeph>还存储有关索引表达式值的统计数据。
+      这些被描述为它们是实际的数据列; 特别是，<codeph>starelid</codeph>引用了索引。
+      但是，没有为普通的非表达式索引列创建条目，因为它对于基础表列的条目是多余的。
+      目前，索引表达式的条目始终具有<codeph>stainherit = false</codeph>。
+      </p>
+    <p>当<codeph>stainherit = false</codeph>时，每个表格列通常有一个条目已被分析。
+      如果表具有继承子项，则Greenplum数据库会创建第二个条目，其中<codeph>stainherit = true</codeph>。
+      此行表示列在继承树上的统计信息，例如，您将使用<codeph>SELECT <varname>column</varname> FROM <varname>table</varname>*</codeph>看到的数据的统计信息，
+      而<codeph>stainherit = false</codeph>行表示<codeph>SELECT <varname>column</varname> FROM ONLY <varname>table</varname></codeph>表的结果。
+      </p>
+    <p>由于不同类型的统计数据可能适用于不同类型的数据，因此<codeph>pg_statistic</codeph>不会非常假设它存储的是哪种统计数据。
+      在<codeph>pg_statistic</codeph>中只给出了非常普通的统计信息（例如nullness）。
+      其他所有内容都存储在插槽中，插槽是相关列的组，其内容由插槽列之一中的代码编号标识。
+      </p>
+    <p><codeph>pg_statistic</codeph>不应该被公众读取，因为即使关于表的内容的统计信息也可能被认为是敏感的（例如：工资列的最小值和最大值）。
+      <codeph>pg_stats</codeph>是<codeph>pg_statistic</codeph>上的公共可读视图，它只公开有关当前用户可读的表的信息。
+      </p>
     <table id="hv156260">
       <title>pg_catalog.pg_statistic</title>
       <tgroup cols="4">
@@ -42,10 +34,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -55,7 +47,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid </entry>
-            <entry colname="col4">The table or index that the described column belongs to.</entry>
+            <entry colname="col4">被描述列所属的表或索引。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -63,7 +55,7 @@
             </entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3">pg_attribute.attnum</entry>
-            <entry colname="col4">The number of the described column.</entry>
+            <entry colname="col4">被描述列的编号。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -71,8 +63,7 @@
             </entry>
             <entry colname="col2">bool</entry>
             <entry colname="col3"/>
-            <entry colname="col4">If true, the statistics include inheritance child columns,
-              not just the values in the specified relations.</entry>
+            <entry colname="col4">如果为true，则统计信息包括继承子列，而不仅仅是指定关系中的值。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -80,7 +71,7 @@
             </entry>
             <entry colname="col2">float4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The fraction of the column's entries that are null.</entry>
+            <entry colname="col4">列项为空的比例。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -88,7 +79,7 @@
             </entry>
             <entry colname="col2">int4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The average stored width, in bytes, of nonnull entries.</entry>
+            <entry colname="col4">非空项的平均存储宽度，以字节计。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -96,12 +87,11 @@
             </entry>
             <entry colname="col2">float4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The number of distinct nonnull data values in the column. A value
-              greater than zero is the actual number of distinct values. A value less than zero is
-              the negative of a fraction of the number of rows in the table (for example, a column
-              in which values appear about twice on the average could be represented by
-                <codeph>stadistinct</codeph> = -0.5). A zero value means the number of distinct
-              values is unknown.</entry>
+            <entry colname="col4">列中不同的非空数据值的数量。
+              大于零的值是不同值的实际数量。
+              小于零的值是表中行数的乘数的负值（例如，其中值平均显示两次的列可以由<codeph>stadistinct</codeph> = -0.5表示）。
+              零值表示不同值的数量未知。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -109,8 +99,8 @@
             </entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">A code number indicating the kind of statistics stored in the
-                <codeph>N</codeph>th slot of the <codeph>pg_statistic</codeph> row.</entry>
+            <entry colname="col4">一个代码，它表示存储在该<codeph>pg_statistic</codeph>行中第<codeph>N</codeph>个“槽位”的统计类型。
+             </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -118,9 +108,9 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_operator.oid</entry>
-            <entry colname="col4">An operator used to derive the statistics stored in the
-                <codeph>N</codeph>th slot. For example, a histogram slot would show the
-                <codeph>&lt;</codeph> operator that defines the sort order of the data.</entry>
+            <entry colname="col4">一个用于生成这些存储在第N个“槽位”的统计信息的操作符。
+              比如，一个柱状图槽位会用&lt;操作符，该操作符定义了该数据的排序顺序。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -128,9 +118,8 @@
             </entry>
             <entry colname="col2">float4[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Numerical statistics of the appropriate kind for the
-                <codeph>N</codeph>th slot, or NULL if the slot kind does not involve numerical
-              values.</entry>
+            <entry colname="col4">第<codeph>N</codeph>个“槽位”的类型的数值类型统计，如果该槽位不涉及数值类型则为NULL。
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -138,11 +127,9 @@
             </entry>
             <entry colname="col2">anyarray</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Column data values of the appropriate kind for the
-                <codeph>N</codeph>th slot, or NULL if the slot kind does not store any data values.
-              Each array's element values are actually of the specific column's data type, so there
-              is no way to define these columns' type more specifically than
-                <codeph>anyarray</codeph>.</entry>
+            <entry colname="col4">第<codeph>N</codeph>个“槽位”的类型的列值，如果该槽位类型不存储任何数据值则为NULL。
+              每个数组的元素值实际上都是指定列的数据类型，因此，除了把这些列的类型定义成<codeph>anyarray</codeph>之外别无他法。
+              </entry>
           </row>
         </tbody>
       </tgroup>

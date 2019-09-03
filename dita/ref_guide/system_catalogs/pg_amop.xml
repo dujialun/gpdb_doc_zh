@@ -4,15 +4,12 @@
 <topic id="topic1" xml:lang="en">
   <title id="fw143540">pg_amop</title>
   <body>
-    <p>The <codeph>pg_amop</codeph> table stores information about operators associated with index
-      access method operator classes. There is one row for each operator that is a member of an
-      operator class.</p>
-    <p>An entry's <codeph>amopmethod</codeph> must match the <codeph>opfmethod</codeph>
-        of its containing operator family (including <codeph>amopmethod</codeph> here is
-        an intentional denormalization of the catalog structure for performance reasons).
-        Also, <codeph>amoplefttype</codeph> and <codeph>amoprighttype</codeph> must match
-        the <codeph>oprleft</codeph> and <codeph>oprright</codeph> fields of the referenced
-        <codeph>pg_operator</codeph> entry.</p>
+    <p><codeph>pg_amop</codeph>表存储有关与索引访问方法操作符类关联的运算符的信息。
+      每个运算符都有一行是运算符类的成员。
+      </p>
+    <p>条目的<codeph>amopmethod</codeph>必须与其包含的运算符族的<codeph>opfmethod</codeph>匹配（包括<codeph>amopmethod</codeph>这里是出于性能原因故意对catalog结构进行非规范化）。
+      此外，<codeph>amoplefttype</codeph>和<codeph>amoprighttype</codeph>必须与引用的<codeph>pg_operator</codeph>条目的<codeph>oprleft</codeph>和<codeph>oprright</codeph>字段匹配。
+      </p>
     <table id="fw143542">
       <title>pg_catalog.pg_amop</title>
       <tgroup cols="4">
@@ -22,10 +19,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -33,57 +30,55 @@
             <entry colname="col1"><codeph>oid</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Row identifier (hidden attribute; must be explicitly selected)</entry>
+            <entry colname="col4">行标识符（隐藏属性;必须显式选择）</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amopfamily</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_opfamily.oid</entry>
-            <entry colname="col4">The operator family that this entry is for</entry>
+            <entry colname="col4">此条目所针对的运算符系列</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amoplefttype</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Left-hand input data type of operator</entry>
+            <entry colname="col4">左侧输入数据类型的运算符</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amoprighttype</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Right-hand input data type of operator</entry>
+            <entry colname="col4">右侧输入数据类型的运算符</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amopstrategy</codeph></entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Operator strategy number</entry>
+            <entry colname="col4">元算符策略编号</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amoppurpose</codeph></entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Operator purpose, either <codeph>s</codeph> for search or
-             <codeph>o</codeph> for ordering</entry>
+            <entry colname="col4">运算符目的，<codeph>s</codeph>用于搜索或<codeph>o</codeph>用于订购</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amopopr</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_operator.oid</entry>
-            <entry colname="col4">OID of the operator</entry>
+            <entry colname="col4">运算符的OID</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amopmethod</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_am.oid</entry>
-            <entry colname="col4">Index access method for the operator family</entry>
+            <entry colname="col4">运算符成员的索引访问方法</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amopsortfamily</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_opfamily.oid</entry>
-            <entry colname="col4">If an ordering operator, the B-tree operator family that this entry
-              sorts according to; zero if a search operator</entry>
+            <entry colname="col4">如果是一个排序运算符，则该条目按此排序的B树运算符系列; 如果是搜索运算符则为零</entry>
           </row>
         </tbody>
       </tgroup>

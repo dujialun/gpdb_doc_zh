@@ -1,125 +1,140 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="hq141670">pg_stat_activity</title><body><p>The view <codeph>pg_stat_activity</codeph> shows one row per server
-process and details about it associated user session and query. The columns
-that report data on the current query are available unless the parameter
-<codeph>stats_command_string</codeph> has been turned off. Furthermore,
-these columns are only visible if the user examining the view is a superuser
-or the same as the user owning the process being reported on.</p><p>The maximum length of the query text string stored in the column <codeph>current_query</codeph>
-      can be controlled with the server configuration parameter
-        <codeph>track_activity_query_size</codeph>. </p><table id="hq141982"><title>pg_catalog.pg_stat_activity</title><tgroup cols="4"><colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="86pt"/><colspec colnum="3" colname="col3" colwidth="85pt"/><colspec colnum="4" colname="col4" colwidth="147pt"/><thead><row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row></thead><tbody><row><entry colname="col1"><codeph>datid</codeph></entry><entry colname="col2">oid</entry><entry colname="col3">pg_database.oid</entry><entry colname="col4">Database OID</entry></row><row><entry colname="col1"><codeph>datname</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">Database name</entry></row>
+<topic id="topic1" xml:lang="en">
+  <title id="hq141670">pg_stat_activity</title>
+  <body><p>视图<codeph>pg_stat_activity</codeph>每行显示一个服务器进程同时详细描述与之关联的用户会话和查询。
+    这些列报告当前查询上可用的数据，除非参数<codeph>stats_command_string</codeph>被关闭。
+    此外，只有在检查视图的用户是超级用户或者是正在报告的进程的拥有者时，这些列才可见。
+    </p>
+    <p>列<codeph>current_query</codeph>中存储的查询文本字符串的最大长度可以通过服务器配置参数<codeph>track_activity_query_size</codeph>来控制。
+      </p>
+    <table id="hq141982">
+      <title>pg_catalog.pg_stat_activity</title>
+      <tgroup cols="4">
+        <colspec colnum="1" colname="col1" colwidth="131pt"/>
+        <colspec colnum="2" colname="col2" colwidth="86pt"/>
+        <colspec colnum="3" colname="col3" colwidth="85pt"/>
+        <colspec colnum="4" colname="col4" colwidth="147pt"/>
+        <thead><row><entry colname="col1">列</entry><entry colname="col2">类型</entry><entry colname="col3">参考</entry><entry colname="col4">描述</entry></row></thead><tbody>
+        <row>
+          <entry colname="col1"><codeph>datid</codeph></entry>
+          <entry colname="col2">oid</entry>
+          <entry colname="col3">pg_database.oid</entry>
+          <entry colname="col4">数据库OID</entry>
+        </row>
+        <row>
+          <entry colname="col1"><codeph>datname</codeph></entry>
+          <entry colname="col2">name</entry>
+          <entry colname="col3"/>
+          <entry colname="col4">数据库名称</entry>
+        </row>
           <row>
             <entry><codeph>pid</codeph></entry>
             <entry>integer</entry>
             <entry/>
-            <entry>Process ID of this backend</entry>
+            <entry>服务进程的进程ID</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>sess_id</codeph></entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Session ID</entry>
+            <entry colname="col4">会话ID</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>usesysid</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">OID of the user logged into this backend</entry>
+            <entry colname="col4">登录此后端的用户的OID</entry>
           </row>
           <row>
             <entry><codeph>usename</codeph></entry>
             <entry>name</entry>
             <entry/>
-            <entry>Name of the user logged into this backend</entry>
+            <entry>登录到此后端的用户的名称</entry>
           </row>
           <row>
             <entry>application_name</entry>
             <entry>text</entry>
             <entry/>
-            <entry>Name of the application that is connected to this backend</entry>
+            <entry>连接到此后端的应用程序的名称</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>client_addr</codeph></entry>
             <entry colname="col2">inet</entry>
             <entry colname="col3"/>
-            <entry colname="col4">IP address of the client connected to this backend. If this field
-              is null, it indicates either that the client is connected via a Unix socket on the
-              server machine or that this is an internal process such as autovacuum.</entry>
+            <entry colname="col4">连接到此后端的客户端的IP地址。
+              如果此字段为空，则表示客户端通过服务器计算机上的Unix套接字连接，或者这是内部进程（如autovacuum）。
+              </entry>
           </row>
           <row>
             <entry><codeph>client_hostname</codeph></entry>
             <entry>text</entry>
             <entry/>
-            <entry>Host name of the connected client, as reported by a reverse DNS lookup of
-                <codeph>client_addr</codeph>. This field will only be non-null for IP connections,
-              and only when log_hostname is enabled.</entry>
+            <entry>客户端的主机名，由<codeph>client_addr</codeph>的反向DNS查找报告。
+              对于IP连接，此字段仅为非null，并且仅在启用log_hostname时才为空。
+              </entry>
           </row>
           <row>
             <entry colname="col1"><codeph>client_port</codeph></entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"/>
-            <entry colname="col4">TCP port number that the client is using for communication with
-              this backend, or -1 if a Unix socket is used</entry>
+            <entry colname="col4">客户端用于与此后端通信的TCP端口号，如果使用Unix套接字，则为-1
+              </entry>
           </row>
           <row>
             <entry colname="col1"><codeph>backend_start</codeph></entry>
             <entry colname="col2">timestamptz</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Time backend process was started</entry>
+            <entry colname="col4">后端进程启动时间</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>xact_start</codeph></entry>
             <entry colname="col2">timestamptz</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Transaction start time</entry>
+            <entry colname="col4">事务开始时间</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>query_start</codeph></entry>
             <entry colname="col2">timestamptz</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Time query began execution</entry>
+            <entry colname="col4">查询开始执行时间</entry>
           </row>
           <row>
             <entry><codeph>state_change</codeph></entry>
             <entry>timestampz</entry>
             <entry/>
-            <entry>Time when the <codeph>state</codeph> was last changed</entry>
+            <entry>状态最后一次改变的时间</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>waiting</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if waiting on a lock, false if not waiting</entry>
+            <entry colname="col4">如果等待一个锁为True，否则为false</entry>
           </row>
           <row>
             <entry><codeph>state</codeph></entry>
             <entry>text</entry>
             <entry/>
-            <entry>Current overall state of this backend. Possible values are:<ul
+            <entry>此后端的当前整体状态。可能的值是：<ul
                 id="ul_c5x_thv_kgb">
                 <li>
-                  <p><codeph>active</codeph>: The backend is executing a query.</p>
+                  <p><codeph>active</codeph>: 后端正在执行查询。</p>
                 </li>
                 <li>
-                  <p><codeph>idle</codeph>: The backend is waiting for a new client command.</p>
+                  <p><codeph>idle</codeph>: 后端正在等待新的客户端命令。</p>
                 </li>
                 <li>
-                  <p><codeph>idle in transaction</codeph>: The backend is in a transaction, but is
-                    not currently executing a query.</p>
+                  <p><codeph>idle in transaction</codeph>: 后端处于事务中，但当前未执行查询。</p>
                 </li>
                 <li>
-                  <p><codeph>idle in transaction (aborted)</codeph>: This state is similar to idle
-                    in transaction, except one of the statements in the transaction caused an
-                    error.</p>
+                  <p><codeph>idle in transaction (aborted)</codeph>: 此状态类似于事务中的空闲，除了事务中的一个语句导致错误。</p>
                 </li>
                 <li>
-                  <p><codeph>fastpath function call</codeph>: The backend is executing a fast-path
-                    function.</p>
+                  <p><codeph>fastpath function call</codeph>: 后端正在执行快速路径功能。</p>
                 </li>
                 <li>
-                  <p><codeph>disabled</codeph>: This state is reported if
-                      <codeph>track_activities</codeph> is disabled in this backend.</p>
+                  <p><codeph>disabled</codeph>: 如果在此后端禁用<codeph>track_activities</codeph>，则报告此状态。</p>
                 </li>
               </ul></entry>
           </row>
@@ -127,34 +142,34 @@ or the same as the user owning the process being reported on.</p><p>The maximum 
             <entry><codeph>query</codeph></entry>
             <entry>text</entry>
             <entry/>
-            <entry>Text of this backend's most recent query. If <codeph>state</codeph> is active
-              this field shows the currently executing query. In all other states, it shows the last
-              query that was executed.</entry>
+            <entry>此后端的最新查询的文本。
+              如果状态为活跃，则此字段显示当前正在执行的查询。
+              在所有其他状态中，它显示最后执行的查询。
+              </entry>
           </row>
           <row>
             <entry colname="col1"><codeph>waiting_reason</codeph></entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Reason the server process is waiting. The value can be:<p>lock,
-                replication, or resgroup</p></entry>
+            <entry colname="col4">服务器进程正在等待的原因。 值可以是：<p>lock，
+                replication或resgroup</p></entry>
           </row>
           <row>
             <entry colname="col1"><codeph>rsgid</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_resgroup.oid</entry>
-            <entry colname="col4">Resource group OID</entry>
+            <entry colname="col4">资源组OID</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>rsgname</codeph></entry>
             <entry colname="col2">text</entry>
             <entry colname="col3">pg_resgroup.rsgname</entry>
-            <entry colname="col4">Resource group name</entry>
+            <entry colname="col4">资源组名称</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>rsgqueueduration</codeph></entry>
             <entry colname="col2">interval</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For a queued query, the total time the query has been
-              queued.</entry>
+            <entry colname="col4">对于排队查询，查询排队的总时间。</entry>
           </row>
 </tbody></tgroup></table></body></topic>

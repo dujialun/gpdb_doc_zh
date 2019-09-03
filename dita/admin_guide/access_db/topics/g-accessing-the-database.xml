@@ -2,6 +2,6 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title>Accessing the Database</title>
-  <shortdesc>This topic describes the various client tools you can use to connect to Greenplum Database, and how to establish a database session. </shortdesc>
+  <title>访问数据库</title>
+  <shortdesc>这个主题描述了几种可用来连接Greenplum数据库的客户端工具以及如何建立一个数据库会话。</shortdesc>
 </topic>

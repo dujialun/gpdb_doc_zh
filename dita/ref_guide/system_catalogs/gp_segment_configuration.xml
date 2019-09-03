@@ -4,8 +4,7 @@
 <topic id="topic1" xml:lang="en">
   <title id="fr163961">gp_segment_configuration</title>
   <body>
-    <p>The <codeph>gp_segment_configuration</codeph> table contains information about mirroring and
-      segment instance configuration.</p>
+    <p><codeph>gp_segment_configuration</codeph>表包含有关Mirror和Segment实例配置的信息。</p>
     <table id="fr163962">
       <title>pg_catalog.gp_segment_configuration</title>
       <tgroup cols="4">
@@ -15,10 +14,10 @@
         <colspec colnum="4" colname="col4" colwidth="138pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -28,7 +27,7 @@
             </entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Unique identifier of a segment (or master) instance.</entry>
+            <entry colname="col4">Segment（或Master）实例的唯一标识符。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -36,11 +35,10 @@
             </entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The content identifier for a segment instance. A primary segment
-              instance and its corresponding mirror will always have the same content
-                identifier.<p>For a segment the value is from 0 to <i>N</i>-1, where <i>N</i> is the
-                number of primary segments in the system.</p><p>For the master, the value is always
-                -1.</p></entry>
+            <entry colname="col4">Segment实例的内容标识符。
+              主Segment实例及其镜像将始终具有相同的内容标识符。
+              <p>对于Segment，值为0到<i>N</i>-1，其中<i>N</i>是系统中主Segment的数量。</p>
+              <p>对于master，值始终为-1。</p></entry>
           </row>
           <row>
             <entry colname="col1">
@@ -48,8 +46,8 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The role that a segment is currently running as. Values are
-                <codeph>p</codeph> (primary) or <codeph>m</codeph>(mirror). </entry>
+            <entry colname="col4">Segment当前正在运行的角色。
+              值为<codeph>p</codeph>（主）或<codeph>m</codeph>（镜像）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -57,8 +55,8 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The role that a segment was originally assigned at initialization
-              time. Values are <codeph>p</codeph> (primary) or <codeph>m</codeph> (mirror).</entry>
+            <entry colname="col4">最初在初始化时分配Segment的角色。
+              值为<codeph>p</codeph>（主）或<codeph>m</codeph>（镜像）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -66,9 +64,8 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The synchronization status of a segment instance with its mirror
-              copy. Values are <codeph>s</codeph> (synchronized) or <codeph>n</codeph> (not
-              synchronized).</entry>
+            <entry colname="col4">Segment实例及其镜像副本的同步状态。
+              值为<codeph>s</codeph>（同步）或<codeph>n</codeph>（未同步）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -76,8 +73,8 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The fault status of a segment instance. Values are
-                <codeph>u</codeph> (up) or <codeph>d</codeph> (down).</entry>
+            <entry colname="col4">Segment实例的故障状态。
+              值是<codeph>u</codeph>（存活）或<codeph>d</codeph>（宕机）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -85,8 +82,7 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The TCP port the database server listener process is
-              using.</entry>
+            <entry colname="col4">数据库监听的TCP端口。T</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -94,7 +90,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The hostname of a segment host.</entry>
+            <entry colname="col4">Segment主机的主机名。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -102,9 +98,8 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The hostname used to access a particular segment instance on a
-              segment host. This value may be the same as <codeph>hostname</codeph> on systems that
-              do not have per-interface hostnames configured.</entry>
+            <entry colname="col4">用于访问Segment主机上的特定Segment实例的主机名。
+              此值可能与未配置每个接口主机名的系统上的主机名相同。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -112,7 +107,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Segment instance data directory.</entry>
+            <entry colname="col4">Segment实例数据目录。</entry>
           </row>
         </tbody>
       </tgroup>

@@ -2,28 +2,24 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic6">
-   <title>Setting Parameters at the System Level</title>
+   <title>设置系统级别参数</title>
    <body>
-      <p>Master parameter settings in the master <codeph>postgresql.conf </codeph>file are the
-         system-wide default. To set a master parameter:</p>
+      <p>Master的<codeph>postgresql.conf</codeph>文件中的Master参数设置是系统范围默认的。
+         要设置一个Master参数：</p>
       <ol>
-         <li id="kh160766">Edit the <codeph>$MASTER_DATA_DIRECTORY/postgresql.conf</codeph>
-            file.</li>
-         <li id="kh160741">Find the parameter to set, uncomment it (remove the preceding
-               <codeph>#</codeph> character), and type the desired value.</li>
-         <li id="kh160753">Save and close the file.</li>
-         <li id="kh160780">For <i>session</i> parameters that do not require a server restart,
-            upload the <codeph>postgresql.conf</codeph> changes as follows:<p>
+         <li id="kh160766">编辑<codeph>$MASTER_DATA_DIRECTORY/postgresql.conf</codeph>文件。</li>
+         <li id="kh160741">找到要设置的参数，取消它的注释（移除前面的<codeph>#</codeph>字符），并且输入想要的值。</li>
+         <li id="kh160753">保存并且关闭该文件。</li>
+         <li id="kh160780">对于不需要重新启动服务器的<i>session</i>参数，按如下上传<codeph>postgresql.conf</codeph>的改变：<p>
                <codeblock>$ gpstop -u</codeblock>
             </p>
          </li>
-         <li id="kh160789">For parameter changes that require a server restart, restart Greenplum
-            Database as follows:<p>
+         <li id="kh160789">对于要求服务器重启的参数更改，按如下重启Greenplum数据库：<p>
                <codeblock>$ gpstop -r</codeblock>
             </p>
          </li>
       </ol>
-      <p outputclass="gpdb">For details about the server configuration parameters, see the
-            <cite>Greenplum Database Reference Guide</cite>.</p>
+      <p outputclass="gpdb">关于服务器配置参数的细节，请见
+            <cite>Greenplum数据库参考指南</cite>.</p>
    </body>
 </topic>

@@ -4,9 +4,9 @@
 <topic id="topic1" xml:lang="en">
   <title id="gy141670">pg_operator</title>
   <body>
-    <p>The <codeph>pg_operator</codeph> system catalog table stores information about operators,
-      both built-in and those defined by <codeph>CREATE OPERATOR</codeph>. Unused column contain
-      zeroes. For example, <codeph>oprleft</codeph> is zero for a prefix operator.</p>
+    <p>系统目录表<codeph>pg_operator</codeph>存储关于操作符的信息，包括内建的和通过<codeph>CREATE OPERATOR</codeph>语句定义的操作符。
+      未用的列包含零值。例如，一个前缀操作符的<codeph>oprleft</codeph>为0。
+      </p>
     <table id="gy150092">
       <title>pg_catalog.pg_operator</title>
       <tgroup cols="4">
@@ -16,10 +16,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -29,7 +29,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Row identifier (hidden attribute, must be explicityly selected)</entry>
+            <entry colname="col4">行标识符（隐藏属性;必须显式选择）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -37,7 +37,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of the operator</entry>
+            <entry colname="col4">操作符的名称</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -45,7 +45,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_namespace.oid</entry>
-            <entry colname="col4">The OID of the namespace that contains this operator</entry>
+            <entry colname="col4">操作符所属的名字空间的OID</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -53,7 +53,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the operator</entry>
+            <entry colname="col4">操作符的拥有者</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -61,8 +61,7 @@
             </entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4"><codeph>b</codeph> = infix (both), <codeph>l</codeph> = prefix
-              (left), <codeph>r</codeph> = postfix (right)</entry>
+            <entry colname="col4"><codeph>b</codeph> = 中缀 (前缀和后缀)，<codeph>l</codeph> = 前缀 ("左")，<codeph>r</codeph> = 后缀 ("右")</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -70,7 +69,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">This operator supports merge joins</entry>
+            <entry colname="col4">此运算符是否支持合并连接</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -78,7 +77,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">This operator supports hash joins</entry>
+            <entry colname="col4">该操作符是否支持哈希连接</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -86,7 +85,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Type of the left operand</entry>
+            <entry colname="col4">左操作数的类型</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -94,7 +93,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Type of the right operand</entry>
+            <entry colname="col4">右操作数的类型</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -102,7 +101,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Type of the result</entry>
+            <entry colname="col4">结果类型</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -110,7 +109,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_operator.oid</entry>
-            <entry colname="col4">Commutator of this operator, if any</entry>
+            <entry colname="col4">此运算符的转换器，如果有的话</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -118,7 +117,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_operator.oid</entry>
-            <entry colname="col4">Negator of this operator, if any</entry>
+            <entry colname="col4">该操作符的求反器，如果有的话</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -126,7 +125,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Function that implements this operator</entry>
+            <entry colname="col4">实现该操作符的函数</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -134,8 +133,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Restriction selectivity estimation function for this
-              operator</entry>
+            <entry colname="col4">该运算符的限制选择性估计函数</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -143,7 +141,7 @@
             </entry>
             <entry colname="col2">regproc</entry>
             <entry colname="col3">pg_proc.oid</entry>
-            <entry colname="col4">Join selectivity estimation function for this operator</entry>
+            <entry colname="col4">加入此运算符的选择性估计函数</entry>
           </row>
         </tbody>
       </tgroup>

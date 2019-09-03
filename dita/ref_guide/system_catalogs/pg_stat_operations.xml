@@ -1,16 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="ht141670">pg_stat_operations</title><body><p>The view <codeph>pg_stat_operations</codeph> shows details about the
-last operation performed on a database object (such as a table, index,
-view or database) or a global object (such as a role).</p><table id="ht141982"><title>pg_catalog.pg_stat_operations</title><tgroup cols="4"><colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="86pt"/><colspec colnum="3" colname="col3" colwidth="85pt"/><colspec colnum="4" colname="col4" colwidth="147pt"/><thead><row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row></thead><tbody><row><entry colname="col1"><codeph>classname</codeph></entry><entry colname="col2">text</entry><entry colname="col3"/><entry colname="col4">The name of the system table in the <codeph>pg_catalog</codeph> schema where
-              the record about this object is stored (<codeph>pg_class</codeph>=relations,
-                <codeph>pg_database</codeph>=databases,<p><codeph>pg_namespace</codeph>=schemas,</p><p><codeph>pg_authid</codeph>=roles)</p></entry></row><row><entry colname="col1"><codeph>objname</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">The name of the object.</entry></row><row><entry colname="col1"><codeph>objid</codeph></entry><entry colname="col2">oid</entry><entry colname="col3"/><entry colname="col4">The OID of the object.</entry></row><row><entry colname="col1"><codeph>schemaname</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">The name of the schema where the object resides.</entry></row><row><entry colname="col1"><codeph>usestatus</codeph></entry><entry colname="col2">text</entry><entry colname="col3"/><entry colname="col4">The status of the role who performed the last operation on the object
-                (<codeph>CURRENT</codeph>=a currently active role in the system,
-                <codeph>DROPPED</codeph>=a role that no longer exists in the system,
-                <codeph>CHANGED</codeph>=a role name that exists in the system, but has changed
-              since the last operation was performed).</entry></row><row><entry colname="col1"><codeph>usename</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">The name of the role that performed the operation
-on this object.</entry></row><row><entry colname="col1"><codeph>actionname</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">The action that was taken on the object.</entry></row><row><entry colname="col1"><codeph>subtype</codeph></entry><entry colname="col2">text</entry><entry colname="col3"/><entry colname="col4">The type of object operated on or the subclass
-of operation performed.</entry></row><row><entry colname="col1"><codeph>statime</codeph></entry><entry colname="col2">timestamptz</entry><entry colname="col3"/><entry colname="col4">The timestamp of the operation. This is the same timestamp that is written to
-              the Greenplum Database server log files in case you need to look up more
-              detailed information about the operation in the logs.</entry></row></tbody></tgroup></table></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1" xml:lang="en">
+    <title id="ht141670">pg_stat_operations</title>
+    <body>
+        <p>视图<codeph>pg_stat_operations</codeph>显示了关于最后一个执行在数据库对象（例如，表、索引、视图或者数据库）上或者全局对象（例如角色）的操作的细节信息。
+        </p>
+        <table id="ht141982">
+            <title>pg_catalog.pg_stat_operations</title>
+            <tgroup cols="4">
+                <colspec colnum="1" colname="col1" colwidth="131pt"/>
+                <colspec colnum="2" colname="col2" colwidth="86pt"/>
+                <colspec colnum="3" colname="col3" colwidth="85pt"/>
+                <colspec colnum="4" colname="col4" colwidth="147pt"/>
+                <thead>
+                    <row>
+                        <entry colname="col1">列</entry>
+                        <entry colname="col2">类型</entry>
+                        <entry colname="col3">参考</entry>
+                        <entry colname="col4">描述</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>classname</codeph>
+                        </entry>
+                        <entry colname="col2">text</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4"><codeph>pg_catalog</codeph> schema中存储有关此对象的记录的系统表的名称
+                            (<codeph>pg_class</codeph>=关系,
+                            <codeph>pg_database</codeph>=数据库,
+                            <p><codeph>pg_namespace</codeph>=schemas,
+                            </p>
+                            <p><codeph>pg_authid</codeph>=角色)
+                            </p>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>objname</codeph>
+                        </entry>
+                        <entry colname="col2">name</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">对象的名称。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>objid</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">对象的OID。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>schemaname</codeph>
+                        </entry>
+                        <entry colname="col2">name</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">对象所在的schema的名称。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>usestatus</codeph>
+                        </entry>
+                        <entry colname="col2">text</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">对对象执行最后一次操作的角色的状态（<codeph>CURRENT</codeph> =系统中当前活动的角色，<codeph>DROPPED</codeph> =系统中不再存在的角色，<codeph>CHANGED</codeph> =系统中存在的角色名称，但自上次操作以来已更改）。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>usename</codeph>
+                        </entry>
+                        <entry colname="col2">name</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">对此对象执行操作的角色的名称。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>actionname</codeph>
+                        </entry>
+                        <entry colname="col2">name</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">对该对象采取的操作。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>subtype</codeph>
+                        </entry>
+                        <entry colname="col2">text</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">操作对象的类型或执行的操作的子类。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>statime</codeph>
+                        </entry>
+                        <entry colname="col2">timestamptz</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">操作的时间戳。
+                            这与写入Greenplum数据库服务器日志文件的时间戳相同，以防您需要在日志中查找有关操作的更多详细信息。
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </body>
+</topic>

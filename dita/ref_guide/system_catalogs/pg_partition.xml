@@ -4,11 +4,10 @@
 <topic id="topic1" xml:lang="en">
   <title id="gz143896">pg_partition</title>
   <body>
-    <p>The <codeph>pg_partition</codeph> system catalog table is used to track partitioned tables
-      and their inheritance level relationships. Each row of <codeph>pg_partition</codeph>
-      represents either the level of a partitioned table in the partition hierarchy, or a
-      subpartition template description. The value of the attribute <codeph>paristemplate</codeph>
-      determines what a particular row represents.</p>
+    <p><codeph>pg_partition</codeph>系统目录表被用来跟踪分区表以及它们的继承层级关系。
+      <codeph>pg_partition</codeph>中的每一行要么代表了一个分区表在分区层级关系中的等级，要么是一个子分区模板的描述。
+      <codeph>paristemplate</codeph>的属性值决定了一个特定行代表的含义。
+      </p>
     <table id="gz143898">
       <title>pg_catalog.pg_partition</title>
       <tgroup cols="4">
@@ -18,10 +17,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -29,49 +28,44 @@
             <entry colname="col1"><codeph>parrelid</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">The object identifier of the table.</entry>
+            <entry colname="col4">表的对象标识符。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>parkind</codeph></entry>
             <entry colname="col2">char</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The partition type - <codeph>R</codeph> for range or
-                <codeph>L</codeph> for list.</entry>
+            <entry colname="col4">分区类型 - <codeph>R</codeph>表示范围或
+                <codeph>L</codeph>表示列表。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>parlevel</codeph></entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The partition level of this row: 0 for the top-level parent table,
-              1 for the first level under the parent table, 2 for the second level, and so
-              on.</entry>
+            <entry colname="col4">该行的分区级别：0代表最顶层的父表，1代表父表下的第一个级别，2代表第二个级别，以此类推。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>paristemplate</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Whether or not this row represents a subpartition template
-              definition (true) or an actual partitioning level (false).</entry>
+            <entry colname="col4">该行是否代表一个子分区模板定义（true）或者实际分区级别（false）。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>parnatts</codeph></entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The number of attributes that define this level.</entry>
+            <entry colname="col4">定义该级别的属性数目。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>paratts</codeph></entry>
             <entry colname="col2">smallint()</entry>
             <entry colname="col3"/>
-            <entry colname="col4">An array of the attribute numbers (as in
-                <codeph>pg_attribute.attnum</codeph>) of the attributes that participate in defining
-              this level.</entry>
+            <entry colname="col4">参与定义该级别的属性编号（正如在<codeph>pg_attribute.attnum</codeph>中的）数组。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>parclass</codeph></entry>
             <entry colname="col2">oidvector</entry>
             <entry colname="col3">pg_opclass.oid</entry>
-            <entry colname="col4">The operator class identifier(s) of the partition columns.</entry>
+            <entry colname="col4">分区列上的操作符类的标识符。</entry>
           </row>
         </tbody>
       </tgroup>

@@ -2,44 +2,23 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic105">
-    <title>Installing the External Table Protocol</title>
+    <title>安装外部表协议</title>
     <body>
-        <p>To use the example external table protocol, you use the C compiler <codeph>cc</codeph> to
-            compile and link the source code to create a shared object that can be dynamically
-            loaded by Greenplum Database. The commands to compile and link the source
-            code on a Linux system are similar to this:</p>
+        <p>要使用例子中的外部表协议，用户需要用C编译器<codeph>cc</codeph>来编译和链接源代码，创建出一个能被Greenplum数据库动态载入的共享对象。在Linux系统上编译和链接该源代码的命令看起来与此类似：</p>
         <p>
             <codeph>cc -fpic -c gpextprotocal.c cc -shared -o gpextprotocal.so
                 gpextprotocal.o</codeph>
         </p>
-        <p>The option <codeph>-fpic</codeph> specifies creating position-independent code (PIC) and
-            the <codeph>-c</codeph> option compiles the source code without linking and creates an
-            object file. The object file needs to be created as position-independent code (PIC) so
-            that it can be loaded at any arbitrary location in memory by Greenplum Database.</p>
-        <p>The flag <codeph>-shared</codeph> specifies creating a shared object (shared library) and
-            the <codeph>-o</codeph> option specifies the shared object file name
-                <codeph>gpextprotocal.so</codeph>. Refer to the GCC manual for more information on
-            the <codeph>cc</codeph> options. </p>
-        <p>The header files that are declared as include files in <codeph>gpextprotocal.c</codeph>
-            are located in subdirectories of <codeph>$GPHOME/include/postgresql/.</codeph>
+        <p>选项<codeph>-fpic</codeph>指定创建位置无关代码（PIC），<codeph>-c</codeph>选项只编译而不链接源代码并且创建一个对象文件。该对象文件需要被创建为位置无关代码（PIC），这样Greenplum数据库才能把它载入到内存中的任意位置。</p>
+        <p>标志<codeph>-shared</codeph>指定创建一个共享对象（共享库），<codeph>-o</codeph>选项指定该共享对象文件的名称为<codeph>gpextprotocal.so</codeph>。更多有关<codeph>cc</codeph>选项的信息请参考GCC手册。</p>
+        <p><codeph>gpextprotocal.c</codeph>中声明为包括文件的头文件位于<codeph>$GPHOME/include/postgresql/</codeph>的子目录中。
         </p>
-        <p>For more information on compiling and linking dynamically-loaded functions and examples
-            of compiling C source code to create a shared library on other operating systems, see
-            the PostgreSQL documentation at <xref
+        <p>更多有关编译及链接动态载入函数的例子和在其他操作系统上编译C源代码创建共享库的例子，请见<xref
                 href="https://www.postgresql.org/docs/8.4/xfunc-c.html#DFUNC" scope="external"
                 format="html">
                 <ph>https://www.postgresql.org/docs/8.4/xfunc-c.html#DFUNC</ph>
-            </xref>. </p>
-        <p>The manual pages for the C compiler <codeph>cc</codeph> and the link editor
-                <codeph>ld</codeph> for your operating system also contain information on compiling
-            and linking source code on your system.</p>
-        <p>The compiled code (shared object file) for the custom protocol must be placed in the same
-            location on every host in your Greenplum Database array (master and all
-            segments). This location must also be in the <codeph>LD_LIBRARY_PATH</codeph> so that
-            the server can locate the files. It is recommended to locate shared libraries either
-            relative to <codeph>$libdir</codeph> (which is located at <codeph>$GPHOME/lib</codeph>)
-            or through the dynamic library path (set by the <codeph>dynamic_library_path</codeph>
-            server configuration parameter) on all master segment instances in the Greenplum Database array. You can use the Greenplum Database
-            utilities <cmdname>gpssh</cmdname> and <codeph>gpscp</codeph> to update segments. </p>
+            </xref>上的Postgres文档。</p>
+        <p>用户操作系统上的C编译器<codeph>cc</codeph>以及链接编辑器<codeph>ld</codeph>的手册页也包含有关在该系统上编译和链接源代码的信息。</p>
+        <p>自定义协议的已编译代码（共享对象文件）在用户的Greenplum数据库阵列中每一个主机（Master和所有的Segment）上必须被放置在相同的位置。这个位置还必须在<codeph>LD_LIBRARY_PATH</codeph>中，这样服务器才能定位该文件。推荐在Greenplum数据库阵列的所有Master和Segment实例上都将共享文件放置在相对于<codeph>$libdir</codeph>（位于<codeph>$GPHOME/lib</codeph>）的位置或者动态库路径（由<codeph>dynamic_library_path</codeph>服务器配置参数设置）中的位置。用户可以使用Greenplum数据库工具<cmdname>gpssh</cmdname>和<codeph>gpscp</codeph>来更新Segment。</p>
     </body>
 </topic>

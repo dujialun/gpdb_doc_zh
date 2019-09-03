@@ -2,62 +2,53 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic7">
-  <title>Enabling Segment Mirroring</title>
+  <title>启用Segment镜像</title>
   <body>
-    <p>Mirror segments allow database queries to fail over to a backup segment if the primary
-      segment is unavailable. By default, mirrors are configured on the same array of hosts as the
-      primary segments. You may choose a completely different set of hosts for your mirror segments
-      so they do not share machines with any of your primary segments.</p>
-    <note type="important">During the online data replication process, Greenplum Database should be
-      in a quiescent state, workloads and other queries should not be running.</note>
+    <p>镜像Segment允许数据库查询在主Segment不可用时故障转移到备用Segment。为了配置镜像，Greenplum数据库
+      系统必须具有足够的节点以保证镜像Segment和对应的主Segment不在同一台主机上。默认情况下，镜像会被配置在
+      主Segment所在的主机阵列上。也可以为镜像Segment选择一组完全不同的主机，这样它们就不会分享任何主
+      Segment的机器。</p>
+    <note type="important">在线数据复制处理期间，Greenplum数据库应该处于一种静止状态，不应运行负载和
+      其他查询。</note>
     <section id="ki169450">
-      <title>To add segment mirrors to an existing system (same hosts as primaries)</title>
+      <title>要增加Segment镜像到一个现有系统（和主Segment相同的主机阵列）</title>
       <ol>
-        <li id="ki156981">Allocate the data storage area for mirror data on all segment hosts. The
-          data storage area must be different from your primary segments' file system location.</li>
-        <li id="ki156983">Use <codeph><xref
+        <li id="ki156981">在所有的Segment主机上为镜像数据分配数据存储区域。数据存储区域必须与主Segment
+          的文件系统位置不同。</li>
+        <li id="ki156983">使用<codeph><xref
               href="../../../utility_guide/admin_utilities/gpssh-exkeys.xml" type="topic"
-              format="dita"/></codeph> to ensure that the segment hosts can SSH and SCP to each
-          other without a password prompt.</li>
-        <li id="ki156993">Run the <codeph><xref
+              format="dita"/></codeph>确保Segment主机能通过SSH和SCP免密码连接到彼此。</li>
+        <li id="ki156993">运行<codeph><xref
               href="../../../utility_guide/admin_utilities/gpaddmirrors.xml" type="topic"
-              format="dita"/></codeph> utility to enable mirroring in your Greenplum Database
-          system. For example, to add 10000 to your primary segment port numbers to calculate the
-          mirror segment port numbers:<codeblock>$ gpaddmirrors -p 10000</codeblock> Where
-            <codeph>-p</codeph> specifies the number to add to your primary segment port numbers.
-          Mirrors are added with the default group mirroring configuration. </li>
+              format="dita"/></codeph>工具在Greenplum数据库系统中启用镜像。
+          例如，在主Segment端口号基础上加10000来计算得到镜像Segment的端口号：
+          <codeblock>$ gpaddmirrors -p 10000</codeblock>其中<codeph>-p</codeph>指定要加在主
+          Segment端口号上的数字。使用默认的组镜像配置来增加镜像。</li>
       </ol>
     </section>
     <section>
-      <title>To add segment mirrors to an existing system (different hosts from primaries)</title>
+      <title>要增加Segment镜像到一个现有系统（和主Segment不同的主机阵列）</title>
       <ol>
-        <li id="ki155416">Ensure the Greenplum Database software is installed on all hosts. <ph>See
-            the <i>Greenplum Database Installation Guide</i> for detailed installation
-            instructions.</ph></li>
-        <li id="ki161799">Allocate the data storage area for mirror data, and tablespaces if needed,
-          on all segment hosts.</li>
-        <li id="ki160816">Use <codeph>gpssh-exkeys</codeph> to ensure the segment hosts can SSH and
-          SCP to each other without a password prompt.</li>
-        <li id="ki155422">Create a configuration file that lists the host names, ports, and data
-          directories on which to create mirrors. To create a sample configuration file to use as a
-          starting point,
-            run:<codeblock>$ gpaddmirrors -o <i>filename</i>          </codeblock><p>The format of
-            the mirror configuration file is:
-            </p><codeblock>mirror<b><varname>row_id</varname></b>=<b><varname>contentID</varname></b>:<b><varname>address</varname></b>:<b><varname>port</varname></b>:<b><varname>data_dir</varname></b></codeblock><p>Where
-              <codeph>row_id</codeph> is the row in the file, <varname>contentID</varname> is the
-            segment instance content ID, <varname>address</varname> is the host name or IP address
-            of the segment host, <varname>port</varname> is the communication port, and
-              <codeph>data_dir</codeph> is the segment instance data directory.</p><p>For example,
-            this is contents of a mirror configuration file for two segment hosts and two segment
-            instances per
-          host:</p><codeblock>mirror0=2:sdw1-1:41000:/data/mirror1/gp2
+        <li id="ki155416">确保在所有主机上都安装有Greenplum数据库软件。<ph>
+          详细的安装指导请见<i>Greenplum数据库安装指南</i>。</ph></li>
+        <li id="ki161799">在所有的Segment主机上为镜像数据分配数据存储区域。</li>
+        <li id="ki160816">使用<codeph>gpssh-exkeys</codeph>确保Segment主机能通过SSH和SCP免密码连接到彼此。</li>
+        <li id="ki155422">创建一个配置文件，其中列出要在其上创建镜像的主机名称、端口号和数据目录。要创建
+          一个示例配置文件作为起点，可运行：
+          <codeblock>$ gpaddmirrors -o <i>filename</i></codeblock>
+          <p>镜像配置文件的格式为：
+            </p><codeblock>mirror<b><varname>row_id</varname></b>=<b><varname>contentID</varname></b>:<b><varname>address</varname></b>:<b><varname>port</varname></b>:<b><varname>data_dir</varname></b></codeblock><p>
+              其中<codeph>row_id</codeph>是文件中的行号, <varname>contentID</varname>是segment实例的内容ID，
+            <varname>address</varname>是segment主机的主机名或IP地址，<varname>port</varname>是用于通信的端口号，
+              <codeph>data_dir</codeph>是segment实例的数据目录。</p>
+          <p>例如这是一个配置文件，其中有两个Segment主机，每个主机上有两个Segment：
+          </p><codeblock>mirror0=2:sdw1-1:41000:/data/mirror1/gp2
 mirror1=3:sdw1-2:41001:/data/mirror2/gp3
 mirror2=0:sdw2-1:41000:/data/mirror1/gp0
 mirror3=1:sdw2-2:41001:/data/mirror2/gp1</codeblock></li>
-        <li id="ki155430">Run the <codeph>gpaddmirrors</codeph> utility to enable mirroring in your
-          Greenplum Database
-            system:<codeblock>$ gpaddmirrors -i <i>mirror_config_file</i></codeblock><p>The
-              <codeph>-i</codeph> option specifies the mirror configuration file you created.</p>
+        <li id="ki155430">运行<codeph>gpaddmirrors</codeph>工具在Greenplum数据库系统中启用镜像：
+          <codeblock>$ gpaddmirrors -i <i>mirror_config_file</i></codeblock>
+          <p>其中<codeph>-i</codeph>指定所创建的镜像配置文件。</p>
         </li>
       </ol>
     </section>

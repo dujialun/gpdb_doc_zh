@@ -2,87 +2,67 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic9">
-  <title>Detecting a Failed Segment</title>
+  <title>检测故障的Segment</title>
   <body>
-    <p>With segment mirroring enabled, Greenplum Database automatically fails over to a mirror
-      segment instance when a primary segment instance goes down. Provided one segment instance is
-      online per portion of data, users may not realize a segment is down. If a transaction is in
-      progress when a fault occurs, the in-progress transaction rolls back and restarts
-      automatically on the reconfigured set of segments. The <codeph><xref
+    <p>如果启用了镜像，Greenplum数据库会在主Segment宕机后自动故障转移到一个镜像Segment上，镜像Segment承担
+      主Segment的角色和职能，故障主Segment变成镜像，用户感觉不到segment产生了故障。当故障出现时，正在进行中
+      的事务会回滚并在新的segment上自动重新开始。<codeph><xref
           href="../../../utility_guide/admin_utilities/gpstate.xml#topic1" type="topic"
-          format="dita"/></codeph> utility can be used to identify failed segments. The utility
-      displays information from the catalog tables including <codeph><xref
-          href="../../../ref_guide/system_catalogs/gp_segment_configuration.xml"/></codeph>. </p>
-    <p>If the entire Greenplum Database system becomes nonoperational due to a segment failure (for
-      example, if mirroring is not enabled or not enough segments are online to access all user
-      data), users will see errors when trying to connect to a database. The errors returned to the
-      client program may indicate the failure. For example:</p>
+          format="dita"/></codeph>工具可以用来分辨故障segment。该工具显示的系统表信息包括<codeph><xref
+          href="../../../ref_guide/system_catalogs/gp_segment_configuration.xml"/></codeph>。</p>
+    <p>如果整个Greenplum数据库系统由于一个Segment故障（例如，如果没有启用镜像或者没有足够的Segment在线
+      以访问全部用户数据）而变得无法运转，用户在尝试连接到数据库时会看到错误。返回给客户端程序的错误可能表明
+      失效。例如：</p>
     <codeblock>ERROR: All segment databases are unavailable</codeblock>
     <section>
-      <title>How a Segment Failure is Detected and Managed</title>
-      <p>On the Greenplum Database master host, the Postgres <codeph>postmaster</codeph> process
-        forks a fault probe process, <codeph>ftsprobe</codeph>. This is also known as the FTS (Fault
-        Tolerance Server) process. The <codeph>postmaster</codeph> process restarts the FTS if it
-        fails. </p>
-      <p dir="ltr">The FTS runs in a loop with a sleep interval between each cycle. On each loop,
-        the FTS probes each primary segment instance by making a TCP socket connection to the
-        segment instance using the hostname and port registered in the
-          <codeph>gp_segment_configuration</codeph> table. If the connection succeeds, the segment
-        performs a few simple checks and reports back to the FTS. The checks include executing a
-          <codeph>stat</codeph> system call on critical segment directories and checking for
-        internal faults in the segment instance. If no issues are detected, a positive reply is sent
-        to the FTS and no action is taken for that segment instance. </p>
-      <p dir="ltr">If the connection cannot be made, or if a reply is not received in the timeout
-        period, then a retry is attempted for the segment instance. If the configured maximum number
-        of probe attempts fail, the FTS probes the segment's mirror to ensure that it is up, and
-        then updates the <codeph>gp_segment_configuration</codeph> table, marking the primary
-        segment "down" and setting the mirror to act as the primary. The FTS updates the
+      <title>segment故障如何被监测和管理</title>
+      <p>在Greenplum数据库master主机上，Postgres的<codeph>postmaster</codeph>进程会创建一个错误侦测子进程
+        <codeph>ftsprobe</codeph>。该进程也被称为FTS (Fault Tolerance Server)进程。如果FTS进程出现故障，
+        <codeph>postmaster</codeph>会重启该进程。</p>
+      <p dir="ltr">FTS进程循环执行，每个循环之间会停顿一会。每一个循环中，FTS都会从<codeph>gp_segment_configuration</codeph>
+        系统表中获取每一个主segment实例的主机名和端口号，并通过与其建立TCP套接字连接的方式连接segment实例
+        来侦测segment的状态。如果成功连接，segment会执行一些简单的检查并报告给FTS。该检查包括在关键的segment
+        目录上执行一个<codeph>stat</codeph>系统调用，并且会检查segment实例的内部错误。如果没有检测到问题，FTS会
+        收到一个积极的反馈信号，被检查的正常segment也不会采取任何附加操作。</p>
+      <p dir="ltr">如果不能建立连接，或者在超时时间内没有得到反馈，FTS会尝试重新连接segment实例。
+        如果达到了FTS的最大重试次数，FTS会去检测该segment的镜像看其是否在线，如果在线它就会修改
+        <codeph>gp_segment_configuration</codeph>表，将原来的主segment标记为"down"并设置
+        镜像承担主segment的角色。FTS会把执行过的操作更新到
             <codeph><xref href="../../../ref_guide/system_catalogs/gp_configuration_history.xml"
-          /></codeph> table with the operations performed.</p>
-      <p dir="ltr">When there is only an active primary segment and the corresponding mirror is
-        down, the primary goes into the <i>not synchronizing</i> state and continues logging
-        database changes, so the mirror can be synchronized without performing a full copy of data
-        from the primary to the mirror.</p>
-      <p>Running the <codeph>gpstate</codeph> utility with the <codeph>-e</codeph> option displays
-        any issues with a primary or mirror segment instances. Other <codeph>gpstate</codeph>
-        options that display information about all primary or mirror segment instances such as
-          <codeph>-m</codeph> (mirror instance information) and <codeph>-c</codeph> (primary and
-        mirror configuration information) also display information about primary and mirror issues. </p>
-      <p dir="ltr">You can also can see the mode: <codeph>s</codeph> (synchronizing) or
-          <codeph>n</codeph> (not synchronizing) for each segment instance, as well as the status
-          <codeph>u</codeph> (up) or <codeph>d</codeph> (down), in the
-          <codeph>gp_segment_configuration</codeph> table. </p>
-      <p dir="ltr">The <codeph><xref href="../../../utility_guide/admin_utilities/gprecoverseg.xml"
-          /></codeph> utility is used to bring up a mirror that is down. By default,
-          <codeph>gprecoverseg</codeph> performs an incremental recovery, placing the mirror into
-        synchronizing mode, which starts to replay the recorded changes from the primary onto the
-        mirror. If the incremental recovery cannot be completed, the recovery fails and
-          <codeph>gprecoverseg</codeph> should be run again with the <codeph>-F</codeph> option, to
-        perform full recovery. This causes the primary to copy all of the data to the mirror.</p>
-      <p>After a segment instance has been recovered, the <codeph>gpstate -e</codeph> command might
-        list primary and mirror segment instances that are switched. This indicates that the system
-        is not balanced (the primary and mirror instances are not in their originally configured
-        roles). If a system is not balanced, there might be skew resulting from the number of active
-        primary segment instances on segment host systems.</p>
-      <p dir="ltr">The <codeph>gp_segment_configuration</codeph> table has columns
-          <codeph>role</codeph> and <codeph>preferred_role</codeph>. These can have values of either
-          <codeph>p</codeph> for primary or <codeph>m</codeph> for mirror. The <codeph>role</codeph>
-        column shows the segment instance current role and the <codeph>preferred_role</codeph> shows
-        the original role of the segment instance. </p>
-      <p dir="ltr">In a balanced system, the <codeph>role</codeph> and
-          <codeph>preferred_role</codeph> matches for all segment instances. When they do not match
-        the system is not balanced. To rebalance the cluster and bring all the segments into their
-        preferred role, run the <codeph>gprecoverseg</codeph> command with the <codeph>-r</codeph>
-        option.</p>
+          /></codeph>表中。</p>
+      <p dir="ltr">当系统中只有主segment正常，其对应的镜像故障时，主segment会进入<i>not synchronizing</i>
+        状态并继续记录数据库日志变化，一旦镜像修复，便可以将这些变化继续同步，而不用从主segment执行一个完整的拷贝。
+      </p>
+      <p>运行<codeph>gpstate</codeph>工具并带有<codeph>-e</codeph>选项可以展示单个主segment和镜像segment实例
+        的任何问题。<codeph>gpstate</codeph>的另外一些选项也能显示所有主segment或镜像segment实例的信息，例如
+        <codeph>-m</codeph>（镜像实例信息）、<codeph>-c</codeph>（主segment和镜像segment配置信息），另外也可以
+        显示主segment和镜像segment的问题。</p>
+      <p dir="ltr">您也可以从系统表<codeph>gp_segment_configuration</codeph>查看当前模式：
+        <codeph>s</codeph> (同步状态)<codeph>n</codeph> (非同步状态)，还有当前状态
+          <codeph>u</codeph> (在线) or <codeph>d</codeph> (离线)。</p>
+      <p dir="ltr"><codeph><xref href="../../../utility_guide/admin_utilities/gprecoverseg.xml"
+          /></codeph>工具可以用于将离线的镜像segment重新加入集群。默认情况下，
+          <codeph>gprecoverseg</codeph>会执行增量恢复，首先将镜像放入同步模式，接下来会重放主segment上
+        记录下来的日志变化到镜像segment。如果增量恢复失败，整个恢复便会失败。此时可以执行<codeph>gprecoverseg</codeph>
+        并带有<codeph>-F</codeph>选项，以执行一个全量恢复，该操作会复制主segment上的所有数据到镜像segment上。</p>
+      <p>segment实例恢复后，<codeph>gpstate -e</codeph>命令可以列出所有切换了的主segment和镜像segment实例信息。
+        该信息表示系统目前处于不均衡状态（主实例和镜像实例不在他们的初始配置角色）。如果系统目前处于不均衡状态，在segment
+        主机系统上可能存在活动主segment实例分布不均匀的结果。</p>
+      <p dir="ltr">系统表<codeph>gp_segment_configuration</codeph>包含列<codeph>role</codeph>和
+        <codeph>preferred_role</codeph>。该列上的值为<codeph>p</codeph>代表主segment，<codeph>m</codeph>
+        代表镜像segment。<codeph>role</codeph>列展示segment实例当前角色，<codeph>preferred_role</codeph>
+        列展示segment实例原来的角色。</p>
+      <p dir="ltr">在一个平衡的系统中，所有segment实例的<codeph>role</codeph>和<codeph>preferred_role</codeph>
+        列都是对应一致的。当某一个列存在不一样的情况时，表明系统是不平衡的。为了重新平衡集群并将所有的segment恢复到他们
+        本来的角色，可以运行<codeph>gprecoverseg</codeph>命令并带有<codeph>-r</codeph>选项。</p>
     </section>
     <section>
-      <title>Simple Failover and Recovery Example</title>
-      <p dir="ltr">Consider a single primary-mirror segment instance pair where the primary segment
-        has failed over to the mirror. The following table shows the segment instance preferred
-        role, role, mode, and status from <codeph>gp_segment_configuration</codeph> table before
-        beginning recovery of the failed primary segment. </p>
-      <p>You can also run <codeph>gpstate -e</codeph> to display any issues with a primary or mirror
-        segment instances. </p>
+      <title>简单的故障转移和恢复示例</title>
+      <p dir="ltr">本例子已经假设一个单独的主-镜像segment实例对中主segment故障并切换到镜像segment。
+        以下表格展示在恢复到正常的主segment之前，segment实例在<codeph>gp_segment_configuration</codeph>
+        表中的本来角色, 当前角色, 模式, 和状态：
+        </p>
+      <p>也可以通过执行<codeph>gpstate -e</codeph>来显示主segment和镜像segment的状态信息</p>
       <table frame="all" rowsep="1" colsep="1" id="table_hdk_jst_fgb">
         <tgroup cols="5">
           <colspec colname="c1" colnum="1" colwidth="1.0*"/>
@@ -93,10 +73,10 @@
           <thead>
             <row>
               <entry/>
-              <entry><codeph>preferred_role</codeph></entry>
-              <entry><codeph>role</codeph></entry>
-              <entry><codeph>mode</codeph></entry>
-              <entry><codeph>status</codeph></entry>
+              <entry><codeph>本来角色</codeph></entry>
+              <entry><codeph>当前角色</codeph></entry>
+              <entry><codeph>模式</codeph></entry>
+              <entry><codeph>状态</codeph></entry>
             </row>
           </thead>
           <tbody>
@@ -117,14 +97,11 @@
           </tbody>
         </tgroup>
       </table>
-      <p>The segment instance roles are not in their preferred roles, and the primary is down. The
-        mirror is up, the role is now primary, and it is not synchronizing because its mirror, the
-        failed primary, is down. After fixing issues with the segment host and primary segment
-        instance, you use <codeph>gprecoverseg</codeph> to prepare failed segment instances for
-        recovery and initiate synchronization between the primary and mirror instances. </p>
-      <p>Once <codeph>gprecoverseg</codeph> has completed, the segments are in the states shown in
-        the following table where the primary-mirror segment pair is up with the primary and mirror
-        roles reversed from their preferred roles.</p>
+      <p>segment实例不在他们原来的最佳角色，主segment故障。镜像segment上线成为主segment，目前为非同步模式，
+        因为他的镜像（之前失败的主segment）处于故障状态。当修复了故障问题后，使用<codeph>gprecoverseg</codeph>
+        重新将失败的实例拉起并在主segment和镜像segment之间同步差异数据。</p>
+      <p>一旦<codeph>gprecoverseg</codeph>操作完成，segment的状态如下表展示，主segment和镜像segment
+        转换成为他们之前的最佳角色。</p>
       <table frame="all" rowsep="1" colsep="1" id="table_idk_jst_fgb">
         <tgroup cols="5">
           <colspec colname="c1" colnum="1" colwidth="1.0*"/>
@@ -135,10 +112,10 @@
           <thead>
             <row>
               <entry/>
-              <entry><codeph>preferred_role</codeph></entry>
-              <entry><codeph>role</codeph></entry>
-              <entry><codeph>mode</codeph></entry>
-              <entry><codeph>status</codeph></entry>
+              <entry><codeph>本来角色</codeph></entry>
+              <entry><codeph>当前角色</codeph></entry>
+              <entry><codeph>模式</codeph></entry>
+              <entry><codeph>状态</codeph></entry>
             </row>
           </thead>
           <tbody>
@@ -159,8 +136,8 @@
           </tbody>
         </tgroup>
       </table>
-      <p>The <codeph>gprecoverseg -r</codeph> command rebalances the system by returning the segment
-        roles to their preferred roles.</p>
+      <p><codeph>gprecoverseg -r</codeph>命令通过将segment的角色切换回他们之前的最佳角色来重新平衡
+        整个集群系统。</p>
       <table frame="all" rowsep="1" colsep="1" id="table_jdk_jst_fgb">
         <tgroup cols="5">
           <colspec colname="c1" colnum="1" colwidth="1.0*"/>
@@ -171,10 +148,10 @@
           <thead>
             <row>
               <entry/>
-              <entry><codeph>preferred_role</codeph></entry>
-              <entry><codeph>role</codeph></entry>
-              <entry><codeph>mode</codeph></entry>
-              <entry><codeph>status</codeph></entry>
+              <entry><codeph>本来角色</codeph></entry>
+              <entry><codeph>当前角色</codeph></entry>
+              <entry><codeph>模式</codeph></entry>
+              <entry><codeph>状态</codeph></entry>
             </row>
           </thead>
           <tbody>
@@ -197,43 +174,37 @@
       </table>
     </section>
     <section>
-      <title>Configuring FTS Behavior</title>
-      <p>There is a set of server configuration parameters that affect FTS behavior:<parml>
+      <title>配置FTS行为</title>
+      <p>有一系列的服务器配置参数会影响FTS行为：<parml>
           <plentry>
             <pt>gp_fts_probe_interval</pt>
-            <pd>How often, in seconds, to begin a new FTS loop. For example if the setting is 60 and
-              the probe loop takes 10 seconds, the FTS process sleeps 50 seconds. If the setting is
-              60 and probe loop takes 75 seconds, the process sleeps 0 seconds. The default is 60,
-              and the maximum is 3600. </pd>
+            <pd>开始下一个FTS循环的时间间隔，以秒为单位。例如将该参数设置为60，检测循环持续10秒，那么FTS进程
+              沉睡50秒。如果设置该参数为60，检测循环持续75秒，FTS进程沉睡0秒。该参数默认值为60，最大为3600。</pd>
           </plentry>
           <plentry>
             <pt>gp_fts_probe_timeout</pt>
-            <pd>Probe timeout between master and segment, in seconds. The default is 20, and the
-              maximum is 3600. </pd>
+            <pd>master到segment之间的检测超时时间，以秒为单位。默认20秒，最大3600秒。</pd>
           </plentry>
           <plentry>
             <pt>gp_fts_probe_retries</pt>
-            <pd>The number of attempts to probe a segment. For example if the setting is 5 there
-              will be 4 retries after the first attempt fails. Default: 5 </pd>
+            <pd>检测segment失败后的重试次数，例如如果设置为5，那么首次失败后，会再进行4次检测尝试。默认为5。</pd>
           </plentry>
           <plentry>
             <pt>gp_log_fts</pt>
-            <pd>Logging level for FTS. The value may be "off", "terse", "verbose", or "debug". The
-              "verbose" setting can be used in production to provide useful data for
-              troubleshooting. The "debug" setting should not be used in production. Default:
-              "terse"</pd>
+            <pd>FTS日志级别。可设置的值有："off", "terse", "verbose", or "debug"。
+              "verbose"设置可以用在生产上，能为问题定位提供一些有用的数据。"debug"
+              设置不能用在生产上。默认为："terse"。
+              </pd>
           </plentry>
           <plentry>
             <pt>gp_segment_connect_timeout</pt>
-            <pd>The maximum time (in seconds) allowed for a mirror to respond. Default: 600 (10
-              minutes)</pd>
+            <pd>允许镜像响应的最大时间，以秒为单位。默认为：600（10分钟）
+              </pd>
           </plentry>
         </parml></p>
-      <p>In addition to the fault checking performed by the FTS, a primary segment that is unable to
-        send data to its mirror can change the status of the mirror to down. The primary queues up
-        the data and after <codeph>gp_segment_connect_timeout</codeph> seconds passes, indicates a
-        mirror failure, causing the mirror to be marked down and the primary to go into change
-        tracking mode.</p>
+      <p>除了可以使用FTS执行错误检查外，不能发送数据到其镜像segment的主segment可以改变镜像的状态为down。
+        主segment会将同步数据暂时排队处理，如果<codeph>gp_segment_connect_timeout</codeph>时间超时，
+        此时意味着镜像故障，系统会标记镜像为down并将主segment变为变化追踪（change tracking）模式。</p>
     </section>
   </body>
 </topic>

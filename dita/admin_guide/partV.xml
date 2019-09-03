@@ -2,13 +2,11 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="nt173529">Managing Performance</title>
-  <shortdesc>The topics in this section cover Greenplum Database performance
-    management, including how to monitor performance and how to configure workloads to prioritize
-    resource utilization. </shortdesc>
+  <title id="nt173529">性能管理</title>
+  <shortdesc>这一节的内容是Greenplum数据库的性能管理，其中包含了如何监控，以及如何通过配置工作量来进行资源调用的优先级管理。 </shortdesc>
   <body>
     <section otherprops="op-print">
-      <p>This section contains the following topics:<ul id="ul_hhv_5pq_lp" otherprops="op-print">
+      <p>这一章包括如下主题<ul id="ul_hhv_5pq_lp" otherprops="op-print">
           <li><xref href="perf_intro.xml#topic1"/></li>
           <li><xref href="perf_issues.xml#topic1"/></li>
           <li><xref href="workload_mgmt.xml#topic1"/></li>

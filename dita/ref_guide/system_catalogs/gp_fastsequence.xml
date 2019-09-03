@@ -4,9 +4,9 @@
 <topic id="topic1" xml:lang="en">
   <title id="fc138336">gp_fastsequence</title>
   <body>
-    <p>The <codeph>gp_fastsequence</codeph> table contains information about append-optimized and
-      column-oriented tables. The <codeph>last_sequence</codeph> value indicates maximum row number
-      currently used by the table.</p>
+    <p><codeph>gp_fastsequence</codeph>表包含有关追加优化表和列存表的信息。
+      <codeph>last_sequence</codeph>值表示该表当前使用的最大行号。
+      </p>
     <table id="fc138428">
       <title>pg_catalog.gp_fastsequence</title>
       <tgroup cols="4">
@@ -16,10 +16,10 @@
         <colspec colnum="4" colname="col4" colwidth="138pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -29,8 +29,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">Object id of the <codeph>pg_aoseg.pg_aocsseg_*</codeph> table used
-              to track append-optimized file segments.</entry>
+            <entry colname="col4">用于跟踪追加优化文件段的<codeph>pg_aoseg.pg_aocsseg_*</codeph>表的对象ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -38,7 +37,7 @@
             </entry>
             <entry colname="col2">bigint</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Object modifier.</entry>
+            <entry colname="col4">对象修饰符。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -46,7 +45,7 @@
             </entry>
             <entry colname="col2">bigint</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The last sequence number used by the object.</entry>
+            <entry colname="col4">对象使用的最后一个序列号。</entry>
           </row>
         </tbody>
       </tgroup>

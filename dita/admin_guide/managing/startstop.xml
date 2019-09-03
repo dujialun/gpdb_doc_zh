@@ -2,38 +2,28 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="kg138244">Starting and Stopping Greenplum Database</title>
-  <shortdesc>In a Greenplum Database DBMS, the database server instances (the master and all
-    segments) are started or stopped across all of the hosts in the system in such a way that they
-    can work together as a unified DBMS. </shortdesc>
+  <title id="kg138244">启动和停止Greenplum数据库</title>
+  <shortdesc>在一个Greenplum数据库管理系统中，所有主机上的数据库实例（Master和所有的Segment）一起被启动或者停止，启停操作统一由Master实例发起，它们步调一致，在外界看来是一个完整的数据库管理系统。</shortdesc>
   <body>
-    <p>Because a Greenplum Database system is distributed across many machines, the process for
-      starting and stopping a Greenplum Database system is different than the process for starting
-      and stopping a regular PostgreSQL DBMS.</p>
-    <p>Use the <codeph>gpstart</codeph> and <codeph>gpstop</codeph> utilities to start and stop
-      Greenplum Database, respectively. These utilities are located in the
-        <filepath>$GPHOME/bin</filepath> directory on your Greenplum Database master host.</p>
-    <note type="important">Do not issue a <codeph>kill</codeph> command to end any Postgres process.
-      Instead, use the database command <codeph>pg_cancel_backend()</codeph>. <p>Issuing a
-          <codeph>kill -9</codeph> or <codeph>kill -11</codeph> can introduce database corruption
-        and prevent root cause analysis from being performed.</p></note>
-    <p>For information about <codeph>gpstart</codeph> and <codeph>gpstop</codeph>, see the
-        <cite>Greenplum Database Utility Guide</cite>.</p>
+    <p>由于一个Greenplum数据库系统分布在很多机器上，启动和停止一个Greenplum数据库系统的过程与普通PostgreSQL数据库的启动和停止过程不同。</p>
+    <p>分别使用<codeph>gpstart</codeph> 和 <codeph>gpstop</codeph> 工具来启动和停止Greenplum数据库。这些工具位于Greenplum数据库Master主机的
+        <filepath>$GPHOME/bin</filepath> 目录下。</p>
+    <note type="important">不要采用<codeph>kill</codeph>命令来直接杀掉任何后台Postgres进程。
+      可以使用数据库内命令<codeph>pg_cancel_backend()</codeph>来完成此操作。 <p>采用
+          <codeph>kill -9</codeph> 或 <codeph>kill -11</codeph> 可能引发数据库损坏并且妨碍根据目前数据库的表现进行问题根源分析。</p></note>
+    <p>有关<codeph>gpstart</codeph> 和 <codeph>gpstop</codeph>的详细信息，请参考文档
+        <cite>Greenplum数据库工具指南</cite>。</p>
   </body>
   <task id="task_hkd_gzv_fp">
-    <title>Starting Greenplum Database</title>
-    <shortdesc>Start an initialized Greenplum Database system by running the
-        <codeph>gpstart</codeph> utility on the master instance.</shortdesc>
+    <title>启动Greenplum数据库</title>
+    <shortdesc>在Master实例上，通过执行<codeph>gpstart</codeph>可以启动一个初始化好的Greenplum数据库系统。</shortdesc>
     <taskbody>
-      <context>Use the <codeph>gpstart</codeph> utility to start a Greenplum Database system that
-        has already been initialized by the <codeph>gpinitsystem</codeph> utility, but has been
-        stopped by the <codeph>gpstop</codeph> utility. The <codeph>gpstart</codeph> utility starts
-        Greenplum Database by starting all the Postgres database instances on the Greenplum Database
-        cluster. <codeph>gpstart</codeph> orchestrates this process and performs the process in
-        parallel.</context>
+      <context>可以使用<codeph>gpstart</codeph>工具来启动一个已经由<codeph>gpinitsystem</codeph>工具初始化好的Greenplum数据库系统，前提是该系统已经被<codeph>gpstop</codeph>工具停止。 <codeph>gpstart</codeph>
+       通过启动整个Greenplum数据库集群中的所有Postgres数据库实例来启动Greenplum数据库。
+        <codeph>gpstart</codeph> 会精心安排这一过程并且以并行的方式执行它。</context>
       <steps-unordered id="steps-unordered_ot5_ntk_gp">
         <step>
-          <cmd>Run <codeph>gpstart</codeph> on the master host to start Greenplum Database:</cmd>
+          <cmd>在Master主机上运行<codeph>gpstart</codeph>以启动一个Greenplum数据库：</cmd>
           <stepxmp>
             <codeblock>$ gpstart</codeblock>
           </stepxmp>
@@ -42,14 +32,13 @@
     </taskbody>
   </task>
   <task id="task_gpdb_restart">
-    <title>Restarting Greenplum Database</title>
-    <shortdesc>Stop the Greenplum Database system and then restart it.</shortdesc>
+    <title>重启Greenplum数据库</title>
+    <shortdesc>停止Greenplum数据库系统然后重新启动它。</shortdesc>
     <taskbody>
-      <context>The <codeph>gpstop</codeph> utility with the <codeph>-r</codeph> option can stop and
-        then restart Greenplum Database after the shutdown completes. </context>
+      <context>执行<codeph>gpstop</codeph>工具并带有<codeph>-r</codeph>选项时，会停止Greenplum数据库并在数据库完全关闭后重新启动它。</context>
       <steps-unordered id="steps-unordered_c51_ntk_gp">
         <step>
-          <cmd>To restart Greenplum Database, enter the following command on the master host:</cmd>
+          <cmd>要重启Greenplum数据库，在Master主机上输入下面的命令：</cmd>
           <stepxmp>
             <codeblock>$ gpstop -r</codeblock>
           </stepxmp>
@@ -58,21 +47,18 @@
     </taskbody>
   </task>
   <task id="task_upload_config">
-    <title>Reloading Configuration File Changes Only</title>
-    <shortdesc>Reload changes to Greenplum Database configuration files without interrupting the
-      system.</shortdesc>
+    <title>仅重新载入配置文件更改</title>
+    <shortdesc>重新载入对Greenplum数据库配置文件的更改而不中断系统。</shortdesc>
     <taskbody>
-      <context>The <codeph>gpstop</codeph> utility can reload changes to the
-          <filepath>pg_hba.conf</filepath> configuration file and to <i>runtime</i> parameters in
-        the master <filepath>postgresql.conf</filepath> file and <filepath>pg_hba.conf</filepath>
-        file without service interruption. Active sessions pick up changes when they reconnect to
-        the database. Many server configuration parameters require a full system restart
-          (<codeph>gpstop -r</codeph>) to activate. For information about server configuration
-        parameters, see the <cite>Greenplum Database Reference Guide</cite>.</context>
+      <context><codeph>gpstop</codeph> 工具可以在不中断服务的前提下重新载入对
+        <filepath>pg_hba.conf</filepath>配置文件和Master上<filepath>postgresql.conf</filepath>、
+        <filepath>pg_hba.conf</filepath>文件中的<i>运行</i> 参数进行更改。
+        活动会话将会在它们重新连接到数据库时使用这些更新。
+        很多服务器配置参数需要完全重启系统(<codeph>gpstop -r</codeph>)才能激活。有关服务器配置参数的信息请见
+       <cite>Greenplum Database Reference Guide</cite>。</context>
       <steps-unordered id="steps-unordered_n3k_mtk_gp">
         <step>
-          <cmd>Reload configuration file changes without shutting down the system using the
-              <codeph>gpstop</codeph> utility:</cmd>
+          <cmd>使用<codeph>gpstop</codeph>工具重新载入配置文件更改而不关闭系统：</cmd>
           <stepxmp>
             <codeblock>$ gpstop -u</codeblock>
           </stepxmp>
@@ -81,39 +67,33 @@
     </taskbody>
   </task>
   <task id="task_maint_mode">
-    <title>Starting the Master in Maintenance Mode</title>
-    <shortdesc>Start only the master to perform maintenance or administrative tasks without
-      affecting data on the segments. </shortdesc>
+    <title>以维护模式启动Master</title>
+    <shortdesc>只启动Master来执行维护或者管理任务而不影响Segment上的数据。</shortdesc>
     <taskbody>
-      <context><ph otherprops="pivotal">Maintenance mode should only be used with direction from
-          Pivotal Technical Support. </ph>For example, you could connect to a database only on the
-        master instance in maintenance mode and edit system catalog settings. For more information
-        about system catalog tables, see the <cite>Greenplum Database Reference
-        Guide</cite>.</context>
+      <context><ph otherprops="pivotal">维护模式只能被Pivotal技术支持人员直接使用。</ph>
+        例如，可以用维护模式连接到一个只在Master实例上的数据库并且编辑系统目录设置。
+        更多有关系统目录表的信息请见<cite>Greenplum Database Reference Guide</cite>。</context>
       <steps id="steps_gnq_3rk_gp">
         <step>
-          <cmd>Run <codeph>gpstart</codeph> using the <option>-m</option> option:</cmd>
+          <cmd>使用<option>-m</option>模式运行<codeph>gpstart</codeph>:</cmd>
           <stepxmp>
             <codeblock>$ gpstart -m</codeblock>
           </stepxmp>
         </step>
         <step>
-          <cmd>Connect to the master in maintenance mode to do catalog maintenance. For
-            example:</cmd>
+          <cmd>以维护模式连接到Master进行目录维护。例如：</cmd>
           <stepxmp>
             <codeblock id="kg155401">$ PGOPTIONS='-c gp_session_role=utility' psql postgres</codeblock>
           </stepxmp>
         </step>
         <step>
-          <cmd>After completing your administrative tasks, stop the master in utility mode. Then,
-            restart it in production mode.</cmd>
+          <cmd>在完成管理任务后，停止处于维护模式的额Master。然后以生产模式重启它。</cmd>
           <stepxmp>
             <codeblock>$ gpstop -mr</codeblock>
           </stepxmp>
           <info>
             <note type="warning">
-              <p>Incorrect use of maintenance mode connections can result in an inconsistent system
-                state. Only Technical Support should perform this operation.</p>
+              <p>对维护模式连接的不当使用可能会导致不一致的系统状态。只有技术支持才应该执行这一操作。</p>
             </note>
           </info>
         </step>
@@ -121,60 +101,55 @@
     </taskbody>
   </task>
   <task id="task_gpdb_stop">
-    <title id="kg156168">Stopping Greenplum Database</title>
+    <title id="kg156168">停止Greenplum数据库</title>
     <taskbody>
-      <context>The <codeph>gpstop</codeph> utility stops or restarts your Greenplum Database system
-        and always runs on the master host. When activated, <codeph>gpstop</codeph> stops all
-          <codeph>postgres</codeph> processes in the system, including the master and all segment
-        instances. The <codeph>gpstop</codeph> utility uses a default of up to 64 parallel worker
-        threads to bring down the Postgres instances that make up the Greenplum Database cluster.
-        The system waits for any active transactions to finish before shutting down. To stop
-        Greenplum Database immediately, use fast mode.</context>
+      <context><codeph>gpstop</codeph>工具可以停止或者重启Greenplum数据库系统，它总是运行在Master主机上。
+        当被激活时，<codeph>gpstop</codeph> 会停止系统中所有的<codeph>postgres</codeph>postgres进程，包括Master和所有的Segment实例。
+        <codeph>gpstop</codeph>gpstop工具使用一种默认的最多64个并行工作线程的方式来关闭构成整个Greenplum数据库集群的Postgres实例。
+        系统在关闭之前会等待所有的活动事务完成。要立即停止Greenplum数据库，可以使用快速模式。</context>
       <steps-unordered>
         <step>
-          <cmd>To stop Greenplum Database:</cmd>
+          <cmd>要停止Greenplum数据库：</cmd>
           <stepxmp>
             <codeblock>$ gpstop</codeblock>
           </stepxmp>
         </step>
         <step>
-          <cmd>To stop Greenplum Database in fast mode:</cmd>
+          <cmd>要以快速模式停止Greenplum数据库：</cmd>
           <stepxmp>
             <codeblock>$ gpstop -M fast</codeblock>
           </stepxmp>
-          <stepresult>By default, you are not allowed to shut down Greenplum Database if there are any
-      client connections to the database. Use the <codeph>-M fast</codeph> option to roll
-      back all in progress transactions and terminate any connections before shutting down.</stepresult>
+          <stepresult>默认情况下，如果有任何客户端连接存在，就不允许关闭Greenplum数据库。
+            使用<codeph>-M fast</codeph>选项可以在关闭前回滚所有正在进行中的事务并且中断所有连接。</stepresult>
         </step>
       </steps-unordered>
     </taskbody>
   </task>
   <topic id="topic13">
-    <title>Stopping Client Processes</title>
+    <title>停止客户端进程：</title>
     <body>
-      <p>Greenplum Database launches a new backend process for each client connection. A Greenplum Database user with <codeph>SUPERUSER</codeph> privileges can cancel and terminate these client backend processes.</p>
-      <p>Canceling a backend process with the <codeph>pg_cancel_backend()</codeph> function ends a specific queued or active client query. Terminating a backend process with the <codeph>pg_terminate_backend()</codeph> function terminates a client connection to a database.</p>
-      <p>The <codeph>pg_cancel_backend()</codeph> function has two signatures:<ul>
+      <p>Greenplum数据库会为每一个客户端连接唤起一个后台进程。具有<codeph>SUPERUSER</codeph>权限的Greenplum用户可以取消或直接终止这些客户端后台进程。</p>
+      <p>使用<codeph>pg_cancel_backend()</codeph>函数可以取消某个活动查询或队列中的后台进程。使用<codeph>pg_terminate_backend()</codeph>可以直接终端访问Greenplum数据库的客户端连接。</p>
+      <p><codeph>pg_cancel_backend()</codeph>函数有两种表现形式：<ul>
         <li><codeph>pg_cancel_backend( pid int4 )</codeph></li>
         <li><codeph>pg_cancel_backend( pid int4, msg text )</codeph></li>
       </ul></p>
-      <p>The <codeph>pg_terminate_backend()</codeph> function has two similar signatures:<ul>
+      <p><codeph>pg_terminate_backend()</codeph>函数也有两种同样地表现形式：<ul>
         <li><codeph>pg_terminate_backend( pid int4 )</codeph></li>
         <li><codeph>pg_terminate_backend( pid int4, msg text )</codeph></li>
       </ul></p>
-      <p>If you provide a <codeph>msg</codeph>, Greenplum Database includes the text in the cancel message returned to the client. <codeph>msg</codeph> is limited to 128 bytes; Greenplum Database truncates anything longer.</p>
-      <p>The <codeph>pg_cancel_backend()</codeph> and <codeph>pg_terminate_backend()</codeph> functions return <codeph>true</codeph> if successful, and <codeph>false</codeph> otherwise.</p>
-      <p>To cancel or terminate a backend process, you must first identify the process ID of the backend. You can obtain the process ID from the <codeph>procpid</codeph> column of the <codeph>pg_stat_activity</codeph> view. For example, to view the process information associated with all running and queued queries: <codeblock>=# SELECT usename, procpid, waiting, current_query, datname
+      <p>如果提供了<codeph>msg</codeph>信息, Greenplum数据库会将取消信息的msg内容一并返回给客户端。<codeph>msg</codeph> 最大为128字节; 任何超出该长度的信息都会被Greenplum数据库直接截断。</p>
+      <p>如果<codeph>pg_cancel_backend()</codeph>和<codeph>pg_terminate_backend()</codeph>函数执行成功，会返回状态<codeph>true</codeph>, 相反的会返回<codeph>false</codeph>。</p>
+      <p>要取消或中断后台进程，必须先查出要处理的后台进程ID。进程ID可以从<codeph>pg_stat_activity</codeph>视图的<codeph>procpid</codeph>列得到。
+        例如，如果要看所有运行中和等待中查询的进程信息，可以执行：<codeblock>=# SELECT usename, procpid, waiting, current_query, datname
      FROM pg_stat_activity;</codeblock></p>
-      <p>Sample partial query output:</p>
+      <p>上例语句部分查询结果如下：</p>
         <codeblock> usename |  procpid | waiting |     current_query     | datname
 ---------+----------+---------+-----------------------+---------
   sammy  |   31861  |    f    | &lt;IDLE&gt; in transaction | testdb
   billy  |   31905  |    t    | SELECT * FROM topten; | testdb</codeblock>
-      <p>Use the output to identify the process id (<codeph>procpid</codeph>) of the query
-        or client connection. </p>
-      <p>For example, to cancel the pending query identified in the sample output above
-        and include "Admin canceled long-running query." in the message returned to the client:</p>
+      <p>我们可以从查询结果中找到对应查询或客户端连接的进程ID(<codeph>procpid</codeph>)。</p>
+      <p>例如，下面语句会取消上面输出中的等待查询，并将"Admin canceled long-running query."信息反馈给客户端。</p>
       <p>
         <codeblock>=# SELECT pg_cancel_backend(31905 ,'Admin canceled long-running query.');
 ERROR:  canceling statement due to user request: "Admin canceled long-running query."</codeblock>

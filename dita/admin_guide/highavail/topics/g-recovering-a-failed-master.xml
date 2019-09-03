@@ -2,41 +2,37 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic16">
-  <title>Recovering a Failed Master</title>
+  <title>恢复故障的Master</title>
   <body>
-    <p>If the primary master fails, the Greenplum Database system is not accessible and WAL
-      replication stops. Use <codeph><xref
-          href="../../../utility_guide/admin_utilities/gpactivatestandby.xml"
-          >gpactivatestandby</xref></codeph> to activate the standby master. Upon activation of the
-      standby master, Greenplum Database reconstructs the master host state at the time of the last
-      successfully committed transaction. </p>
-    <p>These steps assume a standby master host is configured for the system. See <xref
-        href="g-enabling-master-mirroring.xml#topic8"/>.</p>
+    <p>如果主Master故障，Greenplum数据库不可访问且WAL复制会停止。使用<codeph><xref
+      href="../../../utility_guide/admin_utilities/gpactivatestandby.xml"
+      >gpactivatestandby</xref></codeph>来激活后备Master。
+      在激活后备Master过程中，Greenplum数据库会重构Master主机为最后一次成功提交事务时的状态。
+      </p>
+    <p>以下步骤假设系统中已经配置了standby master主机。详见<xref
+        href="g-enabling-master-mirroring.xml#topic8"/>。</p>
     <section id="ki181117">
-      <title>To activate the standby master</title>
+      <title>激活standby master</title>
       <ol>
-        <li id="ki155791">Run the <codeph>gpactivatestandby</codeph> utility from the standby master
-          host you are activating. For
-            example:<codeblock>$ gpactivatestandby -d /data/master/gpseg-1</codeblock><p>Where
-              <codeph>-d</codeph> specifies the data directory of the master host you are
-            activating.</p><p>After you activate the standby, it becomes the <i>active</i> or
-              <i>primary</i> master for your Greenplum Database array. </p></li>
-        <li id="ki155816">After the utility completes, run <codeph>gpstate</codeph> with the
-            <codeph>-b</codeph> option to display a summary of the system
-            status:<codeblock>$ gpstate -b</codeblock><p>The master instance status should be
-              <codeph>Active</codeph>. When a standby master is not configured, the command displays
-              <codeph>No master standby configured</codeph> for the standby master status. If you
-            configured a new standby master, its status is <codeph>Passive</codeph>. </p></li>
-        <li id="ki169625">After switching to the newly active master host, run
-            <codeph>ANALYZE</codeph> on it. For
-          example:<codeblock>$ psql <codeph>dbname</codeph> -c 'ANALYZE;'</codeblock></li>
-        <li id="ki155823">Optional: If you have not already done so while activating the prior
-          standby master, you can run <codeph>gpinitstandby</codeph> on the active master host to
-          configure a new standby master.
-          <note type="important">You must initialize a new standby master to continue providing
-            master mirroring.</note><p>For information about restoring the original master and
-            standby master configuration, see <xref
-              href="g-restoring-master-mirroring-after-a-recovery.xml#topic17"/>.</p></li>
+        <li id="ki155791">在standby master主机上运行<codeph>gpactivatestandby</codeph>工具
+          来激活它。例如：
+          <codeblock>$ gpactivatestandby -d /data/master/gpseg-1</codeblock>
+          <p>此处<codeph>-d</codeph>选项指定正在激活的master主机的数据目录。
+            </p><p>激活standby后，状态变为<i>active</i>或<i>primary</i> master
+              </p></li>
+        <li id="ki155816">上面工具执行完成后，运行<codeph>gpstate</codeph>带有<codeph>-b</codeph>
+          选项来显示系统汇总信息：
+          <codeblock>$ gpstate -b</codeblock>
+          <p>master实例状态应该为<codeph>Active</codeph>。
+              如果没有配置standby master，该命令会显示standby master的状态为
+              <codeph>No master standby configured</codeph>。如果配置了standby master，它的状态为
+            <codeph>Passive</codeph>。</p></li>
+        <li id="ki169625">在切换到最新的活动Master主机后，在其上运行
+            <codeph>ANALYZE</codeph> 例如：<codeblock>$ psql <codeph>dbname</codeph> -c 'ANALYZE;'</codeblock></li>
+        <li id="ki155823">可选：如果激活之前的standby master时没有配置一个新的standby master。可以运行
+          <codeph>gpinitstandby</codeph>工具来配置激活一个新的standby master。
+          <note type="important">必须初始化一个新的standby master以继续为master提供镜像。</note><p>关于恢复原来master和standby
+            master的详细配置方法，请见<xref href="g-restoring-master-mirroring-after-a-recovery.xml#topic17"/>。</p></li>
       </ol>
     </section>
   </body>

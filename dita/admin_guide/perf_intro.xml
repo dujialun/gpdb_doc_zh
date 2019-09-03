@@ -2,19 +2,15 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="ja155679">Defining Database Performance</title>
-  <shortdesc>Managing system performance includes measuring performance, identifying the causes of
-    performance problems, and applying the tools and techniques available to you to remedy the
-    problems. </shortdesc>
+  <title id="ja155679">管理性能</title>
+  <shortdesc>系统性能管理包含了性能计算，确定性能问题的造成原因，以及使用可用的工具和技术来解决问题的应用。</shortdesc>
   <body>
-    <p>Greenplum measures database performance based on the rate at
-      which the database management system (DBMS) supplies information to requesters.</p>
+    <p>Greenplum根据数据库管理系统（DBMS）向请求者提供信息的频率来计算数据库的性能。</p>
   </body>
   <topic id="topic2" xml:lang="en">
-    <title id="ja155234">Understanding the Performance Factors</title>
+    <title id="ja155234">理解性能因素Understanding the Performance Factors</title>
     <body>
-      <p>Several key performance factors influence database performance. Understanding these factors
-        helps identify performance opportunities and avoid problems:</p>
+      <p>在计算数据库性能时，有几项关键的性能参数会影响数据库的性能，通过理解这些参数，能够帮助我们更好的去提升性能以及防止发生问题：</p>
       <ul>
         <li id="ja155414">
           <xref href="#topic3" type="topic" format="dita"/>
@@ -34,62 +30,46 @@
       </ul>
     </body>
     <topic id="topic3" xml:lang="en">
-      <title id="ja150771">System Resources</title>
+      <title id="ja150771">系统资源</title>
       <body>
-        <p>Database performance relies heavily on disk I/O and memory usage. To accurately set
-          performance expectations, you need to know the baseline performance of the hardware on
-          which your DBMS is deployed. Performance of hardware components such as CPUs, hard disks,
-          disk controllers, RAM, and network interfaces will significantly affect how fast your
-          database performs.</p>
+        <p>数据库的性能在极大程度上取决于硬盘的I/O速度以及内存使用量，你需要先了解你部署的DBMS所在的硬件平台的基线性能，
+			然后才能对数据库设置正确的性能预期。</p>
       </body>
     </topic>
     <topic id="topic4" xml:lang="en">
-      <title id="ja151122">Workload</title>
+      <title id="ja151122">工作负载</title>
       <body>
-        <p>The workload equals the total demand from the DBMS, and it varies over time. The total
-          workload is a combination of user queries, applications, batch jobs, transactions, and
-          system commands directed through the DBMS at any given time. For example, it can increase
-          when month-end reports are run or decrease on weekends when most users are out of the
-          office. Workload strongly influences database performance. Knowing your workload and peak
-          demand times helps you plan for the most efficient use of your system resources and
-          enables processing the largest possible workload.</p>
+        <p>工作负载即所有来自于DBMS的需求，这个量是会变化的。总工作负载包含了在任意时间点的用户请求、应用、批处理作业、事物以及DBMS直接收到的系统指令。
+			比如说，在快要进行工作汇报的月底，工作负载会增加，而在绝大部分用户都不上班的周末，工作负载就会减少。
+			充分了解你的工作负载以及需求高峰时段可以帮助你对你的系统资源进行最有效的规划，还可以尽可能的提升你的最大工作负载量。</p>
       </body>
     </topic>
     <topic id="topic5" xml:lang="en">
-      <title id="ja150729">Throughput</title>
+      <title id="ja150729">吞吐量</title>
       <body>
-        <p>A system's throughput defines its overall capability to process data. DBMS throughput is
-          measured in queries per second, transactions per second, or average response times. DBMS
-          throughput is closely related to the processing capacity of the underlying systems (disk
-          I/O, CPU speed, memory bandwidth, and so on), so it is important to know the throughput
-          capacity of your hardware when setting DBMS throughput goals.</p>
+        <p>系统的吞吐量决定了它能够处理的最大数据量。DBMS通过每秒的请求数、事物数或者平均反应时间来计算吞吐量。
+			DBMS的吞吐量在很大程度上取决于其所在的系统的处理能力（包括了硬盘I/O，CPU处理速度，内存带宽等等），所以在设置DBMS的目标之前，你必须要清楚地知道你的硬件平台的吞吐能力。</p>
       </body>
     </topic>
     <topic id="topic6" xml:lang="en">
-      <title id="ja150733">Contention</title>
+      <title id="ja150733">竞争Contention</title>
       <body>
-        <p>Contention is the condition in which two or more components of the workload attempt to
-          use the system in a conflicting way — for example, multiple queries that try to update the
-          same piece of data at the same time or multiple large workloads that compete for system
-          resources. As contention increases, throughput decreases.</p>
+        <p>竞争是指在两个以上的组件想要以冲突的方式使用系统时所产生的情况 —— 比如说，
+			多个请求在同一时间试图更新同一部分数据，或是多个大型工作负载想要争夺系统资源。系统的吞吐量会随阻塞量的增加而减少。</p>
       </body>
     </topic>
     <topic id="topic7" xml:lang="en">
-      <title id="ja155364">Optimization</title>
+      <title id="ja155364">优化</title>
       <body>
-        <p>DBMS optimizations can affect the overall system performance. SQL formulation, database
-          configuration parameters, table design, data distribution, and so on enable the database
-          query optimizer to create the most efficient access plans.</p>
+        <p>DBMS优化可以影响系统的整体性能，包括SQL表达式、数据库配置参数、表设计、数据分发等等。
+			启用数据库请求优化器可以帮助创造最多、最有效的访问计划。</p>
       </body>
     </topic>
   </topic>
   <topic id="topic8" xml:lang="en">
-    <title id="ja150561">Determining Acceptable Performance</title>
+    <title id="ja150561">判断可接受的性能</title>
     <body>
-      <p>When approaching a performance tuning initiative, you should know your system's expected
-        level of performance and define measurable performance requirements so you can accurately
-        evaluate your system's performance. Consider the following when setting performance
-        goals:</p>
+      <p>在进行性能调试时，你应该要知道你的系统的性能预期，并定义可以量化的性能需求，这样你才可以准确地评估你的系统性能，在设定性能目标时，请参考以下内容：</p>
       <ul>
         <li id="ja150844">
           <xref href="#topic9" type="topic" format="dita"/>
@@ -100,32 +80,19 @@
       </ul>
     </body>
     <topic id="topic9" xml:lang="en">
-      <title id="ja150845">Baseline Hardware Performance</title>
+      <title id="ja150845">基线硬件性能</title>
       <body>
-        <p>Most database performance problems are caused not by the database, but by the underlying
-          systems on which the database runs. I/O bottlenecks, memory problems, and network issues
-          can notably degrade database performance. Knowing the baseline capabilities of your
-          hardware and operating system (OS) will help you identify and troubleshoot
-          hardware-related problems before you explore database-level or query-level tuning
-          initiatives. </p>
-        <p>See the <i>Greenplum Database Reference Guide</i> for information about
-          running the <codeph>gpcheckperf</codeph> utility to validate hardware and network
-          performance.</p>
+        <p>绝大部分的数据库性能问题都不是数据库本身造成，而是数据所在的系统。I/O瓶颈、内存问题、以及网络故障将会显著地降低数据库的性能。为了更好确认以及排查硬件相关的问题，请在进行数据库级别或请求级别的性能调优前，先了解你的硬件和操作系统的基线性能。</p>
+        <p>有关运行<codeph>gpcheckperf</codeph>工具验证硬件和网络性能的信息请见 <i>Greenplum数据库参考指南</i> 。</p>
       </body>
     </topic>
     <topic id="topic10" xml:lang="en">
-      <title id="ja155920">Performance Benchmarks</title>
+      <title id="ja155920">性能基准</title>
       <body>
-        <p>To maintain good performance or fix performance issues, you should know the capabilities
-          of your DBMS on a defined workload. A benchmark is a predefined workload that produces a
-          known result set. Periodically run the same benchmark tests to help identify
-          system-related performance degradation over time. Use benchmarks to compare workloads and
-          identify queries or applications that need optimization.</p>
-        <p>Many third-party organizations, such as the Transaction Processing Performance Council
-          (TPC), provide benchmark tools for the database industry. TPC provides TPC-H, a decision
-          support system that examines large volumes of data, executes queries with a high degree of
-          complexity, and gives answers to critical business questions. For more information about
-          TPC-H, go to:</p>
+        <p>为了保持良好的性能或是修复性能故障，你应该要了解你的DBMS在对应工作负载下的性能水平，
+			基准就是一个预定义的工作负载，它的运行结果是已知的。你可以通过定期运行这个工作负载来确定系统级的性能。
+			你可以使用基准来对工作负载进行比较、或是测试需要优化的请求或应用。</p>
+        <p>许多第三方机构，比如事务处理性能委员会（TPC），会向数据库行业提供基准工具。其提供的决策支持系统TPC-H可以对大批量的数据进行检测、处理高复杂度的请求、以及提供关键的业务性问题的解决方案。欲知详情，请前往：</p>
         <p>
           <xref href="http://www.tpc.org/tpch" scope="external" format="html">
             <ph>http://www.tpc.org/tpch</ph>

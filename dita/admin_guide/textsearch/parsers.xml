@@ -1,86 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="parsers">
-  <title>Text Search Parsers</title>
-  <shortdesc>This topic describes the types of tokens the Greenplum Database
-    text search parser produces from raw text.  </shortdesc>
+  <title>文本搜索解析器</title>
+  <shortdesc>本主题描述了Greenplum数据库文本搜索解析器从原始文本生成的token类型。</shortdesc>
   <body>
-    <p>Text search parsers are responsible for splitting raw document text into <i>tokens</i> and
-      identifying each token's type, where the set of possible types is defined by the parser
-      itself. Note that a parser does not modify the text at all — it simply identifies plausible
-      word boundaries. Because of this limited scope, there is less need for application-specific
-      custom parsers than there is for custom dictionaries. At present Greenplum Database provides
-      just one built-in parser, which has been found to be useful for a wide range of
-      applications.</p>
-    <p>The built-in parser is named <codeph>pg_catalog.default</codeph>. It recognizes 23 token
-      types, shown in the following table.</p>
+    <p>文本搜索解析器负责将原始文档文本拆分为token并标识每个token的类型，其中可能的类型集由解析器本身定义。
+        请注意，解析器根本不会修改文本 - 它只是识别合理的单词边界。
+        由于范围有限，因此与自定义词典相比，对特定于应用程序的自定义解析器的需求较少。
+        目前，Greenplum数据库只提供了一个内置解析器，它已被发现可用于各种应用程序。
+        </p>
+    <p>内置解析器名为<codeph>pg_catalog.default</codeph>。
+        它识别23种token类型，如下表所示。
+        </p>
     <table id="table_hvs_hm5_kfb">
-      <title>Default Parser's Token Types</title>
+      <title>默认解析器的token类型</title>
       <tgroup cols="3">
         <colspec colnum="1" colname="col1"/>
         <colspec colnum="2" colname="col2"/>
         <colspec colnum="3" colname="col3"/>
         <thead>
           <row>
-            <entry>Alias</entry>
-            <entry>Description</entry>
-            <entry>Example</entry>
+            <entry>别名</entry>
+            <entry>描述</entry>
+            <entry>示例</entry>
           </row>
         </thead>
         <tbody>
           <row>
             <entry>asciiword</entry>
-            <entry>Word, all ASCII letters</entry>
+            <entry>单词，全部为ASCII字母</entry>
             <entry>elephant</entry>
           </row>
           <row>
             <entry>word</entry>
-            <entry>Word, all letters</entry>
+            <entry>单词，全部为字母</entry>
             <entry>mañana</entry>
           </row>
           <row>
             <entry>numword</entry>
-            <entry>Word, letters and digits</entry>
+            <entry>单词，字母和数字</entry>
             <entry>beta1</entry>
           </row>
           <row>
             <entry>asciihword</entry>
-            <entry>Hyphenated word, all ASCII</entry>
+            <entry>连字符，全部为ASCII</entry>
             <entry>up-to-date</entry>
           </row>
           <row>
             <entry>hword</entry>
-            <entry>Hyphenated word, all letters</entry>
+            <entry>连字符，全部为字母</entry>
             <entry>lógico-matemática</entry>
           </row>
           <row>
             <entry>numhword</entry>
-            <entry>Hyphenated word, letters and digits</entry>
+            <entry>连字符，字母和数字</entry>
             <entry>postgresql-beta1</entry>
           </row>
           <row>
             <entry>hword_asciipart</entry>
-            <entry>Hyphenated word part, all ASCII</entry>
+            <entry>连字符部分，全部为ASCII</entry>
             <entry>postgresql in the context postgresql-beta1</entry>
           </row>
           <row>
             <entry>hword_part</entry>
-            <entry>Hyphenated word part, all letters</entry>
+            <entry>连字符部分，全部为字母</entry>
             <entry>lógico or matemática in the context lógico-matemática</entry>
           </row>
           <row>
             <entry>hword_numpart</entry>
-            <entry>Hyphenated word part, letters and digits</entry>
+            <entry>连字符部分，字母和数字</entry>
             <entry>beta1 in the context postgresql-beta1</entry>
           </row>
           <row>
             <entry>email</entry>
-            <entry>Email address</entry>
+            <entry>Email地址</entry>
             <entry>foo@example.com</entry>
           </row>
           <row>
             <entry>protocol</entry>
-            <entry>Protocol head</entry>
+            <entry>协议头</entry>
             <entry>http://</entry>
           </row>
           <row>
@@ -95,70 +93,69 @@
           </row>
           <row>
             <entry>url_path</entry>
-            <entry>URL path</entry>
+            <entry>URL路径</entry>
             <entry>/stuff/index.html, in the context of a URL</entry>
           </row>
           <row>
             <entry>file</entry>
-            <entry>File or path name</entry>
+            <entry>文件或路径名</entry>
             <entry>/usr/local/foo.txt, if not within a URL</entry>
           </row>
           <row>
             <entry>sfloat</entry>
-            <entry>Scientific notation</entry>
+            <entry>科学计数法</entry>
             <entry>-1.234e56</entry>
           </row>
           <row>
             <entry>float</entry>
-            <entry>Decimal notation</entry>
+            <entry>十进制表示法</entry>
             <entry>-1.234</entry>
           </row>
           <row>
             <entry>int</entry>
-            <entry>Signed integer</entry>
+            <entry>有符号数</entry>
             <entry>-1234</entry>
           </row>
           <row>
             <entry>uint</entry>
-            <entry>Unsigned integer</entry>
+            <entry>无符号数</entry>
             <entry>1234</entry>
           </row>
           <row>
             <entry>version</entry>
-            <entry>Version number</entry>
+            <entry>版本号</entry>
             <entry>8.3.0</entry>
           </row>
           <row>
             <entry>tag</entry>
-            <entry>XML tag</entry>
+            <entry>XML标记</entry>
             <entry>&lt;a href="dictionaries.html"></entry>
           </row>
           <row>
             <entry>entity</entry>
-            <entry>XML entity</entry>
+            <entry>XML实体</entry>
             <entry>&amp;amp;</entry>
           </row>
           <row>
             <entry>blank</entry>
-            <entry>Space symbols</entry>
-            <entry>(any whitespace or punctuation not otherwise recognized)</entry>
+            <entry>空白字符</entry>
+            <entry>（任何未经其他方式认可的空格或标点符号）</entry>
           </row>
         </tbody>
       </tgroup>
     </table>
     <note>
-      <p>The parser's notion of a "letter" is determined by the database's locale setting,
-        specifically <codeph>lc_ctype</codeph>. Words containing only the basic ASCII letters are
-        reported as a separate token type, since it is sometimes useful to distinguish them. In most
-        European languages, token types <codeph>word</codeph> and <codeph>asciiword</codeph> should
-        be treated alike.</p>
-      <p><codeph>email</codeph> does not support all valid email characters as defined by RFC 5322.
-        Specifically, the only non-alphanumeric characters supported for email user names are
-        period, dash, and underscore.</p>
+      <p>解析器的“字母”概念由数据库的语言环境设置决定，特别是<codeph>lc_ctype</codeph>。
+          仅包含基本ASCII字母的单词将作为单独的token类型报告，因为区分它们有时很有用。
+          在大多数欧洲语言中，token类型<codeph>word</codeph>和<codeph>asciiword</codeph>应该被视为相似。
+        </p>
+      <p>电子邮件不支持RFC 5322定义的所有有效电子邮件字符。
+          具体而言，电子邮件用户名支持的唯一非字母数字字符是句号，短划线和下划线。
+        </p>
     </note>
-    <p>It is possible for the parser to produce overlapping tokens from the same piece of text. As
-      an example, a hyphenated word will be reported both as the entire word and as each
-      component:</p>
+    <p>解析器可以从同一段文本生成重叠token。
+        例如，一个带连字符的单词将作为整个单词和每个组件报告：
+        </p>
     <codeblock>SELECT alias, description, token FROM ts_debug('foo-bar-beta1');
       alias      |               description                |     token     
 -----------------+------------------------------------------+---------------
@@ -168,8 +165,9 @@
  hword_asciipart | Hyphenated word part, all ASCII          | bar
  blank           | Space symbols                            | -
  hword_numpart   | Hyphenated word part, letters and digits | beta1</codeblock>
-    <p>This behavior is desirable since it allows searches to work for both the whole compound word
-      and for components. Here is another instructive example:</p>
+    <p>这种行为是可取的，因为它允许搜索适用于整个复合词和组件。
+        这是另一个有指导性的例子：
+        </p>
     <codeblock>SELECT alias, description, token FROM ts_debug('http://example.com/stuff/index.html');
   alias   |  description  |            token             
 ----------+---------------+------------------------------
