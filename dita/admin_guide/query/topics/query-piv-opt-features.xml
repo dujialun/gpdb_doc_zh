@@ -3,10 +3,9 @@
 
 
 <topic id="topic1">
-  <title>GPORCA Features and Enhancements</title>
+  <title>GPORCA特性和增强</title>
   <abstract>
-    <shortdesc>GPORCA, the Greenplum next generation query optimizer, includes enhancements for specific types of queries and
-      operations:</shortdesc>
+    <shortdesc>GPORCA是Greenplum的下一代查询优化器，它包括了对特定类型的查询和操作的增强：</shortdesc>
     <ul id="ul_ywz_j5d_gr">
       <li>
         <xref href="#topic_dwy_zml_gr" format="dita"/>
@@ -23,118 +22,85 @@
     </ul>
   </abstract>
   <body>
-    <p>GPORCA also includes these optimization enhancements:<ul id="ul_vtk_2wd_gr">
-        <li>Improved join ordering</li>
-        <li>Join-Aggregate reordering</li>
-        <li>Sort order optimization</li>
-        <li>Data skew estimates included in query optimization</li>
+    <p>GPORCA还包括下面这些优化增强：<ul id="ul_vtk_2wd_gr">
+        <li>改进的连接排序</li>
+        <li>连接-聚集重排序</li>
+        <li>排序顺序优化</li>
+        <li>查询优化中包括的数据倾斜估计</li>
       </ul></p>
   </body>
   <topic id="topic_dwy_zml_gr">
-    <title>Queries Against Partitioned Tables</title>
+    <title>对分区表的查询</title>
     <body>
-      <p>GPORCA includes these enhancements for queries against partitioned
-          tables:<ul id="ul_upq_hkr_gr">
-          <li>Partition elimination is improved.</li>
-          <li>Uniform multi-level partitioned tables are supported. For information about uniform
-            multi-level partitioned tables, see <xref href="query-piv-uniform-part-tbl.xml#topic1"
+      <p>GPORCA包括这些对分区表上查询的增强：<ul id="ul_upq_hkr_gr">
+          <li>改进了分区消除。</li>
+          <li>支持统一多级分区表。有关统一多级分区表的信息，请见<xref href="query-piv-uniform-part-tbl.xml#topic1"
             /></li>
-          <li>Query plan can contain the <cmdname>Partition selector</cmdname> operator.</li>
-          <li>Partitions are not enumerated in <cmdname>EXPLAIN</cmdname> plans. <p>For queries that
-              involve static partition selection where the partitioning key is compared to a
-              constant, GPORCA lists the number of partitions to be scanned in
-              the <codeph>EXPLAIN</codeph> output under the Partition Selector operator. This
-              example Partition Selector operator shows the filter and number of partitions
-              selected:
+          <li>查询计划可以包含分区选择器操作符。</li>
+		  <li>不在<cmdname>EXPLAIN</cmdname>计划中枚举分区。<p>对于涉及静态分区选择的查询，在其中会将分区键与常量进行比较，GPORCA会在<codeph>EXPLAIN</codeph>输出的分区选择器操作符下面列出要被扫描的分区数。这个示例分区选择器操作符展示了过滤条件和选中的分区数：
               <codeblock>Partition Selector for Part_Table (dynamic scan id: 1) 
        <b>Filter: a > 10
-       Partitions selected:  1 (out of 3)</b></codeblock></p><p>For
-              queries that involve dynamic partition selection where the partitioning key is
-              compared to a variable, the number of partitions that are scanned will be known only
-              during query execution. The partitions selected are not shown in the
-                <codeph>EXPLAIN</codeph> output.</p></li>
-          <li>Plan size is independent of number of partitions.</li>
-          <li>Out of memory errors caused by number of partitions are reduced.</li>
+		   Partitions selected:  1 (out of 3)</b></codeblock></p><p>对于涉及动态分区选择的查询，在其中会将分区键与变量进行比较，要扫描的分区数只有在查询执行时才能知道。选中的分区不会显示在<codeph>EXPLAIN</codeph>输出中。</p></li>
+          <li>计划尺寸与分区数无关。</li>
+          <li>由于分区数导致的内存不足错误被减少。</li>
         </ul></p>
-      <p>This example <cmdname>CREATE TABLE</cmdname> command creates a range partitioned table.</p>
+		<p>这个<cmdname>CREATE TABLE</cmdname>命令的例子创建一个范围分区表。</p>
       <codeblock>CREATE TABLE sales(order_id int, item_id int, amount numeric(15,2), 
       date date, yr_qtr int)
    <b>range partitioned by yr_qtr</b>;</codeblock>
-      <p>GPORCA improves on these types of queries against partitioned tables:</p>
+      <p>GPORCA改进了针对分区表的这些类型的查询：</p>
       <ul id="ul_jdl_zwd_gr">
-        <li>Full table scan. Partitions are not enumerated in
-          plans.<codeblock>SELECT * FROM sales;</codeblock></li>
-        <li>Query with a constant filter predicate. Partition elimination is
-          performed.<codeblock>SELECT * FROM sales WHERE yr_qtr = 201501;</codeblock></li>
-        <li>Range selection. Partition elimination is
-          performed.<codeblock>SELECT * FROM sales WHERE yr_qtr BETWEEN 201601 AND 201704 ;</codeblock></li>
-        <li>Joins involving partitioned tables. In this example, the partitioned dimension table
-            <i>date_dim</i> is joined with fact table
-          <i>catalog_sales</i>:<codeblock>SELECT * FROM catalog_sales
+        <li>全表扫描。计划中不会枚举分区。<codeblock>SELECT * FROM sales;</codeblock></li>
+        <li>带一个常量过滤谓词的查询。会执行分区消除。<codeblock>SELECT * FROM sales WHERE yr_qtr = 201501;</codeblock></li>
+        <li>范围选择。会执行分区消除。<codeblock>SELECT * FROM sales WHERE yr_qtr BETWEEN 201601 AND 201704 ;</codeblock></li>
+		<li>涉及到分区表的连接。在下面这个例子中，分区过的维度表<i>date_dim</i> 被连接到事实表<i>catalog_sales</i>：<codeblock>SELECT * FROM catalog_sales
    WHERE date_id IN (SELECT id FROM date_dim WHERE month=12);</codeblock></li>
       </ul>
     </body>
   </topic>
   <topic id="topic_vph_wml_gr">
-    <title>Queries that Contain Subqueries</title>
+    <title>含有子查询的查询</title>
     <body>
-      <p>GPORCA handles subqueries more efficiently. A subquery is query that is
-        nested inside an outer query block. In the following query, the <cmdname>SELECT</cmdname> in
-        the <cmdname>WHERE</cmdname> clause is a
-        subquery.<codeblock>SELECT * FROM part
+		<p>GPORCA更有效地处理子查询。子查询是嵌套在外层查询块里面的查询。在下面的查询中，<cmdname>WHERE</cmdname>子句中的<cmdname>SELECT</cmdname>是一个子查询。<codeblock>SELECT * FROM part
   WHERE price > (<b>SELECT avg(price) FROM part</b>);</codeblock></p>
-      <p>GPORCA also handles queries that contain a correlated subquery (CSQ) more
-        efficiently. A correlated subquery is a subquery that uses values from the outer query. In
-        the following query, the <codeph>price</codeph> column is used in both the outer query and
-        the subquery.
+	  <p>GPORCA还能更有效地处理含有相关子查询（CSQ）的查询。相关子查询是使用来自外层查询的值的子查询。在下面的查询中，<codeph>price</codeph>列被使用在外层查询和子查询中。
         <codeblock>SELECT * FROM part p1
   WHERE <b>price</b> > (<b>SELECT avg(</b>price<b>) FROM part p2 
   WHERE  p2.brand = p1.brand</b>);</codeblock></p>
-      <p>GPORCA generates more efficient plans for the following types of
-        subqueries: <ul id="ul_mk2_fyd_gr">
-          <li>CSQ in the <cmdname>SELECT</cmdname>
-            list.<codeblock>SELECT *,
+      <p>GPORCA为下列类型的子查询生成更有效的计划： <ul id="ul_mk2_fyd_gr">
+			  <li><cmdname>SELECT</cmdname>列表中的CSQ。
+            <codeblock>SELECT *,
  (<b>SELECT min(price) FROM part p2 WHERE p1.brand = p2.brand</b>)
  AS foo
 FROM part p1;</codeblock></li>
-          <li>CSQ in disjunctive (<cmdname>OR</cmdname>) filters.
+          <li>析取（OR）过滤条件中的CSQ。
             <codeblock>SELECT FROM part p1 WHERE p_size > 40 <b>OR</b> 
       p_retailprice > 
       (<b>SELECT avg(p_retailprice) 
           FROM part p2 
           WHERE p2.p_brand = p1.p_brand</b>)</codeblock></li>
-          <li>Nested CSQ with skip level
-              correlations<codeblock>SELECT * FROM part p1 WHERE p1.p_partkey 
+          <li>具有越级关联的嵌套CSQ<codeblock>SELECT * FROM part p1 WHERE p1.p_partkey
 IN (<b>SELECT p_partkey FROM part p2 WHERE p2.p_retailprice = </b>
      (<b>SELECT min(p_retailprice)
        FROM part p3 
        WHERE p3.p_brand = p1.p_brand)</b>
-);</codeblock><note>Nested
-              CSQ with skip level correlations are not supported by the Postgres query
-              optimizer.</note></li>
-          <li>CSQ with aggregate and inequality. This example contains a CSQ with an
-            inequality.<codeblock>SELECT * FROM part p1 WHERE p1.p_retailprice =
+);</codeblock><note>传统查询优化器不支持具有越级关联的嵌套CSQ。</note></li>
+          <li>有聚集和不等于的CSQ。下面这个例子包含一个有不等于的CSQ。<codeblock>SELECT * FROM part p1 WHERE p1.p_retailprice =
  (SELECT min(p_retailprice) FROM part p2 WHERE p2.p_brand &lt;> p1.p_brand);</codeblock></li>
         </ul><ul id="ul_qpq_1vs_gr">
-          <li>CSQ that must return one
-            row.<codeblock>SELECT p_partkey, 
+          <li>必须返回一行的CSQ。<codeblock>SELECT p_partkey,
   (<b>SELECT p_retailprice FROM part p2 WHERE p2.p_brand = p1.p_brand</b> )
 FROM part p1;</codeblock></li>
         </ul></p>
     </body>
   </topic>
   <topic id="topic_c3v_rml_gr">
-    <title>Queries that Contain Common Table Expressions</title>
+    <title>含有公共表表达式的查询</title>
     <body>
-      <p>GPORCA handles queries that contain the <cmdname>WITH</cmdname> clause.
-        The <cmdname>WITH</cmdname> clause, also known as a common table expression (CTE), generates
-        temporary tables that exist only for the query. This example query contains a
-        CTE.<codeblock><b>WITH v AS (SELECT a, sum(b) as s FROM T where c &lt; 10 GROUP BY a)</b>
+		<p>GPORCA处理含有<cmdname>WITH</cmdname>子句的查询。<cmdname>WITH</cmdname>子句也被称为公共表表达式（CTE），它会生成只在该查询中存在的临时表。下面这个查询例子包含一个CTE。<codeblock><b>WITH v AS (SELECT a, sum(b) as s FROM T where c &lt; 10 GROUP BY a)</b>
   SELECT *FROM  v AS v1 ,  v AS v2
   WHERE v1.a &lt;> v2.a AND v1.s &lt; v2.s;</codeblock></p>
-      <p>As part of query optimization, GPORCA can push down predicates into a
-        CTE. For example query, GPORCA pushes the equality predicates to the
-        CTE.<codeblock>WITH v AS (SELECT a, sum(b) as s FROM T GROUP BY a)
+      <p>作为查询优化的一部分，GPORCA可以把谓词下推到一个CTE中。对于下面的例子查询，GPORCA把等于谓词推到了CTE。<codeblock>WITH v AS (SELECT a, sum(b) as s FROM T GROUP BY a)
   SELECT *
   FROM v as v1, v as v2, v as v3
   WHERE v1.a &lt; v2.a
@@ -142,15 +108,14 @@ FROM part p1;</codeblock></li>
     AND <b>v1.a = 10</b>
     AND <b>v2.a = 20</b>
     AND <b>v3.a = 30</b>;</codeblock></p>
-      <p>GPORCA can handle these types of CTEs:<ul id="ul_ohm_d3r_gr">
-          <li>CTE that defines one or multiple tables. In this query, the CTE defines two
-            tables.<codeblock><b>WITH cte1 AS (SELECT a, sum(b) as s FROM T 
+      <p>GPORCA可以处理这些类型的CTE：<ul id="ul_ohm_d3r_gr">
+          <li>定义一个或者多个表的CTE。在下面的这个查询中，CTE定义两个表。<codeblock><b>WITH cte1 AS (SELECT a, sum(b) as s FROM T
                where c &lt; 10 GROUP BY a),
       cte2 AS (SELECT a, s FROM cte1 where s > 1000)</b>
   SELECT *
   FROM cte1 as v1, cte2 as v2, cte2 as v3
   WHERE v1.a &lt; v2.a AND v1.s &lt; v3.s;</codeblock></li>
-          <li>Nested CTEs.
+          <li>嵌套CTE。
             <codeblock><b>WITH</b> v AS (<b>WITH</b> w AS (SELECT a, b FROM foo 
                       WHERE b &lt; 5) 
            SELECT w1.a, w2.b 
@@ -163,22 +128,18 @@ FROM part p1;</codeblock></li>
     </body>
   </topic>
   <topic id="topic_plx_mml_gr">
-    <title>DML Operation Enhancements with GPORCA</title>
+    <title>GPORCA的DML操作增强</title>
     <body>
-      <p>GPORCA contains enhancements for DML operations such as
-          <cmdname>INSERT</cmdname><ph>, <cmdname>UPDATE</cmdname>, and
-            <cmdname>DELETE</cmdname></ph>.<ul id="ul_rnx_nml_gr">
-          <li>A DML node in a query plan is a query plan operator.<ul id="ul_f4x_nml_gr">
-              <li>Can appear anywhere in the plan, as a regular node (top slice only for now)</li>
-              <li>Can have consumers</li>
+		<p>GPORCA含有对DML操作（例如<cmdname>INSERT</cmdname><ph>，<cmdname>UPDATE</cmdname>和<cmdname>DELETE</cmdname></ph>）的增强。
+			<ul id="ul_rnx_nml_gr">
+          <li>查询计划中的DML节点是一个查询计划操作符。<ul id="ul_f4x_nml_gr">
+              <li>可以作为一个常规节点（目前只有顶层切片）出现在计划中的任何地方</li>
+              <li>可以有消费者</li>
             </ul></li>
-          <li><cmdname>UPDATE</cmdname> operations use the query plan operator
-              <cmdname>Split</cmdname> and supports these operations: <ul id="ul_slx_nvl_gr">
-              <li><cmdname>UPDATE</cmdname> operations on the table distribution key columns. </li>
-              <li><cmdname>UPDATE</cmdname> operations on the table on the partition key
-                column.</li>
-            </ul><p>This example plan shows the <cmdname>Split</cmdname>
-              operator.<codeblock>QUERY PLAN
+			<li><cmdname>UPDATE</cmdname>操作使用查询计划操作符<cmdname>Split</cmdname>并且支持这些操作：<ul id="ul_slx_nvl_gr">
+					<li>表的分布键列上的<cmdname>UPDATE</cmdname>操作。 </li>
+					<li>表的分区键列上的<cmdname>UPDATE</cmdname>操作。</li>
+						</ul><p>这个计划的例子展示了<cmdname>Split</cmdname>操作符。<codeblock>QUERY PLAN
 --------------------------------------------------------------
 Update  (cost=0.00..5.46 rows=1 width=1)
    ->  Redistribute Motion 2:2  (slice1; segments: 2)
@@ -187,9 +148,8 @@ Update  (cost=0.00..5.46 rows=1 width=1)
                ->  <b>Split  (cost=0.00..2.13 rows=1 width=40)</b>
                      ->  Result  (cost=0.00..1.05 rows=1 width=40)
                            ->  Seq Scan on dmltest</codeblock></p></li>
-          <li>New query plan operator <cmdname>Assert</cmdname> is used for constraints
-              checking.<p>This example plan shows the <cmdname>Assert</cmdname>
-              operator.<codeblock>QUERY PLAN
+			   <li>新的查询计划操作符<cmdname>Assert</cmdname>被用于约束检查。
+				   <p>这个计划的例子展示了<cmdname>Assert</cmdname>操作符。<codeblock>QUERY PLAN
 ------------------------------------------------------------
  Insert  (cost=0.00..4.61 rows=3 width=8)
    ->  <b>Assert  (cost=0.00..3.37 rows=3 width=24)</b>
