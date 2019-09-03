@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="aq20941">ALTER LANGUAGE</title><body><p id="sql_command_desc">Changes the name of a procedural language.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">ALTER LANGUAGE <varname>name</varname> RENAME TO <varname>newname</varname>
-ALTER LANGUAGE <varname>name</varname> OWNER TO <varname>new_owner</varname></codeblock></section><section id="section3"><title>Description</title><p><codeph>ALTER LANGUAGE</codeph> changes the definition of a procedural language for a specific
-        database. Definition changes supported include renaming the language or assigning a new
-        owner. You must be superuser or the owner of the language to use <codeph>ALTER
-          LANGUAGE</codeph>.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>Name of a language. </pd></plentry><plentry><pt><varname>newname</varname></pt><pd>The new name of the language.</pd></plentry></parml></section>
+<topic id="topic1"><title id="aq20941">ALTER LANGUAGE</title><body><p id="sql_command_desc">更改过程语言的名称。</p><section id="section2"><title>概要</title><codeblock id="sql_command_synopsis">ALTER LANGUAGE <varname>name</varname> RENAME TO <varname>newname</varname>
+ALTER LANGUAGE <varname>name</varname> OWNER TO <varname>new_owner</varname></codeblock></section><section id="section3"><title>描述</title><p><codeph>ALTER LANGUAGE</codeph>修改指定数据库的过程语言定义。定义的修改支持包括重命名语言或者指定一个新的所有者。你必须是超级用户或者是这个语言的所有者才能使用<codeph>ALTER
+          LANGUAGE</codeph>.</p></section><section id="section4"><title>参数</title><parml><plentry><pt><varname>name</varname></pt><pd>语言的名称。 </pd></plentry><plentry><pt><varname>newname</varname></pt><pd>语言的新名称</pd></plentry></parml></section>
     <bodydiv>
       <parml>
         <plentry>
           <pt>
             <varname>new_owner</varname></pt>
-          <pd>   The new owner of the language.</pd>
+          <pd>语言的新的所有者。</pd>
         </plentry>
       </parml>
-    </bodydiv><section id="section5"><title>Compatibility</title><p>There is no <codeph>ALTER LANGUAGE</codeph> statement in the SQL standard.
-</p></section><section id="section6"><title>See Also</title><p><codeph><xref href="./CREATE_LANGUAGE.xml#topic1" type="topic" format="dita"/></codeph>,
+    </bodydiv><section id="section5"><title>兼容性</title><p>在SQL标准中没有<codeph>ALTER LANGUAGE</codeph>语句。
+</p></section><section id="section6"><title>另见</title><p><codeph><xref href="./CREATE_LANGUAGE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_LANGUAGE.xml#topic1" type="topic" format="dita"
         /></codeph></p></section></body></topic>
