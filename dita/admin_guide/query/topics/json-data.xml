@@ -96,17 +96,16 @@
                 <entry><codeph>null</codeph>
                 </entry>
                 <entry>(none)</entry>
-                <entry>The JSON <codeph>null</codeph> 原始类型不同于<codeph>NULL</codeph>。</entry>
-              </row><codeph>numeric</codeph>
-            </tbody>
+                <entry>The JSON <codeph>null</codeph> 原始类型不同于SQL <codeph>NULL</codeph>。</entry>
+              </row>            </tbody>
           </tgroup>
         </table>
-        <p>对于有效的<codeph>jsonb</codeph> 数据的构成有一些次要的约束，这些约束既不适用于<codeph>json</codeph> 数据类型，也不适用于抽象的JSON，对应于基础数据类型所能表示的限制。值得注意的是，当将数据转换为<codeph>jsonb</codeph>数据类型时，超出Greenplum数据库<codeph>numeric</codeph>数据类型范围的数字将被拒绝，而<codeph>json/codeph>数据类型不会拒绝这些数字。
+        <p>对于有效的<codeph>jsonb</codeph> 数据的构成有一些次要的约束，这些约束既不适用于<codeph>json</codeph> 数据类型，也不适用于抽象的JSON，对应于基础数据类型所能表示的限制。值得注意的是，当将数据转换为<codeph>jsonb</codeph>数据类型时，超出Greenplum数据库<codeph>numeric</codeph>数据类型范围的数字将被拒绝，而<codeph>json</codeph>数据类型不会拒绝这些数字。
         </p>
         <p>RFC 7159允许这种实施定义的限制。然而，在实践中，这些问题可能会出现在其他实现中，因为通常将JSON原始类型 <codeph>number</codeph>表示为IEEE 754双精度浮点（RFC7159明确预测并允许）。
           </p>
         <p>当使用JSON作为与其他系统的交换格式时，请注意与Greenplum数据库最初存储的数据相比，数字精度可能会降低。</p>
-        <p>另外，正如上表中所指出的，对于JSON原语类型的输入格式，存在一些小的限制，这些限制不适用于相应的Greenplum数据库数据类型。 .</p>
+        <p>另外，正如上表中所指出的，对于JSON原语类型的输入格式，存在一些小的限制，这些限制不适用于相应的Greenplum数据库数据类型。 </p>
       </section>
     </body>
   </topic>
@@ -160,7 +159,7 @@ SELECT '{"bar": "baz", "balance": 7.77, "active":false}'::jsonb;
   <topic id="topic_isx_2tw_mq">
     <title>jsonb容器与存在</title>
     <body>
-      <p>测试容器是<codeph>jsonb</codeph>的一项重要功能。 <codeph>json</codeph>类型没有并行的设施集。容器测试一个<codeph>jsonb</codeph> 文档中是否包含了另一个<codeph>jsonb</codeph> 文档。这些例子返回true，除非另有标注：
+      <p>测试<i>容器</i>是<codeph>jsonb</codeph>的一项重要功能。 <codeph>json</codeph>类型没有并行的设施集。容器测试一个<codeph>jsonb</codeph> 文档中是否包含了另一个<codeph>jsonb</codeph> 文档。这些例子返回true，除非另有标注：
     </p>
       <codeblock>--简单标量/原始数值仅包含相同的值：
 SELECT '"foo"'::jsonb @> '"foo"'::jsonb;
@@ -235,7 +234,7 @@ SELECT '"foo"'::jsonb ? 'foo';</codeblock>
         </ul></p>
     </body>
     <topic id="topic_yjx_dq2_rfb">
-      <title>jsonb数据上的GIN索引/title>
+      <title>jsonb数据上的GIN索引</title>
       <body>
         <p>可以使用GIN索引有效地搜索出现在大量<codeph>jsonb</codeph>文档（基准）中的键或键/值对。两个GIN操作符类，提供不同的性能和灵活性权衡。</p>
         <p><varname>jsonb</varname>的默认GIN操作符类支持带<codeph>@></codeph>, <codeph>?</codeph>, <codeph>?&amp;</codeph> 和 <codeph>?|</codeph>操作符的查询。（有关这些运算符实现的语义的详细信息，请参见表 <xref href="#topic_o5y_14w_2z/table_dcb_y3w_mq" format="dita"/>
@@ -285,7 +284,8 @@ SELECT jdoc->'guid', jdoc->'name' FROM api WHERE jdoc -> 'tags' ? 'qui';</codebl
         <note>对于这个讨论，术语<i>value</i>包括数组元素，尽管JSON术语有时考虑数组元素不同于对象中的值。
           </note>
         <p>基本上，每个<codeph>jsonb_path_ops</codeph>索引项都是值的散列和指向该值的键；例如，要索引<codeph>{"foo": {"bar": "baz"}}</codeph>，将创建一个索引项，将<codeph>foo</codeph>,
-            <codeph>bar</codeph>, 和<codeph>baz</codeph> 中的三个都合并到散列值中。因此，查找此结构的包含查询将导致极其具体的索引搜索；但根本无法确定foo是否显示为键。另一方面，<codeph>jsonb_ops</codeph> 索引将分别创建三个表示codeph>foo</codeph>,
+            <codeph>bar</codeph>, 和<codeph>baz</codeph>
+          中的三个都合并到散列值中。因此，查找此结构的包含查询将导致极其具体的索引搜索；但根本无法确定foo是否显示为键。另一方面，<codeph>jsonb_ops</codeph> 索引将分别创建三个表示<codeph>foo</codeph>,
           <codeph>bar</codeph>, 和<codeph>baz</codeph> 的索引项；然后，为了执行包含性查询，它将查找包含这三个项的行。虽然GIN索引可以相当有效地执行这样的搜索，但是它仍然比同等的<codeph>jsonb_path_ops</codeph>搜索更不具体和更慢，特别是如果有大量的行包含三个索引项中的任何一个。
            </p>
         <p><codeph>jsonb_path_ops</codeph>方法的一个缺点是它不会为不包含任何值的json结构生成索引项，例如<codeph>{"a":{}}</codeph>：。如果请求搜索包含此类结构的文档，则需要进行完全索引扫描，这非常慢。<codeph>jsonb_path_ops</codeph>不适合经常执行这种搜索的应用程序。
@@ -387,7 +387,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>int</codeph>
                 </entry>
-                <entry>	获得JSON数组元素的文本形式。</entry>
+                <entry>	获得JSON数组元素的<codeph>text</codeph>形式。</entry>
                 <entry>
                   <codeph>'[1,2,3]'::json->>2</codeph>
                 </entry>
@@ -402,7 +402,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>text</codeph>
                 </entry>
-                <entry>获得JSON对象域的文本形式。</entry>
+                <entry>获得JSON对象域的<codeph>text</codeph>形式。</entry>
                 <entry>
                   <codeph>'{"a":1,"b":2}'::json->>'b'</codeph>
                 </entry>
@@ -430,7 +430,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>text[]</codeph>
                 </entry>
-                <entry>获得在指定路径上的JSON对象的文本形式。</entry>
+                <entry>获得在指定路径上的JSON对象的<codeph>text</codeph>形式。</entry>
                 <entry>
                   <codeph>'{"a":[1,2,3],"b":[4,5,6]}'::json#>>'{a,2}'</codeph>
                 </entry>
@@ -441,13 +441,13 @@ Array with n elements > array with n - 1 elements</pre>
             </tbody>
           </tgroup>
         </table>
-        <note>对于JSON和JSONB数据类型，这些运算符都有并行变体。字段、元素和路径提取运算符返回的数据类型与其左侧输入（JSON或JSONB）相同，但指定为返回<codeph>text</codeph>的数据类型除外，后者将值强制为<codeph>text</codeph>。如果JSON输入没有与请求匹配的正确结构，则字段、元素和路径提取运算符返回<codeph>NULL</codeph>，而不是失败；例如，如果不存在这样的元素。
+        <note>对于<codeph>json</codeph>和<codeph>jsonb</codeph>数据类型，这些运算符都有并行变体。字段、元素和路径提取运算符返回的数据类型与其左侧输入（<codeph>json</codeph>和<codeph>jsonb</codeph>）相同，但指定为返回<codeph>text</codeph>的数据类型除外，后者将值强制为<codeph>text</codeph>。如果JSON输入没有与请求匹配的正确结构，则字段、元素和路径提取运算符返回<codeph>NULL</codeph>，而不是失败；例如，如果不存在这样的元素。
           </note>
-        <p>下表描述了需要JSONB数据类型作为左操作数的运算符。这些运算符中的许多都可以通过JSONB运算符类进行索引。有关JSONB包含和存在语义的完整描述，请参见<xref
+        <p>下表描述了需要<codeph>jsonb</codeph>数据类型作为左操作数的运算符。这些运算符中的许多都可以通过<codeph>jsonb</codeph>运算符类进行索引。有关<codeph>jsonb</codeph>包含和存在语义的完整描述，请参见<xref
                 href="#topic_isx_2tw_mq" format="dita"/>。有关如何使用这些运算符有效地索引JSONB数据的信息，请参阅<xref
                 href="#topic_aqt_1tw_mq" format="dita"/>。</p>
         <table id="table_dcb_y3w_mq">
-          <title><codeph>jsonb</codeph> 操作符</title>
+          <title><codeph>jsonb</codeph>操作符</title>
           <tgroup cols="4">
             <colspec colnum="1" colname="col1" colwidth="1*"/>
             <colspec colnum="2" colname="col2" colwidth="1.94*"/>
@@ -525,7 +525,7 @@ Array with n elements > array with n - 1 elements</pre>
             </tbody>
           </tgroup>
         </table>
-        <p>下表中的标准比较运算符仅适用于JSONB数据类型，而不适用于JSON数据类型。它们遵循JSONB索引<xref
+        <p>下表中的标准比较运算符仅适用于 <codeph>jsonb</codeph>数据类型，而不适用于 <codeph>json</codeph>数据类型。它们遵循 <codeph>jsonb</codeph>索引<xref
                 href="#topic_aqt_1tw_mq" format="dita"/>中描述的B树操作的排序规则。</p>
         <table id="table_j4w_z5n_vq">
           <title><codeph>jsonb</codeph> 比较运算符</title>
@@ -606,7 +606,7 @@ Array with n elements > array with n - 1 elements</pre>
                   <codeph>to_json(anyelement)</codeph>
                 </entry>
                 <entry>返回该值作为一个合法的JSON对象。
-                    数组和组合会被递归处理并且转换成数组和对象。如果输入包含一个从该类型到json的造型，会使用该cast函数来执行转换，否则将会产生一个JSON标量值。对于任何非数字、布尔值或空值的标量类型，会使用其文本表示，并且加上适当的引号和转义让它变成一个合法的JSON字符串。
+                    数组和组合会被递归处理并且转换成数组和对象。如果输入包含一个从该类型到 <codeph>json</codeph>的转换，会使用该cast函数来执行转换，否则将会产生一个JSON标量值。对于任何非数字、布尔值或空值的标量类型，会使用其文本表示，并且加上适当的引号和转义让它变成一个合法的JSON字符串。
                    </entry>
                 <entry>
                   <codeph>to_json('Fred said "Hi."'::text)</codeph>
@@ -619,7 +619,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>array_to_json(anyarray [, pretty_bool])</codeph>
                 </entry>
-                <entry>返回该数组为一个JSON数组。一个Greenplum数据库多维数组会变成一个JSON数组的数组。<p>如果pretty_bool为true，在第一维元素之间会增加换行。</p></entry>
+                <entry>返回该数组为一个JSON数组。一个Greenplum数据库多维数组会变成一个JSON数组的数组。<p>如果<codeph>pretty_bool</codeph> 为true，在第一维元素之间会增加换行。</p></entry>
                 <entry>
                   <codeph>array_to_json('{{1,5},{99,100}}'::int[])</codeph>
                 </entry>
@@ -631,7 +631,7 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry>
                   <codeph>row_to_json(record [, pretty_bool])</codeph>
                 </entry>
-                <entry>返回该行为一个JSON对象。 <p>如果pretty_bool为true，在第一级别元素之间会增加换行。</p></entry>
+                <entry>返回该行为一个JSON对象。 <p>如果<codeph>pretty_bool</codeph> pretty_bool为true，在第一级别元素之间会增加换行。</p></entry>
                 <entry>
                   <codeph>row_to_json(row(1,'foo'))</codeph>
                 </entry>
@@ -699,7 +699,7 @@ Array with n elements > array with n - 1 elements</pre>
         </table>
         <note><codeph>array_to_json</codeph>和<codeph>row_to_json</codeph>的行为与<codeph>to_json</codeph> 相同，只是提供了一个打印漂亮的选项。to_json描述的行为同样适用于其他JSON创建函数转换的每个单独的值。
  </note>
-        <note><xref href="../../../ref_guide/modules/hstore.xml#topic_vcn_jkq_1bb">hstore模块包含从<codeph>hstore</codeph>转换为<codeph>json</codeph>的函数，因此通过<codeph>json</codeph>创建函数转换的hstore值将被表示为json对象，而不是原始字符串值。
+        <note><xref href="../../../ref_guide/modules/hstore.xml#topic_vcn_jkq_1bb"/><codeph>hstore</codeph>模块包含从<codeph>hstore</codeph>转换为<codeph>json</codeph>的函数，因此通过<codeph>json</codeph>创建函数转换的<codeph>hstore</codeph>值将被表示为json对象，而不是原始字符串值。
         </note>
       </body>
     </topic>
@@ -758,7 +758,7 @@ Array with n elements > array with n - 1 elements</pre>
       <body>
         <p>这个表描述处理<codeph>json</codeph>
           和 <codeph>jsonb</codeph>值的函数。</p>
-        <p>许多处理函数和运算符将JSON字符串中的Unicode转义符转换为适当的单个字符。如果输入数据类型是JSONB，这不是问题，因为转换已经完成。但是，对于JSON数据类型输入，这可能导致抛出错误。请参见关于
+        <p>许多处理函数和运算符将JSON字符串中的Unicode转义符转换为适当的单个字符。如果输入数据类型是<codeph>jsonb</codeph>，这不是问题，因为转换已经完成。但是，对于<codeph>json</codeph>数据类型输入，这可能导致抛出错误。请参见关于
             <xref href="#topic_upc_tcs_fz" format="dita"/>。</p>
         <table id="table_wfc_y3w_mb">
           <title>JSON处理函数</title>
@@ -842,7 +842,7 @@ Array with n elements > array with n - 1 elements</pre>
                   <p><codeph>jsonb</codeph>
                   </p>
                 </entry>
-                <entry>	返回path_elems指定的JSON值。等效于#>操作符。
+                <entry>	返回<codeph>path_elems</codeph>指定的JSON值。等效于<codeph>#></codeph>操作符。
                </entry>
                 <entry><codeph>json_extract_path('{"f2":{"f3":1},"f4":{"f5":99,"f6":"foo"}}','f4')</codeph>
                 </entry>
@@ -853,11 +853,12 @@ Array with n elements > array with n - 1 elements</pre>
               <row>
                 <entry><codeph>json_extract_path_text(from_json json, VARIADIC path_elems
                     text[])</codeph>
-                  <p><codeph>返回path_elems指定的JSON值为文本。等效于#>>操作符。</codeph>
+                  <p><codeph>jsonb_extract_path_text(from_json jsonb, VARIADIC path_elems
+                      text[])</codeph>
                   </p></entry>
                 <entry><codeph>text</codeph>
                 </entry>
-                <entry>返回最外层JSON对象中的键集合。</entry>
+                <entry>以文本形式返回<codeph>path_elems</codeph>指向的JSON值。相当于>>运算符。</entry>
                 <entry><codeph>json_extract_path_text('{"f2":{"f3":1},"f4":{"f5":99,"f6":"foo"}}','f4',
                     'f6')</codeph>
                 </entry>
@@ -979,12 +980,8 @@ Array with n elements > array with n - 1 elements</pre>
                   </p></entry>
                 <entry><codeph>record</codeph>
                 </entry>
-                <entry>与所有返回记录的函数一样，调用方必须使用as子句显式定义记录的结构。
-                    选择*从json_到_记录集（“[”a“：1”，b“：”foo“”，”a“：”2”，c“：”bar“]”）作为x（a int，b te）
-                    从JSON对象生成任意记录。可见 <xref
-                    href="#topic_z5d_snw_2z/json_proc_1" format="dita">Note 1</xref>. <p>As with all
-                    functions returning record, the caller must explicitly define the structure of
-                    the record with an <codeph>AS</codeph> clause.</p></entry>
+                <entry>从JSON对象生成任意记录，可见<xref  href="#topic_z5d_snw_2z/json_proc_1" format="dita">Note 1</xref>。
+	 <p>与所有返回记录的函数一样，调用方必须使用<codeph>AS</codeph>子句显式定义记录的结构。 </p></entry>
                 <entry><codeph>select * from json_to_record('{"a":1,"b":[1,2,3],"c":"bar"}') as x(a
                     int, b text, d text)</codeph>
                 </entry>
@@ -1002,10 +999,8 @@ Array with n elements > array with n - 1 elements</pre>
                 <entry><codeph>setof record</codeph>
                 </entry>
                 <entry>从JSON对象数组生成任意记录集，可见 <xref
-                    href="#topic_z5d_snw_2z/json_proc_1" format="dita">Note 1</xref>. <p>
-                    与所有返回记录的函数一样，调用方必须使用<codeph>AS</codeph> clause子句显式定义记录的结构。
-                    选择*从json_到_记录集（“[”a“：1”，b“：”foo“”，”a“：”2”，“c”：“bar”]）作为x（a int，b
-                 </p></entry>
+                    href="#topic_z5d_snw_2z/json_proc_1" format="dita">Note 1</xref>。 <p>
+                    与所有返回记录的函数一样，调用方必须使用<codeph>AS</codeph> clause子句显式定义记录的结构。 </p></entry>
                 <entry><codeph>select * from
                     json_to_recordset('[{"a":1,"b":"foo"},{"a":"2","c":"bar"}]') as x(a int, b
                     text);</codeph>
@@ -1025,7 +1020,7 @@ Array with n elements > array with n - 1 elements</pre>
           <ol id="ol_umc_2sg_pfb">
             <li id="json_proc_1">函数<codeph>json_populate_record()</codeph>, <codeph>json_populate_recordset()</codeph>,
                 <codeph>json_to_record()</codeph> 和 <codeph>json_to_recordset()</codeph>的示例使用常量。
-                但是，典型的用法是引用FROM子句中的表，并使用它的JSON或JSONB列之一作为函数的参数。然后可以在查询的其他部分中引用提取的键值。例如，可以在WHERE子句和目标列表中引用该值。以这种方式提取多个值可以提高性能，而不是使用每个键操作符分别提取多个值。
+                但是，典型的用法是引用<codeph>FROM</codeph>子句中的表，并使用它的<codeph>json</codeph>或<codeph>jsonb</codeph>列之一作为函数的参数。然后可以在查询的其他部分中引用提取的键值。例如，可以在WHERE子句和目标列表中引用该值。以这种方式提取多个值可以提高性能，而不是使用每个键操作符分别提取多个值。
                <p>JSON键与目标行类型中相同的列名匹配。这些函数的JSON类型强制可能不会产生某些类型所需的值。目标行类型中未出现的JSON字段将从输出中省略，不匹配任何JSON字段的目标列将为空。</p></li>
             <li id="json_proc_2"><codeph>json_typeof</codeph>函数NULL返回值 <codeph>null</codeph>不应与SQL<codeph>NULL</codeph>混淆。当调用<codeph>json_typeof('null'::json)</codeph>将返回<codeph>null</codeph>时，调用<codeph>json_typeof(NULL::json)</codeph>将返回SQL<codeph>NULL</codeph>。
                </li>

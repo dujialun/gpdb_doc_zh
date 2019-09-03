@@ -7,9 +7,9 @@
     <shortdesc>检查性能不好的查询的查询计划,来确定可能的性能调优机会。</shortdesc>
   </abstract>
   <body>
-    <p>Greenplum数据库为每个查询设计一个查询计划。选择正确的查询计划来匹配查询和数据结构对好的性能是必要的。 一个查询计划定义Greenplum数据库将如何在并行执行环境中运行查询。 </p>
+    <p>Greenplum数据库为每个查询设计一个 <i>查询计划 </i>。选择正确的查询计划来匹配查询和数据结构对好的性能是必要的。 一个查询计划定义Greenplum数据库将如何在并行执行环境中运行查询。 </p>
     <p>查询优化器使用数据库维护的数据统计信息来选择具有最低可能代价的查询计划。代价以磁盘I/O来度量，磁盘I/O用取得的磁盘页面为单位。目标是最小化计划的总执行代价。</p>
-    <p>可以用EXPLAIN命令查看一个给定查询的计划。EXPLAIN展示查询规划器对该查询计划估计的代价。例如：</p>
+    <p>可以用<codeph>EXPLAIN</codeph>命令查看一个给定查询的计划。<codeph>EXPLAIN</codeph>展示查询规划器对该查询计划估计的代价。例如：</p>
     <p>
       <codeblock>EXPLAIN SELECT * FROM names WHERE id=22;
 </codeblock>
@@ -19,8 +19,9 @@
       <codeblock>EXPLAIN ANALYZE SELECT * FROM names WHERE id=22;
 </codeblock>
     </p>
-    <note>在Greenplum数据库中，默认的GPORCA优化器与传统查询优化器共存。GPORCA生成的EXPLAIN输出与传统查询优化器生成的输出不同。 <p>默认情况下，Greenplum数据库会在可能时使用GPORCA来为查询生成执行计划。</p>
-        <p>当EXPLAIN ANALYZE命令使用GPORCA时，EXPLAIN计划只显示被排除的分区数。被扫描的分区不会被显示。要在Segment日志中显示被扫描分区的名称，可以把服务器配置参数gp_log_dynamic_partition_pruning设置为on。这个SET命令的例子启用了该参数。</p><p>
+    <note>在Greenplum数据库中，默认的GPORCA优化器与传统查询优化器共存。GPORCA生成的<codeph>EXPLAIN</codeph>输出与传统查询优化器生成的输出不同。 <p>默认情况下，Greenplum数据库会在可能时使用GPORCA来为查询生成执行计划。</p>
+        <p>当<codeph>EXPLAIN ANALYZE</codeph>命令使用GPORCA时，<codeph>EXPLAIN</codeph>计划只显示被排除的分区数。被扫描的分区不会被显示。要在段实例
+            日志中显示被扫描分区的名称，可以把服务器配置参数<codeph>gp_log_dynamic_partition_pruning</codeph>设置为<codeph>on</codeph>。这个<codeph>SET</codeph>命令的例子启用了该参数。</p><p>
         <codeblock>SET gp_log_dynamic_partition_pruning = on;</codeblock>
       </p><p>有关GPORCA的信息，请见<xref href="query.xml#topic1"/></p></note>
   </body>
@@ -28,10 +29,11 @@
     <title>阅读EXPLAIN输出</title>
     <body>
       <p>一个查询计划是一棵节点的树。计划中的每个节点表示一个操作，例如表扫描、连接、聚集或者排序。</p>
-      <p>应该从底向上阅读计划：每个节点会把行交给直接在它上面的节点。一个计划中的底层节点通常是表扫描操作：顺序的、索引的或者位图索引扫描。如果该查询要求那些行上的连接、聚集、排序或者其他操作，就会有额外的节点在扫描节点上面负责执行这些操作。最顶层的计划节点通常是Greenplum数据库的移动节点：重新分布、显式重新分布、广播或者收集移动。这些操作在查询处理时在Segment实例之间移动行。</p>
+      <p>
+          应该从底向上阅读计划：每个节点会把行交给直接在它上面的节点。一个计划中的底层节点通常是表扫描操作：顺序的、索引的或者位图索引扫描。如果该查询要求那些行上的连接、聚集、排序或者其他操作，就会有额外的节点在扫描节点上面负责执行这些操作。最顶层的计划节点通常是Greenplum数据库的移动节点：重新分布、显式重新分布、广播或者收集移动。这些操作在查询处理时在段实例之间移动行。</p>
       <p><codeph>EXPLAIN</codeph> 的输出对计划树中的每个节点都有一行并且为该计划节点显示基本的节点类型和下列执行代价估计：</p>
       <ul>
-        <li id="in182482"><b>cost</b> —以磁盘页面获取为单位度量。1.0等于一次顺序磁盘页面读取。第一个估计是得到第一行的启动代价，第二个估计是得到所有行的总代价。总代价总是假定所有的行都将被检索，但并不总是这样。例如，如果查询使用了LIMIT，并非所有的行都会被检索。</li>
+        <li id="in182482"><b>cost</b> —以磁盘页面获取为单位度量。1.0等于一次顺序磁盘页面读取。第一个估计是得到第一行的启动代价，第二个估计是得到所有行的总代价。总代价总是假定所有的行都将被检索，但并不总是这样。例如，如果查询使用了<codeph>LIMIT</codeph>，并非所有的行都会被检索。</li>
         <li id="in182483"><b>rows</b> —这个计划节点输出的总行数。这个数字通常小于被该计划节点处理或者扫描的行数，它反映了任意WHERE子句条件的估计选择度。理想情况下，最顶层节点的估计近似于该查询实际返回、更新或者删除的行数。</li>
         <li id="in182484"><b>width</b> —这个计划节点输出的所有行的总字节数。</li>
       </ul>
@@ -55,29 +57,32 @@ Gather Motion 2:1 (slice1) (cost=0.00..20.88 rows=1 width=13)
          Filter: name::text ~~ 'Joelle'::text
 </codeblock>
         </p>
-        <p>从底向上阅读这个计划。一开始，查询优化器顺序地扫描names表。注意WHERE子句被应用为一个filter条件。这意味着扫描操作会对它扫描的每个行检查该条件并且只输出满足该条件的行。</p>
-        <p>扫描操作的结果被传递给一个收集移动操作。在Greenplum数据库中，收集移动是Segment何时把行发送给Master。在这个例子中，我们有两个Segment实例会向一个Master实例发送。这个操作工作在并行执行计划的slice1上。查询计划会被划分成切片，这样Segment可以并行工作在查询计划的片段上。</p>
-        <p>为这个计划估计的启动代价是00.00（没有代价）而总代价是20.88次磁盘页面获取。优化器估计这个查询将返回一行。</p>
+        <p>从底向上阅读这个计划。一开始，查询优化器顺序地扫描<i>names</i>表。注意<codeph>WHERE</codeph>子句被应用为一个<i>filter</i>条件。这意味着扫描操作会对它扫描的每个行检查该条件并且只输出满足该条件的行。</p>
+        <p>扫描操作的结果被传递给一个<i> gather motion</i>
+            操作。在Greenplum数据库中，收集移动是段实例何时把行发送给Master。在这个例子中，我们有两个Segment实例会向一个Master实例发送。这个操作工作在并行执行计划的<i>slices</i>
+            上。查询计划会被划分成<i>slices</i>，这样段实例可以并行工作在查询计划的片段上。</p>
+        <p>为这个计划估计的启动代价是<codeph>00.00</codeph>（没有代价）而总代价是<codeph>20.88</codeph>次磁盘页面获取。优化器估计这个查询将返回一行。</p>
       </body>
     </topic>
   </topic>
   <topic id="topic42" xml:lang="en">
     <title>阅读EXPLAIN ANALYZE输出</title>
     <body>
-      <p><codeph>EXPLAIN ANALYZE</codeph>规划并且运行语句。EXPLAIN ANALYZE计划会把实际执行代价和优化器的估计一起显示。这允许用户查看优化器的估计是否接近于实际。EXPLAIN ANALYZE也展示下列信息：</p>
+      <p><codeph>EXPLAIN ANALYZE</codeph>规划并且运行语句。<codeph>EXPLAIN ANALYZE</codeph>计划会把实际执行代价和优化器的估计一起显示。这允许用户查看优化器的估计是否接近于实际。EXPLAIN ANALYZE也展示下列信息：</p>
       <ul>
         <li id="in209045">查询执行的总运行时间（以毫秒为单位）。</li>
         <li id="in209046">查询计划每个切片使用的内存，以及为整个查询语句保留的内存。</li>
-        <li id="in209047">一个计划节点操作中涉及的工作者（Segment）数量。其中只统计返回行的Segment。</li>
-        <li id="in209048">为该操作产生最多行的Segment返回的行最大数量。如果多个Segment产生了相等的行数，EXPLAIN ANALYZE会显示那个用了最长<time> to end的Segment。</li>
-        <li id="in209049">为一个操作产生最多行的Segment的ID。</li>
-        <li id="in209050">相关操作使用的内存量（work_mem）。如果work_mem不足以在内存中执行该操作，计划会显示溢出到磁盘的数据量最少的Segment的溢出数据量。例如：<p>
+        <li id="in209047">一个计划节点操作中涉及的工作者（段实例）数量。其中只统计返回行的段实例。</li>
+          <li id="in209048">为该操作产生最多行的段实例返回的行最大数量。如果多个段实例产生了相等的行数，EXPLAIN ANALYZE会显示那个用了运行最长<i>&lt;time&gt;</i>的段实例。</li>
+        <li id="in209049">为一个操作产生最多行的段实例的ID。</li>
+        <li id="in209050">相关操作使用的内存量（work_mem）。如果work_mem不足以在内存中执行该操作，计划会显示溢出到磁盘的数据量最少的段实例的溢出数据量。例如：<p>
             <codeblock>Work_mem used: 64K bytes avg, 64K bytes max (seg0).
 Work_mem wanted: 90K bytes avg, 90K byes max (seg0) to lessen 
 workfile I/O affecting 2 workers.
 </codeblock>
           </p></li>
-        <li id="in209053">产生最多行的Segment检索到第一行的时间（以毫秒为单位）以及该Segment检索到所有行花掉的时间。如果<time> to first row与运行到结束的<time> to end相同，结果中可能会省略前者。</li>
+        <li id="in209053">产生最多行的段实例检索到第一行的时间（以毫秒为单位）以及该段实例检索到所有行花掉的时间。如果到获取第1行的<i>&lt;time&gt;</i>与运行到结束的<i>&lt;time&gt;</i>
+          相同，结果中可能会省略前者。</li>
       </ul>
     </body>
     <topic id="topic43" xml:lang="en">
@@ -102,15 +107,16 @@ Gather Motion 2:1 (slice1; segments: 2) (cost=0.00..20.88 rows=1 width=13)
  <b>Memory used: 128000K bytes</b>
  <b>Total runtime: 22.548 ms</b>
 </codeblock>
-        <p>从底向上阅读这个查询。运行这个查询花掉的总时间是22.548毫秒。</p>
-        <p><i>sequential scan</i>操作只有一个返回行的Segment（seg0），并且它只返回1行。它用了0.255毫秒找到第一行且用了0.486毫秒来扫描所有的行。
-            这个结果接近于优化器的估计：查询优化器估计这个查询将会返回一行。收集移动（Segment向Master发送数据）接收到1行。这个操作的总消耗时间是0.537毫秒。</p>
+        <p>从底向上阅读这个查询。运行这个查询花掉的总时间是<i>22.548</i> 毫秒。</p>
+        <p><i>sequential scan</i>操作只有一个返回行的段实例（<i>seg0</i>），并且它只返回 <i>1行</i>。它用了<i>0.255</i>毫秒找到第一行且用了<i>0
+            .486</i>毫秒来扫描所有的行。
+            这个结果接近于优化器的估计：查询优化器估计这个查询将会返回一行。收集移动（段实例向Master发送数据）接收到1行。这个操作的总消耗时间是<i>0.537</i>毫秒。</p>
       </body>
-      <topic id="topic_idt_2ll_gr">
+      <p id="topic_idt_2ll_gr">
         <title>判断查询优化器</title>
         <body>
-          <p>用户可以查看EXPLAIN输出来判断是否启用了GPORCA以及这个解释计划是由GPORCA还是传统查询优化器生成。这一信息出现在EXPLAIN输出的末尾。Settings行显示服务器配置参数OPTIMIZER的设置。Optimizer status行显示该解释计划是由GPORCA还是传统查询优化器生成。</p>
-            <p>对于这两个查询计划的例子，GPORCA被启用，所以服务器配置参数OPTIMIZER为on。对于第一个计划，GPORCA生成了该EXPLAIN计划。对于第二个计划，Greenplum数据库回退到传统查询优化器来生成该查询计划。</p>>
+          <p>用户可以查看<cmdname>EXPLAIN</cmdname>输出来判断是否启用了GPORCA以及这个解释计划是由GPORCA还是传统查询优化器生成。这一信息出现在<cmdname>EXPLAIN</cmdname>输出的末尾。Settings行显示服务器配置参数<codeph>OPTIMIZER</codeph>的设置。 <codeph>Optimizer status</codeph>行显示该解释计划是由GPORCA还是传统查询优化器生成。</p>
+            <p>对于这两个查询计划的例子，GPORCA被启用，所以服务器配置参数<codeph>OPTIMIZER</codeph> 为<codeph>on</codeph>。对于第一个计划，GPORCA生成了该 <cmdname>EXPLAIN</cmdname>计划。对于第二个计划，Greenplum数据库回退到传统查询优化器来生成该查询计划。</p>>
             <codeblock>                       QUERY PLAN
 ------------------------------------------------------------------------------------
  Aggregate  (cost=0.00..296.14 rows=1 width=8)
@@ -130,8 +136,7 @@ Gather Motion 2:1 (slice1; segments: 2) (cost=0.00..20.88 rows=1 width=13)
                ->  Seq Scan on part  (cost=0.00..3018.79 rows=100040 width=1)
  Settings:  <b>optimizer=on</b>
  Optimizer status: <b>Postgres query optimizer</b>
-(5 rows)</codeblock>
-          </p>
+                (5 rows)</codeblock></body></p>
           <p>对于这个查询，服务器配置参数<codeph>OPTIMIZER</codeph>是
               <codeph>off</codeph>.<codeblock>explain select count(*) from part;
 
@@ -153,18 +158,20 @@ Gather Motion 2:1 (slice1; segments: 2) (cost=0.00..20.88 rows=1 width=13)
     <body>
       <p>如果一个查询执行得不好，检查它的查询并且提出以下问题：</p>
       <ul>
-        <li id="in182530"><b>该计划中的操作花费了特别长的时间吗？</b> 查找消耗了多数查询执行时间的操作。例如，如果一个索引扫描花费了比预期长的时间，该索引可能过期并且需要重建索引。或者，调整enable_<operator> 参数来看看是否能够强制传统查询优化器（规划器）来为该查询选择一个不同的计划。</li>
-        <li id="in182538"><b>优化器的估计是否接近实际？</b> Run <codeph>运行EXPLAIN ANALYZE并且查看规划器估计的行数是否接近查询操作实际返回的行数。如果有很大的差别，应在相关列上收集更多统计信息。
-            更多EXPLAIN ANALYZE和ANALYZE命令上的信息请见<i>Greenplum数据库参考指南</i> </p></li>
-        <li id="in182542"><b>在该计划中是否很早就应用了选择性谓词?</b> 在计划中早些应用最具选择性的过滤条件，这样会有较少的行在计划树中向上移动。如果查询计划没有正确地估计查询谓词的选择度，应在相关列上收集更多统计信息。更多有关收集统计信息的内容请见Greenplum数据库参考指南中的ANALYZE命令。 用户还可以尝试重新排序SQL语句中的WHERE子句。</li>
+        <li id="in182530"><b>该计划中的操作花费了特别长的时间吗？</b> 查找消耗了多数查询执行时间的操作。例如，如果一个索引扫描花费了比预期长的时间，该索引可能过期并且需要重建索引。或者，调整<codeph>enable_&lt;operator&gt; </codeph>参数来看看是否能够强制传统查询优化器（规划器）来为该查询选择一个不同的计划。</li>
+        <li id="in182538"><b>优化器的估计是否接近实际？</b> 
+	运行<codeph>EXPLAIN ANALYZE</codeph>并且查看规划器估计的行数是否接近查询操作实际返回的行数。如果有很大的差别，应在相关列上收集更多统计信息。
+            更多 <codeph>EXPLAIN ANALYZE</codeph>和<codeph>ANALYZE</codeph> 命令的信息请见<i>Greenplum数据库参考指南</i> </li>
+        <li id="in182542"><b>在该计划中是否很早就应用了选择性谓词?</b> 在计划中早些应用最具选择性的过滤条件，这样会有较少的行在计划树中向上移动。如果查询计划没有正确地估计查询谓词的选择度，应在相关列上收集更多统计信息。<ph>更多有关收集统计信息的内容请见Greenplum数据库参考指南中的<codeph>ANALYZE</codeph>命令。</ph> 用户还可以尝试重新排序SQL语句中的<codeph>WHERE</codeph>子句。</li>
         <li id="in182546"><b>优化器是否选择了最好的连接顺序？</b> 当查询连接多个表时，确保优化器选择了最具选择性的连接顺序。计划中应该尽早做消除最多行的连接，这样会有较少的行在计划树中向上移动。
-            如果计划没有选择最优的连接顺序，可以设置join_collapse_limit=1并且在SQL语句中使用显式的JOIN语法来强制传统查询优化器（规划器）用指定的连接顺序。还可以在相关的连接列上收集更多的统计信息。
-             更多有关收集统计信息的内容请见Greenplum数据库参考指南中的ANALYZE命令。</p></li>
+            如果计划没有选择最优的连接顺序，可以设置<codeph>join_collapse_limit=1</codeph>并且在SQL语句中使用显式的JOIN语法来强制传统查询优化器（规划器）用指定的连接顺序。还可以在相关的连接列上收集更多的统计信息。
+             更多有关收集统计信息的内容请见Greenplum数据库参考指南中的<codeph>ANALYZE</codeph>命令。</li>
         <li id="in182550"><b>优化器是否有选择地扫描分区表？ </b> 如果在使用表分区，优化器是否有选择地只扫描满足查询谓词所需的子表？对父表的扫描应该会返回0行，因为父表中不包含任何数据。一个显示选择性分区扫描的查询计划例子，可见 <xref
             href="../../ddl/ddl-partition.xml#topic74"/> 验证分区策略</li>
-        <li id="in182554"><b>优化器是否在适用时选择了哈希聚集和哈希连接操作？</b> 哈希操作通常比其他类型的连接或者聚集快很多。行比较和排序在内存中完成而不需要读写磁盘。为了让查询优化器选择哈希操作，必须由足够多的可用内存来保存估计数量的行。尝试增加工作内存来改进查询的性能。如果可能，未查询运行一次EXPLAIN ANALYZE来显示那些计划操作会溢出到磁盘、它们使用了多少工作内存以及需要多少内存来避免溢出到磁盘。例如：<p><codeph>Work_mem used: 23430K bytes avg, 23430K bytes max (seg0). Work_mem
+        <li id="in182554"><b>优化器是否在适用时选择了哈希聚集和哈希连接操作？</b> 哈希操作通常比其他类型的连接或者聚集快很多。行比较和排序在内存中完成而不需要读写磁盘。为了让查询优化器选择哈希操作，必须由足够多的可用内存来保存估计数量的行。尝试增加工作内存来改进查询的性能。如果可能，未查询运行一次EXPLAIN ANALYZE来显示那些计划操作会溢出到磁盘、它们使用了多少工作内存以及需要多少内存来避免溢出到磁盘。例如：
+            <p><codeph>Work_mem used: 23430K bytes avg, 23430K bytes max (seg0). Work_mem
               wanted: 33649K bytes avg, 33649K bytes max (seg0) to lessen workfile I/O affecting 2
-              workers.</codeph></p><p>来自于EXPLAIN ANALYZE的"bytes wanted"消息是基于被写出到工作文件的数据量的而且并不准确。所需的最小work_mem可以与建议值不同。</p></li>
+              workers.</codeph></p><p>来自于 <codeph>EXPLAIN ANALYZE</codeph>的"bytes wanted"消息是基于被写出到工作文件的数据量的而且并不准确。所需的最小work_mem可以与建议值不同。</p></li>
       </ul>
     </body>
   </topic>

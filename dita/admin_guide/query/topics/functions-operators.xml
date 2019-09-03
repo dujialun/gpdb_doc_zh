@@ -113,7 +113,7 @@
             <p>更多关于<codeph>EXECUTE ON</codeph>属性的信息, 参看 <codeph><xref
                         href="../../../ref_guide/sql_commands/CREATE_FUNCTION.xml#topic1"
                         format="dita" scope="peer">创建函数</xref></codeph>.</p>
-            <p>在Greenplum数据库中，数据被划分为多个segment-每个segment都是一个不同的PostgreSQL数据库。为了防止不一致或意外的结果，如果函数包含SQL命令或者任意修改数据库的方式，请不要在segment级别执行被分类为volatile的函数。
+            <p>在Greenplum数据库中，数据被划分为多个段-每个段都是一个不同的PostgreSQL数据库。为了防止不一致或意外的结果，如果函数包含SQL命令或者任意修改数据库的方式，请不要在segment级别执行被分类为volatile的函数。
                 例如，不允许对Greenplum数据库中的分布式数据<codeph>setval()</codeph>等函数，因为它们可能导致段实例之间的数据不一致。</p>
             <p>函数可以对segment上的复制表（<codeph>DISTRIBUTED REPLICATED</codeph>）执行只读查询，但修改数据的任何SQL命令都必须在master实例上执行。 </p>
             <p>为了确保数据的一致性，您可以在主服务器上安全地运行语句来调用使用<codeph>VOLATILE
@@ -126,7 +126,7 @@ SELECT foo();</codeblock>
             <p>
                 <codeblock>SELECT * from foo();</codeblock>
             </p>
-            <p>Greenplum数据库不支持返回表引用（rangeFuncs）的函数或使用refCursor数据类型的函数。</p>
+            <p>Greenplum数据库不支持返回表引用（<codeph>rangeFuncs</codeph>）的函数或使用<codeph>refCursor</codeph>数据类型的函数。</p>
         </body>
         <topic id="topic281" xml:lang="en">
             <title id="in1414519">函数易变性和计划缓冲</title>
@@ -633,7 +633,7 @@ SELECT foo();</codeblock>
                                         <i>expr</i>] ORDER BY <i>expr</i> )</codeph>
                             </entry>
                             <entry colname="col4">
-                                在不做自连接的情况下，提供对于同一个表中多于一行的访问。给定一个查询返回的一系列行以及该游标的一个位置，lead提供对位于该位置之后一个给定物理偏移量的行的访问。如果没有指定offset，默认偏移量是1。default设置当偏移量超出窗口范围之外时要返回的值。如果没有指定default，默认值是空值。
+                                在不做自连接的情况下，提供对于同一个表中多于一行的访问。给定一个查询返回的一系列行以及该游标的一个位置，lead提供对位于该位置之后一个给定物理偏移量的行的访问。如果没有指定offset，默认偏移量是1。default设置当偏移量超出窗口范围之外时要返回的值。如果没有指定<i>default</i>，默认值是空值。
                                </entry>
                         </row>
                         <row>
@@ -723,7 +723,7 @@ SELECT foo();</codeblock>
                             <entry colname="col3">
                                 <codeph>MEDIAN (<i>expression</i>)</codeph>
                                 <p>
-                                    <i>Example:</i>
+                                    <i>例子：</i>
                                 </p>
                                 <codeblock>SELECT department_id, MEDIAN(salary) 
 FROM employees 
@@ -741,7 +741,7 @@ GROUP BY department_id; </codeblock>
                             <entry colname="col3">
                                 <codeph>sum(array[[1,2],[3,4]])</codeph>
                                 <p>
-                                    <i>例如：</i>
+                                    <i>例子：</i>
                                 </p>
                                 <codeblock>CREATE TABLE mymatrix (myvalue int[]);
 INSERT INTO mymatrix VALUES (array[[1,2],[3,4]]);

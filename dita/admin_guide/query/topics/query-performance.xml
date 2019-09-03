@@ -10,7 +10,7 @@
   <body>
 
     <ul>
-      <li id="in198681">动态分区消除<p>在Greenplum数据库中，只有在查询运行时才可用的值被用来动态地剪枝分区，这会改进查询的处理速度。通过将服务器配置参数<codeph>gp_dynamic_partition_pruning</codeph>设置为<codeph>ON</codeph> 或者<codeph>OFF</codeph> 可启用或者禁用动态分区消除，该参数默认是ON。</p></li>
+      <li id="in198681">动态分区消除<p>在Greenplum数据库中，只有在查询运行时才可用的值被用来动态地剪枝分区，这会改进查询的处理速度。通过将服务器配置参数<codeph>gp_dynamic_partition_pruning</codeph>设置为<codeph>ON</codeph> 或者<codeph>OFF</codeph> 可启用或者禁用动态分区消除，该参数默认是<codeph>ON</codeph> 。</p></li>
 
       <li id="in198822">内存优化<p>Greenplum数据库为一个查询中的不同操作符最优地分配内存以及在处理查询的各阶段中释放并重新分配内存。</p></li>
     </ul>
