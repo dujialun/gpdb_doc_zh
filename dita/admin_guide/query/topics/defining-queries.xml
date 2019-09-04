@@ -24,7 +24,7 @@
             <p>Greenplum数据库使用PostgreSQL的结构和语法，但有一些不同。更多有关PostgreSQL中的SQL规则和概念的信息，请见PostgreSQL文档中的“SQL语法”。</p>
         </body>
     </topic>
-    <topic id="topic4" xml:lang="en"/>
+    <topic id="topic4" xml:lang="en">
         <title id="in140511">SQL值表达式</title>
         <body>
             <p>SQL值表达式由一个或者多个值、符号、操作符、SQL函数及数据组成。值表达式会比较数据或者执行计算并且返回一个值作为结果。计算包括逻辑的、数学的和集合操作。
