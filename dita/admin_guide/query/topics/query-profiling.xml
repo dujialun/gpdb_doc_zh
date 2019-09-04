@@ -2,7 +2,7 @@
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 
 <topic id="topic39" xml:lang="en">
-  <title id="in198649">查询画像</title>
+  <title id="in198649">查询分析</title>
   <abstract>
     <shortdesc>检查性能不好的查询的查询计划,来确定可能的性能调优机会。</shortdesc>
   </abstract>
