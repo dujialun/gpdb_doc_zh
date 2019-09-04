@@ -10,15 +10,15 @@
   <topic id="topic2" xml:lang="en">
     <title>理解查询规划和分发</title>
     <body>
-      <p id="iy139991">Master接收、解析并且优化查询。作为结果的查询计划可能是并行的或者定向的。如图 <xref href="#topic2/iy139990" type="fig" format="dita"/>所示，Master会把并行查询计划分发到所有的Segment。而如图 2<xref href="#topic2/iy145883" type="fig" format="dita"/>所示，Master会把定向查询计划分发到单一的一个段实例。每个段实例负责在其自己的数据集上执行本地数据库操作。 </p>
-      <p>大部分的数据库操作（例如表扫描、连接、聚集和排序）都会以并行的方式在所有段实例上执行。在一个段实例的数据库上执行的每个操作都独立于存储在其他段实例数据库中的数据。</p>
+      <p id="iy139991">Master接收、解析并且优化查询。作为结果的查询计划可能是并行的或者定向的。如图 <xref href="#topic2/iy139990" type="fig" format="dita"/>所示，Master会把并行查询计划分发到所有的Segment。而如图 2<xref href="#topic2/iy145883" type="fig" format="dita"/>所示，Master会把定向查询计划分发到单一的一个segment实例。每个segment实例负责在其自己的数据集上执行本地数据库操作。 </p>
+      <p>大部分的数据库操作（例如表扫描、连接、聚集和排序）都会以并行的方式在所有segment实例上执行。在一个segment实例的数据库上执行的每个操作都独立于存储在其他segment实例数据库中的数据。</p>
       <fig id="iy139990">
         <title>分发并行查询计划 </title>
         <image href="../../graphics/parallel_plan.jpg" placement="break" width="450px"
           height="297px"/>
       </fig>
       <p>某些查询可能只访问单个Segment上的数据，例如单行的<codeph>INSERT</codeph><ph>, <codeph>UPDATE</codeph>,
-        <codeph>DELETE</codeph>,</ph> 或者 <codeph>SELECT</codeph>操作或者以表分布键列过滤的查询。在这些查询中，段实例，而是定向给到包含受影响或者相关行的段实例。</p>
+        <codeph>DELETE</codeph>,</ph> 或者 <codeph>SELECT</codeph>操作或者以表分布键列过滤的查询。在这些查询中，segment实例，而是定向给到包含受影响或者相关行的segment实例。</p>
       <fig id="iy145883">
         <title>分发定向查询计划 </title>
         <image href="../../graphics/targeted_dispatch.jpg" placement="break" width="454px"
@@ -30,7 +30,7 @@
     <title id="iy139957">理解Greenplum的查询计划</title>
     <body>
       <p>查询计划是Greenplum数据库将要执行以产生查询答案的操作集合。计划中的每个<i>节点</i>或者步骤表示一个数据库操作，例如表扫描、连接、聚集或者排序。计划的读取和执行按照从底向上的顺序进行。</p>
-      <p id="iy146386">除通常的数据库操作（例如表扫描、连接等等）之外，Greenplum数据库还有一种额外的被称为<i>移动</i>的操作类型。移动操作涉及到在查询处理期间在段实例之间移动元组。注意并非每一个查询都需要移动操作。例如，定向查询计划就不需要通过Interconnect移动数据。</p>
+      <p id="iy146386">除通常的数据库操作（例如表扫描、连接等等）之外，Greenplum数据库还有一种额外的被称为<i>移动</i>的操作类型。移动操作涉及到在查询处理期间在segment实例之间移动元组。注意并非每一个查询都需要移动操作。例如，定向查询计划就不需要通过Interconnect移动数据。</p>
       <p>为了在查询执行期间达到最大并行度，Greenplum将查询计划的工作划分成切片。切片是Segment能够在其上独立工作的计划片段。只要有一个移动操作出现在计划中，该查询计划就会被切片，在移动的两端分别有一个切片。</p>
       <p>例如，下面涉及两个表之间连接的简单查询：</p>
       <p>
@@ -39,9 +39,9 @@ FROM sales JOIN customer USING (cust_id)
 WHERE dateCol = '04-30-2016';
 </codeblock>
       </p>
-      <p><xref href="#topic3/iy140224" type="fig" format="dita"/> 展示了这个查询计划。每个段实例接收一份查询计划的拷贝并且并行地根据计划工作。 </p>
-      <p>这个例子的查询计划有一个<i>重分布移动</i>，它在段实例之间移动元组以完成连接。重分布移动是必要的，因为customer表在Segment上按照<codeph>cust_id</codeph>分布，而sales表是按照sale_id分布。为了执行该连接，sales元组必须按照cust_id重新分布。该计划在重分布移动操作的两边被切换，形成了<i>slice 1</i>和<i>slice 2</i>。 </p>
-      <p>这个查询计划由另一种称为收集移动的移动操作。收集操作表示段实例何时将结果发回给Master，Master再将结果呈现给客户端。由于只要有移动产生查询计划就会被切片，这个计划在其最顶层也有一个隐式的切片（<i>slice 3</i>）。不是所有的查询计划都涉及收集移动。例如，一个<codeph>CREATE TABLE x AS SELECT...</codeph>语句不会有收集移动，因为元组都被发送到新创建的表而不是发给Master。 </p>
+      <p><xref href="#topic3/iy140224" type="fig" format="dita"/> 展示了这个查询计划。每个segment实例接收一份查询计划的拷贝并且并行地根据计划工作。 </p>
+      <p>这个例子的查询计划有一个<i>重分布移动</i>，它在segment实例之间移动元组以完成连接。重分布移动是必要的，因为customer表在Segment上按照<codeph>cust_id</codeph>分布，而sales表是按照sale_id分布。为了执行该连接，sales元组必须按照cust_id重新分布。该计划在重分布移动操作的两边被切换，形成了<i>slice 1</i>和<i>slice 2</i>。 </p>
+      <p>这个查询计划由另一种称为收集移动的移动操作。收集操作表示segment实例何时将结果发回给Master，Master再将结果呈现给客户端。由于只要有移动产生查询计划就会被切片，这个计划在其最顶层也有一个隐式的切片（<i>slice 3</i>）。不是所有的查询计划都涉及收集移动。例如，一个<codeph>CREATE TABLE x AS SELECT...</codeph>语句不会有收集移动，因为元组都被发送到新创建的表而不是发给Master。 </p>
       <fig id="iy140224">
         <title>查询切片计划 </title>
         <image href="../../graphics/slice_plan.jpg" placement="break" width="462px"
