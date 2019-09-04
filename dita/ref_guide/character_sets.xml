@@ -1,65 +1,621 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="ig167937">Character Set Support</title><body><p>The character set support in Greenplum Database allows you to store
-text in a variety of character sets, including single-byte character
-sets such as the ISO 8859 series and multiple-byte character sets such
-as EUC (Extended Unix Code), UTF-8, and Mule internal code. All supported
-character sets can be used transparently by clients, but a few are not
-supported for use within the server (that is, as a server-side encoding).
-The default character set is selected while initializing your Greenplum
-Database array using <codeph>gpinitsystem</codeph>. It can be overridden
-when you create a database, so you can have multiple databases each with
-a different character set.</p><table id="ig167946"><title>Greenplum Database Character Sets <ph>
-          <fn>Not all APIs support all the listed character sets. For example, the JDBC driver does
-            not support MULE_INTERNAL, LATIN6, LATIN8, and LATIN10.</fn>
-        </ph></title><tgroup cols="6"><colspec colnum="1" colname="col1" colwidth="78pt"/><colspec colnum="2" colname="col2" colwidth="124pt"/><colspec colnum="3" colname="col3" colwidth="82pt"/><colspec colnum="4" colname="col4" colwidth="38pt"/><colspec colnum="5" colname="col5" colwidth="51pt"/><colspec colnum="6" colname="col6" colwidth="75pt"/><thead><row><entry colname="col1"><ph>Name</ph></entry><entry colname="col2"><ph>Description</ph></entry><entry colname="col3"><ph>Language</ph></entry><entry colname="col4"><ph>Server?</ph></entry><entry colname="col5"><ph>Bytes/Char</ph></entry><entry colname="col6"><ph>Aliases</ph></entry></row></thead><tbody><row><entry colname="col1">BIG5</entry><entry colname="col2">Big Five</entry><entry colname="col3">Traditional Chinese</entry><entry colname="col4">No</entry><entry colname="col5">1-2</entry><entry colname="col6">WIN950, Windows950</entry></row><row><entry colname="col1">EUC_CN</entry><entry colname="col2">Extended UNIX Code-CN</entry><entry colname="col3">Simplified Chinese</entry><entry colname="col4">Yes</entry><entry colname="col5">1-3</entry><entry colname="col6"/></row><row><entry colname="col1">EUC_JP</entry><entry colname="col2">Extended UNIX Code-JP</entry><entry colname="col3">Japanese</entry><entry colname="col4">Yes</entry><entry colname="col5">1-3</entry><entry colname="col6"/></row><row><entry colname="col1">EUC_KR</entry><entry colname="col2">Extended UNIX Code-KR</entry><entry colname="col3">Korean</entry><entry colname="col4">Yes</entry><entry colname="col5">1-3</entry><entry colname="col6"/></row><row><entry colname="col1">EUC_TW</entry><entry colname="col2">Extended UNIX Code-TW</entry><entry colname="col3">Traditional Chinese, Taiwanese</entry><entry colname="col4">Yes</entry><entry colname="col5">1-3</entry><entry colname="col6"/></row><row><entry colname="col1">GB18030</entry><entry colname="col2">National Standard</entry><entry colname="col3">Chinese</entry><entry colname="col4">No</entry><entry colname="col5">1-2</entry><entry colname="col6"/></row><row><entry colname="col1">GBK</entry><entry colname="col2">Extended National Standard</entry><entry colname="col3">Simplified Chinese</entry><entry colname="col4">No</entry><entry colname="col5">1-2</entry><entry colname="col6">WIN936, Windows936</entry></row><row><entry colname="col1">ISO_8859_5</entry><entry colname="col2">ISO 8859-5, ECMA 113</entry><entry colname="col3">Latin/Cyrillic</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">ISO_8859_6</entry><entry colname="col2">ISO 8859-6, ECMA 114</entry><entry colname="col3">Latin/Arabic</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">ISO_8859_7</entry><entry colname="col2">ISO 8859-7, ECMA 118</entry><entry colname="col3">Latin/Greek</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">ISO_8859_8</entry><entry colname="col2">ISO 8859-8, ECMA 121</entry><entry colname="col3">Latin/Hebrew</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">JOHAB</entry><entry colname="col2">JOHA </entry><entry colname="col3">Korean (Hangul)</entry><entry colname="col4">Yes</entry><entry colname="col5">1-3</entry><entry colname="col6"/></row><row><entry colname="col1">KOI8</entry><entry colname="col2">KOI8-R(U)</entry><entry colname="col3">Cyrillic</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">KOI8R</entry></row><row><entry colname="col1">LATIN1</entry><entry colname="col2">ISO 8859-1, ECMA 94</entry><entry colname="col3">Western European</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ISO88591</entry></row><row><entry colname="col1">LATIN2</entry><entry colname="col2">ISO 8859-2, ECMA 94</entry><entry colname="col3">Central European</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ISO88592</entry></row><row><entry colname="col1">LATIN3</entry><entry colname="col2">ISO 8859-3, ECMA 94</entry><entry colname="col3">South European</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ISO88593</entry></row><row><entry colname="col1">LATIN4</entry><entry colname="col2">ISO 8859-4, ECMA 94</entry><entry colname="col3">North European</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ISO88594</entry></row><row><entry colname="col1">LATIN5</entry><entry colname="col2">ISO 8859-9, ECMA 128</entry><entry colname="col3">Turkish</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ISO88599</entry></row><row><entry colname="col1">LATIN6</entry><entry colname="col2">ISO 8859-10, ECMA 144</entry><entry colname="col3">Nordic</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ISO885910</entry></row><row><entry colname="col1">LATIN7</entry><entry colname="col2">ISO 8859-13</entry><entry colname="col3">Baltic</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ISO885913</entry></row><row><entry colname="col1">LATIN8</entry><entry colname="col2">ISO 8859-14</entry><entry colname="col3">Celtic</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ISO885914</entry></row><row><entry colname="col1">LATIN9</entry><entry colname="col2">ISO 8859-15</entry><entry colname="col3">LATIN1 with Euro and accents</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ISO885915</entry></row><row><entry colname="col1">LATIN10</entry><entry colname="col2">ISO 8859-16, ASRO SR 14111</entry><entry colname="col3">Romanian</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ISO885916</entry></row><row><entry colname="col1">MULE_INTERNAL</entry><entry colname="col2">Mule internal code</entry><entry colname="col3">Multilingual Emacs</entry><entry colname="col4">Yes</entry><entry colname="col5">1-4</entry><entry colname="col6"/></row><row><entry colname="col1">SJIS</entry><entry colname="col2">Shift JIS</entry><entry colname="col3">Japanese</entry><entry colname="col4">No</entry><entry colname="col5">1-2</entry><entry colname="col6">Mskanji, ShiftJIS, WIN932, Windows932</entry></row><row><entry colname="col1">SQL_ASCII</entry><entry colname="col2">unspecified <fn>The SQL_ASCII setting behaves considerably differently from
-                the other settings. Byte values 0-127 are interpreted according to the ASCII
-                standard, while byte values 128-255 are taken as uninterpreted characters. If you
-                are working with any non-ASCII data, it is unwise to use the SQL_ASCII setting as a
-                client encoding. SQL_ASCII is not supported as a server encoding.</fn></entry><entry colname="col3">any</entry><entry colname="col4">No</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">UHC</entry><entry colname="col2">Unified Hangul Code</entry><entry colname="col3">Korean</entry><entry colname="col4">No</entry><entry colname="col5">1-2</entry><entry colname="col6">WIN949, Windows949</entry></row><row><entry colname="col1">UTF8</entry><entry colname="col2">Unicode, 8-bit </entry><entry colname="col3">all</entry><entry colname="col4">Yes</entry><entry colname="col5">1-4</entry><entry colname="col6">Unicode</entry></row><row><entry colname="col1">WIN866</entry><entry colname="col2">Windows CP866</entry><entry colname="col3">Cyrillic</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ALT</entry></row><row><entry colname="col1">WIN874</entry><entry colname="col2">Windows CP874</entry><entry colname="col3">Thai</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">WIN1250</entry><entry colname="col2">Windows CP1250</entry><entry colname="col3">Central European</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">WIN1251</entry><entry colname="col2">Windows CP1251</entry><entry colname="col3">Cyrillic</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">WIN</entry></row><row><entry colname="col1">WIN1252</entry><entry colname="col2">Windows CP1252</entry><entry colname="col3">Western European</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">WIN1253</entry><entry colname="col2">Windows CP1253</entry><entry colname="col3">Greek</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">WIN1254</entry><entry colname="col2">Windows CP1254</entry><entry colname="col3">Turkish</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">WIN1255</entry><entry colname="col2">Windows CP1255</entry><entry colname="col3">Hebrew</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">WIN1256</entry><entry colname="col2">Windows CP1256</entry><entry colname="col3">Arabic</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">WIN1257</entry><entry colname="col2">Windows CP1257</entry><entry colname="col3">Baltic</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6"/></row><row><entry colname="col1">WIN1258</entry><entry colname="col2">Windows CP1258</entry><entry colname="col3">Vietnamese</entry><entry colname="col4">Yes</entry><entry colname="col5">1</entry><entry colname="col6">ABC, TCVN, TCVN5712, VSCII</entry></row></tbody></tgroup></table></body><topic id="topic2" xml:lang="en"><title>Setting the Character Set</title><body><p>gpinitsystem defines the default character set for a Greenplum Database
-system by reading the setting of the <codeph>ENCODING</codeph> parameter
-in the <codeph>gp_init_config</codeph> file at initialization time. The
-default character set is <codeph>UNICODE</codeph> or <codeph>UTF8</codeph>.</p><p>You can create a database with a different character set besides what
-is used as the system-wide default. For example: </p><codeblock>=&gt; CREATE DATABASE korean WITH ENCODING 'EUC_KR';</codeblock><p><b>Important:</b> Although you can specify any encoding you want for a
-database, it is unwise to choose an encoding that is not what is expected
-by the locale you have selected. The <codeph>LC_COLLATE</codeph> and
-<codeph>LC_CTYPE</codeph> settings imply a particular encoding, and locale-dependent
-operations (such as sorting) are likely to misinterpret data that is
-in an incompatible encoding.</p><p>Since these locale settings are frozen by gpinitsystem, the apparent
-flexibility to use different encodings in different databases is more
-theoretical than real.</p><p>One way to use multiple encodings safely is to set the locale to <codeph>C</codeph>
-or <codeph>POSIX</codeph> during initialization time, thus disabling
-any real locale awareness. </p></body></topic><topic id="topic3" xml:lang="en"><title>Character Set Conversion Between Server and Client</title><body><p>Greenplum Database supports automatic character set conversion between
-server and client for certain character set combinations. The conversion
-information is stored in the master <i>pg_conversion</i> system catalog
-table. Greenplum Database comes with some predefined conversions or you
-can create a new conversion using the SQL command <codeph>CREATE CONVERSION</codeph>.
-</p><table id="ig167171"><title>Client/Server Character Set Conversions</title><tgroup cols="2"><colspec colnum="1" colname="col1" colwidth="125pt"/><colspec colnum="2" colname="col2" colwidth="250pt"/><thead><row><entry colname="col1">Server Character Set </entry><entry colname="col2">Available Client Character Sets</entry></row></thead><tbody><row><entry colname="col1">BIG5</entry><entry colname="col2">not supported as a server encoding</entry></row><row><entry colname="col1">EUC_CN</entry><entry colname="col2">EUC_CN, MULE_INTERNAL, UTF8</entry></row><row><entry colname="col1">EUC_JP</entry><entry colname="col2">EUC_JP, MULE_INTERNAL, SJIS, UTF8</entry></row><row><entry colname="col1">EUC_KR</entry><entry colname="col2">EUC_KR, MULE_INTERNAL, UTF8</entry></row><row><entry colname="col1">EUC_TW </entry><entry colname="col2">EUC_TW, BIG5, MULE_INTERNAL, UTF8 </entry></row><row><entry colname="col1">GB18030</entry><entry colname="col2">not supported as a server encoding</entry></row><row><entry colname="col1">GBK</entry><entry colname="col2">not supported as a server encoding</entry></row><row><entry colname="col1">ISO_8859_5</entry><entry colname="col2">ISO_8859_5, KOI8, MULE_INTERNAL, UTF8, WIN866,
-WIN1251</entry></row><row><entry colname="col1">ISO_8859_6</entry><entry colname="col2">ISO_8859_6, UTF8</entry></row><row><entry colname="col1">ISO_8859_7</entry><entry colname="col2">ISO_8859_7, UTF8</entry></row><row><entry colname="col1">ISO_8859_8</entry><entry colname="col2">ISO_8859_8, UTF8</entry></row><row><entry colname="col1">JOHAB</entry><entry colname="col2">JOHAB, UTF8</entry></row><row><entry colname="col1">KOI8</entry><entry colname="col2">KOI8, ISO_8859_5, MULE_INTERNAL, UTF8, WIN866,
-WIN1251</entry></row><row><entry colname="col1">LATIN1</entry><entry colname="col2">LATIN1, MULE_INTERNAL, UTF8</entry></row><row><entry colname="col1">LATIN2</entry><entry colname="col2">LATIN2, MULE_INTERNAL, UTF8, WIN1250</entry></row><row><entry colname="col1">LATIN3</entry><entry colname="col2">LATIN3, MULE_INTERNAL, UTF8</entry></row><row><entry colname="col1">LATIN4</entry><entry colname="col2">LATIN4, MULE_INTERNAL, UTF8</entry></row><row><entry colname="col1">LATIN5</entry><entry colname="col2">LATIN5, UTF8</entry></row><row><entry colname="col1">LATIN6</entry><entry colname="col2">LATIN6, UTF8</entry></row><row><entry colname="col1">LATIN7</entry><entry colname="col2">LATIN7, UTF8</entry></row><row><entry colname="col1">LATIN8</entry><entry colname="col2">LATIN8, UTF8 </entry></row><row><entry colname="col1">LATIN9</entry><entry colname="col2">LATIN9, UTF8</entry></row><row><entry colname="col1">LATIN10</entry><entry colname="col2">LATIN10, UTF8</entry></row><row><entry colname="col1">MULE_INTERNAL</entry><entry colname="col2">MULE_INTERNAL, BIG5, EUC_CN, EUC_JP, EUC_KR,
-EUC_TW, ISO_8859_5, KOI8, LATIN1 to LATIN4, SJIS, WIN866, WIN1250, WIN1251</entry></row><row><entry colname="col1">SJIS</entry><entry colname="col2">not supported as a server encoding</entry></row><row><entry colname="col1">SQL_ASCII</entry><entry colname="col2">not supported as a server encoding</entry></row><row><entry colname="col1">UHC</entry><entry colname="col2">not supported as a server encoding</entry></row><row><entry colname="col1">UTF8</entry><entry colname="col2">all supported encodings</entry></row><row><entry colname="col1">WIN866</entry><entry colname="col2">WIN866</entry></row><row><entry colname="col1">ISO_8859_5</entry><entry colname="col2">KOI8, MULE_INTERNAL, UTF8, WIN1251</entry></row><row><entry colname="col1">WIN874</entry><entry colname="col2">WIN874, UTF8</entry></row><row><entry colname="col1">WIN1250</entry><entry colname="col2">WIN1250, LATIN2, MULE_INTERNAL, UTF8</entry></row><row><entry colname="col1">WIN1251</entry><entry colname="col2">WIN1251, ISO_8859_5, KOI8, MULE_INTERNAL, UTF8,
-WIN866 </entry></row><row><entry colname="col1">WIN1252</entry><entry colname="col2">WIN1252, UTF8</entry></row><row><entry colname="col1">WIN1253</entry><entry colname="col2">WIN1253, UTF8</entry></row><row><entry colname="col1">WIN1254</entry><entry colname="col2">WIN1254, UTF8</entry></row><row><entry colname="col1">WIN1255</entry><entry colname="col2">WIN1255, UTF8</entry></row><row><entry colname="col1">WIN1256</entry><entry colname="col2">WIN1256, UTF8</entry></row><row><entry colname="col1">WIN1257</entry><entry colname="col2">WIN1257, UTF8 </entry></row><row><entry colname="col1">WIN1258</entry><entry colname="col2">WIN1258, UTF8</entry></row></tbody></tgroup></table><p>To enable automatic character set conversion, you have to tell Greenplum
-Database the character set (encoding) you would like to use in the client.
-There are several ways to accomplish this: </p><ul><li id="ig167344">Using the <codeph>\encoding</codeph> command in <codeph>psql</codeph>,
-which allows you to change client encoding on the fly.</li><li id="ig167345">Using <codeph>SET</codeph><codeph>client_encoding TO</codeph>.<p>To set the client
-            encoding, use the following SQL command:
-            </p><codeblock>=&gt; SET CLIENT_ENCODING TO '<i>value</i>';</codeblock><p>To query the
-            current client encoding: </p><codeblock>=&gt; SHOW client_encoding;</codeblock><p>To
-            return to the default encoding:
-          </p><codeblock>=&gt; RESET client_encoding;</codeblock></li><li id="ig167351">Using the <codeph>PGCLIENTENCODING</codeph> environment variable. When
-<codeph>PGCLIENTENCODING</codeph> is defined in the client's environment,
-that client encoding is automatically selected when a connection to the
-server is made. (This can subsequently be overridden using any of the
-other methods mentioned above.) </li><li id="ig167352">Setting the configuration parameter <codeph>client_encoding</codeph>.
-If <codeph>client_encoding</codeph> is set in the master <codeph>postgresql.conf
-</codeph>file, that client encoding is automatically selected when a
-connection to Greenplum Database is made. (This can subsequently be overridden
-using any of the other methods mentioned above.) </li></ul><p>If the conversion of a particular character is not possible " suppose
-you chose <codeph>EUC_JP</codeph> for the server and <codeph>LATIN1</codeph>
-for the client, then some Japanese characters do not have a representation
-in <codeph>LATIN1</codeph> " then an error is reported. </p><p>If the client character set is defined as <codeph>SQL_ASCII</codeph>,
-encoding conversion is disabled, regardless of the server's character
-set. The use of <codeph>SQL_ASCII</codeph> is unwise unless you are working
-with all-ASCII data. <codeph>SQL_ASCII</codeph> is not supported as a
-server encoding.</p></body></topic></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1" xml:lang="en">
+    <title id="ig167937">字符集支持</title>
+    <body>
+        <p>Greenplum数据库中的字符集支持允许您以各种字符集存储文本，包括单字节字符集（如ISO 8859系列）和多字节字符集（如EUC（扩展Unix代码），UTF-8）， 和Mule内部代码。
+            客户端可以透明地使用所有支持的字符集，但少数只能在服务器上使用（即作为一种服务器端编码）。
+            使用<codeph>gpinitsystem</codeph>初始化Greenplum数据库阵列时，会选择默认字符集。
+            创建数据库时可以覆盖它，因此您可以拥有多个数据库，每个数据库具有不同的字符集。
+        </p>
+        <table id="ig167946">
+            <title>Greenplum数据库字符集
+                <ph>
+                    <fn>并非所有API都支持所有列出的字符集。
+                        例如，JDBC驱动程序不支持MULE_INTERNAL，LATIN6，LATIN8和LATIN10。
+                    </fn>
+                </ph>
+            </title>
+            <tgroup cols="6">
+                <colspec colnum="1" colname="col1" colwidth="78pt"/>
+                <colspec colnum="2" colname="col2" colwidth="124pt"/>
+                <colspec colnum="3" colname="col3" colwidth="82pt"/>
+                <colspec colnum="4" colname="col4" colwidth="38pt"/>
+                <colspec colnum="5" colname="col5" colwidth="51pt"/>
+                <colspec colnum="6" colname="col6" colwidth="75pt"/>
+                <thead>
+                    <row>
+                        <entry colname="col1">
+                            <ph>名称</ph>
+                        </entry>
+                        <entry colname="col2">
+                            <ph>描述</ph>
+                        </entry>
+                        <entry colname="col3">
+                            <ph>语言</ph>
+                        </entry>
+                        <entry colname="col4">
+                            <ph>是否服务端?</ph>
+                        </entry>
+                        <entry colname="col5">
+                            <ph>字节/字符</ph>
+                        </entry>
+                        <entry colname="col6">
+                            <ph>别名</ph>
+                        </entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry colname="col1">BIG5</entry>
+                        <entry colname="col2">Big Five</entry>
+                        <entry colname="col3">繁体中文</entry>
+                        <entry colname="col4">No</entry>
+                        <entry colname="col5">1-2</entry>
+                        <entry colname="col6">WIN950, Windows950</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">EUC_CN</entry>
+                        <entry colname="col2">Extended UNIX Code-CN</entry>
+                        <entry colname="col3">简体中文</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1-3</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">EUC_JP</entry>
+                        <entry colname="col2">Extended UNIX Code-JP</entry>
+                        <entry colname="col3">日文</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1-3</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">EUC_KR</entry>
+                        <entry colname="col2">Extended UNIX Code-KR</entry>
+                        <entry colname="col3">韩文</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1-3</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">EUC_TW</entry>
+                        <entry colname="col2">Extended UNIX Code-TW</entry>
+                        <entry colname="col3">繁体中文，台湾</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1-3</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">GB18030</entry>
+                        <entry colname="col2">国家标准</entry>
+                        <entry colname="col3">中文</entry>
+                        <entry colname="col4">No</entry>
+                        <entry colname="col5">1-2</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">GBK</entry>
+                        <entry colname="col2">扩展国标</entry>
+                        <entry colname="col3">简体中文</entry>
+                        <entry colname="col4">No</entry>
+                        <entry colname="col5">1-2</entry>
+                        <entry colname="col6">WIN936, Windows936</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">ISO_8859_5</entry>
+                        <entry colname="col2">ISO 8859-5, ECMA 113</entry>
+                        <entry colname="col3">Latin/Cyrillic</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">ISO_8859_6</entry>
+                        <entry colname="col2">ISO 8859-6, ECMA 114</entry>
+                        <entry colname="col3">Latin/Arabic</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">ISO_8859_7</entry>
+                        <entry colname="col2">ISO 8859-7, ECMA 118</entry>
+                        <entry colname="col3">Latin/Greek</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">ISO_8859_8</entry>
+                        <entry colname="col2">ISO 8859-8, ECMA 121</entry>
+                        <entry colname="col3">Latin/Hebrew</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">JOHAB</entry>
+                        <entry colname="col2">JOHA</entry>
+                        <entry colname="col3">Korean (Hangul)</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1-3</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">KOI8</entry>
+                        <entry colname="col2">KOI8-R(U)</entry>
+                        <entry colname="col3">Cyrillic</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">KOI8R</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">LATIN1</entry>
+                        <entry colname="col2">ISO 8859-1, ECMA 94</entry>
+                        <entry colname="col3">Western European</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ISO88591</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">LATIN2</entry>
+                        <entry colname="col2">ISO 8859-2, ECMA 94</entry>
+                        <entry colname="col3">Central European</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ISO88592</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">LATIN3</entry>
+                        <entry colname="col2">ISO 8859-3, ECMA 94</entry>
+                        <entry colname="col3">South European</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ISO88593</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">LATIN4</entry>
+                        <entry colname="col2">ISO 8859-4, ECMA 94</entry>
+                        <entry colname="col3">North European</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ISO88594</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">LATIN5</entry>
+                        <entry colname="col2">ISO 8859-9, ECMA 128</entry>
+                        <entry colname="col3">Turkish</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ISO88599</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">LATIN6</entry>
+                        <entry colname="col2">ISO 8859-10, ECMA 144</entry>
+                        <entry colname="col3">Nordic</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ISO885910</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">LATIN7</entry>
+                        <entry colname="col2">ISO 8859-13</entry>
+                        <entry colname="col3">Baltic</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ISO885913</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">LATIN8</entry>
+                        <entry colname="col2">ISO 8859-14</entry>
+                        <entry colname="col3">Celtic</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ISO885914</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">LATIN9</entry>
+                        <entry colname="col2">ISO 8859-15</entry>
+                        <entry colname="col3">LATIN1 with Euro and accents</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ISO885915</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">LATIN10</entry>
+                        <entry colname="col2">ISO 8859-16, ASRO SR 14111</entry>
+                        <entry colname="col3">Romanian</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ISO885916</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">MULE_INTERNAL</entry>
+                        <entry colname="col2">Mule internal code</entry>
+                        <entry colname="col3">Multilingual Emacs</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1-4</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">SJIS</entry>
+                        <entry colname="col2">Shift JIS</entry>
+                        <entry colname="col3">Japanese</entry>
+                        <entry colname="col4">No</entry>
+                        <entry colname="col5">1-2</entry>
+                        <entry colname="col6">Mskanji, ShiftJIS, WIN932, Windows932</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">SQL_ASCII</entry>
+                        <entry colname="col2">unspecified
+                            <fn>SQL_ASCII设置与其他设置的行为大不相同。
+                                字节值0-127根据ASCII标准进行解释，字节值128-255作为未解释的字符。
+                                如果使用任何非ASCII数据，则将SQL_ASCII设置用作客户端编码是不明智的。
+                                不支持SQL_ASCII作为服务器编码。
+                            </fn>
+                        </entry>
+                        <entry colname="col3">any</entry>
+                        <entry colname="col4">No</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">UHC</entry>
+                        <entry colname="col2">Unified Hangul Code</entry>
+                        <entry colname="col3">Korean</entry>
+                        <entry colname="col4">No</entry>
+                        <entry colname="col5">1-2</entry>
+                        <entry colname="col6">WIN949, Windows949</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">UTF8</entry>
+                        <entry colname="col2">Unicode, 8-bit</entry>
+                        <entry colname="col3">all</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1-4</entry>
+                        <entry colname="col6">Unicode</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN866</entry>
+                        <entry colname="col2">Windows CP866</entry>
+                        <entry colname="col3">Cyrillic</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ALT</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN874</entry>
+                        <entry colname="col2">Windows CP874</entry>
+                        <entry colname="col3">Thai</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN1250</entry>
+                        <entry colname="col2">Windows CP1250</entry>
+                        <entry colname="col3">Central European</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN1251</entry>
+                        <entry colname="col2">Windows CP1251</entry>
+                        <entry colname="col3">Cyrillic</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">WIN</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN1252</entry>
+                        <entry colname="col2">Windows CP1252</entry>
+                        <entry colname="col3">Western European</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN1253</entry>
+                        <entry colname="col2">Windows CP1253</entry>
+                        <entry colname="col3">Greek</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN1254</entry>
+                        <entry colname="col2">Windows CP1254</entry>
+                        <entry colname="col3">Turkish</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN1255</entry>
+                        <entry colname="col2">Windows CP1255</entry>
+                        <entry colname="col3">Hebrew</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN1256</entry>
+                        <entry colname="col2">Windows CP1256</entry>
+                        <entry colname="col3">Arabic</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN1257</entry>
+                        <entry colname="col2">Windows CP1257</entry>
+                        <entry colname="col3">Baltic</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6"/>
+                    </row>
+                    <row>
+                        <entry colname="col1">WIN1258</entry>
+                        <entry colname="col2">Windows CP1258</entry>
+                        <entry colname="col3">Vietnamese</entry>
+                        <entry colname="col4">Yes</entry>
+                        <entry colname="col5">1</entry>
+                        <entry colname="col6">ABC, TCVN, TCVN5712, VSCII</entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </body>
+    <topic id="topic2" xml:lang="en">
+        <title>设置字符集</title>
+        <body>
+            <p>gpinitsystem通过在初始化时读取<codeph>gp_init_config</codeph>文件中<codeph>ENCODING</codeph>参数的设置来定义Greenplum数据库系统的默认字符集。
+                默认字符集是<codeph>UNICODE</codeph>或<codeph>UTF8</codeph>。
+            </p>
+            <p>除了用作系统范围的默认值之外，您还可以创建具有不同字符集的数据库。例如：
+            </p>
+            <codeblock>=&gt; CREATE DATABASE korean WITH ENCODING 'EUC_KR';</codeblock>
+            <p>
+                <b>重点:</b>
+                虽然您可以为数据库指定所需的任何编码，但选择与您选择的语言环境不同的编码是不明智的。
+                <codeph>LC_COLLATE</codeph>和<codeph>LC_CTYPE</codeph>设置意味着特定的编码，
+                并且依赖于区域设置的操作（例如排序）可能会错误解释处于不兼容编码的数据。
+            </p>
+            <p>由于这些语言环境设置被gpinitsystem冻结，因此在不同数据库中使用不同编码的明显的灵活性更具理论性而非实用性。
+            </p>
+            <p>安全使用多种编码的一种方法是在初始化期间将语言环境设置为<codeph>C</codeph>或<codeph>POSIX</codeph>，从而禁用任何真实的语言环境感知。
+            </p>
+        </body>
+    </topic>
+    <topic id="topic3" xml:lang="en">
+        <title>服务器和客户端之间的字符集转换t</title>
+        <body>
+            <p>Greenplum数据库支持服务器和客户端之间针对特定字符集组合的自动字符集转换。
+                转换信息存储在master <i>pg_conversion</i>系统catalog表中。
+                Greenplum数据库附带了一些预定义的转换，或者您可以使用SQL命令<codeph>CREATE CONVERSION</codeph>创建新的转换。
+            </p>
+            <table id="ig167171">
+                <title>客户端/服务器字符集转换</title>
+                <tgroup cols="2">
+                    <colspec colnum="1" colname="col1" colwidth="125pt"/>
+                    <colspec colnum="2" colname="col2" colwidth="250pt"/>
+                    <thead>
+                        <row>
+                            <entry colname="col1">服务器字符集</entry>
+                            <entry colname="col2">可用的客户端字符集</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry colname="col1">BIG5</entry>
+                            <entry colname="col2">不支持作为服务器编码</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">EUC_CN</entry>
+                            <entry colname="col2">EUC_CN, MULE_INTERNAL, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">EUC_JP</entry>
+                            <entry colname="col2">EUC_JP, MULE_INTERNAL, SJIS, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">EUC_KR</entry>
+                            <entry colname="col2">EUC_KR, MULE_INTERNAL, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">EUC_TW</entry>
+                            <entry colname="col2">EUC_TW, BIG5, MULE_INTERNAL, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">GB18030</entry>
+                            <entry colname="col2">不支持作为服务器编码</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">GBK</entry>
+                            <entry colname="col2">不支持作为服务器编码</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">ISO_8859_5</entry>
+                            <entry colname="col2">ISO_8859_5, KOI8, MULE_INTERNAL, UTF8, WIN866,
+                                WIN1251
+                            </entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">ISO_8859_6</entry>
+                            <entry colname="col2">ISO_8859_6, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">ISO_8859_7</entry>
+                            <entry colname="col2">ISO_8859_7, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">ISO_8859_8</entry>
+                            <entry colname="col2">ISO_8859_8, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">JOHAB</entry>
+                            <entry colname="col2">JOHAB, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">KOI8</entry>
+                            <entry colname="col2">KOI8, ISO_8859_5, MULE_INTERNAL, UTF8, WIN866,
+                                WIN1251
+                            </entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">LATIN1</entry>
+                            <entry colname="col2">LATIN1, MULE_INTERNAL, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">LATIN2</entry>
+                            <entry colname="col2">LATIN2, MULE_INTERNAL, UTF8, WIN1250</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">LATIN3</entry>
+                            <entry colname="col2">LATIN3, MULE_INTERNAL, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">LATIN4</entry>
+                            <entry colname="col2">LATIN4, MULE_INTERNAL, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">LATIN5</entry>
+                            <entry colname="col2">LATIN5, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">LATIN6</entry>
+                            <entry colname="col2">LATIN6, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">LATIN7</entry>
+                            <entry colname="col2">LATIN7, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">LATIN8</entry>
+                            <entry colname="col2">LATIN8, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">LATIN9</entry>
+                            <entry colname="col2">LATIN9, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">LATIN10</entry>
+                            <entry colname="col2">LATIN10, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">MULE_INTERNAL</entry>
+                            <entry colname="col2">MULE_INTERNAL, BIG5, EUC_CN, EUC_JP, EUC_KR,
+                                EUC_TW, ISO_8859_5, KOI8, LATIN1 to LATIN4, SJIS, WIN866, WIN1250, WIN1251
+                            </entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">SJIS</entry>
+                            <entry colname="col2">不支持作为服务器编码</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">SQL_ASCII</entry>
+                            <entry colname="col2">不支持作为服务器编码</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">UHC</entry>
+                            <entry colname="col2">不支持作为服务器编码</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">UTF8</entry>
+                            <entry colname="col2">所有支持的编码</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN866</entry>
+                            <entry colname="col2">WIN866</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">ISO_8859_5</entry>
+                            <entry colname="col2">KOI8, MULE_INTERNAL, UTF8, WIN1251</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN874</entry>
+                            <entry colname="col2">WIN874, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN1250</entry>
+                            <entry colname="col2">WIN1250, LATIN2, MULE_INTERNAL, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN1251</entry>
+                            <entry colname="col2">WIN1251, ISO_8859_5, KOI8, MULE_INTERNAL, UTF8,
+                                WIN866
+                            </entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN1252</entry>
+                            <entry colname="col2">WIN1252, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN1253</entry>
+                            <entry colname="col2">WIN1253, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN1254</entry>
+                            <entry colname="col2">WIN1254, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN1255</entry>
+                            <entry colname="col2">WIN1255, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN1256</entry>
+                            <entry colname="col2">WIN1256, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN1257</entry>
+                            <entry colname="col2">WIN1257, UTF8</entry>
+                        </row>
+                        <row>
+                            <entry colname="col1">WIN1258</entry>
+                            <entry colname="col2">WIN1258, UTF8</entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+            <p>要启用自动字符集转换，您必须告诉Greenplum数据库您要在客户端中使用的字符集（编码）。
+                有几种方法可以实现此目的：
+            </p>
+            <ul>
+                <li id="ig167344">在<codeph>psql</codeph>中使用<codeph>\encoding</codeph>命令，它允许您动态更改客户端编码。
+                </li>
+                <li id="ig167345">使用
+                    <codeph>SET</codeph>
+                    <codeph>client_encoding TO</codeph>.
+                    <p>要设置客户端编码，请使用以下SQL命令
+                    </p>
+                    <codeblock>=&gt; SET CLIENT_ENCODING TO '<i>value</i>';
+                    </codeblock>
+                    <p>要查询当前的客户端编码：
+                    </p>
+                    <codeblock>=&gt; SHOW client_encoding;</codeblock>
+                    <p>要返回到默认编码：
+                    </p>
+                    <codeblock>=&gt; RESET client_encoding;</codeblock>
+                </li>
+                <li id="ig167351">使用<codeph>PGCLIENTENCODING</codeph>环境变量。
+                    在客户端环境中定义<codeph>PGCLIENTENCODING</codeph>时，将在与服务器建立连接时自动选择该客户端编码。
+                    （这可以随后使用上面提到的任何其他方法覆盖。）
+                </li>
+                <li id="ig167352">设置配置参数<codeph>client_encoding</codeph>。
+                    如果在master <codeph>postgresql.conf</codeph>文件中设置了<codeph>client_encoding</codeph>，
+                    则在建立与Greenplum数据库的连接时会自动选择该客户端编码。
+                    （这可以随后使用上面提到的任何其他方法覆盖。）
+                </li>
+            </ul>
+            <p>如果无法转换特定字符“假设您为服务器选择了<codeph>EUC_JP</codeph>而对客户端选择了<codeph>LATIN1</codeph>，
+                那么某些日文字符在<codeph>LATIN1</codeph>中没有表示”，则会报告错误。
+            </p>
+            <p>如果客户端字符集定义为<codeph>SQL_ASCII</codeph>，则无论服务器的字符集如何，都将禁用编码转换。
+                除非使用all-ASCII数据，否则使用<codeph>SQL_ASCII</codeph>是不明智的。
+            </p>
+        </body>
+    </topic>
+</topic>

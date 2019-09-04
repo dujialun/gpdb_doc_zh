@@ -4,13 +4,14 @@
 <topic xmlns:ditaarch="http://dita.oasis-open.org/architecture/2005/" id="topic1" xml:lang="en"
     ditaarch:DITAArchVersion="1.1" domains="(topic ui-d) (topic hi-d) (topic pr-d) (topic sw-d)
     (topic ut-d) (topic indexing-d)" class="- topic/topic ">
-    <title id="id135496" class="- topic/title ">Greenplum Environment Variables</title>
+    <title id="id135496" class="- topic/title ">Greenplum环境变量</title>
     <body class="- topic/body ">
-        <p>This reference lists and describes the environment variables to set for Greenplum
-            Database. Set these in your user's startup shell profile (such as <codeph class="+
-                topic/ph pr-d/codeph ">~/.bashrc</codeph> or <codeph class="+ topic/ph pr-d/codeph "
-                >~/.bash_profile</codeph>), or in <codeph class="+ topic/ph pr-d/codeph "
-                >/etc/profile</codeph> if you want to set them for all users.</p>
+        <p>该参考列出并描述了Greenplum中可设置的环境变量。
+            如果想为所有用户设置这些环境变量，需要在用户的启动shell配置文件（如<codeph class="+
+                topic/ph pr-d/codeph ">~/.bashrc</codeph>或<codeph class="+ topic/ph pr-d/codeph "
+            >~/.bash_profile</codeph>或者在<codeph class="+ topic/ph pr-d/codeph "
+            >/etc/profile</codeph>中进行设置这些环境变量。
+            </p>
         <ul id="ul_ljp_gqc_bq">
             <li><xref href="#topic2" format="dita"/></li>
             <li><xref href="#topic7" format="dita"/></li>
@@ -19,21 +20,19 @@
     <topic id="topic2" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d) (topic
         hi-d) (topic pr-d) (topic sw-d)                          (topic ut-d) (topic indexing-d)"
         class="- topic/topic ">
-        <title class="- topic/title ">Required Environment Variables</title>
+        <title class="- topic/title ">必需的环境变量</title>
         <body class="- topic/body ">
-            <note type="note" class="- topic/note "><codeph class="+ topic/ph pr-d/codeph "
-                    >GPHOME</codeph>, <codeph class="+ topic/ph pr-d/codeph ">PATH</codeph> and
-                    <codeph class="+ topic/ph pr-d/codeph ">LD_LIBRARY_PATH</codeph> can be set by
-                sourcing the <codeph>greenplum_path.sh</codeph> file from your Greenplum Database
-                installation directory</note>
+            <note type="note" class="- topic/note ">
+                <codeph class="+ topic/ph pr-d/codeph ">GPHOME</codeph>，
+                <codeph class="+ topic/ph pr-d/codeph ">PATH</codeph>和<codeph class="+ topic/ph pr-d/codeph ">LD_LIBRARY_PATH</codeph>能够通过引入Greenplum安装目录下的<codeph>greenplum_path.sh</codeph>文件来设置。
+                </note>
         </body>
         <topic id="topic3" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d) (topic
             hi-d) (topic pr-d) (topic sw-d)                          (topic ut-d) (topic
             indexing-d)" class="- topic/topic ">
             <title id="id138636" class="- topic/title ">GPHOME</title>
             <body class="- topic/body ">
-                <p>This is the installed location of your Greenplum Database software. For
-                    example:</p>
+                <p>该参数指明了Greenplum安装位置。例如：</p>
                 <codeblock>GPHOME=/usr/local/greenplum-db-<varname>&lt;version></varname>
 export GPHOME</codeblock>
             </body>
@@ -43,9 +42,9 @@ export GPHOME</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id139357" class="- topic/title ">PATH</title>
             <body class="- topic/body ">
-                <p>Your <codeph class="+ topic/ph pr-d/codeph ">PATH</codeph> environment variable
-                    should point to the location of the Greenplum Database <codeph class="+ topic/ph
-                        pr-d/codeph ">bin</codeph> directory. For example:</p>
+                <p><codeph class="+ topic/ph pr-d/codeph ">PATH</codeph>环境变量指出Greenplum的<codeph class="+ topic/ph
+                        pr-d/codeph ">bin</codeph>目录所在位置。例如：
+                    </p>
                 <codeblock>PATH=$GPHOME/bin:$PATH
 export PATH</codeblock>
             </body>
@@ -55,9 +54,8 @@ export PATH</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138662" class="- topic/title ">LD_LIBRARY_PATH</title>
             <body class="- topic/body ">
-                <p>The <codeph class="+ topic/ph pr-d/codeph ">LD_LIBRARY_PATH</codeph> environment
-                    variable should point to the location of the Greenplum Database/PostgreSQL
-                    library files. For example:</p>
+                <p><codeph class="+ topic/ph pr-d/codeph ">LD_LIBRARY_PATH</codeph>环境变量指出了Greenplum/PostgreSQL库文件所在位置。例如：
+                    </p>
                 <codeblock>LD_LIBRARY_PATH=$GPHOME/lib
 export LD_LIBRARY_PATH</codeblock>
             </body>
@@ -67,8 +65,8 @@ export LD_LIBRARY_PATH</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138677" class="- topic/title ">MASTER_DATA_DIRECTORY</title>
             <body class="- topic/body ">
-                <p>This should point to the directory created by the gpinitsystem utility in the
-                    master data directory location. For example:</p>
+                <p>该变量指出在master数据目录中通过gpinitsystem创建的目录。例如：
+                    </p>
                 <codeblock>MASTER_DATA_DIRECTORY=/data/master/gpseg-1
 export MASTER_DATA_DIRECTORY</codeblock>
             </body>
@@ -77,27 +75,24 @@ export MASTER_DATA_DIRECTORY</codeblock>
     <topic id="topic7" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d) (topic
         hi-d) (topic pr-d) (topic sw-d)                          (topic ut-d) (topic indexing-d)"
         class="- topic/topic ">
-        <title class="- topic/title ">Optional Environment Variables</title>
+        <title class="- topic/title ">可选的环境变量</title>
         <body class="- topic/body ">
-            <p>The following are standard PostgreSQL environment variables, which are also
-                recognized in Greenplum Database. You may want to add the connection-related
-                environment variables to your profile for convenience, so you do not have to type so
-                many options on the command line for client connections. Note that these environment
-                variables should be set on the Greenplum Database master host only.</p>
+            <p>以下是标准的PostgreSQL环境变量，它们也在Greenplum数据库中被识别。
+                为方便起见，您可能希望将与连接相关的环境变量添加到配置文件中，因此您无需在命令行上为客户端连接键入这么多选项。
+                请注意，这些环境变量应仅在Greenplum数据库master主机上设置。
+                </p>
         </body>
         <topic id="topic8" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d) (topic
             hi-d) (topic pr-d) (topic sw-d)                          (topic ut-d) (topic
             indexing-d)" class="- topic/topic ">
             <title id="id139713" class="- topic/title ">PGAPPNAME</title>
             <body class="- topic/body ">
-                <p>The name of the application that is usually set by an application when it
-                    connects to the server. This name is displayed in the activity view and in log
-                    entries. The <codeph class="+ topic/ph pr-d/codeph ">PGAPPNAME</codeph>
-                    environmental variable behaves the same as the <codeph class="+ topic/ph
-                        pr-d/codeph ">application_name</codeph> connection parameter. The default
-                    value for <codeph class="+ topic/ph pr-d/codeph ">application_name</codeph> is
-                        <codeph>psql</codeph>. The name cannot be longer than 63
-                    characters. </p>
+                <p>应用的名称，通常当一个应用连接到服务器时设置的。
+                    该名称在活动视图和日志条目中有显示。
+                    <codeph class="+ topic/ph pr-d/codeph ">PGAPPNAME</codeph>环境变量和<codeph class="+ topic/ph
+                        pr-d/codeph ">application_name</codeph>连接参数有相同的行为。
+                    <codeph class="+ topic/ph pr-d/codeph ">application_name</codeph>的默认值是<codeph>psql</codeph>。该名称不能超过63个字符。
+                    </p>
             </body>
         </topic>
         <topic id="topic9" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d) (topic
@@ -105,7 +100,7 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id139717" class="- topic/title ">PGDATABASE</title>
             <body class="- topic/body ">
-                <p>The name of the default database to use when connecting.</p>
+                <p>默认连接到的数据库名称。</p>
             </body>
         </topic>
         <topic id="topic10" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d)
@@ -113,7 +108,7 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138709" class="- topic/title ">PGHOST</title>
             <body class="- topic/body ">
-                <p>The Greenplum Database master host name.</p>
+                <p>Greenplum数据库的Master主机名称。</p>
             </body>
         </topic>
         <topic id="topic11" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d)
@@ -121,9 +116,9 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138715" class="- topic/title ">PGHOSTADDR</title>
             <body class="- topic/body ">
-                <p>The numeric IP address of the master host. This can be set instead of or in
-                    addition to <codeph class="+ topic/ph pr-d/codeph ">PGHOST</codeph> to avoid DNS
-                    lookup overhead.</p>
+                <p>Master主机的数字IP地址。
+                    设置该变量可以用来代替或者在<codeph class="+ topic/ph pr-d/codeph ">PGHOST</codeph>之上从而避免DNS查询的过多开销。
+                    </p>
             </body>
         </topic>
         <topic id="topic12" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d)
@@ -131,11 +126,11 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138718" class="- topic/title ">PGPASSWORD </title>
             <body class="- topic/body ">
-                <p>The password used if the server demands password authentication. Use of this
-                    environment variable is not recommended for security reasons (some operating
-                    systems allow non-root users to see process environment variables via <codeph
-                        class="+ topic/ph pr-d/codeph ">ps</codeph>). Instead consider using the
-                        <codeph class="+ topic/ph pr-d/codeph ">~/.pgpass</codeph> file.</p>
+                <p>服务器要求密码验证时使用的密码。
+                    出于安全原因，不建议使用此环境变量（某些操作系统允许非root用户通过<codeph
+                            class="+ topic/ph pr-d/codeph ">ps</codeph>查看进程环境变量）。
+                    而是考虑使用<codeph class="+ topic/ph pr-d/codeph ">~/.pgpass</codeph>文件。
+                    </p>
             </body>
         </topic>
         <topic id="topic13" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d)
@@ -143,11 +138,11 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138721" class="- topic/title ">PGPASSFILE </title>
             <body class="- topic/body ">
-                <p>The name of the password file to use for lookups. If not set, it defaults to
-                        <codeph class="+ topic/ph pr-d/codeph ">~/.pgpass</codeph>. See the topic
-                    about <xref href="https://www.postgresql.org/docs/8.3/libpq-pgpass.html"
-                        scope="external" format="html" class="- topic/xref ">The Password File</xref> in the PostgreSQL documentation for more
-                    information.</p>
+                <p>用于查找的密码文件的名称。
+                    如果未设置，则默认为<codeph class="+ topic/ph pr-d/codeph ">~/.pgpass</codeph>。
+                    有关详细信息，请参阅PostgreSQL文档中有关<xref href="https://www.postgresql.org/docs/8.3/libpq-pgpass.html"
+                                                   scope="external" format="html" class="- topic/xref ">密码文件</xref>的主题。
+                    </p>
             </body>
         </topic>
         <topic id="topic14" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d)
@@ -155,8 +150,8 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138725" class="- topic/title ">PGOPTIONS</title>
             <body class="- topic/body ">
-                <p>Sets additional configuration parameters for the Greenplum Database master
-                    server.</p>
+                <p>为Greenplum数据库master服务器设置其他配置参数。
+                    </p>
             </body>
         </topic>
         <topic id="topic15" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d)
@@ -164,8 +159,8 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138731" class="- topic/title ">PGPORT</title>
             <body class="- topic/body ">
-                <p>The port number of the Greenplum Database server on the master host. The default
-                    port is 5432.</p>
+                <p>master主机上Greenplum数据库服务器的端口号。默认端口为5432。
+                    </p>
             </body>
         </topic>
         <topic id="topic16" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d)
@@ -173,7 +168,7 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138741" class="- topic/title ">PGUSER</title>
             <body class="- topic/body ">
-                <p>The Greenplum Database user name used to connect.</p>
+                <p>用于连接的Greenplum数据库用户名。</p>
             </body>
         </topic>
         <topic id="topic17" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d)
@@ -181,8 +176,9 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138747" class="- topic/title ">PGDATESTYLE</title>
             <body class="- topic/body ">
-                <p>Sets the default style of date/time representation for a session. (Equivalent to
-                        <codeph class="+ topic/ph pr-d/codeph ">SET datestyle TO...</codeph>)</p>
+                <p>设置会话的日期/时间表示的默认样式。
+                    （相当于<codeph class="+ topic/ph pr-d/codeph ">SET datestyle TO...</codeph>）
+                    </p>
             </body>
         </topic>
         <topic id="topic18" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d)
@@ -190,8 +186,10 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138750" class="- topic/title ">PGTZ</title>
             <body class="- topic/body ">
-                <p>Sets the default time zone for a session. (Equivalent to <codeph class="+
-                        topic/ph pr-d/codeph ">SET timezone TO...</codeph>)</p>
+                <p>设置会话的默认时区。
+                    （相当于<codeph class="+
+                        topic/ph pr-d/codeph ">SET timezone TO...</codeph>）
+                    </p>
             </body>
         </topic>
         <topic id="topic19" xml:lang="en" ditaarch:DITAArchVersion="1.1" domains="(topic ui-d)
@@ -199,9 +197,10 @@ export MASTER_DATA_DIRECTORY</codeblock>
             indexing-d)" class="- topic/topic ">
             <title id="id138753" class="- topic/title ">PGCLIENTENCODING</title>
             <body class="- topic/body ">
-                <p>Sets the default client character set encoding for a session. (Equivalent to
-                        <codeph class="+ topic/ph pr-d/codeph ">SET client_encoding
-                    TO...</codeph>)</p>
+                <p>设置会话的默认客户端字符集编码。
+                    （相当于<codeph class="+ topic/ph pr-d/codeph ">SET client_encoding
+                        TO...</codeph>）
+                    </p>
             </body>
         </topic>
     </topic>
