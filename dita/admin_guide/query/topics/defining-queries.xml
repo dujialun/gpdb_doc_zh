@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="defining-queries">
-    <title id="in140509">Defining Queries</title>
-    <shortdesc>Greenplum Database is based on the PostgreSQL implementation of the SQL standard. </shortdesc>
+    <title id="in140509">定义查询</title>
+    <shortdesc>Greenplum数据库基于PostgreSQL的SQL标准实现。</shortdesc>
     <body>
-        <p>This topic describes how to construct SQL queries in Greenplum Database.</p>
+        <p>这个主题描述如何在Greenplum数据库中构造SQL查询。</p>
         <ul>
             <li id="in143747">
                 <xref format="dita" href="#topic3" type="topic"/>
@@ -15,117 +15,86 @@
         </ul>
     </body>
     <topic id="topic3" xml:lang="en">
-        <title id="in140510">SQL Lexicon</title>
+        <title id="in140510">SQL词汇</title>
         <body>
-            <p>SQL is a standard language for accessing databases. The language consists of elements
-                that enable data storage, retrieval, analysis, viewing, manipulation, and so on. You
-                use SQL commands to construct queries and commands that the Greenplum Database
-                engine understands. SQL queries consist of a sequence of commands. Commands consist
-                of a sequence of valid tokens in correct syntax order, terminated by a semicolon
-                    (<codeph>;</codeph>). </p>
-            <p>For more information about SQL commands, see <xref
-                    href="../../../ref_guide/sql_commands/sql_ref.xml">SQL Command
-                    Reference</xref><ph otherprops="op-print"> in the <cite>Greenplum Database
-                        Reference Guide</cite></ph>.</p>
-            <p>Greenplum Database uses PostgreSQL's structure and syntax, with some exceptions. For
-                more information about SQL rules and concepts in PostgreSQL, see "SQL Syntax" in the
-                PostgreSQL documentation.</p>
+            <p>SQL是一种访问数据库的标准语言。该语言由数据存储、检索、分析、查看、操纵等元素组成。使用者可以使用SQL命令来构造Greenplum数据库引擎能够理解的查询和命令。命令由以正确语法顺序排列的合法符号序列构成，最后以分号(<codeph>;</codeph>)终结。
+            </p>
+            <p>更多有关<xref
+                    href="../../../ref_guide/sql_commands/sql_ref.xml">SQL命令参考</xref><ph otherprops="op-print">请见<cite>Greenplum数据库参考指南</cite></ph>。</p>
+            <p>Greenplum数据库使用PostgreSQL的结构和语法，但有一些不同。更多有关PostgreSQL中的SQL规则和概念的信息，请见PostgreSQL文档中的“SQL语法”。</p>
         </body>
     </topic>
-    <topic id="topic4" xml:lang="en">
-        <title id="in140511">SQL Value Expressions</title>
+    <topic id="topic4" xml:lang="en"/>
+        <title id="in140511">SQL值表达式</title>
         <body>
-            <p>SQL value expressions consist of one or more values, symbols, operators, SQL
-                functions, and data. The expressions compare data or perform calculations and return
-                a value as the result. Calculations include logical, arithmetic, and set
-                operations.</p>
-            <p>The following are value expressions:</p>
+            <p>SQL值表达式由一个或者多个值、符号、操作符、SQL函数及数据组成。值表达式会比较数据或者执行计算并且返回一个值作为结果。计算包括逻辑的、数学的和集合操作。
+                </p>
+            <p>下列都是值表达式:</p>
             <ul>
-                <li id="in199821">An aggregate expression</li>
-                <li id="in199865">An array constructor</li>
-                <li id="in199876">A column reference</li>
-                <li id="in199883">A constant or literal value</li>
-                <li id="in143969">A correlated subquery</li>
-                <li id="in199893">A field selection expression</li>
-                <li id="in199900">A function call</li>
-                <li id="in205284">A new column value in an <codeph>INSERT</codeph><ph> or
-                            <codeph>UPDATE</codeph></ph></li>
-                <li id="in205286">An operator invocation column reference</li>
-                <li id="in144037">A positional parameter reference, in the body of a function
-                    definition or prepared statement</li>
-                <li id="in144106">A row constructor</li>
-                <li id="in199915">A scalar subquery</li>
-                <li id="in205305">A search condition in a <codeph>WHERE</codeph> clause</li>
-                <li id="in205332">A target list of a <codeph>SELECT</codeph> command</li>
-                <li id="in199922">A type cast</li>
-                <li id="in199929">A value expression in parentheses, useful to group sub-expressions
-                    and override precedence</li>
-                <li id="in199936">A window expression</li>
+                <li id="in199821">一个聚集表达式</li>
+                <li id="in199865">一个数组构造器</li>
+                <li id="in199876">一个列引用</li>
+                <li id="in199883">一个常量或者字面值</li>
+                <li id="in143969">一个相关子查询</li>
+                <li id="in199893">一个域选择表达式</li>
+                <li id="in199900">一个函数调用</li>
+                <li id="in205284"><codeph>INSERT</codeph><ph>或者
+                            <codeph>UPDATE</codeph></ph>中的一个新列值</li>
+                <li id="in205286">一个操作符调用列引用</li>
+                <li id="in144037">函数定义或者预备语句中的一个位置参数引用</li>
+                <li id="in144106">一个行构造器</li>
+                <li id="in199915">一个标量子查询</li>
+                <li id="in205305"><codeph>WHERE</codeph>子句中的一个搜索条件</li>
+                <li id="in205332"><codeph>SELECT</codeph> 命令的一个目标列表</li>
+                <li id="in199922">一个类型造型</li>
+                <li id="in199929">圆括号中的一个值表达式，可用于分组子表达式以及覆盖优先级</li>
+                <li id="in199936">一个窗口表达式</li>
             </ul>
-            <p>SQL constructs such as functions and operators are expressions but do not follow any
-                general syntax rules. For more information about these constructs, see <xref
-                    href="../topics/functions-operators.xml#topic26"/>.</p>
+            <p>函数和操作符等SQL结构是表达式，但它们不遵循任何一般语法规则。更多有关这些结构的信息，请见使用函数和操作符 <xref
+                    href="../topics/functions-operators.xml#topic26"/>。</p>
         </body>
         <topic id="topic5" xml:lang="en">
-            <title>Column References</title>
+            <title>列引用</title>
             <body>
-                <p>A column reference has the form:</p>
+                <p>列引用的形式是：</p>
                 <p>
                     <codeblock><i>correlation</i>.<i>columnname</i></codeblock>
                 </p>
-                <p>Here, <codeph>correlation</codeph> is the name of a table (possibly qualified
-                    with a schema name) or an alias for a table defined with a <codeph>FROM</codeph>
-                    clause or one of the keywords <codeph>NEW</codeph> or <codeph>OLD</codeph>.
-                        <codeph>NEW</codeph> and <codeph>OLD</codeph> can appear only in rewrite
-                    rules, but you can use other correlation names in any SQL statement. If the
-                    column name is unique across all tables in the query, you can omit the
-                        "<codeph>correlation.</codeph>" part of the column reference.</p>
+                <p>这里, <codeph>correlation</codeph>是一个FROM子句中定义的表的名字（可能有SCHEMA名限定）或者别名，或者是关键词NEW和OLD中的一个。NEW和OLD只能出现在重写规则中，但可以在任何SQL语句中使用其他关系名称。如果列名在该查询的所有表中都唯一，可以省略掉表引用的"correlation."部分。
+                    </p>
             </body>
         </topic>
         <topic id="topic6" xml:lang="en">
-            <title>Positional Parameters</title>
+            <title>位置参数</title>
             <body>
-                <p>Positional parameters are arguments to SQL statements or functions that you
-                    reference by their positions in a series of arguments. For example,
-                        <codeph>$1</codeph> refers to the first argument, <codeph>$2</codeph> to the
-                    second argument, and so on. The values of positional parameters are set from
-                    arguments external to the SQL statement or supplied when SQL functions are
-                    invoked. Some client libraries support specifying data values separately from
-                    the SQL command, in which case parameters refer to the out-of-line data values.
-                    A parameter reference has the form:</p>
+                <p>位置参数是SQL语句或者函数的参数，但使用它们在参数序列中的位置来引用。例如，$1引用第一个参数，$2是第二个参数，以此类推。位置参数的值从SQL语句的外部设置或者在SQL函数被调用时提供。一些客户端库支持在SQL命令之外单独指定数据值，在这种情况下参数引用的是线外数据值。参数引用的形式是：</p>
                 <p>
                     <codeblock>$number</codeblock>
                 </p>
-                <p>For example:</p>
+                <p>例如：</p>
                 <p>
                     <codeblock>CREATE FUNCTION dept(text) RETURNS dept
     AS $$ SELECT * FROM dept WHERE name = $1 $$
     LANGUAGE SQL;</codeblock>
                 </p>
-                <p>Here, the <codeph>$1</codeph> references the value of the first function argument
-                    whenever the function is invoked.</p>
+                <p>这里，只要该函数被调用，<codeph>$1</codeph>就引用第一个函数参数的值。</p>
             </body>
         </topic>
         <topic id="topic7" xml:lang="en">
-            <title>Subscripts</title>
+            <title>下标</title>
             <body>
-                <p>If an expression yields a value of an array type, you can extract a specific
-                    element of the array value as follows:</p>
+                <p>如果一个表达式得到的是一个数组类型的值，可以按照下面的方式抽取该数组值中的一个特定元素：</p>
                 <p>
                     <codeblock><i>expression</i>[<i>subscript</i>]
 </codeblock>
                 </p>
-                <p>You can extract multiple adjacent elements, called an array slice, as follows
-                    (including the brackets):</p>
+                <p>可以按下面的方式（包括方括号）抽取多个相邻的元素，它们被称为一个数组切片：</p>
                 <p>
                     <codeblock><i>expression</i>[<i>lower_subscript</i>:<i>upper_subscript</i>]
 </codeblock>
                 </p>
-                <p>Each subscript is an expression and yields an integer value.</p>
-                <p>Array expressions usually must be in parentheses, but you can omit the
-                    parentheses when the expression to be subscripted is a column reference or
-                    positional parameter. You can concatenate multiple subscripts when the original
-                    array is multidimensional. For example (including the parentheses):</p>
+                <p>每一个下标都是一个表达式且得到一个整数值。</p>
+                <p>数组表达式通常必须放在圆括号内，但当被指定下标的表达式是一个列引用或者位置参数时可以省略圆括号。当原始数组是多维时可以串接多个下标。例如（包括圆括号）：</p>
                 <p>
                     <codeblock>mytable.arraycolumn[4]</codeblock>
                     <codeblock>mytable.two_d_column[17][34]</codeblock>
@@ -135,16 +104,13 @@
             </body>
         </topic>
         <topic id="topic8" xml:lang="en">
-            <title>Field Selection</title>
+            <title>域选择</title>
             <body>
-                <p>If an expression yields a value of a composite type (row type), you can extract a
-                    specific field of the row as follows:</p>
+                <p>如果一个表达式得到一个组合类型（行类型）的值，可以按照下面的方式抽取该行的一个特定域：</p>
                 <p>
                     <codeblock><i>expression</i>.<i>fieldname</i></codeblock>
                 </p>
-                <p>The row expression usually must be in parentheses, but you can omit these
-                    parentheses when the expression to be selected from is a table reference or
-                    positional parameter. For example:</p>
+                <p>行表达式通常必须放在圆括号中，但当要从中选择的表达式是一个表引用或者位置参数时可以省略这些圆括号。例如：</p>
                 <p>
                     <codeblock>mytable.mycolumn
 </codeblock>
@@ -153,154 +119,101 @@
                     <codeblock>(rowfunction(a,b)).col3
 </codeblock>
                 </p>
-                <p>A qualified column reference is a special case of field selection syntax.</p>
+                <p>被限定的列引用是域选择语法的一种特殊情况。</p>
             </body>
         </topic>
         <topic id="topic9" xml:lang="en">
-            <title>Operator Invocations</title>
+            <title>操作符调用</title>
             <body>
-                <p>Operator invocations have the following possible syntaxes:</p>
+                <p>操作符调用有下列可能的语法：</p>
                 <p>
                     <codeblock><i>expression operator expression</i>(binary infix operator)</codeblock>
                     <codeblock><i>operator expression</i>(unary prefix operator)</codeblock>
                     <codeblock><i>expression operator</i>(unary postfix operator)</codeblock>
                 </p>
-                <p>Where <i>operator</i> is an operator token, one of the key words
-                        <codeph>AND</codeph>, <codeph>OR</codeph>, or <codeph>NOT</codeph>, or
-                    qualified operator name in the form:</p>
+                <p>其中<i>operator</i>是一个操作符符号、关键词<codeph>AND</codeph>, <codeph>OR</codeph>,或<codeph>NOT</codeph>之一，还可以是下面形式的限定操作符名：</p>
                 <p>
                     <codeblock>OPERATOR(<i>schema</i>.<i>operatorname</i>)</codeblock>
                 </p>
-                <p>Available operators and whether they are unary or binary depends on the operators
-                    that the system or user defines. For more information about built-in operators,
-                    see <xref href="../topics/functions-operators.xml#topic29"/>.</p>
+                <p>可用的操作符以及它们是一元的还是二元的取决于系统或者用户定义的操作符。更多有关内建操作符的信息请见 <xref href="../topics/functions-operators.xml#topic29"/>.</p>
             </body>
         </topic>
         <topic id="topic10" xml:lang="en">
-            <title id="in144774">Function Calls</title>
+            <title id="in144774">函数调用</title>
             <body>
-                <p>The syntax for a function call is the name of a function (possibly qualified with
-                    a schema name), followed by its argument list enclosed in parentheses:</p>
+                <p>函数调用的语法是一个函数名（可能由一个模式名限定），后面跟着圆括号中的参数：</p>
                 <p>
                     <codeblock><i>function</i> ([<i>expression</i> [, <i>expression</i> ... ]])</codeblock>
                 </p>
-                <p>For example, the following function call computes the square root of 2:</p>
+                <p>例如，下面的函数调用计算2的平方根：</p>
                 <p>
                     <codeblock>sqrt(2)</codeblock>
                 </p>
-                <p>See <xref href="../../../ref_guide/function-summary.xml#topic1">Summary of
-                        Built-in Functions</xref><ph otherprops="op-print"> in the <cite>Greenplum
-                            Database Reference Guide</cite></ph> for lists of the built-in functions
-                    by category. You can add custom functions, too.</p>
+                <p>见<xref href="../../../ref_guide/function-summary.xml#topic1">内建函数</xref><ph otherprops="op-print">的分类列表请见<cite>Greenplum
+                    数据库参考指南</cite></ph>。用户也可以增加自定义函数。</p>
             </body>
         </topic>
         <topic id="topic11" xml:lang="en">
-            <title id="in144846">Aggregate Expressions</title>
+            <title id="in144846">聚集表达式</title>
             <body>
-                <p>An aggregate expression applies an aggregate function across the rows that a
-                    query selects. An aggregate function performs a calculation on a set of values
-                    and returns a single value, such as the sum or average of the set of values. The
-                    syntax of an aggregate expression is one of the following:</p>
+                <p>聚集表达式在一个查询选择的行上应用一个聚集函数。聚集函数在一组值之上执行一次计算并且返回一个单一值，例如这一组值的总和或者平均。聚集表达式的语法是下列之一：</p>
                 <ul>
                     <li id="in144858"><codeph><i>aggregate_name</i>(<i>expression</i> [ , ... ]
-                            )</codeph> — operates across all input rows for which the expected
-                        result value is non-null. <codeph>ALL</codeph> is the default.</li>
+                            )</codeph> — 在所有输入行上操作，预期的结果值非空。 <codeph>ALL</codeph> 是默认。</li>
                     <li id="in144859"><codeph><i>aggregate_name</i>(ALL <i>expression</i> [ , ... ]
-                            )</codeph> — operates identically to the first form because
-                            <codeph>ALL</codeph> is the default.</li>
+                            )</codeph> — 和第一种形式相同，因为
+                            <codeph>ALL</codeph> 是默认</li>
                     <li id="in144860"><codeph><i>aggregate_name</i>(DISTINCT <i>expression</i> [ ,
-                            ... ] )</codeph> — operates across all distinct non-null values of input
-                        rows.</li>
-                    <li id="in144861"><codeph><i>aggregate_name</i>(*)</codeph> — operates on all
-                        rows with values both null and non-null. Generally, this form is most useful
-                        for the <codeph>count(*)</codeph> aggregate function.</li>
+                            ... ] )</codeph> — 输入行的所有可区分非空值上操作。</li>
+                    <li id="in144861"><codeph><i>aggregate_name</i>(*)</codeph> —  在所有值为空以及非空的行上操作。通常这种形式对于 <codeph>count(*)</codeph>聚集函数最有用。</li>
                 </ul>
-                <p>Where <i>aggregate_name</i> is a previously defined aggregate (possibly
-                    schema-qualified) and <i>expression</i> is any value expression that does not
-                    contain an aggregate expression.</p>
-                <p>For example, <codeph>count(*)</codeph> yields the total number of input rows,
-                        <codeph>count(f1)</codeph> yields the number of input rows in which
-                        <codeph>f1</codeph> is <ph>non-null, and </ph><codeph>count(distinct
-                        f1)</codeph> yields the number of distinct non-null values of
-                        <codeph>f1</codeph>.</p>
-                <p>For predefined aggregate functions, see <xref
-                        href="../topics/functions-operators.xml#topic29"/>. You can also add custom
-                    aggregate functions.</p>
-                <p>Greenplum Database provides the <codeph>MEDIAN</codeph> aggregate function, which
-                    returns the fiftieth percentile of the <codeph>PERCENTILE_CONT</codeph> result
-                    and special aggregate expressions for inverse distribution functions as
-                    follows:</p>
+                <p>其中 <i>aggregate_name</i> 是一个之前定义的聚集（可能有模式名限定）而expression是任何不包含聚集表达式的值表达式。</p>
+                <p>例如, <codeph>count(*)</codeph> 会得到输入行的总数，<codeph>count(f1)</codeph>得到输入行中<codeph>f1</codeph>为非空的数量，而<codeph>count(distinct
+                    f1)</codeph>会得到<codeph>f1</codeph>中可区分非空值的数量。
+                       </p>
+                <p>预定义的聚集函数,可见<xref
+                        href="../topics/functions-operators.xml#topic29"/>. 用户也可以增加自定义聚集函数。</p>
+                <p>Greenplum函数提供<codeph>MEDIAN</codeph>聚集函数，它返回<codeph>PERCENTILE_CONT</codeph>结果和逆分布函数的特殊聚集表达式的第50个百分位数：</p>
                 <p>
                     <codeblock>PERCENTILE_CONT(_percentage_) WITHIN GROUP (ORDER BY _expression_)
 </codeblock>
                     <codeblock>PERCENTILE_DISC(_percentage_) WITHIN GROUP (ORDER BY _expression_)
 </codeblock>
                 </p>
-                <p>Currently you can use only these two expressions with the keyword <codeph>WITHIN
-                        GROUP</codeph>.</p>
+                <p>当前只能将这两个表达式与关键词WITHIN GROUP一起使用。</p>
             </body>
             <topic id="topic12" xml:lang="en">
-                <title>Limitations of Aggregate Expressions</title>
+                <title>聚集函数的限制</title>
                 <body>
-                    <p>The following are current limitations of the aggregate expressions:</p>
+                    <p>下面是聚集表达式的当前限制：</p>
                     <ul>
-                        <li id="in199103">Greenplum Database does not support the following
-                            keywords: ALL, DISTINCT, FILTER and OVER. See <xref
-                                href="../topics/functions-operators.xml#topic31/in2073121"/> for
-                            more details. </li>
-                        <li id="in199105">An aggregate expression can appear only in the result list
-                            or HAVING clause of a SELECT command. It is forbidden in other clauses,
-                            such as WHERE, because those clauses are logically evaluated before the
-                            results of aggregates form. This restriction applies to the query level
-                            to which the aggregate belongs.</li>
-                        <li id="in200910">When an aggregate expression appears in a subquery, the
-                            aggregate is normally evaluated over the rows of the subquery. If the
-                            aggregate's arguments contain only outer-level variables, the aggregate
-                            belongs to the nearest such outer level and evaluates over the rows of
-                            that query. The aggregate expression as a whole is then an outer
-                            reference for the subquery in which it appears, and the aggregate
-                            expression acts as a constant over any one evaluation of that subquery.
-                            See <xref format="dita" href="#topic15" type="topic"/> and <xref
+                        <li id="in199103">Greenplum数据库不支持下列关键词：ALL、DISTINCT、FILTER和OVER。详见 <xref
+                                href="../topics/functions-operators.xml#topic31/in2073121"/>  </li>
+                        <li id="in199105">聚集表达式只能出现在SELECT命令的结果列表或者HAVING子句中。在其他子句（例如WHERE）中不允许聚集表达式，因为那些子句逻辑上会在聚集形式的结果之前计算。这种限制适用于该聚集所属的查询级别。</li>
+                        <li id="in200910">当聚集表达式出现在子查询中时，该聚集通常在子查询的行之上计算。如果该聚集的参数只包含外层变量，该聚集属于最近的那个外层并且在那个外层查询的行上计算。
+                            该查询表达式总的来说是其出现的子查询的外部引用，并且该聚集表达式在那个子查询的任何一次计算中都像一个常量。请参考<xref format="dita" href="#topic15" type="topic"/> and <xref
                                 href="../topics/functions-operators.xml#topic29/in204913"/>.</li>
-                        <li id="in200915">Greenplum Database does not support DISTINCT with multiple
-                            input expressions.</li>
-                        <li id="in2009151">Greenplum Database does not support specifying an
-                            aggregate function as an argument to another aggregate function.</li>
-                        <li id="in2009152">Greenplum Database does not support specifying a window
-                            function as an argument to an aggregate function.</li>
+                        <li id="in200915">Greenplum数据库不支持有多个输入表达式的DISTINCT。</li>
+                        <li id="in2009151">Greenplum数据库不支持指定聚合函数作为另一个聚合函数的参数。</li>
+                        <li id="in2009152">Greenplum数据库不支持指定窗口函数作为聚合函数的参数。</li>
                     </ul>
                 </body>
             </topic>
         </topic>
         <topic id="topic13" xml:lang="en">
-            <title id="in199183">Window Expressions</title>
+            <title id="in199183">窗口表达式</title>
             <body>
-                <p>Window expressions allow application developers to more easily compose complex
-                    online analytical processing (OLAP) queries using standard SQL commands. For
-                    example, with window expressions, users can calculate moving averages or sums
-                    over various intervals, reset aggregations and ranks as selected column values
-                    change, and express complex ratios in simple terms.</p>
-                <p>A window expression represents the application of a <i>window function</i>
-                    to a <i>window frame</i>, which is defined with an <codeph>OVER()</codeph>
-                    clause. This is comparable to the type of calculation that can be done with an
-                    aggregate function and a <codeph>GROUP BY</codeph> clause. Unlike aggregate
-                    functions, which return a single result value for each group of rows, window
-                    functions return a result value for every row, but that value is calculated
-                    with respect to the set of rows in the window frame to which the row belongs.
-                    The <codeph>OVER()</codeph> clause allows dividing the rows into <i>partitions</i> and
-                    then further restricting the window frame by specifying which rows preceding or
-                    following the current row within its partition to include in the calculation.</p>
-                <p>Greenplum Database does not support specifying a window function as an argument
-                    to another window function.</p>
-                <p>The syntax of a window expression is:</p>
+                <p>窗口表达式允许应用开发者更容易地使用标准SQL命令构造复杂的在线分析处理（OLAP）查询。
+                    例如，通过窗口查询，用户可以在多个区间上计算移动平均或者总和、在选择的列值改变时重置聚集和排名以及用简单的术语表达合比。</p>
+                <p>窗口表达式表示将一个<i>窗口函数</i>应用到一个<i>窗口帧</i>，后者在一个特殊的OVER()子句中定义。窗口分区是一个行的集合，这些行被集合起来应用一个窗口函数。这与使用聚合函数和<codeph>GROUP BY</codeph>子句可以完成的计算类型相当。和聚集函数（为每个行分组返回一个结果值）不同，窗口函数为每一行返回一个结果值，但是该结果值是针对一个特定窗口分区中的行计算得来。
+                    如果没有指定分区，窗口函数会在完整的中间结果集上计算。</p>
+                <p>Greenplum数据库不支持将窗口函数制定为另一个窗口函数的参数。</p>
+                <p>窗口表达式的语法是：</p>
                 <p>
                     <codeblock><i>window_function</i> ( [<i>expression</i> [, ...]] ) OVER ( <i>window_specification</i> )</codeblock>
                 </p>
-                <p>Where <i><codeph>window_function</codeph></i> is one of the functions listed in
-                        <xref href="../topics/functions-operators.xml#topic30/in164369"/> or a
-                    user-defined window function, <i><codeph>expression</codeph></i> is any value
-                    expression that does not contain a window expression, and
-                            <i><codeph>window_specification</codeph></i> is:</p>
+                <p>其中<i><codeph>window_function</codeph></i>window_function是列在
+                        <xref href="../topics/functions-operators.xml#topic30/in164369"/>中的函数之一，<i><codeph>expression</codeph></i>是任何不含窗口表达式的值表达式，而<i><codeph>window_specification</codeph></i>是：</p>
                 <p><codeblock>[<i>window_name</i>]
 [PARTITION BY <i>expression </i>[, ...]]
 [[ORDER BY <i>expression</i> [ASC | DESC | USING <i>operator</i>] [NULLS {FIRST | LAST}] [, ...]
@@ -308,68 +221,43 @@
        { UNBOUNDED PRECEDING
        | <i>expression</i> PRECEDING
        | CURRENT ROW
-       | BETWEEN <i>window_frame_bound</i> AND <i>window_frame_bound</i> }]]</codeblock>    and
-                    where <codeph><i>window_frame_bound</i></codeph> can be one
-                    of:<codeblock>    UNBOUNDED PRECEDING
+       | BETWEEN <i>window_frame_bound</i> AND <i>window_frame_bound</i> }]]</codeblock> 
+                    其中<codeph><i>window_frame_bound</i></codeph>可以是下列之一：
+                    <codeblock>    UNBOUNDED PRECEDING
     <i>expression</i> PRECEDING
     CURRENT ROW
     <i>expression</i> FOLLOWING
     UNBOUNDED FOLLOWING</codeblock></p>
-                <p>A window expression can appear only in the select list of a
-                        <codeph>SELECT</codeph> command. For example:</p>
+                <p>窗口只能出现在<codeph>SELECT</codeph> 命令的选择列表中。例如：</p>
                 <p>
                     <codeblock>SELECT count(*) OVER(PARTITION BY customer_id), * FROM sales;
 </codeblock>
                 </p>
-                <p>In a window expression, a window function call must be followed immediately by an
-                        <codeph>OVER</codeph> clause. The <codeph>OVER</codeph> clause specifies the
-                    window frame—the rows to be processed by the window function. This syntactically
-                    distinguishes the function from a regular or aggregate function.</p>
-                <p>A window specification has the following characteristics:</p>
+                <p>在窗口表达式中，一个窗口函数调用必须紧跟<codeph>OVER</codeph> 子句。OVER子句使得窗口函数与其他聚集或者报表函数相区别。OVER子句定义窗口函数要应用于其上的window_specification。</p>
+                <p>窗口说明具有下列特点：</p>
                 <ul>
-                    <li id="in166168">The <codeph>PARTITION BY</codeph> clause defines the window
-                        partitions to which the window function is applied. If omitted, the entire
-                        result set is treated as one partition.</li>
-                    <li id="in167327">The <codeph>ORDER BY</codeph> clause defines the expression(s)
-                        for sorting rows within a window partition. The <codeph>ORDER BY</codeph>
-                        clause of a window specification is separate and distinct from the
-                            <codeph>ORDER BY</codeph> clause of a regular query expression. The
-                            <codeph>ORDER BY</codeph> clause is required for the window functions
-                        that calculate rankings, as it identifies the measure(s) for the ranking
-                        values. For OLAP aggregations, the <codeph>ORDER BY</codeph> clause is
-                        required to use window frames (the <codeph>ROWS</codeph> or
-                            <codeph>RANGE</codeph> clause).</li>
+                    <li id="in166168"> <codeph>PARTITION BY</codeph> 子句定义窗口函数要应用于其上的窗口分区。如果省略，整个结果集会被当做一个分区。</li>
+                    <li id="in167327"> <codeph>ORDER BY</codeph> 子句定义在窗口分区内用来排序行的表达式。
+                        窗口说明的ORDER BY子句是独立的并且与一个常规查询表达式的<codeph>ORDER BY</codeph> 子句不同。
+                        计算排名的窗口函数会要求<codeph>ORDER BY</codeph> 子句，因为它要确定排名值的排名程度。
+                        对于OLAP聚集，使用窗口帧（<codeph>ROWS</codeph>和<codeph>RANGE</codeph> 子句）也要求ORDER BY子句。
+                      </li>
                 </ul>
-                <note type="note">Columns of data types without a coherent ordering, such as
-                        <codeph>time</codeph>, are not good candidates for use in the <codeph>ORDER
-                        BY</codeph> clause of a window specification. <codeph>Time</codeph>, with or
-                    without a specified time zone, lacks a coherent ordering because addition and
-                    subtraction do not have the expected effects. For example, the following is not
-                    generally true: <codeph>x::time &lt; x::time + '2
+                <note type="note">没有一致排序的数据类型列（如 <codeph>time</codeph>）并不适合在窗口说明的ORDER BY子句中使用。 <codeph>time</codeph>（不管有没有指定的时区）缺少一种一致的排序，因为加法和减法无法得到预期的效果。例如，下面的式子并不总是为真：<codeph>x::time &lt; x::time + '2
                     hour'::interval</codeph></note>
                 <ul id="ul_im5_14q_2gb">
-                    <li id="in167503">The <codeph>ROWS</codeph> or <codeph>RANGE</codeph> clause 
-                        defines a window frame
-                        for aggregate (non-ranking) window functions. A window frame defines a set
-                        of rows within a window partition. When a window frame is defined, the
-                        window function computes on the contents of this moving frame rather than
-                        the fixed contents of the entire window partition. Window frames are
-                        row-based (<codeph>ROWS</codeph>) or value-based
-                        (<codeph>RANGE</codeph>).</li>
+                    <li id="in167503"> <codeph>ROWS</codeph> 或者 <codeph>RANGE</codeph> 子句为聚集（非排名）窗口函数定义窗口帧。一个窗口帧在一个窗口分区内定义一个行集合。当一个窗口帧被定义时，窗口函数会在这个移动帧的内容上计算，而不是在整个窗口分区的固定内容上计算。
+                        窗口帧可以是基于行的（<codeph>ROWS</codeph>）或者基于值的（<codeph>RANGE</codeph>）。</li>
                 </ul>
             </body>
             <topic id="topic_qck_12r_2gb">
-                <title>Window Examples</title>
+                <title>窗口例子</title>
                 <body>
-                    <p>The following examples demonstrate using window functions with partitions and window frames.</p>
+                    <p>以下示例演示如何使用带有分区和窗口框架的窗口函数</p>
                     <section>
-                        <title>Example 1 – Aggregate Window Function Over a Partition</title>
-                        <p>The <codeph>PARTITION BY</codeph> list in the <codeph>OVER</codeph>
-                            clause divides the rows into groups, or partitions, that have the same
-                            values as the specified expressions.</p>
-                        <p>This example compares employees' salaries with the average salaries for
-                            their
-                            departments:<codeblock>SELECT depname, empno, salary, avg(salary) OVER(PARTITION BY depname)
+                        <title>例1 –分区上的聚合窗口函数</title>
+                        <p>在<codeph>OVER</codeph>子句用<codeph>PARTITION BY</codeph>将行进行分组或分区，在相同值的分组内使用指定表达式。 </p>
+                        <p>此例子比较员工工资和部门平均工资：<codeblock>SELECT depname, empno, salary, avg(salary) OVER(PARTITION BY depname)
 FROM empsalary;
   depname  | empno | salary |          avg          
 -----------+-------+--------+-----------------------
@@ -385,33 +273,21 @@ FROM empsalary;
  sales     |     4 |   4800 | 4866.6666666666666667
 (10 rows)
 </codeblock></p>
-                        <p>The first three output columns come from the table
-                                <codeph>empsalary</codeph>, and there is one output row for each row
-                            in the table. The fourth column is the average calculated on all rows
-                            that have the same <codeph>depname</codeph> value as the current row.
-                            Rows that share the same <codeph>depname</codeph> value constitute a
-                            partition, and there are three partitions in this example. The
-                                <codeph>avg</codeph> function is the same as the regular
-                                <codeph>avg</codeph> aggregate function, but the
-                                <codeph>OVER</codeph> clause causes it to be applied as a window
-                            function.</p>
-                        <p>You can also put the window specification in a <codeph>WINDOW</codeph>
-                            clause and reference it in the select list. This example is equivalent
-                            to the previous
-                            query:<codeblock>SELECT depname, empno, salary, avg(salary) OVER(mywindow)
+                        <p>前三个输出列来自表<codeph>empsalary</codeph>，表中每一行都有一个输出行。第四列计算具有相同的 <codeph>depname</codeph>值的平均数。
+                           相同的 <codeph>depname</codeph>行组成一个分区，在这个例子中有三个分区。
+                                <codeph>avg</codeph>函数与常规的聚合函数<codeph>avg</codeph>相同, 但是
+                                <codeph>OVER</codeph>子句使它被用作一个窗口函数。</p>
+                        <p>你可以把窗口的命名放在<codeph>WINDOW</codeph>
+                            子句中，在select中引用. 这个例子相当于之前的查询:<codeblock>SELECT depname, empno, salary, avg(salary) OVER(mywindow)
 FROM empsalary
 WINDOW mywindow AS (PARTITION BY depname);</codeblock></p>
-                        <p>Defining a named window is useful when the select list has multiple
-                            window functions using the same window specification.</p>
+                        <p>当select列表中有多个使用相同功能的窗口函数时，定义一个命名的窗口比较有用。</p>
                     </section>
                     <section>
-                        <title>Example 2 – Ranking Window Function With an ORDER BY Clause</title>
-                        <p>An <codeph>ORDER BY</codeph> clause within the <codeph>OVER</codeph>
-                            clause controls the order in which rows are processed by window
-                            functions. The <codeph>ORDER BY</codeph> list for the window function
-                            does not have to match the output order of the query. This example uses
-                            the <codeph>rank()</codeph> window function to rank employees' salaries
-                            within their departments:</p>
+                        <title>例2 – 使用ORDER BY子句对窗口函数进行排序</title>
+                        <p> 在<codeph>OVER</codeph>子句中的<codeph>ORDER BY</codeph> ，控制窗口函数处理行的顺序。
+                            窗口函数的<codeph>ORDER BY</codeph> 列表不必匹配查询的输出顺序。
+                            这个例子使用 <codeph>rank()</codeph> 窗口函数来排序部门内的员工工资：</p>
                         <codeblock>SELECT depname, empno, salary,
     rank() OVER (PARTITION BY depname ORDER BY salary DESC)
 FROM empsalary;
@@ -430,15 +306,10 @@ FROM empsalary;
 (10 rows)</codeblock>
                     </section>
                     <section>
-                        <title>Example 3 – Aggregate Function over a Row Window Frame</title>
-                        <p>A <codeph>RANGE</codeph> or <codeph>ROWS</codeph> clause defines the
-                            window frame—a set of rows within a partition—that the window function
-                            includes in the calculation. <codeph>ROWS</codeph> specifies a physical
-                            set of rows to process, for example all rows from the beginning of the
-                            partition to the current row.</p>
-                        <p>This example calculates a running total of employee's salaries by department 
-                            using the <codeph>sum()</codeph> function to total rows from the start of 
-                            the partition to the current row:</p>
+                        <title>例3 – 行窗口帧的具体函数</title>
+                        <p>A <codeph>RANGE</codeph> 或 <codeph>ROWS</codeph>子句定义窗口函数计算的窗口帧(一个分区内的多个行)。
+                           <codeph>ROWS</codeph>指定要处理的物理行，例如从分区开始到当前行之间的所有行。 </p>
+                        <p>此例按部门计算员工工资的连续总额。使用 <codeph>sum()</codeph> 函数计算分区开始到当前行的总行数：</p>
                         <codeblock>SELECT depname, empno, salary,
     sum(salary) OVER (PARTITION BY depname ORDER BY salary
         ROWS between UNBOUNDED PRECEDING AND CURRENT ROW)
@@ -458,14 +329,10 @@ FROM empsalary ORDER BY depname, sum;
 (10 rows)</codeblock>
                     </section>
                     <section>
-                        <title>Example 4 – Aggregate Function for a Range Window Frame</title>
-                        <p><codeph>RANGE</codeph> specifies logical values based on values of the
-                                <codeph>ORDER BY</codeph> expression in the <codeph>OVER</codeph>
-                            clause. This example demonstrates the difference between
-                                <codeph>ROWS</codeph> and <codeph>RANGE</codeph>. The frame contains
-                            all rows with salary values less than or equal to the current row. Unlike
-                            the previous example, for employees with the same salary, the sum is the 
-                            same and includes the salaries of all of those employees. </p>
+                        <title>例4 – Range窗口帧的聚合函数</title>
+                        <p><codeph>RANGE</codeph> 指定<codeph>OVER</codeph>子句中基于<codeph>ORDER BY</codeph> 表达式的逻辑值。这个例子展示了
+                                <codeph>ROWS</codeph>和<codeph>RANGE</codeph>的不同。窗口帧包含小于或等于当前行的所有行的工资值。
+                            与之前的例子不同，相同工资的员工，总和是相同的，包括所有这些员工的工资。 </p>
                         <codeblock>SELECT depname, empno, salary,
     sum(salary) OVER (PARTITION BY depname ORDER BY salary
         RANGE between UNBOUNDED PRECEDING AND CURRENT ROW)
@@ -488,87 +355,60 @@ FROM empsalary ORDER BY depname, sum;
             </topic>
         </topic>
         <topic id="topic14" xml:lang="en">
-            <title>Type Casts</title>
+            <title>类型转换</title>
             <body>
-                <p>A type cast specifies a conversion from one data type to another. A cast applied
-                    to a value expression of a known type is a run-time type conversion. The cast
-                    succeeds only if a suitable type conversion is defined. This differs
-                    from the use of casts with constants. A cast applied to a string literal
-                    represents the initial assignment of a type to a literal constant value, so it
-                    succeeds for any type if the contents of the string literal are acceptable input
-                    syntax for the data type.</p>
-                <p>Greenplum Database supports three types of casts applied to a value expression:
+                <p>类型转换指定从一种数据类型到另一种数据类型的转换。应用到已知类型的值表达式是运行时的类型转换。仅当定义了适当的类型转换时才成功。
+                    这个不同于与带有常量的强制转换，应用于字符串文本的强制转换
+                    表示类型对文本常量值的初始赋值，因此如果字符串文字的内容是可接受的数据类型的输入语法，则该转换对任何类型都成功 。</p>
+                <p>Greenplum数据库支持三种类型的值表达式转换：
                         <ul id="ul_f4w_svt_rdb">
-                        <li><i>Explicit cast</i> - Greenplum Database applies a cast when you
-                            explicitly specify a cast between two data types. Greenplum Database
-                            accepts two equivalent syntaxes for explicit type casts:<p>
+                        <li><p><i>显示转换</i> - 当显式指定两种数据类型时的强制转换。Greenplum数据库接受两种等效的类型造型语法：</p>
                                 <codeblock>CAST ( expression AS type )
 expression::type</codeblock>
-                            </p><p>The <codeph>CAST</codeph> syntax conforms to SQL; the syntax using
-                                    <codeph>::</codeph> is historical PostgreSQL usage.</p></li>
-                        <li><i>Assignment cast</i> - Greenplum Database implicitly invokes a cast in
-                            assignment contexts, when assigning a value to a column of the target
-                            data type. For example, a <codeph><xref
-                                    href="../../../ref_guide/sql_commands/CREATE_CAST.xml">CREATE
-                                    CAST</xref></codeph> command with the <codeph>AS
-                                ASSIGNMENT</codeph> clause creates a cast that is applied implicitly
-                            in the assignment context. This example assignment cast assumes that
-                                <codeph>tbl1.f1</codeph> is a column of type <codeph>text</codeph>.
-                            The <codeph>INSERT</codeph> command is allowed because the value is
-                            implicitly cast from the <codeph>integer</codeph> to
-                                <codeph>text</codeph> type.
+                            <p>The <codeph>CAST</codeph>语法符合SQL，带<codeph>::</codeph>的语法是PostgreSQL的一种历史用法。
+                           </p></li>
+                        <li><i>赋值转换</i> - 当被赋值给一个表列时，Greenplum数据库会进行隐式转换。例如，<codeph><xref
+                                    href="../../../ref_guide/sql_commands/CREATE_CAST.xml">，CREATE
+                                    CAST</xref></codeph> 命令在使用<codeph>AS
+                            ASSIGNMENT</codeph> 子句，在赋值语句中创建转换被隐式使用。这个例子赋值转换，假定
+                                <codeph>tbl1.f1</codeph> 是一个<codeph>text</codeph>列，
+                             <codeph>INSERT</codeph>命令被允许，因为值从<codeph>integer</codeph> 隐式转换为<codeph>text</codeph> 。
                             <codeblock>INSERT INTO tbl1 (f1) VALUES (42);</codeblock></li>
-                        <li><i>Implicit cast</i> - Greenplum Database implicitly invokes a cast in
-                            assignment or expression contexts. For example, a <codeph>CREATE
-                                CAST</codeph> command with the <codeph>AS IMPLICIT</codeph> clause
-                            creates an implicit cast, a cast that is applied implicitly in both the
-                            assignment and expression context. This example implicit cast assumes
-                            that <codeph>tbl1.c1</codeph> is a column of type <codeph>int</codeph>.
-                            For the calculation in the predicate, the value of <codeph>c1</codeph>
-                            is implicitly cast from <codeph>int</codeph> to a
-                                <codeph>decimal</codeph>
-                            type.<codeblock>SELECT * FROM tbl1 WHERE tbl1.c2 = (4.3 + tbl1.c1) ;</codeblock></li>
+                        <li><i>隐式转换</i> - Greenplum数据库在赋值或表达式中隐式进行转换。例如，<codeph>CREATE
+                                CAST</codeph> 命令在 <codeph>AS IMPLICIT</codeph> 子句中创建一个隐式转换 , 在赋值和表达式中隐式进行转换。
+                            这个例子隐式转换，假定<codeph>tbl1.c1</codeph> 是一个 <codeph>int</codeph>列。
+                            对于谓词中的计算,  <codeph>c1</codeph>从 <codeph>int</codeph>隐式转换为<codeph>decimal</codeph>。
+                    <codeblock>SELECT * FROM tbl1 WHERE tbl1.c2 = (4.3 + tbl1.c1) ;</codeblock></li>
                     </ul></p>
-                <p>You can usually omit an explicit type cast if there is no ambiguity about the
-                    type a value expression must produce (for example, when it is assigned to a
-                    table column); the system automatically applies a type cast. Greenplum Database
-                    implicitly applies casts only to casts defined with a cast context of
-                    assignment or explicit in the system catalogs. Other casts must be
-                    invoked with explicit casting syntax to prevent unexpected conversions from
-                    being applied without the user's knowledge. </p>
-                <p>You can display cast information with the <codeph>psql</codeph> meta-command
-                        <codeph>\dC</codeph>. Cast information is stored in the catalog table
-                        <codeph>pg_cast</codeph>, and type information is stored in the catalog
-                    table <codeph>pg_type</codeph>. </p>
+                <p>
+                    如果值表达式必须生成的类型没有歧义（例如，当它被分配给表列时），则通常可以省略显式类型转换；
+                    系统会自动应用类型转换。
+                    Greenplum数据库系统只会自动应用在系统目录中标记为"OK to apply implicitly"的转换。
+                    必须使用显式强制转换语法调用其他强制转换，以防止在用户不知情的情况下应用意外的转换。</p>
+                <p>可以通过<codeph>psql</codeph> meta命令<codeph>\dC</codeph>显示强制转换信息。CAST信息存储在目录表<codeph>pg_cast</codeph>中，类型信息存储在目录表<codeph>pg_cast</codeph>中。</p>
             </body>
         </topic>
         <topic id="topic15" xml:lang="en">
-            <title id="in145048">Scalar Subqueries</title>
+            <title id="in145048">标量子查询</title>
             <body>
-                <p>A scalar subquery is a <codeph>SELECT</codeph> query in parentheses that returns
-                    exactly one row with one column. Do not use a <codeph>SELECT</codeph> query that
-                    returns multiple rows or columns as a scalar subquery. The query runs and uses
-                    the returned value in the surrounding value expression. A correlated scalar
-                    subquery contains references to the outer query block.</p>
+                <p>标量子查询是一个圆括号中的<codeph>SELECT</codeph>查询，它返回正好一行一列。
+                    不要将返回多行或者多列的<codeph>SELECT</codeph>查询用作一个标量子查询。
+                    该查询会运行并且把返回的值用在外围的值表达式中。相关标量子查询包含对于外层查询块的引用。</p>
             </body>
         </topic>
         <topic id="topic16" xml:lang="en">
-            <title>Correlated Subqueries</title>
+            <title>相关子查询</title>
             <body>
-                <p>A correlated subquery (CSQ) is a <codeph>SELECT</codeph> query with a
-                        <codeph>WHERE</codeph> clause or target list that contains references to the
-                    parent outer clause. CSQs efficiently express results in terms of results of
-                    another query. Greenplum Database supports correlated subqueries that provide
-                    compatibility with many existing applications. A CSQ is a scalar or table
-                    subquery, depending on whether it returns one or multiple rows. Greenplum
-                    Database does not support correlated subqueries with skip-level
-                    correlations.</p>
+                <p>相关子查询（CSQ）是一个<codeph>SELECT</codeph>查询，其<codeph>WHERE</codeph>子句或者目标列表包含对于外层子句的引用。
+                    CSQ能有效地根据另一个查询的结果来表达结果。
+                    Greenplum数据库支持相关子查询，为很多现有的应用提供了兼容性。
+                    CSQ可以是一个标量或者表子查询，这取决于它返回一行还是多行。Greenplum数据库不支持跨级关联的相关子查询。</p>
             </body>
         </topic>
         <topic id="topic17" xml:lang="en">
-            <title>Correlated Subquery Examples</title>
+            <title>相关子查询例子</title>
             <topic id="topic18" xml:lang="en">
-                <title>Example 1 – Scalar correlated subquery</title>
+                <title>例1 – 标量相关子查询</title>
                 <body>
                     <codeblock>SELECT * FROM t1 WHERE t1.x 
             &gt; (SELECT MAX(t2.x) FROM t2 WHERE t2.y = t1.y);
@@ -576,39 +416,31 @@ expression::type</codeblock>
                 </body>
             </topic>
             <topic id="topic19" xml:lang="en">
-                <title>Example 2 – Correlated EXISTS subquery</title>
+                <title>例2 – 相关EXISTS子查询</title>
                 <body>
                     <codeblock>SELECT * FROM t1 WHERE 
 EXISTS (SELECT 1 FROM t2 WHERE t2.x = t1.x);
 </codeblock>
-                    <p>Greenplum Database uses one of the following methods to run CSQs:</p>
+                    <p>Greenplum数据库使用下列方法之一运行CSQ：</p>
                     <ul>
-                        <li id="in197793">Unnest the CSQ into join operations &#8211; This method is
-                            most efficient, and it is how Greenplum Database runs most CSQs,
-                            including queries from the TPC-H benchmark.</li>
-                        <li id="in197800">Run the CSQ on every row of the outer query &#8211; This
-                            method is relatively inefficient, and it is how Greenplum Database runs
-                            queries that contain CSQs in the <codeph>SELECT</codeph> list or are
-                            connected by <codeph>OR</codeph> conditions.</li>
+                        <li id="in197793">解除CSQ的嵌套变成连接操作 – 这种方法最高效，并且Greenplum数据库会以这种方法运行大多数CSQ，包括来自TPC-H基准的查询。</li>
+                        <li id="in197800">在外层查询的每一行上运行CSQ – 这种方法相对低效，Greenplum数据库会用这种方法来运行含有在SELECT列表中或者由OR条件连接的CSQ的查询。</li>
                     </ul>
-                    <p>The following examples illustrate how to rewrite some of these types of
-                        queries to improve performance.</p>
+                    <p>下面的例子展示了如何重写这些类型的查询来改进性能。</p>
                 </body>
             </topic>
             <topic id="topic20" xml:lang="en">
-                <title>Example 3 - CSQ in the Select List</title>
+                <title>例3 - 选择列表中的CSQ</title>
                 <body>
                     <p>
-                        <i>Original Query</i>
+                        <i>原始查询</i>
                     </p>
                     <codeblock>SELECT T1.a,
       (SELECT COUNT(DISTINCT T2.z) FROM t2 WHERE t1.x = t2.y) dt2 
 FROM t1;</codeblock>
-                    <p>Rewrite this query to perform an inner join with <codeph>t1</codeph> first
-                        and then perform a left join with <codeph>t1</codeph> again. The rewrite
-                        applies for only an equijoin in the correlated condition.</p>
+                    <p>重写这一查询，让它先执行与<codeph>t1</codeph>的内连接，然后再执行与<codeph>t1</codeph>的左连接。这种重写只适用于相关条件中的等值连接。</p>
                     <p>
-                        <i>Rewritten Query</i>
+                        <i>重写查询</i>
                     </p>
                     <codeblock>SELECT t1.a, dt2 FROM t1 
        LEFT JOIN 
@@ -621,20 +453,19 @@ FROM t1;</codeblock>
             </topic>
         </topic>
         <topic id="topic21" xml:lang="en">
-            <title>Example 4 - CSQs connected by OR Clauses</title>
+            <title>例4 - 由OR子句连接的CSQ</title>
             <body>
                 <p>
-                    <i>Original Query</i>
+                    <i>原始查询</i>
                 </p>
                 <codeblock>SELECT * FROM t1 
 WHERE 
 x &gt; (SELECT COUNT(*) FROM t2 WHERE t1.x = t2.x) 
 OR x &lt; (SELECT COUNT(*) FROM t3 WHERE t1.y = t3.y)
 </codeblock>
-                <p>Rewrite this query to separate it into two parts with a union on the
-                        <codeph>OR</codeph> conditions.</p>
+                <p>重写这一查询，把它根据OR条件分解成两个部分，然后联合起来。</p>
                 <p>
-                    <i>Rewritten Query</i>
+                    <i>重写查询</i>
                 </p>
                 <codeblock>SELECT * FROM t1 
 WHERE x &gt; (SELECT count(*) FROM t2 WHERE t1.x = t2.x) 
@@ -642,21 +473,16 @@ UNION
 SELECT * FROM t1 
 WHERE x &lt; (SELECT count(*) FROM t3 WHERE t1.y = t3.y)
 </codeblock>
-                <p>To view the query plan, use <codeph>EXPLAIN SELECT</codeph> or <codeph>EXPLAIN
-                        ANALYZE SELECT</codeph>. Subplan nodes in the query plan indicate that the
-                    query will run on every row of the outer query, and the query is a candidate for
-                    rewriting. For more information about these statements, see <xref
+                <p>要查看查询计划，使用<codeph>EXPLAIN SELECT</codeph>或者<codeph>EXPLAIN ANALYZE SELECT</codeph>。
+                    查询计划中的子计划节点表示该查询将在外层查询的每一行上运行，并且该查询是重写的候选。
+                    更多有关这些语句的信息，请见 <xref
                         href="query-profiling.xml#topic39"/>.</p>
             </body>
         </topic>
         <topic id="topic23" xml:lang="en">
-            <title>Array Constructors</title>
+            <title>数组构造器</title>
             <body>
-                <p>An array constructor is an expression that builds an array value from values for
-                    its member elements. A simple array constructor consists of the key word
-                        <codeph>ARRAY</codeph>, a left square bracket <codeph>[</codeph>, one or
-                    more expressions separated by commas for the array element values, and a right
-                    square bracket <codeph>]</codeph>. For example,</p>
+                <p>数组构造器是一个从其成员元素的值构造一个数组值的表达式。简单的数组构造器由关键词 <codeph>ARRAY</codeph>、一个左方括号<codeph>[</codeph>、一个或多个由逗号分隔的表达式（用于数组元素值）以及一个右方括号<codeph>]</codeph>组成。例如，</p>
                 <p>
                     <codeblock>SELECT ARRAY[1,2,3+4];
   array
@@ -664,13 +490,9 @@ WHERE x &lt; (SELECT count(*) FROM t3 WHERE t1.y = t3.y)
  {1,2,7}
 </codeblock>
                 </p>
-                <p>The array element type is the common type of its member expressions, determined
-                    using the same rules as for <codeph>UNION</codeph> or <codeph>CASE</codeph>
-                    constructs.</p>
-                <p>You can build multidimensional array values by nesting array constructors. In the
-                    inner constructors, you can omit the keyword <codeph>ARRAY</codeph>. For
-                    example, the following two <codeph>SELECT</codeph> statements produce the same
-                    result:</p>
+                <p>数组元素类型是其成员表达式的共同类型，采用和<codeph>UNION</codeph>或者<codeph>CASE</codeph>结构相同的规则确定。</p>
+                <p>可以通过嵌套数组构造器构建多维数组值。
+                    在内层构造器中，可以省略关键词<codeph>ARRAY</codeph>。例如，下面的两个<codeph>SELECT</codeph>语句产生相同的结果:</p>
                 <p>
                     <codeblock>SELECT ARRAY[ARRAY[1,2], ARRAY[3,4]];
 SELECT ARRAY[[1,2],[3,4]];
@@ -679,11 +501,8 @@ SELECT ARRAY[[1,2],[3,4]];
  {{1,2},{3,4}}
 </codeblock>
                 </p>
-                <p>Since multidimensional arrays must be rectangular, inner constructors at the same
-                    level must produce sub-arrays of identical dimensions.</p>
-                <p>Multidimensional array constructor elements are not limited to a
-                        sub-<codeph>ARRAY</codeph> construct; they are anything that produces an
-                    array of the proper kind. For example:</p>
+                <p>由于多维数组必须是矩形，同一层次上的内层构造器必须产生同维的子数组。</p>
+                <p>多维数组构造器元素不限于一个子<codeph>ARRAY</codeph>结构，它们可以是任何产生正确种类数组的东西。例如：</p>
                 <codeblock>CREATE TABLE arr(f1 int[], f2 int[]);
 INSERT INTO arr VALUES (ARRAY[[1,2],[3,4]], 
 ARRAY[[5,6],[7,8]]);
@@ -692,52 +511,40 @@ SELECT ARRAY[f1, f2, '{{9,10},{11,12}}'::int[]] FROM arr;
 ------------------------------------------------
  {{{1,2},{3,4}},{{5,6},{7,8}},{{9,10},{11,12}}}
 </codeblock>
-                <p>You can construct an array from the results of a subquery. Write the array
-                    constructor with the keyword <codeph>ARRAY</codeph> followed by a subquery in
-                    parentheses. For example:</p>
+                <p>可以从子查询的结果构造数组。数组构造器写成关键词<codeph>ARRAY</codeph>后面跟上圆括号中的一个子查询。例如：</p>
                 <codeblock>SELECT ARRAY(SELECT oid FROM pg_proc WHERE proname LIKE 'bytea%');
                           ?column?
 -----------------------------------------------------------
  {2011,1954,1948,1952,1951,1244,1950,2005,1949,1953,2006,31}
 </codeblock>
-                <p>The subquery must return a single column. The resulting one-dimensional array has
-                    an element for each row in the subquery result, with an element type matching
-                    that of the subquery's output column. The subscripts of an array value built
-                    with <codeph>ARRAY</codeph> always begin with <codeph>1</codeph>.</p>
+                <p>子查询必须返回单列。作为结果的一维数组中每一个元素对应于子查询结果中的每一行，元素类型匹配子查询的输出列。
+                    用<codeph>ARRAY</codeph>构建的数组值的下标总是从<codeph>1</codeph>开始。</p>
             </body>
         </topic>
         <topic id="topic24" xml:lang="en">
-            <title>Row Constructors</title>
+            <title>行构造器</title>
             <body>
-                <p>A row constructor is an expression that builds a row value (also called a
-                    composite value) from values for its member fields. For example,</p>
+                <p>行构造器是一个从其成员域的值构建一个行值（也被称为组合值）的表达式。例如，</p>
                 <p>
                     <codeblock>SELECT ROW(1,2.5,'this is a test');
 </codeblock>
                 </p>
-                <p>Row constructors have the syntax <codeph>rowvalue.*</codeph>, which expands to a
-                    list of the elements of the row value, as when you use the syntax
-                        <codeph>.*</codeph> at the top level of a <codeph>SELECT</codeph> list. For
-                    example, if table <codeph>t</codeph> has columns <codeph>f1</codeph> and
-                        <codeph>f2</codeph>, the following queries are the same:</p>
+                <p>行构造器的语法是<codeph>rowvalue.*</codeph>，当在SELECT列表的顶层使用语法<codeph>.*</codeph>时，它会扩展成该行值的元素的列表。
+                    例如，如果表t有列<codeph>f1</codeph>和<codeph>f2</codeph>，下列查询是相同的：</p>
                 <p>
                     <codeblock>SELECT ROW(t.*, 42) FROM t;
 SELECT ROW(t.f1, t.f2, 42) FROM t;
 </codeblock>
                 </p>
-                <p>By default, the value created by a <codeph>ROW</codeph> expression has an
-                    anonymous record type. If necessary, it can be cast to a named composite type —
-                    either the row type of a table, or a composite type created with <codeph>CREATE
-                        TYPE AS</codeph>. To avoid ambiguity, you can explicitly cast the value if
-                    necessary. For example:</p>
+                <p>默认情况下，<codeph>ROW</codeph>表达式创建的值是一种匿名记录类型。如果有必要，它可以被造型成一种命名的组合类型 — 一个表的行类型或者用<codeph>CREATE TYPE AS</codeph>创建的一种组合类型。
+                    为了避免歧义，必要时可以对该值进行显式转换。例如：</p>
                 <p>
                     <codeblock>CREATE TABLE mytable(f1 int, f2 float, f3 text);
 CREATE FUNCTION getf1(mytable) RETURNS int AS 'SELECT $1.f1' 
 LANGUAGE SQL;
 </codeblock>
                 </p>
-                <p>In the following query, you do not need to cast the value because there is only
-                    one <codeph>getf1()</codeph> function and therefore no ambiguity:</p>
+                <p>在下面的查询中，不需要对值转换，因为只有一种<codeph>getf1()</codeph>函数，所以没有歧义：</p>
                 <p>
                     <codeblock>SELECT getf1(ROW(1,2.5,'this is a test'));
  getf1
@@ -748,7 +555,7 @@ CREATE FUNCTION getf1(myrowtype) RETURNS int AS 'SELECT
 $1.f1' LANGUAGE SQL;
 </codeblock>
                 </p>
-                <p>Now we need a cast to indicate which function to call:</p>
+                <p>现在我们需要一次转换来指示要调用哪个函数：</p>
                 <p>
                     <codeblock>SELECT getf1(ROW(1,2.5,'this is a test'));
 ERROR:  function getf1(record) is not unique
@@ -764,53 +571,38 @@ myrowtype));
     11
 </codeblock>
                 </p>
-                <p>You can use row constructors to build composite values to be stored in a
-                    composite-type table column or to be passed to a function that accepts a
-                    composite parameter.</p>
+                <p>可以使用行构造器来构建组合值，该值可以被存储在组合类型表列或者被传递给接受组合类型参数的函数。</p>
             </body>
         </topic>
         <topic id="topic25" xml:lang="en">
-            <title>Expression Evaluation Rules</title>
+            <title>表达式计算规则</title>
             <body>
-                <p>The order of evaluation of subexpressions is undefined. The inputs of an operator
-                    or function are not necessarily evaluated left-to-right or in any other fixed
-                    order.</p>
-                <p>If you can determine the result of an expression by evaluating only some parts of
-                    the expression, then other subexpressions might not be evaluated at all. For
-                    example, in the following expression:</p>
+                <p>子表达式的计算顺序未被定义。一个操作符或者函数的输入不必从左向右或者按照任何其他固定顺序计算。</p>
+                <p>如果通过仅计算表达式的一部分就能确定该表达式的结果，那么其他子表达式可能完全不被计算。例如，在下面的表达式中：</p>
                 <p>
                     <codeblock>SELECT true OR somefunc();
 </codeblock>
                 </p>
-                <p><codeph>somefunc()</codeph> would probably not be called at all. The same is true
-                    in the following expression:</p>
+                <p><codeph>somefunc()</codeph> 可能根本不会被调用。在下面的额表达式中也是如此：</p>
                 <p>
                     <codeblock>SELECT somefunc() OR true;
 </codeblock>
                 </p>
-                <p>This is not the same as the left-to-right evaluation order that Boolean operators
-                    enforce in some programming languages.</p>
-                <p>Do not use functions with side effects as part of complex expressions, especially
-                    in <codeph>WHERE</codeph> and <codeph>HAVING</codeph> clauses, because those
-                    clauses are extensively reprocessed when developing an execution plan. Boolean
-                    expressions (<codeph>AND</codeph>/<codeph>OR</codeph>/<codeph>NOT</codeph>
-                    combinations) in those clauses can be reorganized in any manner that Boolean
-                    algebra laws allow.</p>
-                <p>Use a <codeph>CASE</codeph> construct to force evaluation order. The following
-                    example is an untrustworthy way to avoid division by zero in a
-                        <codeph>WHERE</codeph> clause:</p>
+                <p>这和某些编程语言中的布尔操作符实施的从左向右的计算顺序不同。</p>
+                <p>不要把有副作用的函数用在复杂表达式中，尤其是在WHERE和HAVING子句中，因为在形成执行计划时会广泛地预处理那些子句。
+                    那些子句中的布尔表达式（<codeph>AND</codeph>/<codeph>OR</codeph>/<codeph>NOT</codeph>组合）可能会被以布尔代数法允许的任何方式重新组织。</p>
+                <p>要强制计算顺序，可使用 <codeph>CASE</codeph>结构。下面的例子是一种在 <codeph>WHERE</codeph>子句中避免除零的不可靠的方法：</p>
                 <p>
                     <codeblock>SELECT ... WHERE x &lt;&gt; 0 AND y/x &gt; 1.5;
 </codeblock>
                 </p>
-                <p>The following example shows a trustworthy evaluation order:</p>
+                <p>下面的例子展示了一种可靠的计算顺序：</p>
                 <p>
                     <codeblock>SELECT ... WHERE CASE WHEN x &lt;&gt; 0 THEN y/x &gt; 1.5 ELSE false 
 END;
 </codeblock>
                 </p>
-                <p>This <codeph>CASE</codeph> construct usage defeats optimization attempts; use it
-                    only when necessary.</p>
+                <p>这种<codeph>CASE</codeph>结构的用法会使得优化器无法进行优化尝试，因此只有在必要时才使用它。</p>
             </body>
         </topic>
     </topic>
