@@ -8,7 +8,7 @@
   <body>
     <p>用户可以使用资源管理功能来限制并行的查询数、单个查询所使用的内存量和CPU使用量。
 	Greenplum数据库提供了两种管理资源的模式 —— 资源队列和资源组。</p>
-    <note type="important">在启用着基于资源队列的负载管理的RedHat 6.x 以及 CentOS 6.x系统中
+    <note type="important">在启用着基于资源组的负载管理的RedHat 6.x 以及 CentOS 6.x系统中
 	存在明显的Greenplum数据库性能下降现象，这是Linux cgroup的内核Bug造成的。该内核Bug已经在
 	RedHat 7.x 以及 CentOS 7.x系统中被修复了。
 	<p>若用户对在RedHat 6系统下使用资源组的性能满意，且符合使用场景的话，请将内核版本升级到

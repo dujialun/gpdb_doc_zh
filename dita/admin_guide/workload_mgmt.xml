@@ -2,7 +2,7 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="iz173472">Using Resource Queues</title>
+  <title id="iz173472">使用资源队列</title>
   <body>
     <p>使用Greenplum数据库的工作负载管理根据业务需求对查询按照优先权分配资源，并且在资源不可用时阻止查询开始。</p>
     <p>资源队列是用来管理Greenplum数据库系统中并行的程度的工具。你可以使用<codeph>CREATE RESOURCE
