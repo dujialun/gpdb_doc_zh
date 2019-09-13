@@ -2,72 +2,52 @@
 <!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <dita>
   <topic id="topic_xmh_44c_qfb">
-    <title>Text Search Data Types</title>
+    <title>全文搜索数据类型</title>
     <body>
-      <p>Greenplum Database provides two data types that are designed to support full text search,
-        which is the activity of searching through a collection of natural-language <i>documents</i>
-        to locate those that best match a <i>query</i>. The <codeph>tsvector</codeph> type
-        represents a document in a form optimized for text search; the <codeph>tsquery</codeph> type
-        similarly represents a text query. <xref
-          href="../admin_guide/textsearch/full-text-search.xml"/> provides a detailed explanation of
-        this facility, and <xref href="function-summary.xml#topic_vpj_ss1_lfb"/> summarizes the
-        related functions and operators.</p>
-      <p>The <codeph>tsvector</codeph> and <codeph>tsquery</codeph> types cannot be part of the
-        distribution key of a Greenplum Database table.</p>
+      <p>Greenplum 数据库提供两种数据类型，这两种数据类型被设计来支持全文搜索，即搜索自然语言<i>文档</i>集合并定位与一个<i>查询</i>最匹配内容。<codeph>tsvector</codeph> 类型以一种专为全文搜索优化的形式表示一个文档; 类似地，<codeph>tsquery</codeph> 类型表示一个文本查询。 <xref
+          href="../admin_guide/textsearch/full-text-search.xml"/> 有这方面支持的详细解释, <xref href="function-summary.xml#topic_vpj_ss1_lfb"/> 总结了相关函数和操作。</p>
+      <p><codeph>tsvector</codeph> 和 <codeph>tsquery</codeph> 类型不能是 Greenplum 数据库表的分布键的一部分。</p>
     </body>
     <topic id="topic_mzv_44c_qfb">
       <title>tsvector</title>
       <body>
-        <p>A <codeph>tsvector</codeph> value is a sorted list of distinct <i>lexemes</i>, which are
-          words that have been <i>normalized</i> to merge different variants of the same word (see
-            <xref href="../admin_guide/textsearch/full-text-search.xml"/> for details). Sorting and
-          duplicate-elimination are done automatically during input, as shown in this example:</p>
+        <p>一个 <codeph>tsvector</codeph> 值是不同<i>词素(lexemes)</i>的排序列表, 也就是由对不同形式的词进行合并，已经被<i>标准化</i>的单词组成的列表 (更多细节，请参考
+            <xref href="../admin_guide/textsearch/full-text-search.xml"/>)。 排序和去重在输入过程中已经自动完成。请看以下例子:</p>
         <codeblock>SELECT 'a fat cat sat on a mat and ate a fat rat'::tsvector;
                       tsvector
 ----------------------------------------------------
  'a' 'and' 'ate' 'cat' 'fat' 'mat' 'on' 'rat' 'sat'</codeblock>
-        <p>To represent lexemes containing whitespace or punctuation, surround them with quotes:</p>
+        <p>要表示包含空格和标点符号的词素，可以用单引号把它们包围起来:</p>
         <codeblock>SELECT $$the lexeme '    ' contains spaces$$::tsvector;
                  tsvector                  
 -------------------------------------------
  '    ' 'contains' 'lexeme' 'spaces' 'the'</codeblock>
-        <p>(We use dollar-quoted string literals in this example and the next one to avoid the
-          confusion of having to double quote marks within the literals.) Embedded quotes and
-          backslashes must be doubled:</p>
+        <p>(在这个例子中，我们使用了 $$ 引起来的字符串字面值。下一个例子中，我们使用常规的单引号引起来的字符串，所以字面值中嵌入的单引号必须双写进行转义。) 单引号引起来的词素中嵌入的单引号(')和反斜杠(\)必须双写:</p>
         <codeblock>SELECT $$the lexeme 'Joe''s' contains a quote$$::tsvector;
                     tsvector                    
 ------------------------------------------------
  'Joe''s' 'a' 'contains' 'lexeme' 'quote' 'the'</codeblock>
-        <p>Optionally, integer <i>positions</i> can be attached to lexemes:</p>
+        <p>可选的, 整数<i>定位数值</i>可以被附加到词素:</p>
         <codeblock>SELECT 'a:1 fat:2 cat:3 sat:4 on:5 a:6 mat:7 and:8 ate:9 a:10 fat:11 rat:12'::tsvector;
                                   tsvector
 -------------------------------------------------------------------------------
  'a':1,6,10 'and':8 'ate':9 'cat':3 'fat':2,11 'mat':7 'on':5 'rat':12 'sat':4</codeblock>
-        <p>A position normally indicates the source word's location in the document. Positional
-          information can be used for <i>proximity ranking</i>. Position values can range from 1 to
-          16383; larger numbers are silently set to 16383. Duplicate positions for the same lexeme
-          are discarded.</p>
-        <p>Lexemes that have positions can further be labeled with a <i>weight</i>, which can be
-            <codeph>A</codeph>, <codeph>B</codeph>, <codeph>C</codeph>, or <codeph>D</codeph>.
-            <codeph>D</codeph> is the default and hence is not shown on output:</p>
+        <p>一个定位数值通常表示源单词在文档中的位置。定位信息能够在<i>邻近排名</i>时使用。 定位数值的范围可以从 1 到
+          16383; 更大的数值自动归整到 16383。 相同定位数值的同一词素会被丢弃。</p>
+        <p>包含定位数值的词素可以进一步使用一个<i>权重</i>进行标记, 权重可以是
+            <codeph>A</codeph>, <codeph>B</codeph>, <codeph>C</codeph>, 或 <codeph>D</codeph>。
+            <codeph>D</codeph> 是默认权重因此在输出中不会显示:</p>
         <codeblock>SELECT 'a:1A fat:2B,4C cat:5D'::tsvector;
           tsvector          
 ----------------------------
  'a':1A 'cat':5 'fat':2B,4C</codeblock>
-        <p>Weights are typically used to reflect document structure, for example by marking title
-          words differently from body words. Text search ranking functions can assign different
-          priorities to the different weight markers.</p>
-        <p>It is important to understand that the <codeph>tsvector</codeph> type itself does not
-          perform any normalization; it assumes the words it is given are normalized appropriately
-          for the application. For example,</p>
+        <p>典型地，权重被用来反映文档结构, 例如, 可以使用不同权重标记标题与正文中的单词。全文搜索排名函数能够对不同权重标记指派不同优先级。</p>
+        <p>理解 <codeph>tsvector</codeph> 类型本身并不进行任何标准化非常重要; 它假定给它的单词已经为应用进行了适当地标准化。例如,</p>
         <codeblock>select 'The Fat Rats'::tsvector;
       tsvector      
 --------------------
  'Fat' 'Rats' 'The'</codeblock>
-        <p>For most English-text-searching applications the above words would be considered
-          non-normalized, but tsvector doesn't care. Raw document text should usually be passed
-          through <codeph>to_tsvector</codeph> to normalize the words appropriately for
-          searching:</p>
+        <p>对大多数英文全文搜索应用，上面的单词被认为是非标准化的，但是 tsvector 并不在意。原始文档文本应该总是通过 <codeph>to_tsvector</codeph> 函数来为搜索进行适当地标准化:</p>
         <codeblock>SELECT to_tsvector('english', 'The Fat Rats');
    to_tsvector   
 -----------------
@@ -77,10 +57,8 @@
     <topic id="topic_w2h_p4c_qfb">
       <title>tsquery</title>
       <body>
-        <p>A <codeph>tsquery</codeph> value stores lexemes that are to be searched for, and combines
-          them honoring the Boolean operators <codeph>&amp;</codeph> (AND), <codeph>|</codeph> (OR),
-          and <codeph>!</codeph> (NOT). Parentheses can be used to enforce grouping of the
-          operators:</p>
+        <p>一个 <codeph>tsquery</codeph> 值为搜索存储词素，同时结合它们实现布尔操作 <codeph>&amp;</codeph> (与), <codeph>|</codeph> (或),
+          以及 <codeph>!</codeph> (非)。 括号可以用来表示分组操作:</p>
         <codeblock>SELECT 'fat &amp; rat'::tsquery;
     tsquery    
 ---------------
@@ -95,41 +73,34 @@ SELECT 'fat &amp; rat &amp; ! cat'::tsquery;
         tsquery         
 ------------------------
  'fat' &amp; 'rat' &amp; !'cat'</codeblock>
-        <p>In the absence of parentheses, <codeph>!</codeph> (NOT) binds most tightly, and
-            <codeph>&amp;</codeph> (AND) binds more tightly than <codeph>|</codeph> (OR).</p>
-        <p>Optionally, lexemes in a <codeph>tsquery</codeph> can be labeled with one or more weight
-          letters, which restricts them to match only <codeph>tsvector</codeph> lexemes with
-          matching weights:</p>
+        <p>不使用括号时, <codeph>!</codeph> (非) 具有最高优先级, 另外
+            <codeph>&amp;</codeph> (与) 优先级高于 <codeph>|</codeph> (或)。</p>
+        <p>可选地, 一个 <codeph>tsquery</codeph>中的词素可以带一个或多个权重标记字母，用来限制他们只与合适权重的 <codeph>tsvector</codeph>相匹配:</p>
         <codeblock>SELECT 'fat:ab &amp; cat'::tsquery;
     tsquery
 ------------------
  'fat':AB &amp; 'cat'</codeblock>
-        <p>Also, lexemes in a <codeph>tsquery</codeph> can be labeled with * to specify prefix
-          matching:</p>
+        <p>Also, 一个 <codeph>tsquery</codeph> 中的词素也可以用星号(*)指定前缀匹配:</p>
         <codeblock>SELECT 'super:*'::tsquery;
   tsquery  
 -----------
  'super':*</codeblock>
-        <p>This query will match any word in a <codeph>tsvector</codeph> that begins with "super".
-          Note that prefixes are first processed by text search configurations, which means this
-          comparison returns true:</p>
+        <p>这个查询会匹配一个以 "super" 开头的 <codeph>tsvector</codeph> 中的任何单词。
+          注意前缀会被全文搜索配置首先处理，也就是说这个比较会返回 true (真):</p>
         <codeblock>SELECT to_tsvector( 'postgraduate' ) @@ to_tsquery( 'postgres:*' );
  ?column? 
 ----------
  t
 (1 row)</codeblock>
-        <p>because <codeph>postgres</codeph> gets stemmed to <codeph>postgr</codeph>:</p>
+        <p>因为 <codeph>postgres</codeph> 中提取的词干是 <codeph>postgr</codeph>:</p>
         <codeblock>SELECT to_tsquery('postgres:*');
  to_tsquery 
 ------------
  'postgr':*
 (1 row)</codeblock>
-        <p>which then matches <codeph>postgraduate</codeph>.</p>
-        <p>Quoting rules for lexemes are the same as described previously for lexemes in
-            <codeph>tsvector</codeph>; and, as with <codeph>tsvector</codeph>, any required
-          normalization of words must be done before converting to the <codeph>tsquery</codeph>
-          type. The <codeph>to_tsquery</codeph> function is convenient for performing such
-          normalization:</p>
+        <p>所以就匹配到了 <codeph>postgraduate</codeph>。</p>
+        <p>词素引用规则与前面 <codeph>tsvector</codeph> 中的规则一样; 同时，也和 <codeph>tsvector</codeph> 一样, 任何需要标准化的单词必须在转换为 <codeph>tsquery</codeph>
+          类型之前完成。<codeph>to_tsquery</codeph> 函数可以方便地用来进行这类标准化操作:</p>
         <codeblock>SELECT to_tsquery('Fat:ab &amp; Cats');
     to_tsquery    
 ------------------

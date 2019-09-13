@@ -2,20 +2,20 @@
 <!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <dita>
   <topic id="topic1" xml:lang="en">
-    <title id="if135496">Greenplum数据库数据类型</title>
+    <title id="if135496">Greenplum 数据库数据类型</title>
     <body>
-      <p>Greenplum数据库有一套丰富的本地数据类型供用户使用。用户也可以使用<codeph>CREATE TYPE</codeph>命令定义新的数据类型。本参考手册对所有内置数据类型进行说明。除了这里列出的类型外，还有一些内部使用的数据类型，例如<i>oid</i> (对象标识符)，但这些不在本手册中介绍。</p>
-      <p>在<filepath>contrib</filepath>目录中的可选模块也可能安装新的数据类型。例如<codeph>hstore</codeph>模块引入了一种新数据类型和
-        连带函数来与key-value键值对一起工作。参见<xref
-          href="modules/hstore.xml#topic_vcn_jkq_1bb"/>。<codeph>citext</codeph>模块添加了一种大小写不敏感的文本数据类型。参见<xref href="modules/citext.xml"/>。</p>
+      <p>Greenplum 数据库有一套丰富的本地数据类型供用户使用。用户也可以使用 <codeph>CREATE TYPE</codeph> 命令定义新的数据类型。本参考手册对所有内置数据类型进行说明。除了这里列出的类型外，还有一些内部使用的数据类型，例如 <i>oid</i> (对象标识符)，但这些不在本手册中介绍。</p>
+      <p>在 <filepath>contrib</filepath> 目录中的可选模块也可能安装新的数据类型。例如 <codeph>hstore</codeph> 模块引入了一种新数据类型和
+        连带函数来与 key-value 键值对一起工作。参见 <xref
+          href="modules/hstore.xml#topic_vcn_jkq_1bb"/>。<codeph>citext</codeph> 模块添加了一种大小写不敏感的文本数据类型。参见 <xref href="modules/citext.xml"/>。</p>
       <p>下面的数据类型在SQL中使用: <i>bit</i>, <i>bit varying</i>,
           <i>boolean</i>, <i>character varying, varchar</i>, <i>character, char</i>, <i>date</i>,
           <i>double precision</i>, <i>integer</i>, <i>interval</i>, <i>numeric</i>, <i>decimal</i>,
           <i>real</i>, <i>smallint</i>, <i>time</i> (带时区或不带时区), 以及
           <i>timestamp</i> (带时区或不带时区)。</p>
-      <p>每一种数据类型都有一种外部表示格式，这由数据类型的输入函数和输出函数决定。许多内置数据类型有明显的外部格式。然而，几种特别的数据类型要么只存在于PostgreSQL（以及Greenplum数据库），例如geometric paths，要么有几种可能的表示格式，例如时间和日期类型。一些输入和输出函数是不可逆转的，也就是说，相比较原始输入，输出函数的结果可能存在精度损失。</p>
+      <p>每一种数据类型都有一种外部表示格式，这由数据类型的输入函数和输出函数决定。许多内置数据类型有明显的外部格式。然而，几种特别的数据类型要么只存在于 PostgreSQL（以及 Greenplum 数据库），例如 geometric paths，要么有几种可能的表示格式，例如时间和日期类型。一些输入和输出函数是不可逆转的，也就是说，相比较原始输入，输出函数的结果可能存在精度损失。</p>
       <table id="if139202">
-        <title>Greenplum数据库内置数据类型</title>
+        <title>Greenplum 数据库内置数据类型</title>
         <tgroup cols="5">
           <colspec colnum="1" colname="col1" colwidth="95pt"/>
           <colspec colnum="2" colname="col2" colwidth="74pt"/>
@@ -48,7 +48,7 @@
               <entry colname="col5">大范围自增型整数</entry>
             </row>
             <row>
-              <entry colname="col1">bit [ (n) ]<fn id="if139219">对于变长数据类型，如果大于或等于127字节，需要(除数据本身外)额外4字节的存储空间（小于127字节时额外只需要1字节存储空间）。</fn></entry>
+              <entry colname="col1">bit [ (n) ]<fn id="if139219">对于变长数据类型，如果大于或等于 127 字节，需要(除数据本身外)额外 4 字节的存储空间（小于 127 字节时额外只需要 1 字节存储空间）。</fn></entry>
               <entry colname="col2"/>
               <entry colname="col3"><i>n</i> 位</entry>
               <entry colname="col4"><xref
@@ -166,8 +166,8 @@
             <row>
               <entry colname="col1">json</entry>
               <entry colname="col2"/>
-              <entry colname="col3">1 字节 + json长度</entry>
-              <entry colname="col4">任意长度json</entry>
+              <entry colname="col3">1 字节 + json 大小</entry>
+              <entry colname="col4">任意长度 json</entry>
               <entry colname="col5">不定长（无限制）</entry>
             </row>
             <row>
@@ -289,8 +289,8 @@
               <entry colname="col1">xml<xref href="#topic1/if139219" scope="local" type="fn"
                   format="dita"/></entry>
               <entry colname="col2"/>
-              <entry colname="col3">1 字节 + <i>xml大小</i></entry>
-              <entry colname="col4">任意长度xml</entry>
+              <entry colname="col3">1 字节 + <i>xml 大小</i></entry>
+              <entry colname="col4">任意长度 xml</entry>
               <entry colname="col5">变长，无限制</entry>
             </row>
             <row>
@@ -298,7 +298,7 @@
               <entry colname="col2"/>
               <entry colname="col3"/>
               <entry colname="col4"/>
-              <entry colname="col5">用户级事务ID快照</entry>
+              <entry colname="col5">用户级事务 ID 快照</entry>
             </row>
           </tbody>
         </tgroup>
