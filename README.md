@@ -38,8 +38,8 @@
     - System Catalog Reference（完成：杜佳伦）
     - The gp_toolkit Administrative Schema（翻译中：亓晓帅，进度：1/12）
     - The gpperfmon Database（待认领）
-    - Greenplum Database Data Types（待认领）
+    - Greenplum Database Data Types（翻译中：何江）
     - Server Configuration Parameters（完成：杜佳伦）
     - Additional Supplied Modules（待认领）
     - Others（翻译中：杜佳伦）
-- Platform Extension Framework (PXF) （待认领）
+- Platform Extension Framework (PXF) （翻译中：彭占元，许大贵）
