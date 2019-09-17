@@ -2,118 +2,102 @@
 <!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <dita>
   <topic id="topic_abq_gfk_qfb">
-    <title>Date/Time Types</title>
+    <title>日期/时间类型</title>
     <body><section id="datatype-datetime">
    
 
-   <p>Greenplum supports the full set of SQL date and time types, shown in <xref
-      href="#topic_abq_gfk_qfb/datatype-datetime-table" format="dita"/>. The operations available on
-     these data types are described in <xref
+   <p>Greenplum 完整支持全部 SQL 日期和时间类型, 参见 <xref
+      href="#topic_abq_gfk_qfb/datatype-datetime-table" format="dita"/>。对于这些数据类型可用的操作说明, 参见 PostgreSQL 文档 <xref
       href="https://www.postgresql.org/docs/9.4/functions-datetime.html" format="html"
-      scope="external">Date/Time Functions and Operators</xref> in the PostgreSQL documentation.
-     Dates are counted according to the Gregorian calendar, even in years before that calendar was
-     introduced (see <xref
+      scope="external">日期/时间函数和运算符</xref>。
+     日期根据罗马日历计算，在日历引入之前的年也这样计算 (参见 PostgreSQL 文档 <xref
       href="https://www.postgresql.org/docs/9.4/datetime-units-history.html" format="html"
-      scope="external">History of Units</xref> in the PostgreSQL documentation for more
-     information).</p>
+      scope="external">日期单位的历史</xref>了解更多信息)。</p>
 
     <table id="datatype-datetime-table">
-     <title>Date/Time Types</title>
+     <title>日期/时间类型</title>
      <tgroup cols="6">
       <thead>
        <row>
-        <entry>Name</entry>
-        <entry>Storage Size</entry>
-        <entry>Description</entry>
-        <entry>Low Value</entry>
-        <entry>High Value</entry>
-        <entry>Resolution</entry>
+        <entry>名称</entry>
+        <entry>存储大小</entry>
+        <entry>描述</entry>
+        <entry>最小值</entry>
+        <entry>最大值</entry>
+        <entry>精度</entry>
        </row>
       </thead>
       <tbody>
        <row>
         <entry>timestamp [ (<varname>p</varname>) ] [ without time zone ]</entry>
-        <entry>8 bytes</entry>
-        <entry>both date and time (no time zone)</entry>
+        <entry>8 字节</entry>
+        <entry>包括时间和日期 (无时区)</entry>
         <entry>4713 BC</entry>
         <entry>294276 AD</entry>
-        <entry>1 microsecond / 14 digits</entry>
+        <entry>1 微秒 / 14 位数字</entry>
        </row>
        <row>
         <entry>timestamp [ (<varname>p</varname>) ] with time zone</entry>
-        <entry>8 bytes</entry>
-        <entry>both date and time, with time zone</entry>
+        <entry>8 字节</entry>
+        <entry>包括时间和日期 (有时区)</entry>
         <entry>4713 BC</entry>
         <entry>294276 AD</entry>
-        <entry>1 microsecond / 14 digits</entry>
+        <entry>1 微秒 / 14 位数字</entry>
        </row>
        <row>
         <entry>date</entry>
-        <entry>4 bytes</entry>
-        <entry>date (no time of day)</entry>
+        <entry>4 字节</entry>
+        <entry>日期 (无一天内的时间)</entry>
         <entry>4713 BC</entry>
         <entry>5874897 AD</entry>
-        <entry>1 day</entry>
+        <entry>1 天</entry>
        </row>
        <row>
         <entry>time [ (<varname>p</varname>) ] [ without time zone ]</entry>
-        <entry>8 bytes</entry>
-        <entry>time of day (no date)</entry>
+        <entry>8 字节</entry>
+        <entry>一天内的时间 (无日期和时区)</entry>
         <entry>00:00:00</entry>
         <entry>24:00:00</entry>
-        <entry>1 microsecond / 14 digits</entry>
+        <entry>1 微秒 / 14 位数字</entry>
        </row>
        <row>
         <entry>time [ (<varname>p</varname>) ] with time zone</entry>
-        <entry>12 bytes</entry>
-        <entry>times of day only, with time zone</entry>
+        <entry>12 字节</entry>
+        <entry>一天内的时间, 无日期, 有时区</entry>
         <entry>00:00:00+1459</entry>
         <entry>24:00:00-1459</entry>
-        <entry>1 microsecond / 14 digits</entry>
+        <entry>1 微秒 / 14 位数字</entry>
        </row>
        <row>
         <entry>interval [ <varname>fields</varname> ] [ (<varname>p</varname>) ]</entry>
-        <entry>16 bytes</entry>
-        <entry>time interval</entry>
-        <entry>-178000000 years</entry>
-        <entry>178000000 years</entry>
-        <entry>1 microsecond / 14 digits</entry>
+        <entry>16 字节</entry>
+        <entry>时间间隔</entry>
+        <entry>-178000000 年</entry>
+        <entry>178000000 年</entry>
+        <entry>1 微秒 / 14 位数字</entry>
        </row>
       </tbody>
      </tgroup>
     </table>
 
-   <note>The SQL standard requires that writing just <codeph>timestamp</codeph> be equivalent to
-      <codeph>timestamp without time zone</codeph>, and Greenplum honors that behavior.
-      <codeph>timestamptz</codeph> is accepted as an abbreviation for <codeph>timestamp with time
-      zone</codeph>; this is a PostgreSQL extension. </note>
+   <note>SQL 标准要求 <codeph>timestamp</codeph> 与 <codeph>timestamp without time zone</codeph> 写法一致, Greenplum 实现了这一点。
+      <codeph>timestamptz</codeph> 是 <codeph>timestamp with time
+      zone</codeph> 的缩写; 这是 PostgreSQL 的一点扩展。 </note>
 
-   <p><codeph>time</codeph>, <codeph>timestamp</codeph>, and <codeph>interval</codeph> accept an
-     optional precision value <varname>p</varname> which specifies the number of fractional digits
-     retained in the seconds field. By default, there is no explicit bound on precision. The allowed
-     range of <varname>p</varname> is from 0 to 6 for the <codeph>timestamp</codeph> and
-      <codeph>interval</codeph> types.</p>
+   <p><codeph>time</codeph>, <codeph>timestamp</codeph>, 和 <codeph>interval</codeph> 接受一个可选的精度值 <varname>p</varname>，来指定秒的小数部分数字。默认情况下, 没有明确精度指定。对于 <codeph>timestamp</codeph> 和
+      <codeph>interval</codeph> 类型, 允许的 <varname>p</varname> 值范围为 0 到 6。</p>
 
-   <note>When <codeph>timestamp</codeph> values are stored as eight-byte integers (currently the
-     default), microsecond precision is available over the full range of values. When
-      <codeph>timestamp</codeph> values are stored as double precision floating-point numbers
-     instead (a deprecated compile-time option), the effective limit of precision might be less than
-     6. <codeph>timestamp</codeph> values are stored as seconds before or after midnight 2000-01-01.
-     When <codeph>timestamp</codeph> values are implemented using floating-point numbers,
-     microsecond precision is achieved for dates within a few years of 2000-01-01, but the precision
-     degrades for dates further away. Note that using floating-point datetimes allows a larger range
-     of <codeph>timestamp</codeph> values to be represented than shown above: from 4713 BC up to
-     5874897 AD. <p>The same compile-time option also determines whether <codeph>time</codeph> and
-       <codeph>interval</codeph> values are stored as floating-point numbers or eight-byte integers.
-      In the floating-point case, large <codeph>interval</codeph> values degrade in precision as the
-      size of the interval increases.</p></note>
+   <note>当 <codeph>timestamp</codeph> 值按八字节整数存储(当前默认), 精度可全范围(0 到 6 位)任意设置。当
+      <codeph>timestamp</codeph> 值按双精度浮点数存储(一个过时的编译选项), 精度有效值可能小于 6 位。<codeph>timestamp</codeph> 值存储的是从 2000-01-01 午夜开始的秒的数值。
+      当 <codeph>timestamp</codeph> 值按浮点数实现时，2000-01-01 附近的一些年可以达到微秒精度，但是距离这个日期稍远的一些时间精度就会有所降低。注意：浮点存储的<codeph>timestamp</codeph> 值允许更大的日期范围，比上表中给出的要大，即可以表示从 4713 BC 到
+     5874897 AD 的日期。<p>同样的编译选项也决定 <codeph>time</codeph> 和
+       <codeph>interval</codeph> 类型值存储为浮点数还是八字节整数。
+      当存储位浮点数的时候, 当时间间隔增大时，<codeph>interval</codeph> 的精度有所降低。</p></note>
 
-   <p>For the <codeph>time</codeph> types, the allowed range of
-    <varname>p</varname> is from 0 to 6 when eight-byte integer
-    storage is used, or from 0 to 10 when floating-point storage is used.</p>
+   <p>对于 <codeph>time</codeph> 类型, 使用八字节整数存储时，允许的
+    <varname>p</varname> 值范围从 0 到 6；使用浮点数存储时，允许的<varname>p</varname> 值范围从 0 到 10。</p>
 
-   <p>The <codeph>interval</codeph> type has an additional option, which is
-    to restrict the set of stored fields by writing one of these phrases:
+   <p>另外，<codeph>interval</codeph> 数据类型还有一个附加选项，可以通过书写以下时间单位后缀(<varname>fields</varname>)来来限制存储内容:
 <codeblock>
 YEAR
 MONTH
@@ -129,134 +113,122 @@ HOUR TO MINUTE
 HOUR TO SECOND
 MINUTE TO SECOND
 </codeblock>
-    Note that if both <varname>fields</varname> and
-    <varname>p</varname> are specified, the
-    <varname>fields</varname> must include <codeph>SECOND</codeph>,
-    since the precision applies only to the seconds.</p>
+    注意：如果同时指定 <varname>fields</varname> 与
+    <varname>p</varname> 参数, 
+    <varname>fields</varname> 必须包含 <codeph>SECOND</codeph>,
+    因为精度参数 <varname>p</varname> 只对秒起作用。</p>
 
-   <p>The type <codeph>time with time zone</codeph> is defined by the SQL
-    standard, but the definition exhibits properties which lead to
-    questionable usefulness. In most cases, a combination of
+   <p><codeph>time with time zone</codeph> 类型由 SQL 标准定义，
+    但是定义给出的属性导致人们怀疑它的有用性。
+    大部分情况下，复合使用
     <codeph>date</codeph>, <codeph>time</codeph>, <codeph>timestamp without time
-    zone</codeph>, and <codeph>timestamp with time zone</codeph> should
-    provide a complete range of date/time functionality required by
-    any application.</p>
+    zone</codeph>, 以及 <codeph>timestamp with time zone</codeph> 已经提供了任何应用程序所需的完整日期/时间功能。</p>
 
-   <p>The types <codeph>abstime</codeph>
-    and <codeph>reltime</codeph> are lower precision types which are used internally.
-    You are discouraged from using these types in
-    applications;  these internal types
-    might disappear in a future release.</p>
+   <p><codeph>abstime</codeph> 
+    和 <codeph>reltime</codeph> 是内部使用的低精度数据类型。
+    不建议你在应用程序中使用; 这些内部数据类型可能在未来的某一个版本中消失。</p>
 
     </section>
    <section id="datatype-datetime-input">
-    <title>Date/Time Input</title>
+    <title>日期/时间输入</title>
 
-    <p>Date and time input is accepted in almost any reasonable format, including ISO 8601,
-     SQL-compatible, traditional POSTGRES, and others. For some formats, ordering of day, month, and
-     year in date input is ambiguous and there is support for specifying the expected ordering of
-     these fields. Set the <xref href="config_params/guc-list.xml#DateStyle"/> parameter to
-      <codeph>MDY</codeph> to select month-day-year interpretation, <codeph>DMY</codeph> to select
-     day-month-year interpretation, or <codeph>YMD</codeph> to select year-month-day interpretation.</p>
+    <p>几乎任何合理的日期/时间输入格式都可以被接受。包括 ISO 8601,
+     SQL-兼任格式, 传统 POSTGRES 格式, 等等。对于一些格式, 数据输入中的年、月、日的顺序非常含糊，所以支持指定这些字段的期望顺序。参见 <xref href="config_params/guc-list.xml#DateStyle"/> 通过参数
+      <codeph>MDY</codeph> 指定 月-日-年 格式, <codeph>DMY</codeph> 指定 日-月-年 格式，或者 <codeph>YMD</codeph> 指定 年-月-日 格式。</p>
 
-    <p>Greenplum is more flexible in handling date/time input than the SQL standard requires. See
+    <p>Greenplum 在处理日期/时间输入上比 SQL 标准要求的更加弹性。参见 PostgreSQL 文档
       <xref href="https://www.postgresql.org/docs/9.4/datetime-appendix.html" format="html"
-      scope="external">Appendix B. Date/Time Support</xref> in the PostgreSQL documentation for the
-     exact parsing rules of date/time input and for the recognized text fields including months,
-     days of the week, and time zones.</p>
+      scope="external">附录 B. 时间/日期支持</xref>，了解时间/日期输入的确切解析规则，以及如何识别文本字段，包括月份, 星期和时区。</p>
 
-    <p>Remember that any date or time literal input needs to be enclosed in single quotes, like
-     text strings. SQL requires the following syntax
+    <p>记住，任何日期或时间字面值需要用单引号引起来, 就像字符串一样. SQL 需要这样的语法
      <codeblock>
 <varname>type</varname> [ (<varname>p</varname>) ] '<varname>value</varname>'
 </codeblock>
-     where <varname>p</varname> is an optional precision specification giving the number of
-     fractional digits in the seconds field. Precision can be specified for <codeph>time</codeph>,
-      <codeph>timestamp</codeph>, and <codeph>interval</codeph> types. The allowed values are
-     mentioned above. If no precision is specified in a constant specification, it defaults to the
-     precision of the literal value.</p>
+     这里， <varname>p</varname> 是一个可选精度参数，指定秒的小数位数。它对以下类型起作用， <codeph>time</codeph>,
+      <codeph>timestamp</codeph>, 以及 <codeph>interval</codeph> 类型。
+      允许设定的值范围已经在上面文档中说明； 如果没有指定精度，默认为字面值的精度。</p>
 
    </section>
     <section>
-    <title>Dates</title>
+    <title>日期</title>
 
-    <p><xref href="#topic_abq_gfk_qfb/table_owm_dfr_qfb" format="dita"/> shows some possible inputs
-     for the <codeph>date</codeph> type.</p>
+    <p><xref href="#topic_abq_gfk_qfb/table_owm_dfr_qfb" format="dita"/> 一些可能的 <codeph>date</codeph> 类型输入格式.</p>
 
      <table id="table_owm_dfr_qfb">
-     <title>Date Input</title>
+     <title>日期输入</title>
      <tgroup cols="2">
       <thead>
        <row>
-        <entry>Example</entry>
-        <entry>Description</entry>
+        <entry>举例</entry>
+        <entry>说明</entry>
        </row>
       </thead>
       <tbody>
        <row>
         <entry>1999-01-08</entry>
-        <entry>ISO 8601; January 8 in any mode (recommended format)</entry>
+        <entry>ISO 8601; 1 月 8 日 (推荐格式)</entry>
        </row>
        <row>
         <entry>January 8, 1999</entry>
-        <entry>unambiguous in any <varname>datestyle</varname> input mode</entry>
+        <entry>对任何 <varname>日期风格</varname> 都很明确的输入模式</entry>
        </row>
        <row>
         <entry>1/8/1999</entry>
-        <entry>January 8 in <codeph>MDY</codeph> mode; August 1 in <codeph>DMY</codeph> mode</entry>
+        <entry><codeph>MDY</codeph> 模式：1 月 8 日 ; <codeph>DMY</codeph> 模式：8 月 1 日</entry>
        </row>
        <row>
         <entry>1/18/1999</entry>
-        <entry>January 18 in <codeph>MDY</codeph> mode; rejected in other modes</entry>
+        <entry><codeph>MDY</codeph> 模式：1 月 18 日; 其他模式：无效</entry>
        </row>
        <row>
         <entry>01/02/03</entry>
-        <entry>January 2, 2003 in <codeph>MDY</codeph> mode; February 1, 2003 in
-          <codeph>DMY</codeph> mode; February 3, 2001 in <codeph>YMD</codeph> mode </entry>
+        <entry><codeph>MDY</codeph> 模式：2003 年 1 月 2 日; 
+          <codeph>DMY</codeph> 模式：2003 年 2 月 1 日; 
+          <codeph>YMD</codeph> 模式：2001 年 2 月 3 日 </entry>
        </row>
        <row>
         <entry>1999-Jan-08</entry>
-        <entry>January 8 in any mode</entry>
+        <entry>任何模式：1999 年 1 月 8 日</entry>
        </row>
        <row>
         <entry>Jan-08-1999</entry>
-        <entry>January 8 in any mode</entry>
+        <entry>任何模式：1999 年 1 月 8 日</entry>
        </row>
        <row>
         <entry>08-Jan-1999</entry>
-        <entry>January 8 in any mode</entry>
+        <entry>任何模式：1999 年 1 月 8 日</entry>
        </row>
        <row>
         <entry>99-Jan-08</entry>
-        <entry>January 8 in <codeph>YMD</codeph> mode, else error</entry>
+        <entry><codeph>YMD</codeph> 模式：1999 年 1 月 8 日, 其他：错误</entry>
        </row>
        <row>
         <entry>08-Jan-99</entry>
-        <entry>January 8, except error in <codeph>YMD</codeph> mode</entry>
+        <entry><codeph>YMD</codeph> 模式：错误；其他模式：1999 年 1 月 8 日</entry>
        </row>
        <row>
         <entry>Jan-08-99</entry>
-        <entry>January 8, except error in <codeph>YMD</codeph> mode</entry>
+        <entry><codeph>YMD</codeph> 模式：错误；其他模式：1999 年 1 月 8 日</entry>
        </row>
        <row>
         <entry>19990108</entry>
-        <entry>ISO 8601; January 8, 1999 in any mode</entry>
+        <entry>ISO 8601; 任何模式：1999 年 1 月 8 日</entry>
        </row>
        <row>
         <entry>990108</entry>
-        <entry>ISO 8601; January 8, 1999 in any mode</entry>
+        <entry>ISO 8601; 任何模式：1999 年 1 月 8 日</entry>
        </row>
        <row>
         <entry>1999.008</entry>
-        <entry>year and day of year</entry>
+        <entry>年和一年中的天</entry>
        </row>
        <row>
         <entry>J2451187</entry>
-        <entry>Julian date</entry>
+        <entry>儒略日期（天文学常用）</entry>
        </row>
        <row>
         <entry>January 8, 99 BC</entry>
-        <entry>year 99 BC</entry>
+        <entry>公元前 99 年 1 月 8 日</entry>
        </row>
       </tbody>
      </tgroup>
@@ -264,31 +236,28 @@ MINUTE TO SECOND
     </section>
 
     <section>
-     <title>Times</title>
+     <title>时间</title>
 
-     <p>The time-of-day types are <codeph>time [
-      (<varname>p</varname>) ] without time zone</codeph> and
+     <p>时间类型包括 <codeph>time [
+      (<varname>p</varname>) ] without time zone</codeph> 和
       <codeph>time [ (<varname>p</varname>) ] with time
-      zone</codeph>.  <codeph>time</codeph> alone is equivalent to
-      <codeph>time without time zone</codeph>.</p>
+      zone</codeph>。  <codeph>time</codeph> 与
+      <codeph>time without time zone</codeph> 等价.</p>
 
-     <p>Valid input for these types consists of a time of day followed by an optional time zone.
-     (See <xref href="#topic_abq_gfk_qfb/datatype-datetime-time-table" format="dita"/> and <xref
-      href="#topic_abq_gfk_qfb/datatype-timezone-table" format="dita"/>.) If a time zone is
-     specified in the input for <codeph>time without time zone</codeph>, it is silently ignored. You
-     can also specify a date but it will be ignored, except when you use a time zone name that
-     involves a daylight-savings rule, such as <codeph>America/New_York</codeph>. In this case
-     specifying the date is required in order to determine whether standard or daylight-savings time
-     applies. The appropriate time zone offset is recorded in the <codeph>time with time
-      zone</codeph> value.</p>
+     <p>这些类型的有效的输入格式由时间加上一个可选的时区.
+     (参见 <xref href="#topic_abq_gfk_qfb/datatype-datetime-time-table" format="dita"/> 和 <xref
+      href="#topic_abq_gfk_qfb/datatype-timezone-table" format="dita"/>.) 如果在输入中给 <codeph>time without time zone</codeph> 类型指定了时区, 则时区会被忽略。你如果指定了一个日期，也会被忽略，除非你用了包含夏令时的时区，例如 <codeph>America/New_York</codeph>. 
+      这种情况下，指定日期是必要的，因为需要决定当前是否是标准时间，还是夏令时时间. 
+      使用 <codeph>time with time
+      zone</codeph> 类型时，合适的时区偏移会被记录.</p>
 
       <table id="datatype-datetime-time-table">
-       <title>Time Input</title>
+       <title>时间输入</title>
        <tgroup cols="2">
         <thead>
          <row>
-          <entry>Example</entry>
-          <entry>Description</entry>
+          <entry>举例</entry>
+          <entry>说明</entry>
          </row>
         </thead>
         <tbody>
@@ -310,11 +279,11 @@ MINUTE TO SECOND
          </row>
          <row>
           <entry><codeph>04:05 AM</codeph></entry>
-          <entry>same as 04:05; AM does not affect value</entry>
+          <entry>与 04:05 相同; AM 不影响值</entry>
          </row>
          <row>
           <entry><codeph>04:05 PM</codeph></entry>
-          <entry>same as 16:05; input hour must be &lt;= 12</entry>
+          <entry>与 16:05 相同; 小时值必须 &lt;= 12</entry>
          </row>
          <row>
           <entry><codeph>04:05:06.789-8</codeph></entry>
@@ -334,182 +303,167 @@ MINUTE TO SECOND
          </row>
          <row>
           <entry><codeph>04:05:06 PST</codeph></entry>
-          <entry>time zone specified by abbreviation</entry>
+          <entry>时区用缩写指定</entry>
          </row>
          <row>
           <entry><codeph>2003-04-12 04:05:06 America/New_York</codeph></entry>
-          <entry>time zone specified by full name</entry>
+          <entry>时区用全称指定</entry>
          </row>
         </tbody>
        </tgroup>
       </table>
 
       <table id="datatype-timezone-table">
-       <title>Time Zone Input</title>
+       <title>时区输入</title>
        <tgroup cols="2">
         <thead>
          <row>
-          <entry>Example</entry>
-          <entry>Description</entry>
+          <entry>举例</entry>
+          <entry>说明</entry>
          </row>
         </thead>
         <tbody>
          <row>
           <entry><codeph>PST</codeph></entry>
-          <entry>Abbreviation (for Pacific Standard Time)</entry>
+          <entry>缩写 (太平洋标准时间)</entry>
          </row>
          <row>
           <entry><codeph>America/New_York</codeph></entry>
-          <entry>Full time zone name</entry>
+          <entry>时区全称</entry>
          </row>
          <row>
           <entry><codeph>PST8PDT</codeph></entry>
-          <entry>POSIX-style time zone specification</entry>
+          <entry>POSIX-样式时区格式</entry>
          </row>
          <row>
           <entry><codeph>-8:00</codeph></entry>
-          <entry>ISO-8601 offset for PST</entry>
+          <entry>ISO-8601 偏移(PST)</entry>
          </row>
          <row>
           <entry><codeph>-800</codeph></entry>
-          <entry>ISO-8601 offset for PST</entry>
+          <entry>ISO-8601 偏移(PST)</entry>
          </row>
          <row>
           <entry><codeph>-8</codeph></entry>
-          <entry>ISO-8601 offset for PST</entry>
+          <entry>ISO-8601 偏移(PST)</entry>
          </row>
          <row>
           <entry><codeph>zulu</codeph></entry>
-          <entry>Military abbreviation for UTC</entry>
+          <entry>军方缩写(UTC)</entry>
          </row>
          <row>
           <entry><codeph>z</codeph></entry>
-          <entry>Short form of <codeph>zulu</codeph></entry>
+          <entry><codeph>zulu</codeph>的短格式</entry>
          </row>
         </tbody>
        </tgroup>
       </table>
 
-     <p>Refer to <xref href="#topic_abq_gfk_qfb/datatype-timezones" format="dita"/> for more
-     information on how to specify time zones.</p>
+     <p>参考 <xref href="#topic_abq_gfk_qfb/datatype-timezones" format="dita"/> 了解更多时区格式输入信息.</p>
     </section>
 
     <section>
-    <title>Time Stamps</title>
+    <title>时间戳</title>
 
-     <p>Valid input for the time stamp types consists of the concatenation
-      of a date and a time, followed by an optional time zone,
-      followed by an optional <codeph>AD</codeph> or <codeph>BC</codeph>.
-      (Alternatively, <codeph>AD</codeph>/<codeph>BC</codeph> can appear
-      before the time zone, but this is not the preferred ordering.)
-      Thus:
+     <p>时间戳的有效输入格式由以下几个部分组成：日期，时间，时区(可选),
+      接着可选的 <codeph>AD</codeph> 或 <codeph>BC</codeph>.
+      (另外, <codeph>AD</codeph>/<codeph>BC</codeph> 也可以出现在时区之前, 但不是推荐的顺序.)
+      因而:
 
 <codeph>
 1999-01-08 04:05:06
 </codeph>
-      and:
+      和:
 <codeph>
 1999-01-08 04:05:06 -8:00
 </codeph>
 
-      are valid values, which follow the ISO 8601
-      standard.  In addition, the common format:
+      都是有效的时间戳值, 它们满足 ISO 8601 标准要求.
+      另外, 常用格式:
 <codeph>
 January 8 04:05:06 1999 PST
 </codeph>
-      is supported.</p>
+      也被支持.</p>
 
-     <p>The SQL standard differentiates <codeph>timestamp without time zone</codeph> and
-      <codeph>timestamp with time zone</codeph> literals by the presence of a <codeph>+</codeph> or
-      <codeph>-</codeph> symbol and time zone offset after the time. Hence, according to the
-     standard, <codeph>TIMESTAMP '2004-10-19 10:23:54'</codeph> is a <codeph>timestamp without time
-      zone</codeph>, while <codeph>TIMESTAMP '2004-10-19 10:23:54+02'</codeph> is a
-      <codeph>timestamp with time zone</codeph>. Greenplum never examines the content of a literal
-     string before determining its type, and therefore will treat both of the above as
-      <codeph>timestamp without time zone</codeph>. To ensure that a literal is treated as
-      <codeph>timestamp with time zone</codeph>, give it the correct explicit type:
-      <codeph>TIMESTAMP WITH TIME ZONE '2004-10-19 10:23:54+02'</codeph> In a literal that has been
-     determined to be <codeph>timestamp without time zone</codeph>, Greenplum will silently ignore
-     any time zone indication. That is, the resulting value is derived from the date/time fields in
-     the input value, and is not adjusted for time zone.</p>
+     <p>SQL 标准中 <codeph>timestamp without time zone</codeph> 与
+      <codeph>timestamp with time zone</codeph> 字面值的差异主要体现在时间后面由一个 <codeph>+</codeph> 或
+      <codeph>-</codeph> 号标识的时区. 因此, 根据标准, <codeph>TIMESTAMP '2004-10-19 10:23:54'</codeph> 是一个 <codeph>timestamp without time
+      zone</codeph> 类型字面值, 而 <codeph>TIMESTAMP '2004-10-19 10:23:54+02'</codeph> 是一个
+      <codeph>timestamp with time zone</codeph> 类型的字面值. Greenplum 在确定类型之前从不检查字面值内容, 所以上面两个字面值都会被认为是
+      <codeph>timestamp without time zone</codeph> 类型. 为确保当作
+      <codeph>timestamp with time zone</codeph> 类型对待, 请像这样给出明确类型:
+      <codeph>TIMESTAMP WITH TIME ZONE '2004-10-19 10:23:54+02'</codeph>
+      对于一个已经确定为 <codeph>timestamp without time zone</codeph>类型的字面值, Greenplum 会抛弃时区相关信息. 也就是说, 结果时间戳仅仅根据日期/时间确定，不会根据时区进行调整.</p>
 
-     <p>For <codeph>timestamp with time zone</codeph>, the internally stored value is always in UTC
-     (Universal Coordinated Time, traditionally known as Greenwich Mean Time, GMT). An input value
-     that has an explicit time zone specified is converted to UTC using the appropriate offset for
-     that time zone. If no time zone is stated in the input string, then it is assumed to be in the
-     time zone indicated by the system's <codeph>TimeZone</codeph> parameter, and is converted to
-     UTC using the offset for the <varname>timezone</varname> zone.</p>
+     <p>对于 <codeph>timestamp with time zone</codeph> 类型, 内部值总是按照 UTC
+     (统一协调时间, 通常叫做格林威治时间, GMT) 存储.
+     带有明确时区的输入值会使用合适的时区偏移转为 UTC 时间。
+     如果输入字符串中没有指定时区，会假定为当前系统的 <codeph>TimeZone</codeph> 参数, 并使用这个参数的偏移转换为 UTC 时间。</p>
 
-     <p>When a <codeph>timestamp with time zone</codeph> value is output, it is always converted
-     from UTC to the current <varname>timezone</varname> zone, and displayed as local time in that
-     zone. To see the time in another time zone, either change <varname>timezone</varname> or use
-     the <codeph>AT TIME ZONE</codeph> construct (see <xref
+     <p>当输出一个 <codeph>timestamp with time zone</codeph> 类型值,
+     总是根据当前 <varname>timezone</varname> 时区值进行转换, 并显示为本地时间. 要想以另一个时区查看时间，要么改变 <varname>timezone</varname> 设置，要么使用 <codeph>AT TIME ZONE</codeph> 构造 (参见 PostgreSQL 文档的<xref
       href="https://www.postgresql.org/docs/9.4/functions-datetime.html#FUNCTIONS-DATETIME-ZONECONVERT"
-      format="html" scope="external">AT TIME ZONE</xref> in the PostgreSQL documentation).</p>
+      format="html" scope="external">AT TIME ZONE</xref>).</p>
 
-     <p>Conversions between <codeph>timestamp without time zone</codeph> and
-      <codeph>timestamp with time zone</codeph> normally assume that the
-      <codeph>timestamp without time zone</codeph> value should be taken or given
-      as <varname>timezone</varname> local time.  A different time zone can
-      be specified for the conversion using <codeph>AT TIME ZONE</codeph>.</p>
+     <p>在 <codeph>timestamp without time zone</codeph> 与
+      <codeph>timestamp with time zone</codeph> 间转换通常假定
+      <codeph>timestamp without time zone</codeph> 中的值应该是以 <varname>timezone</varname> 为时区的本地时间. 当然，也可以用 <codeph>AT TIME ZONE</codeph> 指定一个不同的时区.</p>
     </section>
 
     <section>
-     <title>Special Values</title>
+     <title>特殊值</title>
 
-     <p>Greenplum supports several special date/time input values for convenience, as shown in <xref
-      href="#topic_abq_gfk_qfb/datatype-datetime-special-table" format="dita"/>. The values
-      <codeph>infinity</codeph> and <codeph>-infinity</codeph> are specially represented inside the
-     system and will be displayed unchanged; but the others are simply notational shorthands that
-     will be converted to ordinary date/time values when read. (In particular, <codeph>now</codeph>
-     and related strings are converted to a specific time value as soon as they are read.) All of
-     these values need to be enclosed in single quotes when used as constants in SQL commands.</p>
+     <p>为了方便, Greenplum 支持几种特殊的日期/时间输入值格式, 参见 <xref
+      href="#topic_abq_gfk_qfb/datatype-datetime-special-table" format="dita"/>. 
+      <codeph>infinity</codeph> 和 <codeph>-infinity</codeph> 值是用于系统内部的特殊表示，会被直接显示;
+      但其他都只是些快捷记号，会在读取的时候被转换为常规的日期/时间值.(特别地, <codeph>now</codeph>
+     和相关字符串会被转换为读取时的当前特定时间值.) 所有这些常量值在 SQL 命令中都需要用单引号引起来.</p>
 
       <table id="datatype-datetime-special-table">
-       <title>Special Date/Time Inputs</title>
+       <title>特殊日期/时间输入</title>
        <tgroup cols="3">
         <thead>
          <row>
-          <entry>Input String</entry>
-          <entry>Valid Types</entry>
-          <entry>Description</entry>
+          <entry>输入字符串</entry>
+          <entry>有效类型</entry>
+          <entry>说明</entry>
          </row>
         </thead>
         <tbody>
          <row>
           <entry><codeph>epoch</codeph></entry>
           <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
-          <entry>1970-01-01 00:00:00+00 (Unix system time zero)</entry>
+          <entry>1970-01-01 00:00:00+00 (Unix 系统时间零点)</entry>
          </row>
          <row>
           <entry><codeph>infinity</codeph></entry>
           <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
-          <entry>later than all other time stamps</entry>
+          <entry>比任何时间戳都晚的时间</entry>
          </row>
          <row>
           <entry><codeph>-infinity</codeph></entry>
           <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
-          <entry>earlier than all other time stamps</entry>
+          <entry>比任何时间戳都早的时间</entry>
          </row>
          <row>
           <entry><codeph>now</codeph></entry>
           <entry><codeph>date</codeph>, <codeph>time</codeph>, <codeph>timestamp</codeph></entry>
-          <entry>current transaction's start time</entry>
+          <entry>当前事务的开始时间</entry>
          </row>
          <row>
           <entry><codeph>today</codeph></entry>
           <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
-          <entry>midnight today</entry>
+          <entry>今天午夜</entry>
          </row>
          <row>
           <entry><codeph>tomorrow</codeph></entry>
           <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
-          <entry>midnight tomorrow</entry>
+          <entry>明天午夜</entry>
          </row>
          <row>
           <entry><codeph>yesterday</codeph></entry>
           <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
-          <entry>midnight yesterday</entry>
+          <entry>昨天午夜</entry>
          </row>
          <row>
           <entry><codeph>allballs</codeph></entry>
@@ -520,85 +474,76 @@ January 8 04:05:06 1999 PST
        </tgroup>
       </table>
 
-     <p>The following SQL-compatible functions can also be used to obtain the current time value
-     for the corresponding data type: <codeph>CURRENT_DATE</codeph>, <codeph>CURRENT_TIME</codeph>,
+     <p>下面这些 SQL-兼容函数也可以用来获取相应类型的当前时间: <codeph>CURRENT_DATE</codeph>, <codeph>CURRENT_TIME</codeph>,
       <codeph>CURRENT_TIMESTAMP</codeph>, <codeph>LOCALTIME</codeph>,
-      <codeph>LOCALTIMESTAMP</codeph>. The latter four accept an optional subsecond precision
-     specification. (See <xref
+      <codeph>LOCALTIMESTAMP</codeph>. 后面四个可接受一个可选的亚秒级精度参数. (参见 PostgreSQL 文档的<xref
       href="https://www.postgresql.org/docs/9.4/functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
-      format="html" scope="external">Current Date/Time</xref> in the PostgreSQL documentation.) Note
-     that these are SQL functions and are <i>not</i> recognized in data input strings.</p>
+      format="html" scope="external">当前日期/时间</xref>.) 注意
+     有一些 SQL 函数在输入字符串中 <i>不</i> 被接受.</p>
 
     </section>
    
 
    <section id="datatype-datetime-output">
-    <title>Date/Time Output</title>
+    <title>日期/时间输出</title>
 
     
-    <p>The output format of the date/time types can be set to one of the four styles ISO 8601, SQL
-     (Ingres), traditional POSTGRES (Unix <codeph>date</codeph> format), or German. The default is
-     the ISO format. (The SQL standard requires the use of the ISO 8601 format. The name of the
-      <codeph>SQL</codeph> output format is a historical accident.) <xref
-      href="#topic_abq_gfk_qfb/datatype-datetime-output-table" format="dita"/> shows examples of
-     each output style. The output of the <codeph>date</codeph> and <codeph>time</codeph> types is
-     generally only the date or time part in accordance with the given examples. However, the
-     POSTGRES style outputs date-only values in ISO format.</p>
+    <p>日期/时间类型的输出格式可以被设置为以下四种样式: ISO 8601, SQL
+     (Ingres), 传统 POSTGRES (Unix <codeph>date</codeph> 格式), 或者 German. 默认是 ISO 格式. (SQL 标准需要使用 ISO 8601 格式. 
+      <codeph>SQL</codeph> 输出格式这个名字是由于偶然的历史原因.) <xref
+      href="#topic_abq_gfk_qfb/datatype-datetime-output-table" format="dita"/> 给出了各种输出格式的例子. <codeph>date</codeph> 和 <codeph>time</codeph> 类型的输出格式通常为对应例子中的日期或时间部分.
+      然而, POSTGRES 格式的纯日期输出用的是 ISO 格式.</p>
 
      <table id="datatype-datetime-output-table">
-      <title>Date/Time Output Styles</title>
+      <title>日期/时间输出格式</title>
       <tgroup cols="3">
        <thead>
         <row>
-         <entry>Style Specification</entry>
-         <entry>Description</entry>
-         <entry>Example</entry>
+         <entry>样式规范</entry>
+         <entry>说明</entry>
+         <entry>举例</entry>
         </row>
        </thead>
        <tbody>
         <row>
          <entry><codeph>ISO</codeph></entry>
-         <entry>ISO 8601, SQL standard</entry>
+         <entry>ISO 8601, SQL 标准</entry>
          <entry><codeph>1997-12-17 07:37:16-08</codeph></entry>
         </row>
         <row>
          <entry><codeph>SQL</codeph></entry>
-         <entry>traditional style</entry>
+         <entry>传统样式</entry>
          <entry><codeph>12/17/1997 07:37:16.00 PST</codeph></entry>
         </row>
         <row>
          <entry><codeph>Postgres</codeph></entry>
-         <entry>original style</entry>
+         <entry>原始样式</entry>
          <entry><codeph>Wed Dec 17 07:37:16 1997 PST</codeph></entry>
         </row>
         <row>
          <entry><codeph>German</codeph></entry>
-         <entry>regional style</entry>
+         <entry>区域样式</entry>
          <entry><codeph>17.12.1997 07:37:16.00 PST</codeph></entry>
         </row>
        </tbody>
       </tgroup>
      </table>
 
-    <note> ISO 8601 specifies the use of uppercase letter <codeph>T</codeph> to separate the date
-     and time. Greenplum accepts that format on input, but on output it uses a space rather than
-      <codeph>T</codeph>, as shown above. This is for readability and for consistency with RFC 3339
-     as well as some other database systems. </note>
+    <note> ISO 8601 规定使用大写字母 <codeph>T</codeph> 隔开日期和时间. Greenplum 支持这个输入格式, 但是输出时使用空格而不是
+      <codeph>T</codeph>, 上面您已经看到了. 这是为了可读性，同时与 RFC 3339 以及一些其他数据库系统保持一致. </note>
 
-    <p>In the SQL and POSTGRES styles, day appears before month if DMY field ordering has been
-     specified, otherwise month appears before day. (See <xref
-      href="#topic_abq_gfk_qfb/table_owm_dfr_qfb" format="dita"/> for how this setting also affects
-     interpretation of input values.) <xref
-      href="#topic_abq_gfk_qfb/datatype-datetime-output2-table" format="dita"/> shows examples.</p>
+    <p>在 SQL 和 POSTGRES 样式中, 如果指定 DMY 模式，日会出现在月之前; 其他情况下月在日之前. (参见 <xref
+      href="#topic_abq_gfk_qfb/table_owm_dfr_qfb" format="dita"/> 关于这些设置如何影响输入值解释.) <xref
+      href="#topic_abq_gfk_qfb/datatype-datetime-output2-table" format="dita"/> 中的例子.</p>
 
      <table id="datatype-datetime-output2-table">
-      <title>Date Order Conventions</title>
+      <title>日期顺序约定</title>
       <tgroup cols="3">
        <thead>
         <row>
-         <entry><varname>datestyle</varname> Setting</entry>
-         <entry>Input Ordering</entry>
-         <entry>Example Output</entry>
+         <entry><varname>datestyle</varname> 设置</entry>
+         <entry>输入顺序</entry>
+         <entry>输出举例</entry>
         </row>
        </thead>
        <tbody>
@@ -621,32 +566,25 @@ January 8 04:05:06 1999 PST
       </tgroup>
      </table>
 
-    <p>The date/time style can be selected by the user using the <codeph>SET datestyle</codeph>
-     command, the <codeph>DateStyle</codeph> parameter in the <codeph>postgresql.conf</codeph>
-     configuration file, or the <codeph>PGDATESTYLE</codeph> environment variable on the server or
-     client.</p>
+    <p>用户可以使用以下方式选择日期/时间样式: <codeph>SET datestyle</codeph> 命令,
+    <codeph>postgresql.conf</codeph>
+     配置文件中的 <codeph>DateStyle</codeph> 参数, 或者服务器或客户端的 <codeph>PGDATESTYLE</codeph> 环境变量.</p>
 
-    <p>The formatting function <codeph>to_char</codeph> (see <xref
+    <p>格式化函数 <codeph>to_char</codeph> (参见 <xref
       href="https://www.postgresql.org/docs/9.4/functions-formatting.html" format="html"
-      scope="external">Data Type Formatting Functions</xref>) is also available as a more flexible
-     way to format date/time output.</p>
+      scope="external">数据类型格式化函数</xref>) 是一种格式化日期/时间输出的更加灵活的方式.</p>
    </section>
 
    <section id="datatype-timezones">
-    <title>Time Zones</title>
+    <title>时区</title>
 
     
 
-   <p>Time zones, and time-zone conventions, are influenced by political decisions, not just earth
-     geometry. Time zones around the world became somewhat standardized during the 1900s, but
-     continue to be prone to arbitrary changes, particularly with respect to daylight-savings rules.
-     Greenplum uses the widely-used IANA (Olson) time zone database for information about historical
-     time zone rules. For times in the future, the assumption is that the latest known rules for a
-     given time zone will continue to be observed indefinitely far into the future.</p>
+   <p>时区和时区转换，不仅仅是地理位置问题，也受政治决定影响. 从 1900 年以来，世界上的时区稍微标准了一点, 但还是在持续的改变, 尤其是夏令时规则.
+     Greenplum 使用广泛采纳的 IANA (Olson) 时区数据库来定义历史时区规则. 对于未来时间, 假定给定时区的现行已知规则会无限期持续.</p>
 
-    <p>Greenplum endeavors to be compatible with the SQL standard definitions for typical usage.
-     However, the SQL standard has an odd mix of date and time types and capabilities. Two obvious
-     problems are: <ol>
+    <p>Greenplum 保持与 SQL 标准兼容的典型用法定义.
+     然而, SQL 标准偶尔也有一点混淆时间和日期类型和能力. 两个明显的问题是: <ol>
       <li>Although the <codeph>date</codeph> type cannot have an associated time zone, the
         <codeph>time</codeph> type can. Time zones in the real world have little meaning unless
        associated with a date as well as a time, since the offset can vary through the year with

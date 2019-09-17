@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <dita>
-  <topic id="topic1" xml:lang="en">
+  <topic id="topic1" xml:lang="zh-cn">
     <title id="if135496">Greenplum 数据库数据类型</title>
     <body>
       <p>Greenplum 数据库有一套丰富的本地数据类型供用户使用。用户也可以使用 <codeph>CREATE TYPE</codeph> 命令定义新的数据类型。本参考手册对所有内置数据类型进行说明。除了这里列出的类型外，还有一些内部使用的数据类型，例如 <i>oid</i> (对象标识符)，但这些不在本手册中介绍。</p>
