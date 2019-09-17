@@ -3,7 +3,7 @@
 <!DOCTYPE dita
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "../../../../dtd/ditabase.dtd">
 <dita>
-   <topic xml:lang="en-us" id="rangetypes">
+   <topic xml:lang="zh-cn" id="rangetypes">
       <title>Range Types</title>
       <body>
          <p> Range types are data types representing a range of values of some element type (called
@@ -18,7 +18,7 @@
             of time and date ranges for scheduling purposes is the clearest example; but price
             ranges, measurement ranges from an instrument, and so forth can also be useful. </p>
       </body>
-      <topic xml:lang="en-us" id="rangetypes-builtin">
+      <topic xml:lang="zh-cn" id="rangetypes-builtin">
          <title>Built-in Range Types</title>
          <body>
             <p> Greenplum Database comes with the following built-in range types: <ul>
@@ -58,7 +58,7 @@
                   href="sql_commands/CREATE_TYPE.xml#topic1"/> for more information. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-examples">
+      <topic xml:lang="zh-cn" id="rangetypes-examples">
          <title>Examples</title>
          <body>
             <p><codeblock>
@@ -85,7 +85,7 @@ SELECT isempty(numrange(1, 5));
                operators and functions on range types. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-inclusivity">
+      <topic xml:lang="zh-cn" id="rangetypes-inclusivity">
          <title>Inclusive and Exclusive Bounds</title>
          <body>
             <p> Every non-empty range has two bounds, the lower bound and the upper bound. All
@@ -102,7 +102,7 @@ SELECT isempty(numrange(1, 5));
                inclusivity of the lower and upper bounds of a range value, respectively. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-infinite">
+      <topic xml:lang="zh-cn" id="rangetypes-infinite">
          <title>Infinite (Unbounded) Ranges</title>
          <body>
             <p> The lower bound of a range can be omitted, meaning that all points less than the
@@ -125,7 +125,7 @@ SELECT isempty(numrange(1, 5));
                infinite lower and upper bounds of a range, respectively. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-io">
+      <topic xml:lang="zh-cn" id="rangetypes-io">
          <title>Range Input/Output</title>
          <body>
             <p> The input for a range value must follow one of the following patterns:
@@ -174,7 +174,7 @@ SELECT '[4,4)'::int4range;
             </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-construct">
+      <topic xml:lang="zh-cn" id="rangetypes-construct">
          <title>Constructing Ranges</title>
          <body>
             <p> Each range type has a constructor function with the same name as the range type.
@@ -203,7 +203,7 @@ SELECT numrange(NULL, 2.2);
             </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-discrete">
+      <topic xml:lang="zh-cn" id="rangetypes-discrete">
          <title>Discrete Range Types</title>
          <body>
             <p> A discrete range is one whose element type has a well-defined <q>step</q>, such as
@@ -235,7 +235,7 @@ SELECT numrange(NULL, 2.2);
                can use other conventions, however. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-defining">
+      <topic xml:lang="zh-cn" id="rangetypes-defining">
          <title>Defining New Range Types</title>
          <body>
             <p> Users can define their own range types. The most common reason to do this is to use
@@ -298,7 +298,7 @@ SELECT '[11:10, 23:00]'::timerange;
                creating range types. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-indexing">
+      <topic xml:lang="zh-cn" id="rangetypes-indexing">
          <title>Indexing</title>
          <body>
             <p> GiST and SP-GiST indexes can be created for table columns of range types. For
