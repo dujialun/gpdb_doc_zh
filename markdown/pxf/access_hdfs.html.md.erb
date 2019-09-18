@@ -42,7 +42,7 @@ Segment实例使用它在Greenplum数据库中的 `gp_segment_id` 和元数据�
 PXF代理调用HDFS Java API来读取数据并将其传递给segment实例。 segment实例将其部分数据传递给Greenplum数据库master节点。 此通信跨segment节点和segment实例并行发生。
 
 
-## <a id="hadoop_prereq"></a>预备条件
+## <a id="hadoop_prereq"></a>先决条件
 
 在使用PXF处理Hadoop数据之前，请确保：
 
@@ -111,12 +111,12 @@ PXF Hadoop连接器公开以下配置文件以读取这些支持的数据格式�
 | HDFS | [Parquet](hdfs_parquet.html) | hdfs:parquet | Parquet |
 | HDFS | AvroSequenceFile | hdfs:AvroSequenceFile | n/a |
 | HDFS | [SequenceFile](hdfs_seqfile.html) | hdfs:SequenceFile | SequenceWritable |
-| [Hive](hive_pxf.html) | 存储为 TextFile | Hive, [HiveText](hive_pxf.html#hive_text) | n/a |
-| [Hive](hive_pxf.html) | 存储为 SequenceFile | Hive | n/a |
-| [Hive](hive_pxf.html) | 存储为 RCFile | Hive, [HiveRC](hive_pxf.html#hive_hiverc) | n/a |
-| [Hive](hive_pxf.html) | 存储为 ORC | Hive, [HiveORC](hive_pxf.html#hive_orc), HiveVectorizedORC | n/a |
-| [Hive](hive_pxf.html) | 存储为 Parquet | Hive | n/a |
-| [HBase](hbase_pxf.html) | Any | HBase | n/a |
+| [Hive](hive_pxf.html) | TextFile 存储格式 | Hive, [HiveText](hive_pxf.html#hive_text) | n/a |
+| [Hive](hive_pxf.html) | SequenceFile 存储格式 | Hive | n/a |
+| [Hive](hive_pxf.html) | RCFile 存储格式 | Hive, [HiveRC](hive_pxf.html#hive_hiverc) | n/a |
+| [Hive](hive_pxf.html) | ORC 存储格式 | Hive, [HiveORC](hive_pxf.html#hive_orc), HiveVectorizedORC | n/a |
+| [Hive](hive_pxf.html) | Parquet 存储格式 | Hive | n/a |
+| [HBase](hbase_pxf.html) | 任何 | HBase | n/a |
 
 使用`CREATE EXTERNAL TABLE`命令指定`pxf`协议时，提供配置文件名称，以创建引用Hadoop文件、目录或表的Greenplum数据库外部表。例如, 以下命令创建了一个配置文件名为`hdfs:text`的外部表:
 
