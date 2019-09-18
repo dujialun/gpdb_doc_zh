@@ -585,261 +585,203 @@ January 8 04:05:06 1999 PST
 
     <p>Greenplum 保持与 SQL 标准兼容的典型用法定义.
      然而, SQL 标准偶尔也有一点混淆时间和日期类型和能力. 两个明显的问题是: <ol>
-      <li>Although the <codeph>date</codeph> type cannot have an associated time zone, the
-        <codeph>time</codeph> type can. Time zones in the real world have little meaning unless
-       associated with a date as well as a time, since the offset can vary through the year with
-       daylight-saving time boundaries. </li>
-      <li>The default time zone is specified as a constant numeric offset from UTC. It is therefore
-       impossible to adapt to daylight-saving time when doing date/time arithmetic across DST
-       boundaries. </li>
+      <li>虽然 <codeph>date</codeph> 类型不能带时区, 但是
+        <codeph>time</codeph> 类型是可以的. 不与日期和时间关联，时区在真实世界意义不大, 因为偏移变化与夏令时边界相关. </li>
+      <li>默认时区是与 UTC 之间差异的常量数值. 因而，当进行跨 DST 边界的日期/时间数值计算时，可能采用夏令时. </li>
      </ol></p>
 
-    <p>To address these difficulties, we recommend using date/time types that contain both date and
-     time when using time zones. We do <i>not</i> recommend using the type <codeph>time with time
-      zone</codeph> (though it is supported by Greenplum for legacy applications and for compliance
-     with the SQL standard). Greenplum assumes your local time zone for any type containing only
-     date or time.</p>
+    <p>为了解决这些困难, 当使用时区的时候，我们推荐用同时包含日期和时间的日期/时间类型.
+    我们 <i>不</i> 推荐使用 <codeph>time with time
+      zone</codeph> 类型(虽然 Greenplum 支持，但主要是为了一个老应用，同时保持与 SQL 标准兼容).
+      对于任何只包含日期或时间的类型, Greenplum 假定是你的本地时区(的时间或日期).</p>
 
-    <p>All timezone-aware dates and times are stored internally in UTC. They are converted to local
-     time in the zone specified by the <codeph>TimeZone</codeph> configuration parameter before
-     being displayed to the client.</p>
+    <p>所有时区感知的日期和时间内部都存储为 UTC 值. 当被显示到客户端时，才通过 <codeph>TimeZone</codeph> 配置参数的值转换为指定时区的日期或时间.</p>
 
-    <p>Greenplum allows you to specify time zones in three different forms: <ol>
-      <li>A full time zone name, for example <codeph>America/New_York</codeph>. The recognized time
-       zone names are listed in the <codeph>pg_timezone_names</codeph> view. Greenplum uses the
-       widely-used IANA time zone data for this purpose, so the same time zone names are also
-       recognized by much other software. </li>
-      <li>A time zone abbreviation, for example <codeph>PST</codeph>. Such a specification merely
-       defines a particular offset from UTC, in contrast to full time zone names which can imply a
-       set of daylight savings transition-date rules as well. The recognized abbreviations are
-       listed in the <codeph>pg_timezone_abbrevs</codeph> view. You cannot set the configuration
-       parameters <xref href="config_params/guc-list.xml#TimeZone"/> or <xref
-        href="config_params/guc-list.xml#log_timezone"/> to a time zone abbreviation, but you can
-       use abbreviations in date/time input values and with the <codeph>AT TIME ZONE</codeph>
-       operator. </li>
-      <li>In addition to the timezone names and abbreviations, Greenplum will accept POSIX-style
-       time zone specifications of the form <varname>STD</varname><varname>offset</varname> or
-        <varname>STD</varname><varname>offset</varname><varname>DST</varname>, where
-        <varname>STD</varname> is a zone abbreviation, <varname>offset</varname> is a numeric offset
-       in hours west from UTC, and <varname>DST</varname> is an optional daylight-savings zone
-       abbreviation, assumed to stand for one hour ahead of the given offset. For example, if
-        <codeph>EST5EDT</codeph> were not already a recognized zone name, it would be accepted and
-       would be functionally equivalent to United States East Coast time. In this syntax, a zone
-       abbreviation can be a string of letters, or an arbitrary string surrounded by angle brackets
-        (<codeph>&lt;&gt;</codeph>). When a daylight-savings zone abbreviation is present, it is
-       assumed to be used according to the same daylight-savings transition rules used in the IANA
-       time zone database's entry. In a standard Greenplum installation, is the same as
-        <codeph>US/Eastern</codeph>, so that POSIX-style time zone specifications follow USA
-       daylight-savings rules. If needed, you can adjust this behavior by replacing the file. </li>
-     </ol> In short, this is the difference between abbreviations and full names: abbreviations
-     represent a specific offset from UTC, whereas many of the full names imply a local
-     daylight-savings time rule, and so have two possible UTC offsets. As an example,
-      <codeph>2014-06-04 12:00 America/New_York</codeph> represents noon local time in New York,
-     which for this particular date was Eastern Daylight Time (UTC-4). So <codeph>2014-06-04 12:00
-      EDT</codeph> specifies that same time instant. But <codeph>2014-06-04 12:00 EST</codeph>
-     specifies noon Eastern Standard Time (UTC-5), regardless of whether daylight savings was
-     nominally in effect on that date.</p>
+    <p>Greenplum 允许你以三种不同的形式指定时区: <ol>
+      <li>时区全称, 例如 <codeph>America/New_York</codeph>. 在 <codeph>pg_timezone_names</codeph> 视图里列出了所有可被识别的时区名称.
+      为了这个目的，Greenplum 使用广泛采纳的 IANA 的时区数据, 因此同样的时区名称也可以被很多其他软件识别. </li>
+      <li>另一个形式时时区缩写, 例如 <codeph>PST</codeph>. 对于 时区全称，能够暗示夏令时规则，而时区缩写这个规范只能表示与 UTC 直接的时区偏移. 可识别的缩写列在 <codeph>pg_timezone_abbrevs</codeph> 视图中. 你不能给时区缩写设置配置参数 <xref href="config_params/guc-list.xml#TimeZone"/> 或 <xref
+        href="config_params/guc-list.xml#log_timezone"/>, 但你可以在时间/日期输入值中通过 <codeph>AT TIME ZONE</codeph>
+       操作符使用缩写. </li>
+      <li>除了时区全称和时区缩写外, Greenplum 也接受 POSIX-风格的时区规范，形如 <varname>STD</varname><varname>offset</varname> 或者
+        <varname>STD</varname><varname>offset</varname><varname>DST</varname>, 这里
+        <varname>STD</varname> 是一个时区缩写, <varname>offset</varname> 是 UTC 往西偏移的小时数值, <varname>DST</varname> 是一个可选的夏令时时区缩写, 假定为比给定偏移提前一个小时. 举个例子, 如果
+        <codeph>EST5EDT</codeph> 还没有被识别为时区名称, 它能被接受，相当于美国东岸时间(United States East Coast time). 在这种语法中, 时区缩写可以是一串字母, 或者包围在尖括号中的任意字符串(<codeph>&lt;&gt;</codeph>). 当存在夏令时时区缩写时, 假定使用与 IANA 时区数据库中相同的夏令时转换规则. 在标准 Greenplum 安装时, 与
+        <codeph>US/Eastern</codeph> 相同, 因此 POSIX-风格时区规范遵守 USA
+       夏令时规则. 如果需要，你也可以通过替换文件来调整这个行为. </li>
+     </ol> 总之, 这就是时区全称与缩写的不同: 缩写表示与 UTC 之间的偏移, 而全称还暗示了夏令时规则, 因此有两种可能的 UTC 偏移. 例如,
+      <codeph>2014-06-04 12:00 America/New_York</codeph> 表示纽约本地时间中午, 指定为东部夏令时间 Eastern Daylight Time (UTC-4). 因此 <codeph>2014-06-04 12:00
+      EDT</codeph> 指定了同样的时间常数. 但是 <codeph>2014-06-04 12:00 EST</codeph>
+     指定为东部标准时间 (UTC-5) 中午, 不管那天夏令时是否正常生效与否.</p>
 
-    <p>To complicate matters, some jurisdictions have used the same timezone abbreviation to mean
-     different UTC offsets at different times; for example, in Moscow <codeph>MSK</codeph> has meant
-     UTC+3 in some years and UTC+4 in others. Greenplum interprets such abbreviations according to
-     whatever they meant (or had most recently meant) on the specified date; but, as with the
-      <codeph>EST</codeph> example above, this is not necessarily the same as local civil time on
-     that date.</p>
+    <p>另外复杂情况是, 有些管辖范围使用同样的时区缩写表示不同的 UTC 偏移和不同的时间; 例如, 在 <codeph>MSK</codeph> 有些年头表示
+     UTC+3, 有些年头又表示 UTC+4. 对于这些缩写, Greenplum 根据日期来进行解释(对于未来时间，根据最近的情况解释); 
+     但是, 就像上面 <codeph>EST</codeph> 这个例子, 这不一定与那个日期的本地时间相同.</p>
 
-    <p>One should be wary that the POSIX-style time zone feature can lead to silently accepting
-     bogus input, since there is no check on the reasonableness of the zone abbreviations. For
-     example, <codeph>SET TIMEZONE TO FOOBAR0</codeph> will work, leaving the system effectively
-     using a rather peculiar abbreviation for UTC. Another issue to keep in mind is that in POSIX
-     time zone names, positive offsets are used for locations of Greenwich. Everywhere else,
-     Greenplum follows the ISO-8601 convention that positive timezone offsets are of Greenwich.</p>
+    <p>应该小心 POSIX-风格时区特征很容易导致错误输入被默默接受, 因为很难检查时区输入的合理性. 
+    例如, <codeph>SET TIMEZONE TO FOOBAR0</codeph> 能够正常工作, 让系统有效使用相当特别的 UTC 缩写. 
+    另一个要记住的问题是在 POSIX 时区名称中, 正数被用在(相对于)格林威治时间. 其他任何地方,
+     Greenplum 遵守 ISO-8601 约定, 正时区偏移都是(相对于)格林威治时间.</p>
 
-    <p>In all cases, timezone names and abbreviations are recognized case-insensitively.</p>
+    <p>所有情况中, 失去名称和缩小都是大小写无关的.</p>
 
-    <p>Neither timezone names nor abbreviations are hard-wired into the server; they are obtained
-     from configuration files <ph otherprops="pivotal"> (see <xref
-       href="../install_guide/localization.xml" scope="peer">Configuring Localization
-       Settings</xref>)</ph>.</p>
+    <p>不论时区名称还是缩写, 都没有硬编码进服务程序; 我们是从配置文件 <ph otherprops="pivotal"> (参考 <xref
+       href="../install_guide/localization.xml" scope="peer">配置本地化设置</xref>)</ph>.</p>
 
-    <p>The <codeph>TimeZone</codeph> configuration parameter can be set in the file , or in any of
-     the other standard ways for setting configuration parameters. There are also some special ways
-     to set it: <ol>
-      <li>The SQL command <codeph>SET TIME ZONE</codeph> sets the time zone for the session. This is
-       an alternative spelling of <codeph>SET TIMEZONE TO</codeph> with a more SQL-spec-compatible
-       syntax. </li>
-      <li>The <codeph>PGTZ</codeph> environment variable is used by <codeph>libpq</codeph> clients
-       to send a <codeph>SET TIME ZONE</codeph> command to the server upon connection. </li>
+    <p><codeph>TimeZone</codeph> 配置参数可以在文件中设定, 或者其他任何标准设置配置参数的方式. 
+    另外也有一个特殊方式来设置: <ol>
+      <li>SQL 命令 <codeph>SET TIME ZONE</codeph> 可以设置当前会话的时区. 
+      这是比 <codeph>SET TIMEZONE TO</codeph> 更符合 SQL 兼容规范的一种形式. </li>
+      <li> <codeph>PGTZ</codeph> 环境变量被 <codeph>libpq</codeph> 客户端用来, 在初始化与服务器的连接时, 发送 <codeph>SET TIME ZONE</codeph> 命令. </li>
      </ol></p>
    </section>
 
    <section id="datatype-interval-input">
-    <title>Interval Input</title>
+    <title>时间段输入</title>
 
-     <p><codeph>interval</codeph> values can be written using the following verbose syntax:
+     <p><codeph>时间段</codeph> 值可以被写成下面的详细语法:
      <codeblock>
 <varname>@</varname> <varname>quantity</varname> <varname>unit</varname> <varname>quantity</varname> <varname>unit</varname>... <varname>direction</varname>
 </codeblock>
-     where <varname>quantity</varname> is a number (possibly signed); <varname>unit</varname> is
+     这里 <varname>quantity</varname> 是一个有符号数值; <varname>unit</varname> 是
       <codeph>microsecond</codeph>, <codeph>millisecond</codeph>, <codeph>second</codeph>,
       <codeph>minute</codeph>, <codeph>hour</codeph>, <codeph>day</codeph>, <codeph>week</codeph>,
       <codeph>month</codeph>, <codeph>year</codeph>, <codeph>decade</codeph>,
-      <codeph>century</codeph>, <codeph>millennium</codeph>, or abbreviations or plurals of these
-     units; <varname>direction</varname> can be <codeph>ago</codeph> or empty. The at sign
-      (<codeph>@</codeph>) is optional noise. The amounts of the different units are implicitly
-     added with appropriate sign accounting. <codeph>ago</codeph> negates all the fields. This
-     syntax is also used for interval output, if <xref
-      href="config_params/guc-list.xml#IntervalStyle"/> is set to <codeph>postgres_verbose</codeph>.</p>
+      <codeph>century</codeph>, <codeph>millennium</codeph>, 或者这些单位的缩写或复数形式; 
+      <varname>direction</varname> 可以是 <codeph>ago</codeph> 或者 为空. at 符号
+      (<codeph>@</codeph>) 是一个可选的无用符号. 不同单位的值会被隐式的加在一起(考虑符号和单位). <codeph>ago</codeph> 导致所有单位的值都变号. 如果 <xref
+      href="config_params/guc-list.xml#IntervalStyle"/> 设置为了 <codeph>postgres_verbose</codeph>, 这个语法也用于时间段输出.</p>
 
-    <p>Quantities of days, hours, minutes, and seconds can be specified without
-     explicit unit markings.  For example, <codeph>'1 12:59:10'</codeph> is read
-     the same as <codeph>'1 day 12 hours 59 min 10 sec'</codeph>.  Also,
-     a combination of years and months can be specified with a dash;
-     for example <codeph>'200-10'</codeph> is read the same as <codeph>'200 years
-     10 months'</codeph>.  (These shorter forms are in fact the only ones allowed
-     by the SQL standard, and are used for output when
-     <varname>IntervalStyle</varname> is set to <codeph>sql_standard</codeph>.)</p>
+    <p>天, 小时, 分, 和秒的数量都可以不用单位指定. 例如, <codeph>'1 12:59:10'</codeph> 与这个 <codeph>'1 day 12 hours 59 min 10 sec'</codeph> 是一样的.  另外,
+     年和月可以通过一个划线(减号)来指定;
+     例如 <codeph>'200-10'</codeph> 读出来与 <codeph>'200 years
+     10 months'</codeph> 一样.  (这些短格式事实上是 SQL 标准仅允许的格式. 当
+     <varname>IntervalStyle</varname> 设置给 <codeph>sql_standard</codeph> 时, 也按这样的格式输出.)</p>
 
-    <p>Interval values can also be written as ISO 8601 time intervals, using either the
-      <codeph>format with designators</codeph> of the standard's section 4.4.3.2 or the
-      <codeph>alternative format</codeph> of section 4.4.3.3. The format with designators looks like
-     this:
+    <p>时间段值也可以写成 ISO 8601 时间段的格式, 用标准中的 4.4.3.2 节内容 <codeph>format with designators</codeph>,
+    或者用 4.4.3.3 节说明的 <codeph>alternative format</codeph>.
+    format with designators 看起来像这个样子:
      <codeblock>
 P <varname>quantity</varname> <varname>unit</varname> <varname>quantity</varname> <varname>unit</varname> ...  T  <varname>quantity</varname> <varname>unit</varname> ...
 </codeblock>
-     The string must start with a <codeph>P</codeph>, and may include a <codeph>T</codeph> that
-     introduces the time-of-day units. The available unit abbreviations are given in <xref
-      href="#topic_abq_gfk_qfb/datatype-interval-iso8601-units" format="dita"/>. Units may be
-     omitted, and may be specified in any order, but units smaller than a day must appear after
-      <codeph>T</codeph>. In particular, the meaning of <codeph>M</codeph> depends on whether it is
-     before or after <codeph>T</codeph>.</p>
+     这个时间段字符串必须以 <codeph>P</codeph> 开头, 可以包含一个<codeph>T</codeph> 来隔开时间部分. 可以使用的缩写列在 <xref
+      href="#topic_abq_gfk_qfb/datatype-interval-iso8601-units" format="dita"/> 中. 
+      单位可以忽略, 也可以按任意顺序指定, 但是时间单位必须出现在
+      <codeph>T</codeph> 后面. 
+      特别地, <codeph>M</codeph> 的含义依赖于它出现在 <codeph>T</codeph> 之前还是之后.</p>
 
      <table id="datatype-interval-iso8601-units">
-      <title>ISO 8601 Interval Unit Abbreviations</title>
+      <title>ISO 8601 时间段单位缩写</title>
      <tgroup cols="2">
        <thead>
         <row>
-         <entry>Abbreviation</entry>
-         <entry>Meaning</entry>
+         <entry>缩写</entry>
+         <entry>含义</entry>
         </row>
        </thead>
        <tbody>
         <row>
          <entry>Y</entry>
-         <entry>Years</entry>
+         <entry>年</entry>
         </row>
         <row>
          <entry>M</entry>
-         <entry>Months (in the date part)</entry>
+         <entry>月 (在日期部分)</entry>
         </row>
         <row>
          <entry>W</entry>
-         <entry>Weeks</entry>
+         <entry>周</entry>
         </row>
         <row>
          <entry>D</entry>
-         <entry>Days</entry>
+         <entry>天</entry>
         </row>
         <row>
          <entry>H</entry>
-         <entry>Hours</entry>
+         <entry>小时</entry>
         </row>
         <row>
          <entry>M</entry>
-         <entry>Minutes (in the time part)</entry>
+         <entry>分 (在时间部分)</entry>
         </row>
         <row>
          <entry>S</entry>
-         <entry>Seconds</entry>
+         <entry>秒</entry>
         </row>
        </tbody>
       </tgroup>
      </table>
 
-     <p>In the alternative format:
+     <p>另一种格式:
 <codeblock>
 P  <varname>years</varname>-<varname>months</varname>-<varname>days</varname>   T <varname>hours</varname>:<varname>minutes</varname>:<varname>seconds</varname> 
 </codeblock>
-      the string must begin with <codeph>P</codeph>, and a
-      <codeph>T</codeph> separates the date and time parts of the interval.
-      The values are given as numbers similar to ISO 8601 dates.</p>
+      字符串必须以 <codeph>P</codeph> 开头, 用字母
+      <codeph>T</codeph> 隔开时间段的日期和时间部分.
+      数值按类似于 ISO 8601 日期格式书写.</p>
 
-    <p>When writing an interval constant with a <varname>fields</varname>
-     specification, or when assigning a string to an interval column that was
-     defined with a <varname>fields</varname> specification, the interpretation of
-     unmarked quantities depends on the <varname>fields</varname>.  For
-     example <codeph>INTERVAL '1' YEAR</codeph> is read as 1 year, whereas
-     <codeph>INTERVAL '1'</codeph> means 1 second.  Also, field values
-     <codeph>to the right</codeph> of the least significant field allowed by the
-     <varname>fields</varname> specification are silently discarded.  For
-     example, writing <codeph>INTERVAL '1 day 2:03:04' HOUR TO MINUTE</codeph>
-     results in dropping the seconds field, but not the day field.</p>
+    <p>当书写一个带有 <varname>fields</varname> 格式的时间段常量, 
+     或者当把一个字符串赋给带有 <varname>fields</varname>
+     格式的时间段列时, 
+     没有标志单位的数值根据 <varname>fields</varname> 解释.
+     例如 <codeph>INTERVAL '1' YEAR</codeph> 读成 1 年, 而
+     <codeph>INTERVAL '1'</codeph> 意味着 1 秒.  
+     另外, 带有 <codeph>to the right</codeph> 字段值中 <varname>fields</varname> 允许的右边最不重要的字段会被简单的忽略.
+     例如, 写 <codeph>INTERVAL '1 day 2:03:04' HOUR TO MINUTE</codeph>
+     结果或丢弃秒部分, 而不会丢掉天的部分.</p>
 
-    <p>According to the SQL standard all fields of an interval value must have the same sign, so a
-     leading negative sign applies to all fields; for example the negative sign in the interval
-     literal <codeph>'-1 2:03:04'</codeph> applies to both the days and hour/minute/second parts.
-     Greenplum allows the fields to have different signs, and traditionally treats each field in the
-     textual representation as independently signed, so that the hour/minute/second part is
-     considered positive in this example. If <varname>IntervalStyle</varname> is set to
-      <codeph>sql_standard</codeph> then a leading sign is considered to apply to all fields (but
-     only if no additional signs appear). Otherwise the traditional Greenplum interpretation is
-     used. To avoid ambiguity, it's recommended to attach an explicit sign to each field if any
-     field is negative.</p>
+    <p>根据 SQL 标准, 时间段中所有部分必须有同样的符号, 开头的负号会对所有部分起作用;
+    例如, 在时间段字面值 <codeph>'-1 2:03:04'</codeph> 中, 负号应用于天, 以及小时/分/秒 部分.
+     Greenplum 允许各部分有不同的符号, 并且传统认为文本中每个部分有独立的符号, 因此上面例子中小时/分/秒会被认为是正值.
+     如果 <varname>IntervalStyle</varname> 设置给
+      <codeph>sql_standard</codeph> 那么开头的负号就应用到所有部分 (只有当别的地方没有符号时). 要不然, 就用传统 Greenplum 解释.
+      为了避免模糊, 如果时间段值是负的, 建议每个部分都带上负号.</p>
 
-    <p>In the verbose input format, and in some fields of the more compact
-     input formats, field values can have fractional parts; for example
-     <codeph>'1.5 week'</codeph> or <codeph>'01:02:03.45'</codeph>.  Such input is
-     converted to the appropriate number of months, days, and seconds
-     for storage.  When this would result in a fractional number of
-     months or days, the fraction is added to the lower-order fields
-     using the conversion factors 1 month = 30 days and 1 day = 24 hours.
-     For example, <codeph>'1.5 month'</codeph> becomes 1 month and 15 days.
-     Only seconds will ever be shown as fractional on output.</p>
+    <p>在详细日期格式中, 对于更紧凑的输入格式的几个部分值可以带小数; 例如
+     <codeph>'1.5 week'</codeph> 或者 <codeph>'01:02:03.45'</codeph>.  这些输入被转换为月, 天和秒来存储. 
+     当这些导致结果的月或者天有小数时, 小数部分被加到低一级的部分上. 转换规则是 1 月 = 30 天, 1 天 = 24 小时.
+     例如, <codeph>'1.5 month'</codeph> 变成 1 月 15 天.
+     输出中秒从来不会显示小数部分.</p>
 
-    <p><xref href="#topic_abq_gfk_qfb/datatype-interval-input-examples" format="dita"/> shows some
-     examples of valid <codeph>interval</codeph> input.</p>
+    <p><xref href="#topic_abq_gfk_qfb/datatype-interval-input-examples" format="dita"/> 这里给出 <codeph>时间段</codeph> 输入的有效示例.</p>
 
      <table id="datatype-interval-input-examples">
-      <title>Interval Input</title>
+      <title>时间段输入</title>
       <tgroup cols="2">
        <thead>
         <row>
-         <entry>Example</entry>
-         <entry>Description</entry>
+         <entry>举例</entry>
+         <entry>说明</entry>
         </row>
        </thead>
        <tbody>
         <row>
          <entry>1-2</entry>
-         <entry>SQL standard format: 1 year 2 months</entry>
+         <entry>SQL 标准格式: 1 年 2 个月</entry>
         </row>
         <row>
          <entry>3 4:05:06</entry>
-         <entry>SQL standard format: 3 days 4 hours 5 minutes 6 seconds</entry>
+         <entry>SQL 标准格式: 3 天 4 小时 5 分 6 秒</entry>
         </row>
         <row>
          <entry>1 year 2 months 3 days 4 hours 5 minutes 6 seconds</entry>
-         <entry>Traditional Postgres format: 1 year 2 months 3 days 4 hours 5 minutes 6 seconds</entry>
+         <entry>传统 Postgres 格式: 1 年 2 月 3 天 4 小时 5 分 6 秒</entry>
         </row>
         <row>
          <entry>P1Y2M3DT4H5M6S</entry>
-         <entry>ISO 8601 <codeph>format with designators</codeph>: same meaning as above</entry>
+         <entry>ISO 8601 <codeph>format with designators</codeph>: 同上</entry>
         </row>
         <row>
          <entry>P0001-02-03T04:05:06</entry>
-         <entry>ISO 8601 <codeph>alternative format</codeph>: same meaning as above</entry>
+         <entry>ISO 8601 <codeph>alternative format</codeph>: 同上</entry>
         </row>
        </tbody>
       </tgroup>
      </table>
 
-    <p>Internally <codeph>interval</codeph> values are stored as months, days,
-     and seconds. This is done because the number of days in a month
-     varies, and a day can have 23 or 25 hours if a daylight savings
-     time adjustment is involved.  The months and days fields are integers
-     while the seconds field can store fractions.  Because intervals are
-     usually created from constant strings or <codeph>timestamp</codeph> subtraction,
-     this storage method works well in most cases, but can cause unexpected
-     results:
+    <p>内部地 <codeph>时间段</codeph> 值被存为月, 天,
+     和秒. 这是因为一个月中的天数是变化的, 另外因为夏令时的原因, 一天可能有23, 24 或 25 小时.  月和天部分是整数, 秒可以包含小数.  因为时间段通常从常量字符串或 <codeph>时间戳</codeph> 相减得来,
+     大部分情况下这种存储挺好, 但有时也有一些意外:
 
 <codeph>
 SELECT EXTRACT(hours from '80 minutes'::interval);
@@ -853,52 +795,41 @@ SELECT EXTRACT(days from '80 hours'::interval);
          0
 </codeph>
 
-     Functions <codeph>justify_days</codeph> and
-     <codeph>justify_hours</codeph> are available for adjusting days
-     and hours that overflow their normal ranges.</p>
+     当超过值得正常范围时, 可以用 <codeph>justify_days</codeph> 函数和
+     <codeph>justify_hours</codeph> 函数用来调整天和小时.</p>
 
    </section>
 
    <section id="datatype-interval-output">
-    <title>Interval Output</title>
+    <title>时间段输出</title>
 
 
-    <p>The output format of the interval type can be set to one of the four styles
+    <p>时间段类型得输出格式可以设置为以下四种格式之一: 
       <codeph>sql_standard</codeph>, <codeph>postgres</codeph>, <codeph>postgres_verbose</codeph>,
-     or <codeph>iso_8601</codeph>, using the command <codeph>SET intervalstyle</codeph>. The default
-     is the <codeph>postgres</codeph> format. <xref
-      href="#topic_abq_gfk_qfb/interval-style-output-table" format="dita"/> shows examples of each
-     output style.</p>
+     或者 <codeph>iso_8601</codeph>, 通过命令 <codeph>SET intervalstyle</codeph> 来设置. 默认是 <codeph>postgres</codeph> 格式.
+     <xref
+      href="#topic_abq_gfk_qfb/interval-style-output-table" format="dita"/> 里有每种输出格式的一些例子.</p>
 
-    <p>The <codeph>sql_standard</codeph> style produces output that conforms to
-     the SQL standard's specification for interval literal strings, if
-     the interval value meets the standard's restrictions (either year-month
-     only or day-time only, with no mixing of positive
-     and negative components).  Otherwise the output looks like a standard
-     year-month literal string followed by a day-time literal string,
-     with explicit signs added to disambiguate mixed-sign intervals.</p>
+    <p>如果时间段值符合标准要求 (年-月
+    或者 天-时间, 没有混合正负数), <codeph>sql_standard</codeph> 样式产生的输出遵从 SQL 标准中对于时间段字面值的规范.  要不然输出看起来像一个标准的 年-月 字面值, 后面跟着一个 天-时间 字面值字符串, 并且标记上明确的符号来消除混合符号带来的歧义.</p>
 
-    <p>The output of the <codeph>postgres</codeph> style matches the output of PostgreSQL releases
-     prior to 8.4 when the <xref href="config_params/guc-list.xml#DateStyle"/> parameter was set to
-      <codeph>ISO</codeph>.</p>
+    <p> 当 <xref href="config_params/guc-list.xml#DateStyle"/> 
+    参数设置为 <codeph>ISO</codeph> 时, <codeph>postgres</codeph> 样式输出与 PostgreSQL 8.4 发布之前的输出一致.</p>
 
-    <p>The output of the <codeph>postgres_verbose</codeph> style matches the output of
-     PostgreSQL releases prior to 8.4 when the
-     <varname>DateStyle</varname> parameter was set to non-<codeph>ISO</codeph> output.</p>
+    <p>当 <varname>DateStyle</varname> 参数设置为
+    非-<codeph>ISO</codeph> 时, <codeph>postgres_verbose</codeph> 样式的输出与 PostgreSQL 8.4 之前版本的输出一致.</p>
 
-    <p>The output of the <codeph>iso_8601</codeph> style matches the <codeph>format
-     with designators</codeph> described in section 4.4.3.2 of the
-     ISO 8601 standard.</p>
+    <p><codeph>iso_8601</codeph> 样式与 ISO 8601 标准中 4.4.3.2 节关于<codeph>format with designators</codeph> 的描述一致.</p>
 
      <table id="interval-style-output-table">
-       <title>Interval Output Style Examples</title>
+       <title>时间段输出样式举例</title>
        <tgroup cols="4">
         <thead>
          <row>
-          <entry>Style Specification</entry>
-          <entry>Year-Month Interval</entry>
-          <entry>Day-Time Interval</entry>
-          <entry>Mixed Interval</entry>
+          <entry>样式规范</entry>
+          <entry>年-月 时间段</entry>
+          <entry>天-时间 时间段</entry>
+          <entry>混合时间段</entry>
          </row>
         </thead>
         <tbody>
