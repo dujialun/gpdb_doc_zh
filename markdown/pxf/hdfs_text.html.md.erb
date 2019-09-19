@@ -21,7 +21,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-PXF HDFS连接器支持纯分隔和逗号分隔的值表单文本数据。 本节介绍如何使用PXF访问HDFS文本数据，包括如何在引用了HDFS数据存储的文件的外部表中创建，查询和插入数据。
+PXF HDFS连接器支持纯分隔和逗号分隔的值表单文本数据。 本节介绍如何使用PXF访问HDFS文本数据，包括如何创建引用了HDFS文件的外部表，查询外部表和向外部表写入数据。
 
 ## <a id="prereq"></a>先决条件
 
@@ -119,7 +119,7 @@ Beijing,Jul,411,11600.67' > /tmp/pxf_hdfs_simple.txt
     postgres=# SELECT * FROM pxf_hdfs_textsimple_csv;
     ```
 
-    当您为逗号分隔值数据指定`FORMAT 'CSV'`时，不需要提供`delimiter`分隔符选项，因为逗号是默认的分隔符。
+    当您为逗号分隔值数据指定`FORMAT 'CSV'`时，不需要提供`delimiter`分隔符选项，因为默认的分隔符是逗号。
 
 ## <a id="profile_textmulti"></a>读取含有双引号引起来的换行符的文本数据
 
