@@ -2,9 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="pw216155">Greenplum PL/Python Language Extension</title>
+  <title id="pw216155">Greenplum PL/Python语言扩展</title>
   <body>
-    <p>This section contains an overview of the Greenplum Database PL/Python Language.</p>
+    <p>本节概述了Greenplum数据库PL/Python语言。</p>
     <ul>
       <li id="pw223311">
         <xref href="#topic2" type="topic" format="dita"/>
@@ -27,82 +27,82 @@
     </ul>
   </body>
   <topic id="topic2" xml:lang="en">
-    <title id="pw216140">About Greenplum PL/Python</title>
+    <title id="pw216140">关于Greenplum PL/Python</title>
     <body>
-      <p>PL/Python is a loadable procedural language. With the Greenplum Database PL/Python
-        extension, you can write a Greenplum Database user-defined functions in Python that take
-        advantage of Python features and modules to quickly build robust database applications. </p>
-      <p>You can run PL/Python code blocks as anonymous code blocks. See the <codeph><xref
-            href="../sql_commands/DO.xml#topic1">DO</xref></codeph> command in the <cite>Greenplum
-          Database Reference Guide</cite>.</p>
-      <p>The Greenplum Database PL/Python extension is installed by default with Greenplum Database.
-        Greenplum Database installs a version of Python and PL/Python. This is location of the
-        Python installation that Greenplum Database uses:</p>
+      <p>PL/Python是一种可加载的过程语言。
+        使用Greenplum数据库PL/Python扩展，您可以在Python中编写Greenplum数据库用户定义函数，利用Python功能和模块快速构建强大的数据库应用程序。
+        </p>
+      <p>您可以将PL/Python代码块作为匿名代码块运行。
+        请参阅<cite>Greenplum数据库参考指南</cite>中的<codeph><xref
+                href="../sql_commands/DO.xml#topic1">DO</xref></codeph>命令。
+        </p>
+      <p>Greenplum数据库PL/Python扩展默认安装在Greenplum数据库中。
+        Greenplum数据库安装了Python和PL/Python的一个版本。
+        这是Greenplum数据库使用的Python安装的位置：
+        </p>
       <codeblock>$GPHOME/ext/python/</codeblock>
     </body>
     <topic id="topic3" xml:lang="en">
-      <title>Greenplum Database PL/Python Limitations</title>
+      <title>Greenplum数据库PL/Python限制</title>
       <body>
         <ul id="ul_qhg_33m_zt">
-          <li>Greenplum Database does not support PL/Python triggers.</li>
-          <li>PL/Python is available only as a Greenplum Database untrusted language.</li>
-          <li>Updatable cursors (<codeph>UPDATE...WHERE CURRENT OF</codeph> and
-              <codeph>DELETE...WHERE CURRENT OF</codeph>) are not supported.</li>
+          <li>Greenplum数据库不支持PL/Python触发器。</li>
+          <li>PL/Python仅作为Greenplum数据库不可信语言提供。</li>
+          <li>不支持可更新游标（<codeph>UPDATE ... WHERE CURRENT OF和DELETE ... WHERE CURRENT OF</codeph>）。
+            </li>
         </ul>
       </body>
     </topic>
   </topic>
   <topic id="topic4" xml:lang="en">
-    <title id="pw217326">Enabling and Removing PL/Python support</title>
+    <title id="pw217326">启用和删除PL/Python支持</title>
     <body>
-      <p>The PL/Python language is installed with Greenplum Database. To create and run a PL/Python
-        user-defined function (UDF) in a database, you must register the PL/Python language with the
-        database. </p>
+      <p>PL/Python语言随Greenplum数据库一起安装。
+        要在数据库中创建和运行PL/Python用户定义函数（UDF），必须在数据库中注册PL/Python语言。
+        </p>
     </body>
     <topic id="topic5" xml:lang="en">
-      <title>Enabling PL/Python Support</title>
+      <title>启用PL/Python支持</title>
       <body>
-        <p>For each database that requires its use, register the PL/Python language with the SQL
-          command <codeph>CREATE EXTENSION</codeph>. Because PL/Python is an untrusted language,
-          only superusers can register PL/Python with a database. For example, running this command
-          as the <codeph>gpadmin</codeph> user registers PL/Python with the database named
-            <codeph>testdb</codeph>:</p>
+        <p>对于需要使用它的每个数据库，使用SQL命令<codeph>CREATE EXTENSION</codeph>注册PL/Python语言。
+          由于PL/Python是一种不受信任的语言，因此只有超级用户才能将PL/Python注册到数据库中。
+          例如，当<codeph>gpadmin</codeph>用户使用名为<codeph>testdb</codeph>的数据库注册PL/Python时，运行此命令：
+          </p>
         <codeblock>$ psql -d testdb -c 'CREATE EXTENSION plpythonu;'</codeblock>
-        <p>PL/Python is registered as an untrusted language.</p>
+        <p>PL/Python注册为不受信任的语言。</p>
       </body>
     </topic>
     <topic id="topic6" xml:lang="en">
-      <title>Removing PL/Python Support</title>
+      <title>删除PL/Python支持</title>
       <body>
-        <p>For a database that no longer requires the PL/Python language, remove support for
-          PL/Python with the SQL command <codeph>DROP EXTENSION</codeph>. Because PL/Python is an
-          untrusted language, only superusers can remove support for the PL/Python language from a
-          database. For example, running this command as the <codeph>gpadmin</codeph> user removes
-          support for PL/Python from the database named <codeph>testdb</codeph>:</p>
+        <p>对于不再需要PL/Python语言的数据库，请使用SQL命令<codeph>DROP EXTENSION</codeph>删除对PL/Python的支持。
+          由于PL/Python是一种不受信任的语言，因此只有超级用户才能从数据库中删除对PL/Python语言的支持。
+          例如，以<codeph>gpadmin</codeph>用户身份运行此命令将从名为<codeph>testdb</codeph>的数据库中删除对PL/Python的支持：
+          </p>
         <codeblock>$ psql -d testdb -c 'DROP EXTENSION plpythonu;'</codeblock>
-        <p> The default command fails if any existing objects (such as functions) depend on the
-          language. Specify the <codeph>CASCADE</codeph> option to also drop all dependent objects,
-          including functions that you created with PL/Python. </p>
+        <p>如果任何现有对象（如函数）依赖于语言，则默认命令将失败。
+          指定<codeph>CASCADE</codeph>选项也可以删除所有依赖对象，包括使用PL/Python创建的函数。
+          </p>
       </body>
     </topic>
   </topic>
   <topic id="topic7" xml:lang="en">
-    <title id="pw218204">Developing Functions with PL/Python</title>
+    <title id="pw218204">用PL/Python开发函数</title>
     <body>
-      <p>The body of a PL/Python user-defined function is a Python script. When the function is
-        called, its arguments are passed as elements of the array <codeph>args[]</codeph>. Named
-        arguments are also passed as ordinary variables to the Python script. The result is returned
-        from the PL/Python function with <codeph>return</codeph> statement, or
-          <codeph>yield</codeph> statement in case of a result-set statement. </p>
+      <p>PL/Python用户定义函数的主体是Python脚本。
+        调用该函数时，其参数将作为数组<codeph>args[]</codeph>的元素传递。
+        命名参数也作为普通变量传递给Python脚本。
+        结果从带有<codeph>return</codeph>语句的PL/Python函数返回，或者在结果集语句的情况下从<codeph>yield</codeph>语句返回。
+        </p>
     </body>
     <topic id="topic1113" xml:lang="en">
-      <title id="pw2137121113">Arrays and Lists</title>
+      <title id="pw2137121113">数组和列表</title>
       <body>
-        <p>You pass SQL array values into PL/Python functions with a Python list. Similarly,
-          PL/Python functions return SQL array values as a Python list. In the typical PL/Python
-          usage pattern, you will specify an array with <codeph>[]</codeph>.</p>
-
-        <p>The following example creates a PL/Python function that returns an array of integers:</p>
+        <p>使用Python列表将SQL数组值传递到PL/Python函数中。
+          类似地，PL/Python函数将SQL数组值作为Python列表返回。
+          在典型的PL/Python使用模式中，您将使用<codeph>[]</codeph>指定数组。
+          </p>
+        <p>以下示例创建一个返回整数数组的PL/Python函数：</p>
         <codeblock>CREATE FUNCTION return_py_int_array()
   RETURNS int[]
 AS $$
@@ -115,13 +115,13 @@ SELECT return_py_int_array();
  {1,11,21,31}
 (1 row) </codeblock>
 
-        <p>PL/Python treats multi-dimensional arrays as lists of lists. You pass a multi-dimensional
-          array to a PL/Python function using nested Python lists. When a PL/Python function returns
-          a multi-dimensional array, the inner lists at each level must all be of the same size. </p>
-
-        <p>The following example creates a PL/Python function that takes a multi-dimensional array
-          of integers as input. The function displays the type of the provided argument, and returns
-          the multi-dimensional array:</p>
+        <p>PL/Python将多维数组视为列表列表。
+          使用嵌套的Python列表将多维数组传递给PL/Python函数。
+          当PL/Python函数返回一个多维数组时，每个级别的内部列表必须都具有相同的大小。
+          </p>
+        <p>以下示例创建一个PL/Python函数，该函数将多维数组的整数作为输入。
+          该函数显示提供的参数的类型，并返回多维数组：
+          </p>
         <codeblock>CREATE FUNCTION return_multidim_py_array(x int4[]) 
   RETURNS int4[]
 AS $$
@@ -137,27 +137,25 @@ CONTEXT:  PL/Python function "return_multidim_py_type"
  {{1,2,3},{4,5,6}}
 (1 row) </codeblock>
 
-        <p>PL/Python also accepts other Python sequences, such as tuples, as function arguments for
-          backwards compatibility with Greenplum versions where multi-dimensional arrays were not
-          supported. In such cases, the Python sequences are always treated as one-dimensional
-          arrays because they are ambiguous with composite types.</p>
+        <p>PL/Python还接受其他Python序列（如元组）作为函数参数，以便向后兼容不支持多维数组的Greenplum版本。
+          在这种情况下，Python序列始终被视为一维数组，因为它们与复合类型不一致。
+          </p>
       </body>
     </topic>
     <topic id="topic1117" xml:lang="en">
-      <title id="pw2137121117">Composite Types</title>
+      <title id="pw2137121117">复合类型</title>
       <body>
-        <p>You pass composite-type arguments to a PL/Python function using Python mappings. The
-          element names of the mapping are the attribute names of the composite types. If an
-          attribute has the null value, its mapping value is <codeph>None</codeph>.</p>
-        <p>You can return a composite type result as a sequence type (tuple or list). You must
-          specify a composite type as a tuple, rather than a list, when it is used in a
-          multi-dimensional array. You cannot return an array of composite types as a list because
-          it would be ambiguous to determine whether the list represents a composite type or another
-          array dimension. In the typical usage pattern, you will specify composite type tuples with
-            <codeph>()</codeph>.</p>
-
-        <p>In the following example, you create a composite type and a PL/Python function that
-          returns an array of the composite type:</p>
+        <p>使用Python映射将复合类型参数传递给PL/Python函数。
+          映射的元素名称是复合类型的属性名称。
+          如果属性具有空值，则其映射值为<codeph>None</codeph>。
+          </p>
+        <p>您可以将复合类型结果作为序列类型（元组或列表）返回。
+          在多维数组中使用复合类型时，必须将复合类型指定为元组，而不是列表。
+          您不能将复合类型数组作为列表返回，因为确定列表是表示复合类型还是其他数组维度是不明确的。
+          在典型的使用模式中，您将使用<codeph>()</codeph>指定复合类型元组。
+          </p>
+        <p>在以下示例中，您将创建一个复合类型和一个返回复合类型数组的PL/Python函数：
+          </p>
         <codeblock>CREATE TYPE type_record AS (
   first text,
   second int4
@@ -174,80 +172,78 @@ SELECT * FROM composite_type_as_list();
 ------------------------------------------------------------------------------------
  {{"(first,1)","(second,1)"},{"(first,2)","(second,2)"},{"(first,3)","(second,3)"}}
 (1 row) </codeblock>
-        <p>Refer to the PostgreSQL <xref
-          href="https://www.postgresql.org/docs/9.4/plpython-data.html#PLPYTHON-ARRAYS"
-            scope="external" format="html">Arrays, Lists</xref> documentation for additional
-          information on PL/Python handling of arrays and composite types.</p>
+        <p>有关PL/Python处理数组和复合类型的其他信息，请参阅PostgreSQL<xref
+                href="https://www.postgresql.org/docs/9.4/plpython-data.html#PLPYTHON-ARRAYS"
+                scope="external" format="html">数组，列表</xref>文档。
+          </p>
       </body>
     </topic>
 
     <topic id="topic8" xml:lang="en">
-      <title>Executing and Preparing SQL Queries </title>
+      <title>执行和准备SQL查询</title>
       <body>
-        <p>The PL/Python <codeph>plpy</codeph> module provides two Python functions to execute an
-          SQL query and prepare an execution plan for a query, <codeph>plpy.execute</codeph> and
-            <codeph>plpy.prepare</codeph>. Preparing the execution plan for a query is useful if you
-          run the query from multiple Python functions.</p>
-        <p>PL/Python also supports the <codeph>plpy.subtransaction()</codeph> function to help
-          manage <codeph>plpy.execute</codeph> calls in an explicit subtransaction. See <xref
-            href="https://www.postgresql.org/docs/9.4/plpython-subtransaction.html"
-            format="html" scope="external">Explicit Subtransactions</xref> in the PostgreSQL
-          documentation for additional information about <codeph>plpy.subtransaction()</codeph>.</p>
+        <p>PL/Python <codeph>plpy</codeph>模块提供了两个Python函数来执行SQL查询并为查询<codeph>plpy.execute</codeph>和<codeph>plpy.prepare</codeph>准备执行计划。
+          如果从多个Python函数运行查询，则为查询准备执行计划很有用。
+          </p>
+        <p>PL/Python还支持<codeph>plpy.subtransaction()</codeph>函数，以帮助在显式子事务中管理<codeph>plpy.execute</codeph>调用。
+          有关<codeph>plpy.subtransaction()</codeph>的其他信息，请参阅PostgreSQL文档中的<xref
+                  href="https://www.postgresql.org/docs/9.4/plpython-subtransaction.html"
+                  format="html" scope="external">显式子事务</xref>。
+          </p>
       </body>
       <topic id="topic_jnf_45f_zt">
         <title>plpy.execute</title>
         <body>
-          <p>Calling <codeph>plpy.execute</codeph> with a query string and an optional limit
-            argument causes the query to be run and the result to be returned in a Python result
-            object. The result object emulates a list or dictionary object. The rows returned in the
-            result object can be accessed by row number and column name. The result set row
-            numbering starts with 0 (zero). The result object can be modified. The result object has
-            these additional methods: <ul id="ul_z5f_45f_zt">
-              <li><codeph>nrows</codeph> that returns the number of rows returned by the query.</li>
-              <li><codeph>status</codeph> which is the <codeph>SPI_execute()</codeph> return
-                value.</li>
+          <p>使用查询字符串和可选的限制参数调用<codeph>plpy.execute</codeph>会导致运行查询并在Python结果对象中返回结果。
+            结果对象模拟列表或字典对象。
+            可以通过行号和列名访问结果对象中返回的行。
+            结果集行编号从0（零）开始。 可以修改结果对象。 结果对象具有以下附加方法：
+            <ul id="ul_z5f_45f_zt">
+              <li><codeph>nrows</codeph> 返回查询返回的行数。</li>
+              <li><codeph>status</codeph> 这是<codeph>SPI_execute()</codeph>返回值。</li>
             </ul></p>
-          <p>For example, this Python statement in a PL/Python user-defined function executes a
-            query. </p>
+          <p>例如，PL/Python用户定义函数中的此Python语句执行查询。
+            </p>
           <codeblock>rv = plpy.execute("SELECT * FROM my_table", 5)</codeblock>
-          <p>The <codeph>plpy.execute</codeph> function returns up to 5 rows from
-              <codeph>my_table</codeph>. The result set is stored in the <codeph>rv</codeph> object.
-            If <codeph>my_table</codeph> has a column <codeph>my_column</codeph>, it would be
-            accessed as:</p>
+          <p><codeph>plpy.execute</codeph>函数最多可从<codeph>my_table</codeph>返回5行。
+            结果集存储在<codeph>rv</codeph>对象中。
+            如果<codeph>my_table</codeph>有一个列<codeph>my_column</codeph>，它将被访问为：
+            </p>
           <codeblock>my_col_data = rv[i]["my_column"]</codeblock>
-          <p>Since the function returns a maximum of 5 rows, the index <varname>i</varname> can be
-            an integer between 0 and 4.</p>
+          <p>由于函数最多返回5行，因此索引<varname>i</varname>可以是0到4之间的整数。
+            </p>
         </body>
       </topic>
       <topic id="topic_jwf_p5f_zt">
         <title>plpy.prepare</title>
         <body>
-          <p>The function <codeph>plpy.prepare</codeph> prepares the execution plan for a query. It
-            is called with a query string and a list of parameter types, if you have parameter
-            references in the query. For example, this statement can be in a PL/Python user-defined
-            function:</p>
+          <p>函数<codeph>plpy.prepare</codeph>为查询准备执行计划。
+            如果在查询中有参数引用，则使用查询字符串和参数类型列表调用它。
+            例如，此语句可以在PL/Python用户定义的函数中：
+            </p>
           <codeblock>plan = plpy.prepare("SELECT last_name FROM my_users WHERE 
   first_name = $1", [ "text" ])</codeblock>
-          <p>The string <codeph>text</codeph> is the data type of the variable that is passed for
-            the variable <varname>$1</varname>. After preparing a statement, you use the function
-              <codeph>plpy.execute</codeph> to run it:</p>
+          <p>字符串<codeph>text</codeph>是为变量<varname>$1</varname>传递的变量的数据类型。
+            准备好语句后，使用<codeph>plpy.execute</codeph>函数运行它：
+            </p>
           <codeblock>rv = plpy.execute(plan, [ "Fred" ], 5)</codeblock>
-          <p>The third argument is the limit for the number of rows returned and is optional.</p>
-          <p>When you prepare an execution plan using the PL/Python module the plan is automatically
-            saved. See the Postgres Server Programming Interface (SPI) documentation for information
-            about the execution plans <xref
-              href="https://www.postgresql.org/docs/9.4/spi.html" scope="external"
-              format="html">https://www.postgresql.org/docs/9.4/spi.html</xref>.</p>
-          <p>To make effective use of saved plans across function calls you use one of the Python
-            persistent storage dictionaries SD or GD. </p>
-          <p>The global dictionary SD is available to store data between function calls. This
-            variable is private static data. The global dictionary GD is public data, available to
-            all Python functions within a session. Use GD with care.</p>
-          <p>Each function gets its own execution environment in the Python interpreter, so that
-            global data and function arguments from <codeph>myfunc</codeph> are not available to
-              <codeph>myfunc2</codeph>. The exception is the data in the GD dictionary, as mentioned
-            previously.</p>
-          <p>This example uses the SD dictionary:</p>
+          <p>第三个参数是返回的行数限制，是可选的。</p>
+          <p>使用PL/Python模块准备执行计划时，计划会自动保存。
+            有关执行计划的信息，请参阅Postgres服务器编程接口（SPI）文档<xref
+                    href="https://www.postgresql.org/docs/9.4/spi.html" scope="external"
+                    format="html">https://www.postgresql.org/docs/9.4/spi.html</xref>。
+            </p>
+          <p>要在函数调用中有效使用已保存的计划，请使用Python持久存储字典SD或GD之一。
+            </p>
+          <p>全局字典SD可用于在函数调用之间存储数据。
+            此变量是私有静态数据。
+            全局字典GD是公共数据，可用于会话中的所有Python函数。
+            小心使用GD。
+            </p>
+          <p>每个函数在Python解释器中都有自己的执行环境，因此<codeph>myfunc</codeph>的全局数据和函数参数不可用于<codeph>myfunc2</codeph>。
+            如前所述，GD词典中的数据是例外。
+            </p>
+          <p>此示例使用SD字典：</p>
           <codeblock>CREATE FUNCTION usesavedplan() RETURNS trigger AS $$
   if SD.has_key("plan"):
     plan = SD["plan"]
@@ -262,10 +258,10 @@ $$ LANGUAGE plpythonu;</codeblock>
       </topic>
     </topic>
     <topic id="topic_s3d_vc4_xt">
-      <title>Handling Python Errors and Messages</title>
+      <title>处理Python错误和消息</title>
       <body>
-        <p> The Python module <codeph>plpy</codeph> implements these functions to manage errors and
-          messages:</p>
+        <p>Python模块<codeph>plpy</codeph>实现了这些函数来管理错误和消息：
+          </p>
         <ul id="ul_fp4_jq5_xt">
           <li><codeph>plpy.debug</codeph></li>
           <li><codeph>plpy.log</codeph></li>
@@ -276,28 +272,23 @@ $$ LANGUAGE plpythonu;</codeblock>
           <li><codeph>plpy.fatal</codeph></li>
           <li><codeph>plpy.debug</codeph></li>
         </ul>
-        <p>The message functions <codeph>plpy.error</codeph> and <codeph>plpy.fatal</codeph> raise a
-          Python exception which, if uncaught, propagates out to the calling query, causing the
-          current transaction or subtransaction to be aborted. The functions <codeph>raise
-            plpy.ERROR(msg)</codeph> and <codeph>raise plpy.FATAL(msg)</codeph> are equivalent to
-          calling <codeph>plpy.error</codeph> and <codeph>plpy.fatal</codeph>, respectively. The
-          other message functions only generate messages of different priority levels. </p>
-        <p>Whether messages of a particular priority are reported to the client, written to the
-          server log, or both is controlled by the Greenplum Database server configuration
-          parameters <codeph>log_min_messages</codeph> and <codeph>client_min_messages</codeph>. For
-          information about the parameters see the <cite>Greenplum Database Reference
-          Guide</cite>.</p>
+        <p>消息函数<codeph>plpy.error</codeph>和<codeph>plpy.fatal</codeph>引发一个Python异常，如果未被捕获，则传播到调用查询，导致当前事务或子事务中止。
+          函数<codeph>raise plpy.ERROR(msg)</codeph>和<codeph>raise plpy.FATAL(msg)</codeph>分别与<codeph>plpy.error</codeph>和<codeph>plpy.fatal</codeph>等价。
+          其他消息函数仅生成不同优先级的消息。
+          </p>
+        <p>是否向客户端报告特定优先级的消息，写入服务器日志，
+          还是两者都由Greenplum数据库服务器配置参数<codeph>log_min_messages</codeph>和<codeph>client_min_messages</codeph>控制。
+          有关参数的信息，请参阅<cite>Greenplum数据库参考指南</cite>。
+          </p>
       </body>
     </topic>
     <topic id="topic9" xml:lang="en">
-      <title>Using the dictionary GD To Improve PL/Python Performance</title>
+      <title>使用字典GD提高PL/Python性能</title>
       <body>
-        <p>In terms of performance, importing a Python module is an expensive operation and can
-          affect performance. If you are importing the same module frequently, you can use Python
-          global variables to load the module on the first invocation and not require importing the
-          module on subsequent calls. The following PL/Python function uses the GD persistent
-          storage dictionary to avoid importing a module if it has already been imported and is in
-          the GD. </p>
+        <p>在性能方面，导入Python模块是一项昂贵的操作，可能会影响性能。
+          如果要经常导入同一模块，则可以使用Python全局变量在第一次调用时加载模块，而不需要在后续调用中导入模块。
+          以下PL/Python函数使用GD持久存储字典来避免导入模块（如果模块已经导入并且在GD中）。
+          </p>
         <codeblock>psql=#
    CREATE FUNCTION pytest() returns text as $$ 
       if 'mymodule' not in GD:
@@ -309,35 +300,31 @@ $$;</codeblock>
     </topic>
   </topic>
   <topic id="topic10" xml:lang="en">
-    <title id="pw221333">Installing Python Modules</title>
+    <title id="pw221333">安装Python模块</title>
     <body>
-      <p>When you install a Python module on Greenplum Database, the Greenplum Database Python
-        environment must have the module added to it across all segment hosts and mirror hosts in
-        the cluster. When expanding Greenplum Database, you must add the Python modules to the new
-        segment hosts. You can use the Greenplum Database utilities <codeph>gpssh</codeph> and
-          <codeph>gpscp</codeph> run commands on Greenplum Database hosts and copy files to the
-        hosts. For information about the utilities, see the <cite>Greenplum Database Utility
-          Guide</cite>.</p>
-      <p>As part of the Greenplum Database installation, the <codeph>gpadmin</codeph> user
-        environment is configured to use Python that is installed with Greenplum Database.</p>
-      <p>To check the Python environment, you can use the <codeph>which</codeph> command:</p>
+      <p>在Greenplum数据库上安装Python模块时，Greenplum数据库Python环境必须在群集中的所有segment主机和mirror主机上添加模块。
+        扩容Greenplum数据库时，必须将Python模块添加到新的segment主机中。
+        您可以在Greenplum数据库主机上使用Greenplum数据库实用程序<codeph>gpssh</codeph>和<codeph>gpscp</codeph>运行命令，并将文件复制到主机。
+        有关实用程序的信息，请参阅<cite>Greenplum数据库实用程序指南</cite>。
+        </p>
+      <p>作为Greenplum数据库安装的一部分，<codeph>gpadmin</codeph>用户环境配置为使用随Greenplum数据库一起安装的Python。
+        </p>
+      <p>要检查Python环境，可以使用<codeph>which</codeph>命令：</p>
       <codeblock>which python</codeblock>
-      <p>The command returns the location of the Python installation. The Python installed with
-        Greenplum Database is in the Greenplum Database <codeph>ext/python</codeph> directory.</p>
+      <p>该命令返回Python安装的位置。
+        与Greenplum数据库一起安装的Python位于Greenplum数据库<codeph>ext/python</codeph>目录中。
+        </p>
       <codeblock>/<varname>path_to_greenplum-db</varname>/ext/python/bin/python</codeblock>
-      <p>When running shell commands on remote hosts with <codeph>gpssh</codeph>, you can specify
-        the <codeph>-s</codeph> option. When the option is specified, <codeph>gpssh</codeph> sources
-        the <codeph>greenplum_path.sh</codeph> file before running commands on the remote hosts. For
-        example, this command should display the Python installed with Greenplum Database on each
-        host.<codeblock>gpssh -f gpdb_hosts which python</codeblock></p>
-      <p>If it does not, you can add the <codeph>-s</codeph> to source
-          <codeph>greenplum_path.sh</codeph> on the remote hosts before running the command.
+      <p>使用<codeph>gpssh</codeph>在远程主机上运行shell命令时，可以指定<codeph>-s</codeph>选项。
+        指定该选项后，<codeph>gpssh</codeph>会在远程主机上运行命令之前加载<codeph>greenplum_path.sh</codeph>文件。
+        例如，此命令应显示在每台主机上使用Greenplum数据库安装的Python。
+        <codeblock>gpssh -f gpdb_hosts which python</codeblock></p>
+      <p>如果没有，则可以在运行命令之前在远程主机上添加<codeph>-s</codeph>到源<codeph>greenplum_path.sh</codeph>。
         <codeblock>gpssh -s -f gpdb_hosts which python</codeblock></p>
-      <p>To display the list of currently installed Python modules, run this command.</p>
+      <p>要显示当前安装的Python模块列表，请运行此命令。</p>
       <codeblock>python -c "help('modules')"</codeblock>
-      <p>Run <codeph>gpssh</codeph> in interactive mode to display Python modules on remote hosts.
-        This example starts <codeph>gpssh</codeph> in interactive mode and lists the Python modules
-        on the Greenplum Database host <codeph>sdw1</codeph>.
+      <p>以交互模式运行<codeph>gpssh</codeph>以在远程主机上显示Python模块。
+        此示例以交互模式启动<codeph>gpssh</codeph>，并在Greenplum数据库主机<codeph>sdw1</codeph>上列出Python模块。
         <codeblock>$ gpssh -s -h sdw1
 => python -c "help('modules')"
 . . . 
@@ -351,7 +338,7 @@ $</codeblock></p>
           >Pivotal Network</xref>. For information about the libraries, see <xref scope="peer"
           type="topic" format="dita" href="../../install_guide/install_python_dsmod.xml#topic1"
           >Python Data Science Module Package</xref>.</p>
-      <p>These sections describe installing and testing Python modules:<ul id="ul_ukh_4wr_wt">
+      <p>这些部分描述了安装和测试Python模块：<ul id="ul_ukh_4wr_wt">
           <li><xref href="#topic_yx3_yjq_rt" format="dita"/></li>
           <li><xref href="#topic_g4j_hmt_ycb" format="dita"/></li>
           <li><xref href="#topic_j53_5jq_rt" format="dita"/></li>
@@ -359,23 +346,21 @@ $</codeblock></p>
         </ul></p>
     </body>
     <topic id="topic_yx3_yjq_rt">
-      <title>Installing Python pip</title>
+      <title>安装Python pip</title>
       <body>
-        <p>The Python utility <codeph>pip</codeph> installs Python packages that contain Python
-          modules and other resource files from versioned archive files. </p>
-        <p>Run this command to install <codeph>pip</codeph>.</p>
+        <p>Python实用程序<codeph>pip</codeph>安装Python包，其中包含Python模块和来自版本化归档文件的其他资源文件。
+          </p>
+        <p>运行此命令以安装<codeph>pip</codeph>。</p>
         <codeblock>python -m ensurepip --default-pip</codeblock>
-        <p>The command runs the <codeph>ensurepip</codeph> module to bootstrap (install and
-          configure) the <codeph>pip</codeph> utility from the local Python installation.</p>
-        <p>You can run this command to ensure the <codeph>pip</codeph>, <codeph>setuptools</codeph>
-          and <codeph>wheel</codeph> projects are current. Current Python projects ensure that you
-          can install Python packages from source distributions or pre-built distributions
-          (wheels).</p>
+        <p>该命令运行<codeph>ensurepip</codeph>模块以从本地Python安装引导（安装和配置）<codeph>pip</codeph>实用程序。
+          </p>
+        <p>您可以运行此命令以确保<codeph>pip</codeph>，<codeph>setuptools</codeph>和<codeph>wheel</codeph>项目是最新的。
+          当前的Python项目确保您可以从源代码分发或预构建的分发（wheels）安装Python包。
+          </p>
         <codeblock>python -m pip install --upgrade pip setuptools wheel</codeblock>
-        <p>You can use <codeph>gpssh</codeph> to run the commands on the Greenplum Database hosts.
-          This example runs <codeph>gpssh</codeph> in interactive mode to install
-            <codeph>pip</codeph> on the hosts listed in the file
-          <codeph>gpdb_hosts</codeph>.<codeblock>$ gpssh -s -f gpdb_hosts
+        <p>您可以使用<codeph>gpssh</codeph>在Greenplum数据库主机上运行命令。
+          此示例以交互模式运行<codeph>gpssh</codeph>，以在文件<codeph>gpdb_hosts</codeph>中列出的主机上安装<codeph>pip</codeph>。
+          <codeblock>$ gpssh -s -f gpdb_hosts
 => python -m ensurepip --default-pip
 [centos6-mdw1] Ignoring indexes: https://pypi.python.org/simple
 [centos6-mdw1] Collecting setuptools
@@ -389,52 +374,53 @@ $</codeblock></p>
 [centos6-sdw1] Successfully installed pip-8.1.1 setuptools-20.10.1
 => exit
 $</codeblock></p>
-        <p>The <codeph>=></codeph> is the inactive prompt for <codeph>gpssh</codeph>. The utility
-          displays the output from each host. The <codeph>exit</codeph> command exits from
-            <codeph>gpssh</codeph> interactive mode.</p>
-        <p>This <codeph>gpssh</codeph> command runs a single command on all hosts listed in the file
-            <codeph>gpdb_hosts</codeph>.<codeblock>gpssh -s -f gpdb_hosts python -m pip install --upgrade pip setuptools wheel</codeblock></p>
-        <p>The utility displays the output from each host.</p>
-        <p>For more information about installing Python packages, see <xref
+        <p><codeph>=></codeph>是<codeph>gpssh</codeph>的非活动提示。
+          该实用程序显示每个主机的输出。
+          <codeph>exit</codeph>命令退出<codeph>gpssh</codeph>交互模式。
+          </p>
+        <p>此<codeph>gpssh</codeph>命令在文件<codeph>gpdb_hosts</codeph>中列出的所有主机上运行单个命令。
+          <codeblock>gpssh -s -f gpdb_hosts python -m pip install --upgrade pip setuptools wheel</codeblock></p>
+        <p>该实用程序显示每个主机的输出。</p>
+        <p>有关安装Python包的更多信息，参考<xref
             href="https://packaging.python.org/tutorials/installing-packages/" format="html"
-            scope="external">https://packaging.python.org/tutorials/installing-packages/</xref>.</p>
+            scope="external">https://packaging.python.org/tutorials/installing-packages/</xref>。</p>
       </body>
     </topic>
     <topic id="topic_g4j_hmt_ycb">
-      <title>Installing Python Packages with pip</title>
+      <title>使用pip安装Python包</title>
       <body>
-        <p>After installing <codeph>pip</codeph>, you can install Python packages. This command
-          installs the <codeph>numpy</codeph> and <codeph>scipy</codeph> packages. </p>
+        <p>安装<codeph>pip</codeph>后，您可以安装Python包。
+          此命令安装<codeph>numpy</codeph>和<codeph>scipy</codeph>包。
+          </p>
         <codeblock>python -m pip install --user numpy scipy</codeblock>
-        <p>The <codeph>--user</codeph> option attempts to avoid conflicts when installing Python
-          packages. </p>
-        <p>You can use <codeph>gpssh</codeph> to run the command on the Greenplum Database hosts. </p>
-        <p>For information about these and other Python packages, see <xref href="#topic12"
-            format="dita"/>.</p>
+        <p><codeph>--user</codeph>选项尝试在安装Python包时避免冲突。
+          </p>
+        <p>您可以使用<codeph>gpssh</codeph>在Greenplum数据库主机上运行该命令。</p>
+        <p>有关这些和其他Python包的信息，请参阅<xref href="#topic12" format="dita"/>。</p>
       </body>
     </topic>
     <topic id="topic_j53_5jq_rt">
-      <title>Building and Installing Python Modules Locally</title>
+      <title>在本地构建和安装Python模块</title>
       <body>
-        <p>If you are building a Python module, you must ensure that the build creates the correct
-          executable. For example on a Linux system, the build should create a 64-bit
-          executable.</p>
-        <p>Before building a Python module to be installed, ensure that the appropriate software to
-          build the module is installed and properly configured. The build environment is required
-          only on the host where you build the module. </p>
-        <p>You can use the Greenplum Database utilities <codeph>gpssh</codeph> and
-            <codeph>gpscp</codeph> to run commands on Greenplum Database hosts and to copy files to
-          the hosts.</p>
+        <p>如果要构建Python模块，则必须确保构建创建正确的可执行文件。
+          例如，在Linux系统上，构建应该创建一个64位可执行文件。
+          </p>
+        <p>在构建要安装的Python模块之前，请确保已安装并正确配置构建模块的相应软件。
+          只有在构建模块的主机上才需要构建环境。
+          </p>
+        <p>您可以使用Greenplum数据库实用程序<codeph>gpssh</codeph>和<codeph>gpscp</codeph>在Greenplum数据库主机上运行命令并将文件复制到主机。
+          </p>
       </body>
     </topic>
     <topic id="topic_e4p_gcw_vt">
-      <title>Testing Installed Python Modules</title>
+      <title>测试已安装的Python模块</title>
       <body>
-        <p>You can create a simple PL/Python user-defined function (UDF) to validate that Python a
-          module is available in the Greenplum Database. This example tests the NumPy module.</p>
-        <p>This PL/Python UDF imports the NumPy module. The function returns
-            <codeph>SUCCESS</codeph> if the module is imported, and <codeph>FAILURE</codeph> if an
-          import error occurs.</p>
+        <p>您可以创建一个简单的PL/Python用户定义函数（UDF）来验证Python模块在Greenplum数据库中是否可用。
+          此示例测试NumPy模块。
+          </p>
+        <p>此PL/Python UDF导入NumPy模块。
+          如果导入模块成功，则函数返回<codeph>SUCCESS</codeph>;如果发生导入错误，则返回<codeph>FAILURE</codeph>。
+          </p>
         <codeblock>CREATE OR REPLACE FUNCTION plpy_test(x int)
 returns text
 as $$
@@ -444,45 +430,42 @@ as $$
   except ImportError, e:
       return 'FAILURE'
 $$ language plpythonu;</codeblock>
-        <p>Create a table that contains data on each Greenplum Database segment instance. Depending
-          on the size of your Greenplum Database installation, you might need to generate more data
-          to ensure data is distributed to all segment instances.</p>
+        <p>创建一个包含每个Greenplum数据库segment实例上的数据的表。
+          根据Greenplum数据库安装的大小，您可能需要生成更多数据以确保将数据分发到所有segment实例。
+          </p>
         <codeblock>CREATE TABLE DIST AS (SELECT x FROM generate_series(1,50) x ) DISTRIBUTED RANDOMLY ;</codeblock>
-        <p>This <codeph>SELECT</codeph> command runs the UDF on the segment hosts where data is
-          stored in the primary segment instances. </p>
+        <p>此<codeph>SELECT</codeph>命令在segment主机上运行UDF，其中数据存储在primary实例中。
+          </p>
         <codeblock>SELECT gp_segment_id, plpy_test(x) AS status
   FROM dist
   GROUP BY gp_segment_id, status
   ORDER BY gp_segment_id, status;</codeblock>
-        <p>The <codeph>SELECT</codeph> command returns <codeph>SUCCESS</codeph> if the UDF imported
-          the Python module on the Greenplum Database segment instance. If the
-            <codeph>SELECT</codeph> command returns <codeph>FAILURE</codeph>, you can find the
-          segment host of the segment instance host. The Greenplum Database system table
-            <codeph>gp_segment_configuration</codeph> contains information about mirroring and
-          segment configuration. This command returns the host name for a segment ID.</p>
+        <p>如果UDF在Greenplum数据库segment实例上成功导入Python模块，则<codeph>SELECT</codeph>命令返回<codeph>SUCCESS</codeph>。
+          如果<codeph>SELECT</codeph>命令返回<codeph>FAILURE</codeph>，则可以找到segment实例主机的segment主机。
+          Greenplum数据库系统表<codeph>gp_segment_configuration</codeph>包含有关mirror和segment配置的信息。
+          此命令返回segment ID的主机名。
+          </p>
         <codeblock>SELECT hostname, content AS seg_ID FROM gp_segment_configuration
   WHERE content = <varname>seg_id</varname> ;</codeblock>
-        <p>If <codeph>FAILURE</codeph> is returned, these are some possible causes:</p>
+        <p>如果返回<codeph>FAILURE</codeph>，则可能是以下原因：</p>
         <ul id="ul_kx1_rwq_wt">
-          <li>A problem accessing required libraries. For the NumPy example, a Greenplum Database
-            might have a problem accessing the OpenBLAS libraries or the Python libraries on a
-            segment host.<p>Make sure you get no errors when running command on the segment host as
-              the <codeph>gpadmin</codeph> user. This <codeph>gpssh</codeph> command tests importing
-              the numpy module on the segment host
-              <codeph>mdw1</codeph>.<codeblock>gpssh -s -h mdw1 python -c "import numpy"</codeblock></p></li>
-          <li>If the Python <codeph>import</codeph> command does not return an error, environment
-            variables might not be configured in the Greenplum Database environment. For example,
-            the Greenplum Database might not have been restarted after installing the Python Package
-            on the host system.</li>
+          <li>访问所需库时出现问题。
+            对于NumPy示例，Greenplum数据库可能在访问OpenBLAS库或segment主机上的Python库时遇到问题。
+            <p>在segment主机上以<codeph>gpadmin</codeph>用户身份运行命令时，请确保没有错误。
+              此<codeph>gpssh</codeph>命令测试在segment主机<codeph>mdw1</codeph>上导入numpy模块。
+              <codeblock>gpssh -s -h mdw1 python -c "import numpy"</codeblock></p></li>
+          <li>如果Python <codeph>import</codeph>命令未返回错误，则可能未在Greenplum数据库环境中配置环境变量。
+            例如，在主机系统上安装Python包之后，可能尚未重新启动Greenplum数据库。
+            </li>
         </ul>
       </body>
     </topic>
   </topic>
 
   <topic id="topic11" xml:lang="en">
-    <title id="pw213712">Examples</title>
+    <title id="pw213712">示例</title>
     <body>
-      <p>This PL/Python UDF returns the maximum of two integers:</p>
+      <p>此PL/Python UDF返回最多两个整数：</p>
       <codeblock>CREATE FUNCTION pymax (a integer, b integer)
   RETURNS integer
 AS $$
@@ -492,21 +475,23 @@ AS $$
      return a
   return b
 $$ LANGUAGE plpythonu;</codeblock>
-      <p>You can use the <codeph>STRICT</codeph> property to perform the null handling instead of
-        using the two conditional statements.</p>
+      <p>您可以使用<codeph>STRICT</codeph>属性执行空值处理，而不是使用两个条件语句。
+        </p>
       <codeblock>CREATE FUNCTION pymax (a integer, b integer) 
   RETURNS integer AS $$ 
 return max(a,b) 
 $$ LANGUAGE plpythonu STRICT ;</codeblock>
-      <p>You can run the user-defined function <codeph>pymax</codeph> with <codeph>SELECT</codeph>
-        command. This example runs the UDF and shows the output.</p>
+      <p>您可以使用<codeph>SELECT</codeph>命令运行用户定义的函数<codeph>pymax</codeph>。
+        此示例运行UDF并显示输出。
+        </p>
       <codeblock>SELECT ( pymax(123, 43));
 column1
 ---------
      123
 (1 row)</codeblock>
-      <p>This example that returns data from an SQL query that is run against a table. These two
-        commands create a simple table and add data to the table.</p>
+      <p>此示例返回针对表运行的SQL查询中的数据。
+        这两个命令创建一个简单的表并向表中添加数据。
+        </p>
       <codeblock>CREATE TABLE sales (id int, year int, qtr int, day int, region text)
   DISTRIBUTED BY (id) ;
 
@@ -518,10 +503,10 @@ INSERT INTO sales VALUES
  (5, 2014, 1,5, 'europe'),
  (6, 2014, 2,6, 'asia'),
  (7, 2002, 3,7, 'usa') ;</codeblock>
-      <p>This PL/Python UDF executes a <codeph>SELECT</codeph> command that returns 5 rows from the
-        table. The Python function returns the <codeph>REGION</codeph> value from the row specified
-        by the input value. In the Python function, the row numbering starts from 0. Valid input for
-        the function is an integer between 0 and 4. </p>
+      <p>此PL/Python UDF执行<codeph>SELECT</codeph>命令，该命令从表中返回5行。
+        Python函数从输入值指定的行返回<codeph>REGION</codeph>值。
+        在Python函数中，行编号从0开始。函数的有效输入是0到4之间的整数。
+        </p>
       <codeblock>CREATE OR REPLACE FUNCTION mypytest(a integer) 
   RETURNS setof text 
 AS $$ 
@@ -530,14 +515,14 @@ AS $$
   region.append(rv[a]["region"])
   return region
 $$ language plpythonu EXECUTE ON MASTER;</codeblock>
-      <p>Running this <codeph>SELECT</codeph> statement returns the <codeph>REGION</codeph> column
-        value from the third row of the result set.</p>
+      <p>运行此<codeph>SELECT</codeph>语句将从结果集的第三行返回<codeph>REGION</codeph>列值。
+        </p>
       <codeblock>SELECT mypytest(2) ;</codeblock>
-      <p>This command deletes the UDF from the database.</p>
+      <p>此命令从数据库中删除UDF。</p>
       <codeblock>DROP FUNCTION mypytest(integer) ;</codeblock>
-      <p>This example executes the PL/Python function in the previous example as an anonymous block
-        with the <codeph>DO</codeph> command. In the example, the anonymous block retrieves the
-        input value from a temporary table.</p>
+      <p>此示例使用<codeph>DO</codeph>命令将前一示例中的PL/Python函数作为匿名块执行。
+        在该示例中，匿名块从临时表中检索输入值。
+        </p>
       <codeblock>CREATE TEMP TABLE mytemp AS VALUES (2) DISTRIBUTED RANDOMLY;
 
 DO $$ 
@@ -550,28 +535,28 @@ $$ language plpythonu;</codeblock>
     </body>
   </topic>
   <topic id="topic12" xml:lang="en">
-    <title id="pw213965">References</title>
+    <title id="pw213965">参考</title>
     <topic id="topic13" xml:lang="en">
-      <title>Technical References</title>
+      <title>技术参考</title>
       <body>
-        <p>For information about the Python language, see <xref href="https://www.python.org/"
-            scope="external" format="html">https://www.python.org/</xref>.</p>
-        <p>For information about PL/Python see the PostgreSQL documentation at <xref
+        <p>有关Python语言的信息，参考<xref href="https://www.python.org/"
+            scope="external" format="html">https://www.python.org/</xref>。</p>
+        <p>有关PL/Python的信息，请参阅PostgreSQL文档<xref
             href="https://www.postgresql.org/docs/9.4/plpython.html" scope="external"
-            format="html">https://www.postgresql.org/docs/9.4/plpython.html</xref>. </p>
-        <p>For information about Python Package Index (PyPI), see <xref
+            format="html">https://www.postgresql.org/docs/9.4/plpython.html</xref>。</p>
+        <p>有关Python包索引（PyPI）的信息，参考<xref
             href="https://pypi.python.org/pypi" format="html" scope="external"
-            >https://pypi.python.org/pypi</xref>.</p>
-        <p>These are some Python modules that can be installed:<ul id="ul_wl3_mnr_wt">
-            <li>SciPy library provides user-friendly and efficient numerical routines such as
-              routines for numerical integration and optimization. The SciPy site includes other
-              similar Python libraries <xref href="http://www.scipy.org/index.html" format="html"
-                scope="external">http://www.scipy.org/index.html</xref>. </li>
-            <li>Natural Language Toolkit (nltk) is a platform for building Python programs to work
-              with human language data. <xref href="http://www.nltk.org/" format="html"
-                scope="external">http://www.nltk.org/</xref>. For information about installing the
-              toolkit see <xref href="http://www.nltk.org/install.html" format="html"
-                scope="external">http://www.nltk.org/install.html</xref>.</li>
+            >https://pypi.python.org/pypi</xref>。</p>
+        <p>这些是可以安装的一些Python模块：<ul id="ul_wl3_mnr_wt">
+            <li>SciPy库提供用户友好且高效的数值例程，例如用于数值积分和优化的例程。
+              SciPy站点包括其他类似的Python库
+              <xref href="http://www.scipy.org/index.html" format="html"
+                scope="external">http://www.scipy.org/index.html</xref>。</li>
+            <li>Natural Language Toolkit（nltk）是一个用于构建Python程序以处理人类语言数据的平台。
+              <xref href="http://www.nltk.org/" format="html"
+                scope="external">http://www.nltk.org/</xref>。
+              有关安装工具包的信息，请参阅<xref href="http://www.nltk.org/install.html" format="html"
+                scope="external">http://www.nltk.org/install.html</xref>。</li>
           </ul></p>
       </body>
     </topic>

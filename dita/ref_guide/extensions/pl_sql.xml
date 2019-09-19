@@ -2,9 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="pt212122">Greenplum PL/pgSQL Procedural Language</title>
+  <title id="pt212122">Greenplum PL/pgSQL过程语言</title>
   <body>
-    <p>This section contains an overview of the Greenplum Database PL/pgSQL language.</p>
+    <p>本节概述了Greenplum数据库PL/pgSQL语言。</p>
     <ul>
       <li id="pt222286">
         <xref href="#topic2" type="topic" format="dita"/>
@@ -21,93 +21,89 @@
     </ul>
   </body>
   <topic id="topic2" xml:lang="en">
-    <title id="pt218674">About Greenplum Database PL/pgSQL</title>
+    <title id="pt218674">关于Greenplum数据库PL/pgSQL</title>
     <body>
-      <p>Greenplum Database PL/pgSQL is a loadable procedural language that is installed and
-        registered by default with Greenplum Database. You can create user-defined functions using
-        SQL statements, functions, and operators.</p>
-      <p>With PL/pgSQL you can group a block of computation and a series of SQL queries inside the
-        database server, thus having the power of a procedural language and the ease of use of SQL.
-        Also, with PL/pgSQL you can use all the data types, operators and functions of Greenplum
-        Database SQL. </p>
-      <p>The PL/pgSQL language is a subset of Oracle PL/SQL. Greenplum Database PL/pgSQL is based on
-        Postgres PL/pgSQL. The Postgres PL/pgSQL documentation is at <xref
+      <p>Greenplum数据库PL/pgSQL是一种可加载的过程语言，默认情况下使用Greenplum数据库进行安装和注册。
+          您可以使用SQL语句，函数和运算符创建用户定义的函数。
+          </p>
+      <p>使用PL/pgSQL，您可以在数据库服务器内对计算块和一系列SQL查询进行分组，从而具有过程语言的强大功能和SQL的易用性。
+          此外，使用PL/pgSQL，您可以使用Greenplum数据库SQL的所有数据类型，运算符和函数。
+          </p>
+      <p>PL/pgSQL语言是Oracle PL/SQL的子集。
+          Greenplum数据库PL/pgSQL基于Postgres PL/pgSQL。
+          Postgres PL/pgSQL文档位于
+          <xref
           href="https://www.postgresql.org/docs/9.4/plpgsql.html" scope="external"
           format="html">https://www.postgresql.org/docs/9.4/plpgsql.html</xref></p>
-      <p>When using PL/pgSQL functions, function attributes affect how Greenplum Database creates
-        query plans. You can specify the attribute <codeph>IMMUTABLE</codeph>,
-          <codeph>STABLE</codeph>, or <codeph>VOLATILE</codeph> as part of the
-          <codeph>LANGUAGE</codeph> clause to classify the type of function, For information about
-        the creating functions and function attributes, see the <codeph><xref
-            href="../sql_commands/CREATE_FUNCTION.xml#topic1"/></codeph> command in the
-          <cite>Greenplum Database Reference Guide</cite>.</p>
-      <p>You can run PL/SQL code blocks as anonymous code blocks. See the <codeph><xref
-            href="../sql_commands/DO.xml#topic1"/></codeph> command in the <cite>Greenplum Database
-          Reference Guide</cite>.</p>
+      <p>使用PL/pgSQL函数时，函数属性会影响Greenplum数据库创建查询计划的方式。
+          您可以将属性<codeph>IMMUTABLE</codeph>，<codeph>STABLE</codeph>或<codeph>VOLATILE</codeph>指定为<codeph>LANGUAGE</codeph>子句的一部分，以对函数类型进行分类。
+          有关创建函数和函数属性的信息，请参阅<cite>Greenplum数据库参考指南</cite>中的<codeph><xref
+                  href="../sql_commands/CREATE_FUNCTION.xml#topic1"/></codeph>命令。
+          </p>
+      <p>您可以将PL/SQL代码块作为匿名代码块运行。
+          请参阅<cite>Greenplum数据库参考指南</cite>中的<codeph><xref
+                  href="../sql_commands/DO.xml#topic1"/></codeph>命令。
+          </p>
     </body>
     <topic id="topic3" xml:lang="en">
-      <title>Greenplum Database SQL Limitations</title>
+      <title>Greenplum数据库SQL限制</title>
       <body>
-        <p>When using Greenplum Database PL/pgSQL, limitations include</p>
+        <p>使用Greenplum数据库PL/pgSQL时，限制包括</p>
         <ul>
-          <li id="pt219857">Triggers are not supported</li>
-          <li id="pt222490">Cursors are forward moving only (not scrollable)</li>
-          <li>Updatable cursors (<codeph>UPDATE...WHERE CURRENT OF</codeph> and
-              <codeph>DELETE...WHERE CURRENT OF</codeph>) are not supported.</li>
+          <li id="pt219857">不支持触发器</li>
+          <li id="pt222490">游标只向前移动（不可滚动）</li>
+          <li>不支持可更新游标（<codeph>UPDATE...WHERE CURRENT OF</codeph>和<codeph>DELETE...WHERE CURRENT OF</codeph>）。
+              </li>
         </ul>
-        <p>For information about Greenplum Database SQL conformance, see <xref
-            href="../feature_summary.xml#topic1"/> in the <cite>Greenplum Database Reference
-            Guide</cite>.</p>
+        <p>有关Greenplum数据库SQL一致性的信息，请参阅<cite>Greenplum数据库参考指南</cite>中的<xref
+                href="../feature_summary.xml#topic1"/>。
+            </p>
       </body>
     </topic>
     <topic id="topic4" xml:lang="en">
-      <title>The PL/pgSQL Language</title>
+      <title>PL/pgSQL语言</title>
       <body>
-        <p>PL/pgSQL is a block-structured language. The complete text of a function definition must
-          be a block. A block is defined as:</p>
+        <p>PL/pgSQL是一种块结构语言。
+            函数定义的完整文本必须是块。块定义为：
+            </p>
         <codeblock>[ <varname>label</varname> ]
 [ DECLARE
    declarations ]
 BEGIN
    statements
 END [ label ];</codeblock>
-        <p>Each declaration and each statement within a block is terminated by a semicolon (;). A
-          block that appears within another block must have a semicolon after <codeph>END</codeph>,
-          as shown in the previous block. The <codeph>END</codeph> that concludes a function body
-          does not require a semicolon.</p>
-        <p>A <varname>label</varname> is required only if you want to identify
-          the block for use in an <codeph>EXIT</codeph> statement, or to qualify
-          the names of variables declared in the block. If you provide a label
-          after <codeph>END</codeph>, it must match the label at the block's beginning.</p>
-        <note type="important">Do not confuse the use of the <codeph>BEGIN</codeph> and
-            <codeph>END</codeph> keywords for grouping statements in PL/pgSQL with the database
-          commands for transaction control. The PL/pgSQL <codeph>BEGIN</codeph> and
-            <codeph>END</codeph> keywords are only for grouping; they do not start or end a
-          transaction. Functions are always executed within a transaction established by an outer
-          query — they cannot start or commit that transaction, since there would be no context for
-          them to execute in. However, a PL/pgSQL block that contains an <codeph>EXCEPTION</codeph>
-          clause effectively forms a subtransaction that can be rolled back without affecting the
-          outer transaction. For more about the <codeph>EXCEPTION</codeph> clause, see the
-          PostgreSQL documentation on trapping errors at <xref
+        <p>块中的每个声明和每个语句都以分号（;）结束。
+            出现在另一个块中的块在END之后必须有分号，如上一个块所示。
+            结束函数体的<codeph>END</codeph>不需要分号。
+            </p>
+        <p>仅当您要识别要在<codeph>EXIT</codeph>语句中使用的块或限定块中声明的变量的名称时，才需要<varname>label</varname>。
+            如果在<codeph>END</codeph>之后提供label，则它必须与块开头的label匹配。
+            </p>
+        <note type="important">对于使用用于事务控制的数据库命令PL/pgSQL分组语句，不要混淆使用<codeph>BEGIN</codeph>和<codeph>END</codeph>关键字。
+            PL/pgSQL <codeph>BEGIN</codeph>和<codeph>END</codeph>关键字仅用于分组; 他们不会开始或结束事务。
+            函数总是在外部查询建立的事务中执行 - 它们无法启动或提交该事务，因为它们没有上下文可供执行。
+            但是，包含<codeph>EXCEPTION</codeph>子句的PL/pgSQL块有效地形成了一个子事务，可以在不影响外部事务的情况下回滚。
+            有关<codeph>EXCEPTION</codeph>子句的更多信息，请参阅
+            <xref
             href="https://www.postgresql.org/docs/9.4/plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING"
             scope="external" format="html"
-            >https://www.postgresql.org/docs/9.4/plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING</xref>. </note>
-        <p>Keywords are case-insensitive. Identifiers
-          are implicitly converted to lowercase unless double-quoted, just as they
-          are in ordinary SQL commands.</p>
-        <p>Comments work the same way in PL/pgSQL code as in ordinary SQL:</p>
+            >https://www.postgresql.org/docs/9.4/plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING</xref>。</note>
+        <p>关键字不区分大小写。除非双引号，否则标识符将隐式转换为小写，就像在普通SQL命令中一样。
+            </p>
+        <p>PL/pgSQL代码中的注释与普通SQL中的注释相同：</p>
         <ul>
-          <li id="pt219192">A double dash (--) starts a comment that extends to the end of the line. </li>
-          <li id="pt219185">A /* starts a block comment that extends to the matching occurrence of */.
-              <p>Block comments nest.</p></li>
+          <li id="pt219192">双短划线(--)开始一条延伸到该行末尾的注释。</li>
+          <li id="pt219185">/* 启动一个块注释，扩展到匹配的 */。
+              <p>阻止评论嵌套。</p>
+              </li>
         </ul>
-        <p>Any statement in the statement section of a block can be a subblock. Subblocks can be
-          used for logical grouping or to localize variables to a small group of statements.</p>
-        <p>Variables declared in a subblock mask any similarly-named variables of
-          outer blocks for the duration of the subblock. You can access the outer
-           variables if you qualify their names with their block's label. For
-           example this function declares a variable named <codeph>quantity</codeph>
-           several times:</p>
+        <p>块的语句部分中的任何语句都可以是子块。
+            子块可用于逻辑分组或将变量本地化为一小组语句。
+            </p>
+        <p>在子块中声明的变量在子块的持续时间内屏蔽外部块的任何类似命名的变量。
+            如果使用块的标签限定其名称，则可以访问外部变量。
+            例如，此函数多次声明一个名为<codeph>quantity</codeph>的变量：
+            </p>
         <codeblock>CREATE FUNCTION testfunc() RETURNS integer AS $$
 &lt;&lt; outerblock >>
 DECLARE
@@ -130,54 +126,67 @@ END;
 $$ LANGUAGE plpgsql;</codeblock>
       </body>
       <topic id="topic5" xml:lang="en">
-        <title>Executing SQL Commands</title>
+        <title>执行SQL命令</title>
         <body>
-          <p>You can execute SQL commands with PL/pgSQL statements such as <codeph>EXECUTE</codeph>,
-              <codeph>PERFORM</codeph>, and <codeph>SELECT ... INTO</codeph>. For information about
-            the PL/pgSQL statements, see <xref
+          <p>您可以使用PL/pgSQL语句执行SQL命令，例如<codeph>EXECUTE</codeph>，<codeph>PERFORM</codeph>和<codeph>SELECT ... INTO</codeph>。
+              有关PL/pgSQL语句的信息，请参阅
+              <xref
               href="https://www.postgresql.org/docs/9.4/plpgsql-statements.html"
               scope="external" format="html"
               >https://www.postgresql.org/docs/9.4/plpgsql-statements.html</xref>. </p>
-          <note type="note">The PL/pgSQL statement <codeph>SELECT INTO</codeph> is not supported in
-            the <codeph>EXECUTE</codeph> statement. </note>
+          <note type="note"><codeph>EXECUTE</codeph>语句不支持PL/pgSQL语句<codeph>SELECT INTO</codeph>。
+              </note>
         </body>
       </topic>
     </topic>
   </topic>
   <topic id="topic67" xml:lang="en">
-    <title id="pt21749299">PL/pgSQL Plan Caching</title>
+    <title id="pt21749299">PL/pgSQL计划缓存</title>
     <body>
-        <p>A PL/pgSQL function’s volatility classification has implications on how Greenplum Database caches plans that reference the function.  Refer to <xref href="../../admin_guide/query/topics/functions-operators.xml#topic281">Function Volatility and Plan Caching</xref> in the <cite>Greenplum Database Administrator
-              Guide</cite> for information on plan caching considerations for Greenplum Database function volatility categories.</p>
-        <p>When a PL/pgSQL function executes for the first time in a database session, the PL/pgSQL interpreter parses the function’s SQL expressions and commands. The interpreter creates a prepared execution plan as each expression and SQL command is first executed in the function. The PL/pgSQL interpreter reuses the execution plan for a specific expression and SQL command for the life of the database connection. While this reuse substantially reduces the total amount of time required to parse and generate plans, errors in a specific expression or command cannot be detected until run time when that part of the function is executed.</p>
-        <p>Greenplum Database will automatically re-plan a saved query plan if there is any schema change to any relation used in the query, or if any user-defined function used in the query is redefined. This makes the re-use of a prepared plan transparent in most cases.</p>
-        <p>The SQL commands that you use in a PL/pgSQL function must refer to the same tables and columns on every execution. You cannot use a parameter as the name of a table or a column in an SQL command.</p>
-        <p>PL/pgSQL caches a separate query plan for each combination of actual argument types in which you invoke a polymorphic function to ensure that data type differences do not cause unexpected failures.</p>
-        <p>Refer to the PostgreSQL <xref href="https://www.postgresql.org/docs/9.0/plpgsql-implementation.html#PLPGSQL-PLAN-CACHING" scope="external" format="html">Plan Caching</xref> documentation for a detailed discussion of plan caching considerations in the PL/pgSQL language.</p>
+        <p>PL/pgSQL函数的波动率分类对Greenplum数据库如何缓存引用该函数的计划有影响。
+            有关Greenplum数据库函数波动率类别的计划缓存注意事项的信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的<xref href="../../admin_guide/query/topics/functions-operators.xml#topic281">函数波动率和计划缓存</xref>。
+            </p>
+        <p>当PL/pgSQL函数在数据库会话中第一次执行时，PL/pgSQL解释器会解析函数的SQL表达式和命令。
+            解释器创建一个准备好的执行计划，因为每个表达式和SQL命令首先在函数中执行。
+            PL/pgSQL解释器在数据库连接的生命周期中重用特定表达式和SQL命令的执行计划。
+            虽然这种重用大大减少了解析和生成计划所需的总时间，但是直到执行该部分函数的运行时才能检测到特定表达式或命令中的错误。
+            </p>
+        <p>如果对查询中使用的任何关系进行任何架构更改，或者重新定义查询中使用的任何用户定义函数，Greenplum数据库将自动重新规划已保存的查询计划。
+            这使得在大多数情况下重复使用准备好的计划是透明的。
+            </p>
+        <p>您在PL/pgSQL函数中使用的SQL命令必须在每次执行时引用相同的表和列。
+            您不能将参数用作SQL命令中的表或列的名称。
+            </p>
+        <p>PL/pgSQL为实际参数类型的每个组合缓存一个单独的查询计划，您可以在其中调用多态函数以确保数据类型差异不会导致意外故障。
+            </p>
+        <p>有关PL/pgSQL语言中计划缓存注意事项的详细讨论，
+            请参阅PostgreSQL<xref href="https://www.postgresql.org/docs/9.0/plpgsql-implementation.html#PLPGSQL-PLAN-CACHING" scope="external" format="html">计划缓存</xref>文档。
+            </p>
     </body>
   </topic>
   <topic id="topic6" xml:lang="en">
-    <title id="pt217492">PL/pgSQL Examples</title>
+    <title id="pt217492">PL/pgSQL示例</title>
     <body>
-      <p>The following are examples of PL/pgSQL user-defined functions.</p>
+      <p>以下是PL/pgSQL用户定义函数的示例。</p>
     </body>
     <topic id="topic7" xml:lang="en">
-      <title>Example: Aliases for Function Parameters</title>
+      <title>示例：函数参数的别名</title>
       <body>
-        <p>Parameters passed to functions are named with identifiers such as <codeph>$1</codeph>,
-            <codeph>$2</codeph>. Optionally, aliases can be declared for <codeph>$n</codeph>
-          parameter names for increased readability. Either the alias or the numeric identifier can
-          then be used to refer to the parameter value.</p>
-        <p>There are two ways to create an alias. The preferred way is to give a name to the
-          parameter in the <codeph>CREATE FUNCTION</codeph> command, for example:</p>
+        <p>传递给函数的参数使用诸如<codeph>$1</codeph>，<codeph>$2</codeph>之类的标识符命名。
+            （可选）可以为<codeph>$n</codeph>参数名称声明别名，以提高可读性。
+            然后可以使用别名或数字标识符来引用参数值。
+            </p>
+        <p>有两种方法可以创建别名。
+            首选方法是在<codeph>CREATE FUNCTION</codeph>命令中为参数指定名称，例如：
+            </p>
         <codeblock>CREATE FUNCTION sales_tax(subtotal real) RETURNS real AS $$
 BEGIN
    RETURN subtotal * 0.06;
 END;
 $$ LANGUAGE plpgsql;</codeblock>
-        <p>You can also explicitly declare an alias, using the declaration syntax:</p>
+        <p>您还可以使用声明语法显式声明别名：</p>
         <codeblock>name ALIAS FOR $n;</codeblock>
-        <p>This example, creates the same function with the <codeph>DECLARE</codeph> syntax.</p>
+        <p>此示例使用<codeph>DECLARE</codeph>语法创建相同的函数。</p>
         <codeblock>CREATE FUNCTION sales_tax(real) RETURNS real AS $$
 DECLARE
     subtotal ALIAS FOR $1;
@@ -188,53 +197,52 @@ $$ LANGUAGE plpgsql;</codeblock>
       </body>
     </topic>
     <topic id="topic8" xml:lang="en">
-      <title>Example: Using the Data Type of a Table Column</title>
+      <title>示例：使用表列的数据类型</title>
       <body>
-        <p>When declaring a variable, you can use the <codeph>%TYPE</codeph> construct to specify the data type of
-          a variable or table column. This is the syntax for declaring a variable whose type is the data type
-          of a table column:</p>
+        <p>声明变量时，可以使用<codeph>%TYPE</codeph>构造指定变量或表列的数据类型。
+            这是声明其类型是表列的数据类型的变量的语法：
+            </p>
         <codeblock>name table.column_name%TYPE;</codeblock>
-        <p>You can use the <codeph>%TYPE</codeph> construct to declare variables that will hold database values. For example, suppose you
-          have a column named <codeph>user_id</codeph> in your <codeph>users</codeph> table. To
-          declare a variable named <codeph>my_userid</codeph> with the same data type as the
-            <codeph>users.user_id</codeph> column:</p>
+        <p>您可以使用<codeph>%TYPE</codeph>构造来声明将保存数据库值的变量。
+            例如，假设您的<codeph>users</codeph>表中有一个名为<codeph>user_id</codeph>的列。
+            声明名为<codeph>my_userid</codeph>的变量，其数据类型与<codeph>users.user_id</codeph>列相同：
+            </p>
         <codeblock>my_userid users.user_id%TYPE;</codeblock>
-        <p><codeph>%TYPE</codeph> is particularly valuable in polymorphic functions, since the data
-          types needed for internal variables may change from one call to the next. Appropriate
-          variables can be created by applying <codeph>%TYPE</codeph> to the function’s arguments or
-          result placeholders.</p>
+        <p><codeph>%TYPE</codeph>在多态函数中特别有价值，因为内部变量所需的数据类型可能会从一个调用更改为下一个调用。
+            通过将<codeph>%TYPE</codeph>应用于函数的参数或结果占位符，可以创建适当的变量。
+            </p>
       </body>
     </topic>
     <topic id="topic9" xml:lang="en">
-      <title>Example: Composite Type Based on a Table Row</title>
+      <title>示例：基于表行的复合类型</title>
       <body>
-        <p>A variable of a composite type is called a row variable. The following syntax declares a composite variable based on table row:</p>
+        <p>复合类型的变量称为行变量。
+            以下语法基于表行声明复合变量：</p>
         <codeblock>name table_name%ROWTYPE;</codeblock>
-        <p>Such a row variable can hold a whole row of a <codeph>SELECT</codeph> or
-            <codeph>FOR</codeph> query result, so long as that query's column set matches the declared
-          type of the variable. The individual fields of the row value are accessed using the usual
-          dot notation, for example <codeph>rowvar.column</codeph>.</p>
-        <p>Parameters to a function can be composite types (complete table rows). In that case, the
-          corresponding identifier <codeph>$n</codeph> will be a row variable, and fields can be
-          selected from it, for <codeph>example $1.user_id</codeph>.</p>
-        <p>Only the user-defined columns of a table row are accessible in a row-type variable, not
-          the OID or other system columns. The fields of the row type inherit the table’s field size
-          or precision for data types such as <codeph>char(n)</codeph>.</p>
-        <p>The next example function uses a row variable composite type. Before creating the
-          function, create the table that is used by the function with this
-          command.<codeblock>CREATE TABLE table1 (
+        <p>这样的行变量可以保存<codeph>SELECT</codeph>或<codeph>FOR</codeph>查询结果的整行，只要该查询的列集与变量的声明类型匹配即可。
+            使用通常的点表示法访问行值的各个字段，例如<codeph>rowvar.column</codeph>。
+            </p>
+        <p>函数的参数可以是复合类型（完整的表行）。
+            在这种情况下，相应的标识符<codeph>$n</codeph>将是行变量，并且可以从中选择字段，例如<codeph>$1.user_id</codeph>。
+            </p>
+        <p>只能在行类型变量中访问表行的用户定义列，而不能访问OID或其他系统列。
+            行类型的字段为数据类型（如<codeph>char(n)</codeph>）继承表的字段大小或精度。
+            </p>
+        <p>下一个示例函数使用行变量复合类型。
+            在创建函数之前，使用此命令创建函数使用的表。
+            <codeblock>CREATE TABLE table1 (
   f1 text,
   f2 numeric,
   f3 integer
 ) distributed by (f1);</codeblock></p>
-        <p>This <codeph>INSERT</codeph> command adds data to the
-          table.<codeblock>INSERT INTO table1 values 
+        <p>此<codeph>INSERT</codeph>命令将数据添加到表中。
+            <codeblock>INSERT INTO table1 values
  ('test1', 14.1, 3),
  ('test2', 52.5, 2),
  ('test3', 32.22, 6),
  ('test4', 12.1, 4) ;</codeblock></p>
-        <p>This function uses a column <codeph>%TYPE</codeph> variable and <codeph>%ROWTYPE</codeph> composite variable based on
-            <codeph>table1</codeph>. </p>
+        <p>此函数使用基于<codeph>table1</codeph>的列<codeph>%TYPE</codeph>变量和<codeph>%ROWTYPE</codeph>复合变量。
+            </p>
         <codeblock>CREATE OR REPLACE FUNCTION t1_calc( name text) RETURNS integer 
 AS $$ 
 DECLARE
@@ -246,28 +254,26 @@ BEGIN
     RETURN calc_int ;
 END;
 $$ LANGUAGE plpgsql VOLATILE;</codeblock>
-        <note>The previous function is classified as a <codeph>VOLATILE</codeph> function because
-          function values could change within a single table scan.</note>
-        <p>The following <codeph>SELECT</codeph> command uses the function.</p>
+        <note>前一个函数被归类为<codeph>VOLATILE</codeph>函数，因为函数值可能在单个表扫描中发生变化。
+            </note>
+        <p>以下<codeph>SELECT</codeph>命令使用该函数。</p>
         <codeblock>select t1_calc( 'test1' );</codeblock>
-        <note type="note">The example PL/pgSQL function uses <codeph>SELECT</codeph> with the
-            <codeph>INTO</codeph> clause. It is different from the SQL command <codeph>SELECT
-            INTO</codeph>. If you want to create a table from a <codeph>SELECT</codeph> result
-          inside a PL/pgSQL function, use the SQL command <codeph>CREATE TABLE AS</codeph>.</note>
+        <note type="note">示例PL/pgSQL函数将<codeph>SELECT</codeph>与<codeph>INTO</codeph>子句一起使用。
+            它与SQL命令<codeph>SELECT INTO</codeph>不同。
+            如果要从PL/pgSQL函数内的<codeph>SELECT</codeph>结果创建表，请使用SQL命令<codeph>CREATE TABLE AS</codeph>。
+            </note>
       </body>
     </topic>
 
     <topic xml:lang="en" id="topic_lsh_5n5_2z1717">
-      <title>Example: Using a Variable Number of Arguments</title>
+      <title>示例：使用可变数量的参数</title>
       <body>
-        <p>You can declare a PL/pgSQL function to accept variable numbers of arguments, as long as
-          all of the optional arguments are of the same data type. You must mark the last argument
-          of the function as <codeph>VARIADIC</codeph> and declare the argument using an array type.
-          You can refer to a function that includes <codeph>VARIADIC</codeph> arguments as a
-          variadic function.
+        <p>只要所有可选参数都具有相同的数据类型，就可以声明PL/pgSQL函数接受可变数量的参数。
+            必须将函数的最后一个参数标记为<codeph>VARIADIC</codeph>，并使用数组类型声明参数。
+            您可以将包含<codeph>VARIADIC</codeph>参数的函数称为可变参数函数。
           </p>
-        <p>For example, this variadic function returns the minimum value of a variable array
-          of numerics:</p>
+        <p>例如，这个可变参数函数返回数值变量数组的最小值：
+            </p>
         <p>
           <codeblock>CREATE FUNCTION mleast (VARIADIC numeric[]) 
     RETURNS numeric AS $$
@@ -286,26 +292,26 @@ SELECT mleast(10, -1, 5, 4.4);
 (1 row)
 </codeblock>
         </p>
-        <p>Effectively, all of the actual arguments at or beyond the <codeph>VARIADIC</codeph> 
-          position are gathered up into a one-dimensional array.</p>
-        <p>You can pass an already-constructed array into a variadic function. This is particularly
-          useful when you want to pass arrays between variadic functions. Specify
-          <codeph>VARIADIC</codeph> in the function call as follows:</p>
+        <p>实际上，<codeph>VARIADIC</codeph>位置或其以外的所有实际参数都被收集到一维数组中。
+            </p>
+        <p>您可以将已构造的数组传递给可变参数函数。
+            当您想要在可变参数函数之间传递数组时，这尤其有用。
+            在函数调用中指定<codeph>VARIADIC</codeph>，如下所示：
+            </p>
           <codeblock>SELECT mleast(VARIADIC ARRAY[10, -1, 5, 4.4]);</codeblock>
-        <p>This prevents PL/pgSQL from expanding the function's variadic parameter into its element type.</p>
+        <p>这可以防止PL/pgSQL将函数的可变参数扩展为其元素类型。
+            </p>
     </body>
   </topic>
 
     <topic xml:lang="en" id="topic_lsh_5n5_2z1313">
-      <title>Example: Using Default Argument Values</title>
+      <title>示例：使用默认参数值</title>
       <body>
-        <p>You can declare PL/pgSQL functions with default values for some or all input arguments.
-          The default values are inserted whenever the function is called with fewer than the 
-          declared number of 
-          arguments. Because arguments can only be omitted from the end of the actual argument
-          list, you must provide default values for all arguments after an argument defined with
-          a default value.</p>
-        <p>For example:</p>
+        <p>您可以使用某些或所有输入参数的默认值声明PL/pgSQL函数。
+            只要调用的函数少于声明的参数个数，就会插入默认值。
+            因为参数只能从实际参数列表的末尾省略，所以必须在使用默认值定义的参数之后为所有参数提供默认值。
+            </p>
+        <p>示例：</p>
         <p>
           <codeblock>CREATE FUNCTION use_default_args(a int, b int DEFAULT 2, c int DEFAULT 3)
     RETURNS int AS $$
@@ -336,24 +342,24 @@ SELECT use_default_args(10);
 (1 row)
 </codeblock>
         </p>
-        <p>You can also use the <codeph>=</codeph> sign in place of the keyword <codeph>DEFAULT</codeph>.</p>
+        <p>您也可以使用<codeph>=</codeph>符号代替关键字<codeph>DEFAULT</codeph>。
+            </p>
     </body>
   </topic>
 
 
     <topic xml:lang="en" id="topic_lsh_5n5_2z">
-      <title>Example: Using Polymorphic Data Types </title>
+      <title>示例：使用多态数据类型</title>
       <body>
-        <p>PL/pgSQL supports the polymorphic <i>anyelement</i>, <i>anyarray</i>, <i>anyenum</i>, and
-            <i>anynonarray</i> types. Using these types, you can create a single PL/pgSQL function
-          that operates on multiple data types. Refer to <xref href="../data_types.xml#topic1"
-            >Greenplum Database Data Types</xref> for additional information on polymorphic type
-          support in Greenplum Database.</p>
-        <p>A special parameter named <codeph>$0</codeph> is created when the return type of
-          a PL/pgSQL function is declared as a polymorphic type. The data type of <codeph>$0</codeph>
-          identifies the return type of the function as deduced from the actual input types.</p>
-        <p>In this example, you create a polymorphic function that returns the sum of two
-          values:</p>
+        <p>PL/pgSQL支持多态<i>anyelement</i>，<i>anyarray</i>，<i>anyenum</i>和<i>anynonarray</i>类型。
+            使用这些类型，您可以创建一个可在多种数据类型上运行的PL/pgSQL函数。
+            有关Greenplum数据库中多态类型支持的其他信息，请参阅<xref href="../data_types.xml#topic1">Greenplum数据库数据类型</xref>。
+            </p>
+        <p>当PL/pgSQL函数的返回类型声明为多态类型时，会创建一个名为<codeph>$0</codeph>的特殊参数。
+            <codeph>$0</codeph>的数据类型标识从实际输入类型推导出的函数的返回类型。
+            </p>
+        <p>在此示例中，您将创建一个多态函数，该函数返回两个值的总和：
+            </p>
         <p>
           <codeblock>CREATE FUNCTION add_two_values(v1 anyelement,v2 anyelement)
     RETURNS anyelement AS $$ 
@@ -365,7 +371,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;</codeblock>
         </p>
-        <p>Execute  <codeph>add_two_values()</codeph> providing integer input values:</p>
+        <p>执行<codeph>add_two_values()</codeph>，提供整数输入值：
+            </p>
         <p>
           <codeblock>SELECT add_two_values(1, 2);
  add_two_values
@@ -373,25 +380,24 @@ $$ LANGUAGE plpgsql;</codeblock>
               3
 (1 row)</codeblock>
         </p>
-        <p>The return type of <codeph>add_two_values()</codeph> is integer, the type of the input
-          arguments. Now execute  <codeph>add_two_values()</codeph> providing float input
-          values:</p>
+        <p><codeph>add_two_values()</codeph>的返回类型是整数，即输入参数的类型。
+            现在执行<codeph>add_two_values()</codeph>，提供浮点输入值：
+            </p>
         <codeblock>SELECT add_two_values (1.1, 2.2);
  add_two_values
 ----------------
             3.3
 (1 row)</codeblock>
-        <p>The return type of <codeph>add_two_values()</codeph> in this case is float.</p>
-        <p>You can also specify <codeph>VARIADIC</codeph> arguments in polymorphic functions.</p>
+        <p>在这种情况下，<codeph>add_two_values()</codeph>的返回类型是float。</p>
+        <p>您还可以在多态函数中指定<codeph>VARIADIC</codeph>参数。</p>
     </body>
   </topic>
   <topic id="topic_isw_3sx_cz">
-      <title>Example: Anonymous Block</title>
+      <title>示例：匿名块</title>
       <body>
-        <p>This example executes the statements in the <codeph>t1_calc()</codeph> function from a previous example as an anonymous block using the
-            <codeph>DO</codeph> command. In the example, the anonymous block retrieves the input
-          value from a temporary
-          table.<codeblock>CREATE TEMP TABLE list AS VALUES ('test1') DISTRIBUTED RANDOMLY;
+        <p>此示例使用<codeph>DO</codeph>命令将前一个示例中的<codeph>t1_calc()</codeph>函数中的语句作为匿名块执行。
+            在该示例中，匿名块从临时表中检索输入值。
+            <codeblock>CREATE TEMP TABLE list AS VALUES ('test1') DISTRIBUTED RANDOMLY;
 
 DO $$ 
 DECLARE
@@ -406,23 +412,23 @@ END $$ LANGUAGE plpgsql ;</codeblock></p>
     </topic>
   </topic>
   <topic id="topic10" xml:lang="en">
-    <title id="pt214450">References</title>
+    <title id="pt214450">参考</title>
     <body>
-      <p>The PostgreSQL documentation about PL/pgSQL is at <xref
+      <p>关于PL/pgSQL的PostgreSQL文档是在<xref
           href="https://www.postgresql.org/docs/9.4/plpgsql.html" scope="external"
           format="html">https://www.postgresql.org/docs/9.4/plpgsql.html</xref></p>
-      <p>Also, see the <codeph><xref href="../sql_commands/CREATE_FUNCTION.xml#topic1"/></codeph>
-        command in the <cite>Greenplum Database Reference Guide</cite>.</p>
-      <p>For a summary of built-in Greenplum Database functions, see <xref
-          href="../function-summary.xml#topic1"/> in the <cite>Greenplum Database Reference
-          Guide</cite>. For information about using Greenplum Database functions see "Querying Data"
-        in the <cite>Greenplum Database Administrator Guide</cite></p>
-      <p>For information about porting Oracle functions, see <xref
-          href="https://www.postgresql.org/docs/9.4/plpgsql-porting.html" scope="external"
-          format="html">https://www.postgresql.org/docs/9.4/plpgsql-porting.html</xref>. For
-        information about installing and using the Oracle compatibility functions with Greenplum
-        Database, see "Oracle Compatibility Functions" in the <cite>Greenplum Database Utility
-          Guide</cite>.</p>
+      <p>另请参阅<cite>Greenplum数据库参考指南</cite>中的<codeph><xref href="../sql_commands/CREATE_FUNCTION.xml#topic1"/></codeph>命令。
+        </p>
+      <p>有关内置Greenplum数据库函数的摘要，请参阅<cite>Greenplum数据库参考指南</cite>中的<xref
+              href="../function-summary.xml#topic1"/>。
+          有关使用Greenplum数据库函数的信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的“查询数据”
+          </p>
+      <p>有关移植Oracle函数的信息，请参阅<xref
+              href="https://www.postgresql.org/docs/9.4/plpgsql-porting.html" scope="external"
+              format="html">https://www.postgresql.org/docs/9.4/plpgsql-porting.html</xref>。
+          有关在Greenplum数据库中安装和使用Oracle兼容性函数的信息，
+          请参阅<cite>Greenplum数据库实用程序指南</cite>中的“Oracle兼容性函数”。
+          </p>
     </body>
   </topic>
 </topic>
