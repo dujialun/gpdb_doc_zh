@@ -4,100 +4,90 @@
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "../../../../dtd/ditabase.dtd">
 <dita>
    <topic xml:lang="zh-cn" id="rangetypes">
-      <title>Range Types</title>
+      <title>范围类型</title>
       <body>
-         <p> Range types are data types representing a range of values of some element type (called
-            the range's <term>subtype</term>). For instance, ranges of <codeph>timestamp</codeph>
-            might be used to represent the ranges of time that a meeting room is reserved. In this
-            case the data type is <codeph>tsrange</codeph> (short for <q>timestamp range</q>), and
-               <codeph>timestamp</codeph> is the subtype. The subtype must have a total order so
-            that it is well-defined whether element values are within, before, or after a range of
-            values. </p>
-         <p> Range types are useful because they represent many element values in a single range
-            value, and because concepts such as overlapping ranges can be expressed clearly. The use
-            of time and date ranges for scheduling purposes is the clearest example; but price
-            ranges, measurement ranges from an instrument, and so forth can also be useful. </p>
+         <p> 范围类型是一种数据类型，它代表一种元素类型 (即范围类型的 <term>子类型</term>) 的一个范围.
+         举例说, <codeph>timestamp</codeph> 的范围类型可以用来表示一个会议室预定的时间范围.
+         在这个例子中，数据类型是 <codeph>tsrange</codeph> (<q>timestamp range</q> 的缩写), 这里
+               <codeph>timestamp</codeph> 是子数据类型. 子数据类型必须有一个整体顺序，因此很好确定一个元素值是否在范围值域内，范围值域前，还是范围值域后面. </p>
+         <p> 范围类型表示单个范围内的许多元素，所以非常有用, 因为一些概念，像重叠范围，能够用范围类型清晰表达. 为调度目的使用时间和日期是一个更清楚的例子; 对于价格范围,
+         仪器的测量范围, 等等, 也很有用. </p>
       </body>
       <topic xml:lang="zh-cn" id="rangetypes-builtin">
-         <title>Built-in Range Types</title>
+         <title>内置范围类型</title>
          <body>
-            <p> Greenplum Database comes with the following built-in range types: <ul>
+            <p> Greenplum 数据库带有以下内置范围类型: <ul>
                   <li>
                      <p>
-                        <codeph>int4range</codeph> -- Range of <codeph>integer</codeph>
+                        <codeph>int4range</codeph> -- <codeph>integer</codeph> 范围
                      </p>
                   </li>
                   <li>
                      <p>
-                        <codeph>int8range</codeph> -- Range of <codeph>bigint</codeph>
+                        <codeph>int8range</codeph> -- <codeph>bigint</codeph> 范围
                      </p>
                   </li>
                   <li>
                      <p>
-                        <codeph>numrange</codeph> -- Range of <codeph>numeric</codeph>
+                        <codeph>numrange</codeph> -- <codeph>numeric</codeph> 范围
                      </p>
                   </li>
                   <li>
                      <p>
-                        <codeph>tsrange</codeph> -- Range of <codeph>timestamp without time
-                           zone</codeph>
+                        <codeph>tsrange</codeph> -- <codeph>timestamp without time
+                           zone</codeph> 范围
                      </p>
                   </li>
                   <li>
                      <p>
-                        <codeph>tstzrange</codeph> -- Range of <codeph>timestamp with time
-                           zone</codeph>
+                        <codeph>tstzrange</codeph> -- <codeph>timestamp with time
+                           zone</codeph> 范围
                      </p>
                   </li>
                   <li>
                      <p>
-                        <codeph>daterange</codeph> -- Range of <codeph>date</codeph>
+                        <codeph>daterange</codeph> -- <codeph>date</codeph> 范围
                      </p>
                   </li>
-               </ul> In addition, you can define your own range types; see <xref
-                  href="sql_commands/CREATE_TYPE.xml#topic1"/> for more information. </p>
+               </ul> 除此之外, 你也可以定义你自己的范围类型; 参见 <xref
+                  href="sql_commands/CREATE_TYPE.xml#topic1"/> 了解更多信息. </p>
          </body>
       </topic>
       <topic xml:lang="zh-cn" id="rangetypes-examples">
-         <title>Examples</title>
+         <title>举例</title>
          <body>
             <p><codeblock>
 CREATE TABLE reservation (room int, during tsrange);
 INSERT INTO reservation VALUES
     (1108, '[2010-01-01 14:30, 2010-01-01 15:30)');
 
--- Containment
+-- 包含
 SELECT int4range(10, 20) @&gt; 3;
 
--- Overlaps
+-- 重叠
 SELECT numrange(11.1, 22.2) &amp;&amp; numrange(20.0, 30.0);
 
--- Extract the upper bound
+-- 提取上边界
 SELECT upper(int8range(15, 25));
 
--- Compute the intersection
+-- 计算交集
 SELECT int4range(10, 20) * int4range(15, 25);
 
--- Is the range empty?
+-- 是否为空?
 SELECT isempty(numrange(1, 5));
 </codeblock>
-               See <xref href="function-summary.xml#functions-range"/> for complete lists of
-               operators and functions on range types. </p>
+               参见 <xref href="function-summary.xml#functions-range"/> 查看范围类型的操作符和函数完整列表. </p>
          </body>
       </topic>
       <topic xml:lang="zh-cn" id="rangetypes-inclusivity">
-         <title>Inclusive and Exclusive Bounds</title>
+         <title>包含边界与非包含边界</title>
          <body>
-            <p> Every non-empty range has two bounds, the lower bound and the upper bound. All
-               points between these values are included in the range. An inclusive bound means that
-               the boundary point itself is included in the range as well, while an exclusive bound
-               means that the boundary point is not included in the range. </p>
-            <p> In the text form of a range, an inclusive lower bound is represented by
-                  <codeph>[</codeph> while an exclusive lower bound is represented by
-                  <codeph>(</codeph> . Likewise, an inclusive upper bound is represented by
-                  <codeph>]</codeph> , while an exclusive upper bound is represented by
-                  <codeph>)</codeph> . (See <xref href="function-summary.xml#functions-range"/> for
-               more details.) </p>
+            <p> 每一个非空范围有两个边界, 下边界和上边界. 所有在这两个边界之间的点都包含在范围内. 包含边界意味着边界点本身也包括在范围内, 而非包含边界意思是边界点不包括在范围内. </p>
+            <p> 对于一个范围的文本格式, 包含下边界用
+                  <codeph>[</codeph> 表示, 而非包含下边界用
+                  <codeph>(</codeph> 表示. 同样, 包含上边界用
+                  <codeph>]</codeph> 表示, 而非包含上边界用
+                  <codeph>)</codeph> 表示. (参见 <xref href="function-summary.xml#functions-range"/> 了解更多信息.) </p>
             <p> The functions <codeph>lower_inc</codeph> and <codeph>upper_inc</codeph> test the
                inclusivity of the lower and upper bounds of a range value, respectively. </p>
          </body>
