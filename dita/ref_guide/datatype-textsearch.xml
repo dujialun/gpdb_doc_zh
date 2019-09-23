@@ -2,7 +2,7 @@
 <!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <dita>
   <topic id="topic_xmh_44c_qfb">
-    <title>全文搜索数据类型</title>
+    <title>全文搜索类型</title>
     <body>
       <p>Greenplum 数据库提供两种数据类型，这两种数据类型被设计来支持全文搜索，即搜索自然语言 <i>文档</i> 集合并定位与一个 <i>查询</i> 最匹配内容。 <codeph>tsvector</codeph> 类型以一种专为全文搜索优化的形式表示一个文档; 类似地， <codeph>tsquery</codeph> 类型表示一个文本查询。 <xref
           href="../admin_guide/textsearch/full-text-search.xml"/> 有这方面支持的详细解释, <xref href="function-summary.xml#topic_vpj_ss1_lfb"/> 总结了相关函数和操作。</p>
