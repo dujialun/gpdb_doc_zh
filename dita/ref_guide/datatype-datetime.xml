@@ -795,7 +795,7 @@ SELECT EXTRACT(days from '80 hours'::interval);
          0
 </codeph>
 
-     当超过值得正常范围时, 可以用 <codeph>justify_days</codeph> 函数和
+     当超过值的正常范围时, 可以用 <codeph>justify_days</codeph> 函数和
      <codeph>justify_hours</codeph> 函数用来调整天和小时.</p>
 
    </section>
@@ -804,7 +804,7 @@ SELECT EXTRACT(days from '80 hours'::interval);
     <title>时间段输出</title>
 
 
-    <p>时间段类型得输出格式可以设置为以下四种格式之一: 
+    <p>时间段类型的输出格式可以设置为以下四种格式之一: 
       <codeph>sql_standard</codeph>, <codeph>postgres</codeph>, <codeph>postgres_verbose</codeph>,
      或者 <codeph>iso_8601</codeph>, 通过命令 <codeph>SET intervalstyle</codeph> 来设置. 默认是 <codeph>postgres</codeph> 格式.
      <xref
