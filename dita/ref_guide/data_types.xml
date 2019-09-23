@@ -7,7 +7,7 @@
       <p>Greenplum 数据库有一套丰富的本地数据类型供用户使用。用户也可以使用 <codeph>CREATE TYPE</codeph> 命令定义新的数据类型。本参考手册对所有内置数据类型进行说明。除了这里列出的类型外，还有一些内部使用的数据类型，例如 <i>oid</i> (对象标识符)，但这些不在本手册中介绍。</p>
       <p>在 <filepath>contrib</filepath> 目录中的可选模块也可能安装新的数据类型。例如 <codeph>hstore</codeph> 模块引入了一种新数据类型和
         连带函数来与 key-value 键值对一起工作。参见 <xref
-          href="modules/hstore.xml#topic_vcn_jkq_1bb"/>。<codeph>citext</codeph> 模块添加了一种大小写不敏感的文本数据类型。参见 <xref href="modules/citext.xml"/>。</p>
+          href="modules/hstore.xml#topic_vcn_jkq_1bb"/>。 <codeph>citext</codeph> 模块添加了一种大小写不敏感的文本数据类型。参见 <xref href="modules/citext.xml"/>。</p>
       <p>下面的数据类型在SQL中使用: <i>bit</i>, <i>bit varying</i>,
           <i>boolean</i>, <i>character varying, varchar</i>, <i>character, char</i>, <i>date</i>,
           <i>double precision</i>, <i>integer</i>, <i>interval</i>, <i>numeric</i>, <i>decimal</i>,
@@ -48,9 +48,9 @@
               <entry colname="col5">大范围自增型整数</entry>
             </row>
             <row>
-              <entry colname="col1">bit [ (n) ]<fn id="if139219">对于变长数据类型，如果大于或等于 127 字节，需要(除数据本身外)额外 4 字节的存储空间（小于 127 字节时额外只需要 1 字节存储空间）。</fn></entry>
+              <entry colname="col1">bit [ (n) ] <fn id="if139219">对于变长数据类型，如果大于或等于 127 字节，需要(除数据本身外)额外 4 字节的存储空间（小于 127 字节时额外只需要 1 字节存储空间）。</fn> </entry>
               <entry colname="col2"/>
-              <entry colname="col3"><i>n</i> 位</entry>
+              <entry colname="col3"> <i>n</i> 位</entry>
               <entry colname="col4"><xref
                   href="https://www.postgresql.org/docs/8.3/sql-syntax.html#SQL-SYNTAX-BIT-STRINGS"
                   scope="external" format="html">位串常量</xref></entry>
@@ -84,26 +84,26 @@
               <entry colname="col1">bytea<xref href="#topic1/if139219" scope="local" type="fn"
                   format="dita"/></entry>
               <entry colname="col2"/>
-              <entry colname="col3">1 字节 + <i>二进制字符串大小</i></entry>
+              <entry colname="col3">1 字节 + <i>二进制字符串大小</i> </entry>
               <entry colname="col4"><xref
                   href="https://www.postgresql.org/docs/8.3/datatype-binary.html#DATATYPE-BINARY-SQLESC"
-                  scope="external" format="html"><ph>8比特字符</ph>序列</xref></entry>
+                  scope="external" format="html"> <ph>8比特字符</ph> 序列</xref></entry>
               <entry colname="col5">变长二进制字符串</entry>
             </row>
             <row>
               <entry colname="col1">character [ (n) ]<xref href="#topic1/if139219" scope="local"
                   type="fn" format="dita"/></entry>
               <entry colname="col2">char [ (n) ]</entry>
-              <entry colname="col3">1 字节 + <i>n</i></entry>
-              <entry colname="col4">最长<i>n</i> 个字符的字符串</entry>
+              <entry colname="col3">1 字节 + <i>n</i> </entry>
+              <entry colname="col4">最长 <i>n</i> 个字符的字符串</entry>
               <entry colname="col5">定长,（输入不足时自动用）空白填充</entry>
             </row>
             <row>
               <entry colname="col1">character varying [ (n) ]<xref href="#topic1/if139219"
                   scope="local" type="fn" format="dita"/></entry>
               <entry colname="col2">varchar [ (n) ] </entry>
-              <entry colname="col3">1 字节 + <i>字符串大小</i></entry>
-              <entry colname="col4">最长<i>n</i>个字符的字符串</entry>
+              <entry colname="col3">1 字节 + <i>字符串大小</i> </entry>
+              <entry colname="col4">最长 <i>n</i> 个字符的字符串</entry>
               <entry colname="col5">有限制的变长字符串</entry>
             </row>
             <row>
@@ -137,7 +137,7 @@
             </row>
             <row>
               <entry colname="col1">double precision</entry>
-              <entry colname="col2">float8<p>float</p></entry>
+              <entry colname="col2">float8 <p>float</p> </entry>
               <entry colname="col3">8 字节</entry>
               <entry colname="col4">15位十进制数字精度</entry>
               <entry colname="col5">可变精度，精度不确切</entry>
@@ -245,7 +245,7 @@
               <entry colname="col1">text<xref href="#topic1/if139219" scope="local" type="fn"
                   format="dita"/></entry>
               <entry colname="col2"/>
-              <entry colname="col3">1 字节 + <i>字符串长度</i></entry>
+              <entry colname="col3">1 字节 + <i>字符串长度</i> </entry>
               <entry colname="col4">任意长度字符串</entry>
               <entry colname="col5">不定长（无限制）</entry>
             </row>
@@ -289,7 +289,7 @@
               <entry colname="col1">xml<xref href="#topic1/if139219" scope="local" type="fn"
                   format="dita"/></entry>
               <entry colname="col2"/>
-              <entry colname="col3">1 字节 + <i>xml 大小</i></entry>
+              <entry colname="col3">1 字节 + <i>xml 大小</i> </entry>
               <entry colname="col4">任意长度 xml</entry>
               <entry colname="col5">变长，无限制</entry>
             </row>

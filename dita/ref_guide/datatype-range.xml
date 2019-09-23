@@ -6,9 +6,9 @@
    <topic xml:lang="zh-cn" id="rangetypes">
       <title>范围类型</title>
       <body>
-         <p> 范围类型是一种数据类型，它代表一种元素类型 (即范围类型的 <term>子类型</term>) 的一个范围.
+         <p> 范围类型是一种数据类型，它代表一种元素类型 (即范围类型的 <term>子类型</term> ) 的一个范围.
          举例说, <codeph>timestamp</codeph> 的范围类型可以用来表示一个会议室预定的时间范围.
-         在这个例子中，数据类型是 <codeph>tsrange</codeph> (<q>timestamp range</q> 的缩写), 这里
+         在这个例子中，数据类型是 <codeph>tsrange</codeph> ( <q>timestamp range</q> 的缩写), 这里
                <codeph>timestamp</codeph> 是子数据类型. 子数据类型必须有一个整体顺序，因此很好确定一个元素值是否在范围值域内，范围值域前，还是范围值域后面. </p>
          <p> 范围类型表示单个范围内的许多元素，所以非常有用, 因为一些概念，像重叠范围，能够用范围类型清晰表达. 为调度目的使用时间和日期是一个更清楚的例子; 对于价格范围,
          仪器的测量范围, 等等, 也很有用. </p>
@@ -56,7 +56,7 @@
       <topic xml:lang="zh-cn" id="rangetypes-examples">
          <title>举例</title>
          <body>
-            <p><codeblock>
+            <p> <codeblock>
 CREATE TABLE reservation (room int, during tsrange);
 INSERT INTO reservation VALUES
     (1108, '[2010-01-01 14:30, 2010-01-01 15:30)');
@@ -113,10 +113,10 @@ SELECT isempty(numrange(1, 5));
          <body>
             <p> 范围类型的输入必须遵循下面的模式:
                <codeblock>
-(<varname>lower-bound</varname>,<varname>upper-bound</varname>)
-(<varname>lower-bound</varname>,<varname>upper-bound</varname>]
-[<varname>lower-bound</varname>,<varname>upper-bound</varname>)
-[<varname>lower-bound</varname>,<varname>upper-bound</varname>]
+( <varname>lower-bound</varname>, <varname>upper-bound</varname> )
+( <varname>lower-bound</varname>, <varname>upper-bound</varname> ]
+[ <varname>lower-bound</varname>, <varname>upper-bound</varname> )
+[ <varname>lower-bound</varname>, <varname>upper-bound</varname> ]
 empty
 </codeblock>
                和前面说的一样, 方括号或圆括号表示是否上下边界是包含, 非包含关系. 注意最后一种模式是
@@ -153,8 +153,8 @@ SELECT '[4,4)'::int4range;
                由于避免了边界值的额外引号(和转义), 通常使用构造函数比写一个范围字面常量更方便. 构造函数接受二或三个参数.
 			   两个参数形式构造一个标准格式的范围
 			   (包含下边界, 不包含上边界), 而三个参数格式构造一个通过第三个参数指定的边界(包含关系).
-			   第三个参数必须是下面的字符串之一: <codeph>()</codeph> ,
-                  <codeph>(]</codeph> , <codeph>[)</codeph> , 或者 <codeph>[]</codeph> . 举例如下:
+			   第三个参数必须是下面的字符串之一: <codeph>()</codeph>,
+                  <codeph>(]</codeph>, <codeph>[)</codeph>, 或者 <codeph>[]</codeph>. 举例如下:
                <codeblock>
 -- 全格式是: 下边界, 上边界, 以及文本参数指示
 -- 包含/非包含边界.
@@ -180,7 +180,7 @@ SELECT numrange(NULL, 2.2);
                   <codeph>integer</codeph> 或 <codeph>date</codeph>. 在这些类型中, 当在两个元素间没有合法的值时, 我们就可以说这两个元素是相邻的. 
 			这个与连续范围相对, 在连续范围中, 两个元素之间总是可以找到其它元素值. 例如, 
                   <codeph>numeric</codeph> 类型的范围就是连续的, 
-                  <codeph>timestamp</codeph>类型的范围也是连续的. (即使 <codeph>timestamp</codeph> 有有限的精度, 理论上可以认为它是离散的, 但由于步长值通常不重要, 所以最好认为它是连续的.) </p>
+                  <codeph>timestamp</codeph> 类型的范围也是连续的. (即使 <codeph>timestamp</codeph> 有有限的精度, 理论上可以认为它是离散的, 但由于步长值通常不重要, 所以最好认为它是连续的.) </p>
             <p> 另一个理解离散范围类型的方法是, 对于每一个元素值, 它有清晰的
                   <q>后一个</q> 和 <q>前一个</q> 值. 
 				  了解了这些, 就可以通过选择后一个或前一个元素值, 取代原始元素值, 来对范围边界的包含和非包含关系进行转换.
@@ -215,7 +215,7 @@ SELECT '[1.234, 5.678]'::floatrange;
                函数. canonicalization 函数接受一个范围值, 返回一个具有不同边界和格式的等价范围值. 对于表示同一值集的两个范围, canonicalization 函数输出一致., 例如整数范围 <codeph>[1, 7]</codeph> 和 <codeph>[1, 8)</codeph>, 一定是相同的. 不论你选择哪一个作为标准输出,
                只要不同格式的等价值总是映射到同样格式的相同值(就可以). 除了调整包含/非包含边界格式,  canonicalization 函数还可以圆整(四舍五入)边界值,
 			   例如设定的步长比子类型存储分辨能力宽(就需要这个功能). 例如, 一个 <codeph>timestamp</codeph> 范围类型, 可以定义为步长为 1 小时, 这种情况下, canonicalization 函数需要对不是整小时的边界进行圆整, 当然也可以抛出一个异常. </p>
-            <p> 另外, 与 GiST 或 SP-GiST 索引一起使用的范围类型应该定义一个子类型差异函数, 即 <codeph>subtype_diff</codeph>, 函数. (没有 <codeph>subtype_diff</codeph> 函数索引也能工作, 但可能被认为没有提供这个函数时高效.) 子类型差异函数接受两个子类型输入值, 同时返回他们之间的差 (即, <varname>X</varname> 减去 <varname>Y</varname>) 用
+            <p> 另外, 与 GiST 或 SP-GiST 索引一起使用的范围类型应该定义一个子类型差异函数, 即 <codeph>subtype_diff</codeph>, 函数. (没有 <codeph>subtype_diff</codeph> 函数索引也能工作, 但可能被认为没有提供这个函数时高效.) 子类型差异函数接受两个子类型输入值, 同时返回他们之间的差 (即, <varname>X</varname> 减去 <varname>Y</varname> ) 用
                   <codeph>float8</codeph> 值表示. 在我们上面的例子中, 函数
                   <codeph>float8mi</codeph> 隐含有常规 <codeph>float8</codeph> 相减操作来用; 但对于任何其他子类型, 某种类型的转换是必要的. 关于如何表示数值之间差异的一些创造性想法也很需要. 为了最大限度扩展这种可能, <codeph>subtype_diff</codeph>
                函数应该与选定操作类和校对函数一致; 也就是说, 根据排序顺序, 当第一个参数比第二个大时, 这个函数应该范围正数. </p>

@@ -32,18 +32,18 @@
         <p>多态参数和返回值互相关联，当查询调用一个多态函数的时候，真实类型才被决定。每个位置 (或者参数或者返回值) 声明为 <i>anyelement</i> 类型时，允许有任何特定的实际类型, 但是，任何调用中，必须是同一种真实数据类型. 每个位置声明为 <i>anyarray</i> 允许有任何类型的数组, 但同样的，(在一个特定查询中,)必须是同一种数据类型. 如果有位置声明为 <i>anyarray</i> 同时别的位置声明为
             <i>anyelement</i>, 在 <i>anyarray</i> 位置中的实际数组类型的元素必须与 <i>anyelement</i> 位置 中的类型相同.
             <i>anynonarray</i> 与 <i>anyelement</i> 类型同样对待, 但是包含附加的约束就是，实际类型不能是数组类型. <i>anyenum</i> 被当作 <i>anyelement</i> 同样对待, 但是实际类型必须是 <codeph>enum</codeph> 类型. </p>
-        <p>当超过一个参数位置声明为多态类型，最终效果是只允许仅有特定的实际参数组合. 举例说, 函数声明为 <codeph>equal(<i>anyelement</i>, <i>anyelement</i>)</codeph> 则这个函数接受两个输入值，并且他们是同样的数据类型就可以.</p>
+        <p>当超过一个参数位置声明为多态类型，最终效果是只允许仅有特定的实际参数组合. 举例说, 函数声明为 <codeph>equal( <i>anyelement</i>, <i>anyelement</i> )</codeph> 则这个函数接受两个输入值，并且他们是同样的数据类型就可以.</p>
         <p>当一个函数的返回值声明为多态类型时, 必须有一个参数位置也声明为多态类型, 并且实际参数的数据类型决定调用的实际返回值类型. 举例说, 如果还没有数组订阅机制，你可以像这样定义一个函数实现订阅: 
-        <codeph>subscript(<i>anyarray</i>, integer) returns
-            <i>anyelement</i></codeph>. 这里声明约束第一个参数必须是数组类型, 并且允许解析器根据第一个实际参数类型, 推断新的正确的返回值类型. 另一个例子是一个函数声明为
-              <codeph>myfunc(<i>anyarray</i>) returns <i>anyenum</i></codeph> 则只能接受一个 <codeph>enum</codeph> 类型数组(作为参数).</p>
+        <codeph>subscript( <i>anyarray</i>, integer) returns
+            <i>anyelement</i> </codeph>. 这里声明约束第一个参数必须是数组类型, 并且允许解析器根据第一个实际参数类型, 推断新的正确的返回值类型. 另一个例子是一个函数声明为
+              <codeph>myfunc( <i>anyarray</i> ) returns <i>anyenum</i> </codeph> 则只能接受一个 <codeph>enum</codeph> 类型数组(作为参数).</p>
         <p>注意: <i>anynonarray</i> 和 <i>anyenum</i> 不表示单个类型变量;
           可以用 <i>anyelement</i>, 只是带一点附加约束. 
-          例如, 声明函数为 <codeph>myfunc(<i>anyelement</i>,
-            <i>anyenum</i>)</codeph> 与声明为 <codeph>myfunc(<i>anyenum</i>,
-              <i>anyenum</i>)</codeph> 是一样的: 两者的实际参数都必须是同样的 <codeph>enum</codeph>
+          例如, 声明函数为 <codeph>myfunc( <i>anyelement</i>,
+            <i>anyenum</i> )</codeph> 与声明为 <codeph>myfunc( <i>anyenum</i>,
+              <i>anyenum</i> )</codeph> 是一样的: 两者的实际参数都必须是同样的 <codeph>enum</codeph>
           类型.</p>
-        <p>一个可变参数函数 (接收可变数目参数) 中，如果最后的参数声明为 <codeph>VARIADIC <i>anyarray</i></codeph>, 就是多态的. 为了匹配和决定实际参数类型, 这样的函数与你生命合适数量的 <i>anynonarray</i> 参数的函数一样.</p>
+        <p>一个可变参数函数 (接收可变数目参数) 中，如果最后的参数声明为 <codeph>VARIADIC <i>anyarray</i> </codeph>, 就是多态的. 为了匹配和决定实际参数类型, 这样的函数与你生命合适数量的 <i>anynonarray</i> 参数的函数一样.</p>
         <p>了解更多多态类型信息, 参见 PostgreSQL 文档关于 <xref
             href="https://www.postgresql.org/docs/8.3/xfunc-c.html#AEN41553" format="html"
             scope="external">多态参数和返回值</xref>.</p>
@@ -55,20 +55,20 @@
         <p>当用 <i>anytable</i> 伪类型声明了一个函数参数, 这就是一个二维表表达式. 一个二维表表达式的写法是把 <codeph>SELECT</codeph>
           语句放在一个 <codeph>TABLE()</codeph> 函数中. 你可以通过添加这样的语句来指定表的分布规则: <codeph>SCATTER RANDOMLY</codeph>, 或者 <codeph>SCATTER
             BY</codeph> 子句以及列列表指定分布键. </p>
-        <p><codeph>SELECT</codeph> 语句在函数被调用时执行, 结果集被分布到 segments 节点中, 因此每一个 segment 节点在一部分结果表上执行函数.</p>
+        <p> <codeph>SELECT</codeph> 语句在函数被调用时执行, 结果集被分布到 segments 节点中, 因此每一个 segment 节点在一部分结果表上执行函数.</p>
         <p>举例说, 下面这个表表达式从一个叫做
             <codeph>customer</codeph> 的表中选了三列，并将分布键设置为第一列:</p>
         <codeblock>TABLE(SELECT cust_key, name, address FROM customer SCATTER BY 1)</codeblock>
-        <p><codeph>SELECT</codeph> 语句可以包括连接多个基础表,
+        <p> <codeph>SELECT</codeph> 语句可以包括连接多个基础表,
             <codeph>WHERE</codeph> 语句, 聚集, 以及任何有效的查询语法.</p>
-        <p> 对于 C 或 C++ 语言实现的函数，<i>anytable</i> 类型 是唯一允许的(多态)类型. 函数体可以用 Greenplum 数据库服务器编程接口 (SPI) 或者 Greenplum 伙伴连接器接口 (GPPC) API 访问. </p>
+        <p> 对于 C 或 C++ 语言实现的函数， <i>anytable</i> 类型 是唯一允许的(多态)类型. 函数体可以用 Greenplum 数据库服务器编程接口 (SPI) 或者 Greenplum 伙伴连接器接口 (GPPC) API 访问. </p>
         <p otherprops="pivotal"> <i>anytable</i> 类型可以用在一些 Pivotal GPText API 的用户自定义函数中. 下面的 GPText 例子 使用 <codeph>TABLE</codeph>
           函数，并在其中使用了 <codeph>SCATTER BY</codeph> 语句。
             <codeph>gptext.index()</codeph> 用来填充索引，
-            <codeph>mydb.mytest.articles</codeph> 从消息表中获取数据:<codeblock>SELECT * FROM gptext.index(TABLE(SELECT * FROM mytest.messages 
+            <codeph>mydb.mytest.articles</codeph> 从消息表中获取数据: <codeblock>SELECT * FROM gptext.index(TABLE(SELECT * FROM mytest.messages 
           SCATTER BY distrib_id), 'mydb.mytest.messages');
-        </codeblock></p>
-        <p otherprops="pivotal">关于 <codeph>gptext.index()</codeph>的更多信息,
+        </codeblock> </p>
+        <p otherprops="pivotal">关于 <codeph>gptext.index()</codeph> 的更多信息,
           参见 Pivotal GPText 文档.</p>
       </body>
     </topic>

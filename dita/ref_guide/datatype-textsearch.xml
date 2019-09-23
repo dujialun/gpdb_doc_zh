@@ -4,14 +4,14 @@
   <topic id="topic_xmh_44c_qfb">
     <title>全文搜索数据类型</title>
     <body>
-      <p>Greenplum 数据库提供两种数据类型，这两种数据类型被设计来支持全文搜索，即搜索自然语言<i>文档</i>集合并定位与一个<i>查询</i>最匹配内容。<codeph>tsvector</codeph> 类型以一种专为全文搜索优化的形式表示一个文档; 类似地，<codeph>tsquery</codeph> 类型表示一个文本查询。 <xref
+      <p>Greenplum 数据库提供两种数据类型，这两种数据类型被设计来支持全文搜索，即搜索自然语言 <i>文档</i> 集合并定位与一个 <i>查询</i> 最匹配内容。 <codeph>tsvector</codeph> 类型以一种专为全文搜索优化的形式表示一个文档; 类似地， <codeph>tsquery</codeph> 类型表示一个文本查询。 <xref
           href="../admin_guide/textsearch/full-text-search.xml"/> 有这方面支持的详细解释, <xref href="function-summary.xml#topic_vpj_ss1_lfb"/> 总结了相关函数和操作。</p>
-      <p><codeph>tsvector</codeph> 和 <codeph>tsquery</codeph> 类型不能是 Greenplum 数据库表的分布键的一部分。</p>
+      <p> <codeph>tsvector</codeph> 和 <codeph>tsquery</codeph> 类型不能是 Greenplum 数据库表的分布键的一部分。</p>
     </body>
     <topic id="topic_mzv_44c_qfb">
       <title>tsvector</title>
       <body>
-        <p>一个 <codeph>tsvector</codeph> 值是不同<i>词素(lexemes)</i>的排序列表, 也就是由对不同形式的词进行合并，已经被<i>标准化</i>的单词组成的列表 (更多细节，请参考
+        <p>一个 <codeph>tsvector</codeph> 值是不同 <i>词素(lexemes)</i> 的排序列表, 也就是由对不同形式的词进行合并，已经被 <i>标准化</i> 的单词组成的列表 (更多细节，请参考
             <xref href="../admin_guide/textsearch/full-text-search.xml"/>)。 排序和去重在输入过程中已经自动完成。请看以下例子:</p>
         <codeblock>SELECT 'a fat cat sat on a mat and ate a fat rat'::tsvector;
                       tsvector
@@ -27,15 +27,15 @@
                     tsvector                    
 ------------------------------------------------
  'Joe''s' 'a' 'contains' 'lexeme' 'quote' 'the'</codeblock>
-        <p>可选的, 整数<i>定位数值</i>可以被附加到词素:</p>
+        <p>可选的, 整数 <i>定位数值</i> 可以被附加到词素:</p>
         <codeblock>SELECT 'a:1 fat:2 cat:3 sat:4 on:5 a:6 mat:7 and:8 ate:9 a:10 fat:11 rat:12'::tsvector;
                                   tsvector
 -------------------------------------------------------------------------------
  'a':1,6,10 'and':8 'ate':9 'cat':3 'fat':2,11 'mat':7 'on':5 'rat':12 'sat':4</codeblock>
-        <p>一个定位数值通常表示源单词在文档中的位置。定位信息能够在<i>邻近排名</i>时使用。 定位数值的范围可以从 1 到
+        <p>一个定位数值通常表示源单词在文档中的位置。定位信息能够在 <i>邻近排名</i> 时使用。 定位数值的范围可以从 1 到
           16383; 更大的数值自动归整到 16383。 相同定位数值的同一词素会被丢弃。</p>
-        <p>包含定位数值的词素可以进一步使用一个<i>权重</i>进行标记, 权重可以是
-            <codeph>A</codeph>, <codeph>B</codeph>, <codeph>C</codeph>, 或 <codeph>D</codeph>。
+        <p>包含定位数值的词素可以进一步使用一个 <i>权重</i> 进行标记, 权重可以是
+            <codeph>A</codeph>, <codeph>B</codeph>, <codeph>C</codeph>, 或 <codeph>D</codeph> 。
             <codeph>D</codeph> 是默认权重因此在输出中不会显示:</p>
         <codeblock>SELECT 'a:1A fat:2B,4C cat:5D'::tsvector;
           tsvector          
@@ -75,7 +75,7 @@ SELECT 'fat &amp; rat &amp; ! cat'::tsquery;
  'fat' &amp; 'rat' &amp; !'cat'</codeblock>
         <p>不使用括号时, <codeph>!</codeph> (非) 具有最高优先级, 另外
             <codeph>&amp;</codeph> (与) 优先级高于 <codeph>|</codeph> (或)。</p>
-        <p>可选地, 一个 <codeph>tsquery</codeph>中的词素可以带一个或多个权重标记字母，用来限制他们只与合适权重的 <codeph>tsvector</codeph>相匹配:</p>
+        <p>可选地, 一个 <codeph>tsquery</codeph> 中的词素可以带一个或多个权重标记字母，用来限制他们只与合适权重的 <codeph>tsvector</codeph> 相匹配:</p>
         <codeblock>SELECT 'fat:ab &amp; cat'::tsquery;
     tsquery
 ------------------
@@ -92,15 +92,15 @@ SELECT 'fat &amp; rat &amp; ! cat'::tsquery;
 ----------
  t
 (1 row)</codeblock>
-        <p>因为 <codeph>postgres</codeph> 中提取的词干是 <codeph>postgr</codeph>:</p>
+        <p>因为 <codeph>postgres</codeph> 中提取的词干是 <codeph>postgr</codeph> :</p>
         <codeblock>SELECT to_tsquery('postgres:*');
  to_tsquery 
 ------------
  'postgr':*
 (1 row)</codeblock>
-        <p>所以就匹配到了 <codeph>postgraduate</codeph>。</p>
+        <p>所以就匹配到了 <codeph>postgraduate</codeph> 。</p>
         <p>词素引用规则与前面 <codeph>tsvector</codeph> 中的规则一样; 同时，也和 <codeph>tsvector</codeph> 一样, 任何需要标准化的单词必须在转换为 <codeph>tsquery</codeph>
-          类型之前完成。<codeph>to_tsquery</codeph> 函数可以方便地用来进行这类标准化操作:</p>
+          类型之前完成。 <codeph>to_tsquery</codeph> 函数可以方便地用来进行这类标准化操作:</p>
         <codeblock>SELECT to_tsquery('Fat:ab &amp; Cats');
     to_tsquery    
 ------------------

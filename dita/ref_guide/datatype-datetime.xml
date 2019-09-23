@@ -29,7 +29,7 @@
       </thead>
       <tbody>
        <row>
-        <entry>timestamp [ (<varname>p</varname>) ] [ without time zone ]</entry>
+        <entry>timestamp [ ( <varname>p</varname> ) ] [ without time zone ]</entry>
         <entry>8 字节</entry>
         <entry>包括时间和日期 (无时区)</entry>
         <entry>4713 BC</entry>
@@ -37,7 +37,7 @@
         <entry>1 微秒 / 14 位数字</entry>
        </row>
        <row>
-        <entry>timestamp [ (<varname>p</varname>) ] with time zone</entry>
+        <entry>timestamp [ ( <varname>p</varname> ) ] with time zone</entry>
         <entry>8 字节</entry>
         <entry>包括时间和日期 (有时区)</entry>
         <entry>4713 BC</entry>
@@ -53,7 +53,7 @@
         <entry>1 天</entry>
        </row>
        <row>
-        <entry>time [ (<varname>p</varname>) ] [ without time zone ]</entry>
+        <entry>time [ ( <varname>p</varname> ) ] [ without time zone ]</entry>
         <entry>8 字节</entry>
         <entry>一天内的时间 (无日期和时区)</entry>
         <entry>00:00:00</entry>
@@ -61,7 +61,7 @@
         <entry>1 微秒 / 14 位数字</entry>
        </row>
        <row>
-        <entry>time [ (<varname>p</varname>) ] with time zone</entry>
+        <entry>time [ ( <varname>p</varname> ) ] with time zone</entry>
         <entry>12 字节</entry>
         <entry>一天内的时间, 无日期, 有时区</entry>
         <entry>00:00:00+1459</entry>
@@ -69,7 +69,7 @@
         <entry>1 微秒 / 14 位数字</entry>
        </row>
        <row>
-        <entry>interval [ <varname>fields</varname> ] [ (<varname>p</varname>) ]</entry>
+        <entry>interval [ <varname>fields</varname> ] [ ( <varname>p</varname> ) ]</entry>
         <entry>16 字节</entry>
         <entry>时间间隔</entry>
         <entry>-178000000 年</entry>
@@ -84,20 +84,20 @@
       <codeph>timestamptz</codeph> 是 <codeph>timestamp with time
       zone</codeph> 的缩写; 这是 PostgreSQL 的一点扩展。 </note>
 
-   <p><codeph>time</codeph>, <codeph>timestamp</codeph>, 和 <codeph>interval</codeph> 接受一个可选的精度值 <varname>p</varname>，来指定秒的小数部分数字。默认情况下, 没有明确精度指定。对于 <codeph>timestamp</codeph> 和
+   <p> <codeph>time</codeph>, <codeph>timestamp</codeph>, 和 <codeph>interval</codeph> 接受一个可选的精度值 <varname>p</varname> ，来指定秒的小数部分数字。默认情况下, 没有明确精度指定。对于 <codeph>timestamp</codeph> 和
       <codeph>interval</codeph> 类型, 允许的 <varname>p</varname> 值范围为 0 到 6。</p>
 
    <note>当 <codeph>timestamp</codeph> 值按八字节整数存储(当前默认), 精度可全范围(0 到 6 位)任意设置。当
-      <codeph>timestamp</codeph> 值按双精度浮点数存储(一个过时的编译选项), 精度有效值可能小于 6 位。<codeph>timestamp</codeph> 值存储的是从 2000-01-01 午夜开始的秒的数值。
-      当 <codeph>timestamp</codeph> 值按浮点数实现时，2000-01-01 附近的一些年可以达到微秒精度，但是距离这个日期稍远的一些时间精度就会有所降低。注意：浮点存储的<codeph>timestamp</codeph> 值允许更大的日期范围，比上表中给出的要大，即可以表示从 4713 BC 到
+      <codeph>timestamp</codeph> 值按双精度浮点数存储(一个过时的编译选项), 精度有效值可能小于 6 位。 <codeph>timestamp</codeph> 值存储的是从 2000-01-01 午夜开始的秒的数值。
+      当 <codeph>timestamp</codeph> 值按浮点数实现时，2000-01-01 附近的一些年可以达到微秒精度，但是距离这个日期稍远的一些时间精度就会有所降低。注意：浮点存储的 <codeph>timestamp</codeph> 值允许更大的日期范围，比上表中给出的要大，即可以表示从 4713 BC 到
      5874897 AD 的日期。<p>同样的编译选项也决定 <codeph>time</codeph> 和
        <codeph>interval</codeph> 类型值存储为浮点数还是八字节整数。
-      当存储位浮点数的时候, 当时间间隔增大时，<codeph>interval</codeph> 的精度有所降低。</p></note>
+      当存储位浮点数的时候, 当时间间隔增大时， <codeph>interval</codeph> 的精度有所降低。</p></note>
 
    <p>对于 <codeph>time</codeph> 类型, 使用八字节整数存储时，允许的
-    <varname>p</varname> 值范围从 0 到 6；使用浮点数存储时，允许的<varname>p</varname> 值范围从 0 到 10。</p>
+    <varname>p</varname> 值范围从 0 到 6；使用浮点数存储时，允许的 <varname>p</varname> 值范围从 0 到 10。</p>
 
-   <p>另外，<codeph>interval</codeph> 数据类型还有一个附加选项，可以通过书写以下时间单位后缀(<varname>fields</varname>)来来限制存储内容:
+   <p>另外， <codeph>interval</codeph> 数据类型还有一个附加选项，可以通过书写以下时间单位后缀( <varname>fields</varname> )来来限制存储内容:
 <codeblock>
 YEAR
 MONTH
@@ -118,13 +118,13 @@ MINUTE TO SECOND
     <varname>fields</varname> 必须包含 <codeph>SECOND</codeph>,
     因为精度参数 <varname>p</varname> 只对秒起作用。</p>
 
-   <p><codeph>time with time zone</codeph> 类型由 SQL 标准定义，
+   <p> <codeph>time with time zone</codeph> 类型由 SQL 标准定义，
     但是定义给出的属性导致人们怀疑它的有用性。
     大部分情况下，复合使用
     <codeph>date</codeph>, <codeph>time</codeph>, <codeph>timestamp without time
     zone</codeph>, 以及 <codeph>timestamp with time zone</codeph> 已经提供了任何应用程序所需的完整日期/时间功能。</p>
 
-   <p><codeph>abstime</codeph> 
+   <p> <codeph>abstime</codeph> 
     和 <codeph>reltime</codeph> 是内部使用的低精度数据类型。
     不建议你在应用程序中使用; 这些内部数据类型可能在未来的某一个版本中消失。</p>
 
@@ -142,7 +142,7 @@ MINUTE TO SECOND
 
     <p>记住，任何日期或时间字面值需要用单引号引起来, 就像字符串一样. SQL 需要这样的语法
      <codeblock>
-<varname>type</varname> [ (<varname>p</varname>) ] '<varname>value</varname>'
+<varname>type</varname> [ ( <varname>p</varname> ) ] ' <varname>value</varname> '
 </codeblock>
      这里， <varname>p</varname> 是一个可选精度参数，指定秒的小数位数。它对以下类型起作用， <codeph>time</codeph>,
       <codeph>timestamp</codeph>, 以及 <codeph>interval</codeph> 类型。
@@ -174,15 +174,15 @@ MINUTE TO SECOND
        </row>
        <row>
         <entry>1/8/1999</entry>
-        <entry><codeph>MDY</codeph> 模式：1 月 8 日 ; <codeph>DMY</codeph> 模式：8 月 1 日</entry>
+        <entry> <codeph>MDY</codeph> 模式：1 月 8 日 ; <codeph>DMY</codeph> 模式：8 月 1 日</entry>
        </row>
        <row>
         <entry>1/18/1999</entry>
-        <entry><codeph>MDY</codeph> 模式：1 月 18 日; 其他模式：无效</entry>
+        <entry> <codeph>MDY</codeph> 模式：1 月 18 日; 其他模式：无效</entry>
        </row>
        <row>
         <entry>01/02/03</entry>
-        <entry><codeph>MDY</codeph> 模式：2003 年 1 月 2 日; 
+        <entry> <codeph>MDY</codeph> 模式：2003 年 1 月 2 日; 
           <codeph>DMY</codeph> 模式：2003 年 2 月 1 日; 
           <codeph>YMD</codeph> 模式：2001 年 2 月 3 日 </entry>
        </row>
@@ -200,15 +200,15 @@ MINUTE TO SECOND
        </row>
        <row>
         <entry>99-Jan-08</entry>
-        <entry><codeph>YMD</codeph> 模式：1999 年 1 月 8 日, 其他：错误</entry>
+        <entry> <codeph>YMD</codeph> 模式：1999 年 1 月 8 日, 其他：错误</entry>
        </row>
        <row>
         <entry>08-Jan-99</entry>
-        <entry><codeph>YMD</codeph> 模式：错误；其他模式：1999 年 1 月 8 日</entry>
+        <entry> <codeph>YMD</codeph> 模式：错误；其他模式：1999 年 1 月 8 日</entry>
        </row>
        <row>
         <entry>Jan-08-99</entry>
-        <entry><codeph>YMD</codeph> 模式：错误；其他模式：1999 年 1 月 8 日</entry>
+        <entry> <codeph>YMD</codeph> 模式：错误；其他模式：1999 年 1 月 8 日</entry>
        </row>
        <row>
         <entry>19990108</entry>
@@ -239,8 +239,8 @@ MINUTE TO SECOND
      <title>时间</title>
 
      <p>时间类型包括 <codeph>time [
-      (<varname>p</varname>) ] without time zone</codeph> 和
-      <codeph>time [ (<varname>p</varname>) ] with time
+      ( <varname>p</varname> ) ] without time zone</codeph> 和
+      <codeph>time [ ( <varname>p</varname> ) ] with time
       zone</codeph>。  <codeph>time</codeph> 与
       <codeph>time without time zone</codeph> 等价.</p>
 
@@ -262,51 +262,51 @@ MINUTE TO SECOND
         </thead>
         <tbody>
          <row>
-          <entry><codeph>04:05:06.789</codeph></entry>
+          <entry> <codeph>04:05:06.789</codeph> </entry>
           <entry>ISO 8601</entry>
          </row>
          <row>
-          <entry><codeph>04:05:06</codeph></entry>
+          <entry> <codeph>04:05:06</codeph> </entry>
           <entry>ISO 8601</entry>
          </row>
          <row>
-          <entry><codeph>04:05</codeph></entry>
+          <entry> <codeph>04:05</codeph> </entry>
           <entry>ISO 8601</entry>
          </row>
          <row>
-          <entry><codeph>040506</codeph></entry>
+          <entry> <codeph>040506</codeph> </entry>
           <entry>ISO 8601</entry>
          </row>
          <row>
-          <entry><codeph>04:05 AM</codeph></entry>
+          <entry> <codeph>04:05 AM</codeph> </entry>
           <entry>与 04:05 相同; AM 不影响值</entry>
          </row>
          <row>
-          <entry><codeph>04:05 PM</codeph></entry>
+          <entry> <codeph>04:05 PM</codeph> </entry>
           <entry>与 16:05 相同; 小时值必须 &lt;= 12</entry>
          </row>
          <row>
-          <entry><codeph>04:05:06.789-8</codeph></entry>
+          <entry> <codeph>04:05:06.789-8</codeph> </entry>
           <entry>ISO 8601</entry>
          </row>
          <row>
-          <entry><codeph>04:05:06-08:00</codeph></entry>
+          <entry> <codeph>04:05:06-08:00</codeph> </entry>
           <entry>ISO 8601</entry>
          </row>
          <row>
-          <entry><codeph>04:05-08:00</codeph></entry>
+          <entry> <codeph>04:05-08:00</codeph> </entry>
           <entry>ISO 8601</entry>
          </row>
          <row>
-          <entry><codeph>040506-08</codeph></entry>
+          <entry> <codeph>040506-08</codeph> </entry>
           <entry>ISO 8601</entry>
          </row>
          <row>
-          <entry><codeph>04:05:06 PST</codeph></entry>
+          <entry> <codeph>04:05:06 PST</codeph> </entry>
           <entry>时区用缩写指定</entry>
          </row>
          <row>
-          <entry><codeph>2003-04-12 04:05:06 America/New_York</codeph></entry>
+          <entry> <codeph>2003-04-12 04:05:06 America/New_York</codeph> </entry>
           <entry>时区用全称指定</entry>
          </row>
         </tbody>
@@ -324,36 +324,36 @@ MINUTE TO SECOND
         </thead>
         <tbody>
          <row>
-          <entry><codeph>PST</codeph></entry>
+          <entry> <codeph>PST</codeph> </entry>
           <entry>缩写 (太平洋标准时间)</entry>
          </row>
          <row>
-          <entry><codeph>America/New_York</codeph></entry>
+          <entry> <codeph>America/New_York</codeph> </entry>
           <entry>时区全称</entry>
          </row>
          <row>
-          <entry><codeph>PST8PDT</codeph></entry>
+          <entry> <codeph>PST8PDT</codeph> </entry>
           <entry>POSIX-样式时区格式</entry>
          </row>
          <row>
-          <entry><codeph>-8:00</codeph></entry>
+          <entry> <codeph>-8:00</codeph> </entry>
           <entry>ISO-8601 偏移(PST)</entry>
          </row>
          <row>
-          <entry><codeph>-800</codeph></entry>
+          <entry> <codeph>-800</codeph> </entry>
           <entry>ISO-8601 偏移(PST)</entry>
          </row>
          <row>
-          <entry><codeph>-8</codeph></entry>
+          <entry> <codeph>-8</codeph> </entry>
           <entry>ISO-8601 偏移(PST)</entry>
          </row>
          <row>
-          <entry><codeph>zulu</codeph></entry>
+          <entry> <codeph>zulu</codeph> </entry>
           <entry>军方缩写(UTC)</entry>
          </row>
          <row>
-          <entry><codeph>z</codeph></entry>
-          <entry><codeph>zulu</codeph>的短格式</entry>
+          <entry> <codeph>z</codeph> </entry>
+          <entry> <codeph>zulu</codeph> 的短格式</entry>
          </row>
         </tbody>
        </tgroup>
@@ -367,7 +367,7 @@ MINUTE TO SECOND
 
      <p>时间戳的有效输入格式由以下几个部分组成：日期，时间，时区(可选),
       接着可选的 <codeph>AD</codeph> 或 <codeph>BC</codeph>.
-      (另外, <codeph>AD</codeph>/<codeph>BC</codeph> 也可以出现在时区之前, 但不是推荐的顺序.)
+      (另外, <codeph>AD</codeph> / <codeph>BC</codeph> 也可以出现在时区之前, 但不是推荐的顺序.)
       因而:
 
 <codeph>
@@ -393,7 +393,7 @@ January 8 04:05:06 1999 PST
       <codeph>timestamp without time zone</codeph> 类型. 为确保当作
       <codeph>timestamp with time zone</codeph> 类型对待, 请像这样给出明确类型:
       <codeph>TIMESTAMP WITH TIME ZONE '2004-10-19 10:23:54+02'</codeph>
-      对于一个已经确定为 <codeph>timestamp without time zone</codeph>类型的字面值, Greenplum 会抛弃时区相关信息. 也就是说, 结果时间戳仅仅根据日期/时间确定，不会根据时区进行调整.</p>
+      对于一个已经确定为 <codeph>timestamp without time zone</codeph> 类型的字面值, Greenplum 会抛弃时区相关信息. 也就是说, 结果时间戳仅仅根据日期/时间确定，不会根据时区进行调整.</p>
 
      <p>对于 <codeph>timestamp with time zone</codeph> 类型, 内部值总是按照 UTC
      (统一协调时间, 通常叫做格林威治时间, GMT) 存储.
@@ -431,43 +431,43 @@ January 8 04:05:06 1999 PST
         </thead>
         <tbody>
          <row>
-          <entry><codeph>epoch</codeph></entry>
-          <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
+          <entry> <codeph>epoch</codeph> </entry>
+          <entry> <codeph>date</codeph>, <codeph>timestamp</codeph> </entry>
           <entry>1970-01-01 00:00:00+00 (Unix 系统时间零点)</entry>
          </row>
          <row>
-          <entry><codeph>infinity</codeph></entry>
-          <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
+          <entry> <codeph>infinity</codeph> </entry>
+          <entry> <codeph>date</codeph>, <codeph>timestamp</codeph> </entry>
           <entry>比任何时间戳都晚的时间</entry>
          </row>
          <row>
-          <entry><codeph>-infinity</codeph></entry>
-          <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
+          <entry> <codeph>-infinity</codeph> </entry>
+          <entry> <codeph>date</codeph>, <codeph>timestamp</codeph> </entry>
           <entry>比任何时间戳都早的时间</entry>
          </row>
          <row>
-          <entry><codeph>now</codeph></entry>
-          <entry><codeph>date</codeph>, <codeph>time</codeph>, <codeph>timestamp</codeph></entry>
+          <entry> <codeph>now</codeph> </entry>
+          <entry> <codeph>date</codeph>, <codeph>time</codeph>, <codeph>timestamp</codeph> </entry>
           <entry>当前事务的开始时间</entry>
          </row>
          <row>
-          <entry><codeph>today</codeph></entry>
-          <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
+          <entry> <codeph>today</codeph> </entry>
+          <entry> <codeph>date</codeph>, <codeph>timestamp</codeph> </entry>
           <entry>今天午夜</entry>
          </row>
          <row>
-          <entry><codeph>tomorrow</codeph></entry>
-          <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
+          <entry> <codeph>tomorrow</codeph> </entry>
+          <entry> <codeph>date</codeph>, <codeph>timestamp</codeph> </entry>
           <entry>明天午夜</entry>
          </row>
          <row>
-          <entry><codeph>yesterday</codeph></entry>
-          <entry><codeph>date</codeph>, <codeph>timestamp</codeph></entry>
+          <entry> <codeph>yesterday</codeph> </entry>
+          <entry> <codeph>date</codeph>, <codeph>timestamp</codeph> </entry>
           <entry>昨天午夜</entry>
          </row>
          <row>
-          <entry><codeph>allballs</codeph></entry>
-          <entry><codeph>time</codeph></entry>
+          <entry> <codeph>allballs</codeph> </entry>
+          <entry> <codeph>time</codeph> </entry>
           <entry>00:00:00.00 UTC</entry>
          </row>
         </tbody>
@@ -506,24 +506,24 @@ January 8 04:05:06 1999 PST
        </thead>
        <tbody>
         <row>
-         <entry><codeph>ISO</codeph></entry>
+         <entry> <codeph>ISO</codeph> </entry>
          <entry>ISO 8601, SQL 标准</entry>
-         <entry><codeph>1997-12-17 07:37:16-08</codeph></entry>
+         <entry> <codeph>1997-12-17 07:37:16-08</codeph> </entry>
         </row>
         <row>
-         <entry><codeph>SQL</codeph></entry>
+         <entry> <codeph>SQL</codeph> </entry>
          <entry>传统样式</entry>
-         <entry><codeph>12/17/1997 07:37:16.00 PST</codeph></entry>
+         <entry> <codeph>12/17/1997 07:37:16.00 PST</codeph> </entry>
         </row>
         <row>
-         <entry><codeph>Postgres</codeph></entry>
+         <entry> <codeph>Postgres</codeph> </entry>
          <entry>原始样式</entry>
-         <entry><codeph>Wed Dec 17 07:37:16 1997 PST</codeph></entry>
+         <entry> <codeph>Wed Dec 17 07:37:16 1997 PST</codeph> </entry>
         </row>
         <row>
-         <entry><codeph>German</codeph></entry>
+         <entry> <codeph>German</codeph> </entry>
          <entry>区域样式</entry>
-         <entry><codeph>17.12.1997 07:37:16.00 PST</codeph></entry>
+         <entry> <codeph>17.12.1997 07:37:16.00 PST</codeph> </entry>
         </row>
        </tbody>
       </tgroup>
@@ -541,26 +541,26 @@ January 8 04:05:06 1999 PST
       <tgroup cols="3">
        <thead>
         <row>
-         <entry><varname>datestyle</varname> 设置</entry>
+         <entry> <varname>datestyle</varname> 设置</entry>
          <entry>输入顺序</entry>
          <entry>输出举例</entry>
         </row>
        </thead>
        <tbody>
         <row>
-         <entry><codeph>SQL, DMY</codeph></entry>
-         <entry><varname>day</varname>/<varname>month</varname>/<varname>year</varname></entry>
-         <entry><codeph>17/12/1997 15:37:16.00 CET</codeph></entry>
+         <entry> <codeph>SQL, DMY</codeph> </entry>
+         <entry> <varname>day</varname> / <varname>month</varname> / <varname>year</varname> </entry>
+         <entry> <codeph>17/12/1997 15:37:16.00 CET</codeph> </entry>
         </row>
         <row>
-         <entry><codeph>SQL, MDY</codeph></entry>
-         <entry><varname>month</varname>/<varname>day</varname>/<varname>year</varname></entry>
-         <entry><codeph>12/17/1997 07:37:16.00 PST</codeph></entry>
+         <entry> <codeph>SQL, MDY</codeph> </entry>
+         <entry> <varname>month</varname> / <varname>day</varname> / <varname>year</varname> </entry>
+         <entry> <codeph>12/17/1997 07:37:16.00 PST</codeph> </entry>
         </row>
         <row>
-         <entry><codeph>Postgres, DMY</codeph></entry>
-         <entry><varname>day</varname>/<varname>month</varname>/<varname>year</varname></entry>
-         <entry><codeph>Wed 17 Dec 07:37:16 1997 PST</codeph></entry>
+         <entry> <codeph>Postgres, DMY</codeph> </entry>
+         <entry> <varname>day</varname> / <varname>month</varname> / <varname>year</varname> </entry>
+         <entry> <codeph>Wed 17 Dec 07:37:16 1997 PST</codeph> </entry>
         </row>
        </tbody>
       </tgroup>
@@ -603,10 +603,10 @@ January 8 04:05:06 1999 PST
       <li>另一个形式时时区缩写, 例如 <codeph>PST</codeph>. 对于 时区全称，能够暗示夏令时规则，而时区缩写这个规范只能表示与 UTC 直接的时区偏移. 可识别的缩写列在 <codeph>pg_timezone_abbrevs</codeph> 视图中. 你不能给时区缩写设置配置参数 <xref href="config_params/guc-list.xml#TimeZone"/> 或 <xref
         href="config_params/guc-list.xml#log_timezone"/>, 但你可以在时间/日期输入值中通过 <codeph>AT TIME ZONE</codeph>
        操作符使用缩写. </li>
-      <li>除了时区全称和时区缩写外, Greenplum 也接受 POSIX-风格的时区规范，形如 <varname>STD</varname><varname>offset</varname> 或者
-        <varname>STD</varname><varname>offset</varname><varname>DST</varname>, 这里
+      <li>除了时区全称和时区缩写外, Greenplum 也接受 POSIX-风格的时区规范，形如 <varname>STD</varname> <varname>offset</varname> 或者
+        <varname>STD</varname> <varname>offset</varname> <varname>DST</varname>, 这里
         <varname>STD</varname> 是一个时区缩写, <varname>offset</varname> 是 UTC 往西偏移的小时数值, <varname>DST</varname> 是一个可选的夏令时时区缩写, 假定为比给定偏移提前一个小时. 举个例子, 如果
-        <codeph>EST5EDT</codeph> 还没有被识别为时区名称, 它能被接受，相当于美国东岸时间(United States East Coast time). 在这种语法中, 时区缩写可以是一串字母, 或者包围在尖括号中的任意字符串(<codeph>&lt;&gt;</codeph>). 当存在夏令时时区缩写时, 假定使用与 IANA 时区数据库中相同的夏令时转换规则. 在标准 Greenplum 安装时, 与
+        <codeph>EST5EDT</codeph> 还没有被识别为时区名称, 它能被接受，相当于美国东岸时间(United States East Coast time). 在这种语法中, 时区缩写可以是一串字母, 或者包围在尖括号中的任意字符串( <codeph>&lt;&gt;</codeph> ). 当存在夏令时时区缩写时, 假定使用与 IANA 时区数据库中相同的夏令时转换规则. 在标准 Greenplum 安装时, 与
         <codeph>US/Eastern</codeph> 相同, 因此 POSIX-风格时区规范遵守 USA
        夏令时规则. 如果需要，你也可以通过替换文件来调整这个行为. </li>
      </ol> 总之, 这就是时区全称与缩写的不同: 缩写表示与 UTC 之间的偏移, 而全称还暗示了夏令时规则, 因此有两种可能的 UTC 偏移. 例如,
@@ -628,7 +628,7 @@ January 8 04:05:06 1999 PST
     <p>不论时区名称还是缩写, 都没有硬编码进服务程序; 我们是从配置文件 <ph otherprops="pivotal"> (参考 <xref
        href="../install_guide/localization.xml" scope="peer">配置本地化设置</xref>)</ph>.</p>
 
-    <p><codeph>TimeZone</codeph> 配置参数可以在文件中设定, 或者其他任何标准设置配置参数的方式. 
+    <p> <codeph>TimeZone</codeph> 配置参数可以在文件中设定, 或者其他任何标准设置配置参数的方式. 
     另外也有一个特殊方式来设置: <ol>
       <li>SQL 命令 <codeph>SET TIME ZONE</codeph> 可以设置当前会话的时区. 
       这是比 <codeph>SET TIMEZONE TO</codeph> 更符合 SQL 兼容规范的一种形式. </li>
@@ -639,7 +639,7 @@ January 8 04:05:06 1999 PST
    <section id="datatype-interval-input">
     <title>时间段输入</title>
 
-     <p><codeph>时间段</codeph> 值可以被写成下面的详细语法:
+     <p> <codeph>时间段</codeph> 值可以被写成下面的详细语法:
      <codeblock>
 <varname>@</varname> <varname>quantity</varname> <varname>unit</varname> <varname>quantity</varname> <varname>unit</varname>... <varname>direction</varname>
 </codeblock>
@@ -649,7 +649,7 @@ January 8 04:05:06 1999 PST
       <codeph>month</codeph>, <codeph>year</codeph>, <codeph>decade</codeph>,
       <codeph>century</codeph>, <codeph>millennium</codeph>, 或者这些单位的缩写或复数形式; 
       <varname>direction</varname> 可以是 <codeph>ago</codeph> 或者 为空. at 符号
-      (<codeph>@</codeph>) 是一个可选的无用符号. 不同单位的值会被隐式的加在一起(考虑符号和单位). <codeph>ago</codeph> 导致所有单位的值都变号. 如果 <xref
+      ( <codeph>@</codeph> ) 是一个可选的无用符号. 不同单位的值会被隐式的加在一起(考虑符号和单位). <codeph>ago</codeph> 导致所有单位的值都变号. 如果 <xref
       href="config_params/guc-list.xml#IntervalStyle"/> 设置为了 <codeph>postgres_verbose</codeph>, 这个语法也用于时间段输出.</p>
 
     <p>天, 小时, 分, 和秒的数量都可以不用单位指定. 例如, <codeph>'1 12:59:10'</codeph> 与这个 <codeph>'1 day 12 hours 59 min 10 sec'</codeph> 是一样的.  另外,
@@ -662,9 +662,9 @@ January 8 04:05:06 1999 PST
     或者用 4.4.3.3 节说明的 <codeph>alternative format</codeph>.
     format with designators 看起来像这个样子:
      <codeblock>
-P <varname>quantity</varname> <varname>unit</varname> <varname>quantity</varname> <varname>unit</varname> ...  T  <varname>quantity</varname> <varname>unit</varname> ...
+P <varname>quantity</varname> <varname>unit</varname> <varname>quantity</varname> <varname>unit</varname>...  T  <varname>quantity</varname> <varname>unit</varname>...
 </codeblock>
-     这个时间段字符串必须以 <codeph>P</codeph> 开头, 可以包含一个<codeph>T</codeph> 来隔开时间部分. 可以使用的缩写列在 <xref
+     这个时间段字符串必须以 <codeph>P</codeph> 开头, 可以包含一个 <codeph>T</codeph> 来隔开时间部分. 可以使用的缩写列在 <xref
       href="#topic_abq_gfk_qfb/datatype-interval-iso8601-units" format="dita"/> 中. 
       单位可以忽略, 也可以按任意顺序指定, 但是时间单位必须出现在
       <codeph>T</codeph> 后面. 
@@ -714,7 +714,7 @@ P <varname>quantity</varname> <varname>unit</varname> <varname>quantity</varname
 
      <p>另一种格式:
 <codeblock>
-P  <varname>years</varname>-<varname>months</varname>-<varname>days</varname>   T <varname>hours</varname>:<varname>minutes</varname>:<varname>seconds</varname> 
+P  <varname>years</varname> - <varname>months</varname> - <varname>days</varname>   T <varname>hours</varname> : <varname>minutes</varname> : <varname>seconds</varname> 
 </codeblock>
       字符串必须以 <codeph>P</codeph> 开头, 用字母
       <codeph>T</codeph> 隔开时间段的日期和时间部分.
@@ -769,11 +769,11 @@ P  <varname>years</varname>-<varname>months</varname>-<varname>days</varname>   
         </row>
         <row>
          <entry>P1Y2M3DT4H5M6S</entry>
-         <entry>ISO 8601 <codeph>format with designators</codeph>: 同上</entry>
+         <entry>ISO 8601 <codeph>format with designators</codeph> : 同上</entry>
         </row>
         <row>
          <entry>P0001-02-03T04:05:06</entry>
-         <entry>ISO 8601 <codeph>alternative format</codeph>: 同上</entry>
+         <entry>ISO 8601 <codeph>alternative format</codeph> : 同上</entry>
         </row>
        </tbody>
       </tgroup>
@@ -817,9 +817,9 @@ SELECT EXTRACT(days from '80 hours'::interval);
     参数设置为 <codeph>ISO</codeph> 时, <codeph>postgres</codeph> 样式输出与 PostgreSQL 8.4 发布之前的输出一致.</p>
 
     <p>当 <varname>DateStyle</varname> 参数设置为
-    非-<codeph>ISO</codeph> 时, <codeph>postgres_verbose</codeph> 样式的输出与 PostgreSQL 8.4 之前版本的输出一致.</p>
+    非- <codeph>ISO</codeph> 时, <codeph>postgres_verbose</codeph> 样式的输出与 PostgreSQL 8.4 之前版本的输出一致.</p>
 
-    <p><codeph>iso_8601</codeph> 样式与 ISO 8601 标准中 4.4.3.2 节关于<codeph>format with designators</codeph> 的描述一致.</p>
+    <p> <codeph>iso_8601</codeph> 样式与 ISO 8601 标准中 4.4.3.2 节关于 <codeph>format with designators</codeph> 的描述一致.</p>
 
      <table id="interval-style-output-table">
        <title>时间段输出样式举例</title>
@@ -834,25 +834,25 @@ SELECT EXTRACT(days from '80 hours'::interval);
         </thead>
         <tbody>
          <row>
-          <entry><codeph>sql_standard</codeph></entry>
+          <entry> <codeph>sql_standard</codeph> </entry>
           <entry>1-2</entry>
           <entry>3 4:05:06</entry>
           <entry>-1-2 +3 -4:05:06</entry>
          </row>
          <row>
-          <entry><codeph>postgres</codeph></entry>
+          <entry> <codeph>postgres</codeph> </entry>
           <entry>1 year 2 mons</entry>
           <entry>3 days 04:05:06</entry>
           <entry>-1 year -2 mons +3 days -04:05:06</entry>
          </row>
          <row>
-          <entry><codeph>postgres_verbose</codeph></entry>
+          <entry> <codeph>postgres_verbose</codeph> </entry>
           <entry>@ 1 year 2 mons</entry>
           <entry>@ 3 days 4 hours 5 mins 6 secs</entry>
           <entry>@ 1 year 2 mons -3 days 4 hours 5 mins 6 secs ago</entry>
          </row>
          <row>
-          <entry><codeph>iso_8601</codeph></entry>
+          <entry> <codeph>iso_8601</codeph> </entry>
           <entry>P1Y2M</entry>
           <entry>P3DT4H5M6S</entry>
           <entry>P-1Y-2M3DT-4H-5M-6S</entry>
