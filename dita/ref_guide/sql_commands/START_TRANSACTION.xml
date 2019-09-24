@@ -4,91 +4,80 @@
 <topic id="topic1">
     <title id="eo20941">START TRANSACTION</title>
     <body>
-        <p id="sql_command_desc">Starts a transaction block.</p>
+        <p id="sql_command_desc">启动事务块。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">START TRANSACTION [<varname>transaction_mode</varname>] [READ WRITE | READ ONLY]</codeblock>
-            <p>where <varname>transaction_mode</varname> is:</p>
+            <p>其中<varname>transaction_mode</varname>是：</p>
             <codeblock>   ISOLATION LEVEL {SERIALIZABLE | READ COMMITTED | READ UNCOMMITTED}</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>START TRANSACTION</codeph> begins a new transaction block. If the isolation
-                level or read/write mode is specified, the new transaction has those
-                characteristics, as if <codeph><xref href="SET_TRANSACTION.xml#topic1" type="topic"
-                        format="dita"/></codeph> was executed. This is the same as the
-                    <codeph>BEGIN</codeph> command.</p>
+            <title>描述</title>
+            <p><codeph>START TRANSACTION</codeph>开始一个新的事务块。
+                如果指定了隔离级别或读/写模式，则新事务具有那些特征，
+                就像执行<codeph><xref href="SET_TRANSACTION.xml#topic1" type="topic" format="dita"/></codeph>一样。
+                这与<codeph>BEGIN</codeph>命令相同。
+                </p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt>READ UNCOMMITTED</pt>
                     <pt>READ COMMITTED</pt>
                     <pt>REPEATABLE READ</pt>
                     <pt>SERIALIZABLE</pt>
-                    <pd>The SQL standard defines four transaction isolation levels: <codeph>READ
-                            UNCOMMITTED</codeph>, <codeph>READ COMMITTED</codeph>,
-                            <codeph>REPEATABLE READ</codeph>, and
-                        <codeph>SERIALIZABLE</codeph>.</pd>
-                    <pd><codeph>READ UNCOMMITTED</codeph> allows transactions to see changes made by
-                        uncomitted concurrent transactions. This is not possible in Greenplum
-                        Database, so <codeph>READ UNCOMMITTED</codeph> is treated the same as
-                            <codeph>READ COMMITTED</codeph>.</pd>
-                    <pd><codeph>READ COMMITTED</codeph>, the default isolation level in Greenplum
-                        Database, guarantees that a statement can only see rows committed before it
-                        began. The same statement executed twice in a transaction can produce
-                        different results if another concurrent transaction commits after the
-                        statement is executed the first time. </pd>
-                    <pd>The <codeph>REPEATABLE READ</codeph> isolation level guarantees that a
-                        transaction can only see rows committed before it began. <codeph>REPEATABLE
-                            READ</codeph> is the strictest transaction isolation level Greenplum
-                        Database supports. Applications that use the <codeph>REPEATABLE
-                            READ</codeph> isolation level must be prepared to retry transactions due
-                        to serialization failures.</pd>
-                    <pd>The <codeph>SERIALIZABLE</codeph> transaction isolation level guarantees
-                        that executing multiple concurrent transactions produces the same effects as
-                        running the same transactions one at a time. If you specify
-                            <codeph>SERIALIZABLE</codeph>, Greenplum Database falls back to
-                            <codeph>REPEATABLE READ</codeph>.</pd>
+                    <pd>SQL标准定义了四个事务隔离级别：
+                        <codeph>READ UNCOMMITTED</codeph>，<codeph>READ COMMITTED</codeph>，
+                        <codeph>REPEATABLE READ</codeph>和<codeph>SERIALIZABLE</codeph>。
+                        </pd>
+                    <pd><codeph>READ UNCOMMITTED</codeph>允许事务查看未提交的并发事务所做的更改。
+                        在Greenplum数据库中这是不可能的，因此<codeph>READ UNCOMMITTED</codeph>与<codeph>READ COMMITTED</codeph>相同。
+                        </pd>
+                    <pd><codeph>READ COMMITTED</codeph>是Greenplum数据库中的默认隔离级别，可确保语句只能看到在其开始之前提交的行。
+                        如果在第一次执行该语句后又提交了另一个并发事务，则在一个事务中执行两次的同一条语句可能会产生不同的结果。
+                        </pd>
+                    <pd><codeph>REPEATABLE READ</codeph>隔离级别确保事务只能看到在事务开始之前提交的行。
+                        <codeph>REPEATABLE READ</codeph>是Greenplum数据库支持的最严格的事务隔离级别。
+                        由于可串行化失败，必须准备使用<codeph>REPEATABLE READ</codeph>隔离级别的应用程序以重试事务。
+                        </pd>
+                    <pd><codeph>SERIALIZABLE</codeph>事务隔离级别确保执行多个并发事务与串行运行这些事务产生相同的效果。
+                        如果指定<codeph>SERIALIZABLE</codeph>，则Greenplum数据库将退回到<codeph>REPEATABLE READ</codeph>。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>READ WRITE</pt>
                     <pt>READ ONLY</pt>
-                    <pd>Determines whether the transaction is read/write or read-only. Read/write is
-                        the default. When a transaction is read-only, the following SQL commands are
-                        disallowed: <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>,
-                            <codeph>DELETE</codeph>, and <codeph>COPY FROM</codeph> if the table
-                        they would write to is not a temporary table; all <codeph>CREATE</codeph>,
-                            <codeph>ALTER</codeph>, and <codeph>DROP</codeph> commands;
-                            <codeph>GRANT</codeph>, <codeph>REVOKE</codeph>,
-                            <codeph>TRUNCATE</codeph>; and <codeph>EXPLAIN ANALYZE</codeph> and
-                            <codeph>EXECUTE</codeph> if the command they would execute is among
-                        those listed.</pd>
+                    <pd>确定事务是读/写还是只读。
+                        读/写是默认设置。
+                        当事务为只读时，不允许使用以下SQL命令：<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>，<codeph>DELETE</codeph>和<codeph>COPY FROM</codeph>（如果要写入的表不是临时表）；
+                        所有的<codeph>CREATE</codeph>，<codeph>ALTER</codeph>和<codeph>DROP</codeph>命令；
+                        <codeph>GRANT</codeph>，<codeph>REVOKE</codeph>，<codeph>TRUNCATE</codeph>；
+                        如果<codeph>EXPLAIN ANALYZE</codeph>和<codeph>EXECUTE</codeph>将要执行的命令在上述命令之中，也不被允许。
+                        和EXPLAIN ANALYZE和EXECUTE，如果它们将要执行的命令在列出的命令之中。
+                        </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>To begin a transaction block: </p>
+            <title>示例</title>
+            <p>启动一个事务块：</p>
             <codeblock>START TRANSACTION;</codeblock>
         </section>
         <section id="section6">
-            <title>Compatibility</title>
-            <p>In the standard, it is not necessary to issue <codeph>START TRANSACTION</codeph> to
-                start a transaction block: any SQL command implicitly begins a block. Greenplum
-                Database behavior can be seen as implicitly issuing a <codeph>COMMIT</codeph> after
-                each command that does not follow <codeph>START TRANSACTION</codeph> (or
-                    <codeph>BEGIN</codeph>), and it is therefore often called 'autocommit'. Other
-                relational database systems may offer an autocommit feature as a convenience. </p>
-            <p>The SQL standard requires commas between successive
-                    <varname>transaction_modes</varname>, but for historical reasons Greenplum
-                Database allows the commas to be omitted.</p>
-            <p>See also the compatibility section of <codeph><xref href="SET_TRANSACTION.xml#topic1"
-                        type="topic" format="dita"/></codeph>.</p>
+            <title>兼容性</title>
+            <p>在标准中，不必发出<codeph>START TRANSACTION</codeph>来启动事务块：任何SQL命令都隐式地开始一个块。
+                Greenplum数据库行为可以看作是在每个不遵循<codeph>START TRANSACTION</codeph>（或<codeph>BEGIN</codeph>）的命令之后隐式发出<codeph>COMMIT</codeph>，因此通常被称为“自动提交”。
+                其他关系数据库系统可能会提供便利的自动提交功能。
+                </p>
+            <p>SQL标准要求连续的<varname>transaction_modes</varname>之间使用逗号，但是由于历史原因，Greenplum数据库允许省略逗号。
+                </p>
+            <p>另请参阅<codeph><xref href="SET_TRANSACTION.xml#topic1"
+                                 type="topic" format="dita"/></codeph>的兼容性部分。
+                </p>
         </section>
         <section id="section7">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="BEGIN.xml#topic1" type="topic" format="dita"/></codeph>,
                         <codeph><xref href="SET_TRANSACTION.xml#topic1" type="topic" format="dita"
                     /></codeph></p>

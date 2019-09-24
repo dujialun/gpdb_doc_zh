@@ -1,241 +1,270 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title id="eq20941">UPDATE</title>
-  <body>
-    <p id="sql_command_desc">Updates rows of a table.</p>
-    <section id="section2">
-      <title>Synopsis</title>
-      <codeblock id="sql_command_synopsis">[ WITH [ RECURSIVE ] <varname>with_query</varname> [, ...] ]
-UPDATE [ONLY] <varname>table</varname> [[AS] <varname>alias</varname>]
-   SET {<varname>column</varname> = {<varname>expression</varname> | DEFAULT} |
-   (<varname>column</varname> [, ...]) = ({<varname>expression</varname> | DEFAULT} [, ...])} [, ...]
-   [FROM <varname>fromlist</varname>]
-   [WHERE <varname>condition </varname>| WHERE CURRENT OF <varname>cursor_name</varname> ]</codeblock>
-    </section>
-    <section id="section3">
-      <title>Description</title>
-      <p><codeph>UPDATE</codeph> changes the values of the specified columns in all rows that
-        satisfy the condition. Only the columns to be modified need be mentioned in the
-          <codeph>SET</codeph> clause; columns not explicitly modified retain their previous
-        values.</p>
-      <p>By default, <codeph>UPDATE</codeph> will update rows in the specified table and all its
-        subtables. If you wish to only update the specific table mentioned, you must use the
-          <codeph>ONLY</codeph> clause.</p>
-      <p>There are two ways to modify a table using information contained in other tables in the
-        database: using sub-selects, or specifying additional tables in the <codeph>FROM</codeph>
-        clause. Which technique is more appropriate depends on the specific circumstances. </p>
-      <p>If the <codeph>WHERE CURRENT OF</codeph> clause is specified, the row that is updated is
-        the one most recently fetched from the specified cursor. </p>
-      <p>The <codeph>WHERE CURRENT OF</codeph> clause is not supported with replicated tables.</p>
-      <p>You must have the <codeph>UPDATE</codeph> privilege on the table, or at least on the
-        column(s) that are listed to be updated. You must also have the <codeph>SELECT</codeph>
-        privilege on any column whose values are read in the <varname>expression</varname>s or
-          <varname>condition</varname>.</p>
-      <note>As the default, Greenplum Database acquires an <codeph>EXCLUSIVE</codeph> lock on tables
-        for <codeph>UPDATE</codeph> operations on heap tables. When the Global Deadlock Detector is
-        enabled, the lock mode for <codeph>UPDATE</codeph> operations on heap tables is <codeph>ROW
-          EXCLUSIVE</codeph>. See <xref href="../../admin_guide/dml.xml#topic_gdd" format="dita"
-        />.</note>
-      <sectiondiv id="section4">
-        <b>Outputs</b>
-        <p>On successful completion, an <codeph>UPDATE</codeph> command returns a command tag of the
-          form:</p>
-        <codeblock>UPDATE <varname>count</varname></codeblock>
-        <p>where <varname>count</varname> is the number of rows updated. If <varname>count</varname>
-          is 0, no rows matched the condition (this is not considered an error). </p>
-      </sectiondiv>
-    </section>
-    <section id="section5">
-      <title>Parameters</title>
-      <parml>
-        <plentry>
-          <pt><varname>with_query</varname></pt>
-          <pd>The <codeph>WITH</codeph> clause allows you to specify one or more subqueries that can
-            be referenced by name in the <codeph>UPDATE</codeph> query. </pd>
-          <pd>For an <codeph>UPDATE</codeph> command that includes a <codeph>WITH</codeph> clause,
-            the clause can only contain <codeph>SELECT</codeph> commands, the <codeph>WITH</codeph>
-            clause cannot contain a data-modifying command (<codeph>INSERT</codeph>,
-              <codeph>UPDATE</codeph>, or <codeph>DELETE</codeph>). </pd>
-          <pd>It is possible for the query (<codeph>SELECT</codeph> statement) to also contain a
-              <codeph>WITH</codeph> clause. In such a case both sets of
-              <varname>with_query</varname> can be referenced within the <codeph>UPDATE</codeph>
-            query, but the second one takes precedence since it is more closely nested.</pd>
-          <pd>See <xref href="../../admin_guide/query/topics/CTE-query.xml#topic_zhs_r1s_w1b"/> and
-                <codeph><xref href="SELECT.xml#topic1"/></codeph> for details. </pd>
-        </plentry>
-        <plentry>
-          <pt>ONLY</pt>
-          <pd>If specified, update rows from the named table only. When not specified, any tables
-            inheriting from the named table are also processed. </pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>table</varname>
-          </pt>
-          <pd>The name (optionally schema-qualified) of an existing table. </pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>alias</varname>
-          </pt>
-          <pd>A substitute name for the target table. When an alias is provided, it completely hides
-            the actual name of the table. For example, given <codeph>UPDATE foo AS f</codeph>, the
-            remainder of the <codeph>UPDATE</codeph> statement must refer to this table as
-              <codeph>f</codeph> not <codeph>foo</codeph>. </pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>column</varname>
-          </pt>
-          <pd>The name of a column in table. The column name can be qualified with a subfield name
-            or array subscript, if needed. Do not include the table's name in the specification of a
-            target column.</pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>expression</varname>
-          </pt>
-          <pd>An expression to assign to the column. The expression may use the old values of this
-            and other columns in the table.</pd>
-        </plentry>
-        <plentry>
-          <pt>DEFAULT</pt>
-          <pd>Set the column to its default value (which will be NULL if no specific default
-            expression has been assigned to it).</pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>fromlist</varname>
-          </pt>
-          <pd>A list of table expressions, allowing columns from other tables to appear in the
-              <codeph>WHERE</codeph> condition and the update expressions. This is similar to the
-            list of tables that can be specified in the <codeph>FROM</codeph> clause of a
-              <codeph>SELECT</codeph> statement. Note that the target table must not appear in the
-              <varname>fromlist</varname>, unless you intend a self-join (in which case it must
-            appear with an <varname>alias</varname> in the <varname>fromlist</varname>).</pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>condition</varname>
-          </pt>
-          <pd>An expression that returns a value of type boolean. Only rows for which this
-            expression returns true will be updated.</pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>cursor_name</varname>
-          </pt>
-          <pd>The name of the cursor to use in a <codeph>WHERE CURRENT OF</codeph> condition. The
-            row to be updated is the one most recently fetched from the cursor. The cursor must be a
-            non-grouping query on the <codeph>UPDATE</codeph> command target table. See
-                <codeph><xref href="DECLARE.xml#topic1" type="topic" format="dita"/></codeph> for
-            more information about creating cursors. </pd>
-          <pd><codeph>WHERE CURRENT OF</codeph> cannot be specified together with a Boolean
-            condition. </pd>
-          <pd>Note that <codeph>WHERE CURRENT OF</codeph> cannot be specified together with a
-            Boolean condition. The <codeph>UPDATE...WHERE CURRENT OF</codeph> statement can only be
-            executed on the server, for example in an interactive psql session or a script. Language
-            extensions such as PL/pgSQL do not have support for updatable cursors.</pd>
-          <pd>See <codeph><xref href="DECLARE.xml#topic1" type="topic" format="dita"/></codeph> for
-            more information about creating cursors.</pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>output_expression</varname>
-          </pt>
-          <pd>An expression to be computed and returned by the <codeph>UPDATE</codeph> command after
-            each row is updated. The expression may use any column names of the table or table(s)
-            listed in <codeph>FROM</codeph>. Write <codeph>*</codeph> to return all columns. </pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>output_name</varname>
-          </pt>
-          <pd>A name to use for a returned column.</pd>
-        </plentry>
-      </parml>
-    </section>
-    <section id="section6">
-      <title>Notes</title>
-      <p><codeph>SET</codeph> is not allowed on the Greenplum distribution key columns of a
-        table.</p>
-      <p>When a <codeph>FROM</codeph> clause is present, what essentially happens is that the target
-        table is joined to the tables mentioned in the from list, and each output row of the join
-        represents an update operation for the target table. When using <codeph>FROM</codeph> you
-        should ensure that the join produces at most one output row for each row to be modified. In
-        other words, a target row should not join to more than one row from the other table(s). If
-        it does, then only one of the join rows will be used to update the target row, but which one
-        will be used is not readily predictable.</p>
-      <p>Because of this indeterminacy, referencing other tables only within sub-selects is safer,
-        though often harder to read and slower than using a join.</p>
-      <p>Executing <codeph>UPDATE</codeph> and <codeph>DELETE</codeph> commands directly on a
-        specific partition (child table) of a partitioned table is not supported. Instead, execute
-        these commands on the root partitioned table, the table created with the <codeph>CREATE
-          TABLE</codeph> command.</p>
-    </section>
-    <section id="section7">
-      <title>Examples</title>
-      <p>Change the word <codeph>Drama</codeph> to <codeph>Dramatic</codeph> in the column
-          <codeph>kind</codeph> of the table <codeph>films</codeph>: </p>
-      <codeblock>UPDATE films SET kind = 'Dramatic' WHERE kind = 'Drama';</codeblock>
-      <p>Adjust temperature entries and reset precipitation to its default value in one row of the
-        table <codeph>weather</codeph>: </p>
-      <codeblock>UPDATE weather SET temp_lo = temp_lo+1, temp_hi = 
-temp_lo+15, prcp = DEFAULT
-WHERE city = 'San Francisco' AND date = '2016-07-03';</codeblock>
-      <p>Use the alternative column-list syntax to do the same update:</p>
-      <codeblock>UPDATE weather SET (temp_lo, temp_hi, prcp) = (temp_lo+1, 
-temp_lo+15, DEFAULT)
-WHERE city = 'San Francisco' AND date = '2016-07-03';</codeblock>
-      <p>Increment the sales count of the salesperson who manages the account for Acme Corporation,
-        using the <codeph>FROM</codeph> clause syntax (assuming both tables being joined are
-        distributed in Greenplum Database on the <codeph>id</codeph> column):</p>
-      <codeblock>UPDATE employees SET sales_count = sales_count + 1 FROM 
-accounts
-WHERE accounts.name = 'Acme Corporation'
-AND employees.id = accounts.id;</codeblock>
-      <p>Perform the same operation, using a sub-select in the <codeph>WHERE</codeph> clause:</p>
-      <codeblock>UPDATE employees SET sales_count = sales_count + 1 WHERE id =
-  (SELECT id FROM accounts WHERE name = 'Acme Corporation');</codeblock>
-      <p>Attempt to insert a new stock item along with the quantity of stock. If the item already
-        exists, instead update the stock count of the existing item. To do this without failing the
-        entire transaction, use savepoints.</p>
-      <codeblock>BEGIN;
--- other operations
-SAVEPOINT sp1;
-INSERT INTO wines VALUES('Chateau Lafite 2003', '24');
--- Assume the above fails because of a unique key violation,
--- so now we issue these commands:
-ROLLBACK TO sp1;
-UPDATE wines SET stock = stock + 24 WHERE winename = 'Chateau 
-Lafite 2003';
--- continue with other operations, and eventually
-COMMIT;</codeblock>
-    </section>
-    <section id="section8">
-      <title>Compatibility</title>
-      <p>This command conforms to the SQL standard, except that the <codeph>FROM</codeph> clause is
-        a Greenplum Database extension. </p>
-      <p>According to the standard, the column-list syntax should allow a list of columns to be
-        assigned from a single row-valued expression, such as a sub-select:</p>
-      <codeblock>UPDATE accounts SET (contact_last_name, contact_first_name) =
-    (SELECT last_name, first_name FROM salesmen
-     WHERE salesmen.id = accounts.sales_id);</codeblock>
-      <p>This is not currently implemented — the source must be a list of independent
-        expressions.</p>
-      <p>Some other database systems offer a <codeph>FROM</codeph> option in which the target table
-        is supposed to be listed again within <codeph>FROM</codeph>. That is not how Greenplum
-        Database interprets <codeph>FROM</codeph>. Be careful when porting applications that use
-        this extension.</p>
-    </section>
-    <section id="section9">
-      <title>See Also</title>
-      <p><codeph><xref href="DECLARE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="DELETE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="SELECT.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="INSERT.xml#topic1" type="topic" format="dita"/></codeph></p>
-    </section>
-  </body>
+    <title id="eq20941">UPDATE</title>
+    <body>
+        <p id="sql_command_desc">更新表的行。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">[ WITH [ RECURSIVE ] <varname>with_query</varname> [, ...] ]
+                UPDATE [ONLY] <varname>table</varname> [[AS] <varname>alias</varname>]
+                   SET {<varname>column</varname> = {<varname>expression</varname> | DEFAULT} |
+                   (<varname>column</varname> [, ...]) = ({<varname>expression</varname> | DEFAULT} [, ...])} [, ...]
+                   [FROM <varname>fromlist</varname>]
+                   [WHERE <varname>condition</varname>| WHERE CURRENT OF <varname>cursor_name</varname> ]
+            </codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>UPDATE</codeph>更改所有满足条件的行中指定列的值。
+                只需在<codeph>SET</codeph>子句中提及要修改的列；
+                未显式修改的列将保留其先前的值。
+            </p>
+            <p>默认情况下，<codeph>UPDATE</codeph>将更新指定表及其所有子表中的行。
+                如果只希望更新提到的特定表，则必须使用<codeph>ONLY</codeph>子句。
+            </p>
+            <p>有两种方法可以使用数据库中其他表中包含的信息来修改表：使用子选择，或在FROM子句中指定其他表。
+                哪种技术更合适取决于具体情况。
+            </p>
+            <p>如果指定了<codeph>WHERE CURRENT OF</codeph>子句，则更新的行是从指定游标中最新获取的行。
+            </p>
+            <p>复制表不支持<codeph>WHERE CURRENT OF</codeph>子句。
+            </p>
+            <p>您必须在表上或至少在要更新的列上具有<codeph>UPDATE</codeph>特权。
+                您还必须拥有读取<varname>expression</varname>或<varname>condition</varname>中的任何列的<codeph>SELECT</codeph>特权。
+            </p>
+            <note>默认情况下，Greenplum数据库为堆表的<codeph>UPDATE</codeph>操作获取表的<codeph>EXCLUSIVE</codeph>锁。
+                启用全局死锁检测器后，堆表上<codeph>UPDATE</codeph>操作的锁定模式为<codeph>ROW EXCLUSIVE</codeph>。
+                请参阅<xref href="../../admin_guide/dml.xml#topic_gdd" format="dita" />。
+            </note>
+            <sectiondiv id="section4">
+                <b>输出</b>
+                <p>成功完成后，<codeph>UPDATE</codeph>命令将返回以下格式的命令标记：
+                </p>
+                <codeblock>UPDATE
+                    <varname>count</varname>
+                </codeblock>
+                <p>其中<varname>count</varname>是更新的行数。
+                    如果<varname>count</varname>为0，则没有符合条件的行（这不视为错误）。
+                </p>
+            </sectiondiv>
+        </section>
+        <section id="section5">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>with_query</varname>
+                    </pt>
+                    <pd><codeph>WITH</codeph>子句允许您指定一个或多个子查询，这些子查询可以在<codeph>UPDATE</codeph>查询中按名称进行引用。
+                    </pd>
+                    <pd>对于包含<codeph>WITH</codeph>子句的<codeph>UPDATE</codeph>命令，
+                        该子句只能包含<codeph>SELECT</codeph>命令，
+                        而<codeph>WITH</codeph>子句不能包含数据修改命令（<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>或<codeph>DELETE</codeph>）。
+                    </pd>
+                    <pd>查询（<codeph>SELECT</codeph>语句）也可能包含<codeph>WITH</codeph>子句。
+                        在这种情况下，可以在<codeph>UPDATE</codeph>查询中引用两组<varname>with_query</varname>，但是第二组优先，因为它的嵌套更紧密。
+                    </pd>
+                    <pd>更多信息，请参考
+                        <xref href="../../admin_guide/query/topics/CTE-query.xml#topic_zhs_r1s_w1b"/>
+                        和
+                        <codeph><xref href="SELECT.xml#topic1"/></codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>ONLY</pt>
+                    <pd>如果指定，则仅更新指定表中的行。
+                        如果未指定，还将处理从指定表继承的任何表。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>table</varname>
+                    </pt>
+                    <pd>现有表的名称（可选，schema限定）。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>alias</varname>
+                    </pt>
+                    <pd>目标表的替代名称。
+                        提供别名后，它将完全隐藏表的实际名称。
+                        例如，在给定<codeph>UPDATE foo AS f</codeph>的情况下，
+                        <codeph>UPDATE</codeph>语句的其余部分必须将此表称为<codeph>f</codeph>而不是<codeph>foo</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>column</varname>
+                    </pt>
+                    <pd>表中列的名称。
+                        如果需要，可以使用子字段名称或数组下标来限定列名称。
+                        在目标列的规范中不要包含表的名称。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>expression</varname>
+                    </pt>
+                    <pd>分配给该列的表达式。
+                        该表达式可以使用表中此列和其他列的旧值。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>DEFAULT</pt>
+                    <pd>将列设置为其默认值（如果未分配任何特定的默认表达式，则为NULL）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>fromlist</varname>
+                    </pt>
+                    <pd>表表达式的列表，允许其他表中的列出现在<codeph>WHERE</codeph>条件和更新表达式中。
+                        这类似于可以在<codeph>SELECT</codeph>语句的<codeph>FROM</codeph>子句中指定的表的列表。
+                        请注意，除非您打算进行自连接，否则目标表不得出现在<varname>fromlist</varname>中（在这种情况下，目标表必须带有别名出现在<varname>fromlist</varname>中）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>condition</varname>
+                    </pt>
+                    <pd>该表达式返回boolean类型的值。
+                        仅此表达式返回true的行将被更新。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>cursor_name</varname>
+                    </pt>
+                    <pd>在<codeph>WHERE CURRENT OF</codeph>条件中使用的游标名称。
+                        要更新的行是从游标最近获取的行。
+                        游标必须是<codeph>UPDATE</codeph>命令目标表上的非分组查询。
+                        有关创建游标的更多信息，请参见<codeph><xref href="DECLARE.xml#topic1" type="topic" format="dita"/></codeph>。
+                    </pd>
+                    <pd>不能与布尔条件一起指定<codeph>WHERE CURRENT OF</codeph>。
+                    </pd>
+                    <pd>注意，不能将<codeph>WHERE CURRENT OF</codeph>与布尔条件一起指定。
+                        <codeph>UPDATE...WHERE CURRENT OF</codeph>语句只能在服务器上执行，例如在交互式psql会话或脚本中。
+                        语言扩展（例如PL / pgSQL）不支持可更新的游标。
+                    </pd>
+                    <pd>有关创建游标的更多信息，请参见<codeph><xref href="DECLARE.xml#topic1" type="topic" format="dita"/></codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>output_expression</varname>
+                    </pt>
+                    <pd>每行更新后，由<codeph>UPDATE</codeph>命令计算并返回表达式。
+                        该表达式可以使用<codeph>FROM</codeph>中列出的一个或多个表的任何列名。
+                        输入<codeph>*</codeph>以返回所有列。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>output_name</varname>
+                    </pt>
+                    <pd>用于返回的列的名称。</pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section6">
+            <title>注解</title>
+            <p>在表的Greenplum分布键列上不允许使用<codeph>SET</codeph>。
+            </p>
+            <p>当存在<codeph>FROM</codeph>子句时，本质上是将目标表连接到from列表中提到的表，
+                并且连接的每个输出行都代表目标表的更新操作。
+                使用<codeph>FROM</codeph>时，应确保该连接为要修改的每一行最多产生一个输出行。
+                换句话说，目标行不应与其他表中的一行连接。
+                如果是这样，那么将仅使用连接行之一来更新目标行，但是将很难预测将使用哪一行。
+            </p>
+            <p>由于存在这种不确定性，因此仅在子选择内引用其他表会更安全，尽管与使用连接相比，通常更难阅读，也更慢。
+            </p>
+            <p>不支持在分区表的特定分区（子表）上直接执行<codeph>UPDATE</codeph>和<codeph>DELETE</codeph>命令。
+                而是在根分区表（使用<codeph>CREATE TABLE</codeph>命令创建的表）上执行这些命令。
+            </p>
+        </section>
+        <section id="section7">
+            <title>示例</title>
+            <p>将表<codeph>films</codeph>中的<codeph>kind</codeph>列，从<codeph>Drama</codeph>改为<codeph>Dramatic</codeph>：
+            </p>
+            <codeblock>UPDATE films SET kind = 'Dramatic' WHERE kind = 'Drama';</codeblock>
+            <p>调整温度条目并将表<codeph>weather</codeph>的一行中的降水重置为默认值：
+            </p>
+            <codeblock>UPDATE weather SET temp_lo = temp_lo+1, temp_hi =
+                temp_lo+15, prcp = DEFAULT
+                WHERE city = 'San Francisco' AND date = '2016-07-03';
+            </codeblock>
+            <p>使用替代的列列表语法进行相同的更新：</p>
+            <codeblock>UPDATE weather SET (temp_lo, temp_hi, prcp) = (temp_lo+1,
+                temp_lo+15, DEFAULT)
+                WHERE city = 'San Francisco' AND date = '2016-07-03';
+            </codeblock>
+            <p>使用<codeph>FROM</codeph>子句语法增加管理Acme Corporation帐户的销售人员的销售数量（假设两个被连接的表在Greenplum数据库中都基于<codeph>id</codeph>列分布）：
+            </p>
+            <codeblock>UPDATE employees SET sales_count = sales_count + 1 FROM
+                accounts
+                WHERE accounts.name = 'Acme Corporation'
+                AND employees.id = accounts.id;
+            </codeblock>
+            <p>使用<codeph>WHERE</codeph>子句中的子选择来执行相同的操作：
+            </p>
+            <codeblock>UPDATE employees SET sales_count = sales_count + 1 WHERE id =
+                (SELECT id FROM accounts WHERE name = 'Acme Corporation');
+            </codeblock>
+            <p>尝试插入新的库存商品以及库存数量。
+                如果物料已经存在，请更新现有物料的库存数量。
+                要在不使整个事务失败的情况下执行此操作，请使用保存点。
+            </p>
+            <codeblock>BEGIN;
+                -- other operations
+                SAVEPOINT sp1;
+                INSERT INTO wines VALUES('Chateau Lafite 2003', '24');
+                -- Assume the above fails because of a unique key violation,
+                -- so now we issue these commands:
+                ROLLBACK TO sp1;
+                UPDATE wines SET stock = stock + 24 WHERE winename = 'Chateau
+                Lafite 2003';
+                -- continue with other operations, and eventually
+                COMMIT;
+            </codeblock>
+        </section>
+        <section id="section8">
+            <title>兼容性</title>
+            <p>该命令符合SQL标准，但<codeph>FROM</codeph>子句是Greenplum数据库扩展。
+            </p>
+            <p>根据标准，列列表语法应允许从单个行值表达式（例如子选择）分配列列表：
+            </p>
+            <codeblock>UPDATE accounts SET (contact_last_name, contact_first_name) =
+                (SELECT last_name, first_name FROM salesmen
+                WHERE salesmen.id = accounts.sales_id);
+            </codeblock>
+            <p>当前尚未实现-源必须是独立表达式的列表。
+            </p>
+            <p>其他一些数据库系统提供<codeph>FROM</codeph>选项，该目标表应该在<codeph>FROM</codeph>中再次列出。
+                那不是Greenplum数据库解释<codeph>FROM</codeph>的方式。
+                移植使用此扩展名的应用程序时请小心。
+            </p>
+        </section>
+        <section id="section9">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="DECLARE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="DELETE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="SELECT.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="INSERT.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
 </topic>
