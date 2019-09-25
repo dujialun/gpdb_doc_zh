@@ -1,5 +1,5 @@
 ---
-title: Reading Avro Data from HDFS
+title: 从HDFS中读取Avro数据
 ---
 
 <!--
@@ -22,29 +22,29 @@ under the License.
 -->
 
 
-Use the PXF HDFS Connector to read Avro-format data. This section describes how to use PXF to access Avro data in HDFS, including how to create and query an external table that references an Avro file in the HDFS data store.
+使用PXF HDFS连接器读取Avro格式数据。本节描述如何使用PXF访问HDFS中的Avro数据，包括如何创建和查询引用HDFS中Avro文件的外部表。
 
-## <a id="prereq"></a>Prerequisites
+## <a id="prereq"></a>先决条件
 
-Ensure that you have met the PXF Hadoop [Prerequisites](access_hdfs.html#hadoop_prereq) before you attempt to read data from HDFS.
+在尝试从HDFS读取或向HDFS写入数据之前，请确保已满足PXF Hadoop[先决条件](access_hdfs.html#hadoop_prereq)。
 
-## <a id="avro_work"></a>Working with Avro Data
+## <a id="avro_work"></a>使用Avro数据
 
-Apache Avro is a data serialization framework where the data is serialized in a compact binary format. Avro specifies that data types be defined in JSON. Avro format data has an independent schema, also defined in JSON. An Avro schema, together with its data, is fully self-describing.
+Apache Avro是一个数据序列化框架，其中的数据都以压缩二进制格式序列化。Avro在Json中指定数据类型。 Avro格式数据具有独立的模式, 这也在Json中定义。 Avro模式及其数据完全是自描述的。
 
-### <a id="profile_hdfsavrodatamap"></a>Data Type Mapping
+### <a id="profile_hdfsavrodatamap"></a>数据类型映射
 
-Avro supports both primitive and complex data types. 
+Avro支持原生数据类型和复杂数据类型。
 
-To represent Avro primitive data types in Greenplum Database, map data values to Greenplum Database columns of the same type. 
+要在Greenplum数据库中表示Avro原生数据类型，请将数据值映射到相同类型的Greenplum列。
 
-Avro supports complex data types including arrays, maps, records, enumerations, and fixed types. Map top-level fields of these complex data types to the Greenplum Database `TEXT` type. While Greenplum Database does not natively support these types, you can create Greenplum Database functions or application code to extract or further process subcomponents of these complex data types.
+Avro支持复杂数据类型数组(array), 映射(map), 记录(record), 枚举(enumeration)以及固定长度类型(fixed type)。 将这些复杂数据类型的顶层字段映射为Greenplum数据库的 `TEXT`类型。虽然Greenplum本身并不支持这些类型，您可以创建Greenplum数据库函数或应用程序代码来提取或进一步处理这些复杂数据类型的子部件。
 
-The following table summarizes external mapping rules for Avro data.
+下表总结了Avro数据的外部映射规则。
 
 <a id="topic_oy3_qwm_ss__table_j4s_h1n_ss"></a>
 
-| Avro Data Type                                                    | PXF/Greenplum Data Type                                                                                                                                                                                            |
+| Avro数据类型| PXF/Greenplum 数据类型|
 |-------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | boolean | boolean |
 | bytes | bytea |
@@ -53,21 +53,21 @@ The following table summarizes external mapping rules for Avro data.
 | int | int or smallint |
 | long | bigint |
 | string | text |
-| Complex type: Array, Map, Record, or Enum                         | text, with delimiters inserted between collection items, mapped key-value pairs, and record data.                                                                                           |
-| Complex type: Fixed                                               | bytea                                                                                                                                                                                               |
-| Union                                                             | Follows the above conventions for primitive or complex data types, depending on the union; supports Null values.                                                                     |
+| 复杂类型: Array, Map, Record, or Enum                         | text, 并在集合项、映射的键值对和记录数据之间插入分隔符。|
+| 复杂类型: Fixed                                               | bytea                                                                                                                                                                                               |
+| 并集                                                             | 对于原始数据类型或复杂数据类型，遵循上述约定，具体取决于并集；支持Null值。|
 
 
-### <a id="topic_tr3_dpg_ts__section_m2p_ztg_ts"></a>Avro Schemas and Data
+### <a id="topic_tr3_dpg_ts__section_m2p_ztg_ts"></a>Avro 模式和数据
 
-Avro schemas are defined using JSON, and composed of the same primitive and complex types identified in the data type mapping section above. Avro schema files typically have a `.avsc` suffix.
+Avro 模式使用json定义，由上面数据类型映射部分中的原生类型和复杂类型组成。Avro 模式文件通常具有`.avsc`后缀。
 
-Fields in an Avro schema file are defined via an array of objects, each of which is specified by a name and a type.
+Avro模式文件中的字段是通过对象数组定义的，每个对象都由名称和类型指定。
 
 
-## <a id="profile_cet"></a>Creating the External Table
+## <a id="profile_cet"></a>创建外部表
 
-Use the `hdfs:avro` profile to read Avro-format data in HDFS. The following syntax creates a Greenplum Database readable external table that references such a file:
+使用`hdfs:avro`配置文件读取HDFS中的Avro格式数据，以下语法创建了引用该配置文件的可读外部表：
 
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
@@ -76,50 +76,50 @@ LOCATION ('pxf://<path-to-hdfs-file>?PROFILE=hdfs:avro[&<custom-option>=<value>[
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
-The specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command are described in the table below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字| 值|
 |-------|-------------------------------------|
-| \<path&#8209;to&#8209;hdfs&#8209;file\>    | The absolute path to the directory or file in the HDFS data store. |
-| PROFILE    | The `PROFILE` keyword must specify `hdfs:avro`. |
-| \<custom&#8209;option\>  | \<custom-option\>s are discussed below.|
-| FORMAT 'CUSTOM' | Use `FORMAT` `'CUSTOM'` with  the `hdfs:avro` profile. The `CUSTOM` `FORMAT` requires that you specify `(FORMATTER='pxfwritable_import')`. |
+| \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径 |
+| PROFILE    | `PROFILE`关键字必须指定为`hdfs:avro`. |
+| \<custom&#8209;option\>  | \<custom-option\>描述见下方|
+| FORMAT 'CUSTOM' | 对`hdfs:avro`配置文件使用`FORMAT` `'CUSTOM'`。`CUSTOM` `FORMAT` 要求您指定为 `(FORMATTER='pxfwritable_import')`。 |
 
 <a id="customopts"></a>
-For complex types, the PXF `hdfs:avro` profile inserts default delimiters between collection items and values. You can use non-default delimiter characters by identifying values for specific `hdfs:avro` custom options in the `CREATE EXTERNAL TABLE` command. 
+对于复杂数据类型，PXF`hdfs:avro`配置文件在集合项和值之间插入默认分隔符。您可以通过指定在`CREATE EXTERNAL TABLE`命令中指定`hdfs:avro`自定义选项来使用非默认分隔符。
 
-The `hdfs:avro` profile supports the following \<custom-option\>s:
+`hdfs:avro`配置文件支持以下\<custom-option\>：
 
-| Option Keyword   | Description       
+| 选项关键字| 描述
 |---------------|--------------------|                                                                                        
-| COLLECTION_DELIM | The delimiter character(s) to place between entries in a top-level array, map, or record field when PXF maps an Avro complex data type to a text column. The default is the comma `,` character. |
-| MAPKEY_DELIM | The delimiter character(s) to place between the key and value of a map entry when PXF maps an Avro complex data type to a text column. The default is the colon `:` character. |
-| RECORDKEY_DELIM | The delimiter character(s) to place between the field name and value of a record entry when PXF maps an Avro complex data type to a text column. The default is the colon `:` character. |
+| COLLECTION_DELIM | 当PXF将Avro复杂数据类型映射到文本列时，放置在顶层数组、映射或记录字段中的条目之间的分隔符。默认为逗号`,`字符。 |
+| MAPKEY_DELIM | 当PXF将Avro复杂数据类型映射到文本列时，放置在映射项的键和值之间的分隔符。默认为冒号`:`字符。|
+| RECORDKEY_DELIM | 当PXF将Avro复杂数据类型映射到文本列时，放置在字段名称和记录条目之间的分隔符。 默认为冒号`:`字符。|
 
 
-## <a id="avro_example"></a>Example: Reading Avro Data
+## <a id="avro_example"></a>示例：读取Avro数据
 
-The examples in this section will operate on Avro data with the following field name and data type record schema:
+本节中的示例将对具有以下字段名称和数据类型模式的Avro数据进行操作:
 
-- id - long
-- username - string
-- followers - array of string
-- fmap - map of long
-- relationship - enumerated type
-- address - record comprised of street number (int), street name (string), and city (string)
+- id - 长整型
+- username - 字符串
+- followers - 字符串数组
+- fmap - 长整型映射
+- relationship - 枚举类型
+- address - 由街道号码(整型)、街道名称(字符串)、以及城市(字符串)组成的记录类型
 
 
-### <a id="topic_tr3_dpg_ts__section_m2p_ztg_ts_99"></a>Create Schema
+### <a id="topic_tr3_dpg_ts__section_m2p_ztg_ts_99"></a>创建模式
 
-Perform the following operations to create an Avro schema to represent the example schema described above.
+执行以下操作创建一个Avro模式，以表示上述模式。
 
-1. Create a file named `avro_schema.avsc`:
+1. 创建一个名为`avro_schema.avsc`的文件:
 
     ``` shell
     $ vi /tmp/avro_schema.avsc
     ```
 
-2. Copy and paste the following text into `avro_schema.avsc`:
+2. 将以下文本复制并粘贴到`avro_schema.avsc`中：
 
     ``` json
     {
@@ -163,17 +163,17 @@ Perform the following operations to create an Avro schema to represent the examp
     }
     ```
 
-### <a id="topic_tr3_dpgspk_15g_tsdata"></a>Create Avro Data File (JSON)
+### <a id="topic_tr3_dpgspk_15g_tsdata"></a>创建Avro数据文件(JSON)
 
-Perform the following steps to create a sample Avro data file conforming to the above schema.
+执行以下步骤来创建符合上述模式的示例Avro文件。
 
-1.  Create a text file named `pxf_avro.txt`:
+1.  创建一个名为`pxf_avro.txt`的文本文件:
 
     ``` shell
     $ vi /tmp/pxf_avro.txt
     ```
 
-2. Enter the following data into `pxf_avro.txt`:
+2. 在`pxf_avro.txt`中输入以下数据：
 
     ``` pre
     {"id":1, "username":"john","followers":["kate", "santosh"], "relationship": "FRIEND", "fmap": {"kate":10,"santosh":4}, "address":{"number":1, "street":"renaissance drive", "city":"san jose"}}
@@ -181,32 +181,33 @@ Perform the following steps to create a sample Avro data file conforming to the 
     {"id":2, "username":"jim","followers":["john", "pam"], "relationship": "COLLEAGUE", "fmap": {"john":3,"pam":3}, "address":{"number":9, "street":"deer creek", "city":"palo alto"}}
     ```
 
-    The sample data uses a comma `,` to separate top level records and a colon `:` to separate map/key values and record field name/values.
+    示例数据使用逗号`,`分隔顶层字段，并使用冒号`:` 分隔键-值对以及记录字段和值.
 
-3. Convert the text file to Avro format. There are various ways to perform the conversion, both programmatically and via the command line. In this example, we use the [Java Avro tools](http://avro.apache.org/releases.html); the jar `avro-tools-1.8.1.jar` file resides in the current directory:
+3. 将文本文件转换为Avro格式文件。有多种方法可以通过编程方式和通过命令行转换。在这个例子中，我们使用[Java Avro tools](http://avro.apache.org/releases.html)。`avro-tools-1.8.1.jar` jar文件放置在当前目录中：
 
     ``` shell
     $ java -jar ./avro-tools-1.8.1.jar fromjson --schema-file /tmp/avro_schema.avsc /tmp/pxf_avro.txt > /tmp/pxf_avro.avro
     ```
 
-    The generated Avro binary data file is written to `/tmp/pxf_avro.avro`. 
+    生成的Avro二进制文件被写入`/tmp/pxf_avro.avro`。
     
-4. Copy the generated Avro file to HDFS:
+4. 将生成的Avro文件复制到HDFS：
 
     ``` shell
     $ hdfs dfs -put /tmp/pxf_avro.avro /data/pxf_examples/
     ```
     
-### <a id="topic_avro_querydata"></a>Query With hdfs:avro Profile
+### <a id="topic_avro_querydata"></a>使用hdfs:avro配置文件查询
 
-Perform the following operations to create and query an external table that references the `pxf_avro.avro` file that you added to HDFS in the previous section. When creating the table:
+执行以下来创建和查询引用您在上一节添加到HDFS的`pxf_avro.avro`文件。创建表时：
 
--  Map the top-level primitive fields, `id` (type long) and `username` (type string), to their equivalent Greenplum Database types (bigint and text). 
--  Map the remaining complex fields to type text.
--  Explicitly set the record, map, and collection delimiters using the `hdfs:avro` profile custom options.
+-  使用PXF默认服务
+-  将顶层原生字段`id` (长整型)和`username`(字符串类型)映射到其等效的Greenplum的数据库类型(bigint和text)。
+-  将剩下的复杂类型映射为text类型
+-  使用`hdfs:avro`配置文件的自定义选项设置记录(record)、映射(map)和集合(collection)的分隔符
 
 
-1. Use the `hdfs:avro` profile to create a queryable external table from the `pxf_avro.avro` file:
+1. 使用`hdfs:avro`配置文件从`pxf_avro.avro`文件创建可查询外部表：
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE pxf_hdfs_avro(id bigint, username text, followers text, fmap text, relationship text, address text)
@@ -214,7 +215,7 @@ Perform the following operations to create and query an external table that refe
               FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
 
-2. Perform a simple query of the `pxf_hdfs_avro` table:
+2. 对`pxf_hdfs_avro`表执行简单查询：
 
     ``` sql
     postgres=# SELECT * FROM pxf_hdfs_avro;
@@ -228,10 +229,10 @@ Perform the following operations to create and query an external table that refe
     (2 rows)
     ```
 
-    The simple query of the external table shows the components of the complex type data separated with the delimiters specified in the `CREATE EXTERNAL TABLE` call.
+    外部表的简单查询显示了复杂数据类型的组成部分，这些组成部分由`CREATE EXTERNAL TABLE`中指定的分隔符分隔。
 
 
-3. Process the delimited components in the text columns as necessary for your application. For example, the following command uses the Greenplum Database internal `string_to_array` function to convert entries in the `followers` field to a text array column in a new view.
+3. 根据您的应用程序处理文本列中被分隔的部分。例如，一下命令使用Greenplum数据库内部的`string_to_array`函数将`followers`字段中的条目转换为新视图中的文本数组列。
 
     ``` sql
     postgres=# CREATE VIEW followers_view AS 
@@ -240,7 +241,7 @@ Perform the following operations to create and query an external table that refe
       FROM pxf_hdfs_avro;
     ```
 
-4. Query the view to filter rows based on whether a particular follower appears in the view:
+4. 根据特定的关注者是否出现在视图中来执行查询并过滤行：
 
     ``` sql
     postgres=# SELECT username, address FROM followers_view WHERE followers @> '{john}';
