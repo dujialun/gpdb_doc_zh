@@ -28,11 +28,11 @@
     - 使用外部数据 （完成：杜佳伦）
     - Loading and Unloading Data （完成：武宁）
     - Managing Performance （完成：钱晨）
-- Security Configuration Guide （待认领）
-- Best Practices Guide （翻译中：苑泽福，进度：7/15）
+- Security Configuration Guide （翻译中：武宁）
+- Best Practices Guide （翻译中：苑泽福，进度：14/15）
     - Demo: [http://47.92.231.67:8080/6-0/best_practices/](http://47.92.231.67:8080/6-0/best_practices/)
 - Utility Guide （待认领）
-- Reference Guide 进行中（参与者：肖磊、杜佳伦、亓晓帅）
+- Reference Guide 进行中（参与者：肖磊、杜佳伦、亓晓帅，何江）
     - Demo: [http://47.92.231.67:8080/6-0/ref_guide/](http://47.92.231.67:8080/6-0/ref_guide/)
     - SQL Command Reference（翻译中：肖磊，进度：7/157）
     - System Catalog Reference（完成：杜佳伦）
