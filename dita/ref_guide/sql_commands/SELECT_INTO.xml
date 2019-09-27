@@ -52,7 +52,7 @@ SELECT [ALL | DISTINCT [ON ( <varname>expression</varname> [, ...] )]]
                 </plentry>
                 <plentry>
                     <pt><varname>new_table</varname></pt>
-                    <pd>要创建的表的名称（可选的模式限定）。</pd>
+                    <pd>要创建的表的名称（可以用schema修饰）。</pd>
                 </plentry>
             </parml>
         </section>

@@ -32,7 +32,7 @@
                     <pt>
                         <varname>name</varname>
                     </pt>
-                    <pd>要清空的表的名称（可选，限定schema）。
+                    <pd>要清空的表的名称（可以用schema修饰）。
                         如果在表名之前指定了<codeph>ONLY</codeph>，则仅该表被清空。
                         如果未指定<codeph>ONLY</codeph>，则该表及其所有子表（如果有）将被清空。
                         （可选）可以在表名称后指定<codeph>*</codeph>，以显式指示包括子表。

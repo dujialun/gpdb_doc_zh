@@ -82,7 +82,7 @@
                     <pt>
                         <varname>table</varname>
                     </pt>
-                    <pd>现有表的名称（可选，schema限定）。</pd>
+                    <pd>现有表的名称（可以用schema修饰）。</pd>
                 </plentry>
                 <plentry>
                     <pt>
