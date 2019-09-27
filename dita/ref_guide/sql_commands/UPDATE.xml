@@ -42,9 +42,7 @@
                 <b>输出</b>
                 <p>成功完成后，<codeph>UPDATE</codeph>命令将返回以下格式的命令标记：
                 </p>
-                <codeblock>UPDATE
-                    <varname>count</varname>
-                </codeblock>
+                <codeblock>UPDATE <varname>count</varname></codeblock>
                 <p>其中<varname>count</varname>是更新的行数。
                     如果<varname>count</varname>为0，则没有符合条件的行（这不视为错误）。
                 </p>
@@ -217,17 +215,16 @@
                 要在不使整个事务失败的情况下执行此操作，请使用保存点。
             </p>
             <codeblock>BEGIN;
-                -- other operations
-                SAVEPOINT sp1;
-                INSERT INTO wines VALUES('Chateau Lafite 2003', '24');
-                -- Assume the above fails because of a unique key violation,
-                -- so now we issue these commands:
-                ROLLBACK TO sp1;
-                UPDATE wines SET stock = stock + 24 WHERE winename = 'Chateau
-                Lafite 2003';
-                -- continue with other operations, and eventually
-                COMMIT;
-            </codeblock>
+-- other operations
+SAVEPOINT sp1;
+INSERT INTO wines VALUES('Chateau Lafite 2003', '24');
+-- Assume the above fails because of a unique key violation,
+-- so now we issue these commands:
+ROLLBACK TO sp1;
+UPDATE wines SET stock = stock + 24 WHERE winename = 'Chateau
+Lafite 2003';
+-- continue with other operations, and eventually
+COMMIT;</codeblock>
         </section>
         <section id="section8">
             <title>兼容性</title>

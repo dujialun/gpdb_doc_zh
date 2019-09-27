@@ -7,13 +7,11 @@
         <p id="sql_command_desc">设置当前会话的当前角色标识符。</p>
         <section id="section2">
             <title>概要</title>
-            <codeblock id="sql_command_synopsis">SET [SESSION | LOCAL] ROLE
-                <varname>rolename</varname>
+            <codeblock id="sql_command_synopsis">SET [SESSION | LOCAL] ROLE <varname>rolename</varname>
 
-                SET [SESSION | LOCAL] ROLE NONE
+SET [SESSION | LOCAL] ROLE NONE
 
-                RESET ROLE
-            </codeblock>
+RESET ROLE</codeblock>
         </section>
         <section id="section3">
             <title>描述</title>
@@ -78,17 +76,16 @@
         <section id="section6">
             <title>示例</title>
             <codeblock>SELECT SESSION_USER, CURRENT_USER;
-                session_user | current_user
-                --------------+--------------
-                peter | peter
+session_user | current_user
+--------------+--------------
+peter | peter
 
-                SET ROLE 'paul';
+SET ROLE 'paul';
 
-                SELECT SESSION_USER, CURRENT_USER;
-                session_user | current_user
-                --------------+--------------
-                peter | paul
-            </codeblock>
+SELECT SESSION_USER, CURRENT_USER;
+session_user | current_user
+--------------+--------------
+peter | paul</codeblock>
         </section>
         <section id="section7">
             <title>兼容性</title>

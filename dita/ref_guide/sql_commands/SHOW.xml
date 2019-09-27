@@ -7,11 +7,9 @@
         <p id="sql_command_desc">显示系统配置参数的值。</p>
         <section id="section2">
             <title>概要</title>
-            <codeblock id="sql_command_synopsis">SHOW
-                <varname>configuration_parameter</varname>
+            <codeblock id="sql_command_synopsis">SHOW <varname>configuration_parameter</varname>
 
-                SHOW ALL
-            </codeblock>
+SHOW ALL</codeblock>
         </section>
         <section id="section3">
             <title>描述</title>
@@ -41,31 +39,28 @@
             <p>显示参数<codeph>DateStyle</codeph>的当前设置：
             </p>
             <codeblock>SHOW DateStyle;
-                DateStyle
-                -----------
-                ISO, MDY
-                (1 row)
-            </codeblock>
+DateStyle
+-----------
+ISO, MDY
+(1 row)</codeblock>
             <p>显示参数<varname>geqo</varname>的当前设置：
             </p>
             <codeblock>SHOW geqo;
-                geqo
-                ------
-                off
-                (1 row)
-            </codeblock>
+geqo
+------
+off
+(1 row)</codeblock>
             <p>显示所有参数的当前设置：</p>
             <codeblock>SHOW ALL;
-                name | setting | description
-                ------------------+---------+----------------------------------------------------
-                application_name | psql | Sets the application name to be reported in sta...
-                .
-                .
-                .
-                xmlbinary | base64 | Sets how binary values are to be encoded in XML.
-                xmloption | content | Sets whether XML data in implicit parsing and s...
-                (331 rows)
-            </codeblock>
+       name       | setting | description
+------------------+---------+----------------------------------------------------
+ application_name | psql | Sets the application name to be reported in sta...
+      .
+      .
+      .
+  xmlbinary       | base64 | Sets how binary values are to be encoded in XML.
+  xmloption       | content | Sets whether XML data in implicit parsing and s...
+(331 rows)</codeblock>
         </section>
         <section id="section6">
             <title>兼容性</title>

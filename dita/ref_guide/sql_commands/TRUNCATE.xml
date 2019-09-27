@@ -8,7 +8,7 @@
         <section id="section2">
             <title>概要</title>
             <codeblock id="sql_command_synopsis">TRUNCATE [TABLE] [ONLY] <varname>name</varname> [ * ] [, ...]
-                [ RESTART IDENTITY | CONTINUE IDENTITY ] [CASCADE | RESTRICT]
+     [ RESTART IDENTITY | CONTINUE IDENTITY ] [CASCADE | RESTRICT]
             </codeblock>
         </section>
         <section id="section3">

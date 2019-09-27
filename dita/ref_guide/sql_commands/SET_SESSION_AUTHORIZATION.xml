@@ -8,13 +8,11 @@
         </p>
         <section id="section2">
             <title>概要</title>
-            <codeblock id="sql_command_synopsis">SET [SESSION | LOCAL] SESSION AUTHORIZATION
-                <varname>rolename</varname>
+            <codeblock id="sql_command_synopsis">SET [SESSION | LOCAL] SESSION AUTHORIZATION <varname>rolename</varname>
 
-                SET [SESSION | LOCAL] SESSION AUTHORIZATION DEFAULT
+SET [SESSION | LOCAL] SESSION AUTHORIZATION DEFAULT
 
-                RESET SESSION AUTHORIZATION
-            </codeblock>
+RESET SESSION AUTHORIZATION</codeblock>
         </section>
         <section id="section3">
             <title>描述</title>
@@ -66,17 +64,16 @@
         <section id="section5">
             <title>示例</title>
             <codeblock>SELECT SESSION_USER, CURRENT_USER;
-                session_user | current_user
-                --------------+--------------
-                peter | peter
+session_user | current_user
+--------------+--------------
+peter | peter
 
-                SET SESSION AUTHORIZATION 'paul';
+SET SESSION AUTHORIZATION 'paul';
 
-                SELECT SESSION_USER, CURRENT_USER;
-                session_user | current_user
-                --------------+--------------
-                paul | paul
-            </codeblock>
+SELECT SESSION_USER, CURRENT_USER;
+session_user | current_user
+--------------+--------------
+paul | paul</codeblock>
         </section>
         <section id="section6">
             <title>兼容性</title>

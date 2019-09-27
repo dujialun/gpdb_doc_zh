@@ -9,7 +9,7 @@
             <title>概要</title>
             <codeblock id="sql_command_synopsis">START TRANSACTION [<varname>transaction_mode</varname>] [READ WRITE | READ ONLY]</codeblock>
             <p>其中<varname>transaction_mode</varname>是：</p>
-            <codeblock>   ISOLATION LEVEL {SERIALIZABLE | READ COMMITTED | READ UNCOMMITTED}</codeblock>
+            <codeblock>ISOLATION LEVEL {SERIALIZABLE | READ COMMITTED | READ UNCOMMITTED}</codeblock>
         </section>
         <section id="section3">
             <title>描述</title>

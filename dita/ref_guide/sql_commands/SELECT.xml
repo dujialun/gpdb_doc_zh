@@ -7,88 +7,62 @@
         <p id="sql_command_desc">从表或视图中检索行。</p>
         <section id="section2">
             <title>概要</title>
-            <codeblock id="sql_command_synopsis">[ WITH [ RECURSIVE<sup>1</sup> ] <varname>with_query</varname> [, ...]
-                ]
-                SELECT [ALL | DISTINCT [ON (<varname>expression</varname> [, ...])]]
-                  * | <varname>expression</varname>[[AS] <varname>output_name</varname>] [, ...]
-                  [FROM <varname>from_item</varname> [, ...]]
-                  [WHERE <varname>condition</varname>]
-                  [GROUP BY <varname>grouping_element</varname> [, ...]]
-                  [HAVING <varname>condition</varname> [, ...]]
-                  [WINDOW <varname>window_name</varname> AS (<varname>window_definition</varname>) [, ...] ]
-                  [{UNION | INTERSECT | EXCEPT} [ALL | DISTINCT] <varname>select</varname>]
-                  [ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] [NULLS {FIRST
-                | LAST}] [, ...]]
-                  [LIMIT {<varname>count</varname> | ALL}]
-                  [OFFSET <varname>start</varname> [ ROW | ROWS ] ]
-                [FETCH { FIRST | NEXT } [ <varname>count</varname> ] { ROW | ROWS } ONLY]
-                  [FOR {UPDATE | NO KEY UPDATE | SHARE | KEY SHARE} [OF <varname>table_name</varname> [, ...]] [NOWAIT]
-                [...]]
+            <codeblock id="sql_command_synopsis">[ WITH [ RECURSIVE<sup>1</sup> ] <varname>with_query</varname> [, ...] ]
+SELECT [ALL | DISTINCT [ON (<varname>expression</varname> [, ...])]]
+      * | <varname>expression</varname>[[AS] <varname>output_name</varname>] [, ...]
+      [FROM <varname>from_item</varname> [, ...]]
+      [WHERE <varname>condition</varname>]
+      [GROUP BY <varname>grouping_element</varname> [, ...]]
+      [HAVING <varname>condition</varname> [, ...]]
+      [WINDOW <varname>window_name</varname> AS (<varname>window_definition</varname>) [, ...] ]
+      [{UNION | INTERSECT | EXCEPT} [ALL | DISTINCT] <varname>select</varname>]
+      [ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] [NULLS {FIRST | LAST}] [, ...]]
+      [LIMIT {<varname>count</varname> | ALL}]
+      [OFFSET <varname>start</varname> [ ROW | ROWS ] ]
+      [FETCH { FIRST | NEXT } [ <varname>count</varname> ] { ROW | ROWS } ONLY]
+      [FOR {UPDATE | NO KEY UPDATE | SHARE | KEY SHARE} [OF <varname>table_name</varname> [, ...]] [NOWAIT] [...]]
 
-                TABLE { [ ONLY ] <varname>table_name</varname> [ * ] | <varname>with_query_name</varname> }
+TABLE { [ ONLY ] <varname>table_name</varname> [ * ] | <varname>with_query_name</varname> }
             </codeblock>
             <p>其中<varname>with_query:</varname>是：
             </p>
-            <codeblock>  <varname>with_query_name</varname> [( <varname>column_name</varname> [, ...] )] AS ( <varname>
-                select
-            </varname> | <varname>values</varname> | <varname>insert</varname> | <varname>update</varname> | <varname>
-                delete
-            </varname> )
-            </codeblock>
+            <codeblock>  <varname>with_query_name</varname> [( <varname>column_name</varname> [, ...] )] AS ( <varname>select</varname> | <varname>values</varname> | <varname>insert</varname> | <varname>update</varname> | <varname>delete</varname> )</codeblock>
             <p>其中<varname>from_item</varname>可以是以下之一：
             </p>
-            <codeblock>[ONLY] <varname>table_name</varname> [ * ] [ [ AS ] <varname>alias</varname> [ ( <varname>
-                column_alias
-            </varname> [, ...] ) ] ]
-                ( <varname>select</varname> ) [ AS ] <varname>alias</varname> [( <varname>column_alias</varname> [, ...]
-                ) ]<varname>
-                    with_query_name
-                </varname> [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
-                <varname>function_name</varname>
-                ( [ <varname>argument</varname> [, ...] ] )
+            <codeblock>[ONLY] <varname>table_name</varname> [ * ] [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
+( <varname>select</varname> ) [ AS ] <varname>alias</varname> [( <varname>column_alias</varname> [, ...] ) ]
+<varname>with_query_name</varname> [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
+<varname>function_name</varname> ( [ <varname>argument</varname> [, ...] ] )
                 [ WITH ORDINALITY ] [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
-                <varname>function_name</varname>
-                ( [ <varname>argument</varname> [, ...] ] ) [ AS ] <varname>alias</varname> ( <varname>
-                    column_definition
-                </varname> [, ...] )
-                <varname>function_name</varname>
-                ( [ <varname>argument</varname> [, ...] ] ) AS ( <varname>column_definition</varname> [, ...] )
-                ROWS FROM( function_name ( [ argument [, ...] ] ) [ AS ( column_definition [, ...] ) ] [, ...] )
+<varname>function_name</varname> ( [ <varname>argument</varname> [, ...] ] ) [ AS ] <varname>alias</varname> ( <varname>column_definition</varname> [, ...] )
+<varname>function_name</varname> ( [ <varname>argument</varname> [, ...] ] ) AS ( <varname>column_definition</varname> [, ...] )
+ROWS FROM( function_name ( [ argument [, ...] ] ) [ AS ( column_definition [, ...] ) ] [, ...] )
                 [ WITH ORDINALITY ] [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
-                <varname>from_item</varname>
-                [ NATURAL ] <varname>join_type</varname>
-                <varname>from_item</varname>
-                          [ ON <varname>join_condition</varname> | USING ( <varname>join_column</varname> [, ...] ) ]
-            </codeblock>
+<varname>from_item</varname> [ NATURAL ] <varname>join_type</varname> <varname>from_item</varname>
+                [ ON <varname>join_condition</varname> | USING ( <varname>join_column</varname> [, ...] ) ]</codeblock>
             <p>其中<varname>grouping_element</varname>可以是以下之一：
             </p>
-            <codeblock>  ()
-                  
-                <varname>expression</varname>
-                  ROLLUP (<varname>expression</varname> [,...])
-                  CUBE (<varname>expression</varname> [,...])
-                  GROUPING SETS ((<varname>grouping_element</varname> [, ...]))
-            </codeblock>
+            <codeblock>()
+<varname>expression</varname>
+ROLLUP (<varname>expression</varname> [,...])
+CUBE (<varname>expression</varname> [,...])
+GROUPING SETS ((<varname>grouping_element</varname> [, ...]))</codeblock>
             <p>其中<varname>window_definition</varname>是：
             </p>
             <codeblock>  [<varname>existing_window_name</varname>]
-                  [PARTITION BY <varname>expression</varname> [, ...]]
-                  [ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>]
-                [NULLS {FIRST | LAST}] [, ...]]
-                [{ RANGE | ROWS}
-                <varname>frame_start</varname>
-                | {RANGE | ROWS} BETWEEN <varname>frame_start</varname> AND
-                <varname>frame_end</varname>
-            </codeblock>
+  [PARTITION BY <varname>expression</varname> [, ...]]
+  [ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>]
+  [NULLS {FIRST | LAST}] [, ...]]
+  [{ RANGE | ROWS} <varname>frame_start</varname>
+      | {RANGE | ROWS} BETWEEN <varname>frame_start</varname> AND <varname>frame_end</varname></codeblock>
             <p>其中<varname>frame_start</varname>和<varname>frame_end</varname>可以是以下之一：
                 <codeblock>UNBOUNDED PRECEDING
-                    <varname>value</varname>
-                    PRECEDING
-                    CURRENT ROW
-                    <varname>value</varname>
-                    FOLLOWING
-                    UNBOUNDED FOLLOWING
-                </codeblock>
+<varname>value</varname>
+PRECEDING
+CURRENT ROW
+<varname>value</varname>
+FOLLOWING
+UNBOUNDED FOLLOWING</codeblock>
             </p>
             <p>
                 <b>注解：</b>
@@ -169,11 +143,7 @@
                 <p>如果指定了<codeph>RECURSIVE</codeph>，则它允许<codeph>SELECT</codeph>子查询按名称引用自己。
                     这样的子查询具有一般形式
                 </p>
-                <codeblock>
-                    <varname>non_recursive_term</varname>
-                    UNION [ALL | DISTINCT]
-                    <varname>recursive_term</varname>
-                </codeblock>
+                <codeblock><varname>non_recursive_term</varname> UNION [ALL | DISTINCT] <varname>recursive_term</varname></codeblock>
                 <p>递归自引用出现在<codeph>UNION</codeph>的右侧。
                     每个查询仅允许一个递归自引用。
                     不支持递归数据修改语句，但是您可以在数据修改语句中使用递归<codeph>SELECT</codeph>查询的结果。
@@ -207,22 +177,20 @@
                 <p>以下是集合操作限制的示例。
                     该查询返回错误，因为集合操作<codeph>UNION</codeph>包含对表<codeph>foo</codeph>的引用。
                     <codeblock>WITH RECURSIVE foo(i) AS (
-                        SELECT 1
-                        UNION ALL
-                        SELECT i+1 FROM (SELECT * FROM foo UNION SELECT 0) bar
-                        )
-                        SELECT * FROM foo LIMIT 5;
-                    </codeblock>
+    SELECT 1
+    UNION ALL
+    SELECT i+1 FROM (SELECT * FROM foo UNION SELECT 0) bar
+)
+SELECT * FROM foo LIMIT 5;</codeblock>
                 </p>
                 <p>由于集合操作<codeph>UNION</codeph>没有对CTE <codeph>foo</codeph>的引用，因此允许此递归CTE。
                     <codeblock>WITH RECURSIVE foo(i) AS (
-                        SELECT 1
-                        UNION ALL
-                        SELECT i+1 FROM (SELECT * FROM bar UNION SELECT 0) bar, foo
-                        WHERE foo.i = bar.a
-                        )
-                        SELECT * FROM foo LIMIT 5;
-                    </codeblock>
+    SELECT 1
+    UNION ALL
+    SELECT i+1 FROM (SELECT * FROM bar UNION SELECT 0) bar, foo
+    WHERE foo.i = bar.a
+)
+SELECT * FROM foo LIMIT 5;</codeblock>
                 </p>
                 <p><codeph>WITH</codeph>查询的一个关键属性是，即使主查询多次引用它们，一次执行主查询也只会对它们进行一次评估。
                     特别是，无论主查询是读取全部输出还是输出任何内容，都保证数据修改语句仅执行一次。
@@ -275,11 +243,9 @@
                     使用与<codeph>ORDER BY</codeph>相同的规则来解释<codeph>DISTINCT ON</codeph>表达式（请参见上文）。
                     请注意，除非使用<codeph>ORDER BY</codeph>来确保所需的行最先出现，否则每个集合的“第一行”都是不可预测的。
                     例如：
-                    <codeblock>
-                        SELECT DISTINCT ON (location) location, time, report
-                        FROM weather_reports
-                        ORDER BY location, time DESC;
-                    </codeblock>
+                    <codeblock>SELECT DISTINCT ON (location) location, time, report
+    FROM weather_reports
+    ORDER BY location, time DESC;</codeblock>
                     检索每个位置的最新天气报告。
                     但是，如果我们没有使用<codeph>ORDER BY</codeph>强制每个位置的时间值按降序排列，那么我们将从每个位置不可预测的时间获得报告。
                 </p>
@@ -434,9 +400,7 @@
                 <b>WHERE子句</b>
                 <p>可选的<codeph>WHERE</codeph>子句具有一般形式：
                 </p>
-                <codeblock>WHERE
-                    <varname>condition</varname>
-                </codeblock>
+                <codeblock>WHERE <varname>condition</varname></codeblock>
                 <p><varname>condition</varname>是任何计算结果为<codeph>boolean</codeph>型结果的表达式。
                     任何不满足此条件的行将从输出中删除。
                     如果用一行的实际值替换其中的变量引用后，该表达式返回真，则该行符合条件。
@@ -446,16 +410,14 @@
                 <b>GROUP BY子句</b>
                 <p>可选的<codeph>GROUP BY</codeph>子句具有一般形式：
                 </p>
-                <codeblock>GROUP BY <varname>grouping_element</varname>[, ...]
-                </codeblock>
+                <codeblock>GROUP BY <varname>grouping_element</varname>[, ...]</codeblock>
                 <p>其中<varname>grouping_element</varname>可以是以下之一：
                 </p>
                 <codeblock>()
-                    <varname>expression</varname>
-                    ROLLUP (<varname>expression</varname> [,...])
-                    CUBE (<varname>expression</varname> [,...])
-                    GROUPING SETS ((<varname>grouping_element</varname> [, ...]))
-                </codeblock>
+<varname>expression</varname>
+ROLLUP (<varname>expression</varname> [,...])
+CUBE (<varname>expression</varname> [,...])
+GROUPING SETS ((<varname>grouping_element</varname> [, ...]))</codeblock>
                 <p><codeph>GROUP BY</codeph>将所有共享有相同值的分组表达式的所有选定行压缩为单行。
                     <varname>expression</varname>可以是输入列名称，也可以是输出列（<codeph>SELECT</codeph>列表项）的名称或序号，或者是由输入列值组成的任意表达式。
                     如有歧义，<codeph>GROUP BY</codeph>名称将被解释为输入列名称，而不是输出列名称。
@@ -507,8 +469,7 @@
                         <pd>等效于：</pd>
                         <pd>
                             <codeblock>GROUP BY GROUPING SETS( (a,b,c), (a,b), (a,c), (b,c), (a),
-                                (b), (c), () )
-                            </codeblock>
+(b), (c), () )</codeblock>
                         </pd>
                         <pd>注意，<codeph>CUBE</codeph>的<varname>n</varname>个元素转换为2n个分组集。
                             考虑在需要交叉表报告的任何情况下使用<codeph>CUBE</codeph>。
@@ -562,22 +523,18 @@
                 </p>
                 <p>例如：</p>
                 <codeblock>SELECT vendor, rank() OVER (mywindow) FROM sale
-                    GROUP BY vendor
-                    WINDOW mywindow AS (ORDER BY sum(prc*qty));
-                </codeblock>
+GROUP BY vendor
+WINDOW mywindow AS (ORDER BY sum(prc*qty));</codeblock>
                 <p><codeph>WINDOW</codeph>子句具有以下一般形式：
                 </p>
-                <codeblock>WINDOW <varname>window_name</varname> AS (<varname>window_definition</varname>)
-                </codeblock>
+                <codeblock>WINDOW <varname>window_name</varname> AS (<varname>window_definition</varname>)</codeblock>
                 <p>其中<varname>window_name</varname>是可以从<codeph>OVER</codeph>子句或后续窗口定义中引用的名称，
                     而<varname>window_definition</varname>为：
                 </p>
                 <codeblock>[<varname>existing_window_name</varname>]
-                    [PARTITION BY <varname>expression</varname> [, ...]]
-                    [ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] [NULLS
-                    {FIRST | LAST}] [, ...] ]
-                    [<varname>frame_clause</varname>]
-                </codeblock>
+[PARTITION BY <varname>expression</varname> [, ...]]
+[ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] [NULLS {FIRST | LAST}] [, ...] ]
+[<varname>frame_clause</varname>]</codeblock>
                 <parml>
                     <plentry>
                         <pt>
@@ -620,11 +577,8 @@
                         <pd>可选的<codeph><varname>frame_clause</varname></codeph>定义依赖于框架的窗口函数的窗口框架（并非全部如此）。
                             窗口框架是查询的每一行（称为当前行）的一组相关行。
                             <codeph><varname>frame_clause</varname></codeph>可以是以下之一
-                            <codeblock>{ RANGE | ROWS }
-                                <varname>frame_start</varname>
-                                { RANGE | ROWS } BETWEEN <varname>frame_start</varname> AND
-                                <varname>frame_end</varname>
-                            </codeblock>
+                            <codeblock>{ RANGE | ROWS } <varname>frame_start</varname>
+{ RANGE | ROWS } BETWEEN <varname>frame_start</varname> AND <varname>frame_end</varname></codeblock>
                             其中<codeph><varname>frame_start</varname></codeph>和<codeph><varname>frame_end</varname></codeph>可以是以下之一
                             <ul id="ul_ehq_kws_1gb">
                                 <li>
@@ -718,9 +672,7 @@
                 <b>HAVING子句</b>
                 <p>可选的<codeph>HAVING</codeph>子句具有以下一般形式：
                 </p>
-                <codeblock>HAVING
-                    <varname>condition</varname>
-                </codeblock>
+                <codeblock>HAVING <varname>condition</varname></codeblock>
                 <p>其中<varname>condition</varname>与为<codeph>WHERE</codeph>子句指定的条件相同。
                     <codeph>HAVING</codeph>去除不满足条件的组行。
                     <codeph>HAVING</codeph>与<codeph>WHERE</codeph>不同：<codeph>WHERE</codeph>在应用<codeph>GROUP BY</codeph>之前过滤单个行，
@@ -737,11 +689,7 @@
                 <b>UNION子句</b>
                 <p><codeph>UNION</codeph>子句具有以下一般形式：
                 </p>
-                <codeblock>
-                    <varname>select_statement</varname>
-                    UNION [ALL | DISTINCT]
-                    <varname>select_statement</varname>
-                </codeblock>
+                <codeblock><varname>select_statement</varname> UNION [ALL | DISTINCT] <varname>select_statement</varname></codeblock>
                 <p>其中<varname>select_statement</varname>是不带<codeph>ORDER BY</codeph>，<codeph>LIMIT</codeph>，
                     <codeph>FOR NO KEY UPDATE</codeph>，<codeph>FOR UPDATE</codeph>，<codeph>FOR SHARE</codeph>或<codeph>FOR KEY SHARE</codeph>子句的任何<codeph>SELECT</codeph>语句。
                     （如果将<codeph>ORDER BY</codeph>和<codeph>LIMIT</codeph>括在圆括号中，则可以将其附加到子查询表达式。
@@ -766,11 +714,7 @@
                 <b>INTERSECT子句</b>
                 <p><codeph>INTERSECT</codeph>子句具有以下一般形式：
                 </p>
-                <codeblock>
-                    <varname>select_statement</varname>
-                    INTERSECT [ALL | DISTINCT]
-                    <varname>select_statement</varname>
-                </codeblock>
+                <codeblock><varname>select_statement</varname> INTERSECT [ALL | DISTINCT] <varname>select_statement</varname></codeblock>
                 <p>其中<varname>select_statement</varname>是不带<codeph>ORDER BY</codeph>，<codeph>LIMIT</codeph>，
                     <codeph>FOR NO KEY UPDATE</codeph>，<codeph>FOR UPDATE</codeph>，
                     <codeph>FOR SHARE</codeph>或<codeph>FOR KEY SHARE</codeph>子句的任何SELECT语句。
@@ -794,11 +738,7 @@
                 <b>EXCEPT子句</b>
                 <p><codeph>EXCEPT</codeph>子句具有以下一般形式：
                 </p>
-                <codeblock>
-                    <varname>select_statement</varname>
-                    EXCEPT [ALL | DISTINCT]
-                    <varname>select_statement</varname>
-                </codeblock>
+                <codeblock><varname>select_statement</varname> EXCEPT [ALL | DISTINCT] <varname>select_statement</varname></codeblock>
                 <p>其中<varname>select_statement</varname>是不带<codeph>ORDER BY</codeph>，<codeph>LIMIT</codeph>，<codeph>FOR NO KEY UPDATE</codeph>，
                     <codeph>FOR UPDATE</codeph>，<codeph>FOR SHARE</codeph>或<codeph>FOR KEY SHARE</codeph>子句的任何<codeph>SELECT</codeph>语句。
                 </p>
@@ -819,8 +759,7 @@
                 <b>ORDER BY子句</b>
                 <p>可选的<codeph>ORDER BY</codeph>子句具有以下一般形式：
                 </p>
-                <codeblock>ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>]
-                    [NULLS {FIRST | LAST}] [,...]
+                <codeblock>ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] [NULLS {FIRST | LAST}] [,...]
                 </codeblock>
                 <p>其中<varname>expression</varname>可以是输出列（<codeph>SELECT</codeph>列表项）的名称或序号，
                     也可以是由输入列值组成的任意表达式。
@@ -871,9 +810,7 @@
                 <p><codeph>LIMIT</codeph>子句包含两个独立的子句：
                 </p>
                 <codeblock>LIMIT {<varname>count</varname> | ALL}
-                    OFFSET
-                    <varname>start</varname>
-                </codeblock>
+OFFSET <varname>start</varname></codeblock>
                 <p>其中<varname>count</varname>指定要返回的最大行数，而<varname>start</varname>指定在开始返回行之前要跳过的行数。
                     如果同时指定了两者，则在开始对要返回的<codeph>count</codeph>行进行计数之前，将跳过起始行。
                 </p>
@@ -883,8 +820,7 @@
                 <p>SQL：2008引入了不同的语法来实现相同的结果，Greenplum数据库也支持该语法。
                     它是：
                     <codeblock>OFFSET <varname>start</varname> [ ROW | ROWS ]
-                        FETCH { FIRST | NEXT } [ <varname>count</varname> ] { ROW | ROWS } ONLY
-                    </codeblock>
+        FETCH { FIRST | NEXT } [ <varname>count</varname> ] { ROW | ROWS } ONLY</codeblock>
                 </p>
                 <p>在这种语法中，标准要求<varname>start</varname>或<varname>count</varname>值是文字常量，参数或变量名；
                     作为Greenplum数据库扩展，可以使用其他表达式，但通常需要将其括在括号中以避免歧义。
@@ -909,14 +845,12 @@
                 </p>
                 <p>锁定子句具有一般形式
                 </p>
-                <codeblock>FOR <varname>lock_strength</varname> [OF <varname>table_name</varname> [ , ... ] ] [ NOWAIT ]
-                </codeblock>
+                <codeblock>FOR <varname>lock_strength</varname> [OF <varname>table_name</varname> [ , ... ] ] [ NOWAIT ]</codeblock>
                 <p>其中<varname>lock_strength</varname>可以是以下之一
                     <codeblock>UPDATE
-                        NO KEY UPDATE
-                        SHARE
-                        KEY SHARE
-                    </codeblock>
+NO KEY UPDATE
+SHARE
+KEY SHARE</codeblock>
                 </p>
                 <note>默认情况下，Greenplum数据库获取对表的<codeph>EXCLUSIVE</codeph>锁，以对堆表进行<codeph>DELETE</codeph>和<codeph>UPDATE</codeph>操作。
                     启用全局死锁检测器后，堆表上<codeph>DELETE</codeph>和<codeph>UPDATE</codeph>操作的锁定模式为<codeph>ROW EXCLUSIVE</codeph>。
@@ -972,13 +906,9 @@
         <section id="table-command">
             <title>TABLE命令</title>
             <p>命令</p>
-            <codeblock>TABLE
-                <varname>name</varname>
-            </codeblock>
+            <codeblock>TABLE <varname>name</varname></codeblock>
             <p>完全等同于</p>
-            <codeblock>SELECT * FROM
-                <varname>name</varname>
-            </codeblock>
+            <codeblock>SELECT * FROM <varname>name</varname></codeblock>
             <p>在部分复杂查询中，它可用作顶级命令或节省空间的语法变体。
             </p>
         </section>
@@ -987,95 +917,85 @@
             <p>连接表<codeph>films</codeph>与表<codeph>distributors</codeph>:
             </p>
             <codeblock>SELECT f.title, f.did, d.name, f.date_prod, f.kind FROM
-                distributors d, films f WHERE f.did = d.did
-            </codeblock>
+distributors d, films f WHERE f.did = d.did</codeblock>
             <p>将表films的<codeph>length</codeph>列求和并将结果按<codeph>kind</codeph>分组:
             </p>
             <codeblock>SELECT kind, sum(length) AS total FROM films GROUP BY kind;</codeblock>
             <p>将表films的<codeph>length</codeph>列求和并将结果按<codeph>kind</codeph>分组并显示总和小于5小时的组：
             </p>
             <codeblock>SELECT kind, sum(length) AS total FROM films GROUP BY kind
-                HAVING sum(length) &lt; interval '5 hours';
-            </codeblock>
+HAVING sum(length) &lt; interval '5 hours';</codeblock>
             <p>计算电影<codeph>kind</codeph>和<codeph>distributor</codeph>的所有销售部分和与总和。
             </p>
             <codeblock>SELECT kind, distributor, sum(prc*qty) FROM sales
-                GROUP BY ROLLUP(kind, distributor)
-                ORDER BY 1,2,3;
-            </codeblock>
+GROUP BY ROLLUP(kind, distributor)
+ORDER BY 1,2,3;</codeblock>
             <p>根据总销量计算电影发行商的排名：</p>
             <codeblock>SELECT distributor, sum(prc*qty),
-                       rank() OVER (ORDER BY sum(prc*qty) DESC)
-                FROM sale
-                GROUP BY distributor ORDER BY 2 DESC;
-            </codeblock>
+     rank() OVER (ORDER BY sum(prc*qty) DESC)
+FROM sale
+GROUP BY distributor ORDER BY 2 DESC;</codeblock>
             <p>以下两个示例是根据第二列（<codeph>name</codeph>）的内容对单个结果进行排序的相同方法：
             </p>
             <codeblock>SELECT * FROM distributors ORDER BY name;
-                SELECT * FROM distributors ORDER BY 2;
-            </codeblock>
+SELECT * FROM distributors ORDER BY 2;</codeblock>
             <p>下一个示例说明如何获取表<codeph>distributors</codeph>和<codeph>actors</codeph>的并集，将结果限制为每个表中以字母<codeph>W</codeph>开头的行。
                 只需要不同的行，因此关键字<codeph>ALL</codeph>被省略：
             </p>
             <codeblock>SELECT distributors.name FROM distributors WHERE
-                distributors.name LIKE 'W%' UNION SELECT actors.name FROM
-                actors WHERE actors.name LIKE 'W%';
-            </codeblock>
+distributors.name LIKE 'W%' UNION SELECT actors.name FROM
+actors WHERE actors.name LIKE 'W%';</codeblock>
             <p>此示例说明如何在<codeph>FROM</codeph>子句中使用函数，无论是否包含列定义列表：
             </p>
             <codeblock>CREATE FUNCTION distributors(int) RETURNS SETOF distributors
-                AS $$ SELECT * FROM distributors WHERE did = $1; $$ LANGUAGE
-                SQL;
-                SELECT * FROM distributors(111);
+AS $$ SELECT * FROM distributors WHERE did = $1; $$ LANGUAGE
+SQL;
+SELECT * FROM distributors(111);
 
-                CREATE FUNCTION distributors_2(int) RETURNS SETOF record AS
-                $$ SELECT * FROM distributors WHERE did = $1; $$ LANGUAGE
-                SQL;
-                SELECT * FROM distributors_2(111) AS (dist_id int, dist_name
-                text);
-            </codeblock>
+CREATE FUNCTION distributors_2(int) RETURNS SETOF record AS
+$$ SELECT * FROM distributors WHERE did = $1; $$ LANGUAGE
+SQL;
+SELECT * FROM distributors_2(111) AS (dist_id int, dist_name
+text);</codeblock>
             <p>此示例使用一个简单的<codeph>WITH</codeph>子句：
             </p>
             <codeblock>WITH test AS (
-                SELECT random() as x FROM generate_series(1, 3)
-                )
-                SELECT * FROM test
-                UNION ALL
-                SELECT * FROM test;
-            </codeblock>
+    SELECT random() as x FROM generate_series(1, 3)
+    )
+SELECT * FROM test
+UNION ALL
+SELECT * FROM test;</codeblock>
             <p>本示例使用<codeph>WITH</codeph>子句仅显示最高销售区域中的每产品销售总额。
             </p>
             <codeblock>WITH regional_sales AS
-                SELECT region, SUM(amount) AS total_sales
-                FROM orders
-                GROUP BY region
-                ), top_regions AS (
-                SELECT region
-                FROM regional_sales
-                WHERE total_sales > (SELECT SUM(total_sales) FROM
-                regional_sales)
-                )
-                SELECT region, product, SUM(quantity) AS product_units,
-                SUM(amount) AS product_sales
-                FROM orders
-                WHERE region IN (SELECT region FROM top_regions)
-                GROUP BY region, product;
-            </codeblock>
+   SELECT region, SUM(amount) AS total_sales
+   FROM orders
+   GROUP BY region
+  ), top_regions AS (
+   SELECT region
+   FROM regional_sales
+   WHERE total_sales > (SELECT SUM(total_sales) FROM
+    regional_sales)
+   )
+SELECT region, product, SUM(quantity) AS product_units,
+    SUM(amount) AS product_sales
+FROM orders
+WHERE region IN (SELECT region FROM top_regions)
+GROUP BY region, product;</codeblock>
             <p>该示例可能编写不包含<codeph>WITH</codeph>子句，但需要两级嵌套的sub-<codeph>SELECT</codeph>语句。
             </p>
             <p>本示例使用<codeph>WITH RECURSIVE</codeph>子句从仅显示直接下属的表中查找员工Mary的所有下属（直接或间接）及其间接级别：
             </p>
             <codeblock>WITH RECURSIVE employee_recursive(distance, employee_name, manager_name) AS (
-                SELECT 1, employee_name, manager_name
-                FROM employee
-                WHERE manager_name = 'Mary'
-                UNION ALL
-                SELECT er.distance + 1, e.employee_name, e.manager_name
-                FROM employee_recursive er, employee e
-                WHERE er.employee_name = e.manager_name
-                )
-                SELECT distance, employee_name FROM employee_recursive;
-            </codeblock>
+      SELECT 1, employee_name, manager_name
+      FROM employee
+      WHERE manager_name = 'Mary'
+    UNION ALL
+      SELECT er.distance + 1, e.employee_name, e.manager_name
+      FROM employee_recursive er, employee e
+      WHERE er.employee_name = e.manager_name
+    )
+SELECT distance, employee_name FROM employee_recursive;</codeblock>
             <p>递归查询的典型形式：初始条件，后跟<codeph>UNION [ALL]</codeph>，然后是查询的递归部分。
                 确保查询的递归部分最终不会返回任何元组，否则查询将无限期地循环。
                 有关更多示例，请参见<xref href="../../admin_guide/query/topics/CTE-query.xml#topic_zhs_r1s_w1b"/>。
