@@ -2,13 +2,12 @@
 <!DOCTYPE topic
         PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-    <title id="ef20941">保存点</title>
+    <title id="ef20941">SAVEPOINT</title>
     <body>
         <p id="sql_command_desc">在当前事务中定义一个新的保存点。</p>
         <section id="section2">
             <title>概要</title>
-            <codeblock id="sql_command_synopsis">SAVEPOINT
-                <varname>savepoint_name</varname>
+            <codeblock id="sql_command_synopsis">SAVEPOINT <varname>savepoint_name</varname>
             </codeblock>
         </section>
         <section id="section3">
@@ -22,9 +21,7 @@
             <title>参数</title>
             <parml>
                 <plentry>
-                    <pt>
-                        <varname>savepoint_name</varname>
-                    </pt>
+                    <pt><varname>savepoint_name</varname></pt>
                     <pd>新保存点的名称。</pd>
                 </plentry>
             </parml>
@@ -53,8 +50,7 @@
                 INSERT INTO table1 VALUES (2);
                 ROLLBACK TO SAVEPOINT my_savepoint;
                 INSERT INTO table1 VALUES (3);
-                COMMIT;
-            </codeblock>
+COMMIT;</codeblock>
             <p>上面的事务将插入值1和3，但不插入2。</p>
             <p>要建立并随后销毁一个保存点：</p>
             <codeblock>BEGIN;
@@ -62,9 +58,8 @@
                 SAVEPOINT my_savepoint;
                 INSERT INTO table1 VALUES (4);
                 RELEASE SAVEPOINT my_savepoint;
-                COMMIT;
-            </codeblock>
-            <p>上述交易将同时插入3和4。</p>
+COMMIT;</codeblock>
+            <p>上述事务将同时插入3和4。</p>
         </section>
         <section id="section7">
             <title>兼容性</title>

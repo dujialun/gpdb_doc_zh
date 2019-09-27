@@ -15,7 +15,7 @@ SET SESSION CHARACTERISTICS AS TRANSACTION <varname>transaction_mode</varname>
      [READ ONLY | READ WRITE]
      [NOT] DEFERRABLE</codeblock>
       <p>其中<varname>transaction_mode</varname>为下列之一：</p>
-      <codeblock>   ISOLATION LEVEL {SERIALIZABLE | REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED}</codeblock>
+      <codeblock>ISOLATION LEVEL {SERIALIZABLE | REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED}</codeblock>
     </section>
     <section id="section3">
       <title>描述</title>

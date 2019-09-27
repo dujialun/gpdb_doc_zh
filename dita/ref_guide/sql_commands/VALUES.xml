@@ -83,35 +83,31 @@
             <p>这将返回一个两列三行的表。它实际上等效于：
             </p>
             <codeblock>SELECT 1 AS column1, 'one' AS column2
-                UNION ALL
-                SELECT 2, 'two'
-                UNION ALL
-                SELECT 3, 'three';
-            </codeblock>
+UNION ALL
+SELECT 2, 'two'
+UNION ALL
+SELECT 3, 'three';</codeblock>
             <p>通常，在较大的SQL命令中使用<codeph>VALUES</codeph>。
                 最常见的用法是在<codeph>INSERT</codeph>中：
             </p>
             <codeblock>INSERT INTO films (code, title, did, date_prod, kind)
-                VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');
-            </codeblock>
+                VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');</codeblock>
             <p>在<codeph>INSERT</codeph>的上下文中，<codeph>VALUES</codeph>列表的条目可以为<codeph>DEFAULT</codeph>，
                 以指示此处应使用列默认值而不是指定值：
             </p>
             <codeblock>INSERT INTO films VALUES
                 ('UA502', 'Bananas', 105, DEFAULT, 'Comedy', '82
                 minutes'),
-                ('T_601', 'Yojimbo', 106, DEFAULT, 'Drama', DEFAULT);
-            </codeblock>
+                ('T_601', 'Yojimbo', 106, DEFAULT, 'Drama', DEFAULT);</codeblock>
             <p><codeph>VALUES</codeph>也可以用于可能写入sub-<codeph>SELECT</codeph>的地方，例如在<codeph>FROM</codeph>子句中：
             </p>
             <codeblock>SELECT f.* FROM films f, (VALUES('MGM', 'Horror'), ('UA',
-                'Sci-Fi')) AS t (studio, kind) WHERE f.studio = t.studio AND
-                f.kind = t.kind;
-                UPDATE employees SET salary = salary * v.increase FROM
-                (VALUES(1, 200000, 1.2), (2, 400000, 1.4)) AS v (depno,
-                target, increase) WHERE employees.depno = v.depno AND
-                employees.sales &gt;= v.target;
-            </codeblock>
+'Sci-Fi')) AS t (studio, kind) WHERE f.studio = t.studio AND
+f.kind = t.kind;
+UPDATE employees SET salary = salary * v.increase FROM
+(VALUES(1, 200000, 1.2), (2, 400000, 1.4)) AS v (depno,
+target, increase) WHERE employees.depno = v.depno AND
+employees.sales &gt;= v.target;</codeblock>
             <p>请注意，在<codeph>FROM</codeph>子句中使用<codeph>VALUES</codeph>时，
                 需要<codeph>AS</codeph>子句，就像<codeph>SELECT</codeph>一样。
                 不需要<codeph>AS</codeph>子句为所有列指定名称，但是这样做是一种好习惯。
@@ -123,9 +119,8 @@
                 如果所有条目都是用引号括起来的文字常量，则强制第一个足以确定所有假定的类型：
             </p>
             <codeblock>SELECT * FROM machines WHERE ip_address IN
-                (VALUES('192.168.0.1'::inet), ('192.168.0.10'),
-                ('192.0.2.43'));
-            </codeblock>
+(VALUES('192.168.0.1'::inet), ('192.168.0.10'),
+('192.0.2.43'));</codeblock>
             <note type="note">对于简单的<codeph>IN</codeph>测试，
                 最好依靠<codeph>IN</codeph>的标量列表形式，而不要像上面所示编写<codeph>VALUES</codeph>查询。
                 标量方法列表需要较少的编写，并且通常效率更高。

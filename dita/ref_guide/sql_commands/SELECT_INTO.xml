@@ -60,8 +60,7 @@ SELECT [ALL | DISTINCT [ON ( <varname>expression</varname> [, ...] )]]
             <title>示例</title>
             <p>创建一个新表<codeph>films_recent</codeph>，该表仅包含表<codeph>films</codeph>中的最新条目：
                 </p>
-            <codeblock>SELECT * INTO films_recent FROM films WHERE date_prod &gt;= 
-'2016-01-01';</codeblock>
+            <codeblock>SELECT * INTO films_recent FROM films WHERE date_prod &gt;= '2016-01-01';</codeblock>
         </section>
         <section id="section6">
             <title>兼容性</title>

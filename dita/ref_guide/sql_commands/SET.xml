@@ -7,9 +7,7 @@
     <p id="sql_command_desc">更改Greenplum数据库配置参数的值。</p>
     <section id="section2">
       <title>概要</title>
-      <codeblock id="sql_command_synopsis">SET [SESSION | LOCAL] <varname>configuration_parameter</varname> {TO | =} <varname>value</varname> | 
-    '<varname>value</varname>' | DEFAULT}
-
+      <codeblock id="sql_command_synopsis">SET [SESSION | LOCAL] <varname>configuration_parameter</varname> {TO | =} <varname>value</varname> | '<varname>value</varname>' | DEFAULT}
 SET [SESSION | LOCAL] TIME ZONE {<varname>timezone</varname> | LOCAL | DEFAULT}</codeblock>
     </section>
     <section id="section3">
