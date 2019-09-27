@@ -4,123 +4,124 @@
 <topic id="topic1">
   <title id="ei20941">SET</title>
   <body>
-    <p id="sql_command_desc">Changes the value of a Greenplum Database configuration parameter.</p>
+    <p id="sql_command_desc">更改Greenplum数据库配置参数的值。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">SET [SESSION | LOCAL] <varname>configuration_parameter</varname> {TO | =} <varname>value</varname> | 
     '<varname>value</varname>' | DEFAULT}
 
 SET [SESSION | LOCAL] TIME ZONE {<varname>timezone</varname> | LOCAL | DEFAULT}</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>The <codeph>SET</codeph> command changes server configuration parameters. Any configuration
-        parameter classified as a <varname>session</varname> parameter can be changed on-the-fly
-        with <codeph>SET</codeph>. <codeph>SET</codeph> affects only the value used by the current
-        session. </p>
-      <p>If <codeph>SET</codeph> or <codeph>SET SESSION</codeph> is issued within a transaction that
-        is later aborted, the effects of the <codeph>SET</codeph> command disappear when the
-        transaction is rolled back. Once the surrounding transaction is committed, the effects will
-        persist until the end of the session, unless overridden by another <codeph>SET</codeph>. </p>
-      <p>The effects of <codeph>SET LOCAL</codeph> last only till the end of the current
-        transaction, whether committed or not. A special case is <codeph>SET</codeph> followed by
-          <codeph>SET LOCAL</codeph> within a single transaction: the <codeph>SET LOCAL</codeph>
-        value will be seen until the end of the transaction, but afterwards (if the transaction is
-        committed) the <codeph>SET</codeph> value will take effect.</p>
-      <p>If <codeph>SET LOCAL</codeph> is used within a function that includes a
-          <codeph>SET</codeph> option for the same configuration parameter (see <codeph><xref
-            href="./CREATE_FUNCTION.xml#topic1" type="topic" format="dita"/></codeph>), the effects
-        of the <codeph>SET LOCAL</codeph> command disappear at function exit; the value in effect
-        when the function was called is restored anyway. This allows <codeph>SET LOCAL</codeph> to
-        be used for dynamic or repeated changes of a parameter within a function, while retaining
-        the convenience of using the <codeph>SET</codeph> option to save and restore the caller's
-        value. Note that a regular <codeph>SET</codeph> command overrides any surrounding function's
-          <codeph>SET</codeph> option; its effects persist unless rolled back.</p>
-      <p>If you create a cursor with the <codeph>DECLARE</codeph> command in a transaction, you
-        cannot use the <codeph>SET</codeph> command in the transaction until you close the cursor
-        with the <codeph>CLOSE</codeph> command.</p>
-      <p>See <xref href="../config_params/guc_config.xml" type="topic" format="dita"/> for
-        information about server parameters.</p>
+      <title>描述</title>
+      <p><codeph>SET</codeph>命令更改服务器配置参数。
+        任何分类为<varname>session</varname>参数的配置参数都可以使用<codeph>SET</codeph>即时更改。
+        <codeph>SET</codeph>仅影响当前会话使用的值。
+        </p>
+      <p>如果在稍后中止的事务中发出<codeph>SET</codeph>或<codeph>SET SESSION</codeph>，则回滚该事务时<codeph>SET</codeph>命令的效果会消失。
+        一旦提交了事务，效果将一直持续到会话结束，除非被另一个<codeph>SET</codeph>覆盖。
+        </p>
+      <p><codeph>SET LOCAL</codeph>的影响仅持续到当前事务结束为止，无论是否提交。
+        特殊情况是在单个事务中<codeph>SET LOCAL</codeph>紧随<codeph>SET</codeph>其后：
+        <codeph>SET LOCAL</codeph>值将一直显示到事务结束为止，但是此后（如果提交了事务）<codeph>SET</codeph>值将生效。
+        </p>
+      <p>如果在包含针对同一配置参数的<codeph>SET</codeph>选项的函数中使用<codeph>SET LOCAL</codeph>（请参见<codeph><xref
+              href="./CREATE_FUNCTION.xml#topic1" type="topic" format="dita"/></codeph>），
+        则<codeph>SET LOCAL</codeph>命令的效果在函数退出时消失；
+        无论如何，将恢复调用该函数时有效的值。
+        这允许将<codeph>SET LOCAL</codeph>用于函数中参数的动态或重复更改，
+        同时保留使用<codeph>SET</codeph>选项保存和恢复调用者值的便利。
+        请注意，常规的<codeph>SET</codeph>命令会覆盖周围函数的<codeph>SET</codeph>选项。
+        除非回滚，否则其影响持续存在。
+        </p>
+      <p>如果在事务中使用<codeph>DECLARE</codeph>命令创建游标，
+        则只有在使用<codeph>CLOSE</codeph>命令关闭游标后才能在事务中使用<codeph>SET</codeph>命令。
+        </p>
+      <p>有关服务器参数的信息，请参阅<xref href="../config_params/guc_config.xml" type="topic" format="dita"/>。
+        </p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>SESSION</pt>
-          <pd>Specifies that the command takes effect for the current session. This is the
-            default.</pd>
+          <pd>指定该命令对当前会话生效。这是默认值。
+            </pd>
         </plentry>
         <plentry>
           <pt>LOCAL</pt>
-          <pd>Specifies that the command takes effect for only the current transaction. After
-              <codeph>COMMIT</codeph> or <codeph>ROLLBACK</codeph>, the session-level setting takes
-            effect again. Note that <codeph>SET LOCAL</codeph> will appear to have no effect if it
-            is executed outside of a transaction.</pd>
+          <pd>指定该命令仅对当前事务生效。
+            在<codeph>COMMIT</codeph>或<codeph>ROLLBACK</codeph>之后，会话级设置将再次生效。
+            请注意，如果<codeph>SET LOCAL</codeph>在事务外部执行，则似乎无效。
+            </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>configuration_parameter</varname>
           </pt>
-          <pd>The name of a Greenplum Database configuration parameter. Only parameters classified
-            as <i>session</i> can be changed with <codeph>SET</codeph>. See <xref
-              href="../config_params/guc_config.xml" type="topic" format="dita"/> for details.</pd>
+          <pd>Greenplum数据库配置参数的名称。
+            使用<codeph>SET</codeph>只能更改分类为<i>session</i>的参数。
+            有关详细信息，请参见<xref href="../config_params/guc_config.xml" type="topic" format="dita"/>。
+            </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>value</varname>
           </pt>
-          <pd>New value of parameter. Values can be specified as string constants, identifiers,
-            numbers, or comma-separated lists of these. <codeph>DEFAULT</codeph> can be used to
-            specify resetting the parameter to its default value. If specifying memory sizing or
-            time units, enclose the value in single quotes.</pd>
+          <pd>参数的新值。
+            可以将值指定为字符串常量，标识符，数字或以逗号分隔的列表。
+            <codeph>DEFAULT</codeph>可用于指定将参数重置为其默认值。
+            如果指定内存大小或时间单位，则将值用单引号引起来。
+            </pd>
         </plentry>
         <plentry>
           <pt>TIME ZONE</pt>
-          <pd><codeph>SET TIME ZONE</codeph> value is an alias for <codeph>SET timezone TO
-                <varname>value</varname></codeph>. The syntax <codeph>SET TIME ZONE</codeph> allows
-            special syntax for the time zone specification. Here are examples of valid values: </pd>
+          <pd><codeph>SET TIME ZONE</codeph>值是<codeph>SET timezone TO <varname>value</varname></codeph>。
+            语法<codeph>SET TIME ZONE</codeph>允许时区指定使用特殊语法。
+            以下是有效值的示例：
+            </pd>
           <pd>
             <codeph>'PST8PDT'</codeph>
           </pd>
           <pd>
             <codeph>'Europe/Rome'</codeph>
           </pd>
-          <pd><codeph>-7</codeph> (time zone 7 hours west from UTC)</pd>
-          <pd><codeph>INTERVAL '-08:00' HOUR TO MINUTE</codeph> (time zone 8 hours west from
-            UTC).</pd>
+          <pd><codeph>-7</codeph> (UTC以西7小时时区)</pd>
+          <pd><codeph>INTERVAL '-08:00' HOUR TO MINUTE</codeph> (UTC以西8小时时区)。</pd>
         </plentry>
         <plentry>
           <pt>LOCAL</pt>
           <pt>DEFAULT</pt>
-          <pd>Set the time zone to your local time zone (that is, server's default value of <varname>timezone</varname>). See the <xref
-              href="https://www.postgresql.org/docs/9.4/datatype-datetime.html#DATATYPE-TIMEZONES"
-              scope="external" format="html">Time zone section of the PostgreSQL
-              documentation</xref> for more information about time zones in Greenplum Database.</pd>
+          <pd>将时区设置为您的本地时区（即服务器的默认<varname>timezone</varname>）。
+            有关Greenplum数据库中时区的更多信息，请参见<xref
+                    href="https://www.postgresql.org/docs/9.4/datatype-datetime.html#DATATYPE-TIMEZONES"
+                    scope="external" format="html">PostgreSQL文档的时区部</xref>。
+            </pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Examples</title>
-      <p>Set the schema search path:</p>
+      <title>示例</title>
+      <p>设置schema搜索路径：</p>
       <codeblock>SET search_path TO my_schema, public;</codeblock>
-      <p>Increase the segment host memory per query to 200 MB:</p>
+      <p>将每个查询的segment主机内存增加到200 MB：</p>
       <codeblock>SET statement_mem TO '200MB';</codeblock>
-      <p>Set the style of date to traditional POSTGRES with "day before month" input convention:</p>
+      <p>把日期风格设置为传统POSTGRES的"日在月之前"的输入习惯：</p>
       <codeblock>SET datestyle TO postgres, dmy;</codeblock>
-      <p>Set the time zone for San Mateo, California (Pacific Time):</p>
+      <p>设置加利福尼亚州圣马特奥市的时区（太平洋时间）：</p>
       <codeblock>SET TIME ZONE 'PST8PDT';</codeblock>
-      <p>Set the time zone for Italy:</p>
+      <p>设置意大利的时区：</p>
       <codeblock>SET TIME ZONE 'Europe/Rome'; </codeblock>
     </section>
     <section id="section6">
-      <title>Compatibility</title>
-      <p><codeph>SET TIME ZONE</codeph> extends syntax defined in the SQL standard. The standard
-        allows only numeric time zone offsets while Greenplum Database allows more flexible
-        time-zone specifications. All other <codeph>SET</codeph> features are Greenplum Database
-        extensions. </p>
+      <title>兼容性</title>
+      <p><codeph>SET TIME ZONE</codeph>扩展了SQL标准中定义的语法。
+        该标准仅允许数字时区偏移，而Greenplum数据库允许更灵活的时区规范。
+        <codeph>SET</codeph>的所有其他功能都是Greenplum数据库扩展。
+        </p>
     </section>
     <section id="section7">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="RESET.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
             href="./SHOW.xml#topic1" type="topic" format="dita"/></codeph></p>
     </section>

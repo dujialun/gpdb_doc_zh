@@ -1,1096 +1,1186 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title id="eg20941">SELECT</title>
-  <body>
-    <p id="sql_command_desc">Retrieves rows from a table or view.</p>
-    <section id="section2">
-      <title>Synopsis</title>
-      <codeblock id="sql_command_synopsis">[ WITH [ RECURSIVE<sup>1</sup> ] <varname>with_query</varname> [, ...] ]
-SELECT [ALL | DISTINCT [ON (<varname>expression</varname> [, ...])]]
-  * | <varname>expression </varname>[[AS] <varname>output_name</varname>] [, ...]
-  [FROM <varname>from_item</varname> [, ...]]
-  [WHERE <varname>condition</varname>]
-  [GROUP BY <varname>grouping_element</varname> [, ...]]
-  [HAVING <varname>condition</varname> [, ...]]
-  [WINDOW <varname>window_name</varname> AS (<varname>window_definition</varname>) [, ...] ]
-  [{UNION | INTERSECT | EXCEPT} [ALL | DISTINCT] <varname>select</varname>]
-  [ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] [NULLS {FIRST | LAST}] [, ...]]
-  [LIMIT {<varname>count</varname> | ALL}]
-  [OFFSET <varname>start</varname> [ ROW | ROWS ] ]
-  [FETCH { FIRST | NEXT } [ <varname>count</varname> ] { ROW | ROWS } ONLY]
-  [FOR {UPDATE | NO KEY UPDATE | SHARE | KEY SHARE} [OF <varname>table_name</varname> [, ...]] [NOWAIT] [...]]
+    <title id="eg20941">SELECT</title>
+    <body>
+        <p id="sql_command_desc">从表或视图中检索行。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">[ WITH [ RECURSIVE<sup>1</sup> ] <varname>with_query</varname> [, ...]
+                ]
+                SELECT [ALL | DISTINCT [ON (<varname>expression</varname> [, ...])]]
+                  * | <varname>expression</varname>[[AS] <varname>output_name</varname>] [, ...]
+                  [FROM <varname>from_item</varname> [, ...]]
+                  [WHERE <varname>condition</varname>]
+                  [GROUP BY <varname>grouping_element</varname> [, ...]]
+                  [HAVING <varname>condition</varname> [, ...]]
+                  [WINDOW <varname>window_name</varname> AS (<varname>window_definition</varname>) [, ...] ]
+                  [{UNION | INTERSECT | EXCEPT} [ALL | DISTINCT] <varname>select</varname>]
+                  [ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] [NULLS {FIRST
+                | LAST}] [, ...]]
+                  [LIMIT {<varname>count</varname> | ALL}]
+                  [OFFSET <varname>start</varname> [ ROW | ROWS ] ]
+                [FETCH { FIRST | NEXT } [ <varname>count</varname> ] { ROW | ROWS } ONLY]
+                  [FOR {UPDATE | NO KEY UPDATE | SHARE | KEY SHARE} [OF <varname>table_name</varname> [, ...]] [NOWAIT]
+                [...]]
 
-TABLE { [ ONLY ] <varname>table_name</varname> [ * ] | <varname>with_query_name</varname> }
-</codeblock>
-      <p>where <varname>with_query:</varname> is:</p>
-      <codeblock>  <varname>with_query_name</varname> [( <varname>column_name</varname> [, ...] )] AS ( <varname>select</varname> | <varname>values</varname> | <varname>insert</varname> | <varname>update</varname> | <varname >delete</varname> )</codeblock>
-      <p>where <varname>from_item</varname> can be one of:</p>
-      <codeblock>[ONLY] <varname>table_name</varname> [ * ] [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
-( <varname>select</varname> ) [ AS ] <varname>alias</varname> [( <varname>column_alias</varname> [, ...] ) ]<varname>
-with_query_name</varname> [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
-<varname>function_name</varname> ( [ <varname>argument</varname> [, ...] ] )
-            [ WITH ORDINALITY ] [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
-<varname>function_name</varname> ( [ <varname>argument</varname> [, ...] ] ) [ AS ] <varname>alias</varname> ( <varname>column_definition</varname> [, ...] )
-<varname>function_name</varname> ( [ <varname>argument</varname> [, ...] ] ) AS ( <varname>column_definition</varname> [, ...] )
-ROWS FROM( function_name ( [ argument [, ...] ] ) [ AS ( column_definition [, ...] ) ] [, ...] )
-            [ WITH ORDINALITY ] [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
-<varname>from_item</varname> [ NATURAL ] <varname>join_type</varname> <varname>from_item</varname>
-          [ ON <varname>join_condition</varname> | USING ( <varname>join_column</varname> [, ...] ) ]</codeblock>
-      <p>where <varname>grouping_element</varname> can be one of:</p>
-      <codeblock>  ()
-  <varname>expression</varname>
-  ROLLUP (<varname>expression</varname> [,...])
-  CUBE (<varname>expression</varname> [,...])
-  GROUPING SETS ((<varname>grouping_element</varname> [, ...]))</codeblock>
-      <p>where <varname>window_definition</varname> is:</p>
-      <codeblock>  [<varname>existing_window_name</varname>]
-  [PARTITION BY <varname>expression</varname> [, ...]]
-  [ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] 
-    [NULLS {FIRST | LAST}] [, ...]]
-  [{ RANGE | ROWS} <varname>frame_start</varname> 
-     | {RANGE | ROWS} BETWEEN <varname>frame_start</varname> AND <varname>frame_end</varname>
-</codeblock>
-      <p>where <varname>frame_start</varname> and <varname>frame_end</varname> can be one of:
-        <codeblock>  UNBOUNDED PRECEDING
-  <varname>value</varname> PRECEDING
-  CURRENT ROW
-  <varname>value</varname> FOLLOWING
-  UNBOUNDED FOLLOWING
-</codeblock></p>
-      <p><b>Note:</b>
-        <sup>1</sup>The <codeph>RECURSIVE</codeph> keyword is A Beta feature.</p>
-    </section>
-    <section id="section3">
-      <title>Description</title>
-      <p><codeph>SELECT</codeph> retrieves rows from zero or more tables. The general processing of
-          <codeph>SELECT</codeph> is as follows: </p>
-      <ol>
-        <li>All queries in the <codeph>WITH</codeph> clause are computed. These effectively serve as
-          temporary tables that can be referenced in the <codeph>FROM</codeph> list. </li>
-        <li id="eg138796">All elements in the <codeph>FROM</codeph> list are computed. (Each element
-          in the <codeph>FROM</codeph> list is a real or virtual table.) If more than one element is
-          specified in the <codeph>FROM</codeph> list, they are cross-joined together.</li>
-        <li id="eg138832">If the <codeph>WHERE</codeph> clause is specified, all rows that do not
-          satisfy the condition are eliminated from the output.</li>
-        <li id="eg138840">If the <codeph>GROUP BY</codeph> clause is specified, or if there are
-          aggregate function calls, the output is combined into groups of rows that match on one or
-          more values, and the results of aggregate functions are computed. If the
-            <codeph>HAVING</codeph> clause is present, it eliminates groups that do not satisfy the
-          given condition.</li>
-        <li>The actual output rows are computed using the <codeph>SELECT</codeph> output expressions
-          for each selected row or row group. </li>
-        <li><codeph>SELECT DISTINCT</codeph> eliminates duplicate rows from the result.
-            <codeph>SELECT DISTINCT ON</codeph> eliminates rows that match on all the specified
-          expressions. <codeph>SELECT ALL</codeph> (the default) will return all candidate rows,
-          including duplicates. </li>
-        <li id="eg141787">If a window expression is specified (and optional <codeph>WINDOW</codeph>
-          clause), the output is organized according to the positional (row) or value-based (range)
-          window frame.</li>
-        <li id="eg138848">The actual output rows are computed using the <codeph>SELECT</codeph>
-          output expressions for each selected row.</li>
+                TABLE { [ ONLY ] <varname>table_name</varname> [ * ] | <varname>with_query_name</varname> }
+            </codeblock>
+            <p>其中<varname>with_query:</varname>是：
+            </p>
+            <codeblock>  <varname>with_query_name</varname> [( <varname>column_name</varname> [, ...] )] AS ( <varname>
+                select
+            </varname> | <varname>values</varname> | <varname>insert</varname> | <varname>update</varname> | <varname>
+                delete
+            </varname> )
+            </codeblock>
+            <p>其中<varname>from_item</varname>可以是以下之一：
+            </p>
+            <codeblock>[ONLY] <varname>table_name</varname> [ * ] [ [ AS ] <varname>alias</varname> [ ( <varname>
+                column_alias
+            </varname> [, ...] ) ] ]
+                ( <varname>select</varname> ) [ AS ] <varname>alias</varname> [( <varname>column_alias</varname> [, ...]
+                ) ]<varname>
+                    with_query_name
+                </varname> [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
+                <varname>function_name</varname>
+                ( [ <varname>argument</varname> [, ...] ] )
+                [ WITH ORDINALITY ] [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
+                <varname>function_name</varname>
+                ( [ <varname>argument</varname> [, ...] ] ) [ AS ] <varname>alias</varname> ( <varname>
+                    column_definition
+                </varname> [, ...] )
+                <varname>function_name</varname>
+                ( [ <varname>argument</varname> [, ...] ] ) AS ( <varname>column_definition</varname> [, ...] )
+                ROWS FROM( function_name ( [ argument [, ...] ] ) [ AS ( column_definition [, ...] ) ] [, ...] )
+                [ WITH ORDINALITY ] [ [ AS ] <varname>alias</varname> [ ( <varname>column_alias</varname> [, ...] ) ] ]
+                <varname>from_item</varname>
+                [ NATURAL ] <varname>join_type</varname>
+                <varname>from_item</varname>
+                          [ ON <varname>join_condition</varname> | USING ( <varname>join_column</varname> [, ...] ) ]
+            </codeblock>
+            <p>其中<varname>grouping_element</varname>可以是以下之一：
+            </p>
+            <codeblock>  ()
+                  
+                <varname>expression</varname>
+                  ROLLUP (<varname>expression</varname> [,...])
+                  CUBE (<varname>expression</varname> [,...])
+                  GROUPING SETS ((<varname>grouping_element</varname> [, ...]))
+            </codeblock>
+            <p>其中<varname>window_definition</varname>是：
+            </p>
+            <codeblock>  [<varname>existing_window_name</varname>]
+                  [PARTITION BY <varname>expression</varname> [, ...]]
+                  [ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>]
+                [NULLS {FIRST | LAST}] [, ...]]
+                [{ RANGE | ROWS}
+                <varname>frame_start</varname>
+                | {RANGE | ROWS} BETWEEN <varname>frame_start</varname> AND
+                <varname>frame_end</varname>
+            </codeblock>
+            <p>其中<varname>frame_start</varname>和<varname>frame_end</varname>可以是以下之一：
+                <codeblock>UNBOUNDED PRECEDING
+                    <varname>value</varname>
+                    PRECEDING
+                    CURRENT ROW
+                    <varname>value</varname>
+                    FOLLOWING
+                    UNBOUNDED FOLLOWING
+                </codeblock>
+            </p>
+            <p>
+                <b>注解：</b>
+                <sup>1</sup><codeph>RECURSIVE</codeph>关键字是一个Beta功能。
+            </p>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>SELECT</codeph>从零个或多个表中检索行。
+                <codeph>SELECT</codeph>的一般处理如下：
+            </p>
+            <ol>
+                <li><codeph>WITH</codeph>子句中的所有查询均被计算。
+                    这些可以有效地用作可以在<codeph>FROM</codeph>列表中引用的临时表。
+                </li>
+                <li id="eg138796">将计算<codeph>FROM</codeph>列表中的所有元素。
+                    （<codeph>FROM</codeph>列表中的每个元素都是真实表或虚拟表。）
+                    如果<codeph>FROM</codeph>列表中指定了多个元素，则它们将交叉连接在一起。
+                </li>
+                <li id="eg138832">如果指定了<codeph>WHERE</codeph>子句，则从输出中排除所有不满足该条件的行。
+                </li>
+                <li id="eg138840">如果指定了<codeph>GROUP BY</codeph>子句，或者存在聚合函数调用，
+                    则将输出组合为与一个或多个值匹配的行组，并计算聚合函数的结果。
+                    如果存在<codeph>HAVING</codeph>子句，它将排除不满足给定条件的组。
+                </li>
+                <li>实际的输出行是使用<codeph>SELECT</codeph>输出表达式为每个选定的行或行组计算的。
+                </li>
+                <li><codeph>SELECT DISTINCT</codeph>从结果中消除重复的行。
+                    <codeph>SELECT DISTINCT ON</codeph>消除与所有指定表达式匹配的行。
+                    <codeph>SELECT ALL</codeph>（默认）将返回所有候选行，包括重复项。
+                </li>
+                <li id="eg141787">如果指定了窗口表达式（和可选的<codeph>WINDOW</codeph>子句），
+                    则根据位置（行）或基于值的（范围）窗口框架来组织输出。
+                </li>
+                <li id="eg138848">使用每个选定行的<codeph>SELECT</codeph>输出表达式来计算实际的输出行。
+                </li>
 
-        <li id="eg138856">Using the operators <codeph>UNION</codeph>, <codeph>INTERSECT</codeph>,
-          and <codeph>EXCEPT</codeph>, the output of more than one <codeph>SELECT</codeph> statement
-          can be combined to form a single result set. The <codeph>UNION</codeph> operator returns
-          all rows that are in one or both of the result sets. The <codeph>INTERSECT</codeph>
-          operator returns all rows that are strictly in both result sets. The
-            <codeph>EXCEPT</codeph> operator returns the rows that are in the first result set but
-          not in the second. In all three cases, duplicate rows are eliminated unless
-            <codeph>ALL</codeph> is specified. The noise word <codeph>DISTINCT</codeph> can be added
-          to explicitly specify eliminating duplicate rows. Notice that <codeph>DISTINCT</codeph> is
-          the default behavior here, even though <codeph>ALL</codeph> is the default for
-            <codeph>SELECT</codeph> itself. </li>
-        <li id="eg138864">If the <codeph>ORDER BY</codeph> clause is specified, the returned rows
-          are sorted in the specified order. If <codeph>ORDER BY</codeph> is not given, the rows are
-          returned in whatever order the system finds fastest to produce.</li>
-        <li id="eg138878">If the <codeph>LIMIT</codeph> (or <codeph>FETCH FIRST</codeph>) or
-            <codeph>OFFSET</codeph> clause is specified, the <codeph>SELECT</codeph> statement only
-          returns a subset of the result rows.</li>
-        <li id="eg138885">If <codeph>FOR UPDATE</codeph>, <codeph>FOR NO KEY UPDATE</codeph>,
-            <codeph>FOR SHARE</codeph>,  or <codeph>FOR KEY SHARE</codeph> is specified, the
-            <codeph>SELECT</codeph> statement locks the entire table against concurrent
-          updates.</li>
-      </ol>
-      <p>You must have <codeph>SELECT</codeph> privilege on each column used in a
-          <codeph>SELECT</codeph> command. The use of <codeph>FOR NO KEY UPDATE</codeph>,
-          <codeph>FOR UPDATE</codeph>, <codeph>FOR SHARE</codeph>, or <codeph>FOR KEY SHARE</codeph>
-        requires <codeph>UPDATE</codeph> privilege as well (for at least one column of each table so
-        selected).</p>
-    </section>
-    <section id="section4">
-      <title>Parameters</title>
-      <sectiondiv>
-        <b>The WITH Clause</b>
-        <p>The optional <codeph>WITH</codeph> clause allows you to specify one or more subqueries
-          that can be referenced by name in the primary query. The subqueries effectively act as
-          temporary tables or views for the duration of the primary query. Each subquery can be a
-            <codeph>SELECT</codeph>, <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or
-            <codeph>DELETE</codeph> statement. When writing a data-modifying statement
-            (<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or <codeph>DELETE</codeph>) in
-            <codeph>WITH</codeph>, it is usual to include a <codeph>RETURNING</codeph> clause. It is
-          the output of <codeph>RETURNING</codeph>, <i>not</i> the underlying table that the
-          statement modifies, that forms the temporary table that is read by the primary query. If
-            <codeph>RETURNING</codeph> is omitted, the statement is still executed, but it produces
-          no output so it cannot be referenced as a table by the primary query. </p><p>For a <codeph>SELECT</codeph> command that includes a
-            <codeph>WITH</codeph> clause, the clause can contain at most a single clause that
-          modifies table data (<codeph>INSERT</codeph>, <codeph>UPDATE</codeph> or
-            <codeph>DELETE</codeph> command).</p><p>A
-            <varname>with_query_name</varname> without schema qualification must be specified for
-          each query in the <codeph>WITH</codeph> clause. Optionally, a list of column names can be
-          specified; if the list of column names is omitted, the names are inferred from the
-          subquery. The primary query and the <codeph>WITH</codeph> queries are all (notionally)
-          executed at the same time. </p><p>If <codeph>RECURSIVE</codeph> is specified, it
-          allows a <codeph>SELECT</codeph> subquery to reference itself by name. Such a subquery has
-          the general
-          form</p><codeblock><varname>non_recursive_term</varname> UNION [ALL | DISTINCT] <varname>recursive_term</varname></codeblock><p>where
-          the recursive self-reference appears on the right-hand side of the <codeph>UNION</codeph>.
-          Only one recursive self-reference is permitted per query. Recursive data-modifying
-          statements are not supported, but you can use the results of a recursive
-            <codeph>SELECT</codeph> query in a data-modifying statement.</p><p>If the
-            <codeph>RECURSIVE</codeph> keyword is specified, the <codeph>WITH</codeph> queries need
-          not be ordered: a query can reference another query that is later in the list. However,
-          circular references, or mutual recursion, are not supported. </p><p>Without the
-            <codeph>RECURSIVE</codeph> keyword, <codeph>WITH</codeph> queries can only reference
-          sibling <codeph>WITH</codeph> queries that are earlier in the <codeph>WITH</codeph>
-          list.</p><p><codeph>WITH RECURSIVE</codeph> limitations. These items are not
-          supported:</p><ul id="ul_b21_szt_n1b">
-          <li>A recursive <codeph>WITH</codeph> clause that contains the following in the
-              <varname>recursive_term</varname>. <ul id="ul_c1b_nhf_p1b">
-              <li>Subqueries with a self-reference</li>
-              <li><codeph>DISTINCT</codeph> clause</li>
-              <li><codeph>GROUP BY</codeph> clause</li>
-              <li>A window function</li>
-            </ul></li>
-          <li>A recursive <codeph>WITH</codeph> clause where the <varname>with_query_name</varname>
-            is a part of a set operation.</li>
-        </ul><p>Following is an example of the set operation limitation. This query returns an error
-          because the set operation <codeph>UNION</codeph> contains a reference to the table
-            <codeph>foo</codeph>.
-          <codeblock>WITH RECURSIVE foo(i) AS (
-    SELECT 1
-  UNION ALL
-    SELECT i+1 FROM (SELECT * FROM foo UNION SELECT 0) bar
-)
-SELECT * FROM foo LIMIT 5;</codeblock></p><p>This
-          recursive CTE is allowed because the set operation <codeph>UNION</codeph> does not have a
-          reference to the CTE
-          <codeph>foo</codeph>.<codeblock>WITH RECURSIVE foo(i) AS (
-    SELECT 1
-  UNION ALL
-    SELECT i+1 FROM (SELECT * FROM bar UNION SELECT 0) bar, foo
-    WHERE foo.i = bar.a
-)
-SELECT * FROM foo LIMIT 5;</codeblock></p>
-        <p>A key property of <codeph>WITH</codeph> queries is that they are evaluated only once per
-          execution of the primary query, even if the primary query refers to them more than once.
-          In particular, data-modifying statements are guaranteed to be executed once and only once,
-          regardless of whether the primary query reads all or any of their output.</p>
-        <p>The primary query and the <codeph>WITH</codeph> queries are all (notionally) executed at
-          the same time. This implies that the effects of a data-modifying statement in
-            <codeph>WITH</codeph> cannot be seen from other parts of the query, other than by
-          reading its <codeph>RETURNING</codeph> output. If two such data-modifying statements
-          attempt to modify the same row, the results are unspecified. </p>
-        <p>See <xref
-            href="../../admin_guide/query/topics/CTE-query.xml"/><ph
-            otherprops="pivotal"> in the <cite>Greenplum Database Administrator Guide</cite></ph>
-          for additional information.</p>
-      </sectiondiv>
-      <sectiondiv id="section5">
-        <b>The SELECT List</b>
-        <p>The <codeph>SELECT</codeph> list (between the key words <codeph>SELECT</codeph> and
-            <codeph>FROM</codeph>) specifies expressions that form the output rows of the
-            <codeph>SELECT</codeph> statement. The expressions can (and usually do) refer to columns
-          computed in the <codeph>FROM</codeph> clause. </p><p>An <varname>expression</varname> in
-          the <codeph>SELECT</codeph> list can be a constant value, a column reference, an operator
-          invocation, a function call, an aggregate expression, a window expression, a scalar
-          subquery, and so on. A number of constructs can be classified as an expression but do not
-          follow any general syntax rules. These generally have the semantics of a function or
-          operator. For information about SQL value expressions and function calls, see "Querying
-          Data" in the <i>Greenplum Database Administrator Guide</i>.</p><p>Just as in a table,
-          every output column of a <codeph>SELECT</codeph> has a name. In a simple
-            <codeph>SELECT</codeph> this name is just used to label the column for display, but when
-          the <codeph>SELECT</codeph> is a sub-query of a larger query, the name is seen by the
-          larger query as the column name of the virtual table produced by the sub-query. To specify
-          the name to use for an output column, write <codeph>AS</codeph>
-          <varname>output_name</varname> after the column's expression. (You can omit
-            <codeph>AS</codeph>, but only if the desired output name does not match any SQL keyword.
-          For protection against possible future keyword additions, you can always either write
-            <codeph>AS</codeph> or double-quote the output name.) If you do not specify a column
-          name, Greenplum Database chooses a name is automatically. If the column's expression is a
-          simple column reference then the chosen name is the same as that column's name. In more
-          complex cases, a function or type name may be used, or the system may fall back on a
-          generated name such as <codeph>?column?</codeph> or
-            <codeph>column<varname>N</varname></codeph>. </p><p>An output column's name can be used to
-          refer to the column's value in <codeph>ORDER BY</codeph> and <codeph>GROUP BY</codeph>
-          clauses, but not in the <codeph>WHERE</codeph> or <codeph>HAVING</codeph> clauses; there
-          you must write out the expression instead.</p><p>Instead of an expression,
-            <codeph>*</codeph> can be written in the output list as a shorthand for all the columns
-          of the selected rows. Also, you can write <codeph><varname>table_name</varname>.*</codeph>
-          as a shorthand for the columns coming from just that table. In these cases it is not
-          possible to specify new names with <codeph>AS</codeph>; the output column names will be
-          the same as the table columns' names.</p></sectiondiv>
-      <sectiondiv><b>The DISTINCT Clause</b>
-        <p>If <codeph>SELECT DISTINCT</codeph> is specified, all duplicate rows are removed from the
-          result set (one row is kept from each group of duplicates). <codeph>SELECT ALL</codeph>
-          specifies the opposite: all rows are kept; that is the default. </p>
-        <p>
-          <codeph>SELECT DISTINCT ON ( <varname>expression</varname> [, ...] )</codeph> keeps only
-          the first row of each set of rows where the given expressions evaluate to equal. The
-            <codeph>DISTINCT ON</codeph> expressions are interpreted using the same rules as for
-            <codeph>ORDER BY</codeph> (see above). Note that the "first row" of each set is
-          unpredictable unless <codeph>ORDER BY</codeph> is used to ensure that the desired row
-          appears first. For example:
-          <codeblock>
-SELECT DISTINCT ON (location) location, time, report
-    FROM weather_reports
-    ORDER BY location, time DESC;
-</codeblock>
-          retrieves the most recent weather report for each location. But if we had not used
-            <codeph>ORDER BY</codeph> to force descending order of time values for each location,
-          we'd have gotten a report from an unpredictable time for each location. </p>
-          
-        <p> The <codeph>DISTINCT ON</codeph> expression(s) must match the leftmost <codeph>ORDER
-            BY</codeph> expression(s). The <codeph>ORDER BY</codeph> clause will normally contain
-          additional expression(s) that determine the desired precedence of rows within each
-            <codeph>DISTINCT ON</codeph> group. </p>
-      </sectiondiv>
-      <sectiondiv id="section6"><b>The FROM Clause</b><p>The <codeph>FROM</codeph> clause specifies
-          one or more source tables for the <codeph>SELECT</codeph>. If multiple sources are
-          specified, the result is the Cartesian product (cross join) of all the sources. But
-          usually qualification conditions are added (via <codeph>WHERE</codeph>) to restrict the
-          returned rows to a small subset of the Cartesian product. The <codeph>FROM</codeph> clause
-          can contain the following elements: </p><parml>
-          <plentry>
-            <pt><varname>table_name</varname></pt>
-            <pd>The name (optionally schema-qualified) of an existing table or view. If
-                <codeph>ONLY</codeph> is specified, only that table is scanned. If
-                <codeph>ONLY</codeph> is not specified, the table and all its descendant tables (if
-              any) are scanned.</pd>
-          </plentry>
-          <plentry>
-            <pt><varname>alias</varname></pt>
-            <pd>A substitute name for the <codeph>FROM</codeph> item containing the alias. An alias
-              is used for brevity or to eliminate ambiguity for self-joins (where the same table is
-              scanned multiple times). When an alias is provided, it completely hides the actual
-              name of the table or function; for example given <codeph>FROM foo AS f</codeph>, the
-              remainder of the <codeph>SELECT</codeph> must refer to this <codeph>FROM</codeph> item
-              as <codeph>f</codeph> not <codeph>foo</codeph>. If an alias is written, a column alias
-              list can also be written to provide substitute names for one or more columns of the
-              table.</pd>
-          </plentry>
-          <plentry>
-            <pt><varname>select</varname></pt>
-            <pd>A sub-<codeph>SELECT</codeph> can appear in the <codeph>FROM</codeph> clause. This
-              acts as though its output were created as a temporary table for the duration of this
-              single <codeph>SELECT</codeph> command. Note that the sub-<codeph>SELECT</codeph> must
-              be surrounded by parentheses, and an alias must be provided for it. A <codeph><xref
-                  href="VALUES.xml#topic1">VALUES</xref></codeph> command can also be used here. See
-              "Non-standard Clauses" in the <xref href="#topic1/section19" format="dita"/> section
-              for limitations of using correlated sub-selects in Greenplum Database.</pd>
-          </plentry>
-          <plentry>
-            <pt>
-              <varname>with_query_name</varname>
-            </pt>
-            <pd>A <varname>with_query</varname> is referenced in the <codeph>FROM</codeph> clause by
-              specifying its <varname>with_query_name</varname>, just as though the name were a
-              table name. The <varname>with_query_name</varname> cannot contain a schema qualifier.
-              An alias can be provided in the same way as for a table. </pd>
-            <pd>The <varname>with_query</varname> hides a table of the same name for the purposes of
-              the primary query. If necessary, you can refer to a table of the same name by
-              qualifying the table name with the schema.</pd>
-          </plentry>
-          <plentry>
-            <pt>
-              <varname>function_name</varname>
-            </pt>
-            <pd>Function calls can appear in the <codeph>FROM</codeph> clause. (This is especially
-              useful for functions that return result sets, but any function can be used.) This acts
-              as though its output were created as a temporary table for the duration of this single
-                <codeph>SELECT</codeph> command. An alias may also be used. If an alias is written,
-              a column alias list can also be written to provide substitute names for one or more
-              attributes of the function's composite return type. If the function has been defined
-              as returning the record data type, then an alias or the key word <codeph>AS</codeph>
-              must be present, followed by a column definition list in the form <codeph>(
-                column_name data_type [, ... ] )</codeph>. The column definition list must match the
-              actual number and types of columns returned by the function.</pd>
-          </plentry>
-          <plentry>
-            <pt><varname>join_type</varname></pt>
-            <pd>One of:<ul id="ul_bwd_ft2_m4">
-                <li id="eg139018"><b>[INNER] JOIN</b></li>
-                <li id="eg139020"><b>LEFT [OUTER] JOIN</b></li>
-                <li id="eg139022"><b>RIGHT [OUTER] JOIN</b></li>
-                <li id="eg139024"><b>FULL [OUTER] JOIN</b></li>
-                <li id="eg139026"><b>CROSS JOIN</b></li>
-              </ul></pd>
-            <pd>For the <codeph>INNER</codeph> and <codeph>OUTER</codeph> join types, a join
-              condition must be specified, namely exactly one of <codeph>NATURAL</codeph>,
-                <codeph>ON <varname>join_condition</varname></codeph>, or <codeph>USING (
-                  <varname>join_column</varname> [, ...])</codeph>. See below for the meaning. For
-                <codeph>CROSS JOIN</codeph>, none of these clauses may appear.</pd>
-            <pd>A JOIN clause combines two <codeph>FROM</codeph> items, which for convenience we
-              will refer to as "tables", though in reality they can be any type of
-                <codeph>FROM</codeph> item. Use parentheses if necessary to determine the order of
-              nesting. In the absence of parentheses, <codeph>JOIN</codeph>s nest left-to-right. In
-              any case <codeph>JOIN</codeph> binds more tightly than the commas separating
-                <codeph>FROM</codeph>-list items. </pd>
-            <pd><codeph>CROSS JOIN</codeph> and <codeph>INNER JOIN</codeph> produce a simple
-              Cartesian product, the same result as you get from listing the two tables at the top
-              level of <codeph>FROM</codeph>, but restricted by the join condition (if any).
-                <codeph>CROSS JOIN</codeph> is equivalent to <codeph>INNER JOIN
-                ON</codeph><codeph>(TRUE)</codeph>, that is, no rows are removed by qualification.
-              These join types are just a notational convenience, since they do nothing you could
-              not do with plain <codeph>FROM</codeph> and <codeph>WHERE</codeph>. </pd>
-            <pd><codeph>LEFT OUTER JOIN</codeph> returns all rows in the qualified Cartesian product
-              (i.e., all combined rows that pass its join condition), plus one copy of each row in
-              the left-hand table for which there was no right-hand row that passed the join
-              condition. This left-hand row is extended to the full width of the joined table by
-              inserting null values for the right-hand columns. Note that only the
-                <codeph>JOIN</codeph> clause's own condition is considered while deciding which rows
-              have matches. Outer conditions are applied afterwards.</pd>
-            <pd>Conversely, <codeph>RIGHT OUTER JOIN</codeph> returns all the joined rows, plus one
-              row for each unmatched right-hand row (extended with nulls on the left). This is just
-              a notational convenience, since you could convert it to a <codeph>LEFT OUTER
-                JOIN</codeph> by switching the left and right tables.</pd>
-            <pd><codeph>FULL OUTER JOIN</codeph> returns all the joined rows, plus one row for each
-              unmatched left-hand row (extended with nulls on the right), plus one row for each
-              unmatched right-hand row (extended with nulls on the left).</pd>
-          </plentry>
-        </parml><parml>
-          <plentry>
-            <pt>ON <varname>join_condition</varname></pt>
-            <pd><varname>join_condition</varname> is an expression resulting in a value of type
-                <codeph>boolean</codeph> (similar to a <codeph>WHERE</codeph> clause) that specifies
-              which rows in a join are considered to match.</pd>
-          </plentry>
-          <plentry>
-            <pt>USING (<varname>join_column</varname> [, ...])</pt>
-            <pd>A clause of the form <codeph>USING ( a, b, ... )</codeph> is shorthand for
-                <codeph>ON left_table.a = right_table.a AND left_table.b = right_table.b ...
-              </codeph>. Also, <codeph>USING</codeph> implies that only one of each pair of
-              equivalent columns will be included in the join output, not both.</pd>
-          </plentry>
-          <plentry>
-            <pt>NATURAL</pt>
-            <pd><codeph>NATURAL</codeph> is shorthand for a <codeph>USING</codeph> list that
-              mentions all columns in the two tables that have the same names. If there are no
-              common column names, <codeph>NATURAL</codeph> is equivalent to <codeph>ON
-                TRUE</codeph>. </pd>
-          </plentry>
-        </parml></sectiondiv>
-      <sectiondiv id="section7"><b>The WHERE Clause</b><p>The optional <codeph>WHERE</codeph> clause
-          has the general form:</p><codeblock>WHERE <varname>condition</varname></codeblock><p>where
-            <varname>condition</varname> is any expression that evaluates to a result of type
-            <codeph>boolean</codeph>. Any row that does not satisfy this condition will be
-          eliminated from the output. A row satisfies the condition if it returns true when the
-          actual row values are substituted for any variable references. </p></sectiondiv>
-      <sectiondiv id="section8"><b>The GROUP BY Clause</b><p>The optional <codeph>GROUP BY</codeph>
-          clause has the general
-          form:</p><codeblock>GROUP BY <varname>grouping_element </varname>[, ...]</codeblock><p>where
-            <varname>grouping_element</varname> can be one
-            of:</p><codeblock>()
-<varname>expression</varname>
-ROLLUP (<varname>expression</varname> [,...])
-CUBE (<varname>expression</varname> [,...])
-GROUPING SETS ((<varname>grouping_element</varname> [, ...]))</codeblock><p><codeph>GROUP
-            BY</codeph> will condense into a single row all selected rows that share the same values
-          for the grouped expressions. <varname>expression</varname> can be an input column name, or
-          the name or ordinal number of an output column (<codeph>SELECT</codeph> list item), or an
-          arbitrary expression formed from input-column values. In case of ambiguity, a
-            <codeph>GROUP BY</codeph> name will be interpreted as an input-column name rather than
-          an output column name.</p><p>Aggregate functions, if any are used, are computed across all
-          rows making up each group, producing a separate value for each group. (If there are
-          aggregate functions but no <codeph>GROUP BY</codeph> clause, the query is treated as
-          having a single group comprising all the selected rows.) The set of rows fed to each
-          aggregate function can be further filtered by attaching a <codeph>FILTER</codeph> clause
-          to the aggregate function call. When a <codeph>FILTER</codeph> clause is present, only
-          those rows matching it are included in the input to that aggregate function.</p><p>When
-            <codeph>GROUP BY</codeph> is present, or any aggregate functions are present, it is not
-          valid for the <codeph>SELECT</codeph> list expressions to refer to ungrouped columns
-          except within aggregate functions or when the ungrouped column is functionally dependent
-          on the grouped columns, since there would otherwise be more than one possible value to
-          return for an ungrouped column. A functional dependency exists if the grouped columns (or
-          a subset thereof) are the primary key of the table containing the ungrouped column.</p><p>
-          Keep in mind that all aggregate functions are evaluated before evaluating any "scalar"
-          expressions in the <codeph>HAVING</codeph> clause or <codeph>SELECT</codeph> list. This
-          means that, for example, a <codeph>CASE</codeph> expression cannot be used to skip
-          evaluation of an aggregate function; see<xref
-            href="../../admin_guide/query/topics/defining-queries.xml#topic25"/>. </p><p>Greenplum
-          Database has the following additional OLAP grouping extensions (often referred to as
-            <i>supergroups</i>):</p><parml>
-          <plentry>
-            <pt>ROLLUP</pt>
-            <pd>A <codeph>ROLLUP</codeph> grouping is an extension to the <codeph>GROUP BY</codeph>
-              clause that creates aggregate subtotals that roll up from the most detailed level to a
-              grand total, following a list of grouping columns (or expressions).
-                <codeph>ROLLUP</codeph> takes an ordered list of grouping columns, calculates the
-              standard aggregate values specified in the <codeph>GROUP BY</codeph> clause, then
-              creates progressively higher-level subtotals, moving from right to left through the
-              list. Finally, it creates a grand total. A <codeph>ROLLUP</codeph> grouping can be
-              thought of as a series of grouping sets. For example:</pd>
-            <pd>
-              <codeblock>GROUP BY ROLLUP (a,b,c) </codeblock>
-            </pd>
-            <pd>is equivalent to:</pd>
-            <pd>
-              <codeblock>GROUP BY GROUPING SETS( (a,b,c), (a,b), (a), () ) </codeblock>
-            </pd>
-            <pd>Notice that the <varname>n</varname> elements of a <codeph>ROLLUP</codeph> translate
-              to <varname>n</varname>+1 grouping sets. Also, the order in which the grouping
-              expressions are specified is significant in a <codeph>ROLLUP</codeph>.</pd>
-          </plentry>
-          <plentry>
-            <pt>CUBE</pt>
-            <pd>A <codeph>CUBE</codeph> grouping is an extension to the <codeph>GROUP BY</codeph>
-              clause that creates subtotals for all of the possible combinations of the given list
-              of grouping columns (or expressions). In terms of multidimensional analysis,
-                <codeph>CUBE</codeph> generates all the subtotals that could be calculated for a
-              data cube with the specified dimensions. For example:</pd>
-            <pd>
-              <codeblock>GROUP BY CUBE (a,b,c) </codeblock>
-            </pd>
-            <pd>is equivalent to:</pd>
-            <pd>
-              <codeblock>GROUP BY GROUPING SETS( (a,b,c), (a,b), (a,c), (b,c), (a), 
-(b), (c), () ) </codeblock>
-            </pd>
-            <pd>Notice that <varname>n</varname> elements of a <codeph>CUBE</codeph> translate to 2n
-              grouping sets. Consider using <codeph>CUBE</codeph> in any situation requiring
-              cross-tabular reports. <codeph>CUBE</codeph> is typically most suitable in queries
-              that use columns from multiple dimensions rather than columns representing different
-              levels of a single dimension. For instance, a commonly requested cross-tabulation
-              might need subtotals for all the combinations of month, state, and product.</pd>
-          </plentry>
-          <plentry>
-            <pt>GROUPING SETS</pt>
-            <pd>You can selectively specify the set of groups that you want to create using a
-                <codeph>GROUPING SETS</codeph> expression within a <codeph>GROUP BY</codeph> clause.
-              This allows precise specification across multiple dimensions without computing a whole
-                <codeph>ROLLUP</codeph> or <codeph>CUBE</codeph>. For example:</pd>
-            <pd>
-              <codeblock>GROUP BY GROUPING SETS( (a,c), (a,b) )</codeblock>
-            </pd>
-            <pd>If using the grouping extension clauses <codeph>ROLLUP</codeph>,
-                <codeph>CUBE</codeph>, or <codeph>GROUPING SETS</codeph>, two challenges arise.
-              First, how do you determine which result rows are subtotals, and then the exact level
-              of aggregation for a given subtotal. Or, how do you differentiate between result rows
-              that contain both stored <codeph>NULL</codeph> values and "NULL" values created by the
-                <codeph>ROLLUP</codeph> or <codeph>CUBE</codeph>. Secondly, when duplicate grouping
-              sets are specified in the <codeph>GROUP BY</codeph> clause, how do you determine which
-              result rows are duplicates? There are two additional grouping functions you can use in
-              the <codeph>SELECT</codeph> list to help with this:<ul id="ul_vx1_3ml_m4">
-                <li id="eg143759"><b>grouping(column [, ...])</b> — The <codeph>grouping</codeph>
-                  function can be applied to one or more grouping attributes to distinguish
-                  super-aggregated rows from regular grouped rows. This can be helpful in
-                  distinguishing a "NULL" representing the set of all values in a super-aggregated
-                  row from a <codeph>NULL</codeph> value in a regular row. Each argument in this
-                  function produces a bit — either <codeph>1</codeph> or <codeph>0</codeph>, where
-                    <codeph>1</codeph> means the result row is super-aggregated, and
-                    <codeph>0</codeph> means the result row is from a regular grouping. The
-                    <codeph>grouping</codeph> function returns an integer by treating these bits as
-                  a binary number and then converting it to a base-10 integer.</li>
-                <li id="eg143806"><b>group_id()</b> — For grouping extension queries that contain
-                  duplicate grouping sets, the <codeph>group_id</codeph> function is used to
-                  identify duplicate rows in the output. All <i>unique</i> grouping set output rows
-                  will have a group_id value of 0. For each duplicate grouping set detected, the
-                    <codeph>group_id</codeph> function assigns a group_id number greater than 0. All
-                  output rows in a particular duplicate grouping set are identified by the same
-                  group_id number. </li>
-              </ul></pd>
-          </plentry>
-        </parml></sectiondiv>
-      <sectiondiv id="section9"><b>The WINDOW Clause</b><p>The optional <codeph>WINDOW</codeph>
-          clause specifies the behavior of window functions appearing in the query's
-            <codeph>SELECT</codeph> list or <codeph>ORDER BY</codeph> clause. These functions can
-          reference the <codeph>WINDOW</codeph> clause entries by name in their
-            <codeph>OVER</codeph> clauses. A <codeph>WINDOW</codeph> clause entry does not have to
-          be referenced anywhere, however; if it is not used in the query it is simply ignored. It
-          is possible to use window functions without any <codeph>WINDOW</codeph> clause at all,
-          since a window function call can specify its window definition directly in its
-            <codeph>OVER</codeph> clause. However, the <codeph>WINDOW</codeph> clause saves typing
-          when the same window definition is needed for more than one window function.</p><p>For
-          example:</p><codeblock>SELECT vendor, rank() OVER (mywindow) FROM sale
-GROUP BY vendor
-WINDOW mywindow AS (ORDER BY sum(prc*qty));</codeblock><p>A
-            <codeph>WINDOW</codeph> clause has this general
-  form:</p><codeblock>WINDOW <varname>window_name</varname> AS (<varname>window_definition</varname>)</codeblock><p>where <varname>window_name</varname> is a name that can be referenced from <codeph>OVER</codeph> clauses or subsequent window definitions, and <varname>window_definition</varname> is:</p><codeblock>[<varname>existing_window_name</varname>]
-[PARTITION BY <varname>expression</varname> [, ...]]
-[ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] [NULLS {FIRST | LAST}] [, ...] ]
-[<varname>frame_clause</varname>] </codeblock><parml>
-          <plentry>
-            <pt><varname>existing_window_name</varname></pt>
-            <pd>If an <codeph><varname>existing_window_name</varname></codeph> is specified it must
-              refer to an earlier entry in the <codeph>WINDOW</codeph> list; the new window copies
-              its partitioning clause from that entry, as well as its ordering clause if any. The
-              new window cannot specify its own <codeph>PARTITION BY</codeph> clause, and it can
-              specify <codeph>ORDER BY</codeph> only if the copied window does not have one. The new
-              window always uses its own frame clause; the copied window must not specify a frame
-              clause.</pd>
-          </plentry>
-          <plentry>
-            <pt>PARTITION BY</pt>
-            <pd>The <codeph>PARTITION BY</codeph> clause organizes the result set into logical
-              groups based on the unique values of the specified expression. The elements of the
-                <codeph>PARTITION BY</codeph> clause are interpreted in much the same fashion as
-              elements of a <codeph>GROUP BY</codeph> clause, except that they are always simple
-              expressions and never the name or number of an output column. Another difference is
-              that these expressions can contain aggregate function calls, which are not allowed in
-              a regular <codeph>GROUP BY</codeph> clause. They are allowed here because windowing
-              occurs after grouping and aggregation. When used with window functions, the functions
-              are applied to each partition independently. For example, if you follow
-                <codeph>PARTITION BY</codeph> with a column name, the result set is partitioned by
-              the distinct values of that column. If omitted, the entire result set is considered
-              one partition.</pd>
-            <pd>Similarly, the elements of the <codeph>ORDER BY</codeph> list are interpreted in
-              much the same fashion as elements of an <codeph>ORDER BY</codeph> clause, except that
-              the expressions are always taken as simple expressions and never the name or number of
-              an output column. </pd>
-          </plentry>
-          <plentry>
-            <pt>ORDER BY</pt>
-            <pd>The elements of the <codeph>ORDER BY</codeph> clause define how to sort the rows in
-              each partition of the result set. If omitted, rows are returned in whatever order is
-              most efficient and may vary. <b>Note:</b> Columns of data types that lack a coherent
-              ordering, such as <codeph>time</codeph>, are not good candidates for use in the
-                <codeph>ORDER BY</codeph> clause of a window specification. Time, with or without
-              time zone, lacks a coherent ordering because addition and subtraction do not have the
-              expected effects. For example, the following is not generally true: <codeph>x::time
-                &lt; x::time + '2 hour'::interval</codeph></pd>
-          </plentry>
-          <plentry>
-            <pt><varname>frame_clause</varname>
-            </pt>
-            <pd>The optional <codeph><varname>frame_clause</varname></codeph> defines the <i>window
-                frame</i> for window functions that depend on the frame (not all do). The window
-              frame is a set of related rows for each row of the query (called the <i>current
-                row</i>). The <codeph><varname>frame_clause</varname></codeph> can be one of
-              <codeblock>{ RANGE | ROWS } <varname>frame_start</varname>
-{ RANGE | ROWS } BETWEEN <varname>frame_start</varname> AND <varname>frame_end</varname></codeblock>where
-                  <codeph><varname>frame_start</varname></codeph> and
-                  <codeph><varname>frame_end</varname></codeph> can be one of<ul id="ul_ehq_kws_1gb">
-                <li><codeph>UNBOUNDED PRECEDING</codeph></li>
-                <li><codeph><varname>value</varname> PRECEDING</codeph></li>
-                <li><codeph>CURRENT ROW</codeph></li>
-                <li><codeph><varname>value</varname> FOLLOWING</codeph></li>
-                <li><codeph>UNBOUNDED FOLLOWING</codeph></li>
-              </ul></pd>
-            <pd>If <codeph><varname>frame_end</varname></codeph> is omitted it defaults to
-                <codeph>CURRENT ROW</codeph>. Restrictions are that
-                  <codeph><varname>frame_start</varname></codeph> cannot be <codeph>UNBOUNDED
-                FOLLOWING</codeph>, <codeph><varname>frame_end</varname></codeph> cannot be
-                <codeph>UNBOUNDED PRECEDING</codeph>, and the
-                <codeph><varname>frame_end</varname></codeph> choice cannot appear earlier in the
-              above list than the <codeph><varname>frame_start</varname></codeph> choice — for
-              example <codeph>RANGE BETWEEN CURRENT ROW AND <varname>value</varname>
-                PRECEDING</codeph> is not allowed. </pd>
-            <pd>The default framing option is <codeph>RANGE UNBOUNDED PRECEDING</codeph>, which is
-              the same as <codeph>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</codeph>; it
-              sets the frame to be all rows from the partition start up through the current row's 
-              last peer (a row that <codeph>ORDER
-                BY</codeph> considers equivalent to the current row, or all rows if there
-                is no <codeph>ORDER BY</codeph>). In general, <codeph>UNBOUNDED PRECEDING</codeph> means
-              that the frame starts with the first row of the partition, and similarly
-                <codeph>UNBOUNDED FOLLOWING</codeph> means that the frame ends with the last row of
-              the partition (regardless of <codeph>RANGE</codeph> or <codeph>ROWS</codeph> mode). In
-                <codeph>ROWS</codeph> mode, <codeph>CURRENT ROW</codeph> means that the frame starts
-              or ends with the current row; but in <codeph>RANGE</codeph> mode it means that the
-              frame starts or ends with the current row's first or last peer in the <codeph>ORDER
-                BY</codeph> ordering. The <varname>value</varname>
-              <codeph>PRECEDING</codeph> and <varname>value</varname>
-              <codeph>FOLLOWING</codeph> cases are currently only allowed in <codeph>ROWS</codeph>
-              mode. They indicate that the frame starts or ends with the row that many rows before
-              or after the current row. <varname>value</varname> must be an integer expression not
-              containing any variables, aggregate functions, or window functions. The value must not
-              be null or negative; but it can be zero, which selects the current row itself. </pd>
-            <pd>Beware that the <codeph>ROWS</codeph> options can produce unpredictable results if
-              the <codeph>ORDER BY</codeph> ordering does not order the rows uniquely. The
-                <codeph>RANGE</codeph> options are designed to ensure that rows that are peers in
-              the <codeph>ORDER BY</codeph> ordering are treated alike; all peer rows will be in the
-              same frame. </pd>
-            <pd>Use either a <codeph>ROWS</codeph> or <codeph>RANGE</codeph> clause to express the
-              bounds of the window. The window bound can be one, many, or all rows of a partition.
-              You can express the bound of the window either in terms of a range of data values
-              offset from the value in the current row (<codeph>RANGE</codeph>), or in terms of the
-              number of rows offset from the current row (<codeph>ROWS</codeph>). When using the
-                <codeph>RANGE</codeph> clause, you must also use an <codeph>ORDER BY</codeph>
-              clause. This is because the calculation performed to produce the window requires that
-              the values be sorted. Additionally, the <codeph>ORDER BY</codeph> clause cannot
-              contain more than one expression, and the expression must result in either a date or a
-              numeric value. When using the <codeph>ROWS</codeph> or <codeph>RANGE</codeph> clauses,
-              if you specify only a starting row, the current row is used as the last row in the
-              window.</pd>
-            <pd><b>PRECEDING</b> — The <codeph>PRECEDING</codeph> clause defines the first row of
-              the window using the current row as a reference point. The starting row is expressed
-              in terms of the number of rows preceding the current row. For example, in the case of
-                <codeph>ROWS</codeph> framing, <codeph>5 PRECEDING</codeph> sets the window to start
-              with the fifth row preceding the current row. In the case of <codeph>RANGE</codeph>
-              framing, it sets the window to start with the first row whose ordering column value
-              precedes that of the current row by 5 in the given order. If the specified order is
-              ascending by date, this will be the first row within 5 days before the current row.
-                <codeph>UNBOUNDED PRECEDING</codeph> sets the first row in the window to be the
-              first row in the partition.</pd>
-            <pd><b>BETWEEN</b> — The <codeph>BETWEEN</codeph> clause defines the first and last row
-              of the window, using the current row as a reference point. First and last rows are
-              expressed in terms of the number of rows preceding and following the current row,
-              respectively. For example, <codeph>BETWEEN 3 PRECEDING AND 5 FOLLOWING</codeph> sets
-              the window to start with the third row preceding the current row, and end with the
-              fifth row following the current row. Use <codeph>BETWEEN UNBOUNDED PRECEDING AND
-                UNBOUNDED FOLLOWING</codeph> to set the first and last rows in the window to be the
-              first and last row in the partition, respectively. This is equivalent to the default
-              behavior if no <codeph>ROW</codeph> or <codeph>RANGE</codeph> clause is
-              specified.</pd>
-            <pd><b>FOLLOWING</b> — The <codeph>FOLLOWING</codeph> clause defines the last row of the
-              window using the current row as a reference point. The last row is expressed in terms
-              of the number of rows following the current row. For example, in the case of
-                <codeph>ROWS</codeph> framing, <codeph>5 FOLLOWING</codeph> sets the window to end
-              with the fifth row following the current row. In the case of <codeph>RANGE</codeph>
-              framing, it sets the window to end with the last row whose ordering column value
-              follows that of the current row by 5 in the given order. If the specified order is
-              ascending by date, this will be the last row within 5 days after the current row. Use
-                <codeph>UNBOUNDED FOLLOWING</codeph> to set the last row in the window to be the
-              last row in the partition.</pd>
-            <pd>If you do not specify a <codeph>ROW</codeph> or a <codeph>RANGE</codeph> clause, the
-              window bound starts with the first row in the partition (<codeph>UNBOUNDED
-                PRECEDING</codeph>) and ends with the current row (<codeph>CURRENT ROW</codeph>) if
-                <codeph>ORDER BY</codeph> is used. If an <codeph>ORDER BY</codeph> is not specified,
-              the window starts with the first row in the partition (<codeph>UNBOUNDED
-                PRECEDING</codeph>) and ends with last row in the partition (<codeph>UNBOUNDED
-                FOLLOWING</codeph>).</pd>
-          </plentry>
-        </parml></sectiondiv>
-      <sectiondiv id="section10"><b>The HAVING Clause</b><p>The optional <codeph>HAVING</codeph>
-          clause has the general
-          form:</p><codeblock>HAVING <varname>condition</varname></codeblock><p>where
-            <varname>condition</varname> is the same as specified for the <codeph>WHERE</codeph>
-          clause. <codeph>HAVING</codeph> eliminates group rows that do not satisfy the condition.
-            <codeph>HAVING</codeph> is different from <codeph>WHERE</codeph>: <codeph>WHERE</codeph>
-          filters individual rows before the application of <codeph>GROUP BY</codeph>, while
-            <codeph>HAVING</codeph> filters group rows created by <codeph>GROUP BY</codeph>. Each
-          column referenced in <varname>condition</varname> must unambiguously reference a grouping
-            column, unless the reference appears within an aggregate function or the ungrouped column is
-            functionally dependent on the grouping columns.</p><p>The presence of
-            <codeph>HAVING</codeph> turns a query into a grouped query even if there is no
-            <codeph>GROUP BY</codeph> clause. This is the same as what happens when the query
-          contains aggregate functions but no <codeph>GROUP BY</codeph> clause. All the selected
-          rows are considered to form a single group, and the <codeph>SELECT</codeph> list and
-            <codeph>HAVING</codeph> clause can only reference table columns from within aggregate
-          functions. Such a query will emit a single row if the <codeph>HAVING</codeph> condition is
-          true, zero rows if it is not true. </p></sectiondiv>
-      <sectiondiv id="section11"><b>The UNION Clause</b><p>The <codeph>UNION</codeph> clause has
-          this general
-          form:</p><codeblock><varname>select_statement</varname> UNION [ALL | DISTINCT] <varname>select_statement</varname></codeblock><p>where
-            <varname>select_statement</varname> is any <codeph>SELECT</codeph> statement without an
-            <codeph>ORDER BY</codeph>, <codeph>LIMIT</codeph>, <codeph>FOR NO KEY UPDATE</codeph>,
-            <codeph>FOR UPDATE</codeph>, <codeph>FOR SHARE</codeph>, or <codeph>FOR KEY
-            SHARE</codeph> clause. (<codeph>ORDER BY</codeph> and <codeph>LIMIT</codeph> can be
-          attached to a subquery expression if it is enclosed in parentheses. Without parentheses,
-          these clauses will be taken to apply to the result of the <codeph>UNION</codeph>, not to
-          its right-hand input expression.) </p><p>The <codeph>UNION</codeph> operator computes the
-          set union of the rows returned by the involved <codeph>SELECT</codeph> statements. A row
-          is in the set union of two result sets if it appears in at least one of the result sets.
-          The two <codeph>SELECT</codeph> statements that represent the direct operands of the
-            <codeph>UNION</codeph> must produce the same number of columns, and corresponding
-          columns must be of compatible data types.</p><p>The result of <codeph>UNION</codeph> does
-          not contain any duplicate rows unless the <codeph>ALL</codeph> option is specified.
-            <codeph>ALL</codeph> prevents elimination of duplicates. (Therefore, <codeph>UNION
-            ALL</codeph> is usually significantly quicker than <codeph>UNION</codeph>; use
-            <codeph>ALL</codeph> when you can.) <codeph>DISTINCT</codeph> can be written to
-          explicitly specify the default behavior of eliminating duplicate rows. </p><p>Multiple
-            <codeph>UNION</codeph> operators in the same <codeph>SELECT</codeph> statement are
-          evaluated left to right, unless otherwise indicated by parentheses. </p><p>Currently,
-            <codeph>FOR NO KEY UPDATE</codeph>, <codeph>FOR UPDATE</codeph>, <codeph>FOR
-            SHARE</codeph>, and <codeph>FOR KEY SHARE</codeph> cannot be specified either for a
-            <codeph>UNION</codeph> result or for any input of a <codeph>UNION</codeph>.
-        </p></sectiondiv>
-      <sectiondiv id="section12"><b>The INTERSECT Clause</b><p>The <codeph>INTERSECT</codeph> clause
-          has this general
-          form:</p><codeblock><varname>select_statement</varname> INTERSECT [ALL | DISTINCT] <varname>select_statement</varname></codeblock><p>where
-            <varname>select_statement</varname> is any SELECT statement without an <codeph>ORDER
-            BY</codeph>, <codeph>LIMIT</codeph>, <codeph>FOR NO KEY UPDATE</codeph>, <codeph>FOR
-            UPDATE</codeph>, <codeph>FOR SHARE</codeph>, or <codeph>FOR KEY SHARE</codeph> clause.
-          </p><p>The <codeph>INTERSECT</codeph> operator computes the set intersection of the rows
-          returned by the involved <codeph>SELECT</codeph> statements. A row is in the intersection
-          of two result sets if it appears in both result sets.</p><p>The result of
-            <codeph>INTERSECT</codeph> does not contain any duplicate rows unless the
-            <codeph>ALL</codeph> option is specified. With <codeph>ALL</codeph>, a row that has
-            <varname>m</varname> duplicates in the left table and <varname>n</varname> duplicates in
-          the right table will appear min(<varname>m</varname>, <varname>n</varname>) times in the
-          result set. <codeph>DISTINCT</codeph> can be written to explicitly specify the default
-          behavior of eliminating duplicate rows.</p><p>Multiple <codeph>INTERSECT</codeph>
-          operators in the same <codeph>SELECT</codeph> statement are evaluated left to right,
-          unless parentheses dictate otherwise. <codeph>INTERSECT</codeph> binds more tightly than
-            <codeph>UNION</codeph>. That is, <codeph>A UNION B INTERSECT C</codeph> will be read as
-            <codeph>A UNION (B INTERSECT C)</codeph>. </p><p>Currently, <codeph>FOR NO KEY
-            UPDATE</codeph>, <codeph>FOR UPDATE</codeph>, <codeph>FOR SHARE</codeph>, and
-            <codeph>FOR KEY SHARE</codeph> cannot be specified either for an
-            <codeph>INTERSECT</codeph> result or for any input of an <codeph>INTERSECT</codeph>.
-        </p></sectiondiv>
-      <sectiondiv id="section13"><b>The EXCEPT Clause</b><p>The <codeph>EXCEPT</codeph> clause has
-          this general
-          form:</p><codeblock><varname>select_statement</varname> EXCEPT [ALL | DISTINCT] <varname>select_statement</varname></codeblock><p>where
-            <varname>select_statement</varname> is any <codeph>SELECT</codeph> statement without an
-            <codeph>ORDER BY</codeph>, <codeph>LIMIT</codeph>, <codeph>FOR NO KEY UPDATE</codeph>,
-            <codeph>FOR UPDATE</codeph>, <codeph>FOR SHARE</codeph>, or <codeph>FOR KEY
-            SHARE</codeph> clause. </p><p>The <codeph>EXCEPT</codeph> operator computes the set of
-          rows that are in the result of the left <codeph>SELECT</codeph> statement but not in the
-          result of the right one. </p><p>The result of <codeph>EXCEPT</codeph> does not contain any
-          duplicate rows unless the <codeph>ALL</codeph> option is specified. With
-            <codeph>ALL</codeph>, a row that has <varname>m</varname> duplicates in the left table
-          and <varname>n</varname> duplicates in the right table will appear
-            max(<varname>m-n</varname>,0) times in the result set. <codeph>DISTINCT</codeph> can be
-          written to explicitly specify the default behavior of eliminating duplicate
-          rows.</p><p>Multiple <codeph>EXCEPT</codeph> operators in the same <codeph>SELECT</codeph>
-          statement are evaluated left to right, unless parentheses dictate otherwise.
-            <codeph>EXCEPT</codeph> binds at the same level as <codeph>UNION</codeph>.
-          </p><p>Currently, <codeph>FOR NO KEY UPDATE</codeph>, <codeph>FOR UPDATE</codeph>,
-            <codeph>FOR SHARE</codeph>, and <codeph>FOR KEY SHARE</codeph> cannot be specified
-          either for an <codeph>EXCEPT</codeph> result or for any input of an
-            <codeph>EXCEPT</codeph>. </p></sectiondiv>
-      <sectiondiv id="section14"><b>The ORDER BY Clause</b><p>The optional <codeph>ORDER BY</codeph>
-          clause has this general
-          form:</p><codeblock>ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] [NULLS {FIRST | LAST}] [,...]</codeblock><p>where
-            <varname>expression</varname> can be the name or ordinal number of an output column
-            (<codeph>SELECT</codeph> list item), or it can be an arbitrary expression formed from
-          input-column values. </p><p>The <codeph>ORDER BY</codeph> clause causes the result rows to
-          be sorted according to the specified expressions. If two rows are equal according to the
-          left-most expression, they are compared according to the next expression and so on. If
-          they are equal according to all specified expressions, they are returned in an
-          implementation-dependent order.</p><p>The ordinal number refers to the ordinal
-          (left-to-right) position of the output column. This feature makes it possible to define an
-          ordering on the basis of a column that does not have a unique name. This is never
-          absolutely necessary because it is always possible to assign a name to an output column
-          using the <codeph>AS</codeph> clause. </p><p>It is also possible to use arbitrary
-          expressions in the <codeph>ORDER BY</codeph> clause, including columns that do not appear
-          in the <codeph>SELECT</codeph> output list. Thus the following statement is
-          valid:</p><codeblock>SELECT name FROM distributors ORDER BY code;</codeblock><p>A
-          limitation of this feature is that an <codeph>ORDER BY</codeph> clause applying to the
-          result of a <codeph>UNION</codeph>, <codeph>INTERSECT</codeph>, or <codeph>EXCEPT</codeph>
-          clause may only specify an output column name or number, not an expression.</p><p>If an
-            <codeph>ORDER BY</codeph> expression is a simple name that matches both an output column
-          name and an input column name, <codeph>ORDER BY</codeph> will interpret it as the output
-          column name. This is the opposite of the choice that <codeph>GROUP BY</codeph> will make
-          in the same situation. This inconsistency is made to be compatible with the SQL standard.
-          </p><p>Optionally one may add the key word <codeph>ASC</codeph> (ascending) or
-            <codeph>DESC</codeph> (descending) after any expression in the <codeph>ORDER BY</codeph>
-          clause. If not specified, <codeph>ASC</codeph> is assumed by default. Alternatively, a
-          specific ordering operator name may be specified in the <codeph>USING</codeph> clause.
-            <codeph>ASC</codeph> is usually equivalent to <codeph>USING &lt;</codeph> and
-            <codeph>DESC</codeph> is usually equivalent to <codeph>USING &gt;</codeph>. (But the
-          creator of a user-defined data type can define exactly what the default sort ordering is,
-          and it might correspond to operators with other names.) </p><p>If <codeph>NULLS
-            LAST</codeph> is specified, null values sort after all non-null values; if <codeph>NULLS
-            FIRST</codeph> is specified, null values sort before all non-null values. If neither is
-          specified, the default behavior is <codeph>NULLS LAST</codeph> when <codeph>ASC</codeph>
-          is specified or implied, and <codeph>NULLS FIRST</codeph> when <codeph>DESC</codeph> is
-          specified (thus, the default is to act as though nulls are larger than non-nulls). When
-            <codeph>USING</codeph> is specified, the default nulls ordering depends upon whether the
-          operator is a less-than or greater-than operator.</p><p>Note that ordering options apply
-          only to the expression they follow; for example <codeph>ORDER BY x, y DESC</codeph> does
-          not mean the same thing as <codeph>ORDER BY x DESC, y
-          DESC</codeph>.</p><p>Character-string data is sorted according to the locale-specific
-          collation order that was established when the database was created.</p><p>Character-string data is sorted
-          according to the collation that applies to the column being sorted. That can be overridden
-          as needed by including a <codeph>COLLATE</codeph> clause in the
-            <varname>expression</varname>, for example <codeph>ORDER BY mycolumn COLLATE
-            "en_US"</codeph>. For information about defining collations, see <codeph><xref
-              href="./CREATE_COLLATION.xml">CREATE
-            COLLATION</xref></codeph>.</p></sectiondiv>
-      <sectiondiv><b>The LIMIT Clause</b><p>The <codeph>LIMIT</codeph> clause consists of two
-          independent
-          sub-clauses:</p><codeblock>LIMIT {<varname>count</varname> | ALL}
-OFFSET <varname>start</varname></codeblock><p>where
-            <varname>count</varname> specifies the maximum number of rows to return, while
-            <varname>start</varname> specifies the number of rows to skip before starting to return
-          rows. When both are specified, start rows are skipped before starting to count the
-            <codeph>count</codeph> rows to be returned. </p><p>If the <codeph>count</codeph>
-          expression evaluates to NULL, it is treated as <codeph>LIMIT ALL</codeph>, that is, no
-          limit. If <codeph>start</codeph> evaluates to NULL, it is treated the same as
-            <codeph>OFFSET 0</codeph>.</p><p>SQL:2008 introduced a different syntax to achieve the
-          same result, which Greenplum Database also supports. It is:
-          <codeblock>OFFSET <varname>start</varname> [ ROW | ROWS ]
-            FETCH { FIRST | NEXT } [ <varname>count</varname> ] { ROW | ROWS } ONLY</codeblock></p><p>In this syntax, the <varname>start</varname>
-              or <varname>count</varname> value is required by
-              the standard to be a literal constant, a parameter, or a variable name;
-              as a Greenplum Database extension, other expressions
-              are allowed, but will generally need to be enclosed in parentheses to avoid
-              ambiguity.
-              If <varname>count</varname> is
-              omitted in a <codeph>FETCH</codeph> clause, it defaults to 1.            
-            <codeph>ROW</codeph> and <codeph>ROWS</codeph> as well as <codeph>FIRST</codeph> and
-            <codeph>NEXT</codeph> are noise words that don't influence the effects of these clauses.
-          According to the standard, the <codeph>OFFSET</codeph> clause must come before the
-            <codeph>FETCH</codeph> clause if both are present; but Greenplum Database allows either
-          order.</p><p>When using <codeph>LIMIT</codeph>, it is a good idea to use an <codeph>ORDER
-            BY</codeph> clause that constrains the result rows into a unique order. Otherwise you
-          will get an unpredictable subset of the query's rows — you may be asking for the tenth
-          through twentieth rows, but tenth through twentieth in what ordering? You don't know what
-          ordering unless you specify <codeph>ORDER BY</codeph>. </p><p>The query optimizer takes
-            <codeph>LIMIT</codeph> into account when generating a query plan, so you are very likely
-          to get different plans (yielding different row orders) depending on what you use for
-            <codeph>LIMIT</codeph> and <codeph>OFFSET</codeph>. Thus, using different
-            <codeph>LIMIT/OFFSET</codeph> values to select different subsets of a query result will
-          give inconsistent results unless you enforce a predictable result ordering with
-            <codeph>ORDER BY</codeph>. This is not a defect; it is an inherent consequence of the
-          fact that SQL does not promise to deliver the results of a query in any particular order
-          unless <codeph>ORDER BY</codeph> is used to constrain the order.</p></sectiondiv>
-      <sectiondiv id="section17"><b>The Locking Clause</b><p><codeph>FOR UPDATE</codeph>,
-            <codeph>FOR NO KEY UPDATE</codeph>, <codeph>FOR SHARE</codeph> and <codeph>FOR KEY
-            SHARE</codeph> are <i>locking clauses</i>; they affect how <codeph>SELECT</codeph> locks
-          rows as they are obtained from the table.</p><p>The locking clause has the general
-          form</p><codeblock>FOR <varname>lock_strength</varname> [OF <varname>table_name</varname> [ , ... ] ] [ NOWAIT ]</codeblock><p>where
-            <varname>lock_strength</varname> can be one
-          of<codeblock>UPDATE
-NO KEY UPDATE
-SHARE
-KEY SHARE</codeblock></p><note> By default,
-          Greenplum Database acquires an <codeph>EXCLUSIVE</codeph> lock on tables for
-            <codeph>DELETE</codeph> and <codeph>UPDATE</codeph> operations on heap tables. When the
-          Global Deadlock Detector is enabled the lock mode for <codeph>DELETE</codeph> and
-            <codeph>UPDATE</codeph> operations on heap tables is <codeph>ROW EXCLUSIVE</codeph>. The
-          Global Deadlock Detector is enabled by setting the <xref
-            href="../config_params/guc-list.xml#gp_enable_global_deadlock_detector"
-            >gp_enable_global_deadlock_detector</xref> configuration parameter to true. See <xref
-            href="../../admin_guide/dml.xml#topic_gdd"> Global Deadlock Detector</xref> in the
-            <cite>Greenplum Database Administrator Guide</cite> for information about the Global
-          Deadlock Detector.</note><p>For more information on each row-level lock mode, refer to
-            <xref href="https://www.postgresql.org/docs/9.4/explicit-locking.html" format="html"
-            scope="external">Explicit Locking</xref> in the PostgreSQL documentation.</p><p>To
-          prevent the operation from waiting for other transactions to commit, use the
-            <codeph>NOWAIT</codeph> option. With <codeph>NOWAIT</codeph>, the statement reports an
-          error, rather than waiting, if a selected row cannot be locked immediately. Note that
-            <codeph>NOWAIT</codeph> applies only to the row-level lock(s) — the required <codeph>ROW
-            SHARE</codeph> table-level lock is still taken in the ordinary way. You can use LOCK
-          with the <codeph>NOWAIT</codeph> option first, if you need to acquire the table-level lock
-          without waiting.</p><p>If specific tables are named in a locking clause, then only rows
-          coming from those tables are locked; any other tables used in the <codeph>SELECT</codeph>
-          are simply read as usual. A locking clause without a table list affects all tables used in
-          the statement. If a locking clause is applied to a view or sub-query, it affects all
-          tables used in the view or sub-query. However, these clauses do not apply to
-            <codeph>WITH</codeph> queries referenced by the primary query. If you want row locking
-          to occur within a <codeph>WITH</codeph> query, specify a locking clause within the
-            <codeph>WITH</codeph> query.</p><p>Multiple locking clauses can be written if it is
-          necessary to specify different locking behavior for different tables. If the same table is
-          mentioned (or implicitly affected) by both more than one locking clause, then it is
-          processed as if it was only specified by the strongest one. Similarly, a table is
-          processed as <codeph>NOWAIT</codeph> if that is specified in any of the clauses affecting
-          it.</p><p>The locking clauses cannot be used in contexts where returned rows cannot be
-          clearly identified with individual table rows; for example they cannot be used with
-          aggregation.</p><p>When a locking clause appears at the top level of a
-            <codeph>SELECT</codeph> query, the rows that are locked are exactly those that are
-          returned by the query; in the case of a join query, the rows locked are those that
-          contribute to returned join rows. In addition, rows that satisfied the query conditions as
-          of the query snapshot will be locked, although they will not be returned if they were
-          updated after the snapshot and no longer satisfy the query conditions. If a
-            <codeph>LIMIT</codeph> is used, locking stops once enough rows have been returned to
-          satisfy the limit (but note that rows skipped over by <codeph>OFFSET</codeph> will get
-          locked). Similarly, if a locking clause is used in a cursor's query, only rows actually
-          fetched or stepped past by the cursor will be locked.</p><p>When locking clause appears in
-          a sub-<codeph>SELECT</codeph>, the rows locked are those returned to the outer query by
-          the sub-query. This might involve fewer rows than inspection of the sub-query alone would
-          suggest, since conditions from the outer query might be used to optimize execution of the
-          sub-query. For example,
-          <codeblock>SELECT * FROM (SELECT * FROM mytable FOR UPDATE) ss WHERE col1 = 5;</codeblock>
-          will lock only rows having <codeph>col1 = 5</codeph>, even though that condition is not
-          textually within the sub-query. </p><p>It is possible for a <codeph>SELECT</codeph>
-          command running at the <codeph>READ COMMITTED</codeph> transaction isolation level and
-          using <codeph>ORDER BY</codeph> and a locking clause to return rows out of order. This is
-          because <codeph>ORDER BY</codeph> is applied first. The command sorts the result, but
-          might then block trying to obtain a lock on one or more of the rows. Once the
-            <codeph>SELECT</codeph> unblocks, some of the ordering column values might have been
-          modified, leading to those rows appearing to be out of order (though they are in order in
-          terms of the original column values). This can be worked around at need by placing the
-            <codeph>FOR UPDATE/SHARE</codeph> clause in a sub-query, for example
-          <codeblock>SELECT * FROM (SELECT * FROM mytable FOR UPDATE) ss ORDER BY column1;</codeblock>Note
-          that this will result in locking all rows of <codeph>mytable</codeph>, whereas <codeph>FOR
-            UPDATE</codeph> at the top level would lock only the actually returned rows. This can
-          make for a significant performance difference, particularly if the <codeph>ORDER
-            BY</codeph> is combined with <codeph>LIMIT</codeph> or other restrictions. So this
-          technique is recommended only if concurrent updates of the ordering columns are expected
-          and a strictly sorted result is required. </p><p>At the <codeph>REPEATABLE READ</codeph>
-          or <codeph>SERIALIZABLE</codeph> transaction isolation level this would cause a
-          serialization failure (with a <codeph>SQLSTATE</codeph> of <codeph>40001</codeph>), so
-          there is no possibility of receiving rows out of order under these isolation
-        levels.</p></sectiondiv>
-    </section>
-    <section id="table-command">
-      <title>The TABLE Command</title>
-      <p>The command</p>
-      <codeblock>TABLE <varname>name</varname></codeblock>
-      <p>is completely equivalent to</p>
-      <codeblock>SELECT * FROM <varname>name</varname></codeblock>
-      <p>It can be used as a top-level command or as a space-saving syntax variant in parts of
-        complex queries.</p>
-    </section>
-    <section id="section18">
-      <title>Examples</title>
-      <p>To join the table <codeph>films</codeph> with the table <codeph>distributors</codeph>: </p>
-      <codeblock>SELECT f.title, f.did, d.name, f.date_prod, f.kind FROM 
-distributors d, films f WHERE f.did = d.did</codeblock>
-      <p>To sum the column <codeph>length</codeph> of all films and group the results by
-          <codeph>kind</codeph>: </p>
-      <codeblock>SELECT kind, sum(length) AS total FROM films GROUP BY kind;</codeblock>
-      <p>To sum the column <codeph>length</codeph> of all films, group the results by
-          <codeph>kind</codeph> and show those group totals that are less than 5 hours: </p>
-      <codeblock>SELECT kind, sum(length) AS total FROM films GROUP BY kind 
-HAVING sum(length) &lt; interval '5 hours';</codeblock>
-      <p>Calculate the subtotals and grand totals of all sales for movie <codeph>kind</codeph> and
-          <codeph>distributor</codeph>.</p>
-      <codeblock>SELECT kind, distributor, sum(prc*qty) FROM sales
-GROUP BY ROLLUP(kind, distributor)
-ORDER BY 1,2,3;</codeblock>
-      <p>Calculate the rank of movie distributors based on total sales:</p>
-      <codeblock>SELECT distributor, sum(prc*qty), 
-       rank() OVER (ORDER BY sum(prc*qty) DESC) 
-FROM sale
-GROUP BY distributor ORDER BY 2 DESC;</codeblock>
-      <p>The following two examples are identical ways of sorting the individual results according
-        to the contents of the second column (<codeph>name</codeph>):</p>
-      <codeblock>SELECT * FROM distributors ORDER BY name;
-SELECT * FROM distributors ORDER BY 2;</codeblock>
-      <p>The next example shows how to obtain the union of the tables <codeph>distributors</codeph>
-        and <codeph>actors</codeph>, restricting the results to those that begin with the letter
-          <codeph>W</codeph> in each table. Only distinct rows are wanted, so the key word
-          <codeph>ALL</codeph> is omitted: </p>
-      <codeblock>SELECT distributors.name FROM distributors WHERE 
-distributors.name LIKE 'W%' UNION SELECT actors.name FROM 
-actors WHERE actors.name LIKE 'W%';</codeblock>
-      <p>This example shows how to use a function in the <codeph>FROM</codeph> clause, both with and
-        without a column definition list: </p>
-      <codeblock>CREATE FUNCTION distributors(int) RETURNS SETOF distributors 
-AS $$ SELECT * FROM distributors WHERE did = $1; $$ LANGUAGE 
-SQL;
-SELECT * FROM distributors(111);
+                <li id="eg138856">使用运算符<codeph>UNION</codeph>，<codeph>INTERSECT</codeph>和<codeph>EXCEPT</codeph>，可以组合多个<codeph>SELECT</codeph>语句的输出以形成单个结果集。
+                    <codeph>UNION</codeph>运算符返回一个或两个结果集中的所有行。
+                    <codeph>INTERSECT</codeph>运算符返回完全位于两个结果集中的所有行。
+                    <codeph>EXCEPT</codeph>运算符返回第一个结果集中的行，而不是第二个结果集中的行。
+                    在所有三种情况下，除非指定了<codeph>ALL</codeph>，否则将消除重复的行。
+                    可以添加噪声字<codeph>DISTINCT</codeph>来明确指定消除重复行。
+                    请注意，<codeph>DISTINCT</codeph>是此处的默认行为，即使<codeph>ALL</codeph>是<codeph>SELECT</codeph>本身的默认行为。
+                </li>
+                <li id="eg138864">如果指定了<codeph>ORDER BY</codeph>子句，则返回的行将以指定的顺序排序。
+                    如果未给出<codeph>ORDER BY</codeph>，则以系统最先找到的顺序返回行。
+                </li>
+                <li id="eg138878">如果指定了<codeph>LIMIT</codeph>（或<codeph>FETCH FIRST</codeph>）或<codeph>OFFSET</codeph>子句，
+                    则<codeph>SELECT</codeph>语句仅返回结果行的子集。
+                </li>
+                <li id="eg138885">如果指定了<codeph>FOR UPDATE</codeph>，<codeph>FOR NO KEY UPDATE</codeph>，<codeph>FOR SHARE</codeph>或<codeph>FOR KEY SHARE</codeph>，
+                    则<codeph>SELECT</codeph>语句将锁定整个表以防止并发更新。
+                </li>
+            </ol>
+            <p>您必须对<codeph>SELECT</codeph>命令中使用的每一列都具有<codeph>SELECT</codeph>特权。
+                使用<codeph>FOR NO KEY UPDATE</codeph>，<codeph>FOR UPDATE</codeph>，<codeph>FOR SHARE</codeph>或<codeph>FOR KEY SHARE</codeph>也需要<codeph>UPDATE</codeph>特权（对于这样选择的每个表的至少一列）。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <sectiondiv>
+                <b>WITH子句</b>
+                <p>可选的<codeph>WITH</codeph>子句允许您指定一个或多个子查询，这些子查询可以在主查询中按名称引用。
+                    子查询在主查询期间有效地充当临时表或视图。
+                    每个子查询可以是<codeph>SELECT</codeph>，<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>或<codeph>DELETE</codeph>语句。
+                    在用<codeph>WITH</codeph>编写数据修改语句（<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>或<codeph>DELETE</codeph>）时，通常会包含<codeph>RETURNING</codeph>子句。
+                    它是<codeph>RETURNING</codeph>的输出，而不是该语句修改的基础表，形成了由主查询读取的临时表。
+                    如果省略<codeph>RETURNING</codeph>，则该语句仍将执行，但是不会产生任何输出，因此主查询无法将其引用为表。
+                </p>
+                <p>对于包含<codeph>WITH</codeph>子句的<codeph>SELECT</codeph>命令，
+                    该子句最多可以包含一个用于修改表数据的子句（<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>或<codeph>DELETE</codeph>命令）。
+                </p>
+                <p>必须为<codeph>WITH</codeph>子句中的每个查询指定一个无schema限定的<varname>with_query_name</varname>。
+                    （可选）可以指定列名列表；如果省略列名列表，则从子查询中推断出名称。
+                    主查询和<codeph>WITH</codeph>查询都（理论上）同时执行。
+                </p>
+                <p>如果指定了<codeph>RECURSIVE</codeph>，则它允许<codeph>SELECT</codeph>子查询按名称引用自己。
+                    这样的子查询具有一般形式
+                </p>
+                <codeblock>
+                    <varname>non_recursive_term</varname>
+                    UNION [ALL | DISTINCT]
+                    <varname>recursive_term</varname>
+                </codeblock>
+                <p>递归自引用出现在<codeph>UNION</codeph>的右侧。
+                    每个查询仅允许一个递归自引用。
+                    不支持递归数据修改语句，但是您可以在数据修改语句中使用递归<codeph>SELECT</codeph>查询的结果。
+                </p>
+                <p>如果指定了<codeph>RECURSIVE</codeph>关键字，则无需对<codeph>WITH</codeph>查询进行排序：一个查询可以引用列表中后面的另一个查询。
+                    但是，不支持循环引用或相互递归。
+                </p>
+                <p>如果没有<codeph>RECURSIVE</codeph>关键字，
+                    则<codeph>WITH</codeph>查询只能引用<codeph>WITH</codeph>列表中较早的同级<codeph>WITH</codeph>查询。
+                </p>
+                <p><codeph>WITH RECURSIVE</codeph>限制。不支持这些项目：
+                </p>
+                <ul id="ul_b21_szt_n1b">
+                    <li>一个递归<codeph>WITH</codeph>子句，在<varname>recursive_term</varname>中包含以下内容。
+                        <ul id="ul_c1b_nhf_p1b">
+                            <li>具有自引用的子查询</li>
+                            <li>
+                                <codeph>DISTINCT</codeph>
+                                子句
+                            </li>
+                            <li>
+                                <codeph>GROUP BY</codeph>
+                                子句
+                            </li>
+                            <li>窗口函数</li>
+                        </ul>
+                    </li>
+                    <li>递归<codeph>WITH</codeph>子句，其中<varname>with_query_name</varname>是集合操作的一部分。
+                    </li>
+                </ul>
+                <p>以下是集合操作限制的示例。
+                    该查询返回错误，因为集合操作<codeph>UNION</codeph>包含对表<codeph>foo</codeph>的引用。
+                    <codeblock>WITH RECURSIVE foo(i) AS (
+                        SELECT 1
+                        UNION ALL
+                        SELECT i+1 FROM (SELECT * FROM foo UNION SELECT 0) bar
+                        )
+                        SELECT * FROM foo LIMIT 5;
+                    </codeblock>
+                </p>
+                <p>由于集合操作<codeph>UNION</codeph>没有对CTE <codeph>foo</codeph>的引用，因此允许此递归CTE。
+                    <codeblock>WITH RECURSIVE foo(i) AS (
+                        SELECT 1
+                        UNION ALL
+                        SELECT i+1 FROM (SELECT * FROM bar UNION SELECT 0) bar, foo
+                        WHERE foo.i = bar.a
+                        )
+                        SELECT * FROM foo LIMIT 5;
+                    </codeblock>
+                </p>
+                <p><codeph>WITH</codeph>查询的一个关键属性是，即使主查询多次引用它们，一次执行主查询也只会对它们进行一次评估。
+                    特别是，无论主查询是读取全部输出还是输出任何内容，都保证数据修改语句仅执行一次。
+                </p>
+                <p>主查询和<codeph>WITH</codeph>查询都（理论上）同时执行。
+                    这意味着，除了通过读取其<codeph>RETURNING</codeph>输出之外，不能从查询的其他部分看到<codeph>WITH</codeph>中的数据修改语句的效果。
+                    如果两个这样的数据修改语句试图修改同一行，则结果不确定。
+                </p>
+                <p>有关更多信息，请参见<xref href="../../admin_guide/query/topics/CTE-query.xml"/>。
+                    <xref href="../../admin_guide/query/topics/CTE-query.xml"/>
+                    <ph otherprops="pivotal">in the<cite>Greenplum Database Administrator Guide</cite></ph>
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section5">
+                <b>SELECT列表</b>
+                <p><codeph>SELECT</codeph>列表（在关键字<codeph>SELECT</codeph>和<codeph>FROM</codeph>之间）指定用于形成<codeph>SELECT</codeph>语句输出行的表达式。
+                    表达式可以（通常）引用<codeph>FROM</codeph>子句中计算的列。
+                </p>
+                <p><codeph>SELECT</codeph>列表中的<varname>expression</varname>可以是常量值，列引用，运算符调用，函数调用，聚合表达式，窗口表达式，标量子查询等。
+                    可以将许多结构体归类为表达式，但不遵循任何常规语法规则。
+                    这些通常具有函数或运算符的语义。
+                    有关SQL值表达式和函数调用的信息，请参阅<i>Greenplum数据库管理员指南</i>中的“查询数据”。
+                </p>
+                <p>就像在表中一样，<codeph>SELECT</codeph>的每个输出列都有一个名称。
+                    在简单的<codeph>SELECT</codeph>中，此名称仅用于标记要显示的列，
+                    但是当<codeph>SELECT</codeph>是较大查询的子查询时，该名称在较大查询中被视为由该子查询生成的虚拟表的列名。
+                    要指定用于输出列的名称，请在该列的表达式之后写入<codeph>AS</codeph> <varname>output_name</varname>。
+                    （您可以省略<codeph>AS</codeph>，但只有在所需的输出名称与任何SQL关键字都不匹配时才可以使用。
+                    为防止将来可能再添加关键字，您始终可以写<codeph>AS</codeph>或在输出名称中用双引号。）
+                    如果不指定列名称，Greenplum数据库自动选择一个名称。
+                    如果列的表达式是简单的列引用，则所选名称与该列的名称相同。
+                    在更复杂的情况下，可以使用函数或类型名称，或者系统可能会依赖生成的名称（例如<codeph>?column?</codeph>或<codeph>column<varname>N</varname></codeph>）。
+                </p>
+                <p>输出列的名称可用于引用<codeph>ORDER BY</codeph>和<codeph>GROUP BY</codeph>子句中的列的值，
+                    但不能用于<codeph>WHERE</codeph>或<codeph>HAVING</codeph>子句中。
+                    在那里，您必须写出表达式。
+                </p>
+                <p>可以将<codeph>*</codeph>而不是表达式写到输出列表，作为所选行的所有列的简写。
+                    另外，您可以编写<codeph><varname>table_name</varname>.*</codeph>作为仅来自该表的列的简写。
+                    在这种情况下，无法使用<codeph>AS</codeph>指定新名称。
+                    输出列名称将与表列名称相同。
+                </p>
+            </sectiondiv>
+            <sectiondiv>
+                <b>DISTINCT子句</b>
+                <p>如果指定了<codeph>SELECT DISTINCT</codeph>，则将从结果集中删除所有重复的行（每组重复项中保留一行）。
+                    <codeph>SELECT ALL</codeph>则相反：所有行都保留；这是默认值。
+                </p>
+                <p><codeph>SELECT DISTINCT ON ( <varname>expression</varname> [, ...] )</codeph>仅保留给定表达式等于的每组行的第一行。
+                    使用与<codeph>ORDER BY</codeph>相同的规则来解释<codeph>DISTINCT ON</codeph>表达式（请参见上文）。
+                    请注意，除非使用<codeph>ORDER BY</codeph>来确保所需的行最先出现，否则每个集合的“第一行”都是不可预测的。
+                    例如：
+                    <codeblock>
+                        SELECT DISTINCT ON (location) location, time, report
+                        FROM weather_reports
+                        ORDER BY location, time DESC;
+                    </codeblock>
+                    检索每个位置的最新天气报告。
+                    但是，如果我们没有使用<codeph>ORDER BY</codeph>强制每个位置的时间值按降序排列，那么我们将从每个位置不可预测的时间获得报告。
+                </p>
+                <p><codeph>DISTINCT ON</codeph>表达式必须与最左边的<codeph>ORDER BY</codeph>表达式匹配。
+                    <codeph>ORDER BY</codeph>子句通常将包含附加表达式，这些表达式确定每个<codeph>DISTINCT ON</codeph>组中所需的行优先级。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section6">
+                <b>FROM子句</b>
+                <p><codeph>FROM</codeph>子句为<codeph>SELECT</codeph>指定一个或多个源表。
+                    如果指定了多个源，则结果为所有源的笛卡尔乘积（交叉连接）。
+                    但通常会添加限定条件（通过<codeph>WHERE</codeph>），以将返回的行限制为笛卡尔乘积的一小部分。
+                    <codeph>FROM</codeph>子句可以包含以下元素：
+                </p>
+                <parml>
+                    <plentry>
+                        <pt>
+                            <varname>table_name</varname>
+                        </pt>
+                        <pd>现有表或视图的名称（可以有schema修饰）。
+                            如果指定<codeph>ONLY</codeph>，则仅扫描该表。
+                            如果未指定<codeph>ONLY</codeph>，则扫描该表及其所有子表（如果有）。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>
+                            <varname>alias</varname>
+                        </pt>
+                        <pd>包含别名的<codeph>FROM</codeph>项目的替代名称。
+                            别名用于简洁起见或用于消除自连接的歧义（多次扫描同一张表）。
+                            提供别名后，它将完全隐藏表或函数的实际名称。
+                            例如，在给定<codeph>FROM foo AS f</codeph>的情况下，
+                            <codeph>SELECT</codeph>的其余部分必须将此<codeph>FROM</codeph>项目引用为<codeph>f</codeph>而不是<codeph>foo</codeph>。
+                            如果写入了别名，则还可以写入列别名列表以为表的一个或多个列提供替代名称。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>
+                            <varname>select</varname>
+                        </pt>
+                        <pd>子<codeph>SELECT</codeph>可以出现在<codeph>FROM</codeph>子句中。
+                            这就像在单个<codeph>SELECT</codeph>命令期间将其输出创建为临时表一样。
+                            请注意，子<codeph>SELECT</codeph>必须用括号括起来，并且必须为其提供别名。
+                            <codeph><xref href="VALUES.xml#topic1">VALUES</xref></codeph>命令也可以在这里使用。
+                            有关在Greenplum数据库中使用相关子选择的限制，请参阅<xref href="#topic1/section19" format="dita"/>部分中的“非标准子句”。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>
+                            <varname>with_query_name</varname>
+                        </pt>
+                        <pd>通过指定其<varname>with_query_name</varname>在<codeph>FROM</codeph>子句中引用<varname>with_query</varname>，就像该名称是表名一样。
+                            <varname>with_query_name</varname>不能包含schema限定符。
+                            可以使用与表相同的方式提供别名。
+                        </pd>
+                        <pd><varname>with_query</varname>隐藏用于主查询目的的同名表。
+                            如有必要，可以通过使用schema限定表名来引用相同名称的表。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>
+                            <varname>function_name</varname>
+                        </pt>
+                        <pd>函数调用可以出现在<codeph>FROM</codeph>子句中。
+                            （这对于返回结果集的函数特别有用，但是可以使用任何函数。）
+                            这就像在单个<codeph>SELECT</codeph>命令期间将其输出创建为临时表一样。
+                            也可以使用别名。
+                            如果编写了别名，则还可以编写列别名列表，以为函数的复合返回类型的一个或多个属性提供替代名称。
+                            如果已将函数定义为返回记录数据类型，则必须存在别名或关键字<codeph>AS</codeph>，
+                            然后是形式为<codeph>(column_name data_type [, ... ] )</codeph>的列定义列表。
+                            列定义列表必须匹配该函数返回的实际列数和类型。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>
+                            <varname>join_type</varname>
+                        </pt>
+                        <pd>以下之一：
+                            <ul id="ul_bwd_ft2_m4">
+                                <li id="eg139018">
+                                    <b>[INNER] JOIN</b>
+                                </li>
+                                <li id="eg139020">
+                                    <b>LEFT [OUTER] JOIN</b>
+                                </li>
+                                <li id="eg139022">
+                                    <b>RIGHT [OUTER] JOIN</b>
+                                </li>
+                                <li id="eg139024">
+                                    <b>FULL [OUTER] JOIN</b>
+                                </li>
+                                <li id="eg139026">
+                                    <b>CROSS JOIN</b>
+                                </li>
+                            </ul>
+                        </pd>
+                        <pd>对于<codeph>INNER</codeph>和<codeph>OUTER</codeph>连接类型，必须指定一个连接条件，
+                            即恰好是<codeph>NATURAL</codeph>，<codeph>ON <varname>join_condition</varname></codeph>或<codeph>USING (<varname>join_column</varname>[, ...])</codeph>之一。
+                            含义如下。
+                            对于<codeph>CROSS JOIN</codeph>，这些子句都不会出现。
+                        </pd>
+                        <pd>JOIN子句结合了两个<codeph>FROM</codeph>项，为方便起见，我们将其称为“表”，
+                            尽管实际上它们可以是任何类型的<codeph>FROM</codeph>项。
+                            如有必要，请使用括号确定嵌套顺序。
+                            在没有括号的情况下，<codeph>JOIN</codeph>从左到右嵌套。
+                            无论如何，<codeph>JOIN</codeph>的绑定比逗号分隔<codeph>FROM</codeph>列表项的绑定更紧密。
+                        </pd>
+                        <pd><codeph>CROSS JOIN</codeph>和<codeph>INNER JOIN</codeph>产生一个简单的笛卡尔积，
+                            与在<codeph>FROM</codeph>的顶层列出两个表所获得的结果相同，但受连接条件（如果有）的限制。
+                            <codeph>CROSS JOIN</codeph>等效于<codeph>INNER JOIN ON</codeph> <codeph>(TRUE)</codeph>，即，没有行被限定删除。
+                            这些连接类型只是一种符号上的方便，因为它们无法执行普通<codeph>FROM</codeph>和<codeph>WHERE</codeph>无法完成的工作。
+                        </pd>
+                        <pd><codeph>LEFT OUTER JOIN</codeph>返回合格的笛卡尔乘积中的所有行（即，所有通过其连接条件的组合行），
+                            加上左表中没有通过右表连接条件的每行的一个副本。
+                            通过为右侧列插入空值，此左侧行将扩展为连接表的整个宽度。
+                            请注意，在确定哪些行具有匹配项时，仅考虑<codeph>JOIN</codeph>子句自身的条件。
+                            之后应用外部条件。
+                        </pd>
+                        <pd>相反，<codeph>RIGHT OUTER JOIN</codeph>返回所有已连接的行，并为每个不匹配的右手行加上一行（在左边扩展为空）。
+                            这只是一种符号上的便利，因为您可以通过切换左右表将其转换为<codeph>LEFT OUTER JOIN</codeph>。
+                        </pd>
+                        <pd><codeph>FULL OUTER JOIN</codeph>返回所有连接的行，再加上一行，
+                            用于每行不匹配的左表行（在右边扩展为空），再加上每行不匹配的右表行（扩展在左边为空）。
+                        </pd>
+                    </plentry>
+                </parml>
+                <parml>
+                    <plentry>
+                        <pt>ON
+                            <varname>join_condition</varname>
+                        </pt>
+                        <pd><varname>join_condition</varname>是一个表达式，
+                            其结果为<codeph>boolean</codeph>类型的值（类似于<codeph>WHERE</codeph>子句），该值指定连接中的哪些行被视为匹配。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>USING (<varname>join_column</varname> [, ...])
+                        </pt>
+                        <pd><codeph>USING ( a, b, ... )</codeph>形式的子句是<codeph>ON left_table.a = right_table.a AND left_table.b = right_table.b ...</codeph>的简写。
+                            同样，<codeph>USING</codeph>意味着连接输出中将仅包括每对等效列中的一对，而不是两者。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>NATURAL</pt>
+                        <pd><codeph>NATURAL</codeph>是<codeph>USING</codeph>列表的简写形式，该列表提到两个表中具有相同名称的所有列。
+                            如果没有公用的列名，则<codeph>NATURAL</codeph>等效于<codeph>ON TRUE</codeph>。
+                        </pd>
+                    </plentry>
+                </parml>
+            </sectiondiv>
+            <sectiondiv id="section7">
+                <b>WHERE子句</b>
+                <p>可选的<codeph>WHERE</codeph>子句具有一般形式：
+                </p>
+                <codeblock>WHERE
+                    <varname>condition</varname>
+                </codeblock>
+                <p><varname>condition</varname>是任何计算结果为<codeph>boolean</codeph>型结果的表达式。
+                    任何不满足此条件的行将从输出中删除。
+                    如果用一行的实际值替换其中的变量引用后，该表达式返回真，则该行符合条件。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section8">
+                <b>GROUP BY子句</b>
+                <p>可选的<codeph>GROUP BY</codeph>子句具有一般形式：
+                </p>
+                <codeblock>GROUP BY <varname>grouping_element</varname>[, ...]
+                </codeblock>
+                <p>其中<varname>grouping_element</varname>可以是以下之一：
+                </p>
+                <codeblock>()
+                    <varname>expression</varname>
+                    ROLLUP (<varname>expression</varname> [,...])
+                    CUBE (<varname>expression</varname> [,...])
+                    GROUPING SETS ((<varname>grouping_element</varname> [, ...]))
+                </codeblock>
+                <p><codeph>GROUP BY</codeph>将所有共享有相同值的分组表达式的所有选定行压缩为单行。
+                    <varname>expression</varname>可以是输入列名称，也可以是输出列（<codeph>SELECT</codeph>列表项）的名称或序号，或者是由输入列值组成的任意表达式。
+                    如有歧义，<codeph>GROUP BY</codeph>名称将被解释为输入列名称，而不是输出列名称。
+                </p>
+                <p>汇总函数（如果有的话）在组成每个组的所有行中进行计算，从而为每个组生成单独的值。
+                    （如果有聚合函数但没有<codeph>GROUP BY</codeph>子句，则该查询被视为具有包含所有选定行的单个组。）
+                    可以通过将<codeph>FILTER</codeph>子句附加到聚合函数调用来进一步过滤提供给每个聚合函数的行集。
+                    如果存在<codeph>FILTER</codeph>子句，则只有与之匹配的那些行才包含在该聚合函数的输入中。
+                </p>
+                <p>如果存在<codeph>GROUP BY</codeph>或任何聚合函数，则<codeph>SELECT</codeph>列表表达式不能引用未分组的列，
+                    除非是在聚合函数内，或者当未分组的列在函数上依赖于分组的列时，否则对于未分组的列将会返回不止一个的可能的值。
+                    如果分组的列（或其子集）是包含未分组的列的表的主键，则存在函数依赖。
+                </p>
+                <p>请记住，在评估<codeph>HAVING</codeph>子句或<codeph>SELECT</codeph>列表中的任何“标量”表达式之前，将评估所有聚合函数。
+                    这意味着，例如，<codeph>CASE</codeph>表达式不能用于跳过对聚合函数的求值；见<xref href="../../admin_guide/query/topics/defining-queries.xml#topic25"/>。
+                </p>
+                <p>Greenplum数据库具有以下附加的OLAP分组扩展（通常称为<i>supergroups</i>）：
+                </p>
+                <parml>
+                    <plentry>
+                        <pt>ROLLUP</pt>
+                        <pd><codeph>ROLLUP</codeph>分组是对<codeph>GROUP BY</codeph>子句的扩展，该子句创建聚合部分和，
+                            该部分和从最详细的级别汇总到总计，并遵循分组列（或表达式）的列表。
+                            <codeph>ROLLUP</codeph>提取分组列的有序列表，计算在<codeph>GROUP BY</codeph>子句中指定的标准聚合值，
+                            然后逐步创建更高级别的部分和，从列表的右向左移动。
+                            最后，它创建了一个总计。
+                            可以将<codeph>ROLLUP</codeph>分组视为一系列分组集。 例如：
+                        </pd>
+                        <pd>
+                            <codeblock>GROUP BY ROLLUP (a,b,c)</codeblock>
+                        </pd>
+                        <pd>等效于：</pd>
+                        <pd>
+                            <codeblock>GROUP BY GROUPING SETS( (a,b,c), (a,b), (a), () )</codeblock>
+                        </pd>
+                        <pd>请注意，<codeph>ROLLUP</codeph>的<varname>n</varname>个元素转换为<varname>n</varname>+1个分组集。
+                            同样，在<codeph>ROLLUP</codeph>中指定分组表达式的顺序也很重要。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>CUBE</pt>
+                        <pd><codeph>CUBE</codeph>分组是对<codeph>GROUP BY</codeph>子句的扩展，它为分组列（或表达式）的给定列表的所有可能组合创建部分和。
+                            在多维分析方面，<codeph>CUBE</codeph>生成可以为具有指定维的多维数据集计算的所有部分和。
+                            例如：
+                        </pd>
+                        <pd>
+                            <codeblock>GROUP BY CUBE (a,b,c)</codeblock>
+                        </pd>
+                        <pd>等效于：</pd>
+                        <pd>
+                            <codeblock>GROUP BY GROUPING SETS( (a,b,c), (a,b), (a,c), (b,c), (a),
+                                (b), (c), () )
+                            </codeblock>
+                        </pd>
+                        <pd>注意，<codeph>CUBE</codeph>的<varname>n</varname>个元素转换为2n个分组集。
+                            考虑在需要交叉表报告的任何情况下使用<codeph>CUBE</codeph>。
+                            <codeph>CUBE</codeph>通常最适合使用多个维度列而不是表示单个维度不同级别的列的查询。
+                            例如，通常要求的交叉列表可能需要月份，州和产品的所有组合的部分和。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>GROUPING SETS</pt>
+                        <pd>您可以使用<codeph>GROUP BY</codeph>子句中的<codeph>GROUPING SETS</codeph>表达式有选择地指定要创建的组集。
+                            这样就可以在多个维度上进行精确指定，而无需计算整个<codeph>ROLLUP</codeph>或<codeph>CUBE</codeph>。
+                            例如：
+                        </pd>
+                        <pd>
+                            <codeblock>GROUP BY GROUPING SETS( (a,c), (a,b) )</codeblock>
+                        </pd>
+                        <pd>如果使用分组扩展子句<codeph>ROLLUP</codeph>，<codeph>CUBE</codeph>或<codeph>GROUPING SETS</codeph>，则要面临两个问题。
+                            首先，如何确定哪些结果行是部分和，然后确定给定部分和的确切聚合级别。
+                            或者，如何区分包含存储的<codeph>NULL</codeph>值和由<codeph>ROLLUP</codeph>或<codeph>CUBE</codeph>创建的“NULL”值的结果行。
+                            其次，当在<codeph>GROUP BY</codeph>子句中指定重复的分组集时，如何确定哪些结果行是重复的？
+                            您可以在<codeph>SELECT</codeph>列表中使用两个附加的分组函数来帮助解决此问题：
+                            <ul id="ul_vx1_3ml_m4">
+                                <li id="eg143759">
+                                    <b>grouping(column [, ...])</b>
+                                    — 可以将<codeph>grouping</codeph>函数应用于一个或多个分组属性，以将超聚合的行与常规的分组的行区分开。
+                                    这有助于将代表超级汇总行中所有值的集合的“NULL”与常规行中的<codeph>NULL</codeph>值区分开。
+                                    此函数中的每个参数都产生一个位 - <codeph>1</codeph>或<codeph>0</codeph>，
+                                    其中<codeph>1</codeph>表示结果行是超级聚合的，而<codeph>0</codeph>表示结果行来自常规分组。
+                                    <codeph>grouping</codeph>函数通过将这些位视为二进制数然后将其转换为以10为基的整数来返回整数。
+                                </li>
+                                <li id="eg143806">
+                                    <b>group_id()</b>
+                                    — 对于包含重复分组集的分组扩展查询，<codeph>group_id</codeph>函数用于标识输出中的重复行。
+                                    所有唯一分组集输出的唯一行的group_id值为0。
+                                    对于每个检测到的重复分组集，<codeph>group_id</codeph>函数分配的group_id编号大于0。
+                                    特定重复分组集中的所有输出行均由相同的group_id编号标识。
+                                </li>
+                            </ul>
+                        </pd>
+                    </plentry>
+                </parml>
+            </sectiondiv>
+            <sectiondiv id="section9">
+                <b>WINDOW子句</b>
+                <p>可选的<codeph>WINDOW</codeph>子句指定出现在查询的<codeph>SELECT</codeph>列表或<codeph>ORDER BY</codeph>子句中的窗口函数的行为。
+                    这些函数可以在其<codeph>OVER</codeph>子句中按名称引用<codeph>WINDOW</codeph>子句条目。
+                    但是，<codeph>WINDOW</codeph>子句条目不必在任何地方引用。
+                    如果查询中未使用它，则将其忽略。
+                    可以根本不使用任何<codeph>WINDOW</codeph>子句来使用窗口函数，因为窗口函数调用可以直接在其<codeph>OVER</codeph>子句中指定其窗口定义。
+                    但是，当多个窗口函数需要相同的窗口定义时，<codeph>WINDOW</codeph>子句将保存键入内容。
+                </p>
+                <p>例如：</p>
+                <codeblock>SELECT vendor, rank() OVER (mywindow) FROM sale
+                    GROUP BY vendor
+                    WINDOW mywindow AS (ORDER BY sum(prc*qty));
+                </codeblock>
+                <p><codeph>WINDOW</codeph>子句具有以下一般形式：
+                </p>
+                <codeblock>WINDOW <varname>window_name</varname> AS (<varname>window_definition</varname>)
+                </codeblock>
+                <p>其中<varname>window_name</varname>是可以从<codeph>OVER</codeph>子句或后续窗口定义中引用的名称，
+                    而<varname>window_definition</varname>为：
+                </p>
+                <codeblock>[<varname>existing_window_name</varname>]
+                    [PARTITION BY <varname>expression</varname> [, ...]]
+                    [ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>] [NULLS
+                    {FIRST | LAST}] [, ...] ]
+                    [<varname>frame_clause</varname>]
+                </codeblock>
+                <parml>
+                    <plentry>
+                        <pt>
+                            <varname>existing_window_name</varname>
+                        </pt>
+                        <pd>如果指定了<codeph><varname>existing_window_name</varname></codeph>，则它必须引用<codeph>WINDOW</codeph>列表中的较早条目；
+                            新窗口将复制该条目的分区子句以及其排序子句（如果有）。
+                            新窗口不能指定自己的<codeph>PARTITION BY</codeph>子句，只有复制的窗口没有该子句时，它才能指定<codeph>ORDER BY</codeph>。
+                            新窗口始终使用其自己的frame子句；复制的窗口不得指定frame子句。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>PARTITION BY</pt>
+                        <pd><codeph>PARTITION BY</codeph>子句根据指定表达式的唯一值将结果集组织为逻辑组。
+                            <codeph>PARTITION BY</codeph>子句的元素的解释方式与<codeph>GROUP BY</codeph>子句的元素几乎相同，
+                            不同之处在于它们始终是简单表达式，而不是输出列的名称或编号。
+                            另一个区别是这些表达式可以包含聚合函数调用，这在常规<codeph>GROUP BY</codeph>子句中是不允许的。
+                            在此处允许使用它们，因为窗口在分组和聚合之后发生。
+                            与窗口函数一起使用时，这些函数将分别应用于每个分区。
+                            例如，如果在<codeph>PARTITION BY</codeph>之后加上列名，则结果集将按该列的不同值进行分区。
+                            如果省略，则将整个结果集视为一个分区。
+                        </pd>
+                        <pd>同样，<codeph>ORDER BY</codeph>列表中的元素的解释方式与<codeph>ORDER BY</codeph>子句中的元素几乎相同，
+                            不同之处在于，始终将表达式视为简单表达式，而不使用输出列的名称或编号。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>ORDER BY</pt>
+                        <pd><codeph>ORDER BY</codeph>子句的元素定义如何对结果集的每个分区中的行进行排序。
+                            如果省略，则以最有效的顺序返回行，并且行可能会有所不同。
+                            <b>注意：</b>缺少一致顺序（例如<codeph>time</codeph>）的数据类型的列不是在窗口规范的<codeph>ORDER BY</codeph>子句中使用的良好候选对象。
+                            带有或不带有时区的时间缺乏连贯的排序，因为加法和减法没有预期的效果。
+                            例如，以下条件通常不成立：<codeph>x::time &lt; x::time + '2 hour'::interval</codeph>
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>
+                            <varname>frame_clause</varname>
+                        </pt>
+                        <pd>可选的<codeph><varname>frame_clause</varname></codeph>定义依赖于框架的窗口函数的窗口框架（并非全部如此）。
+                            窗口框架是查询的每一行（称为当前行）的一组相关行。
+                            <codeph><varname>frame_clause</varname></codeph>可以是以下之一
+                            <codeblock>{ RANGE | ROWS }
+                                <varname>frame_start</varname>
+                                { RANGE | ROWS } BETWEEN <varname>frame_start</varname> AND
+                                <varname>frame_end</varname>
+                            </codeblock>
+                            其中<codeph><varname>frame_start</varname></codeph>和<codeph><varname>frame_end</varname></codeph>可以是以下之一
+                            <ul id="ul_ehq_kws_1gb">
+                                <li>
+                                    <codeph>UNBOUNDED PRECEDING</codeph>
+                                </li>
+                                <li>
+                                    <codeph>
+                                        <varname>value</varname>
+                                        PRECEDING
+                                    </codeph>
+                                </li>
+                                <li>
+                                    <codeph>CURRENT ROW</codeph>
+                                </li>
+                                <li>
+                                    <codeph>
+                                        <varname>value</varname>
+                                        FOLLOWING
+                                    </codeph>
+                                </li>
+                                <li>
+                                    <codeph>UNBOUNDED FOLLOWING</codeph>
+                                </li>
+                            </ul>
+                        </pd>
+                        <pd>如果省略<codeph><varname>frame_end</varname></codeph>，则默认为<codeph>CURRENT ROW</codeph>。
+                            限制条件是<codeph><varname>frame_start</varname></codeph>不能为<codeph>UNBOUNDED FOLLOWING</codeph>，
+                            <codeph><varname>frame_end</varname></codeph>不能为<codeph>UNBOUNDED PRECEDING</codeph>，
+                            并且<codeph><varname>frame_end</varname></codeph>选择不能在上述列表中出现在<codeph><varname>frame_start</varname></codeph>选择之前
+                            — 例如，<codeph>RANGE BETWEEN CURRENT ROW AND <varname>value</varname> PRECEDING</codeph>是不允许的。
+                        </pd>
+                        <pd>默认的框架选项是<codeph>RANGE UNBOUNDED PRECEDING</codeph>，与<codeph>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</codeph>之间的范围相同；
+                            它将框架设置为从分区开始到当前行的最后一个对等方的所有行（<codeph>ORDER BY</codeph>的行认为与当前行等效，如果没有<codeph>ORDER BY</codeph>则为所有行）。
+                            通常，<codeph>UNBOUNDED PRECEDING</codeph>表示框架以分区的第一行开始，
+                            类似地<codeph>UNBOUNDED FOLLOWING</codeph>表示框架以分区的最后一行结束（与<codeph>RANGE</codeph>或<codeph>ROWS</codeph>模式无关）。
+                            在<codeph>ROWS</codeph>模式下，<codeph>CURRENT ROW</codeph>表示框架以当前行开始或结束；
+                            但是在<codeph>RANGE</codeph>模式下，这意味着框架以<codeph>ORDER BY</codeph>顺序中当前行的第一个或最后一个对等点开始或结束。
+                            当前仅在<codeph>ROWS</codeph>模式下允许<varname>value</varname> <codeph>PRECEDING</codeph>和<varname>value</varname> <codeph>FOLLOWING</codeph>情况。
+                            它们指示框架以当前行之前或之后许多行的行开始或结束。
+                            <varname>value</varname>必须是不包含任何变量，聚合函数或窗口函数的整数表达式。
+                            该值不能为null或负数；但它可以为零，从而选择当前行本身。
+                        </pd>
+                        <pd>请注意，如果<codeph>ORDER BY</codeph>排序不能唯一地对行进行排序，则<codeph>ROWS</codeph>选项可能会产生不可预测的结果。
+                            <codeph>RANGE</codeph>选项旨在确保以相同的方式对待在<codeph>ORDER BY</codeph>顺序中为对等的行；
+                            所有对等行将在同一框架中。
+                        </pd>
+                        <pd>使用<codeph>ROWS</codeph>或<codeph>RANGE</codeph>子句来表示窗口的边界。
+                            窗口边界可以是一个分区的一行，多行或所有行。
+                            您可以用偏移当前行值的数据值范围（<codeph>RANGE</codeph>）或偏移当前行的行数（<codeph>ROWS</codeph>）来表示窗口的边界。
+                            使用<codeph>RANGE</codeph>子句时，还必须使用<codeph>ORDER BY</codeph>子句。
+                            这是因为为生成窗口而执行的计算需要对值进行排序。
+                            此外，<codeph>ORDER BY</codeph>子句不能包含多个表达式，并且该表达式必须导致日期或数字值。
+                            使用<codeph>ROWS</codeph>或<codeph>RANGE</codeph>子句时，如果仅指定起始行，则当前行将用作窗口中的最后一行。
+                        </pd>
+                        <pd>
+                            <b>PRECEDING</b>
+                            — <codeph>PRECEDING</codeph>子句使用当前行作为参考点定义窗口的第一行。
+                            起始行以当前行之前的行数表示。
+                            例如，对于<codeph>ROWS</codeph>框架，<codeph>5 PRECEDING</codeph>设置窗口从当前行之前的第五行开始。
+                            对于<codeph>RANGE</codeph>框架，它将窗口设置为从第一行开始，其排序列值在给定顺序比当前行的顺序高5。
+                            如果指定的顺序按日期升序，则它将是当前行之前5天内的第一行。
+                            <codeph>UNBOUNDED PRECEDING</codeph>将窗口中的第一行设置为分区中的第一行。
+                        </pd>
+                        <pd>
+                            <b>BETWEEN</b>
+                            — <codeph>BETWEEN</codeph>子句使用当前行作为参考点定义窗口的第一行和最后一行。
+                            第一行和最后一行分别用当前行之前和之后的行数表示。
+                            例如，<codeph>BETWEEN 3 PRECEDING AND 5 FOLLOWING</codeph>将窗口设置为从当前行之前的第三行开始，到当前行之后的第五行结束。
+                            使用<codeph>BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING</codeph>，
+                            可以将窗口中的第一行和最后一行分别设置为分区的第一行和最后一行。
+                            如果未指定<codeph>ROW</codeph>或<codeph>RANGE</codeph>子句，则等效于默认行为。
+                        </pd>
+                        <pd>
+                            <b>FOLLOWING</b>
+                            — FOLLOWING子句使用当前行作为参考点定义窗口的最后一行。
+                            最后一行以当前行之后的行数表示。
+                            例如，对于<codeph>ROWS</codeph>框架，<codeph>5 FOLLOWING</codeph>将窗口设置为在当前行之后的第五行结束。
+                            在<codeph>RANGE</codeph>框架的情况下，它将窗口设置为最后一行的末尾，其排序列值在给定顺序的当前行后5个。
+                            如果指定的顺序按日期升序，则它将是当前行之后5天内的最后一行。
+                            使用<codeph>UNBOUNDED FOLLOWING</codeph>将窗口中的最后一行设置为分区中的最后一行。
+                        </pd>
+                        <pd>如果未指定<codeph>ROW</codeph>或<codeph>RANGE</codeph>子句，并且使用<codeph>ORDER BY</codeph>，
+                            则窗口绑定从分区的第一行（<codeph>UNBOUNDED PRECEDING</codeph>）开始，到当前行（<codeph>CURRENT ROW</codeph>）结束。
+                            如果未指定<codeph>ORDER BY</codeph>，则窗口从分区的第一行开始（<codeph>UNBOUNDED PRECEDING</codeph>），
+                            然后从分区的最后一行结束（<codeph>UNBOUNDED FOLLOWING</codeph>）。
+                        </pd>
+                    </plentry>
+                </parml>
+            </sectiondiv>
+            <sectiondiv id="section10">
+                <b>HAVING子句</b>
+                <p>可选的<codeph>HAVING</codeph>子句具有以下一般形式：
+                </p>
+                <codeblock>HAVING
+                    <varname>condition</varname>
+                </codeblock>
+                <p>其中<varname>condition</varname>与为<codeph>WHERE</codeph>子句指定的条件相同。
+                    <codeph>HAVING</codeph>去除不满足条件的组行。
+                    <codeph>HAVING</codeph>与<codeph>WHERE</codeph>不同：<codeph>WHERE</codeph>在应用<codeph>GROUP BY</codeph>之前过滤单个行，
+                    而<codeph>HAVING</codeph>过滤<codeph>GROUP BY</codeph>创建的组行。
+                    <varname>condition</varname>中引用的每个列都必须明确引用一个分组列，除非该引用出现在聚合函数中或未分组的列在函数上依赖于分组列。
+                </p>
+                <p>即使没有<codeph>GROUP BY</codeph>子句，<codeph>HAVING</codeph>的存在也会将查询转换为分组查询。
+                    这与查询包含聚合函数但不包含<codeph>GROUP BY</codeph>子句的情况相同。
+                    所有选定的行都被视为形成一个单一的组，并且<codeph>SELECT</codeph>列表和<codeph>HAVING</codeph>子句只能引用聚合函数中的表列。
+                    如果<codeph>HAVING</codeph>条件为true，则此类查询将返回单行；如果条件不是true，则将返回零行。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section11">
+                <b>UNION子句</b>
+                <p><codeph>UNION</codeph>子句具有以下一般形式：
+                </p>
+                <codeblock>
+                    <varname>select_statement</varname>
+                    UNION [ALL | DISTINCT]
+                    <varname>select_statement</varname>
+                </codeblock>
+                <p>其中<varname>select_statement</varname>是不带<codeph>ORDER BY</codeph>，<codeph>LIMIT</codeph>，
+                    <codeph>FOR NO KEY UPDATE</codeph>，<codeph>FOR UPDATE</codeph>，<codeph>FOR SHARE</codeph>或<codeph>FOR KEY SHARE</codeph>子句的任何<codeph>SELECT</codeph>语句。
+                    （如果将<codeph>ORDER BY</codeph>和<codeph>LIMIT</codeph>括在圆括号中，则可以将其附加到子查询表达式。
+                    不带圆括号，这些子句将应用于<codeph>UNION</codeph>的结果，而不是其右侧输入表达式。）
+                </p>
+                <p><codeph>UNION</codeph>运算符计算所涉及的<codeph>SELECT</codeph>语句返回的行的集合并集。
+                    如果行出现在至少一个结果集中，则在两个结果集中的行并集中。
+                    表示<codeph>UNION</codeph>的直接操作数的两个<codeph>SELECT</codeph>语句必须产生相同数量的列，并且对应的列必须具有兼容的数据类型。
+                </p>
+                <p>除非指定了<codeph>ALL</codeph>选项，否则<codeph>UNION</codeph>的结果不包含任何重复的行。
+                    <codeph>ALL</codeph>防止重复项的消除。
+                    （因此，<codeph>UNION ALL</codeph>通常比<codeph>UNION</codeph>快得多；请尽可能使用<codeph>ALL</codeph>。）
+                    可以编写<codeph>DISTINCT</codeph>来明确指定消除重复行的默认行为。
+                </p>
+                <p>除非括号中另有说明，否则同一<codeph>SELECT</codeph>语句中的多个<codeph>UNION</codeph>运算符从左到右求值。
+                </p>
+                <p>当前，不能为<codeph>UNION</codeph>结果或<codeph>UNION</codeph>的任何输入指定<codeph>FOR NO KEY UPDATE</codeph>，
+                    <codeph>FOR UPDATE</codeph>，<codeph>FOR SHARE</codeph>和<codeph>FOR KEY SHARE</codeph>。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section12">
+                <b>INTERSECT子句</b>
+                <p><codeph>INTERSECT</codeph>子句具有以下一般形式：
+                </p>
+                <codeblock>
+                    <varname>select_statement</varname>
+                    INTERSECT [ALL | DISTINCT]
+                    <varname>select_statement</varname>
+                </codeblock>
+                <p>其中<varname>select_statement</varname>是不带<codeph>ORDER BY</codeph>，<codeph>LIMIT</codeph>，
+                    <codeph>FOR NO KEY UPDATE</codeph>，<codeph>FOR UPDATE</codeph>，
+                    <codeph>FOR SHARE</codeph>或<codeph>FOR KEY SHARE</codeph>子句的任何SELECT语句。
+                </p>
+                <p><codeph>INTERSECT</codeph>运算符计算所涉及的<codeph>SELECT</codeph>语句返回的行的交集。
+                    如果一行出现在两个结果集中，则该行位于两个结果集中的交集。
+                </p>
+                <p>除非指定<codeph>ALL</codeph>选项，否则<codeph>INTERSECT</codeph>的结果不包含任何重复的行。
+                    使用<codeph>ALL</codeph>，在左表中具有<varname>m</varname>个重复项且在右表中具有<varname>n</varname>个重复项的行将在结果集中出现min（<varname>m</varname>，<varname>n</varname>）次。
+                    可以编写<codeph>DISTINCT</codeph>来明确指定消除重复行的默认行为。
+                </p>
+                <p>除非括号中另有规定，否则同一<codeph>SELECT</codeph>语句中的多个<codeph>INTERSECT</codeph>运算符从左到右求值。
+                    <codeph>INTERSECT</codeph>的优先级比<codeph>UNION</codeph>高。
+                    即，<codeph>A UNION B INTERSECT C</codeph>等同于<codeph>A UNION (B INTERSECT C)</codeph>。
+                </p>
+                <p>当前，不能为<codeph>INTERSECT</codeph>结果或<codeph>INTERSECT</codeph>的任何输入指定<codeph>FOR NO KEY UPDATE</codeph>，
+                    <codeph>FOR UPDATE</codeph>，<codeph>FOR SHARE</codeph>和<codeph>FOR KEY SHARE</codeph>。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section13">
+                <b>EXCEPT子句</b>
+                <p><codeph>EXCEPT</codeph>子句具有以下一般形式：
+                </p>
+                <codeblock>
+                    <varname>select_statement</varname>
+                    EXCEPT [ALL | DISTINCT]
+                    <varname>select_statement</varname>
+                </codeblock>
+                <p>其中<varname>select_statement</varname>是不带<codeph>ORDER BY</codeph>，<codeph>LIMIT</codeph>，<codeph>FOR NO KEY UPDATE</codeph>，
+                    <codeph>FOR UPDATE</codeph>，<codeph>FOR SHARE</codeph>或<codeph>FOR KEY SHARE</codeph>子句的任何<codeph>SELECT</codeph>语句。
+                </p>
+                <p><codeph>EXCEPT</codeph>运算符计算在左<codeph>SELECT</codeph>语句的结果但不在右<codeph>SELECT</codeph>的结果的行集。
+                </p>
+                <p>除非指定了<codeph>ALL</codeph>选项，否则<codeph>EXCEPT</codeph>的结果将不包含任何重复的行。
+                    使用<codeph>ALL</codeph>，在左表中具有<varname>m</varname>个重复项且在右表中具有<varname>n</varname>个重复项的行将在结果集中出现max（<varname>m-n</varname>，0）次。
+                    可以编写<codeph>DISTINCT</codeph>来明确指定消除重复行的默认行为。
+                </p>
+                <p>除非括号中另有规定，否则同一<codeph>SELECT</codeph>语句中的多个<codeph>EXCEPT</codeph>运算符从左到右求值。
+                    <codeph>EXCEPT</codeph>与<codeph>UNION</codeph>优先级相同。
+                </p>
+                <p>当前，不能为<codeph>EXCEPT</codeph>结果或<codeph>EXCEPT</codeph>的任何输入指定<codeph>FOR NO KEY UPDATE</codeph>，
+                    <codeph>FOR UPDATE</codeph>，<codeph>FOR SHARE</codeph>和<codeph>FOR KEY SHARE</codeph>。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section14">
+                <b>ORDER BY子句</b>
+                <p>可选的<codeph>ORDER BY</codeph>子句具有以下一般形式：
+                </p>
+                <codeblock>ORDER BY <varname>expression</varname> [ASC | DESC | USING <varname>operator</varname>]
+                    [NULLS {FIRST | LAST}] [,...]
+                </codeblock>
+                <p>其中<varname>expression</varname>可以是输出列（<codeph>SELECT</codeph>列表项）的名称或序号，
+                    也可以是由输入列值组成的任意表达式。
+                </p>
+                <p><codeph>ORDER BY</codeph>子句使结果行根据指定的表达式排序。
+                    如果两行最左边的表达式相等，则根据下一个表达式对它们进行比较，依此类推。
+                    如果所有指定的表达式相等，则将根据实现的顺序返回它们。
+                </p>
+                <p>序号是指输出列的序数位置（从左到右）。
+                    通过此特性，可以基于没有唯一名称的列来定义顺序。
+                    这绝对不是必须的，因为始终可以使用<codeph>AS</codeph>子句为输出列分配名称。
+                </p>
+                <p>还可以在<codeph>ORDER BY</codeph>子句中使用任意表达式，包括未出现在<codeph>SELECT</codeph>输出列表中的列。
+                    因此，以下语句是有效的：
+                </p>
+                <codeblock>SELECT name FROM distributors ORDER BY code;</codeblock>
+                <p>此特性的局限性在于，应用于<codeph>UNION</codeph>，<codeph>INTERSECT</codeph>或<codeph>EXCEPT</codeph>子句结果的<codeph>ORDER BY</codeph>子句只能指定输出列名称或序号，而不能指定表达式。
+                </p>
+                <p>如果<codeph>ORDER BY</codeph>表达式是一个与输出列名和输入列名都匹配的简单名称，则<codeph>ORDER BY</codeph>将其解释为输出列名。
+                    这与<codeph>GROUP BY</codeph>在相同情况下所做的选择相反。
+                    这两个语句的不一致行为与SQL标准兼容。
+                </p>
+                <p>可以选择在<codeph>ORDER BY</codeph>子句中的任何表达式之后添加关键字<codeph>ASC</codeph>（升序）或<codeph>DESC</codeph>（降序）。
+                    如果未指定，则默认采用<codeph>ASC</codeph>。
+                    或者，可以在<codeph>USING</codeph>子句中指定特定的排序运算符名称。
+                    <codeph>ASC</codeph>通常等效于<codeph>USING &lt;</codeph>，而<codeph>DESC</codeph>通常等效于<codeph>USING &gt;</codeph>。
+                    （但是，用户定义数据类型的创建者可以准确定义默认的排序顺序，并且它可能与其他名称的运算符相对应。）
+                </p>
+                <p>如果指定了<codeph>NULLS LAST</codeph>，则空值将在所有非空值之后排序；
+                    如果指定了<codeph>NULLS FIRST</codeph>，则空值将在所有非空值之前排序。
+                    如果都未指定，则默认行为是在指定或隐含<codeph>ASC</codeph>时为<codeph>NULLS LAST</codeph>，
+                    而在指定<codeph>DESC</codeph>时为<codeph>NULLS FIRST</codeph>（因此，默认值表示空值大于非空值）。
+                    指定<codeph>USING</codeph>时，默认的空值排序取决于运算符是小于运算符还是大于运算符。
+                </p>
+                <p>请注意，排序选项仅适用于它们遵循的表达式。
+                    例如，<codeph>ORDER BY x, y DESC</codeph>的含义与<codeph>ORDER BY x DESC，y DESC</codeph>的含义不同。
+                </p>
+                <p>字符串数据是根据创建数据库时建立的特定于语言环境的排序顺序进行排序的。
+                </p>
+                <p>字符串数据是根据应用于要排序的列的排序规则进行排序的。
+                    可以根据需要通过在<varname>expression</varname>中包含<codeph>COLLATE</codeph>子句来覆盖它，
+                    例如<codeph>ORDER BY mycolumn COLLATE "en_US"</codeph>。
+                    有关定义排序规则的信息，请参见<codeph><xref href="./CREATE_COLLATION.xml">CREATE COLLATION</xref></codeph>。
+                </p>
+            </sectiondiv>
+            <sectiondiv>
+                <b>LIMIT子句</b>
+                <p><codeph>LIMIT</codeph>子句包含两个独立的子句：
+                </p>
+                <codeblock>LIMIT {<varname>count</varname> | ALL}
+                    OFFSET
+                    <varname>start</varname>
+                </codeblock>
+                <p>其中<varname>count</varname>指定要返回的最大行数，而<varname>start</varname>指定在开始返回行之前要跳过的行数。
+                    如果同时指定了两者，则在开始对要返回的<codeph>count</codeph>行进行计数之前，将跳过起始行。
+                </p>
+                <p>如果<codeph>count</codeph>表达式的计算结果为NULL，则将其视为<codeph>LIMIT ALL</codeph>，即无限制。
+                    如果<codeph>start</codeph>计算为NULL，则将其与<codeph>OFFSET 0</codeph>相同。
+                </p>
+                <p>SQL：2008引入了不同的语法来实现相同的结果，Greenplum数据库也支持该语法。
+                    它是：
+                    <codeblock>OFFSET <varname>start</varname> [ ROW | ROWS ]
+                        FETCH { FIRST | NEXT } [ <varname>count</varname> ] { ROW | ROWS } ONLY
+                    </codeblock>
+                </p>
+                <p>在这种语法中，标准要求<varname>start</varname>或<varname>count</varname>值是文字常量，参数或变量名；
+                    作为Greenplum数据库扩展，可以使用其他表达式，但通常需要将其括在括号中以避免歧义。
+                    如果在<codeph>FETCH</codeph>子句中省略了<varname>count</varname>，则其默认值为1。
+                    <codeph>ROW</codeph>和<codeph>ROWS</codeph>以及<codeph>FIRST</codeph>和<codeph>NEXT</codeph>是不影响这些子句效果的干扰词。
+                    根据标准，如果两者都存在，则<codeph>OFFSET</codeph>子句必须位于<codeph>FETCH</codeph>子句之前。
+                    但Greenplum数据库允许使用任何顺序。
+                </p>
+                <p>使用<codeph>LIMIT</codeph>时，最好使用<codeph>ORDER BY</codeph>子句将结果行强制为唯一的顺序。
+                    否则，您将获得查询行的不可预测的子集 - 您可能会要求以第十到第二十行，但以什么顺序要求第十到第二十行？
+                    除非您指定<codeph>ORDER BY</codeph>，否则您不知道该如何排序。
+                </p>
+                <p>查询优化器在生成查询计划时会考虑<codeph>LIMIT</codeph>，因此根据<codeph>LIMIT</codeph>和<codeph>OFFSET</codeph>的使用方式，您很可能会获得不同的计划（产生不同的行顺序）。
+                    因此，除非使用<codeph>ORDER BY</codeph>强制执行可预测的结果顺序，否则使用不同的<codeph>LIMIT/OFFSET</codeph>值选择查询结果的不同子集将产生不一致的结果。
+                    这不是缺陷；这是一个正常的结果，即除非使用<codeph>ORDER BY</codeph>强制该顺序，否则SQL不会保证以任何特定顺序传递查询结果。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section17">
+                <b>Locking子句</b>
+                <p><codeph>FOR UPDATE</codeph>，<codeph>FOR NO KEY UPDATE</codeph>，<codeph>FOR SHARE</codeph>和<codeph>FOR KEY SHARE</codeph>是锁定子句；
+                    它们会影响<codeph>SELECT</codeph>如何锁定从表中获取的行。
+                </p>
+                <p>锁定子句具有一般形式
+                </p>
+                <codeblock>FOR <varname>lock_strength</varname> [OF <varname>table_name</varname> [ , ... ] ] [ NOWAIT ]
+                </codeblock>
+                <p>其中<varname>lock_strength</varname>可以是以下之一
+                    <codeblock>UPDATE
+                        NO KEY UPDATE
+                        SHARE
+                        KEY SHARE
+                    </codeblock>
+                </p>
+                <note>默认情况下，Greenplum数据库获取对表的<codeph>EXCLUSIVE</codeph>锁，以对堆表进行<codeph>DELETE</codeph>和<codeph>UPDATE</codeph>操作。
+                    启用全局死锁检测器后，堆表上<codeph>DELETE</codeph>和<codeph>UPDATE</codeph>操作的锁定模式为<codeph>ROW EXCLUSIVE</codeph>。
+                    通过将<xref href="../config_params/guc-list.xml#gp_enable_global_deadlock_detector">gp_enable_global_deadlock_detector</xref>配置参数设置为true来启用全局死锁检测器。
+                    有关全局死锁检测器的信息，请参见<cite>Greenplum数据库管理员指南</cite>中的<xref href="../../admin_guide/dml.xml#topic_gdd">全局死锁检测器</xref> 。
+                </note>
+                <p>有关每种行级锁定模式的更多信息，请参见PostgreSQL文档中的<xref href="https://www.postgresql.org/docs/9.4/explicit-locking.html" format="html" scope="external">显式锁定</xref>。
+                </p>
+                <p>为防止该操作等待其他事务提交，请使用<codeph>NOWAIT</codeph>选项。
+                    使用<codeph>NOWAIT</codeph>，如果无法立即锁定选定的行，该语句将报告错误，而不是等待。
+                    请注意，<codeph>NOWAIT</codeph>仅适用于行级锁 - 所需的<codeph>ROW SHARE</codeph>表级锁仍以常规方式获取。
+                    如果需要不等待就获取表级锁，则可以先将LOCK与<codeph>NOWAIT</codeph>选项一起使用。
+                </p>
+                <p>如果在锁定子句中命名了特定的表，则仅锁定来自那些表的行；其他使用<codeph>SELECT</codeph>的表则像往常一样简单地读取。
+                    没有表列表的锁定子句会影响该语句中使用的所有表。
+                    如果将锁定子句应用于视图或子查询，则它将影响视图或子查询中使用的所有表。
+                    但是，这些子句不适用于主查询引用的<codeph>WITH</codeph>查询。
+                    如果希望在<codeph>WITH</codeph>查询中发生行锁定，请在<codeph>WITH</codeph>查询中指定一个锁定子句。
+                </p>
+                <p>如果有必要为不同的表指定不同的锁定行为，则可以编写多个锁定子句。
+                    如果同一表被两个以上的锁定子句提及（或隐式影响），则将其视为仅由最强的一个子表指定。
+                    同样，如果在影响该表的任何子句中指定了表，则该表将作为<codeph>NOWAIT</codeph>处理。
+                </p>
+                <p>在无法用单独的表行清楚地标识返回的行的上下文中，不能使用锁定子句；例如，它们不能与聚合一起使用。
+                </p>
+                <p>当锁定子句出现在<codeph>SELECT</codeph>查询的顶层时，被锁定的行与查询返回的行完全相同。
+                    对于连接查询，锁定的行是那些促成返回连接行的行。
+                    此外，查询快照中满足查询条件的行将被锁定，尽管这些行在快照后对其进行更新并且不再满足查询条件不会返回。
+                    如果使用<codeph>LIMIT</codeph>，则一旦返回了足够的行以满足限制，锁定就会停止（但请注意，被<codeph>OFFSET</codeph>跳过的行将被锁定）。
+                    同样，如果在游标的查询中使用锁定子句，则仅锁定实际被游标读取或跳过的行。
+                </p>
+                <p>当sub-<codeph>SELECT</codeph>中出现locking子句时，被锁定的行就是该子查询返回给外部查询的行。
+                    这可能涉及的行数少于单独检查子查询所建议的行数，因为外部查询的条件可用于优化子查询的执行。
+                    例如，
+                    <codeblock>SELECT * FROM (SELECT * FROM mytable FOR UPDATE) ss WHERE col1 = 5;</codeblock>
+                    将仅锁定<codeph>col1 = 5</codeph>的行，即使该条件在文本上不在子查询中。
+                </p>
+                <p><codeph>SELECT</codeph>命令可能以<codeph>READ COMMITTED</codeph>事务隔离级别运行，并且使用<codeph>ORDER BY</codeph>和锁定子句可以使行无序返回。
+                    这是因为<codeph>ORDER BY</codeph>首先被应用。
+                    该命令对结果进行排序，但随后可能会阻止尝试获得对一个或多个行的锁定。
+                    一旦<codeph>SELECT</codeph>解除阻塞，某些排序列值可能已被修改，从而导致这些行看起来是乱序的（尽管就原始列值而言，它们是有序的）。
+                    例如，可以通过在子查询中放置<codeph>FOR UPDATE/SHARE</codeph>子句来解决此问题。
+                    <codeblock>SELECT * FROM (SELECT * FROM mytable FOR UPDATE) ss ORDER BY column1;</codeblock>
+                    请注意，这将导致锁定<codeph>mytable</codeph>的所有行，而顶层的<codeph>FOR UPDATE</codeph>将仅锁定实际返回的行。
+                    这可能会导致明显的性能差异，特别是如果将<codeph>ORDER BY</codeph>与<codeph>LIMIT</codeph>或其他限制结合使用。
+                    因此，仅当期望并发更新排序列并且需要严格排序的结果时才建议使用此技术。
+                </p>
+                <p>在<codeph>REPEATABLE READ</codeph>或<codeph>SERIALIZABLE</codeph>事务隔离级别，
+                    这将导致序列化失败（<codeph>SQLSTATE</codeph>为<codeph>40001</codeph>），因此在这些隔离级别下，不可能乱序接收行。
+                </p>
+            </sectiondiv>
+        </section>
+        <section id="table-command">
+            <title>TABLE命令</title>
+            <p>命令</p>
+            <codeblock>TABLE
+                <varname>name</varname>
+            </codeblock>
+            <p>完全等同于</p>
+            <codeblock>SELECT * FROM
+                <varname>name</varname>
+            </codeblock>
+            <p>在部分复杂查询中，它可用作顶级命令或节省空间的语法变体。
+            </p>
+        </section>
+        <section id="section18">
+            <title>示例</title>
+            <p>连接表<codeph>films</codeph>与表<codeph>distributors</codeph>:
+            </p>
+            <codeblock>SELECT f.title, f.did, d.name, f.date_prod, f.kind FROM
+                distributors d, films f WHERE f.did = d.did
+            </codeblock>
+            <p>将表films的<codeph>length</codeph>列求和并将结果按<codeph>kind</codeph>分组:
+            </p>
+            <codeblock>SELECT kind, sum(length) AS total FROM films GROUP BY kind;</codeblock>
+            <p>将表films的<codeph>length</codeph>列求和并将结果按<codeph>kind</codeph>分组并显示总和小于5小时的组：
+            </p>
+            <codeblock>SELECT kind, sum(length) AS total FROM films GROUP BY kind
+                HAVING sum(length) &lt; interval '5 hours';
+            </codeblock>
+            <p>计算电影<codeph>kind</codeph>和<codeph>distributor</codeph>的所有销售部分和与总和。
+            </p>
+            <codeblock>SELECT kind, distributor, sum(prc*qty) FROM sales
+                GROUP BY ROLLUP(kind, distributor)
+                ORDER BY 1,2,3;
+            </codeblock>
+            <p>根据总销量计算电影发行商的排名：</p>
+            <codeblock>SELECT distributor, sum(prc*qty),
+                       rank() OVER (ORDER BY sum(prc*qty) DESC)
+                FROM sale
+                GROUP BY distributor ORDER BY 2 DESC;
+            </codeblock>
+            <p>以下两个示例是根据第二列（<codeph>name</codeph>）的内容对单个结果进行排序的相同方法：
+            </p>
+            <codeblock>SELECT * FROM distributors ORDER BY name;
+                SELECT * FROM distributors ORDER BY 2;
+            </codeblock>
+            <p>下一个示例说明如何获取表<codeph>distributors</codeph>和<codeph>actors</codeph>的并集，将结果限制为每个表中以字母<codeph>W</codeph>开头的行。
+                只需要不同的行，因此关键字<codeph>ALL</codeph>被省略：
+            </p>
+            <codeblock>SELECT distributors.name FROM distributors WHERE
+                distributors.name LIKE 'W%' UNION SELECT actors.name FROM
+                actors WHERE actors.name LIKE 'W%';
+            </codeblock>
+            <p>此示例说明如何在<codeph>FROM</codeph>子句中使用函数，无论是否包含列定义列表：
+            </p>
+            <codeblock>CREATE FUNCTION distributors(int) RETURNS SETOF distributors
+                AS $$ SELECT * FROM distributors WHERE did = $1; $$ LANGUAGE
+                SQL;
+                SELECT * FROM distributors(111);
 
-CREATE FUNCTION distributors_2(int) RETURNS SETOF record AS 
-$$ SELECT * FROM distributors WHERE did = $1; $$ LANGUAGE 
-SQL;
-SELECT * FROM distributors_2(111) AS (dist_id int, dist_name 
-text);</codeblock>
-      <p>This example uses a simple <codeph>WITH</codeph> clause:</p>
-      <codeblock>WITH test AS (
-  SELECT random() as x FROM generate_series(1, 3)
-  )
-SELECT * FROM test
-UNION ALL
-SELECT * FROM test; </codeblock>
-      <p>This example uses the <codeph>WITH</codeph> clause to display per-product sales totals in
-        only the top sales regions. </p>
-      <codeblock>WITH regional_sales AS 
-    SELECT region, SUM(amount) AS total_sales
-    FROM orders
-    GROUP BY region
-  ), top_regions AS (
-    SELECT region
-    FROM regional_sales
-    WHERE total_sales > (SELECT SUM(total_sales) FROM
-       regional_sales)
-  )
-SELECT region, product, SUM(quantity) AS product_units,
-   SUM(amount) AS product_sales
-FROM orders
-WHERE region IN (SELECT region FROM top_regions) 
-GROUP BY region, product;</codeblock>
-      <p>The example could have been written without the <codeph>WITH</codeph> clause but would have
-        required two levels of nested sub-<codeph>SELECT</codeph> statements.</p>
-      <p>This example uses the <codeph>WITH RECURSIVE</codeph> clause to find all subordinates
-        (direct or indirect) of the employee Mary, and their level of indirectness, from a table
-        that shows only direct subordinates:</p>
-      <codeblock>WITH RECURSIVE employee_recursive(distance, employee_name, manager_name) AS (
-    SELECT 1, employee_name, manager_name
-    FROM employee
-    WHERE manager_name = 'Mary'
-  UNION ALL
-    SELECT er.distance + 1, e.employee_name, e.manager_name
-    FROM employee_recursive er, employee e
-    WHERE er.employee_name = e.manager_name
-  )
-SELECT distance, employee_name FROM employee_recursive;</codeblock>
-      <p>The typical form of recursive queries: an initial condition, followed by <codeph>UNION
-          [ALL]</codeph>, followed by the recursive part of the query. Be sure that the recursive
-        part of the query will eventually return no tuples, or else the query will loop
-        indefinitely. See <xref
-          href="../../admin_guide/query/topics/CTE-query.xml#topic_zhs_r1s_w1b"/><ph
-          otherprops="pivotal"> in the <cite>Greenplum Database Administrator Guide</cite></ph> for
-        more examples.</p>
-    </section>
-    <section id="section19"><title>Compatibility</title><p>The <codeph>SELECT</codeph> statement is
-        compatible with the SQL standard, but there are some extensions and some missing features.
-        </p><sectiondiv id="section20"><b>Omitted FROM Clauses</b><p>Greenplum Database allows one to omit the
-            <codeph>FROM</codeph> clause. It has a straightforward use to compute the results of
-          simple expressions. For example:</p><codeblock>SELECT 2+2;</codeblock><p>Some other SQL
-          databases cannot do this except by introducing a dummy one-row table from which to do the
-            <codeph>SELECT</codeph>. </p><p>Note that if a <codeph>FROM</codeph> clause is not
-          specified, the query cannot reference any database tables. For example, the following
-          query is
-          invalid:<codeblock>SELECT distributors.* WHERE distributors.name = 'Westward';</codeblock>In
-          earlier releases, setting a server configuration parameter,
-            <varname>add_missing_from</varname>, to true allowed Greenplum Database to add an
-          implicit entry to the query's <codeph>FROM</codeph> clause for each table referenced by
-          the query. This is no longer allowed. </p></sectiondiv><sectiondiv id="section21"><b>Omitting the AS Key Word</b><p>In the SQL standard, the optional key
-          word <codeph>AS</codeph> can be omitted before an output column name whenever the new
-          column name is a valid column name (that is, not the same as any reserved keyword).
-          Greenplum Database is slightly more restrictive: <codeph>AS</codeph> is required if the
-          new column name matches any keyword at all, reserved or not. Recommended practice is to
-          use <codeph>AS</codeph> or double-quote output column names, to prevent any possible
-          conflict against future keyword additions. </p><p>In <codeph>FROM</codeph> items, both the
-          standard and Greenplum Database allow <codeph>AS</codeph> to be omitted before an alias
-          that is an unreserved keyword. But this is impractical for output column names, because of
-          syntactic ambiguities.</p></sectiondiv>
-      <sectiondiv id="sectiondiv_ndj_ngd_cgb"><b>ONLY and Inheritance</b><p>The SQL standard
-          requires parentheses around the table name when writing <codeph>ONLY</codeph>, for
-          example: <codeblock>SELECT * FROM ONLY (tab1), ONLY (tab2) WHERE ...</codeblock>Greenplum
-          Database considers these parentheses to be optional.</p><p>Greenplum Database allows a
-          trailing <codeph>* </codeph>to be written to explicitly specify the
-            non-<codeph>ONLY</codeph> behavior of including child tables. The standard does not
-          allow this.</p><p>(These points apply equally to all SQL commands supporting the
-            <codeph>ONLY</codeph> option.)</p></sectiondiv><sectiondiv id="section22"><b>Namespace Available to GROUP BY and ORDER BY</b><p>In the SQL-92
-          standard, an <codeph>ORDER BY</codeph> clause may only use output column names or numbers,
-          while a <codeph>GROUP BY</codeph> clause may only use expressions based on input column
-          names. Greenplum Database extends each of these clauses to allow the other choice as well
-          (but it uses the standard's interpretation if there is ambiguity). Greenplum Database also
-          allows both clauses to specify arbitrary expressions. Note that names appearing in an
-          expression are always taken as input-column names, not as output column names.
-          </p><p>SQL:1999 and later use a slightly different definition which is not entirely upward
-          compatible with SQL-92. In most cases, however, Greenplum Database interprets an
-            <codeph>ORDER BY</codeph> or <codeph>GROUP BY</codeph> expression the same way SQL:1999
-          does. </p></sectiondiv>
-      <sectiondiv><b>Functional Dependencies</b>
-        <p>Greenplum Database recognizes functional dependency
-          (allowing columns to be omitted from <codeph>GROUP BY</codeph>) only when
-            a table's primary key is included in the <codeph>GROUP BY</codeph> list.
-              The SQL standard specifies additional conditions that should be
-              recognized.</p></sectiondiv>
-      <sectiondiv><b>LIMIT and OFFSET</b><p>The clauses <codeph>LIMIT</codeph> and
-            <codeph>OFFSET</codeph> are Greenplum Database-specific syntax, also used by MySQL. The
-          SQL:2008 standard has introduced the clauses <codeph>OFFSET .. FETCH {FIRST|NEXT}
-            ...</codeph> for the same functionality, as shown above. This syntax is also used by IBM
-          DB2. (Applications for Oracle frequently use a workaround involving the automatically
-          generated <codeph>rownum</codeph> column, which is not available in Greenplum Database, to
-          implement the effects of these clauses.)</p></sectiondiv>
-      <sectiondiv><b>FOR NO KEY UPDATE, FOR UPDATE, FOR SHARE, and FOR KEY SHARE</b>
-        <p>Although <codeph>FOR UPDATE</codeph> appears in the SQL standard, the standard allows it
-          only as an option of <codeph>DECLARE CURSOR</codeph>. Greenplum Database allows it in any
-            <codeph>SELECT</codeph> query as well as in sub-<codeph>SELECT</codeph>s, but this is an
-          extension. The <codeph>FOR NO KEY UPDATE</codeph>, <codeph>FOR SHARE</codeph>, and
-            <codeph>FOR KEY SHARE</codeph> variants, as well as the <codeph>NOWAIT</codeph> option,
-          do not appear in the standard. </p></sectiondiv>
-      <sectiondiv><b>Data-Modifying Statements in WITH</b><p>Greenplum Database allows <codeph>INSERT</codeph>,
-        <codeph>UPDATE</codeph>, and <codeph>DELETE</codeph> to be used as <codeph>WITH</codeph>
-          queries. This is not found in the SQL standard.</p></sectiondiv>
-      <sectiondiv id="section23"><b>Nonstandard Clauses</b><p>The clause <codeph>DISTINCT ON</codeph> is
-          not defined in the SQL standard.</p></sectiondiv><sectiondiv id="section24"><b>Limited Use
-          of STABLE and VOLATILE Functions</b><p>To prevent data from becoming out-of-sync across
-          the segments in Greenplum Database, any function classified as <codeph>STABLE</codeph> or
-            <codeph>VOLATILE</codeph> cannot be executed at the segment database level if it
-          contains SQL or modifies the database in any way. See <codeph><xref
-              href="CREATE_FUNCTION.xml#topic1" type="topic" format="dita"/></codeph> for more
-          information.</p></sectiondiv></section>
-    <section id="section25">
-      <title>See Also</title>
-      <p><codeph><xref href="EXPLAIN.xml#topic1" type="topic" format="dita"/></codeph></p>
-    </section>
-  </body>
+                CREATE FUNCTION distributors_2(int) RETURNS SETOF record AS
+                $$ SELECT * FROM distributors WHERE did = $1; $$ LANGUAGE
+                SQL;
+                SELECT * FROM distributors_2(111) AS (dist_id int, dist_name
+                text);
+            </codeblock>
+            <p>此示例使用一个简单的<codeph>WITH</codeph>子句：
+            </p>
+            <codeblock>WITH test AS (
+                SELECT random() as x FROM generate_series(1, 3)
+                )
+                SELECT * FROM test
+                UNION ALL
+                SELECT * FROM test;
+            </codeblock>
+            <p>本示例使用<codeph>WITH</codeph>子句仅显示最高销售区域中的每产品销售总额。
+            </p>
+            <codeblock>WITH regional_sales AS
+                SELECT region, SUM(amount) AS total_sales
+                FROM orders
+                GROUP BY region
+                ), top_regions AS (
+                SELECT region
+                FROM regional_sales
+                WHERE total_sales > (SELECT SUM(total_sales) FROM
+                regional_sales)
+                )
+                SELECT region, product, SUM(quantity) AS product_units,
+                SUM(amount) AS product_sales
+                FROM orders
+                WHERE region IN (SELECT region FROM top_regions)
+                GROUP BY region, product;
+            </codeblock>
+            <p>该示例可能编写不包含<codeph>WITH</codeph>子句，但需要两级嵌套的sub-<codeph>SELECT</codeph>语句。
+            </p>
+            <p>本示例使用<codeph>WITH RECURSIVE</codeph>子句从仅显示直接下属的表中查找员工Mary的所有下属（直接或间接）及其间接级别：
+            </p>
+            <codeblock>WITH RECURSIVE employee_recursive(distance, employee_name, manager_name) AS (
+                SELECT 1, employee_name, manager_name
+                FROM employee
+                WHERE manager_name = 'Mary'
+                UNION ALL
+                SELECT er.distance + 1, e.employee_name, e.manager_name
+                FROM employee_recursive er, employee e
+                WHERE er.employee_name = e.manager_name
+                )
+                SELECT distance, employee_name FROM employee_recursive;
+            </codeblock>
+            <p>递归查询的典型形式：初始条件，后跟<codeph>UNION [ALL]</codeph>，然后是查询的递归部分。
+                确保查询的递归部分最终不会返回任何元组，否则查询将无限期地循环。
+                有关更多示例，请参见<xref href="../../admin_guide/query/topics/CTE-query.xml#topic_zhs_r1s_w1b"/>。
+                <ph otherprops="pivotal">in the <cite>Greenplum Database Administrator Guide</cite></ph>
+            </p>
+        </section>
+        <section id="section19">
+            <title>兼容性</title>
+            <p><codeph>SELECT</codeph>语句与SQL标准兼容，但是有一些扩展和某些缺少的功能。
+            </p>
+            <sectiondiv id="section20">
+                <b>省略FROM子句</b>
+                <p>Greenplum数据库允许省略<codeph>FROM</codeph>子句。
+                    它可以直接用于计算简单表达式的结果。例如：
+                </p>
+                <codeblock>SELECT 2+2;</codeblock>
+                <p>其他一些SQL数据库无法做到这一点，除非引入一个虚拟的单行表来执行<codeph>SELECT</codeph>。
+                </p>
+                <p>请注意，如果未指定<codeph>FROM</codeph>子句，则查询无法引用任何数据库表。
+                    例如，以下查询无效：
+                    <codeblock>SELECT distributors.* WHERE distributors.name = 'Westward';</codeblock>
+                    在较早的版本中，将服务器配置参数<varname>add_missing_from</varname>设置为true允许Greenplum数据库为查询所引用的每个表向查询的<codeph>FROM</codeph>子句添加隐式条目。
+                    这个不再允许。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section21">
+                <b>省略AS关键字</b>
+                <p>在SQL标准中，只要新列名是有效的列名（即与任何保留关键字不同），就可以在输出列名之前省略可选关键字<codeph>AS</codeph>。
+                    Greenplum数据库的限制更为严格：如果新列名完全匹配任何关键字（保留与否），则要求使用<codeph>AS</codeph>。
+                    推荐的做法是使用<codeph>AS</codeph>或双引号输出列名，以防止与将来添加关键字的任何可能的冲突。
+                </p>
+                <p>在<codeph>FROM</codeph>项中，SQL标准和Greenplum数据库都允许在作为未保留关键字的别名之前省略<codeph>AS</codeph>。
+                    但是由于语法上的歧义，这对于输出列名称是不切实际的。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="sectiondiv_ndj_ngd_cgb">
+                <b>ONLY和Inheritance</b>
+                <p>使用<codeph>ONLY</codeph>时，SQL标准要求在表名前后加上括号，例如：
+                    <codeblock>SELECT * FROM ONLY (tab1), ONLY (tab2) WHERE ...</codeblock>
+                    Greenplum数据库认为这些括号是可选的。
+                </p>
+                <p>Greenplum数据库允许编写尾随<codeph>*</codeph>来明确指定包括子表的non-<codeph>ONLY</codeph>行为。
+                    该标准不允许这样做。
+                </p>
+                <p>（这些要点同样适用于所有支持<codeph>ONLY</codeph>选项的SQL命令。）
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section22">
+                <b>Namespace可以用于GROUP BY和ORDER BY</b>
+                <p>在SQL-92标准中，<codeph>ORDER BY</codeph>子句只能使用输出列名称或序号，而<codeph>GROUP BY</codeph>子句只能使用基于输入列名称的表达式。
+                    Greenplum数据库扩展了这些子句中的每一个，以允许其他选择（但是如果有歧义，它将使用标准的解释）。
+                    Greenplum数据库还允许两个子句都指定任意表达式。
+                    请注意，出现在表达式中的名称始终被视为输入列名称，而不是输出列名称。
+                </p>
+                <p>SQL：1999及更高版本使用的定义略有不同，但并不完全与SQL-92向上兼容。
+                    但是，在大多数情况下，Greenplum数据库以与SQL：1999相同的方式解释<codeph>ORDER BY</codeph>或<codeph>GROUP BY</codeph>表达式。
+                </p>
+            </sectiondiv>
+            <sectiondiv>
+                <b>函数依赖</b>
+                <p>仅当表的主键包含在<codeph>GROUP BY</codeph>列表中时，Greenplum数据库才能识别函数依赖（允许从<codeph>GROUP BY</codeph>省略列）。
+                    SQL标准指定了应识别的其他条件。
+                </p>
+            </sectiondiv>
+            <sectiondiv>
+                <b>LIMIT和OFFSET</b>
+                <p>子句<codeph>LIMIT</codeph>和<codeph>OFFSET</codeph>是Greenplum数据库特定的语法，也由MySQL使用。
+                    如上所述，SQL：2008标准引入了子句<codeph>OFFSET .. FETCH {FIRST | NEXT} ...</codeph>来实现相同的功能。
+                    IBM DB2也使用此语法。
+                    （Oracle应用程序经常使用一种变通办法来实现这些子句的效果，该变通办法涉及自动生成的<codeph>rownum</codeph>列，Greenplum数据库中不提供该列。）
+                </p>
+            </sectiondiv>
+            <sectiondiv>
+                <b>FOR NO KEY UPDATE, FOR UPDATE, FOR SHARE和FOR KEY SHARE</b>
+                <p>尽管<codeph>FOR UPDATE</codeph>出现在SQL标准中，但该标准仅允许将它作为<codeph>DECLARE CURSOR</codeph>的选项。
+                    Greenplum数据库允许在任何<codeph>SELECT</codeph>查询以及sub-<codeph>SELECT</codeph>中使用它，但这是一个扩展。
+                    <codeph>FOR NO KEY UPDATE</codeph>，<codeph>FOR SHARE</codeph>和<codeph>FOR KEY SHARE</codeph>变体以及<codeph>NOWAIT</codeph>选项未出现在标准中。
+                </p>
+            </sectiondiv>
+            <sectiondiv>
+                <b>WITH中的数据修改语句</b>
+                <p>Greenplum数据库允许将<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>和<codeph>DELETE</codeph>用作<codeph>WITH</codeph>查询。
+                    在SQL标准中不允许。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section23">
+                <b>非标准子句</b>
+                <p>在SQL标准中未定义<codeph>DISTINCT ON</codeph>子句。
+                </p>
+            </sectiondiv>
+            <sectiondiv id="section24">
+                <b>STABLE和VOLATILE函数的限制</b>
+                <p>为防止数据在Greenplum数据库中的各个segment之间变得不同步，
+                    如果分类为<codeph>STABLE</codeph>或<codeph>VOLATILE</codeph>的任何函数包含SQL或以任何方式修改了数据库，则不能在segment数据库级别执行该函数。
+                    有关更多信息，请参见<codeph><xref href="CREATE_FUNCTION.xml#topic1" type="topic" format="dita"/></codeph>。
+                </p>
+            </sectiondiv>
+        </section>
+        <section id="section25">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="EXPLAIN.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
 </topic>

@@ -5,68 +5,58 @@
 <title>SET CONSTRAINTS</title>
    <body>
       <section id="section1">
-         <p id="sql_command_desc">Sets constraint check timing for the current transaction.</p>
-         <note type="note">Referential integrity syntax (foreign key constraints) is accepted but not
-           enforced.</note>
+         <p id="sql_command_desc">设置当前事务的约束检查时间。</p>
+         <note type="note">引用完整性语法（外键约束）被接受但未强制执行。
+            </note>
       </section>
       <section id="section2">
-         <title>Synopsis</title>
+         <title>概要</title>
          <codeblock id="sql_command_synopsis">SET CONSTRAINTS { ALL | <varname>name</varname> [, ...] } { DEFERRED | IMMEDIATE }</codeblock>
       </section>
       <section id="section3">
-         <title>Description</title>
-         <p><codeph>SET CONSTRAINTS</codeph> sets the behavior of constraint checking within the
-            current transaction. <codeph>IMMEDIATE</codeph> constraints are checked at the end of
-            each statement. <codeph>DEFERRED</codeph> constraints are not checked until transaction
-            commit. Each constraint has its own <codeph>IMMEDIATE</codeph> or
-               <codeph>DEFERRED</codeph> mode. </p>
-         <p>Upon creation, a constraint is given one of three characteristics: <codeph>DEFERRABLE
-               INITIALLY DEFERRED</codeph>, <codeph>DEFERRABLE INITIALLY IMMEDIATE</codeph>, or
-               <codeph>NOT DEFERRABLE</codeph>. The third class is always <codeph>IMMEDIATE</codeph>
-            and is not affected by the <codeph>SET CONSTRAINTS</codeph> command. The first two
-            classes start every transaction in the indicated mode, but their behavior can be changed
-            within a transaction by <codeph>SET CONSTRAINTS</codeph>. </p>
-         <p><codeph>SET CONSTRAINTS</codeph> with a list of constraint names changes the mode of
-            just those constraints (which must all be deferrable). Each constraint name can be
-            schema-qualified. The current schema search path is used to find the first matching name
-            if no schema name is specified. <codeph>SET CONSTRAINTS ALL</codeph> changes the mode of
-            all deferrable constraints. </p>
-         <p>When <codeph>SET CONSTRAINTS</codeph> changes the mode of a constraint from
-               <codeph>DEFERRED</codeph> to <codeph>IMMEDIATE</codeph>, the new mode takes effect
-            retroactively: any outstanding data modifications that would have been checked at the
-            end of the transaction are instead checked during the execution of the <codeph>SET
-               CONSTRAINTS</codeph> command. If any such constraint is violated, the <codeph>SET
-               CONSTRAINTS</codeph> fails (and does not change the constraint mode). Thus,
-               <codeph>SET CONSTRAINTS</codeph> can be used to force checking of constraints to
-            occur at a specific point in a transaction. </p>
-         <p>Currently, only <codeph>UNIQUE</codeph>, <codeph>PRIMARY KEY</codeph>,
-               <codeph>REFERENCES</codeph> (foreign key), and <codeph>EXCLUDE</codeph> constraints
-            are affected by this setting. <codeph>NOT NULL</codeph> and <codeph>CHECK</codeph>
-            constraints are always checked immediately when a row is inserted or modified
-               (<i>not</i> at the end of the statement). Uniqueness and exclusion constraints that
-            have not been declared <codeph>DEFERRABLE</codeph> are also checked immediately. </p>
-         <p>The firing of triggers that are declared as "constraint triggers" is also controlled by
-            this setting — they fire at the same time that the associated constraint should be
-            checked. </p>
+         <title>描述</title>
+         <p><codeph>SET CONSTRAINTS</codeph>设置当前事务中的约束检查行为。
+            在每个语句的末尾检查<codeph>IMMEDIATE</codeph>约束。
+            在提交事务之前，不检查<codeph>DEFERRED</codeph>约束。
+            每个约束都有其自己的<codeph>IMMEDIATE</codeph>或<codeph>DEFERRED</codeph>模式。
+            </p>
+         <p>创建后，将为约束提供以下三个特征之一：<codeph>DEFERRABLE
+            INITIALLY DEFERRED</codeph>，<codeph>DEFERRABLE INITIALLY IMMEDIATE</codeph>或<codeph>NOT DEFERRABLE</codeph>。
+            第三类始终为<codeph>IMMEDIATE</codeph>，不受<codeph>SET CONSTRAINTS</codeph>命令的影响。
+            前两个类以指示的模式启动每个事务，但是可以通过<codeph>SET CONSTRAINTS</codeph>在事务内更改其行为。
+            </p>
+         <p>带有约束名称列表的<codeph>SET CONSTRAINTS</codeph>会更改那些约束的模式（必须全部推迟）。
+            每个约束名称可以是schema限定的。
+            如果未指定schema名称，则使用当前schema搜索路径查找第一个匹配名称。
+            <codeph>SET CONSTRAINTS ALL</codeph>更改所有可延缓约束的模式。
+            </p>
+         <p>当<codeph>SET CONSTRAINTS</codeph>将约束的模式从<codeph>DEFERRED</codeph>更改为<codeph>IMMEDIATE</codeph>时，新模式将追溯生效：
+            在执行<codeph>SET CONSTRAINTS</codeph>命令时，将检查在事务结束时会被检查的所有未完成的数据修改。
+            如果违反了任何此类约束，则<codeph>SET CONSTRAINTS</codeph>会失败（并且不会更改约束模式）。
+            因此，<codeph>SET CONSTRAINTS</codeph>可以用于强制检查约束以在事务的特定点发生。
+            </p>
+         <p>当前，此设置仅影响<codeph>UNIQUE</codeph>，<codeph>PRIMARY KEY</codeph>，<codeph>REFERENCES</codeph>（外键）和<codeph>EXCLUDE</codeph>约束。
+            当插入或修改一行时（不在语句末尾），始终会立即检查<codeph>NOT NULL</codeph>和<codeph>CHECK</codeph>约束。
+            还可以立即检查尚未声明为<codeph>DEFERRABLE</codeph>的唯一性和排除约束。
+            </p>
+         <p>声明为“约束触发器”的触发器的触发也由此设置控制-它们在应检查相关约束的同时触发。
+            </p>
       </section>
       <section id="section4">
-         <title>Notes</title>
-         <p>Because Greenplum Database does not require constraint names to be unique within a
-            schema (but only per-table), it is possible that there is more than one match for a
-            specified constraint name. In this case <codeph>SET CONSTRAINTS</codeph> will act on all
-            matches. For a non-schema-qualified name, once a match or matches have been found in
-            some schema in the search path, schemas appearing later in the path are not searched. </p>
-         <p>This command only alters the behavior of constraints within the current transaction.
-            Issuing this outside of a transaction block emits a warning and otherwise has no effect.
+         <title>注解</title>
+         <p>因为Greenplum数据库不要求约束名称在schema中唯一（而仅按表），所以指定约束名称可能有多个匹配项。
+            在这种情况下，<codeph>SET CONSTRAINTS</codeph>将对所有匹配起作用。
+            对于非schema限定的名称，一旦在搜索路径中的某些schema中找到一个或多个匹配项，就不会搜索路径中稍后出现的schema。
+            </p>
+         <p>此命令仅更改当前事务中约束的行为。
+            在事务块外部发出此命令将发出警告，否则无效。
          </p>
       </section>
       <section id="section5">
-         <title>Compatibility</title>
-         <p>This command complies with the behavior defined in the SQL standard, except for the
-            limitation that, in Greenplum Database, it does not apply to <codeph>NOT NULL</codeph>
-            and <codeph>CHECK</codeph> constraints. Also, Greenplum Database checks non-deferrable
-            uniqueness constraints immediately, not at end of statement as the standard would
-            suggest. </p>
+         <title>兼容性</title>
+         <p>该命令符合SQL标准中定义的行为，除了以下限制：在Greenplum数据库中，该命令不适用于<codeph>NOT NULL</codeph>和<codeph>CHECK</codeph>约束。
+            另外，Greenplum数据库会立即检查不可延展的唯一性约束，而不是像标准建议那样在声明结束时进行检查。
+            </p>
       </section>
    </body>
 </topic>

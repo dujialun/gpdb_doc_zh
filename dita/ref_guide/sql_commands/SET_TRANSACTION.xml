@@ -4,9 +4,9 @@
 <topic id="topic1">
   <title id="em20941">SET TRANSACTION</title>
   <body>
-    <p id="sql_command_desc">Sets the characteristics of the current transaction.</p>
+    <p id="sql_command_desc">设置当前事务的特性。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">SET TRANSACTION [<varname>transaction_mode</varname>] [READ ONLY | READ WRITE]
 
 SET TRANSACTION SNAPSHOT <varname>snapshot_id</varname>
@@ -14,164 +14,151 @@ SET TRANSACTION SNAPSHOT <varname>snapshot_id</varname>
 SET SESSION CHARACTERISTICS AS TRANSACTION <varname>transaction_mode</varname> 
      [READ ONLY | READ WRITE]
      [NOT] DEFERRABLE</codeblock>
-      <p>where <varname>transaction_mode</varname> is one of:</p>
+      <p>其中<varname>transaction_mode</varname>为下列之一：</p>
       <codeblock>   ISOLATION LEVEL {SERIALIZABLE | REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED}</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>The <codeph>SET TRANSACTION</codeph> command sets the characteristics of the current
-        transaction. It has no effect on any subsequent transactions.</p>
-      <p>The available transaction characteristics are the transaction isolation level, the
-        transaction access mode (read/write or read-only), and the deferrable mode. </p>
-      <note>Deferrable transactions require the transaction to be serializable. Greenplum Database
-        does not support serializable transactions, so including the <codeph>DEFERRABLE</codeph>
-        clause has no effect.</note>
-      <p>Greenplum Database does not support the <codeph>SET TRANSACTION SNAPSHOT</codeph> command. </p>
-      <p>The isolation level of a transaction determines what data the transaction can see when
-        other transactions are running concurrently.</p>
+      <title>描述</title>
+      <p><codeph>SET TRANSACTION</codeph>命令设置当前事务的特性。
+        它对任何后续交易都没有影响。
+        </p>
+      <p>可用的事务特性是事务隔离级别，事务访问模式（读/写或只读）和可延迟的模式。
+        </p>
+      <note>可延迟事务要求该事务为可序列化。
+        Greenplum数据库不支持可序列化的事务，因此包含<codeph>DEFERRABLE</codeph>子句无效。
+        </note>
+      <p>Greenplum数据库不支持<codeph>SET TRANSACTION SNAPSHOT</codeph>命令。</p>
+      <p>事务的隔离级别确定当其他事务同时运行时，该事务可以看到哪些数据。
+        </p>
       <ul>
-        <li id="em137940"><b>READ COMMITTED</b> — A statement can only see rows committed before it
-          began. This is the default. </li>
-        <li id="em137943"><b>REPEATABLE READ</b> — All statements in the current transaction can
-          only see rows committed before the first query or data-modification statement executed in
-          the transaction.</li>
+        <li id="em137940"><b>READ COMMITTED</b> — 一条语句只能看到在开始之前提交的行。这是默认值。
+          </li>
+        <li id="em137943"><b>REPEATABLE READ</b> — 当前事务中的所有语句只能看到在事务中执行的第一个查询语句之前提交的或该事务中数据修改语句修改的行。
+          </li>
       </ul>
-      <p>The SQL standard defines two additional levels, <codeph>READ UNCOMMITTED</codeph> and
-          <codeph>SERIALIZABLE</codeph>. In Greenplum Database <codeph>READ UNCOMMITTED</codeph> is
-        treated as <codeph>READ COMMITTED</codeph>. If you specify <codeph>SERIALIZABLE</codeph>,
-        Greenplum Database falls back to <codeph>REPEATABLE READ</codeph>.</p>
-      <p>The transaction isolation level cannot be changed after the first query or
-        data-modification statement (<codeph>SELECT</codeph>, <codeph>INSERT</codeph>,
-          <codeph>DELETE</codeph>, <codeph>UPDATE</codeph>, <codeph>FETCH</codeph>, or
-          <codeph>COPY</codeph>) of a transaction has been executed.</p>
-      <p>The transaction access mode determines whether the transaction is read/write or read-only.
-        Read/write is the default. When a transaction is read-only, the following SQL commands are
-        disallowed: <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, <codeph>DELETE</codeph>, and
-          <codeph>COPY FROM</codeph> if the table they would write to is not a temporary table; all
-          <codeph>CREATE</codeph>, <codeph>ALTER</codeph>, and <codeph>DROP</codeph> commands;
-          <codeph>GRANT</codeph>, <codeph>REVOKE</codeph>, <codeph>TRUNCATE</codeph>; and
-          <codeph>EXPLAIN ANALYZE</codeph> and <codeph>EXECUTE</codeph> if the command they would
-        execute is among those listed. This is a high-level notion of read-only that does not
-        prevent all writes to disk.</p>
-      <p> The <codeph>DEFERRABLE</codeph> transaction property has no effect unless the transaction
-        is also <codeph>SERIALIZABLE</codeph> and <codeph>READ ONLY</codeph>. When all of these
-        properties are set on a transaction, the transaction may block when first acquiring its
-        snapshot, after which it is able to run without the normal overhead of a
-          <codeph>SERIALIZABLE</codeph> transaction and without any risk of contributing to or being
-        cancelled by a serialization failure. Because Greenplum Database does not support
-        serializable transactions, the <codeph>DEFERRABLE</codeph> transaction property has no
-        effect in Greenplum Database. </p>
+      <p>SQL标准定义了两个附加级别，即<codeph>READ UNCOMMITTED</codeph>和<codeph>SERIALIZABLE</codeph>。
+        在Greenplum数据库中，<codeph>READ UNCOMMITTED</codeph>被视为<codeph>READ COMMITTED</codeph>。
+        如果指定<codeph>SERIALIZABLE</codeph>，则Greenplum数据库将退回到<codeph>REPEATABLE READ</codeph>。
+        </p>
+      <p>在执行事务的第一个查询或数据修改语句（<codeph>SELECT</codeph>，<codeph>INSERT</codeph>，<codeph>DELETE</codeph>，<codeph>UPDATE</codeph>，<codeph>FETCH</codeph>或<codeph>COPY</codeph>）之后，
+        不能更改事务隔离级别。
+        </p>
+      <p>事务访问模式确定事务是读/写还是只读。
+        读/写是默认设置。
+        当事务为只读时，不允许使用以下SQL命令：<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>，<codeph>DELETE</codeph>和<codeph>COPY FROM</codeph>（如果要写入的表不是临时表）；
+        所有的<codeph>CREATE</codeph>，<codeph>ALTER</codeph>和<codeph>DROP</codeph>命令；
+        <codeph>GRANT</codeph>，<codeph>REVOKE</codeph>，<codeph>TRUNCATE</codeph>；
+        如果<codeph>EXPLAIN ANALYZE</codeph>和<codeph>EXECUTE</codeph>将要执行的命令在上述命令之中，也不被允许。
+        这是只读的高级概念，不会阻止所有对磁盘的写入。
+        </p>
+      <p>除非事务既是<codeph>SERIALIZABLE</codeph>又是<codeph>READ ONLY</codeph>，否则<codeph>DEFERRABLE</codeph>事务属性无效。
+        当在事务上设置了所有这些属性后，该事务在首次获取其快照时可能会阻塞，
+        此后它可以在没有<codeph>SERIALIZABLE</codeph>事务的正常开销的情况下运行，并且没有任何导致序列化失败或被序列化失败取消的风险。
+        由于Greenplum数据库不支持可序列化的事务，因此<codeph>DEFERRABLE</codeph>事务属性在Greenplum数据库中无效。
+        </p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>SESSION CHARACTERISTICS</pt>
-          <pd>Sets the default transaction characteristics for subsequent transactions of a
-            session.</pd>
+          <pd>为会话的后续事务设置默认事务特性。</pd>
         </plentry>
         <plentry>
           <pt>READ UNCOMMITTED</pt>
           <pt>READ COMMITTED</pt>
           <pt>REPEATABLE READ</pt>
           <pt>SERIALIZABLE</pt>
-          <pd>The SQL standard defines four transaction isolation levels: <codeph>READ
-              UNCOMMITTED</codeph>, <codeph>READ COMMITTED</codeph>, <codeph>REPEATABLE
-              READ</codeph>, and <codeph>SERIALIZABLE</codeph>.</pd>
-          <pd><codeph>READ UNCOMMITTED</codeph> allows transactions to see changes made by
-            uncomitted concurrent transactions. This is not possible in Greenplum Database, so
-              <codeph>READ UNCOMMITTED</codeph> is treated the same as <codeph>READ
-              COMMITTED</codeph>.</pd>
-          <pd><codeph>READ COMMITTED</codeph>, the default isolation level in Greenplum Database,
-            guarantees that a statement can only see rows committed before it began. The same
-            statement executed twice in a transaction can produce different results if another
-            concurrent transaction commits after the statement is executed the first time. </pd>
-          <pd>The <codeph>REPEATABLE READ</codeph> isolation level guarantees that a transaction can
-            only see rows committed before it began. <codeph>REPEATABLE READ</codeph> is the
-            strictest transaction isolation level Greenplum Database supports. Applications that use
-            the <codeph>REPEATABLE READ</codeph> isolation level must be prepared to retry
-            transactions due to serialization failures.</pd>
-          <pd>The <codeph>SERIALIZABLE</codeph> transaction isolation level guarantees that all
-            statements of the current transaction can only see rows committed before the first query
-            or data-modification statement was executed in this transaction. If a pattern of reads
-            and writes among concurrent serializable transactions would create a situation which
-            could not have occurred for any serial (one-at-a-time) execution of those transactions,
-            one of the transactions will be rolled back with a
-              <codeph>serialization_failure</codeph> error. Greenplum Database does not fully
-            support <codeph>SERIALIZABLE</codeph> as defined by the standard, so if you specify
-              <codeph>SERIALIZABLE</codeph>, Greenplum Database falls back to <codeph>REPEATABLE
-              READ</codeph>. See <xref href="#topic1/section7" format="dita"/> for more information
-            about transaction serializability in Greenplum Database.</pd>
+          <pd>SQL标准定义了四个事务隔离级别：
+            <codeph>READ UNCOMMITTED</codeph>，<codeph>READ COMMITTED</codeph>，<codeph>REPEATABLE READ</codeph>和<codeph>SERIALIZABLE</codeph>。
+            </pd>
+          <pd><codeph>READ UNCOMMITTED</codeph>允许事务查看未提交的并发事务所做的更改。
+            在Greenplum数据库中这是不可能的，因此<codeph>READ UNCOMMITTED</codeph>与<codeph>READ COMMITTED</codeph>相同。
+            </pd>
+          <pd><codeph>READ COMMITTED</codeph>是Greenplum数据库中的默认隔离级别，可确保语句只能看到在开始之前提交的行。
+            如果在第一次执行该语句后又提交了另一个并发事务，则在一个事务中执行两次的相同语句可能会产生不同的结果。
+            </pd>
+          <pd><codeph>REPEATABLE READ</codeph>隔离级别确保事务只能看到在事务开始之前提交的行。
+            <codeph>REPEATABLE READ</codeph>是Greenplum数据库支持的最严格的事务隔离级别。
+            由于可串行化失败，使用<codeph>REPEATABLE READ</codeph>隔离级别的应用程序，必须准备重试事务。
+            </pd>
+          <pd><codeph>SERIALIZABLE</codeph>事务隔离级别确保当前事务的所有语句只能看到在此事务中执行第一个查询之前或此事务内数据修改语句提交的行。
+            如果并发可序列化事务之间的读取和写入模式会导致这种事务的任何串行（一次一个）执行都不可能发生的情况，
+            则其中一个事务将回滚，并出现<codeph>serialization_failure</codeph>错误。
+            Greenplum数据库不完全支持标准定义的<codeph>SERIALIZABLE</codeph>，
+            因此，如果指定<codeph>SERIALIZABLE</codeph>，则Greenplum数据库将退回到<codeph>REPEATABLE READ</codeph>。
+            有关Greenplum数据库中事务可串行化的更多信息，请参见<xref href="#topic1/section7" format="dita"/>。
+            </pd>
         </plentry>
         <plentry>
           <pt>READ WRITE</pt>
           <pt>READ ONLY</pt>
-          <pd>Determines whether the transaction is read/write or read-only. Read/write is the
-            default. When a transaction is read-only, the following SQL commands are disallowed:
-              <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, <codeph>DELETE</codeph>, and
-              <codeph>COPY FROM</codeph> if the table they would write to is not a temporary table;
-            all <codeph>CREATE</codeph>, <codeph>ALTER</codeph>, and <codeph>DROP</codeph> commands;
-              <codeph>GRANT</codeph>, <codeph>REVOKE</codeph>, <codeph>TRUNCATE</codeph>; and
-              <codeph>EXPLAIN ANALYZE</codeph> and <codeph>EXECUTE</codeph> if the command they
-            would execute is among those listed.</pd>
+          <pd>确定事务是读/写还是只读。
+            读/写是默认设置。
+            当事务为只读时，不允许使用以下SQL命令：
+            <codeph>INSERT</codeph>，<codeph>UPDATE</codeph>，<codeph>DELETE</codeph>和<codeph>COPY FROM</codeph>（如果要写入的表不是临时表）；
+            所有的<codeph>CREATE</codeph>，<codeph>ALTER</codeph>和<codeph>DROP</codeph>命令；
+            <codeph>GRANT</codeph>，<codeph>REVOKE</codeph>，<codeph>TRUNCATE</codeph>；
+            如果<codeph>EXPLAIN ANALYZE</codeph>和<codeph>EXECUTE</codeph>将要执行的命令在上述命令之中，也不被允许。
+            </pd>
         </plentry>
         <plentry>
           <pt>[NOT] DEFERRABLE</pt>
-          <pd>The <codeph>DEFERRABLE</codeph> transaction property has no effect in Greenplum
-            Database because <codeph>SERIALIZABLE</codeph> transactions are not supported. If
-              <codeph>DEFERRABLE</codeph> is specified and the transaction is also
-              <codeph>SERIALIZABLE</codeph> and <codeph>READ ONLY</codeph>, the transaction may
-            block when first acquiring its snapshot, after which it is able to run without the
-            normal overhead of a <codeph>SERIALIZABLE</codeph> transaction and without any risk of
-            contributing to or being cancelled by a serialization failure. This mode is well suited
-            for long-running reports or backups.</pd>
+          <pd>因为不支持<codeph>SERIALIZABLE</codeph>事务，所以<codeph>DEFERRABLE</codeph>事务属性在Greenplum数据库中无效。
+            如果指定了<codeph>DEFERRABLE</codeph>且该事务既是<codeph>SERIALIZABLE</codeph>也是<codeph>READ ONLY</codeph>的，
+            则该事务在首次获取其快照时可能会阻塞，
+            此后它可以在没有<codeph>SERIALIZABLE</codeph>事务的正常开销的情况下运行，
+            并且不存在构成或被取消可串行化失败风险。
+            会造成任何贡献或被其取消序列化失败。
+            此模式非常适合长时间运行的报告或备份。
+            </pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Notes</title>
-      <p>If <codeph>SET TRANSACTION</codeph> is executed without a prior <codeph>START
-          TRANSACTION</codeph> or <codeph>BEGIN</codeph>, a warning is issued and the command has no
-        effect. </p>
-      <p>It is possible to dispense with <codeph>SET TRANSACTION</codeph> by instead specifying the
-        desired transaction modes in <codeph>BEGIN</codeph> or <codeph>START TRANSACTION</codeph>. </p>
-      <p>The session default transaction modes can also be set by setting the configuration
-        parameters <xref href="../config_params/guc-list.xml#default_transaction_isolation"
-            ><varname>default_transaction_isolation</varname></xref>, <xref
-          href="../config_params/guc-list.xml#default_transaction_read_only"
-            ><varname>default_transaction_read_only</varname></xref>, and <xref
-          href="../config_params/guc-list.xml#default_transaction_deferrable"/>.</p>
+      <title>注解</title>
+      <p>如果在没有事先进行<codeph>START TRANSACTION</codeph>或<codeph>BEGIN</codeph>的情况下执行<codeph>SET TRANSACTION</codeph>，
+        则会发出警告，并且该命令无效。
+        </p>
+      <p>通过在<codeph>BEGIN</codeph>或<codeph>START TRANSACTION</codeph>中指定所需的事务模式，
+        可以省去<codeph>SET TRANSACTION</codeph>。
+        </p>
+      <p>也可以通过设置配置参数<xref href="../config_params/guc-list.xml#default_transaction_isolation"><varname>default_transaction_isolation</varname></xref>，
+        <xref href="../config_params/guc-list.xml#default_transaction_read_only"><varname>default_transaction_read_only</varname></xref>和<xref
+                href="../config_params/guc-list.xml#default_transaction_deferrable"/>来设置会话默认事务模式。
+        </p>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>Set the transaction isolation level for the current transaction:</p>
+      <title>示例</title>
+      <p>设置当前事务的事务隔离级别：</p>
       <codeblock>BEGIN;
 SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;</codeblock>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p>Both commands are defined in the SQL standard. <codeph>SERIALIZABLE</codeph> is the default
-        transaction isolation level in the standard. In Greenplum Database the default is
-          <codeph>READ COMMITTED</codeph>. Due to lack of predicate locking, Greenplum Database does
-        not fully support the <codeph>SERIALIZABLE</codeph> level, so it falls back to the
-          <codeph>REPEATABLE READ</codeph> level when <codeph>SERIAL</codeph> is specified.
-        Essentially, a predicate-locking system prevents phantom reads by restricting what is
-        written, whereas a multi-version concurrency control model (MVCC) as used in Greenplum
-        Database prevents them by restricting what is read. </p>
-      <p>PostgreSQL provides a true serializable isolation level, called serializable snapshot
-        isolation (SSI), which monitors concurrent transactions and rolls back transactions that
-        could introduce serialization anomalies. Greenplum Database does not implement this
-        isolation mode.</p>
-      <p>In the SQL standard, there is one other transaction characteristic that can be set with
-        these commands: the size of the diagnostics area. This concept is specific to embedded SQL,
-        and therefore is not implemented in the Greenplum Database server. </p>
-      <p>The <codeph>DEFERRABLE</codeph> transaction mode is a Greenplum Database language
-        extension.</p>
-      <p>The SQL standard requires commas between successive <varname>transaction_modes</varname>,
-        but for historical reasons Greenplum Database allows the commas to be omitted.</p>
+      <title>兼容性</title>
+      <p>这两个命令均在SQL标准中定义。
+        <codeph>SERIALIZABLE</codeph>是标准中的默认事务隔离级别。
+        在Greenplum数据库中，默认值为<codeph>READ COMMITTED</codeph>。
+        由于缺少谓词锁定，Greenplum数据库不完全支持<codeph>SERIALIZABLE</codeph>级别，
+        因此当指定<codeph>SERIALIZABLE</codeph>时，它退回到<codeph>REPEATABLE READ</codeph>级别。
+        本质上，谓词锁定系统通过限制写的内容来防止幻像读取，
+        而Greenplum数据库中使用的多版本并发控制模型（MVCC）通过限制读取的内容来防止幻像读取。
+        </p>
+      <p>PostgreSQL提供了一个真正的可序列化隔离级别，称为可序列化快照隔离（SSI），
+        它可以监视并发事务并回滚可能引入序列化异常的事务。
+        Greenplum数据库未实现此隔离模式。
+        </p>
+      <p>在SQL标准中，可以使用以下命令设置其他事务特性：诊断区域的大小。
+        此概念是嵌入式SQL特有的，因此未在Greenplum数据库服务器中实现。
+        </p>
+      <p><codeph>DEFERRABLE</codeph>事务模式是Greenplum数据库语言的扩展。
+        </p>
+      <p>SQL标准要求连续的<varname>transaction_modes</varname>之间使用逗号，
+        但是由于历史原因，Greenplum数据库允许省略逗号。
+        </p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="BEGIN.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
             href="LOCK.xml#topic1" type="topic" format="dita"/></codeph></p>
     </section>
