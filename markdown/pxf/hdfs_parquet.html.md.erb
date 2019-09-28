@@ -1,5 +1,5 @@
 ---
-title: Reading and Writing HDFS Parquet Data
+title: 读写HDFS Parquet数据
 ---
 
 <!--
@@ -21,25 +21,25 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Use the PXF HDFS connector to read and write Parquet-format data. This section describes how to read and write HDFS files that are stored in Parquet format, including how to create, query, and insert into external tables that reference files in the HDFS data store.
+使用PXF HDFS连接器读写Parquet格式数据。本节介绍如何读写以Parquet格式存储的HDFS文件，包括如何创建、查询和写入引用HDFS文件的外部表。
 
-PXF currently supports reading and writing primitive Parquet data types only.
+PXF当前仅支持读写基本Parquet数据类型。
 
-<div class="note">PXF Parquet write support is a Beta feature.</div>
-
-
-## <a id="prereq"></a>Prerequisites
-
-Ensure that you have met the PXF Hadoop [Prerequisites](access_hdfs.html#hadoop_prereq) before you attempt to read data from or write data to HDFS.
+<div class="note">PXF Parquet写入支持是一个Beta功能。</div>
 
 
-## <a id="datatype_map"></a>Data Type Mapping
+## <a id="prereq"></a>先决条件
 
-To read and write Parquet primitive data types in Greenplum Database, map Parquet data values to Greenplum Database columns of the same type. The following table summarizes the external mapping rules:
+在尝试从HDFS读取或向HDFS写入数据之前，请确保已满足PXF Hadoop[先决条件](access_hdfs.html#hadoop_prereq)。
+
+
+## <a id="datatype_map"></a>数据类型映射
+
+要在Greenplum数据库中读写Parquet基本数据类型，请将Parquet数据值映射到相同类型的Greenplum数据库列。下表总结了外部映射规则：
 
 <a id="p2g_type_mapping_table"></a>
 
-| Parquet Data Type | PXF/Greenplum Data Type |
+| Parquet数据类型| PXF/Greenplum数据类型|
 |-------------------|-------------------------|
 | boolean | Boolean |
 | byte_array | Bytea, Text |
@@ -50,14 +50,14 @@ To read and write Parquet primitive data types in Greenplum Database, map Parque
 | int64 | Bigint |
 | int96 | Timestamp |
 
-**Note**: When writing to Parquet, PXF localizes a `timestamp` to the current system timezone and converts it to universal time (UT) before finally converting to `int96`.
+**注意**：当写入Parquet时，PXF会将`timestamp`本地化为当前系统时区，并将其转换为通用时间(UT)，最终转换为`int96`。
 
 
-## <a id="profile_cet"></a>Creating the External Table
+## <a id="profile_cet"></a>创建外部表
 
-The PXF HDFS connector `hdfs:parquet` profile supports reading and writing HDFS data in Parquet-format. When you insert records into a writable external table, the block(s) of data that you insert are written to one or more files in the directory that you specified.
+PXF HDFS连接器`hdfs:parquet`配置文件支持读写Parquet格式的HDFS数据。当您将记录插入可写外部表中时，您插入的数据块将写入指定目录中一个或多个文件。
 
-Use the following syntax to create a Greenplum Database external table that references an HDFS directory:
+使用以下语法创建引用HDFS目录的Greenplum数据库外部表：
 
 ``` sql
 CREATE [WRITABLE] EXTERNAL TABLE <table_name>
@@ -68,45 +68,45 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 [DISTRIBUTED BY (<column_name> [, ... ] ) | DISTRIBUTED RANDOMLY];
 ```
 
-The specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command are described in the table below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字| 值|
 |-------|-------------------------------------|
-| \<path&#8209;to&#8209;hdfs&#8209;file\>    | The absolute path to the directory in the HDFS data store. |
-| PROFILE    | The `PROFILE` keyword must specify `hdfs:parquet`. |
-| \<custom&#8209;option\>=\<value\>  | \<custom-option\>s are described below.|
-| FORMAT 'CUSTOM' | Use `FORMAT` '`CUSTOM`' with `(FORMATTER='pxfwritable_export')` (write) or `(FORMATTER='pxfwritable_import')` (read). |
-| DISTRIBUTED BY    | If you plan to load the writable external table with data from an existing Greenplum Database table, consider specifying the same distribution policy or \<column_name\> on the writable external table as that defined for the table from which you plan to load the data. Doing so will avoid extra motion of data between segments on the load operation. |
+| \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径 |
+| PROFILE    | `PROFILE`关键字必须指定为`hdfs:parquet`|
+| \<custom&#8209;option\>=\<value\>  | \<custom-option\>描述见下方|
+| FORMAT 'CUSTOM' | 使用`FORMAT` '`CUSTOM`'时指定`(FORMATTER='pxfwritable_export')` (写入) 或 `(FORMATTER='pxfwritable_import')` (读取). |
+| DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或<字段名>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。 |
 
 <a id="customopts"></a>
-The PXF `hdfs:parquet` profile supports encoding- and compression-related write options. You specify these write options in the `CREATE WRITABLE EXTERNAL TABLE` `LOCATION` clause. The `hdfs:parquet` profile supports the following custom options:
+PXF `hdfs:parquet` 配置文件支持与编码和压缩有关的写入选项。您可以在`CREATE WRITABLE EXTERNAL TABLE` `LOCATION`子句中指定这些写入选项。`hdfs:parquet`配置文件支持以下自定义选项：
 
-| Write Option  | Value Description |
+| 写入选项| 值描述|
 |-------|-------------------------------------|
-| COMPRESSION_CODEC    | The compression codec alias. Supported compression codecs for writing Parquet data include: `snappy`, `gzip`, `lzo`, and `uncompressed` . If this option is not provided, PXF compresses the data using `snappy` compression. |
-| ROWGROUP_SIZE | A Parquet file consists of one or more row groups, a logical partitioning of the data into rows. `ROWGROUP_SIZE` identifies the size (in bytes) of the row group. The default row group size is `8 * 1024 * 1024` bytes. |
-| PAGE_SIZE | A row group consists of column chunks that are divided up into pages. `PAGE_SIZE` is the size (in bytes) of such a page. The default page size is `1024 * 1024` bytes. |
-| DICTIONARY_PAGE_SIZE | Dictionary encoding is enabled by default when PXF writes Parquet files. There is a single dictionary page per column, per row group. `DICTIONARY_PAGE_SIZE` is similar to `PAGE_SIZE`, but for the dictionary. The default dictionary page size is `512 * 1024` bytes. |
-| PARQUET_VERSION | The Parquet version; values `v1` and `v2` are supported. The default Parquet version is `v1`. |
+| COMPRESSION_CODEC    | 压缩编码器别名。 用于写入Parquet数据受支持的压缩编码器包括： `snappy`, `gzip`, `lzo`, 和`uncompressed`。 如果未提供此选项，PXF将使用`snappy`压缩编码器来压缩数据。 |
+| ROWGROUP_SIZE | Parquet文件由一个或多个行组组成，将数据逻辑划分为行。`ROWGROUP_SIZE` 标识行组的大小(以字节为单位)。默认的行组大小为`8 * 1024 * 1024`字节。|
+| PAGE_SIZE | 行组由划分为页面的列块组成。`PAGE_SIZE`是此类页面的大小(以字节为单位)。默认的页面大小为`1024 * 1024`字节。|
+| DICTIONARY_PAGE_SIZE | 当PXF写入Parquet文件时，默认情况下启用字典编码。每列、每行组只有一个字典页面。`DICTIONARY_PAGE_SIZE`与`PAGE_SIZE`类似，但是对于字典而言：默认字典页面大小为`512 * 1024`字节。 |
+| PARQUET_VERSION | Parquet版本；支持`v1` 和 `v2`。默认的Parquet版本为`v1`。|
 
-**Note**: You must explicitly specify `uncompressed` if you do not want PXF to compress the data.
+**注意**: 如果您不希望PXF压缩数据，则必须明确指定`uncompressed`。
 
-Parquet files that you write to HDFS with PXF have the following naming format: `<file>.<compress_extension>.parquet`, for example `1547061635-0000004417_0.gz.parquet`.
+使用PXF写入HDFS的Parquet文件具有以下命名格式：`<file>.<compress_extension>.parquet`，例如 `1547061635-0000004417_0.gz.parquet`.
 
-## <a id="parquet_write"></a> Example
+## <a id="parquet_write"></a> 示例
 
-This example utilizes the data schema introduced in [Example: Reading Text Data on HDFS](hdfs_text.html#profile_text_query).
+本示例采用在[示例：读取HDFS中的文本数据](hdfs_text.html#profile_text_query)中介绍的数据模式。
 
-| Column Name  | Data Type |
+| 列名  | 数据类型|
 |-------|-------------------------------------|
 | location | text |
 | month | text |
 | number\_of\_orders | int |
 | total\_sales | float8 |
 
-In this example, you create a Parquet-format writable external table that references Parquet-format data in HDFS, insert some data into the table, and then create a readable external table to read the data.
+在此示例中，您将创建一个Parquet格式的可写外部表，该表引用了HDFS中的Parquet格式数据，将一些数据插入表中，然后创建一个可读外部表以读取数据。
 
-1. Use the `hdfs:parquet` profile to create a writable external table. For example:
+1. 使用`hdfs:parquet`配置文件创建一个可写外部表。例如：
 
     ``` sql
     postgres=# CREATE WRITABLE EXTERNAL TABLE pxf_tbl_parquet (location text, month text, number_of_orders int, total_sales double precision)
@@ -114,14 +114,14 @@ In this example, you create a Parquet-format writable external table that refere
       FORMAT 'CUSTOM' (FORMATTER='pxfwritable_export');
     ```
 
-2. Write a few records to the `pxf_parquet` HDFS directory by inserting directly into the `pxf_tbl_parquet` table. For example:
+2. 通过直接写入`pxf_tbl_parquet`表将一些记录写入HDFS的`pxf_parquet`目录中。例如：
 
     ``` sql
     postgres=# INSERT INTO pxf_tbl_parquet VALUES ( 'Frankfurt', 'Mar', 777, 3956.98 );
     postgres=# INSERT INTO pxf_tbl_parquet VALUES ( 'Cleveland', 'Oct', 3812, 96645.37 );
     ```
 
-3. Recall that Greenplum Database does not support directly querying a writable external table. To read the data in `pxf_parquet`, create a readable external Greenplum Database referencing this HDFS directory:
+3. 回想一下，Greenplum 数据库不支持直接查询一个可写外部表。要读取`pxf_parquet`中的数据，请创建一个引用此HDFS目录的可读外部表：
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE read_pxf_parquet(location text, month text, number_of_orders int, total_sales double precision)
@@ -129,7 +129,7 @@ In this example, you create a Parquet-format writable external table that refere
         FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
 
-4. Query the readable external table `read_pxf_parquet`:
+4. 查询可读外部表`read_pxf_parquet`：
 
     ``` sql
     postgres=# SELECT * FROM read_pxf_parquet ORDER BY total_sales;
