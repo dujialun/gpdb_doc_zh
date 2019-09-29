@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="do20941">END</title><body><p id="sql_command_desc">Commits the current transaction.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">END [WORK | TRANSACTION]</codeblock></section><section id="section3"><title>Description</title><p><codeph>END</codeph> commits the current transaction. All changes made by the transaction become
-        visible to others and are guaranteed to be durable if a crash occurs. This command is a
-        Greenplum Database extension that is equivalent to <codeph><xref href="COMMIT.xml#topic1"
-            type="topic" format="dita"/></codeph>.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt>WORK</pt><pt>TRANSACTION</pt><pd>Optional keywords. They have no effect.</pd></plentry></parml></section><section id="section5"><title>Examples</title><p>Commit the current transaction:</p><codeblock>END;</codeblock></section><section id="section6"><title>Compatibility</title><p><codeph>END</codeph> is a Greenplum Database extension that provides functionality equivalent to
-            <codeph><xref href="COMMIT.xml#topic1" type="topic" format="dita"/></codeph>, which is
-        specified in the SQL standard. </p></section><section id="section7"><title>See Also</title><p><codeph><xref href="BEGIN.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="./ROLLBACK.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="COMMIT.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="do20941">END</title>
+    <body>
+        <p id="sql_command_desc">提交当前事务。</p>
+        <section id="section2">
+            <title>Synopsis</title>
+            <codeblock id="sql_command_synopsis">END [WORK | TRANSACTION]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>END</codeph>提交当前事务。事务所做的所有更改对其他人都可见，即使发生崩溃，也保证是持久的。
+                此命令是Greenplum数据库扩展，等效于<codeph><xref href="COMMIT.xml#topic1" type="topic" format="dita"/></codeph>。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>WORK</pt>
+                    <pt>TRANSACTION</pt>
+                    <pd>可选关键字。它们没有作用。</pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>提交当前事务：</p>
+            <codeblock>END;</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p><codeph>END</codeph>是Greenplum数据库扩展，它提供的功能等同于SQL标准中指定的<codeph><xref href="COMMIT.xml#topic1" type="topic" format="dita"/></codeph>。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="BEGIN.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="./ROLLBACK.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="COMMIT.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>
