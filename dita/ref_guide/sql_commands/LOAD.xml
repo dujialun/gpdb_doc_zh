@@ -1,15 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="du20941">LOAD</title><body><p id="sql_command_desc">Loads or reloads a shared library file.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">LOAD '<varname>filename</varname>'</codeblock></section><section id="section3"><title>Description</title><p>This command loads a shared library file into the Greenplum Database
-server address space. If the file had been loaded previously, it is first
-unloaded. This command is primarily useful to unload and reload a shared
-library file that has been changed since the server first loaded it.
-To make use of the shared library, function(s) in it need to be declared
-using the <codeph>CREATE FUNCTION</codeph> command. </p><p>The file name is specified in the same way as for shared library names
-in <codeph>CREATE FUNCTION</codeph>; in particular, one may rely on a
-search path and automatic addition of the system's standard shared
-library file name extension.</p><p>Note that in Greenplum Database the shared library file (<codeph>.so</codeph>
-file) must reside in the same path location on every host in the Greenplum
-Database array (masters, segments, and mirrors).</p><p>Only database superusers can load shared library files.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>filename</varname></pt><pd>The path and file name of a shared library file. This file must exist
-in the same location on all hosts in your Greenplum Database array.</pd></plentry></parml></section><section id="section5"><title>Examples</title><p>Load a shared library file:</p><codeblock>LOAD '/usr/local/greenplum-db/lib/myfuncs.so';</codeblock></section><section id="section6"><title>Compatibility</title><p><codeph>LOAD</codeph> is a Greenplum Database extension.</p></section><section id="section7"><title>See Also</title><p><codeph><xref href="CREATE_FUNCTION.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="du20941">LOAD</title>
+    <body>
+        <p id="sql_command_desc">加载或重新加载共享库文件。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">LOAD '<varname>filename</varname>'
+            </codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p>此命令将共享库文件加载到Greenplum数据库服务器地址空间中。
+                如果文件先前已加载，则首先将其卸载。
+                此命令主要用于卸载和重新加载自服务器首次加载以来已更改的共享库文件。
+                要使用共享库，需要使用<codeph>CREATE FUNCTION</codeph>命令声明其中的函数。
+            </p>
+            <p>文件名的指定方法与<codeph>CREATE FUNCTION</codeph>中共享库名的指定方法相同。
+                特别是，可能依赖于搜索路径和系统标准共享库文件名扩展的自动添加。
+            </p>
+            <p>请注意，在Greenplum数据库中，
+                共享库文件（<codeph>.so</codeph>文件）必须位于Greenplum数据库阵列（master，segments和mirrors）中每个主机的相同路径。
+            </p>
+            <p>只有数据库超级用户可以加载共享库文件。</p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>filename</varname>
+                    </pt>
+                    <pd>共享库文件的路径和文件名。
+                        此文件必须存在于Greenplum数据库阵列中所有主机上的相同位置。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>加载共享库文件：</p>
+            <codeblock>LOAD '/usr/local/greenplum-db/lib/myfuncs.so';</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p><codeph>LOAD</codeph>是Greenplum数据库扩展。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="CREATE_FUNCTION.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

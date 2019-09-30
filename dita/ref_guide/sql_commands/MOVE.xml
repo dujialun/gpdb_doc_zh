@@ -1,32 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="dw20941">MOVE</title><body><p id="sql_command_desc">Positions a cursor.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">MOVE [ <varname>forward_direction</varname> [ FROM | IN ] ] <varname>cursor_name</varname></codeblock><p>where <varname>forward_direction</varname> can be empty or one of:</p><codeblock>    NEXT
-    FIRST
-    LAST
-    ABSOLUTE <varname>count</varname>
-    RELATIVE <varname>count</varname>
-    <varname>count</varname>
-    ALL
-    FORWARD
-    FORWARD <varname>count</varname>
-    FORWARD ALL</codeblock></section><section id="section3"><title>Description</title><p><codeph>MOVE</codeph> repositions a cursor
-        without retrieving any data. <codeph>MOVE</codeph> works exactly like the <codeph><xref
-            href="FETCH.xml#topic1" type="topic" format="dita"/></codeph> command, except it only
-        positions the cursor and does not return rows. </p><p>Note that it is not possible to move a
-        cursor position backwards in Greenplum Database, since scrollable cursors are not supported.
-        You can only move a cursor forward in position using <codeph>MOVE</codeph>.</p><sectiondiv
-        id="section4"><b>Outputs</b><p>On successful completion, a <codeph>MOVE</codeph> command
-          returns a command tag of the form</p><codeblock>MOVE <varname>count</varname></codeblock><p>The count
-          is the number of rows that a <codeph>FETCH</codeph> command with the same parameters would
-          have returned (possibly zero). </p></sectiondiv></section><section id="section5"><title>Parameters</title><parml><plentry><pt><varname>forward_direction</varname></pt><pd>The parameters for the <codeph>MOVE</codeph> command are identical to those of the
-              <codeph>FETCH</codeph> command; refer to <codeph><xref href="FETCH.xml#topic1"
-              /></codeph>  for details on syntax and usage.</pd></plentry><plentry><pt><varname>cursor_name</varname></pt><pd>The name of an open cursor.</pd></plentry></parml></section><section id="section6"><title>Examples</title><p>-- Start the transaction:</p><codeblock>BEGIN;</codeblock><p>-- Set up a cursor:</p><codeblock>DECLARE mycursor CURSOR FOR SELECT * FROM films;</codeblock><p>-- Move forward 5 rows in the cursor <codeph>mycursor</codeph>:</p><codeblock>MOVE FORWARD 5 IN mycursor;
-MOVE 5</codeblock><p>--Fetch the next row after that (row 6):</p><codeblock>FETCH 1 FROM mycursor;
- code  | title  | did | date_prod  |  kind  |  len
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="dw20941">MOVE</title>
+    <body>
+        <p id="sql_command_desc">定位游标。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">MOVE [ <varname>forward_direction</varname> [ FROM | IN ] ]
+                <varname>cursor_name</varname>
+            </codeblock>
+            <p>其中<varname>forward_direction</varname>可以为空或以下之一：
+            </p>
+            <codeblock>    NEXT
+    FIRST
+    LAST
+    ABSOLUTE <varname>count</varname>
+    RELATIVE <varname>count</varname>
+    <varname>count</varname>
+    ALL
+    FORWARD
+    FORWARD <varname>count</varname>
+    FORWARD ALL</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>MOVE</codeph>会重新定位游标，而不会检索任何数据。
+                <codeph>MOVE</codeph>的工作方式与<codeph><xref href="FETCH.xml#topic1" type="topic" format="dita"/></codeph>命令完全相同，只不过它仅定位光标而不返回行。
+            </p>
+            <p>请注意，由于不支持可滚动光标，因此无法在Greenplum数据库中向后移动光标位置。
+                您只能使用<codeph>MOVE</codeph>向前移动光标。
+            </p>
+            <sectiondiv
+                    id="section4">
+                <b>输出</b>
+                <p>成功完成后，<codeph>MOVE</codeph>命令将返回以下形式的命令标签：
+                </p>
+                <codeblock>MOVE <varname>count</varname>
+                </codeblock>
+                <p>count是具有相同参数的<codeph>FETCH</codeph>命令将返回的行数（可能为零）。
+                </p>
+            </sectiondiv>
+        </section>
+        <section id="section5">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>forward_direction</varname>
+                    </pt>
+                    <pd><codeph>MOVE</codeph>命令的参数与<codeph>FETCH</codeph>命令的参数相同。
+                        有关语法和用法的详细信息，请参阅<codeph><xref href="FETCH.xml#topic1"/></codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>cursor_name</varname>
+                    </pt>
+                    <pd>打开的游标的名称。</pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>-- 开始事务：</p>
+            <codeblock>BEGIN;</codeblock>
+            <p>-- 设置游标：</p>
+            <codeblock>DECLARE mycursor CURSOR FOR SELECT * FROM films;</codeblock>
+            <p>-- 在游标<codeph>mycursor</codeph>中向前移动5行：
+            </p>
+            <codeblock>MOVE FORWARD 5 IN mycursor;
+MOVE 5</codeblock>
+            <p>-- 之后获取下一行（第6行）：</p>
+            <codeblock>FETCH 1 FROM mycursor;
+code | title | did | date_prod | kind | len
 -------+--------+-----+------------+--------+-------
- P_303 | 48 Hrs | 103 | 1982-10-22 | Action | 01:37
-(1 row)</codeblock><p>-- Close the cursor and end the transaction:</p><codeblock>CLOSE mycursor;
-COMMIT;</codeblock></section><section id="section7"><title>Compatibility</title><p>There is no <codeph>MOVE</codeph> statement in the SQL standard.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="DECLARE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="FETCH.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="CLOSE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+P_303 | 48 Hrs | 103 | 1982-10-22 | Action | 01:37
+(1 row)</codeblock>
+            <p>-- 关闭游标并结束事务：</p>
+            <codeblock>CLOSE mycursor;
+COMMIT;</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p>SQL标准中没有<codeph>MOVE</codeph>语句。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="DECLARE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="FETCH.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="CLOSE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>
