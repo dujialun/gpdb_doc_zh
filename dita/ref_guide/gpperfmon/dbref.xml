@@ -154,6 +154,6 @@
           <li>清空 <codeph>alert_log_stage</codeph> 文件.</li>
         </ol></p>
     </section>
-    <p>以下主题描述 <codeph>gpperfmon</codeph> 数据库表中的内容。</p>
+    <p>以下主题分别描述 <codeph>gpperfmon</codeph> 数据库每表中的内容。</p>
   </body>
 </topic>

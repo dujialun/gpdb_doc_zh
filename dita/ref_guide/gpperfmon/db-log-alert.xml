@@ -4,35 +4,30 @@
 <topic id="CommandCenterDatabaseReference-log_alert">
    <title> log_alert_* </title>
    <body>
-      <p>The <codeph>log_alert_*</codeph> tables store <codeph>pg_log</codeph> errors and warnings. </p>
-      <p>See <xref href="dbref.xml#overview/section_ok2_wd1_41b"/> for information about configuring
-         the system logger for <codeph>gpperfmon</codeph>.</p>
-      <p>There are three <codeph>log_alert</codeph> tables, all having the same columns:</p>
+      <p><codeph>log_alert_*</codeph> 表存储 <codeph>pg_log</codeph> 错误和警报. </p>
+      <p>参考 <xref href="dbref.xml#overview/section_ok2_wd1_41b"/> 了解关于配置
+       <codeph>gpperfmon</codeph> 系统 logger 的更多信息.</p>
+      <p>一共有三张 <codeph>log_alert</codeph> 表, 所有这些表具有相同的列:</p>
       <ul>
-         <li><codeph>log_alert_now</codeph> is an external table whose data is stored in
-               <codeph>.csv</codeph> files in the
-               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/logs</codeph> directory. Current
-               <codeph>pg_log</codeph> errors and warnings data are available in
-               <codeph>log_alert_now</codeph> during the period between data collection from the
-               <codeph>gpperfmon</codeph> agents and automatic commitment to the
-               <codeph>log_alert_history</codeph> table.</li>
-         <li><codeph>log_alert_tail</codeph> is an external table with data stored in
-               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/logs/alert_log_stage</codeph>. This is a
-            transitional table for data that has been cleared from <codeph>log_alert_now</codeph>
-            but has not yet been committed to <codeph>log_alert_history</codeph>. The table includes
-            records from all alert logs except the most recent. It typically contains only a few
-            minutes' worth of data.</li>
-         <li><codeph>log_alert_history</codeph> is a regular table that stores historical
-            database-wide errors and warnings data. It is pre-partitioned into monthly partitions.
-            Partitions are automatically added in two month increments as needed. </li>
+         <li><codeph>log_alert_now</codeph> 是一个外部表，它的数据存储在
+         <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/logs</codeph> 目录下的 <codeph>.csv</codeph> 文件中。
+         在数据从 <codeph>gpperfmon</codeph> 代理自动提交到 <codeph>log_alert_history</codeph> 表期间，
+         当前的 <codeph>pg_log</codeph> 错误和警报数据在 <codeph>log_alert_now</codeph> 中。.</li>
+         <li><codeph>log_alert_tail</codeph> 是一个外部表，它的数据存储在
+               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/logs/alert_log_stage</codeph> 中. 
+               这是一个过渡表，当数据已经从 <codeph>log_alert_now</codeph> 中清除，但还没有提交到
+             <codeph>log_alert_history</codeph> 中时，暂存在这里。该表包括所有警报日志中的记录，
+             但最新的除外。它通常仅包含数据几分钟时间。</li>
+         <li><codeph>log_alert_history</codeph> 是一个常规表，用于存储数据库范围内的历史错误和警告数据。
+         它已预先设置为按月分区。分区会根据需要以两个月为增量自动添加。</li>
       </ul>
       <table>
          <tgroup cols="2">
             <thead>
                <row>
-                  <entry>Column</entry>
-                  <entry>Type</entry>
-                  <entry>Description</entry>
+                  <entry>列</entry>
+                  <entry>类型</entry>
+                  <entry>说明</entry>
                </row>
             </thead>
             <tbody>
@@ -41,210 +36,210 @@
                      <codeph>logtime</codeph>
                   </entry>
                   <entry>timestamp with time zone</entry>
-                  <entry>Timestamp for this log</entry>
+                  <entry>此日志的时间戳</entry>
                </row>
                <row>
                   <entry>
                      <codeph>loguser</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>User of the query</entry>
+                  <entry>查询的用户</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logdatabase</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>The accessed database</entry>
+                  <entry>查询的用户</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logpid</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Process id</entry>
+                  <entry>进程 ID</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logthread</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Thread number</entry>
+                  <entry>线程号</entry>
                </row>
                <row>
                   <entry>
                      <codeph>loghost</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Host name or ip address</entry>
+                  <entry>主机名或 IP 地址</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logport</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Port number</entry>
+                  <entry>端口号</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logsessiontime </codeph>
                   </entry>
                   <entry>timestamp with time zone</entry>
-                  <entry>Session timestamp</entry>
+                  <entry>会话时间戳</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logtransaction</codeph>
                   </entry>
                   <entry>integer</entry>
-                  <entry>Transaction id</entry>
+                  <entry>事务 ID</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logsession</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Session id</entry>
+                  <entry>会话 ID</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logcmdcount</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Command count</entry>
+                  <entry>命令数量</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logsegment</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Segment number</entry>
+                  <entry>Segment 编号</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logslice</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Slice number</entry>
+                  <entry>Slice 编号</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logdistxact</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Distributed transaction</entry>
+                  <entry>分布式事务</entry>
                </row>
                <row>
                   <entry>
                      <codeph>loglocalxact</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Local transaction</entry>
+                  <entry>本地事务</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logsubxact</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Subtransaction</entry>
+                  <entry>子事务</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logseverity</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Log severity</entry>
+                  <entry>日志级别</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logstate</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>State</entry>
+                  <entry>日志状态</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logmessage</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Log message</entry>
+                  <entry>日志信息</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logdetail</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Detailed message</entry>
+                  <entry>详细信息</entry>
                </row>
                <row>
                   <entry>
                      <codeph>loghint</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Hint info</entry>
+                  <entry>提示信息</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logquery</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Executed query</entry>
+                  <entry>查询内容</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logquerypos</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Query position</entry>
+                  <entry>查询位置</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logcontext</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Context info</entry>
+                  <entry>上下文信息</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logdebug</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Debug</entry>
+                  <entry>调试</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logcursorpos</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Cursor position</entry>
+                  <entry>光标位置</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logfunction</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Function info</entry>
+                  <entry>函数信息</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logfile</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Source code file</entry>
+                  <entry>源代码文件</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logline</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Source code line</entry>
+                  <entry>源代码行</entry>
                </row>
                <row>
                   <entry>
                      <codeph>logstack</codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Stack trace</entry>
+                  <entry>堆栈信息</entry>
                </row>
             </tbody>
          </tgroup>
