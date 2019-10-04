@@ -6,7 +6,7 @@
    <body>
       <p> <codeph>queries_*</codeph> 系列表存储高级查询状态信息.</p>
       <p> <codeph>tmid</codeph>, <codeph>ssid</codeph> 和 <codeph>ccnt</codeph> 列是唯一标识特定查询的组合键.</p>
-      <p>一共有三个查询表，所有查询表都具有相同的列:</p>
+      <p>一共有三张查询表，所有查询表都具有相同的列:</p>
       <ul>
          <li>
             <codeph>queries_now</codeph> 是一个外部表, 其数据文件位于

@@ -4,7 +4,7 @@
 <topic id="db-system">
    <title>system_*</title>
    <body>
-      <p> <codeph>system_*</codeph> 表存储系统使用指标. 一共有三个系统表，所有查询表都具有相同的列::</p>
+      <p> <codeph>system_*</codeph> 表存储系统使用指标. 一共有三张查询表，所有查询表都具有相同的列:</p>
       <ul>
          <li>
             <codeph>system_now</codeph> 是一个外部表, 其数据文件位于
