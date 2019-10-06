@@ -2,23 +2,25 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="db-system">
-   <title>system_*</title>
+   <title>system_* 表</title>
    <body>
-      <p> <codeph>system_*</codeph> 表存储系统使用指标. 一共有三张查询表，所有查询表都具有相同的列:</p>
+      <p> <codeph>system_*</codeph> 表存储系统使用指标。 这里一共有三张表，每张表都具有相同的结构(列):</p>
       <ul>
          <li>
             <codeph>system_now</codeph> 是一个外部表, 其数据文件位于
                <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. 
-               在数据从 <codeph>gpperfmon</codeph> 代理自动提交到 <codeph>system_history</codeph> 表期间，
-            当前数据存储在 <codeph>system_now</codeph>  表中。</li>
+               在数据从 <codeph>gpperfmon</codeph> 数据采集代理程序获得数据以后，自动提交到 <codeph>system_history</codeph> 表之前，
+            当前系统使用指标数据存储在 <codeph>system_now</codeph>  表中。</li>
          <li>
             <codeph>system_tail</codeph> 是一个外部表, 其数据文件位于
                <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>.
-                这是一个过渡表，当数据已经从 <codeph>system_now</codeph> 中清除，但还没有提交到
-                <codeph>system_history</codeph> 中时，暂存在这里。它通常仅包含数据几分钟时间。</li>
+                它是一个过渡表，当数据已经从 <codeph>system_now</codeph> 中清除，但还没有提交到
+                <codeph>system_history</codeph> 表中时，暂存在这里。它通常仅包含数据几分钟时间。</li>
          <li>
-            <codeph>system_history</codeph> 是一个常规表，用于存储系统历史使用指标。
-            它已预先设置为按月分区。分区会根据需要以两个月为增量自动添加。</li>
+            <codeph>system_history</codeph> 是一个常规表，
+            用于存储历史系统使用指标。
+            它已预先设置为按月分区。
+            分区会根据需要以两个月为增量自动添加。</li>
       </ul>
       <table>
          <tgroup cols="2">

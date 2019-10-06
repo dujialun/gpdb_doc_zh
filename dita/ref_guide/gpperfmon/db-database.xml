@@ -2,35 +2,30 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="db-database">
-   <title> database_* </title>
+   <title> database_* 表</title>
    <body>
-      <p>The <codeph>database_*</codeph> tables store query workload information for a Greenplum
-         Database instance. There are three database tables, all having the same columns:</p>
+      <p> <codeph>database_*</codeph> 表存储一个 Greenplum 数据库实例的工作负载信息。这里一共有三张表，每张表都具有相同的结构(列):</p>
       <ul>
          <li>
-            <codeph>database_now</codeph> is an external table whose data files are stored in
-               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. Current query workload data
-            is stored in <codeph>database_now</codeph> during the period between data collection
-            from the data collection agents and automatic commitment to the
-               <codeph>database_history</codeph> table.</li>
+            <codeph>database_now</codeph> 是一个外部表，其数据文件位于
+               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. 从数据采集代理程序获得数据以后，自动提交到 <codeph>database_history</codeph> 表之前，当前查询工作负载数据存储在 <codeph>database_now</codeph> 表中。</li>
          <li>
-            <codeph>database_tail</codeph> is an external table whose data files are stored in
-               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. This is a transitional table
-            for query workload data that has been cleared from <codeph>database_now</codeph> but has
-            not yet been committed to <codeph>database_history</codeph>. It typically only contains
-            a few minutes worth of data.</li>
+            <codeph>database_tail</codeph> 是一个外部表, 其数据文件位于
+               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. 它是一个过渡表，当数据已经从 <codeph>database_now</codeph> 中清除，但还没有提交到 <codeph>database_history</codeph> 
+            表中时，暂存在这里。它通常仅包含数据几分钟时间。</li>
          <li>
-            <codeph>database_history</codeph> is a regular table that stores historical
-            database-wide query workload data. It is pre-partitioned into monthly partitions.
-            Partitions are automatically added in two month increments as needed. </li>
+            <codeph>database_history</codeph> 是一个常规表，
+            用于存储历史查询工作负载数据。
+            它已预先设置为按月分区。
+            分区会根据需要以两个月为增量自动添加。 </li>
       </ul>
       <table>
          <tgroup cols="2">
             <thead>
                <row>
-                  <entry>Column</entry>
-                  <entry>Type</entry>
-                  <entry>Description</entry>
+                  <entry>列</entry>
+                  <entry>类型</entry>
+                  <entry>说明</entry>
                </row>
             </thead>
             <tbody>
@@ -39,31 +34,28 @@
                      <codeph>ctime</codeph>
                   </entry>
                   <entry>timestamp</entry>
-                  <entry>Time this row was created.</entry>
+                  <entry>该行的创建时间.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>queries_total</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>The total number of queries in Greenplum Database at data collection
-                     time.</entry>
+                  <entry>采集数据时，Greenplum 数据库中的查询总数量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>queries_running</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>The number of active queries running at data collection time.</entry>
+                  <entry>采集数据时，活动的查询数量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>queries_queued</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>The number of queries waiting in a resource group or resource queue,
-                     depending upon which resource management scheme is active, at data collection
-                     time.</entry>
+                  <entry>采集数据时，资源组或资源队列中处于等待状态的查询数量(与当前使用的资源管理器相关).</entry>
                </row>
             </tbody>
          </tgroup>

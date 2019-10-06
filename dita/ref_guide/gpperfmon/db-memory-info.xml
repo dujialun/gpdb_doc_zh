@@ -2,7 +2,7 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="CommandCenterDatabaseReference-memory_info">
-   <title> memory_info </title>
+   <title> memory_info 视图</title>
    <body>
       <p>The <codeph>memory_info</codeph> view shows per-host memory information from the
             <codeph>system_history</codeph> and <codeph>segment_history</codeph> tables. This allows

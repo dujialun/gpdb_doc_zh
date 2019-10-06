@@ -2,7 +2,7 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="db-queries">
-   <title>queries_* 系列表</title>
+   <title>queries_* 表</title>
    <body>
       <p> <codeph>queries_*</codeph> 系列表存储高级查询状态信息.</p>
       <p> <codeph>tmid</codeph>, <codeph>ssid</codeph> 和 <codeph>ccnt</codeph> 列是唯一标识特定查询的组合键.</p>

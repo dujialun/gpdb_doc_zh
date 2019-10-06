@@ -2,7 +2,7 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="db-segment">
-   <title> segment_* </title>
+   <title> segment_* 表</title>
    <body>
       <p>The <codeph>segment_*</codeph> tables contain memory allocation statistics for the
          Greenplum Database segment instances. This tracks the amount of memory consumed by all

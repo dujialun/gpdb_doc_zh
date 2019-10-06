@@ -2,7 +2,7 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="CommandCenterDatabaseReference-log_alert">
-   <title> log_alert_* </title>
+   <title> log_alert_* 表</title>
    <body>
       <p><codeph>log_alert_*</codeph> 表存储 <codeph>pg_log</codeph> 错误和警报. </p>
       <p>参考 <xref href="dbref.xml#overview/section_ok2_wd1_41b"/> 了解关于配置

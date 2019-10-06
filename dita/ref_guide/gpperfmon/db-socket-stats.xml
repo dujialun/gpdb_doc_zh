@@ -2,7 +2,7 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="db-socket_stats">
-   <title>socket_stats_*</title>
+   <title>socket_stats_* 表</title>
    <body>
       <p> <codeph>socket_stats_*</codeph> 表存储一个 Greenplum 数据库实例中 socket 使用统计指标。
       一共有三张表，所有查询表都具有相同的列:</p>
