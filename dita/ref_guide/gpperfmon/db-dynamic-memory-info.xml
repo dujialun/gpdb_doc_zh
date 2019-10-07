@@ -4,7 +4,7 @@
 <topic id="CommandCenterDatabaseReference-dynamic_memory_info">
    <title>dynamic_memory_info 视图</title>
    <body>
-      <p> <codeph>dynamic_memory_info</codeph> 视图包含一个 segment 主机上所有 segment 实例已用内存和可用动态内存的总和。
+      <p> <codeph>dynamic_memory_info</codeph> 视图展示一个 segment 主机上所有 segment 实例已用内存和可用动态内存的总和。
       动态内存指 Greenplum 数据库实例在启动取消进程前，
       允许一个 segment 实例上查询进程使用的内存(超过该数量则启动取消进程)。
       这个限制有当前所使用的资源管理方案决定 (基于资源组或基于资源队列), 按每个 segment 进行评估.</p>

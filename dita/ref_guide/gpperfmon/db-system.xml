@@ -9,7 +9,7 @@
          <li>
             <codeph>system_now</codeph> 是一个外部表, 其数据文件位于
                <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. 
-               在数据从 <codeph>gpperfmon</codeph> 数据采集代理程序获得数据以后，自动提交到 <codeph>system_history</codeph> 表之前，
+               在数据从 <codeph>gpperfmon</codeph> 数据采集代理程序获得以后，自动提交到 <codeph>system_history</codeph> 表之前，
             当前系统使用指标数据存储在 <codeph>system_now</codeph>  表中。</li>
          <li>
             <codeph>system_tail</codeph> 是一个外部表, 其数据文件位于
