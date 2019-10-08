@@ -2,21 +2,14 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic97">
-    <title>Formatting Columns</title>
+    <title>格式化列</title>
     <body>
-        <p>The default column or field delimiter is the horizontal <codeph>TAB</codeph> character
-                (<codeph>0x09</codeph>) for text files and the comma character
-                (<codeph>0x2C</codeph>) for CSV files. You can declare a single character delimiter
-            using the <codeph>DELIMITER</codeph> clause of <codeph>COPY</codeph>, <codeph>CREATE
-                EXTERNAL TABLE</codeph> or <codeph>gpload</codeph> when you define your data format.
-            The delimiter character must appear between any two data value fields. Do not place a
-            delimiter at the beginning or end of a row. For example, if the pipe character ( | ) is
-            your delimiter:</p>
+        <p>默认的列或者域定界符对于文本文件是水平<codeph>TAB</codeph>字符（<codeph>0x09</codeph>），对于CSV文件是逗号字符（<codeph>0x2C</codeph>）。在定义数据格式时，用户可以使用<codeph>COPY</codeph>、<codeph>CREATE EXTERNAL TABLE</codeph>或者<codeph>gpload</codeph>的<codeph>DELIMITER</codeph>子句声明一个单字符定界符。定界符字符必须出现在任意两个数据值域之间。不要在行的首尾放置定界符。例如，如果竖线字符（|）是定界符：</p>
         <p>
             <codeblock>data value 1|data value 2|data value 3
 </codeblock>
         </p>
-        <p>The following command shows the use of the pipe character as a column delimiter:</p>
+        <p>下列命令展示了竖线字符作为列定界符的使用：</p>
         <codeblock>=# CREATE EXTERNAL TABLE ext_table (name text, date date)
 LOCATION ('gpfdist://&lt;hostname&gt;/filename.txt)
 FORMAT 'TEXT' (DELIMITER '|');

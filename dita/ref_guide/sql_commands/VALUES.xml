@@ -1,75 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="es20941">VALUES</title><body><p id="sql_command_desc">Computes a set of rows.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">VALUES ( <varname>expression</varname> [, ...] ) [, ...]
-   [ORDER BY <varname>sort_expression</varname> [ ASC | DESC | USING <varname>operator</varname> ] [, ...] ]
-   [LIMIT { <varname>count</varname> | ALL } ] 
-   [OFFSET <varname>start</varname> [ ROW | ROWS ] ]
-   [FETCH { FIRST | NEXT } [<varname>count</varname> ] { ROW | ROWS } ONLY ]</codeblock></section><section id="section3"><title>Description</title><p><codeph>VALUES</codeph> computes a row value or set of row values specified by value expressions.
-                It is most commonly used to generate a "constant table" within a larger command, but
-                it can be used on its own.</p><p>When more than one row is specified, all the rows must have the same
-number of elements. The data types of the resulting table's columns
-are determined by combining the explicit or inferred types of the expressions
-appearing in that column, using the same rules as for <codeph>UNION</codeph>.
-</p><p>Within larger commands, <codeph>VALUES</codeph> is syntactically allowed
-                anywhere that <codeph>SELECT</codeph> is. Because it is treated
-                like a <codeph>SELECT</codeph> by the grammar, it is possible to
-                use the <codeph>ORDER BY</codeph>, <codeph>LIMIT</codeph> (or
-                equivalent <codeph>FETCH FIRST</codeph>), and
-                    <codeph>OFFSET</codeph> clauses with a
-                    <codeph>VALUES</codeph> command.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>expression</varname></pt><pd>A constant or expression to compute and insert at the indicated place
-in the resulting table (set of rows). In a <codeph>VALUES</codeph> list
-appearing at the top level of an <codeph>INSERT</codeph>, an expression
-can be replaced by <codeph>DEFAULT</codeph> to indicate that the destination
-column's default value should be inserted. <codeph>DEFAULT</codeph>
-cannot be used when <codeph>VALUES</codeph> appears in other contexts.</pd></plentry><plentry><pt><varname>sort_expression</varname></pt><pd>An expression or integer constant indicating how to sort the result rows. This expression may
-                        refer to the columns of the <codeph>VALUES</codeph> result as
-                            <codeph>column1</codeph>, <codeph>column2</codeph>, etc. For more
-                        details, see "The ORDER BY Clause" in the parameters for <codeph><xref
-                                href="SELECT.xml#topic1"/></codeph>.</pd></plentry><plentry><pt><varname>operator</varname></pt><pd>A sorting operator. For more details, see "The ORDER BY Clause" in the parameters for
-                                <codeph><xref href="SELECT.xml#topic1"/></codeph>. </pd></plentry><plentry><pt>LIMIT count</pt><pt>OFFSET start</pt><pd>The maximum number of rows to return. For more details, see "The LIMIT Clause" in the parameters
-                        for <codeph><xref href="SELECT.xml#topic1"/></codeph>.</pd></plentry></parml></section><section id="section5"><title>Notes</title><p><codeph>VALUES</codeph> lists with very large numbers of rows should
-be avoided, as you may encounter out-of-memory failures or poor performance.
-<codeph>VALUES</codeph> appearing within <codeph>INSERT</codeph> is a
-special case (because the desired column types are known from the <codeph>INSERT</codeph>'s
-target table, and need not be inferred by scanning the <codeph>VALUES</codeph>
-list), so it can handle larger lists than are practical in other contexts.</p></section><section id="section6"><title>Examples</title><p>A bare <codeph>VALUES</codeph> command: </p><codeblock>VALUES (1, 'one'), (2, 'two'), (3, 'three');</codeblock><p>This will return a table of two columns and three rows. It is effectively
-equivalent to:</p><codeblock>SELECT 1 AS column1, 'one' AS column2
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="es20941">VALUES</title>
+    <body>
+        <p id="sql_command_desc">计算一组行。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">VALUES ( <varname>expression</varname> [, ...] ) [, ...]
+                [ORDER BY <varname>sort_expression</varname> [ ASC | DESC | USING <varname>operator</varname> ] [, ...]
+                ]
+                [LIMIT { <varname>count</varname> | ALL } ]
+                [OFFSET <varname>start</varname> [ ROW | ROWS ] ]
+                [FETCH { FIRST | NEXT } [<varname>count</varname> ] { ROW | ROWS } ONLY ]
+            </codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>VALUES</codeph>计算值表达式指定的行值或行值集。
+                它最常用于在较大的命令中生成“常数表”，但可以单独使用。
+            </p>
+            <p>指定多于一行时，所有行必须具有相同数量的元素。
+                通过使用与<codeph>UNION</codeph>相同的规则，
+                组合出现在该列中的表达式的显式或推断类型，来确定结果表的列的数据类型。
+            </p>
+            <p>在较大的命令中，语法上允许<codeph>SELECT</codeph>所在的任何位置使用<codeph>VALUES</codeph>。
+                由于语法将其视为<codeph>SELECT</codeph>，
+                因此可以将<codeph>VALUES</codeph>命令与<codeph>ORDER BY</codeph>，<codeph>LIMIT</codeph>（或等效的<codeph>FETCH FIRST</codeph>）和<codeph>OFFSET</codeph>子句一起使用。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>expression</varname>
+                    </pt>
+                    <pd>要计算并插入到结果表中指定位置（行集）的常量或表达式。
+                        在出现在<codeph>INSERT</codeph>顶层的<codeph>VALUES</codeph>列表中，
+                        可以将表达式替换为<codeph>DEFAULT</codeph>以指示应插入目标列的默认值。
+                        当<codeph>VALUES</codeph>出现在其他上下文中时，不能使用<codeph>DEFAULT</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>sort_expression</varname>
+                    </pt>
+                    <pd>表示如何对结果行进行排序的表达式或整数常量。
+                        该表达式可以将<codeph>VALUES</codeph>结果的列称为<codeph>column1</codeph>，<codeph>column2</codeph>等。
+                        有关更多详细信息，请参见<codeph><xref href="SELECT.xml#topic1"/></codeph>参数中的“ORDER BY子句”。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>operator</varname>
+                    </pt>
+                    <pd>排序运算符。
+                        有关更多详细信息，请参见<codeph><xref href="SELECT.xml#topic1"/></codeph>参数中的“ORDER BY子句”。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>LIMIT count</pt>
+                    <pt>OFFSET start</pt>
+                    <pd>要返回的最大行数。
+                        有关更多详细信息，请参见<codeph><xref href="SELECT.xml#topic1"/></codeph>参数中的“LIMIT子句”。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p>应该避免使用具有大量行的<codeph>VALUES</codeph>列表，因为您可能会遇到内存不足的故障或性能不佳的情况。
+                出现在<codeph>INSERT</codeph>中的<codeph>VALUES</codeph>是一种特殊情况（因为所需的列类型是从<codeph>INSERT</codeph>的目标表中知道的，不需要通过扫描<codeph>VALUES</codeph>列表来推断），
+                因此它可以处理比其他情况下实际更大的列表。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>一条简单的<codeph>VALUES</codeph>命令：
+            </p>
+            <codeblock>VALUES (1, 'one'), (2, 'two'), (3, 'three');</codeblock>
+            <p>这将返回一个两列三行的表。它实际上等效于：
+            </p>
+            <codeblock>SELECT 1 AS column1, 'one' AS column2
 UNION ALL
 SELECT 2, 'two'
 UNION ALL
-SELECT 3, 'three';</codeblock><p>More usually, <codeph>VALUES</codeph> is used within a larger SQL command.
-The most common use is in <codeph>INSERT</codeph>:</p><codeblock>INSERT INTO films (code, title, did, date_prod, kind)
-    VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');</codeblock><p>In the context of <codeph>INSERT</codeph>, entries of a <codeph>VALUES</codeph>
-list can be <codeph>DEFAULT</codeph> to indicate that the column default
-should be used here instead of specifying a value: </p><codeblock>INSERT INTO films VALUES
-    ('UA502', 'Bananas', 105, DEFAULT, 'Comedy', '82 
-minutes'),
-    ('T_601', 'Yojimbo', 106, DEFAULT, 'Drama', DEFAULT);</codeblock><p><codeph>VALUES</codeph> can also be used where a sub-<codeph>SELECT</codeph>
-might be written, for example in a <codeph>FROM</codeph> clause:</p><codeblock>SELECT f.* FROM films f, (VALUES('MGM', 'Horror'), ('UA', 
-'Sci-Fi')) AS t (studio, kind) WHERE f.studio = t.studio AND 
+SELECT 3, 'three';</codeblock>
+            <p>通常，在较大的SQL命令中使用<codeph>VALUES</codeph>。
+                最常见的用法是在<codeph>INSERT</codeph>中：
+            </p>
+            <codeblock>INSERT INTO films (code, title, did, date_prod, kind)
+                VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');</codeblock>
+            <p>在<codeph>INSERT</codeph>的上下文中，<codeph>VALUES</codeph>列表的条目可以为<codeph>DEFAULT</codeph>，
+                以指示此处应使用列默认值而不是指定值：
+            </p>
+            <codeblock>INSERT INTO films VALUES
+                ('UA502', 'Bananas', 105, DEFAULT, 'Comedy', '82
+                minutes'),
+                ('T_601', 'Yojimbo', 106, DEFAULT, 'Drama', DEFAULT);</codeblock>
+            <p><codeph>VALUES</codeph>也可以用于可能写入sub-<codeph>SELECT</codeph>的地方，例如在<codeph>FROM</codeph>子句中：
+            </p>
+            <codeblock>SELECT f.* FROM films f, (VALUES('MGM', 'Horror'), ('UA',
+'Sci-Fi')) AS t (studio, kind) WHERE f.studio = t.studio AND
 f.kind = t.kind;
-UPDATE employees SET salary = salary * v.increase FROM 
-(VALUES(1, 200000, 1.2), (2, 400000, 1.4)) AS v (depno, 
-target, increase) WHERE employees.depno = v.depno AND 
-employees.sales &gt;= v.target;</codeblock><p>Note that an <codeph>AS</codeph> clause is required when <codeph>VALUES</codeph>
-is used in a <codeph>FROM</codeph> clause, just as is true for <codeph>SELECT</codeph>.
-It is not required that the <codeph>AS</codeph> clause specify names
-for all the columns, but it is good practice to do so. The default column
-names for <codeph>VALUES</codeph> are <codeph>column1</codeph>, <codeph>column2</codeph>,
-etc. in Greenplum Database, but these names might be different in other
-database systems.</p><p>When <codeph>VALUES</codeph> is used in <codeph>INSERT</codeph>, the
-values are all automatically coerced to the data type of the corresponding
-destination column. When it is used in other contexts, it may be necessary
-to specify the correct data type. If the entries are all quoted literal
-constants, coercing the first is sufficient to determine the assumed
-type for all: </p><codeblock>SELECT * FROM machines WHERE ip_address IN 
-(VALUES('192.168.0.1'::inet), ('192.168.0.10'), 
-('192.0.2.43'));</codeblock><note type="note">For simple <codeph>IN</codeph> tests, it is better to rely on the list-of-scalars
-                form of <codeph>IN</codeph> than to write a <codeph>VALUES</codeph> query as shown
-                above. The list of scalars method requires less writing and is often more
-                efficient.</note></section><section id="section7"><title>Compatibility</title><p><codeph>VALUES</codeph> conforms to the SQL standard. <codeph>LIMIT</codeph>
-                and <codeph>OFFSET</codeph> are Greenplum Database extensions;
-                see also under <xref href="SELECT.xml#topic1" type="topic"
-                    format="dita"/>.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="INSERT.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-                        href="SELECT.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+UPDATE employees SET salary = salary * v.increase FROM
+(VALUES(1, 200000, 1.2), (2, 400000, 1.4)) AS v (depno,
+target, increase) WHERE employees.depno = v.depno AND
+employees.sales &gt;= v.target;</codeblock>
+            <p>请注意，在<codeph>FROM</codeph>子句中使用<codeph>VALUES</codeph>时，
+                需要<codeph>AS</codeph>子句，就像<codeph>SELECT</codeph>一样。
+                不需要<codeph>AS</codeph>子句为所有列指定名称，但是这样做是一种好习惯。
+                在Greenplum数据库中，<codeph>VALUES</codeph>的默认列名称为<codeph>column1</codeph>，<codeph>column2</codeph>等，
+                但是在其他数据库系统中，这些名称可能不同。
+            </p>
+            <p>在<codeph>INSERT</codeph>中使用<codeph>VALUES</codeph>时，所有值都将自动强制转换为相应目标列的数据类型。
+                在其他上下文中使用它时，可能有必要指定正确的数据类型。
+                如果所有条目都是用引号括起来的文字常量，则强制第一个足以确定所有假定的类型：
+            </p>
+            <codeblock>SELECT * FROM machines WHERE ip_address IN
+(VALUES('192.168.0.1'::inet), ('192.168.0.10'),
+('192.0.2.43'));</codeblock>
+            <note type="note">对于简单的<codeph>IN</codeph>测试，
+                最好依靠<codeph>IN</codeph>的标量列表形式，而不要像上面所示编写<codeph>VALUES</codeph>查询。
+                标量方法列表需要较少的编写，并且通常效率更高。
+            </note>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p><codeph>VALUES</codeph>符合SQL标准。
+                <codeph>LIMIT</codeph>和<codeph>OFFSET</codeph>是Greenplum数据库扩展；
+                另请参见<xref href="SELECT.xml#topic1" type="topic" format="dita"/>下的内容。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p><codeph><xref href="INSERT.xml#topic1" type="topic" format="dita"/></codeph>
+                ,
+                <codeph><xref href="SELECT.xml#topic1" type="topic" format="dita"/></codeph>
+            </p>
+        </section>
+    </body>
+</topic>

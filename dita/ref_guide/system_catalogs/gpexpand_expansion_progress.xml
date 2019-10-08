@@ -1,10 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="ez138336">gpexpand.expansion_progress</title><body><p>The <codeph>gpexpand.expansion_progress </codeph>view contains information
-about the status of a system expansion operation. The view provides calculations
-of the estimated rate of table redistribution and estimated time to completion.</p><p>Status for specific tables involved in the expansion is stored in <xref
-        href="./gp_expansion_tables.xml#topic1" type="topic" format="dita"/>.</p><table id="ez138428"><title>gpexpand.expansion_progress</title><tgroup cols="4"><colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="97pt"/><colspec colnum="3" colname="col3" colwidth="82pt"/><colspec colnum="4" colname="col4" colwidth="138pt"/><thead><row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row></thead><tbody><row><entry colname="col1"><codeph>name</codeph></entry><entry colname="col2">text</entry><entry colname="col3"/><entry colname="col4">Name for the data field provided. Includes:<p>Bytes Left</p><p>Bytes
-                Done</p><p>Estimated Expansion Rate</p><p>Estimated Time to Completion</p><p>Tables
-                Expanded</p><p>Tables Left</p></entry></row><row><entry colname="col1"><codeph>value</codeph></entry><entry colname="col2">text</entry><entry colname="col3"/><entry colname="col4">The value for the progress data. For example:<p><codeph>Estimated
-Expansion Rate - 9.75667095996092 MB/s</codeph></p></entry></row></tbody></tgroup></table></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1" xml:lang="en">
+    <title id="ez138336">gpexpand.expansion_progress</title>
+    <body>
+        <p><codeph>gpexpand.expansion_progress</codeph>视图包含有关系统扩容操作状态的信息。
+            该表提供了表重新分布速度和完成扩容的时间的估算。
+            </p>
+        <p>扩容涉及的特定表的状态存储在<xref href="./gp_expansion_tables.xml#topic1" type="topic" format="dita"/>中。
+            </p>
+        <table id="ez138428">
+            <title>gpexpand.expansion_progress</title>
+            <tgroup cols="4">
+                <colspec colnum="1" colname="col1" colwidth="131pt"/>
+                <colspec colnum="2" colname="col2" colwidth="97pt"/>
+                <colspec colnum="3" colname="col3" colwidth="82pt"/>
+                <colspec colnum="4" colname="col4" colwidth="138pt"/>
+                <thead>
+                    <row>
+                        <entry colname="col1">列</entry>
+                        <entry colname="col2">类型</entry>
+                        <entry colname="col3">参考</entry>
+                        <entry colname="col4">描述</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>name</codeph>
+                        </entry>
+                        <entry colname="col2">text</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">提供的数据域的名称，包括:
+                            <p>剩余字节数</p>
+                            <p>完成字节数</p>
+                            <p>扩展速度估计</p>
+                            <p>估计完成时间</p>
+                            <p>已扩展的表</p>
+                            <p>剩余的表</p>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>value</codeph>
+                        </entry>
+                        <entry colname="col2">text</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">进度数据的值。例如：
+                            <p>
+                                <codeph>扩展速度估计 - 9.75667095996092 MB/s
+                                </codeph>
+                            </p>
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </body>
+</topic>

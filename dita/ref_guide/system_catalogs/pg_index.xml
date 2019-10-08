@@ -4,8 +4,8 @@
 <topic id="topic1" xml:lang="en">
   <title id="gq143896">pg_index</title>
   <body>
-    <p>The <codeph>pg_index</codeph> system catalog table contains part of the information about
-      indexes. The rest is mostly in <xref href="pg_class.xml#topic1">pg_class</xref>.</p>
+    <p><codeph>pg_index</codeph>系统目录表包含部分关于索引的信息。
+      剩下的信息主要在<xref href="pg_class.xml#topic1">pg_class</xref>表中。</p>
     <table id="gq143898">
       <title>pg_catalog.pg_index</title>
       <tgroup cols="4">
@@ -15,10 +15,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -28,7 +28,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">The OID of the pg_class entry for this index.</entry>
+            <entry colname="col4">该索引的pg_class项的OID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -36,8 +36,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">The OID of the pg_class entry for the table this index is
-              for.</entry>
+            <entry colname="col4">该索引所对应的表的pg_class项的OID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -45,8 +44,7 @@
             </entry>
             <entry colname="col2">int2</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The number of columns in the index (duplicates
-              pg_class.relnatts).</entry>
+            <entry colname="col4">索引中的列数（与其pg_class.relnatts重复）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -54,7 +52,7 @@
             </entry>
             <entry colname="col2">boolean </entry>
             <entry colname="col3"/>
-            <entry colname="col4">If true, this is a unique index.</entry>
+            <entry colname="col4">如果为真，则这是一个唯一索引。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -62,21 +60,19 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">If true, this index represents the primary key of the table.
-              (indisunique should always be true when this is true.)</entry>
+            <entry colname="col4">如果为真，则这个索引表示表的主键（此属性为真时indisunique总是为真）。</entry>
           </row>
           <row>
             <entry><codeph>indisexclusion</codeph></entry>
             <entry>boolean</entry>
             <entry/>
-            <entry>If true, this index supports an exclusion constraint</entry>
+            <entry>如果为true，则此索引支持排除约束</entry>
           </row>
           <row>
             <entry>indimmediate</entry>
             <entry>boolean</entry>
             <entry/>
-            <entry>If true, the uniqueness check is enforced immediately on insertion (irrelevant if
-                <codeph>indisunique</codeph> is not true)</entry>
+            <entry>如果为true，则在插入时立即强制执行唯一性检查（如果<codeph>indisunique</codeph>不成立则无关紧要）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -84,8 +80,7 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">If true, the table was last clustered on this index via the
-                <codeph>CLUSTER</codeph> command.</entry>
+            <entry colname="col4">如果为真，表最后一次是通过<codeph>CLUSTER</codeph>命令在此索引上聚簇。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -93,40 +88,35 @@
             </entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">If true, the index is currently valid for queries. False means the
-              index is possibly incomplete: it must still be modified by
-                <codeph>INSERT</codeph>/<codeph>UPDATE</codeph> operations, but it cannot safely be
-              used for queries.</entry>
+            <entry colname="col4">如果为真，则该索引目前对查询有效。
+              如果为假，意味着该索引目前可能不完整：它仍然必须被<codeph>INSERT</codeph>/<codeph>UPDATE</codeph>操作所修改，但是它不能被安全地用于查询。</entry>
           </row>
           <row>
             <entry><codeph>indcheckxmin</codeph></entry>
             <entry>boolean</entry>
             <entry/>
-            <entry>If true, queries must not use the index until the <codeph>xmin</codeph> of this
-                <codeph>pg_index</codeph> row is below their <codeph>TransactionXmin</codeph> event
-              horizon, because the table may contain broken HOT chains with incompatible rows that
-              they can see</entry>
+            <entry>如果为true，则查询必须不使用索引，直到此<codeph>pg_index</codeph>行的<codeph>xmin</codeph>低于其<codeph>TransactionXmin</codeph>事件范围，因为该表可能包含具有可以看到的不兼容行的断开的HOT链</entry>
           </row>
           <row>
             <entry><codeph>indisready</codeph></entry>
             <entry>boolean</entry>
             <entry/>
-            <entry>If true, the index is currently ready for inserts. False means the index must be
-              ignored by <codeph>INSERT</codeph>/<codeph>UPDATE</codeph> operations</entry>
+            <entry>如果为true，则索引当前已准备好进行插入。
+              False意味着<codeph>INSERT</codeph>/<codeph>UPDATE</codeph>操作必须忽略索引
+              </entry>
           </row>
           <row>
             <entry><codeph>indislive</codeph></entry>
             <entry>boolean</entry>
             <entry/>
-            <entry>If false, the index is in process of being dropped, and should be ignored for all
-              purposes </entry>
+            <entry>如果为false，则索引正在被删除，并且应该为所有目的而忽略</entry>
           </row>
           <row>
             <entry><codeph>indisreplident</codeph></entry>
             <entry>boolean</entry>
             <entry/>
-            <entry>If true this index has been chosen as "replica identity" using <codeph>ALTER
-                TABLE ... REPLICA IDENTITY USING INDEX ...</codeph></entry>
+            <entry>如果为true，则使用<codeph>ALTER TABLE ... REPLICA IDENTITY USING INDEX ...</codeph>将此索引选为“副本标识”
+              </entry>
           </row>
           <row>
             <entry colname="col1">
@@ -134,18 +124,16 @@
             </entry>
             <entry colname="col2">int2vector</entry>
             <entry colname="col3">pg_attribute.attnum</entry>
-            <entry colname="col4">This is an array of <codeph>indnatts</codeph> values that indicate
-              which table columns this index indexes. For example a value of 1 3 would mean that the
-              first and the third table columns make up the index key. A zero in this array
-              indicates that the corresponding index attribute is an expression over the table
-              columns, rather than a simple column reference.</entry>
+            <entry colname="col4">这是一个<codeph>indnatts</codeph>值数组，指示此索引索引的表列。
+              例如，值为1 3意味着第一个和第三个表列构成索引键。
+              此数组中的零表示相应的索引属性是表列上的表达式，而不是简单的列引用。
+              </entry>
           </row>
           <row>
             <entry><codeph>indcollation</codeph></entry>
             <entry>oidvector</entry>
             <entry/>
-            <entry>For each column in the index key, this contains the OID of the collation to use
-              for the index.</entry>
+            <entry>对于索引键中的每一列，它包含用于索引的排序规则的OID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -153,15 +141,14 @@
             </entry>
             <entry colname="col2">oidvector</entry>
             <entry colname="col3">pg_opclass.oid</entry>
-            <entry colname="col4">For each column in the index key this contains the OID of the
-              operator class to use.</entry>
+            <entry colname="col4">对于索引键中的每一列，它包含要使用的运算符类的OID。</entry>
           </row>
           <row>
             <entry><codeph>indoption</codeph></entry>
             <entry>int2vector</entry>
             <entry/>
-            <entry>This is an array of <codeph>indnatts</codeph> values that store per-column flag
-              bits. The meaning of the bits is defined by the index's access method.</entry>
+            <entry>这是一个<codeph>indnatts</codeph>值数组，用于存储每列标志位。
+              位的含义由索引的访问方法定义。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -169,10 +156,9 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Expression trees (in <codeph>nodeToString()</codeph>
-              representation) for index attributes that are not simple column references. This is a
-              list with one element for each zero entry in indkey. NULL if all index attributes are
-              simple references.</entry>
+            <entry colname="col4">表达式树（在<codeph>nodeToString()</codeph>表示中），用于不是简单列引用的索引属性。
+              这是一个列表，其中包含indkey中每个零条目的一个元素。
+              如果所有索引属性都是简单引用，则为NULL</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -180,8 +166,8 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Expression tree (in <codeph>nodeToString()</codeph>
-              representation) for partial index predicate. NULL if not a partial index.</entry>
+            <entry colname="col4">部分索引谓词的表达式树（在<codeph>nodeToString()</codeph>表示中）。
+              如果不是部分索引，则为NULL。</entry>
           </row>
         </tbody>
       </tgroup>

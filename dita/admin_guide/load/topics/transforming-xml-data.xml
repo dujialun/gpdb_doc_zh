@@ -2,23 +2,11 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic75">
-   <title>Transforming External Data with gpfdist and gpload</title>
-   <shortdesc>The <codeph>gpfdist</codeph> parallel file server allows you to set up transformations
-      that enable Greenplum Database external tables to read and write files in formats that are not
-      supported with the <codeph>CREATE EXTERNAL TABLE</codeph> command's <codeph>FORMAT</codeph>
-      clause. An <i>input</i> transformation reads a file in the foreign data format and outputs
-      rows to <codeph>gpfdist</codeph> in the CSV or other text format specified in the external
-      table's <codeph>FORMAT</codeph> clause. An <i>output</i> transformation receives rows from
-         <codeph>gpfdist</codeph> in text format and converts them to the foreign data
-      format.</shortdesc>
+   <title>使用gpfdist和gpload转换外部数据</title>
+   <shortdesc><codeph>gpfdist</codeph>并行文件服务器允许用户设置转换，使Greenplum数据库外部表能够以<codeph>CREATE EXTERNAL TABLE</codeph>命令的<codeph>FORMAT</codeph>子句不支持的格式读取和写入文件。<i>input</i>转换以外部数据格式读取文件，并以CSV或外部表的FORMAT子句中指定的其他文本格式将行输出到<codeph>gpfdist</codeph>。<i>output</i>转换以文本格式从<codeph>gpfdist</codeph>接收行，并将它们转换为外部数据格式。</shortdesc>
    <body>
-      <note><codeph>gpfdist</codeph> and <codeph>gpload</codeph> are compatible only with the
-         Greenplum Database major version in which they are shipped. For example, a
-            <codeph>gpfdist</codeph> utility that is installed with Greenplum Database 4.x cannot be
-         used with Greenplum Database 5.x or 6.x.</note>
-      <p>This topic describes the tasks to set up data transformations that work with
-            <codeph>gpfdist</codeph> to read or write external data files with formats that
-         Greenplum Database does not support. </p>
+      <note><codeph>gpfdist</codeph>和<codeph>gpload</codeph>仅与发布它们的Greenplum数据库主要版本兼容。例如，与Greenplum Database 4.x一起安装的<codeph>gpfdist</codeph>工具不能与Greenplum Database 5.x或6.x一起使用。</note>
+      <p>本节介绍了设置数据转换的任务，以使<codeph>gpfdist</codeph>使用Greenplum数据库不支持的格式读取或写入外部数据文件。</p>
       <ul id="ul_xlm_13m_pbb">
          <li><xref href="#topic_mdl_thm_pbb" format="dita"/></li>
          <li><xref href="#topic_el5_k12_pbb" format="dita"/></li>
@@ -30,28 +18,17 @@
       </ul>
    </body>
    <topic id="topic_mdl_thm_pbb">
-      <title>About gpfdist Transformations</title>
+      <title>关于gpfdist转换</title>
       <body>
-         <p>To set up a transformation for a data format, you provide an executable command that
-               <codeph>gpfdist</codeph> can call with the name of the file containing data. For
-            example, you could write a shell script that runs an XSLT transformation on an XML file
-            to output rows with columns delimited with a vertical bar (<codeph>|</codeph>) character
-            and rows delimited with linefeeds. </p>
-         <p>Transformations are configured in a YAML-formatted configuration file passed to
-               <codeph>gpfdist</codeph> on the command line. </p>
-         <p>If you want to load the external data into a table in the Greenplum database, you can
-            use the <codeph>gpload</codeph> utility to automate the tasks to create an external
-            table, run <codeph>gpfdist</codeph>, and load the transformed data into the database
-            table.</p>
-         <p>Accessing data in external XML files from within the database is a common example
-            requiring transformation. The following diagram shows <i>gpfdist</i> performing a
-            transformation on XML files on an ETL server.</p>
+         <p>要设置数据格式转换，用户需要提供一个可执行命令，该命令可以被<codeph>gpfdist</codeph>以包含数据的文件名调用。例如，用户可以编写一个shell脚本，该脚本在XML文件上运行XSLT转换，以输出具有以竖线(<codeph>|</codeph>)字符分隔的列和使用换行符分隔的行的行。</p>
+         <p>转换是在以命令行方式传递给<codeph>gpfdist</codeph>的YAML格式的配置文件中配置的。</p>
+         <p>如果要将外部数据加载到Greenplum数据库的表中，可以使用<codeph>gpload</codeph>工具自动执行创建外部表的任务，运行<codeph>gpfdist</codeph>并将转换后的数据加载到数据库表中。</p>
+         <p>从数据库中访问外部XML文件中的数据是常见的需要转换的示例。下图展示了对ETL服务器上的XML文件执行转换的<i>gpfdist</i>。</p>
          <fig id="du185408">
-            <title>External Tables using XML Transformations</title>
+            <title>使用XML转换的外部表</title>
             <image href="../../graphics/ext-tables-xml.png" placement="break" id="image_xbp_whm_pbb"/>
          </fig>
-         <p>Following are the high-level steps to set up a <codeph>gpfdist</codeph> transformation
-            for external data files. The process is illustrated with an XML example. </p>
+         <p>以下是为外部数据文件设置<codeph>gpfdist</codeph>转换的高级步骤。该过程用XML示例说明。</p>
          <ol id="ol_d4f_4wf_pbb">
             <li><xref href="#topic_el5_k12_pbb" format="dita">Determine the transformation
                   schema</xref>.</li>
@@ -63,18 +40,15 @@
       </body>
    </topic>
    <topic id="topic_el5_k12_pbb">
-      <title>Determine the Transformation Schema</title>
+      <title>确定转换方案</title>
       <body>
-         <p>To prepare for the transformation project:</p>
+         <p>要为转换项目做准备：</p>
          <ol id="ol_fl5_k12_pbb">
-            <li> Determine the goal of the project, such as indexing data, analyzing data, combining
-               data, and so on. </li>
-            <li> Examine the source files and note the file structure and element names.</li>
-            <li> Choose the elements to import and decide if any other limits are appropriate.</li>
+            <li>确定该项目的目标，例如索引数据、分析数据、组合数据等等。</li>
+            <li>检查源文件并标记文件结构和元素名称。</li>
+            <li>选择要导入的元素并且决定是否需要其他适当的限制。</li>
          </ol>
-         <p>For example, the following XML file, <i>prices.xml</i>, is a simple XML file that
-            contains price records. Each price record contains two fields: an item number and a
-            price.</p>
+         <p>例如，下面的XML文件<i>prices.xml</i>是一个简短的包含价格记录的文件。每个价格记录包含两个字段：项目编号和价格。</p>
          <codeblock>&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
 &lt;prices&gt;
   &lt;pricerecord&gt;
@@ -91,28 +65,21 @@
   &lt;/pricerecord&gt;
 &lt;/prices&gt;
 </codeblock>
-         <p>The goal of this transformation is to import all the data into a Greenplum Database
-            readable external table with an integer <codeph>itemnumber</codeph> column and a decimal
-               <codeph>price</codeph> column.</p>
+         <p>目的是把所有的数据导入到一个具有一个整数列<codeph>itemnumber</codeph>和一个小数列<codeph>price</codeph>的Greenplum数据库表中。</p>
       </body>
    </topic>
    <topic id="topic77">
-      <title>Write a Transformation</title>
+      <title>编写转换</title>
       <body>
-         <p>The transformation specifies what to extract from the data. You can use any authoring
-            environment and language appropriate for your project. For XML transformations choose
-            from technologies such as XSLT, Joost (STX), Java, Python, or Perl, based on the goals
-            and scope of the project.</p>
-         <p>In the price example, the next step is to transform the XML data into a two-column
-            delimited text format.</p>
+         <p>转换指定从数据中抽取什么。用户可以使用适合其项目的任何创作环境和语言。对于XML转换，基于项目的目标和范围选择一种如XSLT、Joost（STX）、Java、Python或者Perl的技术。</p>
+         <p>在price的例子中，下一步是转换XML数据成一个简单的分隔成两列的格式。</p>
          <p>
             <codeblock>708421|19.99
 708466|59.25
 711121|24.99
 </codeblock>
          </p>
-         <p>The following STX transform, called <i>input_transform.stx</i>, performs the data
-            transformation.</p>
+         <p>下面的称为<i>input_transform.stx</i>的STX转换完成了这种数据转换。</p>
          <codeblock>&lt;?xml version="1.0"?&gt;
 &lt;stx:transform version="1.0"
    xmlns:stx="http://stx.sourceforge.net/2002/ns"
@@ -136,61 +103,37 @@
   &lt;/stx:template&gt;
 &lt;/stx:transform&gt;
 </codeblock>
-         <p>This STX transform declares two temporary variables, <codeph>itemnumber</codeph> and
-               <codeph>price</codeph>, and the following rules. </p>
+         <p>此STX转换声明两个临时变量<codeph>itemnumber</codeph> 和<codeph>price</codeph>，以及以下规则。</p>
          <ol id="ol_u5s_l12_pbb">
-            <li id="du186530">When an element that satisfies the XPath expression
-                  <codeph>/prices/pricerecord</codeph> is found, examine the child elements and
-               generate output that contains the value of the <codeph>itemnumber</codeph> variable,
-               a <codeph>|</codeph> character, the value of the price variable, and a newline.</li>
-            <li id="du186531">When an <codeph>&lt;itemnumber&gt;</codeph> element is found, store
-               the content of that element in the variable <codeph>itemnumber</codeph>.</li>
-            <li id="du186677">When a &lt;price&gt; element is found, store the content of that
-               element in the variable <codeph>price</codeph>.</li>
+            <li id="du186530">当找到满足XPath表达式<codeph>/prices/pricerecord</codeph>的元素时，检查子元素并生成包含<codeph>itemnumber</codeph>变量值，一个<codeph>|</codeph>字符，price变量值和一个新行的输出。</li>
+            <li id="du186531">当找到<codeph>&lt;itemnumber&gt;</codeph>元素时，将该元素的内容存储在变量<codeph>itemnumber</codeph>中。</li>
+            <li id="du186677">当找到&lt;price&gt;元素后，将该元素的内容存储在变量<codeph>price</codeph>中。</li>
          </ol>
       </body>
    </topic>
    <topic id="topic78">
-      <title>Write the gpfdist Configuration File</title>
+      <title>编写gpfdist配置文件</title>
       <body>
-         <p>The <cmdname>gpfdist</cmdname> configuration is specified as a YAML 1.1 document. It
-            contains rules that <cmdname>gpfdist</cmdname> uses to select a transformation to apply
-            when loading or extracting data. </p>
-         <p>This example <cmdname>gpfdist</cmdname> configuration contains the following items that
-            are required for the <i>prices.xml</i> transformation scenario:</p>
+         <p><cmdname>gpfdist</cmdname>配置是一个YAML 1.1文档。它指定在装载或者抽取数据时<cmdname>gpfdist</cmdname>用来选择一种转换并应用的规则。</p>
+         <p>这个<cmdname>gpfdist</cmdname> 配置的例子包含下列项：</p>
          <ul id="ul_lct_m12_pbb">
-            <li id="du219363">the <codeph>config.yaml</codeph> file defining
-                  <codeph>TRANSFORMATIONS</codeph>
-            </li>
-            <li id="du219364">the <codeph>input_transform.sh</codeph> wrapper script, referenced in
-               the <codeph>config.yaml</codeph> file</li>
-            <li id="du219365">the <codeph>input_transform.stx</codeph> joost transformation, called
-               from <codeph>input_transform.sh</codeph></li>
+            <li id="du219363">定义<codeph>TRANSFORMATIONS</codeph>的<codeph>config.yaml</codeph>文件</li>
+            <li id="du219364"><codeph>config.yaml</codeph>文件中引用的<codeph>input_transform.sh</codeph>包装器脚本</li>
+            <li id="du219365"><codeph>input_transform.sh</codeph>中调用的joost转换<codeph>input_transform.stx</codeph></li>
          </ul>
-         <p>Aside from the ordinary YAML rules, such as starting the document with three dashes
-               (<codeph>---</codeph>), a <cmdname>gpfdist</cmdname> configuration must conform to
-            the following restrictions:</p>
+         <p>除普通的YAML规则（如文档用三个破折号开始（<codeph>---</codeph>））之外，<cmdname>gpfdist</cmdname>配置必须符合下列限制：</p>
          <ol id="ol_mct_m12_pbb">
-            <li id="du186770">A <codeph>VERSION</codeph> setting must be present with the value
-                  <codeph>1.0.0.1</codeph>.</li>
-            <li id="du186771">A <codeph>TRANSFORMATIONS</codeph> setting must be present and contain
-               one or more mappings.</li>
-            <li id="du186772">Each mapping in the <codeph>TRANSFORMATION</codeph> must contain:<ul
+             <li id="du186770"><codeph>VERSION</codeph>设置必须出现并且值为<codeph>1.0.0.1</codeph>。</li>
+            <li id="du186771"><codeph>TRANSFORMATIONS</codeph>设置必须出现并且包含一个或者更多个映射。</li>
+            <li id="du186772"><codeph>TRANSFORMATION</codeph>中的每一个映射必须包含：<ul
                   id="ul_ass_j31_34">
-                  <li id="du186773">a <codeph>TYPE</codeph> with the value 'input' or 'output'</li>
-                  <li id="du186774">a <codeph>COMMAND</codeph> indicating how the transformation is
-                     run.</li>
+                  <li id="du186773">一个值为'input'或者'output'的<codeph>TYPE</codeph></li>
+                  <li id="du186774">一个表明转换如何运行的<codeph>COMMAND</codeph>。</li>
                </ul>
             </li>
-            <li id="du186775">Each mapping in the <codeph>TRANSFORMATION</codeph> can contain
-               optional <codeph>CONTENT</codeph>, <codeph>SAFE</codeph>, and <codeph>STDERR</codeph>
-               settings.</li>
+            <li id="du186775"><codeph>TRANSFORMATION</codeph>中的每一个映射可以包含可选的<codeph>CONTENT</codeph>、<codeph>SAFE</codeph>以及<codeph>STDERR</codeph>设置。</li>
          </ol>
-         <p>The following <cmdname>gpfdist</cmdname> configuration, called
-               <codeph>config.yaml</codeph>, applies to the prices example. The initial indentation
-            on each line is significant and reflects the hierarchical nature of the specification.
-            The transformation name <codeph>prices_input</codeph> in the following example will be
-            referenced later when creating the table in SQL.</p>
+         <p>下面这个称为<codeph>config.yaml</codeph>的<cmdname>gpfdist</cmdname>配置适用于prices的例子。每一行开始的缩进是有意义的，它们反映了该说明的层级性。下面例子中的名称<codeph>prices_input</codeph>将在后面用SQL创建该表时引用。</p>
          <codeblock>---
 VERSION: 1.0.0.1
 TRANSFORMATIONS:
@@ -198,14 +141,8 @@ TRANSFORMATIONS:
     TYPE:     input
     COMMAND:  /bin/bash input_transform.sh %filename%
 </codeblock>
-         <p>The <codeph>COMMAND</codeph> setting uses a wrapper script called
-               <codeph>input_transform.sh</codeph> with a <codeph>%filename%</codeph> placeholder.
-            When <cmdname>gpfdist</cmdname> runs the <codeph>prices_input</codeph> transform, it
-            invokes <codeph>input_transform.sh</codeph> with <codeph>/bin/bash</codeph> and replaces
-            the <codeph>%filename%</codeph> placeholder with the path to the input file to
-            transform. The wrapper script called <codeph>input_transform.sh</codeph> contains the
-            logic to invoke the STX transformation and return the output.</p>
-         <p>If Joost is used, the Joost STX engine must be installed.</p>
+         <p><codeph>COMMAND</codeph>设置使用了一个名为<codeph>input_transform.sh</codeph>的包装器脚本，它带有一个<codeph>%filename%</codeph>占位符。当<cmdname>gpfdist</cmdname>运行该<codeph>prices_input</codeph>转换时，它用<codeph>/bin/bash</codeph>调用<codeph>input_transform.sh</codeph> ，并且将<codeph>%filename%</codeph>占位符替换为要转换的输入文件的路径。名为<codeph>input_transform.sh</codeph>的包装器脚本包含调用STX转换并返回其输出的逻辑。</p>
+         <p>如果使用了Joost，则必须安装Joost STX引擎。</p>
          <codeblock>#!/bin/bash
 # input_transform.sh - sample input transformation, 
 # demonstrating use of Java and Joost STX to convert XML into
@@ -224,66 +161,46 @@ java \
     input_transform.stx \
  | awk 'NF&gt;0
 </codeblock>
-         <p>The <codeph>input_transform.sh</codeph> file uses the Joost STX engine with the AWK
-            interpreter. The following diagram shows the process flow as <cmdname>gpfdist</cmdname>
-            runs the transformation.</p>
+         <p><codeph>input_transform.sh</codeph>文件使用带有AWK解释器的Joost STX引擎。下面的图表展示了<cmdname>gpfdist</cmdname>运行该转换的处理流程。</p>
          <image href="../../graphics/02-pipeline.png" placement="break" width="462px" height="190px"
             id="image_nct_m12_pbb"/>
       </body>
    </topic>
    <topic id="topic80">
-      <title>Transfer the Data</title>
+      <title>传输数据</title>
       <body>
-         <p>Create the target database tables with SQL statements based on the appropriate
-            schema.</p>
-         <p>There are no special requirements for Greenplum Database tables that hold loaded data.
-            In the prices example, the following command creates the <codeph>prices</codeph> table,
-            where the data is to be loaded.</p>
+         <p>使用基于相应模式的SQL语句创建目标数据库表。</p>
+         <p>对于保存已加载数据的Greenplum数据库表没有特殊要求。在<codeph>prices</codeph>示例中，以下命令创建要加载数据的<codeph>prices</codeph>表。</p>
          <codeblock>CREATE TABLE prices (
   itemnumber integer,       
   price       decimal        
 ) 
 DISTRIBUTED BY (itemnumber);
 </codeblock>
-         <p>Next, use one of the following approaches to transform the data with
-               <cmdname>gpfdist</cmdname>.</p>
+         <p>接下来，使用其中一种方法用<cmdname>gpfdist</cmdname>转换数据。</p>
          <ul id="ul_jfr_h32_pbb">
             <li id="du224442">
-               <codeph>gpload</codeph> supports only input transformations, but in many cases is
-               easier to implement. </li>
+               <codeph>GPLOAD</codeph>只支持输入转换，但是在很多情况下更容易实现。</li>
             <li id="du224443">
-               <codeph>gpfdist</codeph> with <codeph>INSERT INTO SELECT FROM</codeph> supports both
-               input and output transformations, but exposes details that <codeph>gpload</codeph>
-               automates for you.</li>
+               <codeph>INSERT INTO SELECT FROM</codeph>支持输入和输出转换，但是会暴露更多细节。</li>
          </ul>
       </body>
       <topic id="topic81">
-         <title>Transforming with gpload</title>
+         <title>用GPLOAD转换</title>
          <body>
-            <p>The Greenplum Database <codeph>gpload</codeph> utility orchestrates a data load
-               operation using the <codeph>gpfdist</codeph> parallel file server and a
-               YAML-formatted configuration file. <codeph>gpload</codeph> automates these tasks:</p>
+            <p>Greenplum数据库<codeph>gpload</codeph>工具使用<codeph>gpfdist</codeph>并行文件服务器和YAML格式的配置文件来编排数据加载操作。<codeph>gpload</codeph>自动执行以下任务：</p>
             <ul id="ul_rt1_jnk_pbb">
-               <li>Creates a readable external table in the database.</li>
-               <li>Starts <codeph>gpfdist</codeph> instances with the configuration file that
-                  contains the transformation. </li>
-               <li>Runs <codeph>INSERT INTO <varname>table_name</varname> SELECT FROM
-                        <varname>external_table</varname></codeph> to load the data.</li>
-               <li>Removes the external table definition.</li>
+               <li>在数据库中创建可读的外部表。</li>
+               <li>使用包含转换的配置文件启动<codeph>gpfdist</codeph>实例。</li>
+               <li>运行<codeph>INSERT INTO <varname>table_name</varname> SELECT FROM <varname>external_table</varname></codeph>以加载数据。</li>
+               <li>删除外部表定义。</li>
             </ul>
-            <p>Transforming data with <codeph>gpload</codeph> requires that the settings
-                  <codeph>TRANSFORM</codeph> and <codeph>TRANSFORM_CONFIG</codeph> appear in the
-                  <codeph>INPUT</codeph> section of the <codeph>gpload</codeph> control file.</p>
-            <p>For more information about the syntax and placement of these settings in the
-                  <codeph>gpload</codeph> control file, see the <i>Greenplum Database Reference
-                  Guide</i>.</p>
+            <p>Transforming data with 用<codeph>gpload</codeph> 转换数据要求出现在<codeph>gpload</codeph> 控制文件的INPUT节中的设置<codeph>TRANSFORM</codeph>和<codeph>TRANSFORM_CONFIG</codeph>。</p>
+            <p>有关在<codeph>gpload</codeph>控制文件中这些设置的语法和布置，请见<i>Greenplum数据库参考指南</i>。</p>
             <ul id="ul_sy3_l32_pbb">
                <li id="du187470">
-                  <codeph>TRANSFORM_CONFIG</codeph> specifies the name of the
-                     <cmdname>gpfdist</cmdname> configuration file.</li>
-               <li id="du200069">The <codeph>TRANSFORM</codeph> setting indicates the name of the
-                  transformation that is described in the file named in
-                     <codeph>TRANSFORM_CONFIG</codeph>.</li>
+                  <codeph>TRANSFORM_CONFIG</codeph>指定<cmdname>gpfdist</cmdname>配置文件的名称。</li>
+               <li id="du200069"><codeph>The TRANSFORM</codeph>设置表示<codeph>TRANSFORM_CONFIG</codeph>中提到的文件中描述的转换名称。</li>
             </ul>
             <codeblock>---
 VERSION: 1.0.0.1
@@ -295,53 +212,36 @@ GPLOAD:
     - TRANSFORM: prices_input
     - SOURCE:
         FILE: prices.xml</codeblock>
-            <p>The transformation name must appear in two places: in the <codeph>TRANSFORM</codeph>
-               setting of the <cmdname>gpfdist</cmdname> configuration file and in the
-                  <codeph>TRANSFORMATIONS</codeph> section of the file named in the
-                  <codeph>TRANSFORM_CONFIG</codeph> section.</p>
-            <p>In the <codeph>gpload</codeph> control file, the optional parameter
-                  <codeph>MAX_LINE_LENGTH</codeph> specifies the maximum length of a line in the XML
-               transformation data that is passed to <codeph>gpload</codeph>.</p>
-            <p>The following diagram shows the relationships between the <codeph>gpload</codeph>
-               control file, the <cmdname>gpfdist</cmdname> configuration file, and the XML data
-               file.</p>
+            <p>转换名称必须出现在两个位置：在<cmdname>gpfdist</cmdname>配置文件的<codeph>TRANSFORM</codeph>设置中以及在<codeph>TRANSFORM_CONFIG</codeph>节提到的文件的<codeph>TRANSFORMATIONS</codeph>节中。</p>
+            <p>在<codeph>gpload</codeph>控制文件中，可选的参数<codeph>MAX_LINE_LENGTH</codeph>指定被传递给<codeph>gpload</codeph>的XML转换数据中一行的最大长度。</p>
+            <p>下面的图表展示了<codeph>gpload</codeph>控制文件、<cmdname>gpfdist</cmdname>配置文件以及XML数据文件之间的关系。</p>
             <image href="../../graphics/03-gpload-files.jpg" placement="break" width="415px"
                height="258px" id="image_ty3_l32_pbb"/>
          </body>
       </topic>
       <topic id="topic82">
-         <title>Transforming with gpfdist and INSERT INTO SELECT FROM</title>
+         <title>用INSERT INTO SELECT FROM转换</title>
          <body>
-            <p>With this load method, you perform each of the tasks that <codeph>gpload</codeph>
-               automates. You start <codeph>gpfdist</codeph>, create an external table, load the
-               data, and clean up by dropping the table and stopping <codeph>gpfdist</codeph>.</p>
-            <p>Specify the transformation in the <codeph>CREATE EXTERNAL TABLE</codeph> definition's
-                  <codeph>LOCATION</codeph> clause. For example, the transform is shown in bold in
-               the following command. (Run <cmdname>gpfdist</cmdname> first, using the command
-                  <codeph>gpfdist -c config.yaml</codeph>).</p>
+            <p>使用此加载方法，用户可以执行<codeph>gpload</codeph>自动执行的每个任务。用户启动<codeph>gpfdist</codeph>，创建一个外部表，加载数据，然后通过删除表并停止<codeph>gpfdist</codeph>来清理。</p>
+            <p>在<codeph>CREATE EXTERNAL TABLE</codeph>定义的<codeph>LOCATION</codeph>子句中指定转换。例如，在下面的命令中转换被显示为粗体（使用命令<codeph>gpfdist -c config.yaml</codeph>先运行<cmdname>gpfdist</cmdname>）。</p>
             <codeblock>CREATE READABLE EXTERNAL TABLE prices_readable (LIKE prices)
    LOCATION ('gpfdist://hostname:8080/prices.xml<b>#transform=prices_input</b>')
    FORMAT 'TEXT' (DELIMITER '|')
    LOG ERRORS SEGMENT REJECT LIMIT 10;
 </codeblock>
-            <p>In the command above, change <codeph>hostname</codeph> to your hostname.
-                  <codeph>prices_input</codeph> comes from the <codeph>gpfdist</codeph>
-               configuration file.</p>
-            <p>The following query then loads the data into the <codeph>prices</codeph> table.</p>
+            <p>在上面的命令中，把<codeph>hostname</codeph>改成实际的主机名。<codeph>prices_input</codeph>来自于<codeph>gpfdist</codeph>配置文件。
+
+</p>
+            <p>下面的查询装载数据到<codeph>prices</codeph>表中。</p>
             <codeblock>INSERT INTO prices SELECT * FROM prices_readable;</codeblock>
          </body>
       </topic>
       <topic id="topic83">
-         <title>Configuration File Format</title>
+         <title>配置文件格式</title>
          <body>
-            <p>The <cmdname>gpfdist</cmdname> configuration file uses the YAML 1.1 document format
-               and implements a schema for defining the transformation parameters. The configuration
-               file must be a valid YAML document.</p>
-            <p>The <cmdname>gpfdist</cmdname> program processes the document in order and uses
-               indentation (spaces) to determine the document hierarchy and relationships of the
-               sections to one another. The use of white space is significant. Do not use white
-               space for formatting and do not use tabs.</p>
-            <p>The following is the basic structure of a configuration file.</p>
+            <p><cmdname>gpfdist</cmdname>配置文件使用YAML 1.1文档格式并且实现了一种定义转换参数的方案。配置文件必须是一个合法的YAML文档。</p>
+            <p><cmdname>gpfdist</cmdname>程序会按照顺序处理该文档并且使用缩进（空格）来判断文档的层次以及小节之间的关系。空白的使用很重要。不要使用空白来进行格式化也不要用制表符。</p>
+            <p>下面是一个配置文件的基本结构。</p>
             <codeblock>---
 VERSION:   1.0.0.1
 TRANSFORMATIONS: 
@@ -358,68 +258,42 @@ TRANSFORMATIONS:
             <parml>
                <plentry id="p_version">
                   <pt>VERSION</pt>
-                  <pd>Required. The version of the <cmdname>gpfdist</cmdname> configuration file
-                     schema. The current version is 1.0.0.1.</pd>
+                  <pd>必需。<cmdname>gpfdist</cmdname>配置文件方案的版本。当前版本是1.0.0.1。</pd>
                </plentry>
                <plentry id="p_transformations">
                   <pt>TRANSFORMATIONS</pt>
-                  <pd>Required. Begins the transformation specification section. A configuration
-                     file must have at least one transformation. When <cmdname>gpfdist</cmdname>
-                     receives a transformation request, it looks in this section for an entry with
-                     the matching transformation name. </pd>
+                  <pd>必需。开始转换说明小节。一个配置文件必须有至少一个转换。当<cmdname>gpfdist</cmdname>收到一个转换请求时，它会在这个小节查找具有匹配的转换名称的项。 </pd>
                </plentry>
                <plentry id="p_type">
                   <pt>TYPE</pt>
-                  <pd>Required. Specifies the direction of transformation. Values are
-                        <codeph>input</codeph> or <codeph>output</codeph>. <ul id="ul_f3p_j3q_34">
+                  <pd>必须。指定转换的方向。值是input或者output。值为
+                        <codeph>input</codeph> 或者 <codeph>output</codeph>. <ul id="ul_f3p_j3q_34">
                         <li id="du198814">
-                           <codeph>input</codeph>: <cmdname>gpfdist</cmdname> treats the standard
-                           output of the transformation process as a stream of records to load into
-                           Greenplum Database.</li>
+                           <codeph>input</codeph>：<cmdname>gpfdist</cmdname>把转换处理的标准输出当做是要载入到Greenplum数据库的一个记录流。</li>
                         <li id="du198815">
                            <codeph>output</codeph>
                            <ph>: </ph>
-                           <cmdname>gpfdist</cmdname> treats the standard input of the
-                           transformation process as a stream of records from Greenplum Database to
-                           transform and write to the appropriate output.</li>
+                           <cmdname>gpfdist</cmdname> 把转换处理的标准输入当作是来自于Greenplum数据库的一个记录流并且写出到适当的输出。</li>
                      </ul>
                   </pd>
                </plentry>
                <plentry id="p_command">
                   <pt>COMMAND</pt>
                   <pd>
-                     <p>Required. Specifies the command <cmdname>gpfdist</cmdname> will execute to
-                        perform the transformation. </p>
-                     <p>For input transformations, <cmdname>gpfdist</cmdname> invokes the command
-                        specified in the <codeph>CONTENT</codeph> setting. The command is expected
-                        to open the underlying file(s) as appropriate and produce one line of
-                           <codeph>TEXT</codeph> for each row to load into Greenplum Database. The
-                        input transform determines whether the entire content should be converted to
-                        one row or to multiple rows.</p>
-                     <p>For output transformations, <cmdname>gpfdist</cmdname> invokes this command
-                        as specified in the <codeph>CONTENT</codeph> setting. The output command is
-                        expected to open and write to the underlying file(s) as appropriate. The
-                        output transformation determines the final placement of the converted
-                        output.</p>
+                     <p>必须。指定将被<cmdname>gpfdist</cmdname>执行来做转换的命令。</p>
+                     <p>对于输入转换，<cmdname>gpfdist</cmdname>调用<codeph>CONTENT</codeph>设置中指定的命令。该命令应该会以适当的方式打开底层文件并且为每一行产生一个<codeph>TEXT</codeph>行以载入到Greenplum数据库。输入转换决定整个内容是应该被转换为一个行还是多个行。</p>
+                     <p>对于输出转换，<cmdname>gpfdist</cmdname>调用在<codeph>CONTENT</codeph>设置中指定的命令。输出命令应该会以适当的方式打开底层文件并且向其中写入。输出转换决定转换好的输出的最终安置。</p>
                   </pd>
                </plentry>
                <plentry id="p_content">
                   <pt>CONTENT</pt>
                   <pd>
-                     <p>Optional. The values are <codeph>data</codeph> and <codeph>paths</codeph>.
-                        The default value is <codeph>data</codeph>.</p>
+                     <p>可选。值是<codeph>data</codeph> 和 <codeph>paths</codeph>。默认值是<codeph>data</codeph>。</p>
                      <ul id="ul_wzg_43q_34">
-                        <li id="du219653">When <codeph>CONTENT</codeph> specifies
-                              <codeph>data</codeph>, the text <codeph>%filename%</codeph> in the
-                              <codeph>COMMAND</codeph> section is replaced by the path to the file
-                           to read or write. </li>
-                        <li id="du199214">When <codeph>CONTENT</codeph> specifies
-                              <codeph>paths</codeph>, the text <codeph>%filename%</codeph> in the
-                              <codeph>COMMAND</codeph> section is replaced by the path to the
-                           temporary file that contains the list of files to read or write. </li>
+                        <li id="du219653">当<codeph>CONTENT</codeph>指定<codeph>data</codeph>时，<codeph>COMMAND</codeph>小节中的文本<codeph>%filename%</codeph>会被替换为要读写的文件路径。</li>
+                        <li id="du199214">当<codeph>CONTENT</codeph>指定<codeph>paths</codeph>时，<codeph>COMMAND</codeph>小节中的文本<codeph>%filename%</codeph>会被替换为包含要读写的文件列表的临时文件路径。</li>
                      </ul>
-                     <p>The following is an example of a <codeph>COMMAND</codeph> section showing
-                        the text <codeph>%filename%</codeph> that is replaced.</p>
+                     <p>下面是一个<codeph>COMMAND</codeph>小节的例子，它展示了被替换掉的文本<codeph>%filename%</codeph>。</p>
                      <p>
                         <codeblock>COMMAND: /bin/bash input_transform.sh %filename%</codeblock>
                      </p>
@@ -428,25 +302,17 @@ TRANSFORMATIONS:
                <plentry id="p_safe">
                   <pt>SAFE</pt>
                   <pd>
-                     <p>Optional. A <codeph>POSIX</codeph> regular expression that the paths must
-                        match to be passed to the transformation. Specify <codeph>SAFE</codeph> when
-                        there is a concern about injection or improper interpretation of paths
-                        passed to the command. The default is no restriction on paths.</p>
+                     <p>可选。一个<codeph>POSIX</codeph> 正则表达式，路径必须匹配它才能被传递给转换。在担心传递给命令的路径被注入或者被不正确解读时指定<codeph>SAFE</codeph>。默认对路径没有限制。</p>
                   </pd>
                </plentry>
                <plentry id="p_stderr">
                   <pt>STDERR</pt>
                   <pd>
-                     <p>Optional. The values are <codeph>server</codeph> and
-                           <codeph>console</codeph>.</p>
-                     <p>This setting specifies how to handle standard error output from the
-                        transformation. The default, <codeph>server</codeph>, specifies that
-                           <cmdname>gpfdist</cmdname> will capture the standard error output from
-                        the transformation in a temporary file and send the first 8k of that file to
-                        Greenplum Database as an error message. The error message will appear as an
-                        SQL error. <codeph>Console</codeph> specifies that
-                           <cmdname>gpfdist</cmdname> does not redirect or transmit the standard
-                        error output from the transformation. </p>
+                     <p>可选。值是<codeph>server</codeph> 和
+                           <codeph>console</codeph>。
+
+</p>
+                     <p>这个设置指定如何处理来自于转换的标准错误输出。默认值<codeph>server</codeph>，指定 <cmdname>gpfdist</cmdname>将捕捉来自于转换的标准错误输出放在一个临时文件中，并且把该文件的前8k字节发送到Greenplum数据库作为一个错误消息。该错误消息将作为一个SQL错误出现。<codeph>Console</codeph>指定<cmdname>gpfdist</cmdname>不会重定向或者转换来自于转换的标准错误输出。</p>
                   </pd>
                </plentry>
             </parml>
@@ -454,47 +320,26 @@ TRANSFORMATIONS:
       </topic>
    </topic>
    <topic id="topic91">
-      <title>XML Transformation Examples</title>
-      <body>
-         <p>The following examples demonstrate the complete process for different types of XML data
-            and STX transformations. Files and detailed instructions associated with these examples
-            are in the GitHub repo <codeph>github.com://greenplum-db/gpdb</codeph> in the
-                  <codeph><xref
+      <title>XML转换示例</title>
+      <body><p>下面的例子展示了对不同类型的XML数据以及STX转换的完整处理。与这些例子相关的文件和详细用法在GitHub仓库<codeph>github.com://greenplum-db/gpdb</codeph> <xref
                   href="https://github.com/greenplum-db/gpdb/blob/master/gpMgmt/demo/gpfdist_transform"
-                  format="html" scope="external">gpMgmt/demo/gpfdist_transform</xref></codeph>
-            directory. Read the README file in the <i>Before You Begin</i> section before you run
-            the examples. The README file explains how to download the example data file used in the
-            examples.</p>
+                  format="html" scope="external">gpMgmt/demo/gpfdist_transform</xref>目录中。在运行这些例子之前，请阅读<i>开始之前</i>小节中的README文件。README文件解释了如何下载这些例子中用到的示例数据文件。</p>
       </body>
       <topic id="topic32">
-         <title>Command-based External Web Tables</title>
+         <title>基于命令的外部Web表</title>
          <body>
-            <p>The output of a shell command or script defines command-based web table data. Specify
-               the command in the <codeph>EXECUTE</codeph> clause of <codeph>CREATE EXTERNAL WEB
-                  TABLE</codeph>. The data is current as of the time the command runs. The
-                  <codeph>EXECUTE</codeph> clause runs the shell command or script on the specified
-               master, and/or segment host or hosts. The command or script must reside on the hosts
-               corresponding to the host(s) defined in the <codeph>EXECUTE</codeph> clause.</p>
-            <p>By default, the command is run on segment hosts when active segments have output rows
-               to process. For example, if each segment host runs four primary segment instances
-               that have output rows to process, the command runs four times per segment host. You
-               can optionally limit the number of segment instances that execute the web table
-               command. All segments included in the web table definition in the <codeph>ON</codeph>
-               clause run the command in parallel.</p>
-            <p>The command that you specify in the external table definition executes from the
-               database and cannot access environment variables from <codeph>.bashrc</codeph> or
-                  <codeph>.profile</codeph>. Set environment variables in the
-                  <codeph>EXECUTE</codeph> clause. For example:</p>
+            <p>一个shell命令或者脚本的输出可定义基于命令的Web表数据。在<codeph>CREATE EXTERNAL WEB TABLE</codeph>的<codeph>EXECUTE</codeph>子句中指定该命令。<codeph>EXECUTE</codeph>子句会在指定的Master以及（一个或者多个）Segment主机上运行该shell命令或脚本。该命令或脚本必须位于<codeph>EXECUTE</codeph>子句中定义的主机上。</p>
+            <p>默认情况下，当活动Segment有输出行要处理时，该命令运行在Segment主机上。例如，如果每一个Segment主机运行四个有输出行要处理的主Segment实例，该命令在每个Segment主机上会运行四次。用户可以有选择地限制执行Web表命令的Segment实例的数量。<codeph>ON</codeph>子句中Web表定义里包括的所有Segment会并行运行该命令。</p>
+            <p>用户在外部表定义中指定的命令从数据库中执行并且不能访问来自<codeph>.bashrc</codeph> 或者
+                  <codeph>.profile</codeph>的环境变量。可在<codeph>EXECUTE</codeph>子句中设置环境变量。例如：</p>
             <p>
                <codeblock>=# CREATE EXTERNAL WEB TABLE output (output text)
     EXECUTE 'PATH=/home/gpadmin/programs; export PATH; myprogram.sh' 
     FORMAT 'TEXT';
 </codeblock>
             </p>
-            <p>Scripts must be executable by the <codeph>gpadmin</codeph> user and reside in the
-               same location on the master or segment hosts.</p>
-            <p>The following command defines a web table that runs a script. The script runs on each
-               segment host where a segment has output rows to process. </p>
+            <p>脚本必须对<codeph>gpadmin</codeph>用户可执行并且在Master或者Segment主机上位于同一位置。</p>
+            <p>下列命令定义一个运行脚本的Web表。该脚本在每一台有需要处理输出行的Segment的Segment主机上运行。 </p>
             <p>
                <codeblock>=# CREATE EXTERNAL WEB TABLE log_output 
     (linenum int, message text) 
@@ -505,30 +350,20 @@ TRANSFORMATIONS:
          </body>
       </topic>
       <topic id="topic93">
-         <title>IRS MeF XML Files (In demo Directory)</title>
+         <title>IRS MeF XML 文件（在demo目录中）</title>
          <body>
-            <p>This example demonstrates loading a sample IRS Modernized eFile tax return using a
-               Joost STX transformation. The data is in the form of a complex XML file.</p>
-            <p>The U.S. Internal Revenue Service (IRS) made a significant commitment to XML and
-               specifies its use in its Modernized e-File (MeF) system. In MeF, each tax return is
-               an XML document with a deep hierarchical structure that closely reflects the
-               particular form of the underlying tax code. </p>
-            <p>XML, XML Schema and stylesheets play a role in their data representation and business
-               workflow. The actual XML data is extracted from a ZIP file attached to a MIME
-               "transmission file" message. For more information about MeF, see <xref
-                  href="https://www.irs.gov/uac/modernized-e-file-overview" scope="external"
-                  format="html">Modernized e-File (Overview)</xref> on the IRS web site.</p>
-            <p>The sample XML document, <i>RET990EZ_2006.xml</i>, is about 350KB in size with two
-               elements:</p>
+            <p>这个例子展示了使用一种Joost STX转换装载一份IRS Modernized eFile tax return数据样例。该数据是一种复杂的XML文件形式。</p>
+            <p>美国国内税务署（IRS）在对XML进行了可观的投资并且指定在其现代化电子文件（MeF）系统中使用它。在MeF中，每一份纳税申报表都是一个具有深层次结构的XML文档，该层次结构仔细地反映了底层纳税代码的特定形式。</p>
+            <p>XML、XML Schema和样式表在他们的数据表达和业务工作流中扮演了重要角色。实际的XML数据被从一个附加了MIME “transimission file”消息的ZIP文件中抽取。更多有关MeF的信息，请见IRS网站上的<xref href="https://www.irs.gov/uac/modernized-e-file-overview" scope="external" format="html">Modernized e-File (Overview)</xref>。</p>
+            <p>样例XML文档<i>RET990EZ_2006.xml</i>大约有350KB大小，它有两个元素：</p>
             <ul id="ul_egs_y42_pbb">
                <li id="du202262">ReturnHeader</li>
                <li id="du202263">ReturnData</li>
             </ul>
-            <p>The &lt;ReturnHeader&gt; element contains general details about the tax return such
-               as the taxpayer's name, the tax year of the return, and the preparer. The
-               &lt;ReturnData&gt; element contains multiple sections with specific details about the
-               tax return and associated schedules. </p>
-            <p>The following is an abridged sample of the XML file.</p>
+            <p>&lt;ReturnHeader&gt; 元素包含了有关纳税申报表的一般细节，例如纳税人的姓名、纳税年份以及preparer。&lt;ReturnData&gt; 元素包含了多个小节，它们含有关于纳税申报表及相关计划表的特定细节。
+
+</p>
+            <p>下面是该XML文件的一个被删节过的例子。</p>
             <codeblock>&lt;?xml version="1.0" encoding="UTF-8"?&gt; 
 &lt;Return returnVersion="2006v2.0"
    xmlns="https://www.irs.gov/efile" 
@@ -553,33 +388,21 @@ TRANSFORMATIONS:
    &lt;/ReturnHeader&gt;
    ... more data ..
 </codeblock>
-            <p>The goal is to import all the data into a Greenplum database. First, convert the XML
-               document into text with newlines "escaped", with two columns:
-                  <codeph>ReturnId</codeph> and a single column on the end for the entire MeF tax
-               return. For example:</p>
+            <p>目标是把所有数据导入到一个Greenplum数据库。首先，将该XML文档转换为文本形式，其中的新行已被转义过并且有两个列： <codeph>ReturnId</codeph>和末尾的一个用于整个MeF纳税申报表的列。例如：</p>
             <p>
                <codeblock>AAAAAAAAAAAAAAAAAAAA|&lt;Return returnVersion="2006v2.0"... 
 </codeblock>
             </p>
-            <p>Load the data into Greenplum Database.</p>
+            <p>载入数据到Greenplum数据库。</p>
          </body>
       </topic>
       <topic id="topic94">
-         <title>WITSML™ Files (In demo Directory)</title>
+         <title> WITSML™ 文件 （在demo目录中）</title>
          <body>
-            <p>This example demonstrates loading sample data describing an oil rig using a Joost STX
-               transformation. The data is in the form of a complex XML file downloaded from
-               energistics.org.</p>
-            <p>The Wellsite Information Transfer Standard Markup Language (WITSML™) is an oil
-               industry initiative to provide open, non-proprietary, standard interfaces for
-               technology and software to share information among oil companies, service companies,
-               drilling contractors, application vendors, and regulatory agencies. For more
-               information about WITSML™, see <xref href="http://www.energistics.org/"
-                  scope="external" format="html">http://www.energistics.org/</xref>.</p>
-            <p>The oil rig information consists of a top level <codeph>&lt;rigs&gt;</codeph> element
-               with multiple child elements such as <codeph>&lt;documentInfo&gt;,
-                  &lt;rig&gt;</codeph>, and so on. The following excerpt from the file shows the
-               type of information in the <codeph>&lt;rig&gt;</codeph> tag.</p>
+            <p>这个例子展示了使用一种Joost STX转换载入描述一个石油钻塔的样例数据。该数据是一种从energistics.org下载的复杂的XML文件格式。</p>
+            <p>Wellsite Information Transfer Standard Markup Language (WITSML™)是一种石油工业发起的为技术和软件提供开放的、非所有权的、标准的接口，以便在石油公司、服务公司、钻探承包商和监管代理之间分享信息。更多有关WITSML™的信息请见<xref href="http://www.energistics.org/"
+                  scope="external" format="html">http://www.energistics.org/</xref>。</p>
+            <p>石油钻塔的信息由一个顶层的<codeph>&lt;rigs&gt;</codeph>元素和多个子元素（例如<codeph>&lt;documentInfo&gt;, &lt;rig&gt;</codeph>,等）构成。下面从该文件中摘录的片段展示了<codeph>&lt;rig&gt;</codeph>标签中的信息的类型。</p>
             <codeblock>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;?xml-stylesheet href="../stylesheets/rig.xsl" type="text/xsl" media="screen"?&gt;
 &lt;rigs 
@@ -601,15 +424,13 @@ TRANSFORMATIONS:
      &lt;classRig&gt;ABS Class A1 M CSDU AMS ACCU&lt;/classRig&gt;
      &lt;approvals&gt;DNV&lt;/approvals&gt;
  ... more data ...</codeblock>
-            <p>The goal is to import the information for this rig into Greenplum Database. </p>
-            <p>The sample document, <i>rig.xml</i>, is about 11KB in size. The input does not
-               contain tabs so the relevant information can be converted into records delimited with
-               a pipe (|).</p>
+            <p>目标是把这个钻塔的信息导入到Greenplum数据库。</p>
+            <p>样例文档<i>rig.xml</i>的尺寸大约是11KB。输入不包含制表符，因此相关信息可以被转换成用竖线（|）分隔的记录。</p>
             <p>
                <codeph>W-12|6507/7-A-42|xr31|Deep Drill #5|Deep Drilling Co.|John
                   Doe|John.Doe@example.com|</codeph>
             </p>
-            <p>With the columns:</p>
+            <p>有这些列：</p>
             <ul id="ul_ids_bp2_pbb">
                <li>
                   <codeph>well_uid text</codeph>, -- e.g. W-12 </li>
@@ -629,7 +450,7 @@ TRANSFORMATIONS:
                   <codeph>doc xml</codeph>
                </li>
             </ul>
-            <p>Then, load the data into Greenplum Database.</p>
+            <p>然后，载入该数据到Greenplum数据库中。</p>
          </body>
       </topic>
    </topic>

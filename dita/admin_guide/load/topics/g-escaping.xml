@@ -2,17 +2,13 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic99">
-   <title>Escaping</title>
+   <title>转义</title>
    <body>
-      <p>There are two reserved characters that have special meaning to Greenplum Database:</p>
+      <p>有两种保留字符对于Greenplum数据库具有特殊含义：</p>
       <ul>
-         <li id="du174909">The designated delimiter character separates columns or fields in the
-            data file. </li>
-         <li id="du174910">The newline character designates a new row in the data file.</li>
+         <li id="du174909">指派的用来在数据文件中分隔列或者域的分隔字符。 </li>
+         <li id="du174910">在数据文件中指定一个新行的新行字符。</li>
       </ul>
-      <p>If your data contains either of these characters, you must escape the character so that
-            Greenplum treats it as data and not as a field separator or
-         new row. By default, the escape character is a \ (backslash) for text-formatted files and a
-         double quote (") for csv-formatted files.</p>
+      <p>如果用户的数据包含这些字符，用户必须转义它们这样Greenplum才会把它们当作数据来对待而不是一个域定界符或者新行。默认情况下，文本格式文件的转义字符是一个\（反斜线）而CSV格式文件的转义字符是一个双引号（"）。</p>
    </body>
 </topic>

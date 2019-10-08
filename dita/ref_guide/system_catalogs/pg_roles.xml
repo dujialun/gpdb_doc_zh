@@ -4,10 +4,10 @@
 <topic id="topic1" xml:lang="en">
   <title id="hn141670">pg_roles</title>
   <body>
-    <p>The view <codeph>pg_roles</codeph> provides access to information about database roles. This
-      is simply a publicly readable view of <xref href="pg_authid.xml#topic1">pg_authid</xref> that
-      blanks out the password field. This view explicitly exposes the OID column of the underlying
-      table, since that is needed to do joins to other catalogs.</p>
+    <p><codeph>pg_roles</codeph>视图提供关提供了关于数据库角色的信息。
+      这是<xref href="pg_authid.xml#topic1">pg_authid</xref>的一个公共可读视图，它隐去了口令域。
+      此视图显示了低层表的OID列，因为需要它来和其他目录做连接。
+      </p>
     <table id="hn141982">
       <title>pg_catalog.pg_roles</title>
       <tgroup cols="4">
@@ -17,10 +17,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -30,7 +30,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role name</entry>
+            <entry colname="col4">角色名</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -38,7 +38,7 @@
             </entry>
             <entry colname="col2">bool </entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role has superuser privileges</entry>
+            <entry colname="col4">角色是否具有超级用户权限</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -46,8 +46,7 @@
             </entry>
             <entry colname="col2">bool</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role automatically inherits privileges of roles it is a member
-              of</entry>
+            <entry colname="col4">如果此角色是另一个角色的成员，角色是否能自动继承另一个角色的权限</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -55,7 +54,7 @@
             </entry>
             <entry colname="col2">bool </entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may create more roles</entry>
+            <entry colname="col4">角色能否创建更多角色</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -63,7 +62,7 @@
             </entry>
             <entry colname="col2">bool </entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may create databases</entry>
+            <entry colname="col4">角色能否创建数据库</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -71,8 +70,7 @@
             </entry>
             <entry colname="col2">bool</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may update system catalogs directly. (Even a superuser may
-              not do this unless this column is true.)</entry>
+            <entry colname="col4">角色能够更新直接更新系统目录（除非该列设置为真，否则超级用户也不能执行该操作）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -80,8 +78,7 @@
             </entry>
             <entry colname="col2">bool</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may log in. That is, this role can be given as the initial
-              session authorization identifier</entry>
+            <entry colname="col4">角色是否能登录？即此角色能否被作为初始会话授权标识符</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -89,8 +86,7 @@
             </entry>
             <entry colname="col2">int4</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For roles that can log in, this sets maximum number of concurrent
-              connections this role can make. -1 means no limit </entry>
+            <entry colname="col4">对于一个可登录的角色，这里设置角色可以发起的最大并发连接数。-1表示无限制。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -98,7 +94,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Not the password (always reads as ********)</entry>
+            <entry colname="col4">不是口令（看起来是********）</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -106,8 +102,7 @@
             </entry>
             <entry colname="col2">timestamptz</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Password expiry time (only used for password authentication); NULL
-              if no expiration</entry>
+            <entry colname="col4">口令失效时间（只用于口令认证），如果永不失效则为NULL</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -115,7 +110,7 @@
             </entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role-specific defaults for run-time configuration variables</entry>
+            <entry colname="col4">运行时配置变量的角色特定默认值</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -123,7 +118,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_resqueue.oid</entry>
-            <entry colname="col4">Object ID of the resource queue this role is assigned to.</entry>
+            <entry colname="col4">该角色指定的资源队列的对象ID</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -131,7 +126,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4"> Object ID of role</entry>
+            <entry colname="col4">角色的ID</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -139,8 +134,7 @@
             </entry>
             <entry colname="col2">bool</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may create readable external tables that use the gpfdist
-              protocol.</entry>
+            <entry colname="col4">角色能够创建使用gpfdist协议的可读的外部表</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -148,8 +142,7 @@
             </entry>
             <entry colname="col2">bool</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may create readable external tables that use the http
-              protocol.</entry>
+            <entry colname="col4">角色能够创建使用http协议的可读的外部表</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -157,8 +150,7 @@
             </entry>
             <entry colname="col2">bool</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Role may create writable external tables that use the gpfdist
-              protocol.</entry>
+            <entry colname="col4">角色能否创建使用了gpfdist协议的可写外部表</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -166,7 +158,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_resgroup.oid</entry>
-            <entry colname="col4">Object ID of the resource group to which this role is assigned.</entry>
+            <entry colname="col4">分配了此角色的资源组的对象ID</entry>
           </row>
         </tbody>
       </tgroup>

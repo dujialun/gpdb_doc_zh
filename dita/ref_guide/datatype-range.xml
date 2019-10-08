@@ -3,244 +3,201 @@
 <!DOCTYPE dita
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "../../../../dtd/ditabase.dtd">
 <dita>
-   <topic xml:lang="en-us" id="rangetypes">
-      <title>Range Types</title>
+   <topic xml:lang="zh-cn" id="rangetypes">
+      <title>范围类型</title>
       <body>
-         <p> Range types are data types representing a range of values of some element type (called
-            the range's <term>subtype</term>). For instance, ranges of <codeph>timestamp</codeph>
-            might be used to represent the ranges of time that a meeting room is reserved. In this
-            case the data type is <codeph>tsrange</codeph> (short for <q>timestamp range</q>), and
-               <codeph>timestamp</codeph> is the subtype. The subtype must have a total order so
-            that it is well-defined whether element values are within, before, or after a range of
-            values. </p>
-         <p> Range types are useful because they represent many element values in a single range
-            value, and because concepts such as overlapping ranges can be expressed clearly. The use
-            of time and date ranges for scheduling purposes is the clearest example; but price
-            ranges, measurement ranges from an instrument, and so forth can also be useful. </p>
+         <p> 范围类型是一种数据类型，它代表一种元素类型 (即范围类型的 <term>子类型</term> ) 的一个范围.
+         举例说, <codeph>timestamp</codeph> 的范围类型可以用来表示一个会议室预定的时间范围.
+         在这个例子中，数据类型是 <codeph>tsrange</codeph> ( <q>timestamp range</q> 的缩写), 这里
+               <codeph>timestamp</codeph> 是子数据类型. 子数据类型必须有一个整体顺序，因此很好确定一个元素值是否在范围值域内，范围值域前，还是范围值域后面. </p>
+         <p> 范围类型表示单个范围内的许多元素，所以非常有用, 因为一些概念，像重叠范围，能够用范围类型清晰表达. 为调度目的使用时间和日期是一个更清楚的例子; 对于价格范围,
+         仪器的测量范围, 等等, 也很有用. </p>
       </body>
-      <topic xml:lang="en-us" id="rangetypes-builtin">
-         <title>Built-in Range Types</title>
+      <topic xml:lang="zh-cn" id="rangetypes-builtin">
+         <title>内置范围类型</title>
          <body>
-            <p> Greenplum Database comes with the following built-in range types: <ul>
+            <p> Greenplum 数据库带有以下内置范围类型: <ul>
                   <li>
                      <p>
-                        <codeph>int4range</codeph> -- Range of <codeph>integer</codeph>
+                        <codeph>int4range</codeph> -- <codeph>integer</codeph> 范围
                      </p>
                   </li>
                   <li>
                      <p>
-                        <codeph>int8range</codeph> -- Range of <codeph>bigint</codeph>
+                        <codeph>int8range</codeph> -- <codeph>bigint</codeph> 范围
                      </p>
                   </li>
                   <li>
                      <p>
-                        <codeph>numrange</codeph> -- Range of <codeph>numeric</codeph>
+                        <codeph>numrange</codeph> -- <codeph>numeric</codeph> 范围
                      </p>
                   </li>
                   <li>
                      <p>
-                        <codeph>tsrange</codeph> -- Range of <codeph>timestamp without time
-                           zone</codeph>
+                        <codeph>tsrange</codeph> -- <codeph>timestamp without time
+                           zone</codeph> 范围
                      </p>
                   </li>
                   <li>
                      <p>
-                        <codeph>tstzrange</codeph> -- Range of <codeph>timestamp with time
-                           zone</codeph>
+                        <codeph>tstzrange</codeph> -- <codeph>timestamp with time
+                           zone</codeph> 范围
                      </p>
                   </li>
                   <li>
                      <p>
-                        <codeph>daterange</codeph> -- Range of <codeph>date</codeph>
+                        <codeph>daterange</codeph> -- <codeph>date</codeph> 范围
                      </p>
                   </li>
-               </ul> In addition, you can define your own range types; see <xref
-                  href="sql_commands/CREATE_TYPE.xml#topic1"/> for more information. </p>
+               </ul> 除此之外, 你也可以定义你自己的范围类型; 参见 <xref
+                  href="sql_commands/CREATE_TYPE.xml#topic1"/> 了解更多信息. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-examples">
-         <title>Examples</title>
+      <topic xml:lang="zh-cn" id="rangetypes-examples">
+         <title>举例</title>
          <body>
-            <p><codeblock>
+            <p> <codeblock>
 CREATE TABLE reservation (room int, during tsrange);
 INSERT INTO reservation VALUES
     (1108, '[2010-01-01 14:30, 2010-01-01 15:30)');
 
--- Containment
+-- 包含
 SELECT int4range(10, 20) @&gt; 3;
 
--- Overlaps
+-- 重叠
 SELECT numrange(11.1, 22.2) &amp;&amp; numrange(20.0, 30.0);
 
--- Extract the upper bound
+-- 提取上边界
 SELECT upper(int8range(15, 25));
 
--- Compute the intersection
+-- 计算交集
 SELECT int4range(10, 20) * int4range(15, 25);
 
--- Is the range empty?
+-- 是否为空?
 SELECT isempty(numrange(1, 5));
 </codeblock>
-               See <xref href="function-summary.xml#functions-range"/> for complete lists of
-               operators and functions on range types. </p>
+               参见 <xref href="function-summary.xml#functions-range"/> 查看范围类型的操作符和函数完整列表. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-inclusivity">
-         <title>Inclusive and Exclusive Bounds</title>
+      <topic xml:lang="zh-cn" id="rangetypes-inclusivity">
+         <title>包含边界与非包含边界</title>
          <body>
-            <p> Every non-empty range has two bounds, the lower bound and the upper bound. All
-               points between these values are included in the range. An inclusive bound means that
-               the boundary point itself is included in the range as well, while an exclusive bound
-               means that the boundary point is not included in the range. </p>
-            <p> In the text form of a range, an inclusive lower bound is represented by
-                  <codeph>[</codeph> while an exclusive lower bound is represented by
-                  <codeph>(</codeph> . Likewise, an inclusive upper bound is represented by
-                  <codeph>]</codeph> , while an exclusive upper bound is represented by
-                  <codeph>)</codeph> . (See <xref href="function-summary.xml#functions-range"/> for
-               more details.) </p>
-            <p> The functions <codeph>lower_inc</codeph> and <codeph>upper_inc</codeph> test the
-               inclusivity of the lower and upper bounds of a range value, respectively. </p>
+            <p> 每一个非空范围有两个边界, 下边界和上边界. 所有在这两个边界之间的点都包含在范围内. 包含边界意味着边界点本身也包括在范围内, 而非包含边界意思是边界点不包括在范围内. </p>
+            <p> 对于一个范围的文本格式, 包含下边界用
+                  <codeph>[</codeph> 表示, 而非包含下边界用
+                  <codeph>(</codeph> 表示. 同样, 包含上边界用
+                  <codeph>]</codeph> 表示, 而非包含上边界用
+                  <codeph>)</codeph> 表示. (参见 <xref href="function-summary.xml#functions-range"/> 了解更多信息.) </p>
+            <p> 函数 <codeph>upper_inc</codeph> 和 <codeph>lower_inc</codeph> 分别用来测试一个范围值的上下边界包含关系. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-infinite">
-         <title>Infinite (Unbounded) Ranges</title>
+      <topic xml:lang="zh-cn" id="rangetypes-infinite">
+         <title>无限 (无边界) 范围</title>
          <body>
-            <p> The lower bound of a range can be omitted, meaning that all points less than the
-               upper bound are included in the range. Likewise, if the upper bound of the range is
-               omitted, then all points greater than the lower bound are included in the range. If
-               both lower and upper bounds are omitted, all values of the element type are
-               considered to be in the range. </p>
-            <p> This is equivalent to considering that the lower bound is <q>minus infinity</q>, or
-               the upper bound is <q>plus infinity</q>, respectively. But note that these infinite
-               values are never values of the range's element type, and can never be part of the
-               range. (So there is no such thing as an inclusive infinite bound -- if you try to
-               write one, it will automatically be converted to an exclusive bound.) </p>
-            <p> Also, some element types have a notion of <q>infinity</q>, but that is just another
-               value so far as the range type mechanisms are concerned. For example, in timestamp
-               ranges, <codeph>[today,]</codeph> means the same thing as <codeph>[today,)</codeph>.
-               But <codeph>[today,infinity]</codeph> means something different from
-                  <codeph>[today,infinity)</codeph> -- the latter excludes the special
-                  <codeph>timestamp</codeph> value <codeph>infinity</codeph>. </p>
-            <p> The functions <codeph>lower_inf</codeph> and <codeph>upper_inf</codeph> test for
-               infinite lower and upper bounds of a range, respectively. </p>
+            <p> 范围的下边界可以忽略, 意味着所有小于上边界的点都包含在范围内. 
+			同样地, 如果范围的上边界被忽略, 那么所有大于下边界的点都包含在范围内.
+			如果上下边界都忽略了, 那么这个元素类型的所有值都被认为包含在范围内. </p>
+            <p> 可以等价地分别认为, 这个时候下边界是 <q>负无穷</q>, 或者上边界是
+			<q>正无穷</q>. 但是请注意, 这些无穷值不是一个范围的元素类型的值, 也不是范围的一部分. 
+			(所有无穷边界不存在包含问题 -- 如果你这样写的话, 会自动转换为非包含边界.) </p>
+            <p> 有些元素类型也有 <q>infinity</q> 的表示, 但那仅仅是一个值, 与范围边界无关. 举例说, 在时间戳范围中, <codeph>[today,]</codeph> 
+			与 <codeph>[today,)</codeph> 含义相同.
+               但是 <codeph>[today,infinity]</codeph> 与
+                  <codeph>[today,infinity)</codeph> 含义就不同了 -- 后者排除了特殊的
+                  <codeph>时间戳</codeph> 值 <codeph>infinity</codeph>. </p>
+            <p> 函数 <codeph>lower_inf</codeph> 和 <codeph>upper_inf</codeph> 可以分别检测一个范围的无限上边界和下边界. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-io">
-         <title>Range Input/Output</title>
+      <topic xml:lang="zh-cn" id="rangetypes-io">
+         <title>范围类型输入/输出</title>
          <body>
-            <p> The input for a range value must follow one of the following patterns:
+            <p> 范围类型的输入必须遵循下面的模式:
                <codeblock>
-(<varname>lower-bound</varname>,<varname>upper-bound</varname>)
-(<varname>lower-bound</varname>,<varname>upper-bound</varname>]
-[<varname>lower-bound</varname>,<varname>upper-bound</varname>)
-[<varname>lower-bound</varname>,<varname>upper-bound</varname>]
+( <varname>lower-bound</varname>, <varname>upper-bound</varname> )
+( <varname>lower-bound</varname>, <varname>upper-bound</varname> ]
+[ <varname>lower-bound</varname>, <varname>upper-bound</varname> )
+[ <varname>lower-bound</varname>, <varname>upper-bound</varname> ]
 empty
 </codeblock>
-               The parentheses or brackets indicate whether the lower and upper bounds are exclusive
-               or inclusive, as described previously. Notice that the final pattern is
-                  <codeph>empty</codeph>, which represents an empty range (a range that contains no
-               points). </p>
-            <p> The <varname>lower-bound</varname> may be either a string that is valid input for
-               the subtype, or empty to indicate no lower bound. Likewise,
-                  <varname>upper-bound</varname> may be either a string that is valid input for the
-               subtype, or empty to indicate no upper bound. </p>
-            <p> Each bound value can be quoted using <codeph>"</codeph> (double quote) characters.
-               This is necessary if the bound value contains parentheses, brackets, commas, double
-               quotes, or backslashes, since these characters would otherwise be taken as part of
-               the range syntax. To put a double quote or backslash in a quoted bound value, precede
-               it with a backslash. (Also, a pair of double quotes within a double-quoted bound
-               value is taken to represent a double quote character, analogously to the rules for
-               single quotes in SQL literal strings.) Alternatively, you can avoid quoting and use
-               backslash-escaping to protect all data characters that would otherwise be taken as
-               range syntax. Also, to write a bound value that is an empty string, write
-                  <codeph>""</codeph>, since writing nothing means an infinite bound. </p>
-            <p> Whitespace is allowed before and after the range value, but any whitespace between
-               the parentheses or brackets is taken as part of the lower or upper bound value.
-               (Depending on the element type, it might or might not be significant.) </p>
-            <p> Examples:
+               和前面说的一样, 方括号或圆括号表示是否上下边界是包含, 非包含关系. 注意最后一种模式是
+                  <codeph>empty</codeph>, 表示一个空范围 (一个不包含任何点的范围). </p>
+            <p> <varname>lower-bound</varname> 可以是一个子类型的有效字符串, 或者用 empty 表示没有下边界. 同样地,
+                  <varname>upper-bound</varname> 可以是一个子类型的有效字符串, 或者用 empty 表示没有上边界. </p>
+            <p> 每一个边界值都可以是用 <codeph>"</codeph> (双引号) 引起来的字符串.
+               如果边界值包含圆括号, 方括号, 逗号, 双引号, 反斜杠的时候, 则必须引起来, 因为这些字符可能是范围语法的一部分. 如果引起来的边界值有双引号或者反斜杠, 需要在前面插入额外的反斜杠进行转义. (在双引号引起来的边界值中两个双引号也用来表示一个双引号字符, 
+			   类似于 SQL 字面值中的单引号规则.) 当然, 你也可以避免引号, 只用反斜杠把所有会被认为是范围语法一部分的字符进行转义. 另外, 边界值也可以写成空字符串
+                  <codeph>""</codeph>, 因为啥也不写意味着无限边界. </p>
+            <p> 在范围值的前后, 允许出现空格, 但是任何在圆括号或方括号之间的空格会被认为是上边界或下边界的一部分.
+               (与元素类型有关, 或许有或许没意义.) </p>
+            <p> 例如:
                <codeblock>
--- includes 3, does not include 7, and does include all points in between
+-- 包含 3, 不包含 7, 并且包含期间的所有点
 SELECT '[3,7)'::int4range;
 
--- does not include either 3 or 7, but includes all points in between
+-- 不包含 3 和 7, 单包含之间的所有点
 SELECT '(3,7)'::int4range;
 
--- includes only the single point 4
+-- 只包含单个点 4
 SELECT '[4,4]'::int4range;
 
--- includes no points (and will be normalized to 'empty')
+-- 不包含任何点 (会被规范化为 'empty')
 SELECT '[4,4)'::int4range;
 </codeblock>
             </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-construct">
-         <title>Constructing Ranges</title>
+      <topic xml:lang="zh-cn" id="rangetypes-construct">
+         <title>构造范围</title>
          <body>
-            <p> Each range type has a constructor function with the same name as the range type.
-               Using the constructor function is frequently more convenient than writing a range
-               literal constant, since it avoids the need for extra quoting of the bound values. The
-               constructor function accepts two or three arguments. The two-argument form constructs
-               a range in standard form (lower bound inclusive, upper bound exclusive), while the
-               three-argument form constructs a range with bounds of the form specified by the third
-               argument. The third argument must be one of the strings <codeph>()</codeph> ,
-                  <codeph>(]</codeph> , <codeph>[)</codeph> , or <codeph>[]</codeph> . For example:
+            <p> 每个范围类型有一个与范围类型同名的构造函数.
+               由于避免了边界值的额外引号(和转义), 通常使用构造函数比写一个范围字面常量更方便. 构造函数接受二或三个参数.
+			   两个参数形式构造一个标准格式的范围
+			   (包含下边界, 不包含上边界), 而三个参数格式构造一个通过第三个参数指定的边界(包含关系).
+			   第三个参数必须是下面的字符串之一: <codeph>()</codeph>,
+                  <codeph>(]</codeph>, <codeph>[)</codeph>, 或者 <codeph>[]</codeph>. 举例如下:
                <codeblock>
--- The full form is: lower bound, upper bound, and text argument indicating
--- inclusivity/exclusivity of bounds.
+-- 全格式是: 下边界, 上边界, 以及文本参数指示
+-- 包含/非包含边界.
 SELECT numrange(1.0, 14.0, '(]');
 
--- If the third argument is omitted, '[)' is assumed.
+-- 如果第三个参数忽略, 默认是 '[)'.
 SELECT numrange(1.0, 14.0);
 
--- Although '(]' is specified here, on display the value will be converted to
--- canonical form, since int8range is a discrete range type (see below).
+-- 虽然这里指定 '(]', 显示值会被转换成经典格式
+-- 因为 int8range 是一个离散范围类型 (见下).
 SELECT int8range(1, 14, '(]');
 
--- Using NULL for either bound causes the range to be unbounded on that side.
+-- 对某一边界使用 NULL 导致这一边无边界.
 SELECT numrange(NULL, 2.2);
 </codeblock>
             </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-discrete">
-         <title>Discrete Range Types</title>
+      <topic xml:lang="zh-cn" id="rangetypes-discrete">
+         <title>离散范围类型</title>
          <body>
-            <p> A discrete range is one whose element type has a well-defined <q>step</q>, such as
-                  <codeph>integer</codeph> or <codeph>date</codeph>. In these types two elements can
-               be said to be adjacent, when there are no valid values between them. This contrasts
-               with continuous ranges, where it's always (or almost always) possible to identify
-               other element values between two given values. For example, a range over the
-                  <codeph>numeric</codeph> type is continuous, as is a range over
-                  <codeph>timestamp</codeph>. (Even though <codeph>timestamp</codeph> has limited
-               precision, and so could theoretically be treated as discrete, it's better to consider
-               it continuous since the step size is normally not of interest.) </p>
-            <p> Another way to think about a discrete range type is that there is a clear idea of a
-                  <q>next</q> or <q>previous</q> value for each element value. Knowing that, it is
-               possible to convert between inclusive and exclusive representations of a range's
-               bounds, by choosing the next or previous element value instead of the one originally
-               given. For example, in an integer range type <codeph>[4,8]</codeph> and
-                  <codeph>(3,9)</codeph> denote the same set of values; but this would not be so for
-               a range over numeric. </p>
-            <p> A discrete range type should have a <i>canonicalization</i> function that is aware
-               of the desired step size for the element type. The canonicalization function is
-               charged with converting equivalent values of the range type to have identical
-               representations, in particular consistently inclusive or exclusive bounds. If a
-               canonicalization function is not specified, then ranges with different formatting
-               will always be treated as unequal, even though they might represent the same set of
-               values in reality. </p>
-            <p> The built-in range types <codeph>int4range</codeph>, <codeph>int8range</codeph>, and
-                  <codeph>daterange</codeph> all use a canonical form that includes the lower bound
-               and excludes the upper bound; that is, <codeph>[)</codeph>. User-defined range types
-               can use other conventions, however. </p>
+            <p> 离散范围类型的元素类型有一个明确定义的 <q>步长</q>, 例如
+                  <codeph>integer</codeph> 或 <codeph>date</codeph>. 在这些类型中, 当在两个元素间没有合法的值时, 我们就可以说这两个元素是相邻的. 
+			这个与连续范围相对, 在连续范围中, 两个元素之间总是可以找到其它元素值. 例如, 
+                  <codeph>numeric</codeph> 类型的范围就是连续的, 
+                  <codeph>timestamp</codeph> 类型的范围也是连续的. (即使 <codeph>timestamp</codeph> 有有限的精度, 理论上可以认为它是离散的, 但由于步长值通常不重要, 所以最好认为它是连续的.) </p>
+            <p> 另一个理解离散范围类型的方法是, 对于每一个元素值, 它有清晰的
+                  <q>后一个</q> 和 <q>前一个</q> 值. 
+				  了解了这些, 就可以通过选择后一个或前一个元素值, 取代原始元素值, 来对范围边界的包含和非包含关系进行转换.
+            举例说, 一个整数范围类型 <codeph>[4,8]</codeph> 和
+                  <codeph>(3,9)</codeph> 表示的是同样值的集合; 但对于一个 numeric 类型的范围就没有这样的关系. </p>
+            <p> 一个离散范围类型应该有一个 <i>canonicalization</i> 函数来感知元素类型的步长. canonicalization 函数用于把等价范围类型值转换为同一表示, 特别是一致的包含或非包含边界. 如果没有指定
+               canonicalization 函数, 那么不同格式总是当成不相等对待, 即使他们实际上表示同样的值域. </p>
+            <p> 内置范围类型 <codeph>int4range</codeph>, <codeph>int8range</codeph>, 和
+                  <codeph>daterange</codeph> 全部使用一个包含下边界, 不包含上边界的一个经典格式; 即 <codeph>[)</codeph>. 然而, 用户定义的范围类型可以使用其他转换形式. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-defining">
-         <title>Defining New Range Types</title>
+      <topic xml:lang="zh-cn" id="rangetypes-defining">
+         <title>定义新的范围类型</title>
          <body>
-            <p> Users can define their own range types. The most common reason to do this is to use
-               ranges over subtypes not provided among the built-in range types. For example, to
-               define a new range type of subtype <codeph>float8</codeph>:
+            <p> 用户可以定义他们自己的范围类型.
+		这样做的通常原因是要使用的子类型的范围没有内置提供.
+			例如, 定义子类型为 <codeph>float8</codeph> 的新的范围类型:
                <codeblock>
 CREATE TYPE floatrange AS RANGE (
     subtype = float8,
@@ -249,40 +206,20 @@ CREATE TYPE floatrange AS RANGE (
 
 SELECT '[1.234, 5.678]'::floatrange;
 </codeblock>
-               Because <codeph>float8</codeph> has no meaningful <q>step</q>, we do not define a
-               canonicalization function in this example. </p>
-            <p> Defining your own range type also allows you to specify a different subtype B-tree
-               operator class or collation to use, so as to change the sort ordering that determines
-               which values fall into a given range. </p>
-            <p> If the subtype is considered to have discrete rather than continuous values, the
-                  <cmdname>CREATE TYPE</cmdname> command should specify a <codeph>canonical</codeph>
-               function. The canonicalization function takes an input range value, and must return
-               an equivalent range value that may have different bounds and formatting. The
-               canonical output for two ranges that represent the same set of values, for example
-               the integer ranges <codeph>[1, 7]</codeph> and <codeph>[1, 8)</codeph>, must be
-               identical. It doesn't matter which representation you choose to be the canonical one,
-               so long as two equivalent values with different formattings are always mapped to the
-               same value with the same formatting. In addition to adjusting the inclusive/exclusive
-               bounds format, a canonicalization function might round off boundary values, in case
-               the desired step size is larger than what the subtype is capable of storing. For
-               instance, a range type over <codeph>timestamp</codeph> could be defined to have a
-               step size of an hour, in which case the canonicalization function would need to round
-               off bounds that weren't a multiple of an hour, or perhaps throw an error instead. </p>
-            <p> In addition, any range type that is meant to be used with GiST or SP-GiST indexes
-               should define a subtype difference, or <codeph>subtype_diff</codeph>, function. (The
-               index will still work without <codeph>subtype_diff</codeph>, but it is likely to be
-               considerably less efficient than if a difference function is provided.) The subtype
-               difference function takes two input values of the subtype, and returns their
-               difference (i.e., <varname>X</varname> minus <varname>Y</varname>) represented as a
-                  <codeph>float8</codeph> value. In our example above, the function
-                  <codeph>float8mi</codeph> that underlies the regular <codeph>float8</codeph> minus
-               operator can be used; but for any other subtype, some type conversion would be
-               necessary. Some creative thought about how to represent differences as numbers might
-               be needed, too. To the greatest extent possible, the <codeph>subtype_diff</codeph>
-               function should agree with the sort ordering implied by the selected operator class
-               and collation; that is, its result should be positive whenever its first argument is
-               greater than its second according to the sort ordering. </p>
-            <p> A less-oversimplified example of a <codeph>subtype_diff</codeph> function is: </p>
+               因为 <codeph>float8</codeph> 没有 <q>步长</q>, 这个例子中我们不能定义一个
+               canonicalization 函数给它. </p>
+            <p> 定义你自己的范围类型也允许你指定一个不同子类型 B-树 操作类或校对方式(collation)来使用, 可以改变排序规则,
+			以决定哪些值会落在给定范围之内. </p>
+            <p> 如果子类型被认为是离散值而不是连续值,
+                  <cmdname>CREATE TYPE</cmdname> 命令应该指定一个 <codeph>canonicalization</codeph>
+               函数. canonicalization 函数接受一个范围值, 返回一个具有不同边界和格式的等价范围值. 对于表示同一值集的两个范围, canonicalization 函数输出一致., 例如整数范围 <codeph>[1, 7]</codeph> 和 <codeph>[1, 8)</codeph>, 一定是相同的. 不论你选择哪一个作为标准输出,
+               只要不同格式的等价值总是映射到同样格式的相同值(就可以). 除了调整包含/非包含边界格式,  canonicalization 函数还可以圆整(四舍五入)边界值,
+			   例如设定的步长比子类型存储分辨能力宽(就需要这个功能). 例如, 一个 <codeph>timestamp</codeph> 范围类型, 可以定义为步长为 1 小时, 这种情况下, canonicalization 函数需要对不是整小时的边界进行圆整, 当然也可以抛出一个异常. </p>
+            <p> 另外, 与 GiST 或 SP-GiST 索引一起使用的范围类型应该定义一个子类型差异函数, 即 <codeph>subtype_diff</codeph>, 函数. (没有 <codeph>subtype_diff</codeph> 函数索引也能工作, 但可能被认为没有提供这个函数时高效.) 子类型差异函数接受两个子类型输入值, 同时返回他们之间的差 (即, <varname>X</varname> 减去 <varname>Y</varname> ) 用
+                  <codeph>float8</codeph> 值表示. 在我们上面的例子中, 函数
+                  <codeph>float8mi</codeph> 隐含有常规 <codeph>float8</codeph> 相减操作来用; 但对于任何其他子类型, 某种类型的转换是必要的. 关于如何表示数值之间差异的一些创造性想法也很需要. 为了最大限度扩展这种可能, <codeph>subtype_diff</codeph>
+               函数应该与选定操作类和校对函数一致; 也就是说, 根据排序顺序, 当第一个参数比第二个大时, 这个函数应该范围正数. </p>
+            <p> 一个关于 <codeph>subtype_diff</codeph> 函数不那么简单的例子是: </p>
             <codeblock>
 CREATE FUNCTION time_subtype_diff(x time, y time) RETURNS float8 AS
 'SELECT EXTRACT(EPOCH FROM (x - y))' LANGUAGE sql STRICT IMMUTABLE;
@@ -294,30 +231,26 @@ CREATE TYPE timerange AS RANGE (
 
 SELECT '[11:10, 23:00]'::timerange;
 </codeblock>
-            <p> See <xref href="sql_commands/CREATE_TYPE.xml#topic1"/> for more information about
-               creating range types. </p>
+            <p> 参见 <xref href="sql_commands/CREATE_TYPE.xml#topic1"/> 了解更多关于创建范围类型的详细信息. </p>
          </body>
       </topic>
-      <topic xml:lang="en-us" id="rangetypes-indexing">
-         <title>Indexing</title>
+      <topic xml:lang="zh-cn" id="rangetypes-indexing">
+         <title>索引</title>
          <body>
-            <p> GiST and SP-GiST indexes can be created for table columns of range types. For
-               instance, to create a GiST index:
+            <p> GiST 和 SP-GiST 索引可以在范围类型列上创建. 例如, 创建一个 GiST 索引:
                <codeblock>
 CREATE INDEX reservation_idx ON reservation USING GIST (during);
 </codeblock>
-               A GiST or SP-GiST index can accelerate queries involving these range operators:
+               一个 GiST 或者 SP-GiST 索引能够加速包含以下操作的范围运算:
                   <codeph>=</codeph>, <codeph>&amp;&amp;</codeph>, <codeph>&lt;@</codeph>,
                   <codeph>@&gt;</codeph>, <codeph>&lt;&lt;</codeph>, <codeph>&gt;&gt;</codeph>,
-                  <codeph>-|-</codeph>, <codeph>&amp;&lt;</codeph>, and <codeph>&amp;&gt;</codeph>
-               (see <xref href="function-summary.xml#functions-range"/> for more information). </p>
-            <p> In addition, B-tree and hash indexes can be created for table columns of range
-               types. For these index types, basically the only useful range operation is equality.
-               There is a B-tree sort ordering defined for range values, with corresponding
-                  <codeph>&lt;</codeph> and <codeph>&gt;</codeph> operators, but the ordering is
-               rather arbitrary and not usually useful in the real world. Range types' B-tree and
-               hash support is primarily meant to allow sorting and hashing internally in queries,
-               rather than creation of actual indexes. </p>
+                  <codeph>-|-</codeph>, <codeph>&amp;&lt;</codeph>, 以及 <codeph>&amp;&gt;</codeph>
+               (参见 <xref href="function-summary.xml#functions-range"/> 了解更多信息). </p>
+            <p> 另外, B-树 和 hash 索引也可以创建在范围类型的表列上. 对于这些索引类型, 基本上只对相等范围操作有用.
+            也有一个范围值的 B-树 排序定义, 具有相应的
+            <codeph>&lt;</codeph> 和 <codeph>&gt;</codeph> 操作, 但是排序方法相当简单粗暴, 现实生活中并不常用. 范围类型的 B-树 和
+               hash 支持主要允许排序和查询内部建立 hash,
+               而不是为了创建实际的索引. </p>
          </body>
       </topic>
    </topic>

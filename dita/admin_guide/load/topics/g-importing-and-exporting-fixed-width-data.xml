@@ -2,14 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic37">
-    <title>Importing and Exporting Fixed Width Data</title>
+    <title>导入和导出固定宽度的数据</title>
     <body>
-        <p>Specify custom formats for fixed-width data with the Greenplum Database
-            functions <codeph>fixedwith_in</codeph> and <codeph>fixedwidth_out</codeph>. These
-            functions already exist in the file
-                <filepath>$GPHOME/share/postgresql/cdb_external_extensions.sql</filepath>. The
-            following example declares a custom format, then calls the
-                <codeph>fixedwidth_in</codeph> function to format the data. </p>
+        <p>用Greenplum数据库函数<codeph>fixedwith_in</codeph>和<codeph>fixedwidth_out</codeph>为固定宽度的数据指定自定义格式。这些函数已经存在于文件<filepath>$GPHOME/share/postgresql/cdb_external_extensions.sql</filepath>中。下面的例子声明一个自定格式，然后调用<codeph>fixedwidth_in</codeph>函数来格式化数据。</p>
         <p>
             <codeblock>CREATE READABLE EXTERNAL TABLE students (
 name varchar(20), address varchar(30), age int)
@@ -18,29 +13,15 @@ FORMAT 'CUSTOM' (formatter=fixedwidth_in,
          name='20', address='30', age='4');
 </codeblock>
         </p>
-        <p>The following options specify how to import fixed width data.</p>
+        <p>下列选项指定如何导入固定宽度的数据。</p>
         <ul>
-            <li id="du200718">Read all the data.<p>To load all the fields on a line of fixed with
-                    data, you must load them in their physical order. You must specify the field
-                    length, but cannot specify a starting and ending position. The fields names in
-                    the fixed width arguments must match the order in the field list at the
-                    beginning of the <codeph>CREATE TABLE</codeph> command.</p>
+            <li id="du200718">读取所有数据。<p>要装载一行固定宽度数据上的所有域，用户必须按照它们的物理顺序装载它们。用户必须指定域长度，但不能指定开始和结束位置。固定宽度参数中的域名称必须匹配<codeph>CREATE TABLE</codeph>命令开头的域列表中的顺序。</p>
             </li>
-            <li id="du200722">Set options for blank and null characters.<p>Trailing blanks are
-                    trimmed by default. To keep trailing blanks, use the
-                        <codeph>preserve_blanks=on</codeph> option. You can reset the trailing blanks
-                    option to the default with the <codeph>preserve_blanks=off</codeph> option.</p>
-                <p>Use the null=<codeph>'null_string_value'</codeph> option to specify a value for
-                    null characters. </p>
+            <li id="du200722">设置空白和空值字符的选项。<p>T拖尾的空白会被默认修剪掉。要保留拖尾的空白，使用<codeph>preserve_blanks=on</codeph>选项。用户可以用<codeph>preserve_blanks=off</codeph>选项重置拖尾空白选项为默认值。使用<codeph>null='null_string_value'</codeph>选项来为空值字符指定一个值。 </p>
             </li>
-            <li id="du200725">If you specify <codeph>preserve_blanks=on</codeph>, you must also
-                define a value for null characters. </li>
-            <li id="du200726">If you specify <codeph>preserve_blanks=off</codeph>, null is not
-                defined, and the field contains only blanks, Greenplum
-                writes a null to the table. If null is defined, Greenplum writes an empty string to the table.<p>Use the
-                        <codeph>line_delim='line_ending'</codeph> parameter to specify the line
-                    ending character. The following examples cover most cases. The
-                        <codeph>E</codeph> specifies an escape string constant.</p>
+            <li id="du200725">如果用户指定<codeph>preserve_blanks=on</codeph>，用户还必须为空值字符定义一个值。 </li>
+            <li id="du200726">如果用户指定<codeph>preserve_blanks=off</codeph>、空值没有定义并且域只包含空白，Greenplum会写一个空值到表中。如果定义了空值，Greenplum会写一个空串到表中。使用<codeph>line_delim='line_ending'</codeph>参数来指定行结束字符。下面的例子覆盖了大部分情况。<codeph>E</codeph>指定了一个转义字符串常量。
+                
                 <codeblock>line_delim=E'\n'
 line_delim=E'\r'
 line_delim=E'\r\n'

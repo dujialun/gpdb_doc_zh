@@ -4,8 +4,7 @@
 <topic xml:lang="en" id="topic1">
   <title>pg_extension</title>
   <body>
-    <p>The system catalog table <codeph>pg_extension</codeph> stores information about installed
-      extensions.</p>
+    <p>该系统目录表<codeph>pg_extension</codeph>存储了关于安装的扩展的信息。</p>
     <table id="table_zgy_xfx_tz">
       <title>pg_catalog.pg_extension</title>
       <tgroup cols="4">
@@ -15,10 +14,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -26,53 +25,51 @@
             <entry colname="col1"><codeph>extname</codeph></entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of the extension.</entry>
+            <entry colname="col4">扩展的名称。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>extowner</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the extension</entry>
+            <entry colname="col4">扩展所有者</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>extnamespace</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_namespace.oid</entry>
-            <entry colname="col4">Schema containing the extension exported objects.</entry>
+            <entry colname="col4">包含扩展导出对象的Schema</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>extrelocatable</codeph></entry>
             <entry colname="col2">boolean</entry>
             <entry colname="col3"/>
-            <entry colname="col4">True if the extension can be relocated to another schema.</entry>
+            <entry colname="col4">如果该扩展能够重定位到其他schema，则为真。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>extversion</codeph></entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Version name for the extension.</entry>
+            <entry colname="col4">扩展的版本名字</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>extconfig</codeph></entry>
             <entry colname="col2">oid[]</entry>
             <entry colname="col3">pg_class.oid</entry>
-            <entry colname="col4">Array of <codeph>regclass</codeph> OIDs for the extension
-              configuration tables, or <codeph>NULL</codeph> if none.</entry>
+            <entry colname="col4">扩展配置表的<codeph>regclass</codeph> OIDs 数组，如果为空则为<codeph>NULL</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>extcondition</codeph></entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Array of <codeph>WHERE</codeph>-clause filter conditions for the
-              extension configuration tables, or <codeph>NULL</codeph> if none.</entry>
+            <entry colname="col4">扩展配置表的<codeph>WHERE</codeph>-clause过滤条件数组，如果没有则为<codeph>NULL</codeph>。</entry>
           </row>
         </tbody>
       </tgroup>
     </table>
-    <p>Unlike most catalogs with a namespace column, <codeph>extnamespace</codeph> does not imply
-      that the extension belongs to that schema. Extension names are never schema-qualified. The
-        <codeph>extnamespace</codeph> schema indicates the schema that contains most or all of the
-      extension objects. If <codeph>extrelocatable</codeph> is <codeph>true</codeph>, then this
-      schema must contain all schema-qualifiable objects that belong to the extension.</p>
+    <p>与大多数命名空间列的目录不同，<codeph>extnamespace</codeph>并不意味着该扩展属于这个schema。
+      扩展的名称不符合schema限制。
+      <codeph>extnamespace</codeph> schema指示其包含大部分或全部扩展对象的schema。
+      如果<codeph>extrelocatable</codeph>为<codeph>true</codeph>，则该schema必须包含所有属于扩展名的符合schema限定的对象。
+      </p>
   </body>
 </topic>

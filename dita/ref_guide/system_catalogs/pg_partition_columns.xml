@@ -4,8 +4,7 @@
 <topic id="topic1" xml:lang="en">
   <title id="ha143896">pg_partition_columns</title>
   <body>
-    <p>The <codeph>pg_partition_columns</codeph> system view is used to show the partition key
-      columns of a partitioned table.</p>
+    <p><codeph>pg_partition_columns</codeph>系统视图被用来显示一个分区表的分区键列。</p>
     <table id="ha179967">
       <title>pg_catalog.pg_partition_columns</title>
       <tgroup cols="4">
@@ -15,10 +14,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -28,7 +27,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The name of the schema the partitioned table is in.</entry>
+            <entry colname="col4">该分区表所在schema的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -36,7 +35,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The table name of the top-level parent table.</entry>
+            <entry colname="col4">顶层父表的表名。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -44,7 +43,7 @@
             </entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The name of the partition key column.</entry>
+            <entry colname="col4">分区键列的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -52,7 +51,7 @@
             </entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The level of this subpartition in the hierarchy.</entry>
+            <entry colname="col4">该子分区在层次中的级别。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -60,8 +59,9 @@
             </entry>
             <entry colname="col2">integer</entry>
             <entry colname="col3"/>
-            <entry colname="col4">For list partitions you can have a composite (multi-column)
-              partition key. This shows the position of the column in a composite key.</entry>
+            <entry colname="col4">对于列表分区可以有组合（多列）分区键。
+              此处显示了列在组合键中的位置。
+              </entry>
           </row>
         </tbody>
       </tgroup>

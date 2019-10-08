@@ -2,30 +2,23 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-    <title id="jc138244">Investigating a Performance Problem</title>
-    <shortdesc>This section provides guidelines for identifying and troubleshooting performance
-        problems in a Greenplum Database system.</shortdesc>
+    <title id="jc138244">检修性能问题</title>
+    <shortdesc>这一节为在一个Greenplum数据库系统中确定和解决性能问题提供了指导。</shortdesc>
     <body>
-        <p>This topic lists steps you can take to help identify the cause of a performance problem.
-            If the problem affects a particular workload or query, you can focus on tuning that
-            particular workload. If the performance problem is system-wide, then hardware problems,
-            system failures, or resource contention may be the cause.</p>
+        <p>这一主题列出了可以帮助用户确定性能问题原因的步骤。如果问题影响了一种特定的负载或查询，
+		用户可以聚焦于调节该特定负载。如果性能问题是系统范围的，那么硬件问题、系统失效或者资源竞争可能是原因。</p>
     </body>
     <topic id="topic2" xml:lang="en">
-        <title>Checking System State</title>
+        <title>检查系统状态</title>
         <body>
-            <p>Use the <codeph>gpstate</codeph> utility to identify failed segments. A Greenplum
-                Database system will incur performance degradation when segment instances are down
-                because other hosts must pick up the processing responsibilities of the down
-                segments.</p>
-            <p>Failed segments can indicate a hardware failure, such as a failed disk drive or
-                network card. Greenplum Database provides the hardware verification tool
-                    <codeph>gpcheckperf</codeph> to help identify the segment hosts with hardware
-                issues.</p>
+            <p>使用<codeph>gpstate</codeph> 工具来确定失效的Segment。当Segment实例宕机时，
+			Greenplum数据库系统将会引发性能退化，因为其他主机必须负担起宕掉的Segment的责任。</p>
+            <p>失效的Segment可能表明有硬件失效，例如一个失效的磁盘驱动器或者网卡。
+			Greenplum数据库提供了硬件验证工具<codeph>gpcheckperf</codeph>来确定有硬件问题的Segment主机。</p>
         </body>
     </topic>
     <topic id="topic3" xml:lang="en">
-        <title>Checking Database Activity</title>
+        <title>检查数据库活动</title>
         <body>
             <ul>
                 <li id="jc155459">
@@ -40,36 +33,28 @@
             </ul>
         </body>
         <topic id="topic4" xml:lang="en">
-            <title id="jc152159">Checking for Active Sessions (Workload)</title>
+            <title id="jc152159">检查活动会话（负载）</title>
             <body>
-                <p>The <i>pg_stat_activity</i> system catalog view shows one row per server process;
-                    it shows the database OID, database name, process ID, user OID, user name,
-                    current query, time at which the current query began execution, time at which
-                    the process was started, client address, and port number. To obtain the most
-                    information about the current system workload, query this view as the database
-                    superuser. For example:</p>
+                <p><i>pg_stat_activity</i> 系统目录视图为每个服务器进程展示了一行，它显示数据库OID、数据库名、
+				进程ID、用户OID、用户名、当前查询、当前查询开始执行的时间、进程开始时间、客户端地址和端口号。
+				要获得大部分有关当前系统负载的信息，可以作为数据库超级用户查询这个视图。例如：</p>
                 <p>
                     <codeblock>SELECT * FROM pg_stat_activity;
 </codeblock>
                 </p>
-                <p>Note that the information does not update instantaneously.</p>
+                <p>注意信息不会立刻更新。</p>
             </body>
         </topic>
         <topic id="topic5" xml:lang="en">
-            <title id="jc155367">Checking for Locks (Contention)</title>
+            <title id="jc155367">检查锁（竞争）</title>
             <body>
-                <p>The <i>pg_locks</i> system catalog view allows you to see information about
-                    outstanding locks. If a transaction is holding a lock on an object, any other
-                    queries must wait for that lock to be released before they can continue. This
-                    may appear to the user as if a query is hanging. </p>
-                <p>Examine <i>pg_locks</i> for ungranted locks to help identify contention between
-                    database client sessions. <i>pg_locks</i> provides a global view of all locks in
-                    the database system, not only those relevant to the current database. You can
-                    join its relation column against <codeph>pg_class.oid</codeph> to identify
-                    locked relations (such as tables), but this works correctly only for relations
-                    in the current database. You can join the <codeph>pid</codeph> column to the
-                        <codeph>pg_stat_activity.procpid</codeph> to see more information about the
-                    session holding or waiting to hold a lock. For example:</p>
+                <p><i>pg_locks</i>系统目录视图允许用户查看有关未解除的锁的信息。如果一个事务在一个对象上持有一个锁，
+				任何其他查询在能够继续之前都必须等待该锁被释放。这对于用户来说可能就好像一个查询悬而不决。 </p>
+                <p>在<i>pg_locks</i>中检查未授予的锁，以便帮助确定数据库客户端会话之间的竞争。
+				<i>pg_locks</i> 提供了数据库系统中所有锁的一个全局视图，而不只是那些与当前数据库相关的锁。
+				用户可以把它的relation列与<codeph>pg_class.oid</codeph>连接在一起以确定被锁住的关系（例如表），
+				但这只对当前数据库中的关系能正确地工作。用户可以把<codeph>pid</codeph>列
+				连接到<codeph>pg_stat_activity.procpid</codeph>以查看更多会话持有或者等待持有锁的信息。例如：</p>
                 <p>
                     <codeblock>SELECT locktype, database, c.relname, l.relation, 
 l.transactionid, l.pid, l.mode, l.granted, 
@@ -79,16 +64,15 @@ a.current_query
         ORDER BY c.relname;
 </codeblock>
                 </p>
-                <p>If you use resource groups, queries that are waiting will also show in
-                        <i>pg_locks</i>. To see how many queries are waiting to run in a resource
-                    group, use the<i> gp_resgroup_status </i>system catalog view. For example:</p>
+                <p>如果用户把资源组用于负载管理，在一个组中等候的查询也会显示在<i>pg_locks</i>中。
+				要查看一个资源组有多少查询正在等待运行，可使用<i> gp_resgroup_status </i>系统目录视图。例如：</p>
                 <p>
                     <codeblock>SELECT * FROM gp_toolkit.gp_resgroup_status;
 </codeblock>
                 </p>
-                <p>Similarly, if you use resource queues, queries that are waiting in a queue also show in
-                        <i>pg_locks</i>. To see how many queries are waiting to run from a resource
-                    queue, use the<i> gp_resqueue_status </i>system catalog view. For example:</p>
+                <p>同样的，如果用户把资源队列用于负载管理，在一个队列中等候的查询也会显示在
+                        <i>pg_locks</i>。要查看一个资源队列中有多少查询正在等待运行，
+						可使用<i> gp_resqueue_status </i>系统目录视图。例如：</p>
                 <p>
                     <codeblock>SELECT * FROM gp_toolkit.gp_resqueue_status;
 </codeblock>
@@ -96,88 +80,67 @@ a.current_query
             </body>
         </topic>
         <topic id="topic6" xml:lang="en">
-            <title id="jc155244">Checking Query Status and System Utilization</title>
+            <title id="jc155244">检查查询状态和系统利用</title>
             <body>
-                <p>You can use system monitoring utilities such as <codeph>ps</codeph>,
-                        <codeph>top</codeph>, <codeph>iostat</codeph>, <codeph>vmstat</codeph>,
-                        <codeph>netstat</codeph> and so on to monitor database activity on the hosts
-                    in your Greenplum Database array. These tools can help identify Greenplum
-                    Database processes (<codeph>postgres</codeph> processes) currently running on
-                    the system and the most resource intensive tasks with regards to CPU, memory,
-                    disk I/O, or network activity. Look at these system statistics to identify
-                    queries that degrade database performance by overloading the system and
-                    consuming excessive resources. Greenplum Database's management tool
-                        <codeph>gpssh</codeph> allows you to run these system monitoring commands on
-                    several hosts simultaneously.</p>
-                <p>You can create and use the Greenplum Database
-                        <i>session_level_memory_consumption</i> view that provides information about
-                    the current memory utilization and idle time for sessions that are running
-                    queries on Greenplum Database. For information about the view, see <xref
+                <p>用户可以使用<codeph>ps</codeph>、<codeph>top</codeph>、<codeph>iostat</codeph>、<codeph>vmstat</codeph>、
+				<codeph>netstat</codeph>之类之类的系统监控工具监控Greenplum数据库阵列中主机上的数据库活动。
+				这些工具能够帮助确定当前运行在系统上的Greenplum数据库进程（<codeph>postgres</codeph> 进程）
+				以及资源占用最多（CPU、内存、磁盘I/O或者网络活动）的任务。查看这些统计信息以确定降低数据库性能的查询，
+				它们会让系统超载并且消耗极多的资源。Greenplum数据库的管理工具<codeph>gpssh</codeph>允许用户在多个主机上
+				同时运行这些系统监控命令。</p>
+                <p>用户可以创建并使用Greenplum数据库的<i>session_level_memory_consumption</i>视图，
+				它为在Greenplum数据库上运行查询的会话提供有关当前内存利用和闲置时间的信息。有关该视图的信息请见<xref
                         href="managing/monitor.xml#topic_slt_ddv_1q"/>.</p>
-                <p>You can enable a dedicated database, <codeph>gpperfmon</codeph>, in which data
-                    collection agents running on each segment host save query and system utilization
-                    metrics. Refer to the <codeph>gperfmon_install</codeph> management utility
-                    reference in the <cite>Greenplum Database Management Utility Reference
-                        Guide</cite> for help creating the <codeph>gpperfmon</codeph> database and
-                    managing the agents. See documentation for the tables and views in the
-                        <codeph>gpperfmon</codeph> database in the <cite>Greenplum Database
-                        Reference Guide</cite>.</p>
-                <p otherprops="pivotal">The optional Greenplum Command Center web-based user
-                    interface graphically displays query and system utilization metrics saved in the
-                        <codeph>gpperfmon</codeph> database. See the <xref
-                        href="https://gpcc.docs.pivotal.io" format="html" scope="external">Greenplum
-                        Command Center Documentation</xref> web site for procedures to enable
-                    Greenplum Command Center.</p>
+                <p>用户可以启用一个专用数据库<codeph>gpperfmon</codeph>，运行在每个Segment主机上的数据收集代理把查询和
+				系统的使用指标保存在其中。 参考<cite>Greenplum数据库管理工具参考指南</cite>中<codeph>gperfmon_install</codeph>的
+				管理使用建议来创建<codeph>gpperfmon</codeph>数据库以及管理代理。<codeph>gpperfmon</codeph>数据库以及管理代理的帮
+				助请参考<cite>Greenplum数据库参考指南</cite>。</p>
+                <p otherprops="pivotal">另外还有可选择配置的网页端Greenplum控制中心可以以图像化的形式
+				显示<codeph>gpperfmon</codeph>数据库中保存的查询和系统工具参数，有关启用Greenplum控制中心的详情请参考<xref
+                        href="https://gpcc.docs.pivotal.io" format="html" scope="external">Greenplum控制中心文档</xref> </p>
             </body>
         </topic>
     </topic>
     <topic id="topic7" xml:lang="en">
-        <title id="jc155206">Troubleshooting Problem Queries</title>
+        <title id="jc155206">检修问题查询</title>
         <body>
-            <p>If a query performs poorly, look at its query plan to help identify problems. The
-                    <codeph>EXPLAIN</codeph> command shows the query plan for a given query. See
-                    <xref href="query/topics/query-profiling.xml#topic39"/> for more information
-                about reading query plans and identifying problems.</p>
-            <p>When an out of memory event occurs during query execution, the Greenplum Database
-                memory accounting framework reports detailed memory consumption of every query
-                running at the time of the event. The information is written to the Greenplum
-                Database segment logs. </p>
+            <p>如果一个查询执行得很糟糕，查看它的查询计划以帮助确定问题。
+                    <codeph>EXPLAIN</codeph>命令展示一个给定查询的查询计划。更多有关阅读查询计划并且确定问题的信息请见
+                    <xref href="query/topics/query-profiling.xml#topic39"/> 。</p>
+            <p>当查询执行期间发生内存不足事件时，Greenplum数据库内存核算框架会报告事件发生时运行的每一个查询的详细内存消耗。
+			这些信息被写入到Greenplum数据库的Segment日志中。</p>
         </body>
     </topic>
     <topic id="topic8" xml:lang="en">
-        <title id="jc155511">Investigating Error Messages</title>
+        <title id="jc155511">研究错误消息</title>
         <body>
-            <p>Greenplum Database log messages are written to files in the <codeph>pg_log</codeph>
-                directory within the master's or segment's data directory. Because the master log
-                file contains the most information, you should always check it first. Log files roll
-                over daily and use the naming convention:
-                        <codeph>gpdb-</codeph><i><codeph>YYYY</codeph></i><codeph>-</codeph><i><codeph>MM</codeph></i><codeph>-</codeph><i><codeph>DD_hhmmss.csv</codeph></i>.
-                To locate the log files on the master host:</p>
+            <p>Greenplum数据库的日志消息被写入到Master或Segment的数据目录中<codeph>pg_log</codeph>
+                子目录下的文件中。由于Master的日志文件包含了大部分的信息，用户应该总是先检查它。
+				日志文件会每日滚动并且使用下面的命名习惯：<codeph>gpdb-</codeph><i><codeph>YYYY</codeph></i><codeph>-</codeph><i><codeph>MM</codeph></i><codeph>-</codeph><i><codeph>DD_hhmmss.csv</codeph></i>.
+               要在Master主机上定位日志文件：</p>
             <p>
                 <codeblock>$ cd $MASTER_DATA_DIRECTORY/pg_log
 </codeblock>
             </p>
-            <p>Log lines have the format of:</p>
+            <p>日志行的格式：</p>
             <codeblock><i>timestamp</i> | <i>user</i> | <i>database</i> | <i>statement_id</i> | <i>con#</i><i>cmd#</i> 
 |:-<i>LOG_LEVEL</i>: <i>log_message
 </i></codeblock>
-            <p>You may want to focus your search for <codeph>WARNING</codeph>,
-                    <codeph>ERROR</codeph>, <codeph>FATAL</codeph> or <codeph>PANIC</codeph> log
-                level messages. You can use the Greenplum utility <codeph>gplogfilter</codeph> to
-                search through Greenplum Database log files. For example, when you run the following
-                command on the master host, it checks for problem log messages in the standard
-                logging locations:</p>
+            <p>用户可能想把搜索聚焦在<codeph>WARNING</codeph>、
+                    <codeph>ERROR</codeph>、<codeph>FATAL</codeph>或者<codeph>PANIC</codeph>日志级别的消息上。
+					用户可以使用Greenplum的工具<codeph>gplogfilter</codeph>在Greenplum数据库的日志文件中搜索。
+					例如，在Master主机上运行下列命令时，它会在标准日志位置检查有问题的日志消息：</p>
             <p>
                 <codeblock>$ gplogfilter -t
 </codeblock>
             </p>
-            <p>To search for related log entries in the segment log files, you can run
-                    <codeph>gplogfilter</codeph> on the segment hosts using <codeph>gpssh</codeph>.
-                You can identify corresponding log entries by the
-                    <i><codeph>statement_id</codeph></i> or
-                    <i><codeph>con</codeph></i><codeph>#</codeph> (session identifier). For example,
-                to search for log messages in the segment log files containing the string
-                    <codeph>con6</codeph> and save output to a file:</p>
+            <p>要在Segment日志文件中搜索相关的日志项，用户可以使用
+                    <codeph>gpssh</codeph>在Segment主机上运行<codeph>gplogfilter</codeph>。
+                可以根据
+                    <i><codeph>statement_id</codeph></i> 或者
+                    <i><codeph>con</codeph></i><codeph>#</codeph>（会话标识符）确定对应的日志项。
+					例如，要在Segment日志文件中搜索含有字符串
+                    <codeph>con6</codeph>的日志消息并且把输出保存到一个文件：</p>
             <p>
                 <codeblock>gpssh -f seg_hosts_file -e 'source 
 /usr/local/greenplum-db/greenplum_path.sh ; gplogfilter -f 
@@ -188,15 +151,13 @@ con6 /gpdata/*/pg_log/gpdb*.csv' &gt; seglog.out
         <topic id="topic9" xml:lang="en" otherprops="pivotal">
             <title id="jc155267">Gathering Information for Pivotal Customer Support</title>
             <body>
-                <p>The Greenplum Magic Tool (GPMT) utility can run diagnostics and collect
-                    information from a Greenplum Database system. You can then send the information
-                    to Pivotal Customer Support to aid the diagnosis of Greenplum Database errors or
-                    system failures.</p>
-                <p>The GPMT  utility is available from the <xref
+                <p>Greenplum魔术工具（GPMT）功能可以对Greenplum数据运行分析并从中采集信息。
+				然后用户可以将信息发送到Pivotal客户支持，帮助诊断Greenplum数据库错误或是系统故障</p>
+                <p>有关GPMT的详情请参见<xref
                         href="https://discuss.pivotal.io/hc/en-us/categories/200072608-Pivotal-Greenplum-Knowledge-Base"
-                        format="html" scope="external">Pivotal Knowledge Base</xref> on the <xref
+                        format="html" scope="external">Pivotal知识库</xref>中的<xref
                         href="https://discuss.pivotal.io/hc/en-us/articles/217546277-Greenplum-Magic-Tool-GPMT-"
-                        format="html" scope="external">GPMT</xref> page.</p>
+                        format="html" scope="external">GPMT</xref>页。</p>
             </body>
         </topic>
     </topic>

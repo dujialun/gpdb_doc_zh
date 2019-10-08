@@ -2,11 +2,8 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic35">
-   <title>Loading and Writing Non-HDFS Custom Data</title>
+   <title>装载和写入非HDFS自定义数据</title>
    <body>
-      <p>Greenplum Database supports <codeph>TEXT</codeph> and <codeph>CSV</codeph> formats for
-         importing and exporting data through external tables. You can load and save data in other
-         formats by defining a custom format or custom protocol or by setting up a transformation
-         with the <codeph>gpfdist</codeph> parallel file server.</p>
+      <p>Greenplum对于导入和导出数据支持<codeph>TEXT</codeph>和<codeph>CSV</codeph>格式。用户可以通过定义和使用一种自定义格式或者自定义协议来装载或者写入其他格式的数据。</p>
    </body>
 </topic>

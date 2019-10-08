@@ -4,11 +4,10 @@
 <topic id="topic1" xml:lang="en">
   <title id="hx156255">pg_tablespace</title>
   <body>
-    <p>The <codeph>pg_tablespace</codeph> system catalog table stores information about the
-      available tablespaces. Tables can be placed in particular tablespaces to aid administration of
-      disk layout. Unlike most system catalogs, <codeph>pg_tablespace</codeph> is shared across all
-      databases of a Greenplum system: there is only one copy of <codeph>pg_tablespace</codeph> per
-      system, not one per database.</p>
+    <p><codeph>pg_tablespace</codeph>系统目录表存储关于可用表空间的信息。
+      表可以被放置在特定表空间中以实现磁盘布局的管理。
+      与大部分其他系统目录不同，<codeph>pg_tablespace</codeph>在Greenplum系统的所有数据库之间共享：在每一个系统中只有一份<codeph>pg_tablespace</codeph>的拷贝，而不是每个数据库一份。
+      </p>
     <table id="hx156260">
       <title>pg_catalog.pg_tablespace</title>
       <tgroup cols="4">
@@ -18,10 +17,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -29,25 +28,25 @@
             <entry colname="col1"><codeph>spcname</codeph></entry>
             <entry colname="col2">name</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Tablespace name.</entry>
+            <entry colname="col4">表空间名。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>spcowner</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">Owner of the tablespace, usually the user who created it.</entry>
+            <entry colname="col4">表空间的拥有者，通常是创建它的用户。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>spcacl </codeph></entry>
             <entry colname="col2">aclitem[] </entry>
             <entry colname="col3"/>
-            <entry colname="col4">Tablespace access privileges.</entry>
+            <entry colname="col4">表空间访问权限。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>spcoptions</codeph></entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Tablespace contentID locations.</entry>
+            <entry colname="col4">表空间contentID位置。</entry>
           </row>
         </tbody>
       </tgroup>

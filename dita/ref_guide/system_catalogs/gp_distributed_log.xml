@@ -4,10 +4,11 @@
 <topic id="topic1" xml:lang="en">
   <title id="ew142834">gp_distributed_log</title>
   <body>
-    <p>The <codeph>gp_distributed_log</codeph> view contains status information about distributed
-      transactions and their associated local transactions. A distributed transaction is a
-      transaction that involves modifying data on the segment instances. Greenplum's distributed transaction manager ensures that the segments
-      stay in synch. This view allows you to see the status of distributed transactions.</p>
+    <p><codeph>gp_distributed_log</codeph>视图包含有关分布式事务及其关联的本地事务的状态信息。
+      分布式事务是涉及修改Segment实例上数据的事务。
+      Greenplum的分布式事务管理器确保了这些Segment保持同步。
+      此视图允许用户查看分布式事务的状态。
+      </p>
     <table id="ew142842">
       <title>pg_catalog.gp_distributed_log</title>
       <tgroup cols="4">
@@ -17,10 +18,10 @@
         <colspec colnum="4" colname="col4" colwidth="145pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -30,8 +31,7 @@
             </entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3">gp_segment_ configuration.content</entry>
-            <entry colname="col4">The content id if the segment. The master is always -1 (no
-              content).</entry>
+            <entry colname="col4">如果是Segment，则是其内容ID。Master总是为-1（无内容）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -39,7 +39,7 @@
             </entry>
             <entry colname="col2">small_int</entry>
             <entry colname="col3">gp_segment_ configuration.dbid</entry>
-            <entry colname="col4">The unique id of the segment instance. </entry>
+            <entry colname="col4">Segment实例的唯一ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -47,7 +47,7 @@
             </entry>
             <entry colname="col2">xid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The global transaction id.</entry>
+            <entry colname="col4">全局事务ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -55,7 +55,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">A system assigned ID for a distributed transaction.</entry>
+            <entry colname="col4">分布式事务的系统分配ID。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -63,8 +63,7 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The status of the distributed transaction (Committed or
-              Aborted).</entry>
+            <entry colname="col4">分布式事务的状态（提交或者中止）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -72,7 +71,7 @@
             </entry>
             <entry colname="col2">xid</entry>
             <entry colname="col3"/>
-            <entry colname="col4">The local transaction ID.</entry>
+            <entry colname="col4">本地事务ID。</entry>
           </row>
         </tbody>
       </tgroup>

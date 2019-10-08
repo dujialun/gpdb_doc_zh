@@ -2,9 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="pv161085">Greenplum PL/Java Language Extension</title>
+  <title id="pv161085">Greenplum的PL/Java语言扩展</title>
   <body>
-    <p>This section contains an overview of the Greenplum Database PL/Java language.</p>
+    <p>本节包含Greenplum数据库的PL/Java语言的概述。</p>
     <ul>
       <li id="pv161174">
         <xref href="#topic2" type="topic" format="dita"/>
@@ -49,71 +49,71 @@
     </ul>
   </body>
   <topic id="topic2" xml:lang="en">
-    <title id="pv161093">About PL/Java </title>
+    <title id="pv161093">关于PL/Java</title>
     <body>
-      <p>With the Greenplum Database PL/Java extension, you can write Java methods using your
-        favorite Java IDE and install the JAR files that contain those methods into Greenplum
-        Database. </p>
-      <p>Greenplum Database PL/Java package is based on the open source PL/Java 1.5.0. Greenplum
-        Database PL/Java provides the following features.</p>
+      <p>使用Greenplum数据库的PL/Java扩展，用户可以使用自己喜欢的Java IDE编写Java方法，并将包含这些方法的JAR文件安装到Greenplum数据库中。</p>
+      <p>Greenplum数据库的PL/Java包基于开源PL/Java 1.5.0。
+        Greenplum数据库的PL/Java提供以下功能。
+        </p>
       <ul>
-        <li id="pv161029">Ability to execute PL/Java functions with Java 8 or Java 11.</li>
-        <li>Ability to specify Java runtime.</li>
-        <li id="pv161030">Standardized utilities (modeled after the SQL 2003 proposal) to install
-          and maintain Java code in the database.</li>
-        <li id="pv161031">Standardized mappings of parameters and result. Complex types as well as
-          sets are supported.</li>
-        <li id="pv161032">An embedded, high performance, JDBC driver utilizing the internal
-          Greenplum Database SPI routines.</li>
-        <li id="pv161033">Metadata support for the JDBC driver. Both
-            <codeph>DatabaseMetaData</codeph> and <codeph>ResultSetMetaData</codeph> are
-          included.</li>
-        <li id="pv161034">The ability to return a ResultSet from a query as an alternative to
-          building a ResultSet row by row.</li>
-        <li id="pv161035">Full support for savepoints and exception handling.</li>
-        <li id="pv161036">The ability to use IN, INOUT, and OUT parameters. </li>
-        <li id="pv161037">Two separate Greenplum Database languages:<ul id="ul_rl4_vc5_lv">
+        <li id="pv161029">能够使用Java 8或Java 11执行PL/Java函数。</li>
+        <li>能够指定Java运行时。</li>
+        <li id="pv161030">在数据库中安装和维护Java代码的标准化实用程序（在SQL 2003提案之后设计）
+          </li>
+        <li id="pv161031">参数和结果的标准化映射。支持复杂类型和集合。
+          </li>
+        <li id="pv161032">使用Greenplum数据库内部SPI例程的嵌入式高性能JDBC驱动程序。
+          </li>
+        <li id="pv161033">元数据支持JDBC驱动程序。
+          包括<codeph>DatabaseMetaData</codeph>和<codeph>ResultSetMetaData</codeph>。
+          </li>
+        <li id="pv161034">能够从查询中返回ResultSet，作为逐行构建ResultSet的替代方法。
+          </li>
+        <li id="pv161035">完全支持保存点和异常处理。</li>
+        <li id="pv161036">能够使用IN，INPUT和OUT参数。</li>
+        <li id="pv161037">两种独立的Greenplum数据库语言:<ul id="ul_rl4_vc5_lv">
             <li>pljava, TRUSTED PL/Java language</li>
             <li>pljavau, UNTRUSTED PL/Java language</li>
           </ul></li>
-        <li id="pv161038">Transaction and Savepoint listeners enabling code execution when a
-          transaction or savepoint is committed or rolled back.</li>
-        <li id="pv161039">Integration with GNU GCJ on selected platforms.</li>
+        <li id="pv161038">当一个事务或者保存点提交或者回滚时，事务和保存点监听器能够被编译执行。
+          </li>
+        <li id="pv161039">在所选平台上与GNU GCJ集成。</li>
       </ul>
-      <p>A function in SQL will appoint a static method in a Java class. In order for the function
-        to execute, the appointed class must available on the class path specified by the Greenplum
-        Database server configuration parameter <codeph>pljava_classpath</codeph>. The PL/Java
-        extension adds a set of functions that helps installing and maintaining the java classes.
-        Classes are stored in normal Java archives, JAR files. A JAR file can optionally contain a
-        deployment descriptor that in turn contains SQL commands to be executed when the JAR is
-        deployed or undeployed. The functions are modeled after the standards proposed for SQL
-        2003.</p>
-      <p>PL/Java implements a standardized way of passing parameters and return values. Complex
-        types and sets are passed using the standard JDBC ResultSet class. </p>
-      <p>A JDBC driver is included in PL/Java. This driver calls Greenplum Database internal SPI
-        routines. The driver is essential since it is common for functions to make calls back to the
-        database to fetch data. When PL/Java functions fetch data, they must use the same
-        transactional boundaries that are used by the main function that entered PL/Java execution
-        context.</p>
-      <p>PL/Java is optimized for performance. The Java virtual machine executes within the same
-        process as the backend to minimize call overhead. PL/Java is designed with the objective to
-        enable the power of Java to the database itself so that database intensive business logic
-        can execute as close to the actual data as possible.</p>
-      <p>The standard Java Native Interface (JNI) is used when bridging calls between the backend
-        and the Java VM.</p>
+      <p>SQL中的一个函数将在Java类中指定一个静态方法。
+        为了使函数能够执行，所指定的类必须能够通过Greenplum数据库服务器上的<codeph>pljava_classpath</codeph>配置参数来指定类路径。
+        PL/Java扩展添加了一组有助于安装和维护java类的函数。
+        类存储在普通的Java档案——JAR文件中。
+        JAR文件可以选择性地包含部署描述符，该描述符又包含在部署或取消部署JAR时要执行的SQL命令。
+        这些函数是按照SQL 2003提出的标准进行设计的。
+        </p>
+      <p>PL/Java实现了传递参数和返回值的标准化方法。
+        使用标准JDBC ResultSet类传递复杂类型和集合。
+        </p>
+      <p>PL/Java中包含JDBC驱动程序。
+        此驱动程序调用Greenplum数据库内部SPI例程。
+        驱动程序是必不可少的，因为函数通常将调用数据库以获取数据。
+        当PL/Java函数提取数据时，它们必须使用与输入PL/Java执行上下文的主函数使用的相同的事务边界。
+        </p>
+      <p>PL/Java针对性能进行了优化。
+        Java虚拟机在与后端相同的进程中执行，以最小化调用开销。
+        PL/Java的设计目的是为了使数据库本身能够实现Java的强大功能，以便数据库密集型业务逻辑可以尽可能靠近实际数据执行。
+        </p>
+      <p>当后端和Java VM之间的桥梁被调用时，将使用标准Java本机接口（JNI）。
+        </p>
     </body>
   </topic>
   <topic id="topic10" xml:lang="en">
-    <title id="pv159836">About Greenplum Database PL/Java</title>
+    <title id="pv159836">关于Greenplum数据库PL/Java</title>
     <body>
-      <p>There are a few key differences between the implementation of PL/Java in standard
-        PostgreSQL and Greenplum Database.</p>
+      <p>在标准PostgreSQL和Greenplum数据库中实现PL/Java有一些关键的区别。
+        </p>
     </body>
     <topic id="topic11" xml:lang="en">
-      <title>Functions</title>
+      <title>函数</title>
       <body>
-        <p>The following functions are not supported in Greenplum Database. The classpath is handled
-          differently in a distributed Greenplum Database environment than in the PostgreSQL environment.<sl>
+        <p>以下函数在Greenplum数据库中不被支持。
+          在分布式的Greenplum数据库环境中，classpath的处理方式与PostgreSQL环境下不同。
+          <sl>
             <sli><codeph>sqlj.install_jar</codeph>
             </sli>
             <sli><codeph>sqlj.replace_jar</codeph>
@@ -122,48 +122,46 @@
             <sli><codeph>sqlj.get_classpath</codeph></sli>
             <sli><codeph>sqlj.set_classpath</codeph></sli>
           </sl></p>
-        <p> Greenplum Database uses the <codeph>pljava_classpath</codeph> server configuration
-          parameter in place of the <codeph>sqlj.set_classpath</codeph> function. </p>
+        <p>Greenplum数据库使用<codeph>pljava_classpath</codeph>服务器配置参数代替<codeph>sqlj.set_classpath</codeph>函数。
+          </p>
       </body>
     </topic>
     <topic id="topic12" xml:lang="en">
-      <title>Server Configuration Parameters</title>
+      <title>服务器配置参数</title>
       <body>
-        <p>The following server configuration parameters are used by PL/Java in Greenplum Database.
-          These parameters replace the <codeph>pljava.*</codeph> parameters that are used in the
-          standard PostgreSQL PL/Java implementation:</p>
+        <p>以下服务器配置参数由PL/Java在Greenplum数据库中使用。
+          这些参数取代了标准PostgreSQL PL/Java实现中使用的<codeph>pljava.*</codeph>参数：
+          </p>
         <ul id="ul_ksz_5r5_b1b">
           <li id="pv159849">
             <codeph>pljava_classpath</codeph>
-            <p>A colon (<codeph>:</codeph>) separated list of the jar files containing the Java
-              classes used in any PL/Java functions. The jar files must be installed in the same
-              locations on all Greenplum Database hosts. With the trusted PL/Java language handler,
-              jar file paths must be relative to the <codeph>$GPHOME/lib/postgresql/java/</codeph>
-              directory. With the untrusted language handler (javaU language tag), paths may be
-              relative to <codeph>$GPHOME/lib/postgresql/java/</codeph> or absolute. </p><p>The
-              server configuration parameter <codeph>pljava_classpath_insecure</codeph> controls
-              whether the server configuration parameter <codeph>pljava_classpath</codeph> can be
-              set by a user without Greenplum Database superuser privileges. When
-                <codeph>pljava_classpath_insecure</codeph> is enabled, Greenplum Database developers
-              who are working on PL/Java functions do not have to be database superusers to change
-                <codeph>pljava_classpath</codeph>.</p>
-            <note type="warning">Enabling <codeph>pljava_classpath_insecure</codeph> exposes a
-              security risk by giving non-administrator database users the ability to run
-              unauthorized Java methods.</note></li>
+            <p>冒号(<codeph>:</codeph>)分隔的包含任何PL/Java函数中使用的Java类的jar文件列表。
+              所有的jar文件必须安装在所有的Greenplum数据库主机的相同位置。
+              使用可信的PL/Java语言处理程序，jar文件路径必须相对于<codeph>$GPHOME/lib/postgresql/java/</codeph>目录。
+              使用不受信任的语言处理程序（javaU语言标记），路径可以相对于<codeph>$GPHOME/lib/postgresql/java/</codeph>或使用绝对路径。
+              </p>
+            <p>服务器配置参数<codeph>pljava_classpath_insecure</codeph>控制服务器配置参数<codeph>pljava_classpath</codeph>是否可以由用户设置，
+              无需Greenplum数据库超级用户权限。
+              当启用<codeph>pljava_classpath_insecure</codeph>时，
+              正在开发PL/Java函数的Greenplum数据库开发人员不必是数据库超级用户身份才能来更改<codeph>pljava_classpath</codeph>。
+              </p>
+            <note type="warning">启用<codeph>pljava_classpath_insecure</codeph>通过为非管理员数据库用户提供能够运行未经授权的Java方法暴露了安全风险。
+              </note></li>
           <li id="pv159853">
             <codeph>pljava_statement_cache_size</codeph>
-            <p>Sets the size in KB of the Most Recently Used (MRU) cache for prepared statements.
-            </p></li>
+            <p>为准备语句设置最近使用（MRU）缓存的大小（KB）。</p>
+            </li>
           <li id="pv159856">
             <codeph>pljava_release_lingering_savepoints</codeph>
-            <p>If <codeph>TRUE</codeph>, lingering savepoints will be released on function exit. If
-                <codeph>FALSE</codeph>, they will be rolled back. </p></li>
+            <p>如果为<codeph>TRUE</codeph>，在函数退出后，长期持续的保存点将会释放。
+              如果为<codeph>FALSE</codeph>，它们将被回滚。
+              </p></li>
           <li id="pv159859">
             <codeph>pljava_vmoptions</codeph>
-            <p>Defines the start up options for the Greenplum Database Java VM. </p></li>
+            <p>定义Greenplum数据库Java VM的启动选项。</p></li>
         </ul>
-        <p>See the <cite>Greenplum Database Reference Guide</cite> for information about the
-          Greenplum Database server configuration parameters.</p>
+        <p>参阅<cite>Greenplum数据库参考指南</cite>有关Greenplum数据库服务器配置参数的信息。
+          </p>
       </body>
     </topic>
   </topic>
@@ -245,42 +243,35 @@
     </topic>
   </topic>
   <topic id="topic6" xml:lang="en">
-    <title id="pv161784">Enabling PL/Java and Installing JAR Files</title>
+    <title id="pv161784">启用PL/Java并安装JAR文件</title>
     <body>
-      <p>Perform the following steps as the Greenplum Database administrator
-          <codeph>gpadmin</codeph>.</p>
+      <p>以Greenplum数据库管理员<codeph>gpadmin</codeph>的身份执行以下步骤。
+        </p>
       <ol id="ol_dpn_qr5_b1b">
-        <li id="pv162268">Enable PL/Java in a database by executing the <codeph>CREATE
-            EXTENSION</codeph> command to register the language. For example, this command enables
-          PL/Java in the <codeph>testdb</codeph>
-            database:<codeblock>$ psql -d testdb -c 'CREATE EXTENSION pljava;'</codeblock><note>The
-            PL/Java <codeph>install.sql</codeph> script, used in previous releases to register the
-            language, is deprecated.</note></li>
-        <li id="pv160325">Copy your Java archives (JAR files) to the same directory on all Greenplum
-          Database hosts. This example uses the Greenplum Database <codeph>gpscp</codeph> utility to
-          copy the file <codeph>myclasses.jar</codeph> to the directory
-            <codeph>$GPHOME/lib/postgresql/java/</codeph>:<codeblock>$ gpscp -f gphosts_file myclasses.jar 
-=:/usr/local/greenplum-db/lib/postgresql/java/</codeblock><p>The
-            file <codeph>gphosts_file</codeph> contains a list of the Greenplum Database
-          hosts.</p></li>
-        <li id="pv160327">Set the <codeph>pljava_classpath</codeph> server configuration parameter
-          in the master <codeph>postgresql.conf</codeph> file. For this example, the parameter value
-          is a colon (:) separated list of the JAR files. For
-            example:<codeblock>$ gpconfig -c pljava_classpath -v 'examples.jar:myclasses.jar'</codeblock><p>The
-            file <codeph>examples.jar</codeph> is installed when you install the PL/Java extension
-            package with the <codeph>gppkg</codeph> utility.</p>
-          <note>If you install JAR files in a directory other than
-              <codeph>$GPHOME/lib/postgresql/java/</codeph>, you must specify the absolute path to
-            the JAR file. Each JAR file must be in the same location on all Greenplum Database
-            hosts. For more information about specifying the location of JAR files, see the
-            information about the <codeph>pljava_classpath</codeph> server configuration parameter
-            in the <cite>Greenplum Database Reference Guide</cite>.</note></li>
-        <li id="pv160329">Reload the <codeph>postgresql.conf</codeph>
-          file.<codeblock>$ gpstop -u</codeblock></li>
-        <li id="pv160335">(optional) Greenplum provides an <codeph>examples.sql</codeph> file
-          containing sample PL/Java functions that you can use for testing. Run the commands in this
-          file to create the test functions (which use the Java classes in
-            <codeph>examples.jar</codeph>).
+        <li id="pv162268">通过执行<codeph>CREATE EXTENSION</codeph>命令注册语言，以在数据库中启用PL/Java。
+          例如，此命令在<codeph>testdb</codeph>数据库中启用PL/Java：
+          <codeblock>$ psql -d testdb -c 'CREATE EXTENSION pljava;'</codeblock>
+          <note>不推荐使用PL/Java <codeph>install.sql</codeph>脚本（在以前的版本中用于注册该语言）。
+            </note></li>
+        <li id="pv160325">将Java归档（JAR文件）复制到所有Greenplum数据库主机上的同一目录。
+          本示例使用Greenplum数据库<codeph>gpscp</codeph>程序将文件<codeph>myclasses.jar</codeph>复制到目录<codeph>$GPHOME/lib/postgresql/java/</codeph>:
+          <codeblock>$ gpscp -f gphosts_file myclasses.jar
+=:/usr/local/greenplum-db/lib/postgresql/java/</codeblock>
+          <p>文件<codeph>gphosts_file</codeph>包含一个Greenplum数据库主机的列表。
+            </p></li>
+        <li id="pv160327">设置<codeph>pljava_classpath</codeph>服务器配置参数在master的<codeph>postgresql.conf</codeph>文件中。
+          对于此示例，参数值是冒号(:)分隔的JAR文件列表。例如：
+          <codeblock>$ gpconfig -c pljava_classpath -v 'examples.jar:myclasses.jar'</codeblock>
+          <p>当用户使用<codeph>gppkg</codeph>实用程序安装PL/Java扩展包时，将安装<codeph>examples.jar</codeph>文件。
+            </p>
+          <note>如果将JAR文件安装在除<codeph>$GPHOME/lib/postgresql/java/</codeph>之外的目录中，则必须指定JAR文件的绝对路径。
+            所有的Greenplum数据库主机上的每个JAR文件必须位于相同的位置。
+            有关指定JAR文件位置的更多信息，参阅<cite>Greenplum数据库参考指南</cite>中的<codeph>pljava_classpath</codeph>服务器配置参数。
+            </note></li>
+        <li id="pv160329">重新加载<codeph>postgresql.conf</codeph>文件。
+          <codeblock>$ gpstop -u</codeblock></li>
+        <li id="pv160335">(可选)Greenplum提供了一个包含可用于测试的示例PL/Java函数的<codeph>examples.sql</codeph>文件。
+          运行此文件中的命令来创建测试函数 (它使用<codeph>examples.jar</codeph>中的Java类)。
           <codeblock>$ psql -f $GPHOME/share/postgresql/pljava/examples.sql</codeblock></li>
       </ol>
     </body>
@@ -335,9 +326,9 @@
     </topic>
   </topic>
   <topic id="topic13" xml:lang="en">
-    <title id="pv158066">Writing PL/Java functions</title>
+    <title id="pv158066">编写PL/Java函数</title>
     <body>
-      <p>Information about writing functions with PL/Java.</p>
+      <p>有关使用PL/Java编写函数的信息。</p>
       <ul>
         <li id="pv164880">
           <xref href="#topic14" type="topic" format="dita"/>
@@ -369,29 +360,30 @@
       </ul>
     </body>
     <topic id="topic14" xml:lang="en">
-      <title id="pv164882">SQL Declaration</title>
+      <title id="pv164882">SQL声明</title>
       <body>
-        <p>A Java function is declared with the name of a class and a static method on that class.
-          The class will be resolved using the classpath that has been defined for the schema where
-          the function is declared. If no classpath has been defined for that schema, the public
-          schema is used. If no classpath is found there either, the class is resolved using the
-          system classloader.</p>
-        <p>The following function can be declared to access the static method
-            <codeph>getProperty</codeph> on <codeph>java.lang.System</codeph> class:</p>
+        <p>一个Java函数被声明为该类的一个类名称和静态方法。
+          该类将用于为该函数声明的schema定义的classpath进行解析。
+          如果没有为该schema定义classpath，则使用public schema。
+          如果没有找到classpath，则使用系统类加载器解析该类。
+          </p>
+        <p>可以声明以下函数来访问<codeph>java.lang.System</codeph>类上的静态方法<codeph>getProperty</codeph>：
+          </p>
         <codeblock>CREATE FUNCTION getsysprop(VARCHAR)
   RETURNS VARCHAR
   AS 'java.lang.System.getProperty'
   LANGUAGE java;</codeblock>
-        <p>Run the following command to return the Java <codeph>user.home</codeph> property:</p>
+        <p>运行以下命令返回Jave <codeph>user.home</codeph>属性:
+          </p>
         <codeblock>SELECT getsysprop('user.home');</codeblock>
       </body>
     </topic>
     <topic id="topic15" xml:lang="en">
-      <title id="pv157321">Type Mapping</title>
+      <title id="pv157321">类型映射</title>
       <body>
-        <p>Scalar types are mapped in a straight forward way. This table lists the current mappings. </p>
+        <p>标量类型以简单的方式映射。此表列出了当前的映射。</p>
         <table id="pv157323">
-          <title>PL/Java data type mapping</title>
+          <title>PL/Java数据类型映射</title>
           <tgroup cols="2">
             <colspec colnum="1" colname="col1" colwidth="110pt"/>
             <colspec colnum="2" colname="col2" colwidth="165pt"/>
@@ -466,22 +458,23 @@
             </tbody>
           </tgroup>
         </table>
-        <p>All other types are mapped to java.lang.String and will utilize the standard
-            <codeph>textin</codeph>/<codeph>textout</codeph> routines registered for respective
-          type.</p>
+        <p>所有其他类型都映射到java.lang.String，
+          并将使用为各自类型注册的标准<codeph>textin</codeph>/<codeph>textout</codeph>例程。
+          </p>
       </body>
     </topic>
     <topic id="topic16" xml:lang="en">
-      <title id="pv157393">NULL Handling</title>
+      <title id="pv157393">NULL处理</title>
       <body>
-        <p>The scalar types that map to Java primitives can not be passed as <codeph>NULL</codeph>
-          values. To pass <codeph>NULL</codeph> values, those types can have an alternative mapping.
-          You enable this mapping by explicitly denoting it in the method reference.</p>
+        <p>映射到java基元的标量类型不能作为<codeph>NULL</codeph>值传递。
+          要传递<codeph>NULL</codeph>值, 这些类型可以有一个替代映射。
+          用户可以通过在方法引用中明确的指定该映射来启用映射。
+          </p>
         <codeblock>CREATE FUNCTION trueIfEvenOrNull(integer)
   RETURNS bool
   AS 'foo.fee.Fum.trueIfEvenOrNull(java.lang.Integer)'
   LANGUAGE java;</codeblock>
-        <p>The Java code would be similar to this:</p>
+        <p>Java代码将类似于：</p>
         <codeblock>package foo.fee;
 public class Fum
 {
@@ -492,31 +485,31 @@ public class Fum
       : (value.intValue() % 2) == 0;
   }
 }</codeblock>
-        <p>The following two statements both yield true:</p>
+        <p>以下两个语句都产生true：</p>
         <codeblock>SELECT trueIfEvenOrNull(NULL);
 SELECT trueIfEvenOrNull(4);</codeblock>
-        <p>In order to return <codeph>NULL</codeph> values from a Java method, you use the object
-          type that corresponds to the primitive (for example, you return
-            <codeph>java.lang.Integer</codeph> instead of <codeph>int</codeph>). The PL/Java resolve
-          mechanism finds the method regardless. Since Java cannot have different return types for
-          methods with the same name, this does not introduce any ambiguity.</p>
+        <p>为了从Java方法返回<codeph>NULL</codeph>值,
+          可以使用与原始对象相对应的对象类型 (例如，返回<codeph>java.lang.Integer</codeph>而不是<codeph>int</codeph>)。
+          PL/Java解析机制无论如何都会找到该方法。
+          由于Java对于具有相同名称的方法不能具有不同的返回类型，因此不会引入任何歧义。
+          </p>
       </body>
     </topic>
     <topic id="topic17" xml:lang="en">
-      <title id="pv157414">Complex Types</title>
+      <title id="pv157414">复杂类型</title>
       <body>
-        <p>A complex type will always be passed as a read-only <codeph>java.sql.ResultSet</codeph>
-          with exactly one row. The ResultSet is positioned on its row so a call to
-            <codeph>next()</codeph> should not be made. The values of the complex type are retrieved
-          using the standard getter methods of the ResultSet.</p>
-        <p>Example:</p>
+        <p>复杂类型将始终作为只读的<codeph>java.sql.ResultSet</codeph>传递，只有一行。
+          ResultSet位于其行上，因此不应该调用<codeph>next()</codeph>。
+          使用ResultSet的标准getter方法检索复杂类型的值。
+          </p>
+        <p>例如:</p>
         <codeblock>CREATE TYPE complexTest
   AS(base integer, incbase integer, ctime timestamptz);
 CREATE FUNCTION useComplexTest(complexTest)
   RETURNS VARCHAR
   AS 'foo.fee.Fum.useComplexTest'
   IMMUTABLE LANGUAGE java;</codeblock>
-        <p>In the Java class <codeph>Fum</codeph>, we add the following static method:</p>
+        <p>在java类<codeph>Fum</codeph>中，我们添加以下静态方法：</p>
         <codeblock>public static String useComplexTest(ResultSet complexTest)
 throws SQLException
 {
@@ -530,22 +523,23 @@ throws SQLException
       </body>
     </topic>
     <topic id="topic18" xml:lang="en">
-      <title id="pv157435">Returning Complex Types</title>
+      <title id="pv157435">返回复杂类型</title>
       <body>
-        <p>Java does not stipulate any way to create a ResultSet. Hence, returning a ResultSet is
-          not an option. The SQL-2003 draft suggests that a complex return value should be handled
-          as an IN/OUT parameter. PL/Java implements a ResultSet that way. If you declare a function
-          that returns a complex type, you will need to use a Java method with boolean return type
-          with a last parameter of type <codeph>java.sql.ResultSet</codeph>. The parameter will be
-          initialized to an empty updateable ResultSet that contains exactly one row.</p>
-        <p>Assume that the <codeph>complexTest</codeph> type in previous section has been
-          created.</p>
+        <p>Java没有规定任何创建ResultSet的方法。
+          因此，返回ResultSet不是一个选项。
+          SQL-2003草案建议将复杂的返回值作为IN/OUT参数处理。
+          PL/Java以这种方式实现了一个ResultSet。
+          如果用户声明一个返回复杂类型的函数，则需要使用带有最后一个参数类型为<codeph>java.sql.ResultSet</codeph>的布尔返回类型的Java方法。
+          该参数将被初始化为一个空的可更新结果集，它只包含一行。
+          </p>
+        <p>假设已经创建了上一节中的<codeph>complexTest</codeph>类型。
+          </p>
         <codeblock>CREATE FUNCTION createComplexTest(int, int)
   RETURNS complexTest
   AS 'foo.fee.Fum.createComplexTest'
   IMMUTABLE LANGUAGE java;</codeblock>
-        <p>The PL/Java method resolve will now find the following method in the <codeph>Fum</codeph>
-          class:</p>
+        <p>PL/Java方法解析现在将在<codeph>Fum</codeph>类中找到以下方法：
+          </p>
         <codeblock>public static boolean complexReturn(int base, int increment, 
   ResultSet receiver)
 throws SQLException
@@ -556,32 +550,32 @@ throws SQLException
     Timestamp(System.currentTimeMillis()));
   return true;
 }</codeblock>
-        <p>The return value denotes if the receiver should be considered as a valid tuple (true) or
-          NULL (false).</p>
+        <p>返回值表示接收方是否应被视为有效的元组（true）或NULL（false）。
+          </p>
       </body>
     </topic>
     <topic id="topic19" xml:lang="en">
-      <title id="pv165879">Functions That Return Sets</title>
+      <title id="pv165879">返回集的函数</title>
       <body>
-        <p>When returning result set, you should not build a result set before returning it, because
-          building a large result set would consume a large amount of resources. It is better to
-          produce one row at a time. Incidentally, that is what the Greenplum Database backend
-          expects a function with SETOF return to do. You can return a SETOF a scalar type such as
-          an <codeph>int</codeph>, <codeph>float</codeph> or <codeph>varchar</codeph>, or you can
-          return a SETOF a complex type. </p>
+        <p>返回结果集时，不要在返回结果集之前构建结果集，因为构建大型结果集将消耗大量资源。
+          最好一次产生一行。
+          顺便提一句，那就是Greenplum数据库后端期望一个使用SETOF返回的函数。
+          那用户就可以返回SETOF的一个标量类型，
+          如<codeph>int</codeph>, <codeph>float</codeph>或<codeph>varchar</codeph>或者可以返回一个复合类型的SETOF。
+          </p>
       </body>
     </topic>
     <topic id="topic20" xml:lang="en">
-      <title id="pv157454">Returning a SETOF &lt;scalar type></title>
+      <title id="pv157454">返回SETOF&lt;标量类型></title>
       <body>
-        <p>In order to return a set of a scalar type, you need create a Java method that returns
-          something that implements the <codeph>java.util.Iterator</codeph> interface. Here is an
-          example of a method that returns a SETOF <codeph>varchar</codeph>:</p>
+        <p>为了返回一组标量类型，用户需要创建一个实现<codeph>java.util.Iterator</codeph>接口的Java方法。
+          这是一个返回一个SETOF的<codeph>varchar</codeph>的方法的例子:
+          </p>
         <codeblock>CREATE FUNCTION javatest.getSystemProperties()
   RETURNS SETOF varchar
   AS 'foo.fee.Bar.getNames'
   IMMUTABLE LANGUAGE java;</codeblock>
-        <p>This simple Java method returns an iterator:</p>
+        <p>这个简单的Java方法返回一个迭代器:</p>
         <codeblock>package foo.fee;
 import java.util.Iterator;
 
@@ -600,31 +594,29 @@ public class Bar
       </body>
     </topic>
     <topic id="topic21" xml:lang="en">
-      <title id="pv157476">Returning a SETOF &lt;complex type></title>
+      <title id="pv157476">返回SETOF&lt;复杂类型></title>
       <body>
-        <p>A method returning a SETOF &lt;complex type> must use either the interface
-            <codeph>org.postgresql.pljava.ResultSetProvider</codeph> or
-            <codeph>org.postgresql.pljava.ResultSetHandle</codeph>. The reason for having two
-          interfaces is that they cater for optimal handling of two distinct use cases. The former
-          is for cases when you want to dynamically create each row that is to be returned from the
-          SETOF function. The latter makes is in cases where you want to return the result of an
-          executed query. </p>
+        <p>返回SETOF&lt;复杂类型>的方法必须使用接口<codeph>org.postgresql.pljava.ResultSetProvider</codeph>或<codeph>org.postgresql.pljava.ResultSetHandle</codeph>。
+          具有两个接口的原因是它们满足两种不同用例的最佳处理。
+          前者适用于要动态创建要从SETOF函数返回的每一行的情况。
+          在用户要返回执行查询的结果的情况下，后者将生成。
+        </p>
       </body>
       <topic id="topic22" xml:lang="en">
-        <title>Using the ResultSetProvider Interface</title>
+        <title>使用ResultSetProvider接口</title>
         <body>
-          <p>This interface has two methods. The boolean <codeph>assignRowValues(java.sql.ResultSet
-              tupleBuilder, int rowNumber)</codeph> and the <codeph>void close()</codeph> method.
-            The Greenplum Database query evaluator will call the <codeph>assignRowValues</codeph>
-            repeatedly until it returns false or until the evaluator decides that it does not need
-            any more rows. Then it calls close.</p>
-          <p>You can use this interface the following way:</p>
+          <p>该接口有两种方法。
+            布尔型<codeph>assignRowValues(java.sql.ResultSet tupleBuilder, int rowNumber)</codeph>和<codeph>void close()</codeph>方法。
+            Greenplum数据库的查询执行器将重复调用<codeph>assignRowValues</codeph>直到它返回假或者直到执行器决定不需要更多行为止。
+            然后它会调用close。
+            </p>
+          <p>用户可以通过以下方式使用此接口：</p>
           <codeblock>CREATE FUNCTION javatest.listComplexTests(int, int)
   RETURNS SETOF complexTest
   AS 'foo.fee.Fum.listComplexTest'
   IMMUTABLE LANGUAGE java;</codeblock>
-          <p>The function maps to a static java method that returns an instance that implements the
-              <codeph>ResultSetProvider</codeph> interface.</p>
+          <p>该函数映射到一个返回实现<codeph>ResultSetProvider</codeph>接口实例的静态java方法。
+            </p>
           <codeblock>public class Fum implements ResultSetProvider
 {
   private final int m_base;
@@ -659,26 +651,24 @@ int increment)
     return new Fum(base, increment);
   }
 }</codeblock>
-          <p>The <codeph>listComplextTests</codeph> method is called once. It may return
-              <codeph>NULL</codeph> if no results are available or an instance of the
-              <codeph>ResultSetProvider</codeph>. Here the Java class <codeph>Fum</codeph>
-            implements this interface so it returns an instance of itself. The method
-              <codeph>assignRowValues</codeph> will then be called repeatedly until it returns
-            false. At that time, close will be called</p>
+          <p><codeph>listComplextTests</codeph>方法被调用一次。
+            如果没有可用结果或<codeph>ResultSetProvider</codeph>实例，将返回<codeph>NULL</codeph>。
+            这里的Java类<codeph>Fum</codeph>实现了这个接口，所以它返回一个自己的实例。
+            然后将重复调用<codeph>assignRowValues</codeph>方法，直到返回false。
+            到那候，将会调用close。
+            </p>
         </body>
       </topic>
       <topic id="topic23" xml:lang="en">
-        <title>Using the ResultSetHandle Interface</title>
+        <title>使用ResultSetHandle接口</title>
         <body>
-          <p>This interface is similar to the <codeph>ResultSetProvider</codeph> interface in that
-            it has a <codeph>close()</codeph> method that will be called at the end. But instead of
-            having the evaluator call a method that builds one row at a time, this method has a
-            method that returns a ResultSet. The query evaluator will iterate over this set and
-            deliver the RestulSet contents, one tuple at a time, to the caller until a call to
-              <codeph>next()</codeph> returns false or the evaluator decides that no more rows are
-            needed.</p>
-          <p>Here is an example that executes a query using a statement that it obtained using the
-            default connection. The SQL suitable for the deployment descriptor looks like this:</p>
+          <p>该接口类似于<codeph>ResultSetProvider</codeph>接口因为它也有将在最后调用的<codeph>close()</codeph>方法。
+            但是，不是让evaluator调用一次构建一行的方法，而是返回一个ResultSet的方法。
+            查询evaluator将遍历该集合，并将RestulSet内容一次一个元组传递给调用者，直到对<codeph>next()</codeph>的调用返回false或者evaluator决定不需要更多行。
+            </p>
+          <p>这是一个使用默认连接获取的语句执行查询的示例。
+            适用于部署描述符的SQL看起来像这样:
+            </p>
           <codeblock>CREATE FUNCTION javatest.listSupers()
   RETURNS SETOF pg_user
   AS 'org.postgresql.pljava.example.Users.listSupers'
@@ -687,8 +677,8 @@ CREATE FUNCTION javatest.listNonSupers()
   RETURNS SETOF pg_user
   AS 'org.postgresql.pljava.example.Users.listNonSupers'
   LANGUAGE java;</codeblock>
-          <p>And in the Java package <codeph>org.postgresql.pljava.example</codeph> a class
-              <codeph>Users</codeph> is added:</p>
+          <p>并且在Java包<codeph>org.postgresql.pljava.example</codeph>中加入了一个<codeph>Users</codeph>类：
+            </p>
           <codeblock>public class Users implements ResultSetHandle
 {
   private final String m_filter;
@@ -728,87 +718,86 @@ eateStatement();
     </topic>
   </topic>
   <topic id="topic24" xml:lang="en">
-    <title id="pv157564">Using JDBC</title>
+    <title id="pv157564">使用JDBC</title>
     <body>
-      <p>PL/Java contains a JDBC driver that maps to the PostgreSQL SPI functions. A connection that
-        maps to the current transaction can be obtained using the following statement:</p>
+      <p>PL/Java包含映射到PostgreSQL SPI函数的JDBC驱动程序。
+        可以使用以下语句获取映射到当前事务的连接：
+        </p>
       <codeblock>Connection conn = 
   DriverManager.getConnection("jdbc:default:connection"); </codeblock>
-      <p>After obtaining a connection, you can prepare and execute statements similar to other JDBC
-        connections. These are limitations for the PL/Java JDBC driver:</p>
+      <p>获取连接后，可以准备和执行类似于其他JDBC连接的语句。
+        这些是PL/Java JDBC驱动程序的限制:
+        </p>
       <ul>
-        <li id="pv157568">The transaction cannot be managed in any way. Thus, you cannot use methods
-          on the connection such as:<ul id="ul_yxm_d3c_lp">
+        <li id="pv157568">事务无法以任何方式进行管理。因此，连接后用户不能用如下方法:
+          <ul id="ul_yxm_d3c_lp">
             <li id="pv157569"><codeph>commit()</codeph></li>
             <li id="pv157570"><codeph>rollback()</codeph></li>
             <li id="pv157571"><codeph>setAutoCommit()</codeph></li>
             <li id="pv157572"><codeph>setTransactionIsolation()</codeph></li>
           </ul></li>
-        <li id="pv157573">Savepoints are available with some restrictions. A savepoint cannot
-          outlive the function in which it was set and it must be rolled back or released by that
-          same function.</li>
-        <li id="pv157574">A ResultSet returned from <codeph>executeQuery()</codeph> are always
-            <codeph>FETCH_FORWARD</codeph> and <codeph>CONCUR_READ_ONLY</codeph>.</li>
-        <li id="pv157575">Meta-data is only available in PL/Java 1.1 or higher.</li>
-        <li id="pv157576"><codeph>CallableStatement</codeph> (for stored procedures) is not
-          implemented.</li>
-        <li id="pv157577">The types <codeph>Clob</codeph> or <codeph>Blob</codeph> are not
-          completely implemented, they need more work. The types <codeph>byte[]</codeph> and
-            <codeph>String</codeph> can be used for <codeph>bytea</codeph> and <codeph>text</codeph>
-          respectively.</li>
+        <li id="pv157573">在保存点上也有一些限制。
+          保存点不能超过其设置的功能，并且必须由同一功能回滚或释放。
+          </li>
+        <li id="pv157574">从<codeph>executeQuery()</codeph>返回的结果集始终为<codeph>FETCH_FORWARD</codeph>和<codeph>CONCUR_READ_ONLY</codeph>。
+          </li>
+        <li id="pv157575">元数据仅在PL/Java 1.1或更高版本中可用。
+          </li>
+        <li id="pv157576"><codeph>CallableStatement</codeph>（用于存储过程）没有实现。
+          </li>
+        <li id="pv157577"><codeph>Clob</codeph>和<codeph>Blob</codeph>类型未完全实现，需要更多工作。
+          <codeph>byte[]</codeph>和<codeph>String</codeph>可分别用于<codeph>bytea</codeph>和<codeph>text</codeph>。
+          </li>
       </ul>
     </body>
   </topic>
   <topic id="topic25" xml:lang="en">
-    <title id="pv157578">Exception Handling</title>
+    <title id="pv157578">异常处理</title>
     <body>
-      <p>You can catch and handle an exception in the Greenplum Database backend just like any other
-        exception. The backend ErrorData structure is exposed as a property in a class called
-          <codeph>org.postgresql.pljava.ServerException</codeph> (derived from
-          <codeph>java.sql.SQLException</codeph>) and the Java try/catch mechanism is synchronized
-        with the backend mechanism.</p>
-      <note type="important">You will not be able to continue executing backend functions until your
-        function has returned and the error has been propagated when the backend has generated an
-        exception unless you have used a savepoint. When a savepoint is rolled back, the exceptional
-        condition is reset and you can continue your execution.</note>
+      <p>您可以像其他任何异常一样捕获并处理Greenplum数据库后端中的异常。
+        后端的ErrorData结构作为一个名为<codeph>org.postgresql.pljava.ServerException</codeph>(从<codeph>java.sql.SQLException</codeph>中派生)的类中的属性公开，
+        并且Java try/catch机制与后端机制同步。
+        </p>
+      <note type="important">在函数返回之前，用户将无法继续执行后端函数，并且在后端生成异常时传播错误，除非用户使用了保存点。
+        当回滚保存点时，异常条件被重置，用户可以继续执行。
+        </note>
     </body>
   </topic>
   <topic id="topic26" xml:lang="en">
-    <title id="pv157582">Savepoints</title>
+    <title id="pv157582">保存点</title>
     <body>
-      <p>Greenplum Database savepoints are exposed using the java.sql.Connection interface. Two
-        restrictions apply.</p>
+      <p>Greenplum数据库保存点使用java.sql.Connection接口公开。有两个限制。
+        </p>
       <ul>
-        <li id="pv157584">A savepoint must be rolled back or released in the function where it was
-          set.</li>
-        <li id="pv157585">A savepoint must not outlive the function where it was set</li>
+        <li id="pv157584">必须在设置的函数中回滚或释放保存点。</li>
+        <li id="pv157585">保存点不能超过其设置的功能。</li>
       </ul>
     </body>
   </topic>
   <topic id="topic27" xml:lang="en">
-    <title id="pv157586">Logging</title>
+    <title id="pv157586">日志</title>
     <body>
-      <p>PL/Java uses the standard Java Logger. Hence, you can write things like:</p>
+      <p>PL/Java使用标准的Java Logger。因此，用户可以按如下写：
+        </p>
       <codeblock>Logger.getAnonymousLogger().info( "Time is " + new 
 Date(System.currentTimeMillis()));</codeblock>
-      <p>At present, the logger uses a handler that maps the current state of the Greenplum Database
-        configuration setting <codeph>log_min_messages</codeph> to a valid Logger level and that
-        outputs all messages using the Greenplum Database backend function <codeph>elog()</codeph>. </p>
-      <note>The <codeph>log_min_messages</codeph> setting is read from the database the first time a
-        PL/Java function in a session is executed. On the Java side, the setting does not change
-        after the first PL/Java function execution in a specific session until the Greenplum
-        Database session that is working with PL/Java is restarted.</note>
-      <p>The following mapping apply between the Logger levels and the Greenplum Database backend
-        levels.</p>
+      <p>目前，记录器使用一个处理程序来映射Greenplum数据库配置设置的当前状态<codeph>log_min_messages</codeph>到有效的Logger级别，
+        并使用Greenplum数据库后端功能输出所有消息<codeph>elog()</codeph>。
+        </p>
+      <note>第一次执行会话中的PL/Java函数时，将从数据库中读取<codeph>log_min_messages</codeph>设置。
+        在Java端，在特定会话中执行第一个PL/Java函数之后，设置不会更改，直到重新启动使用PL/Java的Greenplum数据库会话。
+        </note>
+      <p>Logger级别和Greenplum数据库后端级别之间适用以下映射。
+        </p>
       <table id="pv157590">
-        <title>PL/Java Logging Levels</title>
+        <title>PL/Java日志级别</title>
         <tgroup cols="2">
           <colspec colnum="1" colname="col1" colwidth="131.25pt"/>
           <colspec colnum="2" colname="col2" colwidth="165pt"/>
           <thead>
             <row>
               <entry colname="col1">java.util.logging.Level</entry>
-              <entry colname="col2">Greenplum Database Level</entry>
+              <entry colname="col2">Greenplum数据库级别</entry>
             </row>
           </thead>
           <tbody>
@@ -846,7 +835,7 @@ Date(System.currentTimeMillis()));</codeblock>
     </body>
   </topic>
   <topic id="topic28" xml:lang="en">
-    <title id="pv157624">Security</title>
+    <title id="pv157624">安全</title>
     <body>
       <ul>
         <li id="pv165238">
@@ -858,32 +847,33 @@ Date(System.currentTimeMillis()));</codeblock>
       </ul>
     </body>
     <topic id="topic29" xml:lang="en">
-      <title id="pv157625">Installation</title>
+      <title id="pv157625">安装</title>
       <body>
-        <p>Only a database superuser can install PL/Java. The PL/Java utility functions are
-          installed using SECURITY DEFINER so that they execute with the access permissions that
-          where granted to the creator of the functions.</p>
+        <p>只有数据库超级用户才可以安装PL/Java。
+          使用SECURITY DEFINER安装PL/Java实用程序函数，以便它们执行以授予函数创建者的访问权限。
+          </p>
       </body>
     </topic>
     <topic id="topic30" xml:lang="en">
-      <title id="pv157627">Trusted Language</title>
+      <title id="pv157627">可信语言</title>
       <body>
-        <p>PL/Java is a <i>trusted</i> language. The trusted PL/Java language has no access to the
-          file system as stipulated by PostgreSQL definition of a trusted language. Any database
-          user can create and access functions in a trusted language.</p>
-        <p>PL/Java also installs a language handler for the language <codeph>javau</codeph>. This
-          version is <i>not trusted</i> and only a superuser can create new functions that use it.
-          Any user can call the functions.</p>
+        <p>PL/Java是一种<i>可信</i>语言。
+          可信的PL/Java语言无法访问PostgreSQL定义可信语言所规定的文件系统。
+          任何数据库用户都可以创建和访问受信任的语言的函数。
+          </p>
+        <p>PL/Java还为语言<codeph>javau</codeph>安装语言处理程序。
+          此版本不受信任，只有超级用户可以创建使用它的新函数。
+          任何用户都可以调用这些函数。
+          </p>
       </body>
     </topic>
   </topic>
   <topic id="topic33" xml:lang="en">
-    <title id="pv157633">Some PL/Java Issues and Solutions</title>
+    <title id="pv157633">一些PL/Java问题和解决方案</title>
     <body>
-      <p>When writing the PL/Java, mapping the JVM into the same process-space as the Greenplum
-        Database backend code, some concerns have been raised regarding multiple threads, exception
-        handling, and memory management. Here are brief descriptions explaining how these issues
-        where resolved.</p>
+      <p>当编写PL/Java时，将JVM映射到与Greenplum数据库后端代码相同的进程空间中，对于多个线程，异常处理和内存管理，已经出现了一些问题。
+        这里是简要说明如何解决这些问题。
+        </p>
       <ul>
         <li id="pv165334">
           <xref href="#topic34" type="topic" format="dita"/>
@@ -897,77 +887,78 @@ Date(System.currentTimeMillis()));</codeblock>
       </ul>
     </body>
     <topic id="topic34" xml:lang="en">
-      <title id="pv157635">Multi-threading</title>
+      <title id="pv157635">多线程</title>
       <body>
-        <p>Java is inherently multi-threaded. The Greenplum Database backend is not. There is
-          nothing stopping a developer from utilizing multiple Threads class in the Java code.
-          Finalizers that call out to the backend might have been spawned from a background Garbage
-          Collection thread. Several third party Java-packages that are likely to be used make use
-          of multiple threads. How can this model coexist with the Greenplum Database backend in the
-          same process?</p>
+        <p>Java本身就是多线程的。
+          Greenplum数据库后端不是。
+          没有什么可以阻止开发人员在Java代码中使用多个Threads类。
+          调用后端的终结器可能是从背景垃圾回收线程中产生的。
+          可能使用的几个第三方Java包使用多个线程。
+          该模式在同一过程中如何与Greenplum数据库后端共存？
+          </p>
       </body>
       <topic id="topic35" xml:lang="en">
-        <title>Solution</title>
+        <title>解决方案</title>
         <body>
-          <p>The solution is simple. PL/Java defines a special object called the
-              <codeph>Backend.THREADLOCK</codeph>. When PL/Java is initialized, the backend
-            immediately grabs this objects monitor (i.e. it will synchronize on this object). When
-            the backend calls a Java function, the monitor is released and then immediately regained
-            when the call returns. All calls from Java out to backend code are synchronized on the
-            same lock. This ensures that only one thread at a time can call the backend from Java,
-            and only at a time when the backend is awaiting the return of a Java function call.</p>
+          <p>解决方案很简单。
+            PL/Java定义了一个特殊对象<codeph>Backend.THREADLOCK</codeph>。
+            当初始化PL/Java时，后端立即抓取该对象监视器（即它将在​​此对象上同步）。
+            当后端调用Java函数时，监视器将被释放，然后在调用返回时立即恢复。
+            来自Java的所有调用到后端代码都在同一个锁上同步。
+            这确保一次只能有一个线程可以从Java调用后端，并且只能在后端正在等待返回Java函数调用的时候调用。
+            </p>
         </body>
       </topic>
     </topic>
     <topic id="topic36" xml:lang="en">
-      <title id="pv157639">Exception Handling</title>
+      <title id="pv157639">异常处理</title>
       <body>
-        <p>Java makes frequent use of try/catch/finally blocks. Greenplum Database sometimes use an
-          exception mechanism that calls <codeph>longjmp</codeph> to transfer control to a known
-          state. Such a jump would normally effectively bypass the JVM. </p>
+        <p>Java经常使用try/catch/finally块。
+          Greenplum数据库有时会使用一个异常机制来调用<codeph>longjmp</codeph>来将控件转移到已知状态。
+          这样的跳转通常会有效地绕过JVM。
+          </p>
       </body>
       <topic id="topic37" xml:lang="en">
-        <title>Solution</title>
+        <title>解决方案</title>
         <body>
-          <p>The backend now allows errors to be caught using the macros
-              <codeph>PG_TRY/PG_CATCH</codeph>/<codeph>PG_END_TRY</codeph> and in the catch block,
-            the error can be examined using the ErrorData structure. PL/Java implements a
-              <codeph>java.sql.SQLException</codeph> subclass called
-              <codeph>org.postgresql.pljava.ServerException</codeph>. The ErrorData can be retrieved
-            and examined from that exception. A catch handler is allowed to issue a rollback to a
-            savepoint. After a successful rollback, execution can continue.</p>
+          <p>后端现在允许使用宏<codeph>PG_TRY/PG_CATCH</codeph>/<codeph>PG_END_TRY</codeph>捕获错误，
+            并且在catch块中，可以使用ErrorData结构检查错误。
+            PL/Java实现了一个名为<codeph>org.postgresql.pljava.ServerException</codeph>的<codeph>java.sql.SQLException</codeph>子类。
+            可以从该异常中检索和检查ErrorData。
+            允许捕获处理程序发送回滚到保存点。
+            回滚成功后，执行可以继续。
+            </p>
         </body>
       </topic>
     </topic>
     <topic id="topic38" xml:lang="en">
-      <title id="pv157643">Java Garbage Collector Versus palloc() and Stack Allocation</title>
+      <title id="pv157643">Java垃圾收集器与palloc()和堆栈分配</title>
       <body>
-        <p>Primitive types are always be passed by value. This includes the <codeph>String</codeph>
-          type (this is a must since Java uses double byte characters). Complex types are often
-          wrapped in Java objects and passed by reference. For example, a Java object can contain a
-          pointer to a palloc'ed or stack allocated memory and use native JNI calls to extract and
-          manipulate data. Such data will become stale once a call has ended. Further attempts to
-          access such data will at best give very unpredictable results but more likely cause a
-          memory fault and a crash.</p>
+        <p>原始类型始终按值传递。
+          包括<codeph>String</codeph>类型(这是必需的，因为Java使用双字节字符)。
+          复杂类型通常包含在Java对象中并通过引用传递。
+          例如，Java对象可以包含指向palloc'ed或stack分配的内存的指针，并使用原生的JNI调用来提取和操作数据。
+          一旦调用结束，这些数据将变得陈旧。
+          进一步尝试访问这些数据最多只会产生非常不可预知的结果，但更有可能导致内存错误和崩溃。
+          </p>
       </body>
       <topic id="topic39" xml:lang="en">
-        <title>Solution</title>
+        <title>解决方案</title>
         <body>
-          <p>The PL/Java contains code that ensures that stale pointers are cleared when the
-            MemoryContext or stack where they where allocated goes out of scope. The Java wrapper
-            objects might live on but any attempt to use them will result in a stale native handle
-            exception.</p>
+          <p>PL/Java包含的代码可以确保当MemoryContext或堆栈分配超出范围时，陈旧的指针被清除。
+            Java包装器对象可能会生效，但是使用它们的任何尝试将导致陈旧的原生处理异常。
+            </p>
         </body>
       </topic>
     </topic>
   </topic>
   <topic id="topic40" xml:lang="en">
-    <title id="pv158163">Example</title>
+    <title id="pv158163">示例</title>
     <body>
-      <p>The following simple Java example creates a JAR file that contains a single method and runs
-        the method. </p>
-      <note type="note">The example requires Java SDK to compile the Java file.</note>
-      <p>The following method returns a substring.</p>
+      <p>以下简单的Java示例创建一个包含单个方法并运行该方法的JAR文件。
+        </p>
+      <note type="note">该示例需要Java SDK来编译Java文件。</note>
+      <p>以下方法返回一个子字符串。</p>
       <codeblock>{
 public static String substring(String text, int beginIndex,
   int endIndex)
@@ -975,37 +966,37 @@ public static String substring(String text, int beginIndex,
     return text.substring(beginIndex, endIndex);
     }
 }</codeblock>
-      <p>Enter the java code in a text file <codeph>example.class</codeph>. </p>
-      <p>Contents of the file <codeph>manifest.txt</codeph>:</p>
+      <p>在文本文件<codeph>example.class</codeph>中输入这些Java代码。</p>
+      <p><codeph>manifest.txt</codeph>文件的内容：</p>
       <codeblock>Manifest-Version: 1.0
 Main-Class: Example
 Specification-Title: "Example"
 Specification-Version: "1.0"
 Created-By: 1.6.0_35-b10-428-11M3811
 Build-Date: 01/20/2013 10:09 AM</codeblock>
-      <p>Compile the java code:</p>
+      <p>编译java代码：</p>
       <codeblock>javac *.java</codeblock>
-      <p>Create a JAR archive named analytics.jar that contains the class file and the manifest file
-        MANIFEST file in the JAR.</p>
+      <p>创建名为analytics.jar的JAR存档，其中包含JAR中的类文件和清单文件MANIFEST文件。
+        </p>
       <codeblock>jar cfm analytics.jar manifest.txt *.class</codeblock>
-      <p>Upload the jar file to the Greenplum master host.</p>
-      <p>Run the <codeph>gpscp</codeph> utility to copy the jar file to the Greenplum Java
-        directory. Use the <codeph>-f</codeph> option to specify the file that contains a list of
-        the master and segment hosts.</p>
+      <p>将jar文件上传到Greenplum master主机。</p>
+      <p>运行<codeph>gpscp</codeph>实用程序将jar文件复制到Greenplum Java目录。
+        使用<codeph>-f</codeph>选项指定包含master节点和segment节点主机列表的文件。
+        </p>
       <codeblock>gpscp -f gphosts_file analytics.jar 
 =:/usr/local/greenplum-db/lib/postgresql/java/</codeblock>
-      <p>Use the <codeph>gpconfig</codeph> utility to set the Greenplum
-          <codeph>pljava_classpath</codeph> server configuration parameter. The parameter lists the
-        installed jar files.</p>
+      <p>使用<codeph>gpconfig</codeph>程序设置Greenplum<codeph>pljava_classpath</codeph>服务器配置参数。
+        该参数列出已安装的jar文件。
+        </p>
       <codeblock>gpconfig -c pljava_classpath -v 'analytics.jar'</codeblock>
-      <p>Run the <codeph>gpstop</codeph> utility with the <codeph>-u</codeph> option to reload the
-        configuration files.</p>
+      <p>运行<codeph>gpstop</codeph>实用程序<codeph>-u</codeph>选项重新加载配置文件。
+        </p>
       <codeblock>gpstop -u</codeblock>
-      <p>From the <codeph>psql</codeph> command line, run the following command to show the
-        installed jar files.</p>
+      <p>来自<codeph>psql</codeph>命令行，运行以下命令显示已安装的jar文件。
+        </p>
       <codeblock>show pljava_classpath</codeblock>
-      <p>The following SQL commands create a table and define a Java function to test the method in
-        the jar file:</p>
+      <p>以下SQL命令创建一个表并定义一个Java函数来测试jar文件中的方法：
+        </p>
       <codeblock>create table temp (a varchar) distributed randomly; 
 insert into temp values ('my string'); 
 --Example function 
@@ -1013,10 +1004,10 @@ create or replace function java_substring(varchar, int, int)
 returns varchar as 'Example.substring' language java; 
 --Example execution 
 select java_substring(a, 1, 5) from temp;</codeblock>
-      <p>You can place the contents in a file, <codeph>mysample.sql</codeph> and run the command
-        from a <codeph>psql</codeph> command line:</p>
+      <p>用户可以将内容放在一个文件<codeph>mysample.sql</codeph>中，并从<codeph>psql</codeph>命令行运行该命令:
+        </p>
       <codeblock>> \i mysample.sql </codeblock>
-      <p>The output is similar to this:</p>
+      <p>输出类似于：</p>
       <codeblock>java_substring
 ----------------
  y st
@@ -1024,7 +1015,7 @@ select java_substring(a, 1, 5) from temp;</codeblock>
     </body>
   </topic>
   <topic id="topic41" xml:lang="en">
-    <title id="pv157762">References</title>
+    <title id="pv157762">参考</title>
     <body>
       <p>The PL/Java Github wiki page - <xref href="https://github.com/tada/pljava/wiki"
           format="html" scope="external">https://github.com/tada/pljava/wiki</xref>.</p>

@@ -2,11 +2,11 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic38">
-   <title>Examples: Read Fixed-Width Data</title>
+   <title>例子：读取宽度固定的数据</title>
    <body>
-      <p>The following examples show how to read fixed-width data.</p>
+      <p>下面的例子展示了如何读取宽度固定的数据。</p>
       <section>
-         <title>Example 1 – Loading a table with all fields defined</title>
+         <title>例 1 – 装载一个所有域都定义好的表</title>
          <p>
             <codeblock>CREATE READABLE EXTERNAL TABLE students (
 name varchar(20), address varchar(30), age int)
@@ -17,7 +17,7 @@ FORMAT 'CUSTOM' (formatter=fixedwidth_in,
          </p>
       </section>
       <section>
-         <title>Example 2 – Loading a table with PRESERVED_BLANKS on</title>
+         <title>例 2 – 装载一个打开了PRESERVED_BLANKS的表</title>
          <p>
             <codeblock>CREATE READABLE EXTERNAL TABLE students (
 name varchar(20), address varchar(30), age int)
@@ -29,7 +29,7 @@ FORMAT 'CUSTOM' (formatter=fixedwidth_in,
          </p>
       </section>
       <section>
-         <title>Example 3 – Loading data with no line delimiter</title>
+         <title>例 3 – 装载没有行定界符的数据</title>
          <p>
             <codeblock>CREATE READABLE EXTERNAL TABLE students (
 name varchar(20), address varchar(30), age int)
@@ -40,7 +40,7 @@ FORMAT 'CUSTOM' (formatter=fixedwidth_in,
          </p>
       </section>
       <section>
-         <title>Example 4 – Create a writable external table with a \r\n line delimiter </title>
+         <title>例 4 – 用\r\n行定界符创建一个可写的外部表 </title>
          <p>
             <codeblock>CREATE WRITABLE EXTERNAL TABLE students_out (
 name varchar(20), address varchar(30), age int)

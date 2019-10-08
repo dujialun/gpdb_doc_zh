@@ -1,64 +1,227 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1" xml:lang="en"><title id="ga143896">pg_attribute</title><body><p>The <codeph>pg_attribute</codeph> table stores information about table columns. There will be
-      exactly one <codeph>pg_attribute</codeph> row for every column in every table in the database.
-      (There will also be attribute entries for indexes, and all objects that have
-        <codeph>pg_class</codeph> entries.) The term attribute is equivalent to column.</p><table id="ga143898"><title>pg_catalog.pg_attribute</title><tgroup cols="4"><colspec colnum="1" colname="col1" colwidth="131pt"/><colspec colnum="2" colname="col2" colwidth="86pt"/><colspec colnum="3" colname="col3" colwidth="85pt"/><colspec colnum="4" colname="col4" colwidth="147pt"/><thead><row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row></thead><tbody><row><entry colname="col1"><codeph>attrelid</codeph></entry><entry colname="col2">oid</entry><entry colname="col3">pg_class.oid</entry><entry colname="col4">The table this column belongs to.</entry></row><row><entry colname="col1"><codeph>attname</codeph></entry><entry colname="col2">name</entry><entry colname="col3"/><entry colname="col4">The column name.</entry></row><row><entry colname="col1"><codeph>atttypid</codeph></entry><entry colname="col2">oid</entry><entry colname="col3">pg_type.oid</entry><entry colname="col4">The data type of this column.</entry></row><row><entry colname="col1"><codeph>attstattarget</codeph></entry><entry colname="col2">int4</entry><entry colname="col3"/><entry colname="col4">Controls the level of detail of statistics accumulated
-for this column by <codeph>ANALYZE</codeph>. A zero value indicates that
-no statistics should be collected. A negative value says to use the system
-default statistics target. The exact meaning of positive values is data
-type-dependent. For scalar data types, it is both the target number of
-"most common values" to collect, and the target number of histogram
-bins to create.</entry></row><row><entry colname="col1"><codeph>attlen</codeph></entry><entry colname="col2">int2</entry><entry colname="col3"/><entry colname="col4">A copy of <codeph>pg_type.typlen</codeph> of this column's
-type.</entry></row><row><entry colname="col1"><codeph>attnum</codeph></entry><entry colname="col2">int2</entry><entry colname="col3"/><entry colname="col4">The number of the column. Ordinary columns are
-numbered from 1 up. System columns, such as oid, have (arbitrary) negative
-numbers.</entry></row><row><entry colname="col1"><codeph>attndims</codeph></entry><entry colname="col2">int4</entry><entry colname="col3"/><entry colname="col4">Number of dimensions, if the column is an array
-type; otherwise <codeph>0</codeph>. (Presently, the number of dimensions
-of an array is not enforced, so any nonzero value effectively means it
-is an array.)</entry></row><row><entry colname="col1"><codeph>attcacheoff</codeph></entry><entry colname="col2">int4</entry><entry colname="col3"/><entry colname="col4">Always <codeph>-1</codeph> in storage, but when
-loaded into a row descriptor in memory this may be updated to cache the
-offset of the attribute within the row.</entry></row><row><entry colname="col1"><codeph>atttypmod</codeph></entry><entry colname="col2">int4</entry><entry colname="col3"/><entry colname="col4">Records type-specific data supplied at table
-creation time (for example, the maximum length of a <codeph>varchar</codeph> column).
-It is passed to type-specific input functions and length coercion functions.
-The value will generally be <codeph>-1</codeph> for types that do not
-need it.</entry></row><row><entry colname="col1"><codeph>attbyval</codeph></entry><entry colname="col2">boolean</entry><entry colname="col3"/><entry colname="col4">A copy of <codeph>pg_type.typbyval</codeph> of this
-column's type.</entry></row><row><entry colname="col1"><codeph>attstorage</codeph></entry><entry colname="col2">char</entry><entry colname="col3"/><entry colname="col4">Normally a copy of <codeph>pg_type.typstorage</codeph>
-of this column's type. For TOAST-able data types, this can be altered
-after column creation to control storage policy.</entry></row><row><entry colname="col1"><codeph>attalign</codeph></entry><entry colname="col2">char</entry><entry colname="col3"/><entry colname="col4">A copy of <codeph>pg_type.typalign</codeph> of this
-column's type.</entry></row><row><entry colname="col1"><codeph>attnotnull</codeph></entry><entry colname="col2">boolean</entry><entry colname="col3"/><entry colname="col4">This represents a not-null constraint. It is
-possible to change this column to enable or disable the constraint.</entry></row><row><entry colname="col1"><codeph>atthasdef</codeph></entry><entry colname="col2">boolean</entry><entry colname="col3"/><entry colname="col4">This column has a default value, in which case
-there will be a corresponding entry in the <codeph>pg_attrdef</codeph> catalog
-that actually defines the value.</entry></row><row><entry colname="col1"><codeph>attisdropped</codeph></entry><entry colname="col2">boolean</entry><entry colname="col3"/><entry colname="col4">This column has been dropped and is no longer
-valid. A dropped column is still physically present in the table, but
-is ignored by the parser and so cannot be accessed via SQL.</entry></row><row><entry colname="col1"><codeph>attislocal</codeph></entry><entry colname="col2">boolean</entry><entry colname="col3"/><entry colname="col4">This column is defined locally in the relation.
-Note that a column may be locally defined and inherited simultaneously.</entry></row><row><entry colname="col1"><codeph>attinhcount</codeph></entry><entry colname="col2">int4</entry><entry colname="col3"/><entry colname="col4">The number of direct ancestors this column has.
-A column with a nonzero number of ancestors cannot be dropped nor renamed.</entry></row>
-    <row>
-      <entry colname="col1"><codeph>attcollation</codeph></entry>
-      <entry colname="col2">oid</entry>
-      <entry colname="col3">pg_collation.oid</entry>
-      <entry colname="col4">The defined collation of the column, or zero if the
-        is not of a collatable data type.</entry>
-    </row>
-    <row>
-      <entry colname="col1"><codeph>attacl</codeph></entry>
-      <entry colname="col2">aclitem[]</entry>
-      <entry colname="col3"></entry>
-      <entry colname="col4">Column-level access privileges, if any have been
-        granted specifically on this column.</entry>
-    </row>
-    <row>
-      <entry colname="col1"><codeph>attoptions</codeph></entry>
-      <entry colname="col2">text[]</entry>
-      <entry colname="col3"></entry>
-      <entry colname="col4">Attribute-level options, as "keyword=value" strings.</entry>
-    </row>
-    <row>
-      <entry colname="col1"><codeph>attfdwoptions</codeph></entry>
-      <entry colname="col2">text[]</entry>
-      <entry colname="col3"></entry>
-      <entry colname="col4">Attribute-level foreign data wrapper options, as
-        "keyword=value" strings.</entry>
-    </row>
-</tbody></tgroup></table></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1" xml:lang="en">
+    <title id="ga143896">pg_attribute</title>
+    <body>
+        <p><codeph>pg_attribute</codeph>存储关于表列的信息。
+            数据库中每个表的每一列都正好对应<codeph>pg_attribute</codeph>表的一行（还有有索引的属性项，以及所有有pg_class 项的对象的属性）。
+            术语属性等效于列。
+        </p>
+        <table id="ga143898">
+            <title>pg_catalog.pg_attribute</title>
+            <tgroup cols="4">
+                <colspec colnum="1" colname="col1" colwidth="131pt"/>
+                <colspec colnum="2" colname="col2" colwidth="86pt"/>
+                <colspec colnum="3" colname="col3" colwidth="85pt"/>
+                <colspec colnum="4" colname="col4" colwidth="147pt"/>
+                <thead>
+                    <row>
+                        <entry colname="col1">列</entry>
+                        <entry colname="col2">类型</entry>
+                        <entry colname="col3">参考</entry>
+                        <entry colname="col4">描述</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attrelid</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3">pg_class.oid</entry>
+                        <entry colname="col4">该列所属的表。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attname</codeph>
+                        </entry>
+                        <entry colname="col2">name</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">列名。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>atttypid</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3">pg_type.oid</entry>
+                        <entry colname="col4">该列的数据类型。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attstattarget</codeph>
+                        </entry>
+                        <entry colname="col2">int4</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">控制由<codeph>ANALYZE</codeph>为此列积累的统计信息的详细程度。
+                            0值表示不应收集统计信息。
+                            负值表示使用系统默认的统计信息目标。
+                            正值的确切含义依赖于数据类型。
+                            对于标量数据类型，它既是要收集的“最常用值”的目标，也是要创建的柱状图的目标。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attlen</codeph>
+                        </entry>
+                        <entry colname="col2">int2</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">该列类型的<codeph>pg_type.typlen</codeph>的副本。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attnum</codeph>
+                        </entry>
+                        <entry colname="col2">int2</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">列编号。普通列从1开始编号。系统列（如OID），具有（任意）负编号。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attndims</codeph>
+                        </entry>
+                        <entry colname="col2">int4</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">如果列是一个数组类型则是维度数；否则为<codeph>0</codeph>（目前，数组的维数不是强制的，所以任何非0值都能有效地表示它为一个数组)。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attcacheoff</codeph>
+                        </entry>
+                        <entry colname="col2">int4</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">在存储中始终为<codeph>-1</codeph>，但是当加载到内存中的行描述符时，这可能会被更新以缓存该属性在行中的偏移量。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>atttypmod</codeph>
+                        </entry>
+                        <entry colname="col2">int4</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">记录在表创建时提供的特定类型的数据（例如，<codeph>varchar</codeph>列的最大长度）。
+                            它被传递到特定类型的输入函数和长度强制函数。
+                            对于不需要它的类型，该值通常为<codeph>-1</codeph>。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attbyval</codeph>
+                        </entry>
+                        <entry colname="col2">boolean</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">该列类型的<codeph>pg_type.typbyval</codeph>副本。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attstorage</codeph>
+                        </entry>
+                        <entry colname="col2">char</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">通常是该列类型的<codeph>pg_type.typstorage</codeph>副本。
+                            对于可TOAST的数据类型来说，可以在列创建之后更改这些数据类型，以控制存储策略。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attalign</codeph>
+                        </entry>
+                        <entry colname="col2">char</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">该列类型的<codeph>pg_type.typalign</codeph>副本。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attnotnull</codeph>
+                        </entry>
+                        <entry colname="col2">boolean</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">这表示一个非空约束。
+                            可以更改此列以启用或禁用该约束。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>atthasdef</codeph>
+                        </entry>
+                        <entry colname="col2">boolean</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">此列具有默认值，这种情况下，将在<codeph>pg_attrdef</codeph> catalog中存在相应的条目实际定义默认值。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attisdropped</codeph>
+                        </entry>
+                        <entry colname="col2">boolean</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">该列已被删除，不再有效。
+                            已删除的列仍然物理存在于表中，但是会被解析器忽略，所以无法通过SQL访问。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attislocal</codeph>
+                        </entry>
+                        <entry colname="col2">boolean</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">该列在表中本地定义。
+                            请注意，列可以同时在本地定义和继承。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attinhcount</codeph>
+                        </entry>
+                        <entry colname="col2">int4</entry>
+                        <entry colname="col3"/>
+                        <entry colname="col4">这列的直接祖先的数量。
+                            具有非0数量祖先的列不能被删除或重命名。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attcollation</codeph>
+                        </entry>
+                        <entry colname="col2">oid</entry>
+                        <entry colname="col3">pg_collation.oid</entry>
+                        <entry colname="col4">列的已定义排序规则，如果不是可合并数据类型，则为零。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attacl</codeph>
+                        </entry>
+                        <entry colname="col2">aclitem[]</entry>
+                        <entry colname="col3"></entry>
+                        <entry colname="col4">列级访问权限（如果已在此列上专门授予）。
+                        </entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attoptions</codeph>
+                        </entry>
+                        <entry colname="col2">text[]</entry>
+                        <entry colname="col3"></entry>
+                        <entry colname="col4">属性级选项，作为“keyword = value”字符串。</entry>
+                    </row>
+                    <row>
+                        <entry colname="col1">
+                            <codeph>attfdwoptions</codeph>
+                        </entry>
+                        <entry colname="col2">text[]</entry>
+                        <entry colname="col3"></entry>
+                        <entry colname="col4">属性级外部数据包装器选项，作为“keyword = value”字符串。
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </body>
+</topic>

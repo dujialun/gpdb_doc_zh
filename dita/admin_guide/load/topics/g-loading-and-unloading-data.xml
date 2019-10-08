@@ -2,78 +2,32 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title>Loading and Unloading Data</title>
-  <shortdesc>The topics in this section describe methods for loading and writing data into and out
-    of a Greenplum Database, and how to format data files.</shortdesc>
+  <title>装载和卸载数据</title>
+  <shortdesc>这一节中的主题描述了Greenplum数据库中将数据装载进来和写出去的方法，以及如何格式化数据文件。</shortdesc>
   <body>
-    <p>Greenplum Database supports high-performance parallel data loading and unloading, and for
-      smaller amounts of data, single file, non-parallel data import and export. </p>
-    <p>Greenplum Database can read from and write to several types of external data sources,
-      including text files, Hadoop file systems, Amazon S3, and web servers.<ul id="ul_umr_mlh_kr">
-        <li>The <codeph>COPY</codeph> SQL command transfers data between an external text file on
-          the master host, or multiple text files on segment hosts, and a Greenplum Database
-          table.</li>
-        <li>Readable external tables allow you to query data outside of the database directly and in
-          parallel using SQL commands such as <codeph>SELECT</codeph>, <codeph>JOIN</codeph>, or
-            <codeph>SORT EXTERNAL TABLE DATA</codeph>, and you can create views for external tables.
-          External tables are often used to load external data into a regular database table using a
-          command such as <codeph>CREATE TABLE <varname>table</varname> AS SELECT * FROM
-              <varname>ext_table</varname></codeph>. </li>
-        <li>External web tables provide access to dynamic data. They can be backed with data from
-          URLs accessed using the HTTP protocol or by the output of an OS script running on one or
-          more segments.</li>
-        <li>The <codeph>gpfdist</codeph> utility is the Greenplum Database parallel file
-          distribution program. It is an HTTP server that is used with external tables to allow
-          Greenplum Database segments to load external data in parallel, from multiple file systems.
-          You can run multiple instances of <codeph>gpfdist</codeph> on different hosts and network
-          interfaces and access them in parallel. </li>
-        <li>The <codeph>gpload</codeph> utility automates the steps of a load task using
-            <codeph>gpfdist</codeph> and a YAML-formatted control file. </li>
-        <li>You can create readable and writable external tables with the Greenplum
-           Platform Extension Framework (PXF), and use these tables to load data into,
-           or offload data from, Greenplum Database. For information about using
-           PXF, refer to <xref href="../../external/pxf-overview.xml" format="dita" scope="peer">Accessing External Data with PXF</xref>.</li>
-        <li otherprops="pivotal">The Greenplum-Kafka Integration provides high-speed, parallel
-           data transfer from Kafka to Greenplum Database. For information about using
-           these tools, refer to the documentation at <xref
+    <p>Greenplum数据库支持高性能的并行数据装载和卸载，并且支持对较少数据、单个文件的非并行数据导入和导出。 </p>
+    <p>Greenplum数据库可以对多种类型的外部数据源读出和写入,包括文本文件、Hadoop文件系统、亚马逊S3以及Web服务器。
+      <ul id="ul_umr_mlh_kr">
+        <li><codeph>SQL</codeph>命令<codeph>COPY</codeph>在<codeph>Master</codeph>主机上的一个外部文本文件或在<codeph>Segment</codeph>主机上的多个文本文件和一个Greenplum数据库表之间传输数据。</li>
+        <li>外部表允许用户使用如<codeph>SELECT</codeph>、<codeph>JOIN</codeph>或者<codeph>SORT EXTERNAL TABLE DATA</codeph>等SQL命令并行地直接查询位于数据库之外的数据。用户可以为外部表创建视图。外部表常常被用在一个如<codeph>CREATE TABLE <varname>table</varname> AS SELECT * FROM <varname>ext_table</varname></codeph>之类的命令中，用于装载外部数据到一个普通的数据库表中</li>
+        <li>外部Web表提供对动态数据的访问。它们背后可以是来自于用HTTP协议访问的URL的数据或者一个运行在一个或者更多Segment上的OS脚本的输出数据。</li>
+        <li><codeph>gpfdist</codeph>工具是Greenplum数据库的并行文件分发程序。它是一个配合外部表使用的HTTP服务器，它允许Greenplum数据库的Segment并行地从多个文件系统装载外部数据。用户可以在不同的主机和网络接口上运行多个<codeph>gpfdist</codeph>的实例并且并行访问它们。</li>
+        <li><codeph>gpload</codeph>工具使用<codeph>gpfdist</codeph>和一个YAML格式的控制文件使装载任务的步骤自动化。</li>
+        <li>用户可以使用Greenplum Platform Extension Framework（PXF）创建可读写的外部表，并使用这些表将数据加载到Greenplum数据库或从中卸载数据。如想了解如何使用PXF，请参阅<xref href="../../external/pxf-overview.xml" format="dita" scope="peer">使用PXF访问外部数据</xref>。</li>
+        <li otherprops="pivotal">Greenplum-Kafka集成工具可实现高速、并行地从Kafka到Greenplum数据库的数据传输。如想了解如何使用Greenplum-Kafka, 请参阅<xref
             href="../../../greenplum-kafka/intro.xml" format="dita" scope="peer">Pivotal Greenplum-Kafka Integration</xref>.</li>
-        <li otherprops="pivotal">The GemFire-Greenplum Connector allows the transfer of data between
-          a Pivotal GemFire region and a Greenplum Database table. Pivotal GemFire is an in-memory
-          data management system that provides reliable asynchronous event notifications and
-          guaranteed message delivery. For information about using GemFire-Greenplum Connector, see
-            <xref href="http://ggc.docs.pivotal.io/" format="html" scope="external"
-            >http://ggc.docs.pivotal.io/</xref>. For information about Pivotal GemFire, see <xref
+        <li otherprops="pivotal">The GemFire-Greenplum连接器提供在Pivotal GemFire region和Greenplum数据表之间的数据传输。Pivotal GemFire是内存数据管理系统，它可以提供可靠的异步事件通信以保证信息的传递。如想了解如何使用GemFire-Greenplum连接器, 请参阅<xref href="http://ggc.docs.pivotal.io/" format="html" scope="external">http://ggc.docs.pivotal.io/</xref>. 如想了解更多关于Pivotal GemFire, 请参阅<xref
             href="http://gemfire.docs.pivotal.io/" format="html" scope="external"
             >http://gemfire.docs.pivotal.io/</xref>.</li>
-        <li otherprops="pivotal">The Greenplum-Spark Connector provides high speed, parallel data
-          transfer between Pivotal Greenplum Database and Apache Spark. For information about using
-          the Greenplum-Spark Connector, refer to the documentation at <xref
+        <li otherprops="pivotal">Greenplum-Spark连接器提供在Pivotal Greenplum数据库和Apache Spark之间高速，并行地数据迁移。如想了解如何使用Greenplum-Spark连接器, 请参阅<xref
             href="https://greenplum-spark.docs.pivotal.io/" format="html" scope="external"
             >https://greenplum-spark.docs.pivotal.io/</xref>.</li>
-        <li otherprops="pivotal">The Greenplum-Informatica Connector provides high speed data
-          transfer from an Informatica PowerCenter cluster to a Pivotal Greenplum Database cluster
-          for batch and streaming ETL operations. For information about using the
-          Greenplum-Informatica Connector, refer to the documentation at <xref
+        <li otherprops="pivotal">Greenplum-Informatica连接器用于数据批处理和流式ETL操作，提供从Informatica PowerCenter集群到Pivotal Greenplum数据库集群的高速数据传输。有关更多关于Greenplum-Informatica连接器的信息, 请参阅<xref
             href="https://greenplum-informatica.docs.pivotal.io/" format="html" scope="external"
             >https://greenplum-informatica.docs.pivotal.io/</xref>.</li>
-      </ul>The method you choose to load data depends on the characteristics of the source
-      data&#8212;its location, size, format, and any transformations required. </p>
-    <p>In the simplest case, the <codeph>COPY</codeph> SQL command loads data into a table from a
-      text file that is accessible to the Greenplum Database master instance. This requires no setup
-      and provides good performance for smaller amounts of data. With the <codeph>COPY</codeph>
-      command, the data copied into or out of the database passes between a single file on the
-      master host and the database. This limits the total size of the dataset to the capacity of the
-      file system where the external file resides and limits the data transfer to a single file
-      write stream. </p>
-    <p>More efficient data loading options for large datasets take advantage of the Greenplum
-      Database MPP architecture, using the Greenplum Database segments to load data in parallel.
-      These methods allow data to load simultaneously from multiple file systems, through multiple
-      NICs, on multiple hosts, achieving very high data transfer rates. External tables allow you to
-      access external files from within the database as if they are regular database tables. When
-      used with <codeph>gpfdist</codeph>, the Greenplum Database parallel file distribution program,
-      external tables provide full parallelism by using the resources of all Greenplum Database
-      segments to load or unload data. </p>
-    <p>Greenplum Database leverages the parallel architecture of the Hadoop Distributed File System
-      to access files on that system.</p>
+      </ul>装载数据的方法选择取决于源数据的特性&#8212;它的位置、尺寸、格式以及是否需要转换。</p>
+    <p>在最简单的情况中，SQL命令<codeph>COPY</codeph>从一个对Greenplum数据库Master实例可访问的文本文件中装载数据到一个表中。这样做不需要设置并且可以为较少的数据提供很好的性能。通过<codeph>COPY</codeph>命令，数据可以在Master主机上的单个文件和数据库之间来回复制。这限制数据集的总尺寸为外部文件所在文件系统的容量并且把数据传输限制为一个单一的文件写流。 </p>
+    <p>用于大型数据集的更高效的数据装载选项利用了Greenplum数据库的MPP架构，使用Greenplum数据库的Segment并行装载数据。这些方法允许数据从多个文件系统通过多个主机上的多个NIC被装载，达到非常高的数据传输率。外部表允许用户从数据库中像访问普通数据库表一样访问外部文件。在与Greenplum数据库的并行文件分发程序<codeph>gpfdist</codeph>一起使用时，外部表通过使用所有的Greenplum数据库Segment来装载或卸载数据达到完全并行。</p>
+    <p>Greenplum数据库利用了Hadoop分布式文件系统的并行架构来访问其上的文件。</p>
   </body>
 </topic>

@@ -4,17 +4,13 @@
 <topic id="topic1" xml:lang="en">
   <title id="ev138336">gp_configuration_history</title>
   <body>
-    <p>The <codeph>gp_configuration_history</codeph> table contains information about system changes
-      related to fault detection and recovery operations. The <codeph>fts_probe</codeph> process
-      logs data to this table, as do certain related management utilities such as
-        <codeph>gpcheck</codeph>, <codeph>gprecoverseg</codeph>, and <codeph>gpinitsystem</codeph>.
-      For example, when you add a new segment and mirror segment to the system, records for these
-      events are logged to <codeph>gp_configuration_history</codeph>.</p>
-    <p otherprops="pivotal">The event descriptions stored in this table may be helpful for troubleshooting serious system
-      issues in collaboration with Pivotal Support technicians.</p>
-    <p>This table is populated only on the master. This table is defined in the
-        <codeph>pg_global</codeph> tablespace, meaning it is globally shared across all databases in
-      the system.</p>
+    <p><codeph>gp_configuration_history</codeph>表包含有关故障检测和恢复操作相关的系统更改信息。
+      <codeph>fts_probe</codeph>进程将数据记录到此表，和相关的<codeph>gpcheck</codeph>, <codeph>gprecoverseg</codeph>和<codeph>gpinitsystem</codeph>之类的管理工具一样。
+      例如，当用户向系统添加新的Segment和镜像Segment时，这些事件会被记录到<codeph>gp_configuration_history</codeph>。
+      </p>
+    <p otherprops="pivotal">存储在此表中的事件描述可能有助于与Pivotal支持技术人员协作解决严重的系统问题。</p>
+    <p>该表仅在Master上有数据。该表在<codeph>pg_global</codeph>表空间中定义, 这意味着它在系统中的所有数据库之间全局共享。
+      </p>
     <table id="ev138428">
       <title>pg_catalog.gp_configuration_history</title>
       <tgroup cols="4">
@@ -24,10 +20,10 @@
         <colspec colnum="4" colname="col4" colwidth="138pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -37,7 +33,7 @@
             </entry>
             <entry colname="col2">timestamp with time zone</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Timestamp for the event recorded.</entry>
+            <entry colname="col4">记录事件的时间戳。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -45,8 +41,7 @@
             </entry>
             <entry colname="col2">smallint</entry>
             <entry colname="col3">gp_segment _configuration.dbid</entry>
-            <entry colname="col4">System-assigned ID. The unique identifier of a segment (or master)
-              instance.</entry>
+            <entry colname="col4">系统分配的ID。Segment（或者Master）实例的唯一标识符。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -54,13 +49,12 @@
             </entry>
             <entry colname="col2">text</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Text description of the event.</entry>
+            <entry colname="col4">时间的文本描述。</entry>
           </row>
         </tbody>
       </tgroup>
     </table>
-    <p>For information about <codeph>gpcheck</codeph>,
-        <codeph>gprecoverseg</codeph>, and <codeph>gpinitsystem</codeph>, see the Greenplum Database
-      Utility Guide.</p>
+    <p>有关<codeph>gpcheck</codeph>、 <codeph>gprecoverseg</codeph>和<codeph>gpinitsystem</codeph>的信息，请参阅Greenplum数据库工具指南。
+      </p>
   </body>
 </topic>

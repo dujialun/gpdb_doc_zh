@@ -4,9 +4,9 @@
 <topic id="topic1" xml:lang="en">
   <title id="fx143896">pg_amproc</title>
   <body>
-    <p>The <codeph>pg_amproc</codeph> table stores information about support procedures associated with
-      index access method operator classes. There is one row for each support procedure belonging to
-      an operator class.</p>
+    <p><codeph>pg_amproc</codeph>表存储与索引访问操作符相关的支持过程的信息。
+      对于属于一个操作符类的每个支持过程都有一行。
+      </p>
     <table id="fx143898">
       <title>pg_catalog.pg_amproc</title>
       <tgroup cols="4">
@@ -15,42 +15,42 @@
         <colspec colnum="3" colname="col3" colwidth="85pt"/>
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
-          <row><entry colname="col1">column</entry><entry colname="col2">type</entry><entry colname="col3">references</entry><entry colname="col4">description</entry></row>
+          <row><entry colname="col1">列</entry><entry colname="col2">类型</entry><entry colname="col3">参考</entry><entry colname="col4">描述</entry></row>
         </thead>
         <tbody>
           <row>
             <entry colname="col1"><codeph>oid</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Row identifier (hidden attribute; must be explicitly selected)</entry>
+            <entry colname="col4">行标识符（隐藏属性;必须显式选择）</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amprocfamily</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_opfamily.oid</entry>
-            <entry colname="col4">The operator family this entry is for</entry>
+            <entry colname="col4">此条目适用的运算符系列</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amproclefttype</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Left-hand input data type of associated operator</entry>
+            <entry colname="col4">左侧输入数据类型的运算符</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amprocrighttype</codeph></entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_type.oid</entry>
-            <entry colname="col4">Right-hand input data type of associated operator</entry>
+            <entry colname="col4">右侧输入数据类型的运算符</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amprocnum</codeph></entry>
             <entry colname="col2">int2</entry>
-            <entry colname="col3"/><entry colname="col4">Support procedure number</entry>
+            <entry colname="col3"/><entry colname="col4">支持过程编号</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>amproc</codeph></entry>
             <entry colname="col2">regproc</entry>
-            <entry colname="col3">pg_proc.oid</entry><entry colname="col4">OID of the procedure</entry>
+            <entry colname="col3">pg_proc.oid</entry><entry colname="col4">过程的OID</entry>
           </row>
         </tbody>
       </tgroup>

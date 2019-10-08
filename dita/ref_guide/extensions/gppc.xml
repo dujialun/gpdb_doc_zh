@@ -4,23 +4,18 @@
 <topic id="topic1" xml:lang="en">
   <title id="py212122">Greenplum Partner Connector API</title>
   <body>
-      <p>With the Greenplum Partner Connector API (GPPC API), you can write
-        portable Greenplum Database user-defined functions (UDFs) in the C and
-        C++ programming languages. Functions that you develop with the GPPC API
-        require no recompilation or modification to work with older or newer
-        Greenplum Database versions.</p>
-      <p>Functions that you write to the GPPC API can be invoked using SQL
-        in Greenplum Database. The API provides a set of functions and macros
-        that you can use to issue SQL commands through the Server Programming
-        Interface (SPI), manipulate simple and composite data type function
-        arguments and return values, manage memory, and handle data.</p>
-      <p>You compile the C/C++ functions that you develop with the GPPC API
-        into a shared library. The GPPC functions are available to Greenplum
-        Database users after the shared library is installed in the Greenplum
-        Database cluster and the GPPC functions are registered as SQL UDFs.</p>
-      <note>The Greenplum Partner Connector is supported for Greenplum Database
-        versions 4.3.5.0 and later.</note>
-    <p>This topic contains the following information:</p>
+      <p>使用Greenplum Partner Connector API（GPPC API），
+        您可以使用C和C++编程语言编写可移植的Greenplum数据库用户定义函数（UDF）。
+        使用GPPC API开发的函数不需要重新编译或修改即可使用较旧或较新的Greenplum数据库版本。
+        </p>
+      <p>可以使用Greenplum数据库中的SQL调用您写入GPPC API的函数。
+        API提供了一组函数和宏，可用于通过服务器编程接口（SPI）发出SQL命令，操作简单和复合数据类型函数参数和返回值，管理内存和处理数据。
+        </p>
+      <p>您将使用GPPC API开发的C/C++函数编译到共享库中。
+        在Greenplum数据库群集中安装共享库并将GPPC函数注册为SQL UDF之后，Greenplum数据库用户可以使用GPPC函数。
+        </p>
+      <note>Greenplum Partner Connector支持Greenplum数据库版本4.3.5.0及更高版本。</note>
+    <p>本主题包含以下信息：</p>
     <ul>
       <li id="py219392">
         <xref href="#topic_dev" type="topic" format="dita"/><ul>
@@ -58,76 +53,67 @@
   </body>
 
   <topic id="topic_dev" xml:lang="en">
-    <title id="py21716799">Using the GPPC API</title>
+    <title id="py21716799">使用GPPC API</title>
     <body>
-      <p>The GPPC API shares some concepts with C language functions as defined
-        by PostgreSQL. Refer to <xref href="https://www.postgresql.org/docs/9.4/xfunc-c.html" format="html" scope="external">C-Language Functions</xref>
-        in the PostgreSQL documentation for detailed information about developing
-        C language functions.</p>
-      <p>The GPPC API is a wrapper that makes a C/C++ function SQL-invokable
-        in Greenplum Database. This wrapper shields GPPC functions that you
-         write from Greenplum Database library changes by normalizing table
-         and data manipulation and SPI operations through functions and macros
-         defined by the API.</p>
-      <p>The GPPC API includes functions and macros to:</p><ul>
-        <li>Operate on base and composite data types.</li>
-        <li>Process function arguments and return values.</li>
-        <li>Allocate and free memory.</li>
-        <li>Log and report errors to the client.</li>
-        <li>Issue SPI queries.</li>
-        <li>Return a table or set of rows.</li>
-        <li>Process tables as function input arguments.</li>
+      <p>GPPC API与PostgreSQL定义的C语言函数共享一些概念。
+        有关开发C语言函数的详细信息，请参阅PostgreSQL文档中的<xref href="https://www.postgresql.org/docs/9.4/xfunc-c.html" format="html" scope="external">C语言函数</xref>。
+        </p>
+      <p>GPPC API是一个包装器，它使C/C++函数可以在Greenplum数据库中调用SQL。
+        这个包装器通过API定义的函数和宏对表和数据操作以及SPI操作进行规范化来屏蔽您从Greenplum数据库更改中编写的GPPC函数。
+        </p>
+      <p>GPPC API包括以下函数和宏：</p><ul>
+        <li>对基础和复合数据类型进行操作。</li>
+        <li>处理函数参数和返回值。</li>
+        <li>分配和释放内存。</li>
+        <li>记录并向客户报告错误。</li>
+        <li>发出SPI查询。</li>
+        <li>返回一个表或一组行。</li>
+        <li>将表作为函数输入参数。</li>
       </ul>
     </body>
     <topic id="topic_reqs" xml:lang="en">
-      <title id="py217167">Requirements</title>
+      <title id="py217167">要求</title>
       <body>
-        <p>When you develop with the GPPC API:</p><ul>
-          <li>You must develop your code on a system with the same hardware and
-            software architecture as that of your Greenplum Database hosts.</li>
-          <li>You must write the GPPC function(s) in the C or C++ programming 
-            languages.</li>
-          <li>The function code must use the GPPC API, data types, and macros.</li>
-          <li>The function code must <i>not</i> use the PostgreSQL C-Language
-            Function API, header files, functions, or macros.</li>
-          <li>The function code must <i>not</i> <codeph>#include</codeph> the
-            <codeph>postgres.h</codeph> header file or use <codeph>PG_MODULE_MAGIC</codeph>.</li>
-          <li>You must use only the GPPC-wrapped memory functions to allocate
-            and free memory. See <xref href="#topic_mem" format="dita"/>.</li>
-          <li>Symbol names in your object files must not conflict with each
-            other nor with symbols defined in the Greenplum Database server.
-            You must rename your functions or variables if you get error messages
-            to this effect.</li>
+        <p>使用GPPC API进行开发时：</p><ul>
+          <li>您必须在具有与Greenplum数据库主机相同的硬件和软件体系结构的系统上开发代码。
+            </li>
+          <li>您必须使用C或C++编程语言编写GPPC函数。</li>
+          <li>函数代码必须使用GPPC API，数据类型和宏。</li>
+          <li>函数代码不得使用PostgreSQL C语言函数API，头文件，函数或宏。
+            </li>
+          <li>函数代码不能<codeph>#include</codeph> <codeph>postgres.h</codeph>头文件或使用<codeph>PG_MODULE_MAGIC</codeph>。
+            </li>
+          <li>您必须仅使用GPPC包装的内存函数来分配和释放内存。
+            请参阅<xref href="#topic_mem" format="dita"/>。
+            </li>
+          <li>目标文件中的符号名称不得相互冲突，也不得与Greenplum数据库服务器中定义的符号冲突。
+            如果收到此类错误消息，则必须重命名函数或变量。
+            </li>
         </ul>
       </body>
     </topic>
     <topic id="topic_files" xml:lang="en">
-      <title id="py217167">Header and Library Files</title>
+      <title id="py217167">头文件和库文件</title>
       <body>
-        <p>The GPPC header files and libraries are installed in 
-          <codeph>$GPHOME</codeph>:</p><ul>
-          <li>$GPHOME/include/gppc.h - the main GPPC header file</li>
-          <li>$GPHOME/include/gppc_config.h - header file defining the GPPC
-            version</li>
-          <li>$GPHOME/lib/libgppc.[a, so, so.1, so.1.2] - GPPC archive and
-            shared libraries</li>
+        <p>GPPC头文件和库文件安装在<codeph>$GPHOME</codeph>中：</p>
+        <ul>
+          <li>$GPHOME/include/gppc.h - 主要的GPPC头文件</li>
+          <li>$GPHOME/include/gppc_config.h - 定义GPPC版本的头文件</li>
+          <li>$GPHOME/lib/libgppc.[a, so, so.1, so.1.2] - GPPC存档和共享库</li>
         </ul>
       </body>
     </topic>
     <topic id="topic_data" xml:lang="en">
-      <title id="py217167">Data Types</title>
+      <title id="py217167">数据类型</title>
       <body>
-        <p>The GPPC functions that you create will operate on data residing
-          in Greenplum Database. The GPPC API includes data type definitions for equivalent
-          Greenplum Database SQL data types. You must use these types in your
-          GPPC functions.</p>
-        <p>The GPPC API defines a generic data type that you can use to
-          represent any GPPC type.
-          This data type is named <codeph>GppcDatum</codeph>, and is defined
-          as follows:
+        <p>您创建的GPPC函数将对驻留在Greenplum数据库中的数据进行操作。
+          GPPC API包含等效Greenplum数据库SQL数据类型的数据类型定义。
+          您必须在GPPC函数中使用这些类型。
+          </p>
+        <p>GPPC API定义了可用于表示任何GPPC类型的通用数据类型。
+          此数据类型名为<codeph>GppcDatum</codeph>，定义如下：
           <codeblock>typedef int64_t GppcDatum;</codeblock></p>
-        <p>The following table identifies each GPPC data type and the SQL
-          type to which it maps.</p>
+        <p>下表标识了每个GPPC数据类型以及它映射到的SQL类型。</p>
         <table id="in201681">
         <tgroup cols="4">
           <colspec colname="col1" colnum="1" colwidth="77*"/>
@@ -135,9 +121,9 @@
           <colspec colname="col2" colnum="3" colwidth="86*"/>
           <thead>
             <row>
-              <entry colname="col1">SQL Type</entry>
-              <entry colname="col2">GPPC Type</entry>
-              <entry colname="col3">GPPC Oid for Type</entry>
+              <entry colname="col1">SQL类型</entry>
+              <entry colname="col2">GPPC类型</entry>
+              <entry colname="col3">GPPC类型的Oid</entry>
             </row>
           </thead>
           <tbody>
@@ -240,42 +226,39 @@
         </tgroup>
         </table>
         <p> </p>
-        <p>The GPPC API treats text, numeric, and timestamp data types specially,
-           providing functions to operate on these types.</p>
-        <p>Example GPPC base data type declarations:<codeblock>GppcText       message;
+        <p>GPPC API专门处理文本，数字和时间戳数据类型，提供对这些类型进行操作的函数。
+          </p>
+        <p>示例GPPC基本数据类型声明：<codeblock>GppcText       message;
 GppcInt4       arg1;
 GppcNumeric    total_sales;</codeblock></p>
-        <p>The GPPC API defines functions to convert between the generic
-          <codeph>GppcDatum</codeph> type and the GPPC specific types. For
-          example, to convert from an integer to a datum:<codeblock>
+        <p>GPPC API定义了在通用<codeph>GppcDatum</codeph>类型和GPPC特定类型之间进行转换的函数。
+          例如，要从整数转换为datum：
+          <codeblock>
 GppcInt4 num = 13;
 GppcDatum num_dat = GppcInt4GetDatum(num);</codeblock></p>
       </body>
       <topic id="topic_composite" xml:lang="en">
-        <title id="py217167">Composite Types</title>
+        <title id="py217167">符合类型</title>
         <body>
-          <p>A composite data type represents the structure of a row or record,
-            and is comprised of a list of field names and their data types.
-            This structure information is typically referred to as a tuple
-            descriptor. An instance of a composite type is typically referred
-            to as a tuple or row. A tuple does not have a fixed layout and can
-            contain null fields.</p>
-          <p>The GPPC API provides an interface that you can use to define
-            the structure of, to access, and to set tuples. You will use this
-            interface when your GPPC function takes a table as an input
-            argument or returns table or set of record types. Using tuples
-            in table and set returning functions is covered later in this
-            topic.</p>
+          <p>复合数据类型表示行或记录的结构，由字段名称列表及其数据类型组成。
+            该结构信息通常被称为元组描述符。
+            复合类型的实例通常称为元组或行。
+            元组没有固定的布局，可以包含空字段。
+            </p>
+          <p>GPPC API提供了一个界面，您可以使用该界面定义元组的结构，访问和设置元组。
+            当GPPC函数将表作为输入参数或返回表或记录类型集时，将使用此接口。
+            本主题后面将介绍使用表中的元组和设置返回函数。
+            </p>
         </body>
       </topic>
     </topic>
 
     <topic id="topic_argres" xml:lang="en">
-      <title id="py217167">Function Declaration, Arguments, and Results</title>
+      <title id="py217167">函数声明，参数和结果</title>
       <body>
-        <p>The GPPC API relies on macros to declare functions and to simplify
-          the passing of function arguments and results. These macros include:</p>
-
+        <p>GPPC API依赖于宏来声明函数并简化函数参数和结果的传递。
+          这些宏包括：
+          </p>
         <table id="in201681">
         <tgroup cols="4">
           <colspec colname="col1" colnum="1" colwidth="77*"/>
@@ -283,55 +266,61 @@ GppcDatum num_dat = GppcInt4GetDatum(num);</codeblock></p>
           <colspec colname="col3" colnum="3" colwidth="144*"/>
           <thead>
             <row>
-              <entry colname="col1">Task</entry>
-              <entry colname="col2">Macro Signature</entry>
-              <entry colname="col3">Description</entry>
+              <entry colname="col1">任务</entry>
+              <entry colname="col2">宏签名</entry>
+              <entry colname="col3">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
-              <entry colname="col1">Make a function SQL-invokable</entry>
+              <entry colname="col1">使函数SQL-可调用</entry>
               <entry colname="col2"><codeph>GPPC_FUNCTION_INFO(<varname>function_name</varname>)</codeph></entry>
-              <entry colname="col3">Glue to make function <codeph><varname>function_name</varname></codeph> SQL-invokable.</entry>
+              <entry colname="col3">粘贴使函数<codeph><varname>function_name</varname></codeph>SQL-可调用。</entry>
             </row>
             <row>
-              <entry colname="col1">Declare a function</entry>
+              <entry colname="col1">声明一个函数</entry>
               <entry colname="col2"><codeph>GppcDatum <varname>function_name</varname>(GPPC_FUNCTION_ARGS)</codeph></entry>
-              <entry colname="col3">Declare a GPPC function named <codeph><varname>function_name</varname></codeph>; every function must have this same signature.</entry>
+              <entry colname="col3">声明名为<codeph><varname>function_name</varname></codeph>的GPPC函数; 每个函数都必须具有相同的签名。</entry>
             </row>
             <row>
-              <entry colname="col1">Return the number of arguments</entry>
+              <entry colname="col1">返回参数的数量</entry>
               <entry colname="col2"><codeph>GPPC_NARGS()</codeph></entry>
-              <entry colname="col3">Return the number of arguments passed to the function.</entry>
+              <entry colname="col3">返回传递给函数的参数数量。</entry>
             </row>
             <row>
-              <entry colname="col1">Fetch an argument</entry>
+              <entry colname="col1">获取参数</entry>
               <entry colname="col2"><codeph>GPPC_GETARG_&lt;ARGTYPE&gt;(<varname>arg_num</varname>)</codeph></entry>
-              <entry colname="col3">Fetch the value of argument number <varname>arg_num</varname> (starts at 0), where <codeph>&lt;ARGTYPE&gt;</codeph> identifies the data type of the argument. For example, <codeph>GPPC_GETARG_FLOAT8(0)</codeph>.</entry>
+              <entry colname="col3">获取参数编号<varname>arg_num</varname>的值（从0开始），其中<codeph>&lt;ARGTYPE&gt;</codeph>标识参数的数据类型。
+                例如，<codeph>GPPC_GETARG_FLOAT8(0)</codeph>。
+              </entry>
             </row>
             <row>
-              <entry colname="col1">Fetch and make a copy of a text-type argument</entry>
+              <entry colname="col1">获取并创建文本类型参数的副本</entry>
               <entry colname="col2"><codeph>GPPC_GETARG_&lt;ARGTYPE&gt;_COPY(<varname>arg_num</varname>)</codeph></entry>
-              <entry colname="col3">Fetch and make a copy of the value of argument number <varname>arg_num</varname> (starts at 0). <codeph>&lt;ARGTYPE&gt;</codeph> identifies the text type (text, varchar, bpchar, bytea). For example, <codeph>GPPC_GETARG_BYTEA_COPY(1)</codeph>.</entry>
+              <entry colname="col3">获取并复制参数号<varname>arg_num</varname>的值（从0开始）。
+                <codeph>&lt;ARGTYPE&gt;</codeph>标识文本类型（text，varchar，bpchar，bytea）。
+                例如，<codeph>GPPC_GETARG_BYTEA_COPY(1)</codeph>。
+                </entry>
             </row>
             <row>
-              <entry colname="col1">Determine if an argument is NULL</entry>
+              <entry colname="col1">确定参数是否为NULL</entry>
               <entry colname="col2"><codeph>GPPC_ARGISNULL(<varname>arg_num</varname>)</codeph></entry>
-              <entry colname="col3">Return whether or not argument number <codeph><varname>arg_num</varname></codeph> is NULL.</entry>
+              <entry colname="col3">返回参数编号<codeph><varname>arg_num</varname></codeph>是否为NULL。</entry>
             </row>
             <row>
-              <entry colname="col1">Return a result</entry>
+              <entry colname="col1">返回结果</entry>
               <entry colname="col2"><codeph>GPPC_RETURN_&lt;ARGTYPE&gt;(<varname>return_val</varname>)</codeph></entry>
-              <entry colname="col3">Return the value <codeph><varname>return_val</varname></codeph>, where <codeph>&lt;ARGTYPE&gt;</codeph> identifies the data type of the return value. For example, <codeph>GPPC_RETURN_INT4(131)</codeph>.</entry>
+              <entry colname="col3">返回值<codeph><varname>return_val</varname></codeph>，其中<codeph>&lt;ARGTYPE&gt;</codeph>标识返回值的数据类型。
+                例如，<codeph>GPPC_RETURN_INT4(131)</codeph>。
+              </entry>
             </row>
           </tbody>
         </tgroup>
         </table>
         <p>  </p>
-         <p>When you define and implement your GPPC function, you must declare it
-           with the GPPC API using the two declarations identified
-           above. For example, to declare a GPPC function named
-           <codeph>add_int4s()</codeph>:<codeblock>GPPC_FUNCTION_INFO(add_int4s);
+         <p>定义和实现GPPC函数时，必须使用上面标识的两个声明使用GPPC API声明它。
+           例如，要声明名为<codeph>add_int4s()</codeph>的GPPC函数：
+           <codeblock>GPPC_FUNCTION_INFO(add_int4s);
 GppcDatum add_int4s(GPPC_FUNCTION_ARGS);
 
 GppcDatum
@@ -339,17 +328,15 @@ add_int4s(GPPC_FUNCTION_ARGS)
 {
   // code here
 }</codeblock></p>
-        <p>If the <codeph>add_int4s()</codeph> function takes two input
-          arguments of type <codeph>int4</codeph>, you use the
-          <codeph>GPPC_GETARG_INT4(<varname>arg_num</varname>)</codeph> macro
-          to access the argument values. The argument index starts at 0.
-          For example:<codeblock>GppcInt4  first_int = GPPC_GETARG_INT4(0);
+        <p>如果<codeph>add_int4s()</codeph>函数接受两个<codeph>int4</codeph>类型的输入参数，则使用<codeph>GPPC_GETARG_INT4(<varname>arg_num</varname>)</codeph>宏来访问参数值。
+          参数索引从0开始。例如：
+          <codeblock>GppcInt4  first_int = GPPC_GETARG_INT4(0);
 GppcInt4  second_int = GPPC_GETARG_INT4(1);</codeblock>  </p>
-        <p>If <codeph>add_int4s()</codeph> returns the sum of the two input
-          arguments, you use the <codeph>GPPC_RETURN_INT8(<varname>return_val</varname>)</codeph>
-          macro to return this sum. For example:<codeblock>GppcInt8  sum = first_int + second_int;
+        <p>如果<codeph>add_int4s()</codeph>返回两个输入参数的总和，则使用<codeph>GPPC_RETURN_INT8(<varname>return_val</varname>)</codeph>宏来返回此总和。
+          例如：
+          <codeblock>GppcInt8  sum = first_int + second_int;
 GPPC_RETURN_INT8(sum);</codeblock>  </p>
-         <p>The complete GPPC function:<codeblock>GPPC_FUNCTION_INFO(add_int4s);
+         <p>完整的GPPC函数：<codeblock>GPPC_FUNCTION_INFO(add_int4s);
 GppcDatum add_int4s(GPPC_FUNCTION_ARGS);
 
 GppcDatum
@@ -369,46 +356,45 @@ add_int4s(GPPC_FUNCTION_ARGS)
     </topic>
 
     <topic id="topic_mem" xml:lang="en">
-      <title id="py217167">Memory Handling</title>
+      <title id="py217167">内存处理</title>
       <body>
-        <p>The GPPC API provides functions that you use to allocate and free
-          memory, including text memory. You must use these functions for all
-          memory operations.</p>
+        <p>GPPC API提供用于分配和释放内存的函数，包括文本内存。
+          必须将这些函数用于所有内存操作。
+          </p>
         <table id="in201681">
         <tgroup cols="4">
           <colspec colname="col1" colnum="1" colwidth="86*"/>
           <colspec colname="col2" colnum="2" colwidth="77*"/>
           <thead>
             <row>
-              <entry colname="col1">Function Name</entry>
-              <entry colname="col2">Description</entry>
+              <entry colname="col1">函数名</entry>
+              <entry colname="col2">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">void *GppcAlloc( size_t <varname>num</varname> )</entry>
-              <entry colname="col2">Allocate <varname>num</varname> bytes of uninitialized memory.</entry>
+              <entry colname="col2">分配<varname>num</varname>个字节的未初始化内存。</entry>
             </row>
             <row>
               <entry colname="col1">void *GppcAlloc0( size_t <varname>num</varname> )</entry>
-              <entry colname="col2">Allocate <varname>num</varname> bytes of 0-initialized memory.</entry>
+              <entry colname="col2">分配<varname>num</varname>个字节的初始化为0内存。</entry>
             </row>
             <row>
               <entry colname="col1">void *GppcRealloc( void *<varname>ptr</varname>, size_t <varname>num</varname> )</entry>
-              <entry colname="col2">Resize pre-allocated memory.</entry>
+              <entry colname="col2">调整预分配的内存大小。</entry>
             </row>
             <row>
               <entry colname="col1">void GppcFree( void *<varname>ptr</varname> )</entry>
-              <entry colname="col2">Free allocated memory.</entry>
+              <entry colname="col2">释放分配的内存。</entry>
             </row>
           </tbody>
         </tgroup>
         </table>
-        <p>After you allocate memory, you can use system functions such as
-          <codeph>memcpy()</codeph> to set the data.</p>
-        <p>The following example allocates an array of
-          <codeph>GppcDatum</codeph>s and sets the array to datum versions
-          of the function input arguments:<codeblock>GppcDatum  *values;
+        <p>分配内存后，可以使用<codeph>memcpy()</codeph>等系统函数来设置数据。
+          </p>
+        <p>以下示例分配<codeph>GppcDatum</codeph>数组并将数组设置为函数输入参数的datum版本：
+          <codeblock>GppcDatum  *values;
 int attnum = GPPC_NARGS();
 
 // allocate memory for attnum values
@@ -420,99 +406,93 @@ for( int i=0; i&lt;attnum; i++ ) {
     values[i] = d;
 }</codeblock></p>
 
-        <p>When you allocate memory for a GPPC function, you allocate it in
-          the current context. The GPPC API includes functions to return, 
-          create, switch, and reset memory contexts.</p>
+        <p>为GPPC函数分配内存时，可以在当前上下文中分配它。
+          GPPC API包括返回，创建，切换和重置内存上下文的函数。
+          </p>
         <table id="in201681">
         <tgroup cols="4">
           <colspec colname="col1" colnum="1" colwidth="100*"/>
           <colspec colname="col2" colnum="2" colwidth="63*"/>
           <thead>
             <row>
-              <entry colname="col1">Function Name</entry>
-              <entry colname="col2">Description</entry>
+              <entry colname="col1">函数名</entry>
+              <entry colname="col2">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">GppcMemoryContext GppcGetCurrentMemoryContext(void)</entry>
-              <entry colname="col2">Return the current memory context.</entry>
+              <entry colname="col2">返回当前内存上下文。</entry>
             </row>
             <row>
               <entry colname="col1">GppcMemoryContext GppcMemoryContextCreate(GppcMemoryContext <varname>parent</varname>)</entry>
-              <entry colname="col2">Create a new memory context under <varname>parent</varname>.</entry>
+              <entry colname="col2">在<varname>parent</varname>下创建新的内存上下文。</entry>
             </row>
             <row>
               <entry colname="col1">GppcMemoryContext GppcMemoryContextSwitchTo(GppcMemoryContext <varname>context</varname>)</entry>
-              <entry colname="col2">Switch to the memory context <varname>context</varname>.</entry>
+              <entry colname="col2">切换到内存上下文<varname>context</varname>。</entry>
             </row>
             <row>
               <entry colname="col1">void GppcMemoryContextReset(GppcMemoryContext <varname>context</varname>)</entry>
-              <entry colname="col2">Reset (free) the memory in  memory context <varname>context</varname>.</entry>
+              <entry colname="col2">在内存上下文<varname>context</varname>中重置（释放）内存。</entry>
             </row>
           </tbody>
         </tgroup>
         </table>
-        <p>Greenplum Database typically calls a SQL-invoked function in a
-          per-tuple context that it creates and deletes every time the server
-          backend processes a table row. Do not assume that memory allocated
-          in the current memory context is available across multiple function
-          calls.</p>
+        <p>Greenplum数据库通常在每元组上下文中调用一个SQL调用的函数，它在每次服务器后端处理表行时创建和删除。
+          不要假设在当前内存上下文中分配的内存在多个函数调用中可用。
+          </p>
       </body>
     </topic>
 
     <topic id="topic_varlentext" xml:lang="en">
-      <title id="py217167">Working With Variable-Length Text Types</title>
+      <title id="py217167">使用可变长度文本类型</title>
       <body>
-        <p>The GPPC API supports the variable length text, varchar, blank
-          padded, and byte array types. You must use the GPPC API-provided
-          functions when you operate on these data types. Variable text
-          manipulation functions provided in the GPPC API include those to
-          allocate memory for, determine string length of, get string pointers
-          for, and access these types:</p>
+        <p>GPPC API支持可变长度文本，varchar，空白填充和字节数组类型。
+          在对这些数据类型进行操作时，必须使用GPPC API提供的函数。
+          GPPC API中提供的可变文本操作函数包括为其分配内存，确定字符串长度，获取字符串指针以及访问这些类型的函数：
+          </p>
           <table id="in201681">
           <tgroup cols="2">
             <colspec colname="col1" colnum="1" colwidth="105*"/>
             <colspec colname="col2" colnum="2" colwidth="75*"/>
             <thead>
               <row>
-                <entry colname="col1">Function Name</entry>
-                <entry colname="col2">Description</entry>
+                <entry colname="col1">函数名</entry>
+                <entry colname="col2">描述</entry>
               </row>
             </thead>
             <tbody>
             <row>
               <entry colname="col1">GppcText GppcAllocText( size_t <varname>len</varname> )<p>GppcVarChar GppcAllocVarChar( size_t <varname>len</varname> )</p><p>GppcBpChar GppcAllocBpChar( size_t <varname>len</varname> )</p><p>GppcBytea GppcAllocBytea( size_t <varname>len</varname> )</p></entry>
-              <entry colname="col2">Allocate <varname>len</varname> bytes of memory for the varying length type.</entry>
+              <entry colname="col2">为不同长度类型分配<varname>len</varname>个字节的内存。</entry>
             </row>
             <row>
               <entry colname="col1">size_t GppcGetTextLength( GppcText <varname>s</varname> )<p>size_t GppcGetVarCharLength( GppcVarChar <varname>s</varname> )</p><p>size_t GppcGetBpCharLength( GppcBpChar <varname>s</varname> )</p><p>size_t GppcGetByteaLength( GppcBytea <varname>b</varname> )</p></entry>
-              <entry colname="col2">Return the number of bytes in the memory chunk.</entry>
+              <entry colname="col2">返回内存块中的字节数。</entry>
             </row>
               <row>
                 <entry colname="col1">char *GppcGetTextPointer( GppcText <varname>s</varname> )<p>char *GppcGetVarCharPointer( GppcVarChar <varname>s</varname> )</p><p>char *GppcGetBpCharPointer( GppcBpChar <varname>s</varname> )</p><p>char *GppcGetByteaPointer( GppcBytea <varname>b</varname> )</p></entry>
-                <entry colname="col2">Return a string pointer to the head of the memory chunk. The string is not null-terminated.</entry>
+                <entry colname="col2">返回一个指向内存块头部的字符串指针。该字符串不以空值终止。</entry>
               </row>
               <row>
                 <entry colname="col1">char *GppcTextGetCString( GppcText <varname>s</varname> )<p>char *GppcVarCharGetCString( GppcVarChar <varname>s</varname> )</p><p>char *GppcBpCharGetCString( GppcBpChar <varname>s</varname> )</p></entry>
-                <entry colname="col2">Return a string pointer to the head of the memory chunk. The string is null-terminated.</entry>
+                <entry colname="col2">返回一个指向内存块头部的字符串指针。该字符串以空值终止。</entry>
               </row>
               <row>
                 <entry colname="col1">GppcText *GppcCStringGetText( const char *<varname>s</varname> )<p>GppcVarChar *GppcCStringGetVarChar( const char *<varname>s</varname> )</p><p>GppcBpChar *GppcCStringGetBpChar( const char *<varname>s</varname> )</p></entry>
-                <entry colname="col2">Build a varying-length type from a character string.</entry>
+                <entry colname="col2">从字符串构建变长类型。</entry>
               </row>
             </tbody>
           </tgroup>
           </table>
-          <p>Memory returned by the <codeph>GppcGet&lt;VLEN_ARGTYPE>Pointer()</codeph>
-            functions may point to actual database content. Do not modify the
-            memory content. The GPPC API provides functions to allocate memory
-            for these types should you require it. After you allocate memory,
-            you can use system functions such as <codeph>memcpy()</codeph>
-            to set the data.</p>
-          <p>The following example manipulates text input arguments and
-            allocates and sets result memory for a text string concatenation
-            operation:<codeblock>GppcText first_textstr = GPPC_GETARG_TEXT(0);
+          <p><codeph>GppcGet&lt;VLEN_ARGTYPE>Pointer()</codeph>函数返回的内存可能指向实际的数据库内容。
+            请勿修改内存内容。
+            GPPC API提供了在需要时为这些类型分配内存的函数。
+            分配内存后，可以使用<codeph>memcpy()</codeph>等系统函数来设置数据。
+            </p>
+          <p>以下示例处理文本输入参数，并为文本字符串连接操作分配和设置结果内存：
+            <codeblock>GppcText first_textstr = GPPC_GETARG_TEXT(0);
 GppcText second_textstr = GPPC_GETARG_TEXT(1);
 
 // determine the size of the concatenated string and allocate
@@ -530,11 +510,11 @@ memcpy(GppcGetTextPointer(retstring) + arg0_len, GppcGetTextPointer(second_texts
     </topic>
 
     <topic id="topic_errrpt" xml:lang="en">
-      <title id="py217167">Error Reporting and Logging</title>
+      <title id="py217167">错误报告和记录</title>
       <body>
-        <p>The GPPC API provides error reporting and logging functions. The
-          API defines reporting levels equivalent to those in Greenplum
-          Database:<codeblock>typedef enum GppcReportLevel
+        <p>GPPC API提供错误报告和日志记录函数。
+          API定义的报告级别与Greenplum数据库中的级别相同：
+          <codeblock>typedef enum GppcReportLevel
 {
         GPPC_DEBUG1                             = 10,
         GPPC_DEBUG2                             = 11,
@@ -547,77 +527,73 @@ memcpy(GppcGetTextPointer(retstring) + arg0_len, GppcGetTextPointer(second_texts
         GPPC_WARNING                    	= 19,
         GPPC_ERROR                              = 20,
 } GppcReportLevel;
-</codeblock>(The Greenplum Database <xref href="../config_params/guc-list.xml#client_min_messages"><codeph>client_min_messages</codeph></xref>
-          server configuration parameter governs the current client logging
-          level. The <xref href="../config_params/guc-list.xml#client_min_messages"><codeph>log_min_messages</codeph></xref>
-          configuration parameter governs the current log-to-logfile level.)</p>
-        <p>A GPPC report includes the report level, a report message, and an
-          optional report callback function.</p>
-        <p>Reporting and handling functions provide by the GPPC API include:</p>
+</codeblock>（Greenplum数据库<xref href="../config_params/guc-list.xml#client_min_messages"><codeph>client_min_messages</codeph></xref>服务器配置参数控制当前客户端日志记录级别。
+          <xref href="../config_params/guc-list.xml#client_min_messages"><codeph>log_min_messages</codeph></xref>配置参数控制当前日志到日志文件级别。）
+          </p>
+        <p>GPPC报告包括报告级别，报告消息和可选的报告回调函数。
+          </p>
+        <p>GPPC API提供的报告和处理函数包括：</p>
         <table id="in201681">
         <tgroup cols="4">
           <colspec colname="col1" colnum="1" colwidth="80*"/>
           <colspec colname="col2" colnum="2" colwidth="83*"/>
           <thead>
             <row>
-              <entry colname="col1">Function Name</entry>
-              <entry colname="col2">Description</entry>
+              <entry colname="col1">函数名</entry>
+              <entry colname="col2">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">GppcReport()</entry>
-              <entry colname="col2">Format and print/log a string of the specified report level.</entry>
+              <entry colname="col2">格式化并打印/记录指定报告级别的字符串。</entry>
             </row>
             <row>
               <entry colname="col1">GppcInstallReportCallback()</entry>
-              <entry colname="col2">Register/install a report callback function.</entry>
+              <entry colname="col2">注册/安装报告回调函数。</entry>
             </row>
             <row>
               <entry colname="col1">GppcUninstallReportCallback()</entry>
-              <entry colname="col2">Uninstall a report callback function.</entry>
+              <entry colname="col2">卸载报告回调函数。</entry>
             </row>
             <row>
               <entry colname="col1">GppcGetReportLevel()</entry>
-              <entry colname="col2">Retrieve the level from an error report.</entry>
+              <entry colname="col2">从错误报告中检索级别。</entry>
             </row>
             <row>
               <entry colname="col1">GppcGetReportMessage()</entry>
-              <entry colname="col2">Retrieve the message from an error report.</entry>
+              <entry colname="col2">从错误报告中检索消息。</entry>
             </row>
             <row>
               <entry colname="col1">GppcCheckForInterrupts()</entry>
-              <entry colname="col2">Error out if an interrupt is pending.</entry>
+              <entry colname="col2">如果中断挂起则出错。</entry>
             </row>
           </tbody>
         </tgroup>
         </table>
         <p> </p>
-        <p>The <codeph>GppcReport()</codeph> function signature
-          is:<codeblock>void GppcReport(GppcReportLevel elevel, const char *fmt, ...);</codeblock></p>
-        <p><codeph>GppcReport()</codeph> takes a format string input argument
-          similar to <codeph>printf()</codeph>. The following example generates
-          an error level report message that formats a GPPC text argument:
+        <p><codeph>GppcReport()</codeph>函数签名是：<codeblock>void GppcReport(GppcReportLevel elevel, const char *fmt, ...);</codeblock></p>
+        <p><codeph>GppcReport()</codeph>采用类似于<codeph>printf()</codeph>的格式化字符串输入参数。
+          以下示例生成格式化GPPC文本参数的错误级别报告消息：
           <codeblock>GppcText  uname = GPPC_GETARG_TEXT(1);
 GppcReport(GPPC_ERROR, "Unknown user name: %s", GppcTextGetCString(uname));</codeblock></p>
-        <p>Refer to the <xref href="https://github.com/greenplum-db/gpdb/tree/master/src/interfaces/gppc/test" format="html" scope="external">GPPC example code</xref>
-          for example report callback handlers.</p>
+        <p>有关示例报告回调处理程序，请参阅<xref href="https://github.com/greenplum-db/gpdb/tree/master/src/interfaces/gppc/test" format="html" scope="external">GPPC示例代码</xref>。
+          </p>
       </body>
     </topic>
 
     <topic id="topic_spi" xml:lang="en">
-      <title id="py217167">SPI Functions</title>
+      <title id="py217167">SPI函数</title>
       <body>
-        <p>The Greenplum Database Server Programming Interface (SPI) provides
-          writers of C/C++ functions the ability to run SQL commands within a
-          GPPC function. For additional information on SPI functions, refer to
-           <xref href="https://www.postgresql.org/docs/9.4/spi.html"
-             scope="external"
-             format="html">Server Programming Interface</xref>
-            in the PostgreSQL documentation.</p>
-       <p>The GPPC API exposes a subset of PostgreSQL SPI functions. This
-         subset enables you to issue SPI queries and retrieve SPI result
-         values in your GPPC function. The GPPC SPI wrapper functions are:</p>
+        <p>Greenplum数据库服务器编程接口（SPI）为C/C++函数的编写者提供了在GPPC函数中运行SQL命令的能力。
+          有关SPI函数的其他信息，请参阅PostgreSQL文档中的<xref href="https://www.postgresql.org/docs/9.4/spi.html"
+                                              scope="external"
+                                              format="html">服务器编程接口</xref>。
+          </p>
+       <p>GPPC API公开了PostgreSQL SPI函数的子集。
+         通过该子集，您可以在GPPC函数中发出SPI查询并检索SPI结果值。
+         GPPC SPI包装器函数是：
+         </p>
         <table id="in201681">
         <tgroup cols="4">
           <colspec colname="col1" colnum="1" colwidth="40*"/>
@@ -625,63 +601,62 @@ GppcReport(GPPC_ERROR, "Unknown user name: %s", GppcTextGetCString(uname));</cod
           <colspec colname="col3" colnum="3" colwidth="77*"/>
           <thead>
             <row>
-              <entry colname="col1">SPI Function Name</entry>
-              <entry colname="col2">GPPC Function Name</entry>
-              <entry colname="col3">Description</entry>
+              <entry colname="col1">SPI函数名</entry>
+              <entry colname="col2">GPPC函数名</entry>
+              <entry colname="col3">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">SPI_connect()</entry>
               <entry colname="col2">GppcSPIConnect()</entry>
-              <entry colname="col3">Connect to the Greenplum Database server programming interface.</entry>
+              <entry colname="col3">连接到Greenplum数据库服务器编程接口。</entry>
             </row>
             <row>
               <entry colname="col1">SPI_finish()</entry>
               <entry colname="col2">GppcSPIFinish()</entry>
-              <entry colname="col3">Disconnect from the Greenplum Database server programming interface.</entry>
+              <entry colname="col3">断开与Greenplum数据库服务器编程接口的连接。</entry>
             </row>
             <row>
               <entry colname="col1">SPI_exec()</entry>
               <entry colname="col2">GppcSPIExec()</entry>
-              <entry colname="col3">Execute a SQL statement, returning the number of rows.</entry>
+              <entry colname="col3">执行SQL语句，返回行数。</entry>
             </row>
             <row>
               <entry colname="col1" morerows="3">SPI_getvalue()</entry>
               <entry colname="col2">GppcSPIGetValue()</entry>
-              <entry colname="col3">Retrieve the value of a specific attribute by number from a SQL result as a character string.</entry>
+              <entry colname="col3">从SQL结果中按编号检索特定属性的值作为字符串。</entry>
             </row>
             <row>
               <entry colname="col2">GppcSPIGetDatum()</entry>
-              <entry colname="col3">Retrieve the value of a specific attribute by number from a SQL result as a <codeph>GppcDatum</codeph>.</entry>
+              <entry colname="col3">从SQL结果中按编号检索特定属性的值作为<codeph>GppcDatum</codeph>。</entry>
             </row>
             <row>
               <entry colname="col2">GppcSPIGetValueByName()</entry>
-              <entry colname="col3">Retrieve the value of a specific attribute by name from a SQL result as a character string.</entry>
+              <entry colname="col3">按名称从SQL结果中检索特定属性的值作为字符串。</entry>
             </row>
             <row>
               <entry colname="col2">GppcSPIGetDatumByName()</entry>
-              <entry colname="col3">Retrieve the value of a specific attribute by name from a SQL result as a <codeph>GppcDatum</codeph>.</entry>
+              <entry colname="col3">按名称从SQL结果中检索特定属性的值作为<codeph>GppcDatum</codeph>。</entry>
             </row>
           </tbody>
         </tgroup>
         </table>
         <p>  </p>
-        <p>When you create a GPPC function that accesses the server
-          programming interface, your function should comply with the following
-          flow:<codeblock>GppcSPIConnect();
+        <p>创建访问服务器编程接口的GPPC函数时，您的函数应符合以下流程：
+          <codeblock>GppcSPIConnect();
 GppcSPIExec(...)
 // process the results - GppcSPIGetValue(...), GppcSPIGetDatum(...)
 GppcSPIFinish()</codeblock></p>
-        <p>You use <codeph>GppcSPIExec()</codeph> to execute SQL statements
-          in your GPPC function. When you call this function, you also identify
-          the maximum number of rows to return. The function signature of
-          <codeph>GppcSPIExec()</codeph> is:<codeblock>GppcSPIResult GppcSPIExec(const char *sql_statement, long rcount);</codeblock></p>
-        <p><codeph>GppcSPIExec()</codeph> returns a <codeph>GppcSPIResult</codeph>
-          structure. This structure represents SPI result data. It includes a
-          pointer to the data, information about the number of rows processed,
-          a counter, and a result code. The GPPC API defines this structure as
-          follows:<codeblock>typedef struct GppcSPIResultData
+        <p>您可以使用<codeph>GppcSPIExec()</codeph>在GPPC函数中执行SQL语句。
+          调用此函数时，还可以标识要返回的最大行数。
+          <codeph>GppcSPIExec()</codeph>的函数签名是：
+          <codeblock>GppcSPIResult GppcSPIExec(const char *sql_statement, long rcount);</codeblock></p>
+        <p><codeph>GppcSPIExec()</codeph>返回<codeph>GppcSPIResult</codeph>结构。
+          该结构表示SPI结果数据。
+          它包括指向数据的指针，有关处理的行数的信息，计数器和结果代码。
+          GPPC API定义此结构如下：
+          <codeblock>typedef struct GppcSPIResultData
 {
     struct GppcSPITupleTableData   *tuptable;
     uint32_t                       processed;
@@ -689,12 +664,10 @@ GppcSPIFinish()</codeblock></p>
     int                            rescode;
 } GppcSPIResultData;
 typedef GppcSPIResultData *GppcSPIResult;</codeblock></p>
-        <p>You can set and use the <codeph>current</codeph> field in the
-          <codeph>GppcSPIResult</codeph> structure to examine each row of
-          the <codeph>tuptable</codeph> result data.</p>
-        <p>The following code excerpt uses the GPPC API to connect to SPI,
-          execute a simple query, loop through query results, and finish
-          processing:<codeblock>GppcSPIResult   result;
+        <p>您可以设置和使用<codeph>GppcSPIResult</codeph>结构中的<codeph>current</codeph>字段来检查<codeph>tuptable</codeph>结果数据的每一行。
+          </p>
+        <p>以下代码摘录使用GPPC API连接到SPI，执行简单查询，循环查询结果并完成处理：
+          <codeblock>GppcSPIResult   result;
 char            *attname = "id";
 char            *query = "SELECT i, 'foo' || i AS val FROM generate_series(1, 10)i ORDER BY 1";
 bool            isnull = true;
@@ -725,81 +698,77 @@ GppcSPIFinish();
     </topic>
 
     <topic id="topic_tuple" xml:lang="en">
-      <title id="py21716799">About Tuple Descriptors and Tuples</title>
+      <title id="py21716799">关于元组描述符和元组</title>
       <body>
-        <p>A table or a set of records contains one or more tuples (rows).
-          The structure of each attribute of a tuple is defined by a tuple
-          descriptor. A tuple descriptor defines the following for each
-          attribute in the tuple:<ul>
-           <li>attribute name</li>
-           <li>object identifier of the attribute data type</li>
-           <li>byte length of the attribute data type</li>
-           <li>object identifier of the attribute modifer</li>
+        <p>表或一组记录包含一个或多个元组（行）。
+          元组的每个属性的结构由元组描述符定义。
+          元组描述符为元组中的每个属性定义以下内容：
+          <ul>
+           <li>属性名称</li>
+           <li>属性数据类型的对象标识符</li>
+           <li>属性数据类型的字节长度</li>
+           <li>属性修饰符的对象标识符</li>
         </ul></p>
-        <p>The GPPC API defines an abstract type, <codeph>GppcTupleDesc</codeph>,
-          to represent a tuple/row descriptor. The API also provides functions
-          that you can use to create, access, and set tuple descriptors:</p>
+        <p>GPPC API定义了一个抽象类型<codeph>GppcTupleDesc</codeph>来表示元组/行描述符。
+          API还提供了可用于创建，访问和设置元组描述符的函数：
+          </p>
         <table id="in201681">
           <tgroup cols="2">
             <colspec colname="col1" colnum="1" colwidth="65*"/>
             <colspec colname="col2" colnum="2" colwidth="105*"/>
             <thead>
               <row>
-                <entry colname="col1">Function Name</entry>
-                <entry colname="col2">Description</entry>
+                <entry colname="col1">函数名称</entry>
+                <entry colname="col2">描述</entry>
               </row>
             </thead>
             <tbody>
               <row>
                 <entry colname="col1">GppcCreateTemplateTupleDesc()</entry>
-                <entry colname="col2">Create an empty tuple descriptor with a specified number of attributes.</entry>
+                <entry colname="col2">创建具有指定数量的属性的空元组描述符。</entry>
               </row>
               <row>
                 <entry colname="col1">GppcTupleDescInitEntry()</entry>
-                <entry colname="col2">Add an attribute to the tuple descriptor at a specified position.</entry>
+                <entry colname="col2">在指定位置向元组描述符添加属性。</entry>
               </row>
               <row>
                 <entry colname="col1">GppcTupleDescNattrs()</entry>
-                <entry colname="col2">Fetch the number of attributes in the tuple descriptor.</entry>
+                <entry colname="col2">获取元组描述符中的属性数。</entry>
               </row>
               <row>
                 <entry colname="col1">GppcTupleDescAttrName()</entry>
-                <entry colname="col2">Fetch the name of the attribute in a specific position (starts at 0) in the tuple descriptor.</entry>
+                <entry colname="col2">获取元组描述符中特定位置（从0开始）的属性名称。</entry>
               </row>
               <row>
                 <entry colname="col1">GppcTupleDescAttrType()</entry>
-                <entry colname="col2">Fetch the type object identifier of the attribute in a specific position (starts at 0) in the tuple descriptor.</entry>
+                <entry colname="col2">获取元组描述符中特定位置（从0开始）的属性的类型对象标识符。</entry>
               </row>
               <row>
                 <entry colname="col1">GppcTupleDescAttrLen()</entry>
-                <entry colname="col2">Fetch the type length of an attribute in a specific position (starts at 0) in the tuple descriptor.</entry>
+                <entry colname="col2">获取元组描述符中特定位置（从0开始）的属性的类型长度。</entry>
               </row>
               <row>
                 <entry colname="col1">GppcTupleDescAttrTypmod()</entry>
-                <entry colname="col2">Fetch the type modifier object identifier of an attribute in a specific position (starts at 0) in the tuple descriptor.</entry>
+                <entry colname="col2">获取元组描述符中特定位置（从0开始）的属性的类型修饰符对象标识符。</entry>
               </row>
             </tbody>
           </tgroup>
           </table>
              <p>  </p>
-             <p>To construct a tuple descriptor, you first create a template,
-               and then fill in the descriptor fields for each attribute.
-               The signatures for these functions are:<codeblock>GppcTupleDesc GppcCreateTemplateTupleDesc(int natts);
+             <p>要构造元组描述符，首先要创建一个模板，然后为每个属性填写描述符字段。
+               这些函数的签名是：
+               <codeblock>GppcTupleDesc GppcCreateTemplateTupleDesc(int natts);
 void GppcTupleDescInitEntry(GppcTupleDesc desc, uint16_t attno,
                             const char *attname, GppcOid typid, int32_t typmod);</codeblock></p>
-             <p>In some cases, you may want to initialize a tuple descriptor
-               entry from an attribute definition in an existing tuple. The
-               following functions fetch the number of attributes in a tuple
-               descriptor, as well as the definition of a specific attribute
-               (by number) in the descriptor:<codeblock>int GppcTupleDescNattrs(GppcTupleDesc tupdesc);
+             <p>在某些情况下，您可能希望从现有元组中的属性定义初始化元组描述符条目。
+               以下函数获取元组描述符中的属性数，以及描述符中特定属性（按编号）的定义：
+               <codeblock>int GppcTupleDescNattrs(GppcTupleDesc tupdesc);
 const char *GppcTupleDescAttrName(GppcTupleDesc tupdesc, int16_t attno);
 GppcOid GppcTupleDescAttrType(GppcTupleDesc tupdesc, int16_t attno);
 int16_t GppcTupleDescAttrLen(GppcTupleDesc tupdesc, int16_t attno);
 int32_t GppcTupleDescAttrTypmod(GppcTupleDesc tupdesc, int16_t attno);</codeblock></p>
-             <p>The following example initializes a two attribute tuple
-               descriptor. The first attribute is initialized with the
-               definition of an attribute from a different descriptor, and
-               the second attribute is initialized to a boolean type attribute:
+             <p>以下示例初始化两个属性元组描述符。
+               第一个属性使用来自不同描述符的属性定义进行初始化，第二个属性初始化为布尔类型属性：
                <codeblock>GppcTupleDesc       tdesc;
 GppcTupleDesc       indesc = some_input_descriptor;
 
@@ -815,48 +784,46 @@ GppcTupleDescInitEntry(tdesc, 1,
 // create the boolean attribute
 GppcTupleDescInitEntry(tdesc, 2, "is_active", GppcOidBool, 0);
 </codeblock></p>
-        <p>The GPPC API defines an abstract type, <codeph>GppcHeapTuple</codeph>,
-          to represent a tuple/record/row. A tuple is defined by its tuple
-          descriptor, the value for each tuple attribute, and an indicator
-          of whether or not each value is NULL.</p>
-        <p>The GPPC API provides functions that you can use to set and access
-          a tuple and its attributes:</p>
+        <p>GPPC API定义了一个抽象类型<codeph>GppcHeapTuple</codeph>来表示元组/记录/行。
+          元组由其元组描述符定义，每个元组属性的值以及每个值是否为NULL的指示符。
+          </p>
+        <p>GPPC API提供了可用于设置和访问元组及其属性的函数：
+          </p>
         <table id="in201681">
           <tgroup cols="2">
             <colspec colname="col1" colnum="1" colwidth="65*"/>
             <colspec colname="col2" colnum="2" colwidth="105*"/>
             <thead>
               <row>
-                <entry colname="col1">Function Name</entry>
-                <entry colname="col2">Description</entry>
+                <entry colname="col1">函数名称</entry>
+                <entry colname="col2">描述</entry>
               </row>
             </thead>
             <tbody>
               <row>
                 <entry colname="col1">GppcHeapFormTuple()</entry>
-                <entry colname="col2">Form a tuple from an array of <codeph>GppcDatum</codeph>s.</entry>
+                <entry colname="col2">从<codeph>GppcDatum</codeph>数组中形成一个元组。</entry>
               </row>
               <row>
                 <entry colname="col1">GppcBuildHeapTupleDatum()</entry>
-                <entry colname="col2">Form a <codeph>GppcDatum</codeph> tuple from an array of <codeph>GppcDatum</codeph>s.</entry>
+                <entry colname="col2">从<codeph>GppcDatum</codeph>数组中形成一个<codeph>GppcDatum</codeph>元组。</entry>
               </row>
               <row>
                 <entry colname="col1">GppcGetAttributeByName()</entry>
-                <entry colname="col2">Fetch an attribute from the tuple by name.</entry>
+                <entry colname="col2">按名称从元组中获取属性。</entry>
               </row>
               <row>
                 <entry colname="col1">GppcGetAttributeByNum()</entry>
-                <entry colname="col2">Fetch an attribute from the tuple by number (starts at 1).</entry>
+                <entry colname="col2">从数字中获取元组的属性（从1开始）。</entry>
               </row>
             </tbody>
           </tgroup>
           </table>
              <p>  </p>
-             <p>The signatures for the tuple-building GPPC functions are:<codeblock>GppcHeapTuple GppcHeapFormTuple(GppcTupleDesc tupdesc, GppcDatum *values, bool *nulls);
+             <p>构建元组GPPC函数的签名是：<codeblock>GppcHeapTuple GppcHeapFormTuple(GppcTupleDesc tupdesc, GppcDatum *values, bool *nulls);
 GppcDatum    GppcBuildHeapTupleDatum(GppcTupleDesc tupdesc, GppcDatum *values, bool *nulls);</codeblock></p>
-             <p>The following code excerpt constructs a <codeph>GppcDatum</codeph>
-               tuple from the tuple descriptor in the above code example, and
-                from integer and boolean input arguments to a function:<codeblock>GppcDatum intarg = GPPC_GETARG_INT4(0);
+             <p>以下代码摘录从上面的代码示例中的元组描述符构造<codeph>GppcDatum</codeph>元组，并从函数的整数和布尔输入参数构造：
+               <codeblock>GppcDatum intarg = GPPC_GETARG_INT4(0);
 GppcDatum boolarg = GPPC_GETARG_BOOL(1);
 GppcDatum result, values[2];
 bool nulls[2] = { false, false };
@@ -870,78 +837,78 @@ result = GppcBuildHeapTupleDatum( tdesc, values, nulls );
     </topic>
 
     <topic id="topic_srf" xml:lang="en">
-        <title id="py217167">Set-Returning Functions</title>
+        <title id="py217167">Set-Returning函数</title>
         <body>
-          <p>Greenplum Database UDFs whose signatures include
-            <codeph>RETURNS SETOF RECORD</codeph> or
-            <codeph>RETURNS TABLE( ... )</codeph> are set-returning functions.</p>
-          <p>The GPPC API provides support for returning sets (for example, multiple
-            rows/tuples) from a GPPC function. Greenplum Database calls a
-            set-returning function (SRF) once for each row or item. The
-            function must save enough state to remember what it was doing
-            and to return the next row on each call. Memory that you allocate
-            in the SRF context must survive across multiple function calls.</p>
-          <p>The GPPC API provides macros and functions to help keep track
-            of and set this context, and to allocate SRF memory. They include:</p>
+          <p>其签名包括<codeph>RETURNS SETOF RECORD</codeph>或<codeph>RETURNS TABLE( ... )</codeph>的Greenplum数据库UDF是set-returning函数。
+            </p>
+          <p>GPPC API为GPPC函数返回集（例如，多行/元组）提供支持。
+            Greenplum数据库为每个行或项目调用一次set-returning函数（SRF）。
+            该函数必须保存足够的状态以记住它正在做什么并返回每次调用的下一行。
+            您在SRF上下文中分配的内存必须在多个函数调用中存活。
+            </p>
+          <p>GPPC API提供宏和函数，以帮助跟踪和设置此上下文，并分配SRF内存。
+            他们包括：
+            </p>
         <table id="in201681">
         <tgroup cols="2">
           <colspec colname="col1" colnum="1" colwidth="40*"/>
           <colspec colname="col2" colnum="2" colwidth="60*"/>
           <thead>
             <row>
-              <entry colname="col1">Function/Macro Name</entry>
-              <entry colname="col2">Description</entry>
+              <entry colname="col1">函数/宏名称</entry>
+              <entry colname="col2">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">GPPC_SRF_RESULT_DESC()</entry>
-              <entry colname="col2">Get the output row tuple descriptor for this SRF. The result tuple descriptor is determined by an output table definition or a <codeph>DESCRIBE</codeph> function.</entry>
+              <entry colname="col2">获取此SRF的输出行元组描述符。结果元组描述符由输出表定义或<codeph>DESCRIBE</codeph>函数确定。</entry>
             </row>
             <row>
               <entry colname="col1">GPPC_SRF_IS_FIRSTCALL()</entry>
-              <entry colname="col2">Determine if this is the first call to the SRF.</entry>
+              <entry colname="col2">确定这是否是对SRF的第一次调用。</entry>
             </row>
             <row>
               <entry colname="col1">GPPC_SRF_FIRSTCALL_INIT()</entry>
-              <entry colname="col2">Initialize the SRF context.</entry>
+              <entry colname="col2">初始化SRF上下文。</entry>
             </row>
             <row>
               <entry colname="col1">GPPC_SRF_PERCALL_SETUP()</entry>
-              <entry colname="col2">Restore the context on each call to the SRF.</entry>
+              <entry colname="col2">在每次调用SRF时恢复上下文。</entry>
             </row>
             <row>
               <entry colname="col1">GPPC_SRF_RETURN_NEXT()</entry>
-              <entry colname="col2">Return a value from the SRF and continue processing.</entry>
+              <entry colname="col2">从SRF返回值并继续处理。</entry>
             </row>
             <row>
               <entry colname="col1">GPPC_SRF_RETURN_DONE()</entry>
-              <entry colname="col2">Signal that SRF processing is complete.</entry>
+              <entry colname="col2">SRF处理完成的信号。</entry>
             </row>
             <row>
               <entry colname="col1">GppSRFAlloc()</entry>
-              <entry colname="col2">Allocate memory in this SRF context.</entry>
+              <entry colname="col2">在此SRF上下文中分配内存。</entry>
             </row>
             <row>
               <entry colname="col1">GppSRFAlloc0()</entry>
-              <entry colname="col2">Allocate memory in this SRF context and initialize it to zero.</entry>
+              <entry colname="col2">在此SRF上下文中分配内存并将其初始化为零。</entry>
             </row>
             <row>
               <entry colname="col1">GppSRFSave()</entry>
-              <entry colname="col2">Save user state in this SRF context.</entry>
+              <entry colname="col2">在此SRF上下文中保存用户状态。</entry>
             </row>
             <row>
               <entry colname="col1">GppSRFRestore()</entry>
-              <entry colname="col2">Restore user state in this SRF context.</entry>
+              <entry colname="col2">在此SRF上下文中还原用户状态。</entry>
             </row>
           </tbody>
         </tgroup>
         </table>
         <p>  </p>
-        <p>The <codeph>GppcFuncCallContext</codeph> structure provides the
-          context for an SRF. You create this context on the first call to
-          your SRF. Your set-returning GPPC function must retrieve the
-          function context on each invocation. For example:<codeblock>// set function context
+        <p><codeph>GppcFuncCallContext</codeph>结构提供SRF的上下文。
+          您在第一次调用SRF时创建此上下文。
+          您的set-returning GPPC函数必须在每次调用时检索函数上下文。
+          例如：
+          <codeblock>// set function context
 GppcFuncCallContext fctx;
 if (GPPC_SRF_IS_FIRSTCALL()) {
     fctx = GPPC_SRF_FIRSTCALL_INIT();
@@ -949,82 +916,79 @@ if (GPPC_SRF_IS_FIRSTCALL()) {
 fctx = GPPC_SRF_PERCALL_SETUP();
 // process the tuple
 </codeblock></p>
-         <p>The GPPC function must provide the context when it returns a
-           tuple result or to indicate that processing is complete. For 
-           example:<codeblock>GPPC_SRF_RETURN_NEXT(fctx, result_tuple);
+         <p>GPPC函数必须在返回元组结果时提供上下文或指示处理已完成。
+           例如：
+           <codeblock>GPPC_SRF_RETURN_NEXT(fctx, result_tuple);
 // or
 GPPC_SRF_RETURN_DONE(fctx);</codeblock></p>
 
-        <p>Use a <codeph>DESCRIBE</codeph> function to define the output
-          tuple descriptor of a function that uses the <codeph>RETURNS SETOF RECORD</codeph> clause.
-          Use the <codeph>GPPC_SRF_RESULT_DESC()</codeph> macro to get the
-          output tuple descriptor of a function that uses the <codeph>RETURNS TABLE( ... )</codeph> clause.</p>
-        <p>Refer to the <xref href="#topic_example_srf" type="topic" format="dita"/>
-          for a set-returning function code and deployment example.</p>
+        <p>使用<codeph>DESCRIBE</codeph>函数定义使用<codeph>RETURNS SETOF RECORD</codeph>子句的函数的输出元组描述符。
+          使用<codeph>GPPC_SRF_RESULT_DESC()</codeph>宏获取使用<codeph>RETURNS TABLE( ... )</codeph>子句的函数的输出元组描述符。
+          </p>
+        <p>有关set-returning函数代码和部署示例，请参阅<xref href="#topic_example_srf" type="topic" format="dita"/>。
+          </p>
       </body>
     </topic>
 
     <topic id="topic_tblfunc" xml:lang="en">
-      <title id="py217167">Table Functions</title>
+      <title id="py217167">表函数</title>
       <body>
-        <p>The GPPC API provides the <codeph>GppcAnyTable</codeph> type to
-          pass a table to a function as an input argument, or to return a
-          table as a function result.</p>
-        <p>Table-related functions and macros provided in the GPPC API include:</p>
+        <p>GPPC API提供<codeph>GppcAnyTable</codeph>类型以将表作为输入参数传递给函数，或者将表作为函数结果返回。
+          </p>
+        <p>GPPC API中提供的与表相关的函数和宏包括：</p>
         <table id="in201681">
         <tgroup cols="2">
           <colspec colname="col1" colnum="1" colwidth="40*"/>
           <colspec colname="col2" colnum="2" colwidth="60*"/>
           <thead>
             <row>
-              <entry colname="col1">Function/Macro Name</entry>
-              <entry colname="col2">Description</entry>
+              <entry colname="col1">函数/宏名称</entry>
+              <entry colname="col2">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">GPPC_GETARG_ANYTABLE()</entry>
-              <entry colname="col2">Fetch an anytable function argument.</entry>
+              <entry colname="col2">获取任何表函数参数。</entry>
             </row>
             <row>
               <entry colname="col1">GPPC_RETURN_ANYTABLE()</entry>
-              <entry colname="col2">Return the table.</entry>
+              <entry colname="col2">返回表。</entry>
             </row>
             <row>
               <entry colname="col1">GppcAnyTableGetTupleDesc()</entry>
-              <entry colname="col2">Fetch the tuple descriptor for the table.</entry>
+              <entry colname="col2">获取表的元组描述符。</entry>
             </row>
             <row>
               <entry colname="col1">GppcAnyTableGetNextTuple()</entry>
-              <entry colname="col2">Fetch the next row in the table.</entry>
+              <entry colname="col2">获取表中的下一行。</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
       <p>  </p>
-      <p>You can use the <codeph>GPPC_GETARG_ANYTABLE()</codeph> macro to
-        retrieve a table input argument. When you have access to the table,
-        you can examine the tuple descriptor for the table using the
-        <codeph>GppcAnyTableGetTupleDesc()</codeph> function. The signature
-        of this function is:<codeblock>GppcTupleDesc GppcAnyTableGetTupleDesc(GppcAnyTable t);</codeblock></p>
-       <p>For example, to retrieve the tuple descriptor of a table that
-         is the first input argument to a function:<codeblock>GppcAnyTable     intbl;
+      <p>您可以使用<codeph>GPPC_GETARG_ANYTABLE()</codeph>宏来检索表输入参数。
+        当您有权访问该表时，可以使用<codeph>GppcAnyTableGetTupleDesc()</codeph>函数检查该表的元组描述符。
+        该函数的签名是：
+        <codeblock>GppcTupleDesc GppcAnyTableGetTupleDesc(GppcAnyTable t);</codeblock></p>
+       <p>例如，要检索作为函数的第一个输入参数的表的元组描述符：
+         <codeblock>GppcAnyTable     intbl;
 GppcTupleDesc    in_desc;
 
 intbl = GPPC_GETARG_ANYTABLE(0);
 in_desc = GppcAnyTableGetTupleDesc(intbl);</codeblock></p>
-      <p>The <codeph>GppcAnyTableGetNextTuple()</codeph> function fetches
-        the next row from the table. Similarly, to retrieve the next tuple
-        from the table above:<codeblock>GppcHeapTuple    ntuple;
+      <p><codeph>GppcAnyTableGetNextTuple()</codeph>函数从表中获取下一行。
+        同样，要从上表中检索下一个元组：
+        <codeblock>GppcHeapTuple    ntuple;
 
 ntuple = GppcAnyTableGetNextTuple(intbl);</codeblock></p>
       </body>
     </topic>
 
     <topic id="topic_limits" xml:lang="en">
-      <title id="py217167">Limitations</title>
+      <title id="py217167">限制</title>
       <body>
-        <p>The GPPC API does not support the following operators with Greenplum Database version 5.0.x:</p><ul>
+        <p>使用Greenplum数据库版本5.0.x的GPPC API不支持以下运算符：</p><ul>
           <li>integer || integer</li>
           <li>integer = text</li>
           <li>text &lt; integer</li>
@@ -1033,13 +997,12 @@ ntuple = GppcAnyTableGetNextTuple(intbl);</codeblock></p>
     </topic>
 
     <topic id="topic_samplecode" xml:lang="en">
-      <title id="py217167">Sample Code</title>
+      <title id="py217167">样例代码</title>
       <body>
-        <p>The <xref href="https://github.com/greenplum-db/gpdb/tree/master/src/interfaces/gppc/test" format="html" scope="external">gppc test</xref>
-          directory in the Greenplum Database github repository includes
-          sample GPPC code:</p><ul>
-          <li><codeph>gppc_demo/</codeph> - sample code exercising GPPC SPI functions, error reporting, data type argument and return macros, set-returning functions, and encoding functions</li>
-          <li><codeph>tabfunc_gppc_demo/</codeph> - sample code exercising GPPC table and set-returning functions</li>
+        <p>Greenplum数据库github存储库中的<xref href="https://github.com/greenplum-db/gpdb/tree/master/src/interfaces/gppc/test" format="html" scope="external">gppc test</xref>目录包含示例GPPC代码：
+          </p><ul>
+          <li><codeph>gppc_demo/</codeph> - 示例代码，用于执行GPPC SPI函数，错误报告，数据类型参数和返回宏，set-returning函数和编码函数</li>
+          <li><codeph>tabfunc_gppc_demo/</codeph> - 示例代码执行GPPC表和set-returning函数</li>
         </ul>
       </body>
     </topic>
@@ -1047,25 +1010,21 @@ ntuple = GppcAnyTableGetNextTuple(intbl);</codeblock></p>
   </topic>
 
   <topic id="topic_build" xml:lang="en">
-      <title id="py217167bbb">Building a GPPC Shared Library with PGXS</title>
+      <title id="py217167bbb">使用PGXS构建GPPC共享库</title>
       <body>
-        <p>You compile functions that you write with the GPPC API into one
-          or more shared libraries that the Greenplum Database server loads
-          on demand.</p>
-        <p>You can use the PostgreSQL build extension infrastructure (PGXS)
-          to build the source code for your GPPC functions against a Greenplum
-          Database installation. This framework automates common build rules
-          for simple modules. If you have a more complicated use case, you
-          will need to write your own build system.</p>
-        <p>To use the PGXS infrastructure to generate a shared library for
-          functions that you create with the GPPC API, create a simple
-          <codeph>Makefile</codeph> that sets PGXS-specific variables.</p>
-        <note>Refer to <xref href="https://www.postgresql.org/docs/9.4/extend-pgxs.html" format="html" scope="external">Extension Building Infrastructure</xref>
-          in the PostgreSQL documentation for information about the
-          <codeph>Makefile</codeph> variables supported by PGXS.</note>
-        <p>For example, the following <codeph>Makefile</codeph> generates
-          a shared library named <codeph>sharedlib_name.so</codeph> from
-          two C source files named <codeph>src1.c</codeph> and <codeph>src2.c</codeph>:<codeblock>MODULE_big = sharedlib_name
+        <p>您可以将使用GPPC API编写的函数编译到Greenplum数据库服务器按需加载的一个或多个共享库中。
+          </p>
+        <p>您可以使用PostgreSQL构建扩展基础结构（PGXS）根据Greenplum数据库安装为您的GPPC函数构建源代码。
+          该框架自动化简单模块的通用构建规则。
+          如果您有一个更复杂的用例，则需要编写自己的构建系统。
+          </p>
+        <p>要使用PGXS基础结构为使用GPPC API创建的函数生成共享库，请创建一个设置PGXS特定变量的简单<codeph>Makefile</codeph>。
+          </p>
+        <note>有关PGXS支持的<codeph>Makefile</codeph>变量的信息，
+          请参阅PostgreSQL文档中的<xref href="https://www.postgresql.org/docs/9.4/extend-pgxs.html" format="html" scope="external">扩展的构建基础设施</xref>。
+          </note>
+        <p>例如，以下<codeph>Makefile</codeph>从名为<codeph>src1.c</codeph>和<codeph>src2.c</codeph>的两个C源文件生成名为<codeph>sharedlib_name.so</codeph>的共享库：
+          <codeblock>MODULE_big = sharedlib_name
 OBJS = src1.o src2.o
 PG_CPPFLAGS = -I$(shell $(PG_CONFIG) --includedir)
 SHLIB_LINK = -L$(shell $(PG_CONFIG) --libdir) -lgppc
@@ -1074,126 +1033,110 @@ PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)</codeblock></p>
 
-        <p><codeph>MODULE_big</codeph> identifes the base name of the shared
-          library generated by the <codeph>Makefile</codeph>.</p>
-        <p><codeph>PG_CPPFLAGS</codeph> adds the Greenplum Database installation
-          include directory to the compiler header file search path.</p>
-        <p><codeph>SHLIB_LINK</codeph> adds the Greenplum Database installation
-          library directory to the linker search path. This variable also adds
-          the GPPC library (<codeph>-lgppc</codeph>) to the link command.</p>
-        <p>The <codeph>PG_CONFIG</codeph> and <codeph>PGXS</codeph> variable
-          settings and the <codeph>include</codeph> statement are required
-          and typically reside in the last three lines of the
-          <codeph>Makefile</codeph>.</p>
+        <p><codeph>MODULE_big</codeph>标识<codeph>Makefile</codeph>生成的共享库的基本名称。
+          </p>
+        <p><codeph>PG_CPPFLAGS</codeph>将Greenplum数据库安装包含目录添加到编译器头文件搜索路径中。
+          </p>
+        <p><codeph>SHLIB_LINK</codeph>将Greenplum数据库安装库目录添加到链接器搜索路径。
+          此变量还将GPPC库（<codeph>-lgppc</codeph>）添加到link命令。
+          </p>
+        <p><codeph>PG_CONFIG</codeph>和<codeph>PGXS</codeph>变量设置和<codeph>include</codeph>语句是必需的，
+          通常位于<codeph>Makefile</codeph>的最后三行。
+          </p>
       </body>
   </topic>
 
   <topic id="topic_reg" xml:lang="en">
-      <title id="py21716799">Registering a GPPC Function with Greenplum Database</title>
+      <title id="py21716799">使用Greenplum数据库注册GPPC函数</title>
       <body>
-        <p>Before users can invoke a GPPC function from SQL, you must
-          register the function with Greenplum Database.</p>
-        <p>Registering a GPPC function involves mapping the GPPC function
-          signature to a SQL user-defined function. You define this mapping
-          with the <codeph>CREATE FUNCTION .. AS </codeph> command specifying
-          the GPPC shared library name. You may choose to use the same name
-          or differing names for the GPPC and SQL functions.</p>
-        <p>Sample <codeph>CREATE FUNCTION ... AS </codeph> syntax follows:
+        <p>在用户可以从SQL调用GPPC函数之前，必须使用Greenplum数据库注册该函数。
+          </p>
+        <p>注册GPPC函数涉及将GPPC函数签名映射到SQL用户定义的函数。
+          您可以使用<codeph>CREATE FUNCTION .. AS </codeph>命令定义此映射，以指定GPPC共享库名称。
+          您可以选择为GPPC和SQL函数使用相同的名称或不同的名称。
+          </p>
+        <p>示例<codeph>CREATE FUNCTION ... AS </codeph>语法如下：
           <codeblock>CREATE FUNCTION <varname>sql_function_name</varname>(<varname>arg</varname>[, ...]) RETURNS <varname>return_type</varname>
   AS '<varname>shared_library_path</varname>'[, '<varname>gppc_function_name</varname>']
 LANGUAGE C STRICT [WITH (DESCRIBE=<varname>describe_function</varname>)];</codeblock></p>
-         <p>You may omit the shared library <codeph>.so</codeph> extension
-           when you specify <codeph><varname>shared_library_path</varname></codeph>.</p>
-        <p>The following command registers the example <codeph>add_int4s()</codeph>
-          function referenced earlier in this topic to a SQL UDF named
-          <codeph>add_two_int4s_gppc()</codeph> if the GPPC function was compiled
-          and linked in a shared library named <codeph>gppc_try.so</codeph>:
+         <p>指定<codeph><varname>shared_library_path</varname></codeph>时，可以省略共享库<codeph>.so</codeph>扩展名。
+           </p>
+        <p>如果GPPC函数在名为<codeph>gppc_try.so</codeph>的共享库中编译和链接，
+          则以下命令将本主题前面引用的示例<codeph>add_int4s()</codeph>函数注册到名为<codeph>add_two_int4s_gppc()</codeph>的SQL UDF：
           <codeblock>CREATE FUNCTION add_two_int4s_gppc(int4, int4) RETURNS int8
   AS 'gppc_try.so', 'add_int4s'
 LANGUAGE C STRICT;</codeblock></p>
       </body>
 
   <topic id="topic_dynload" xml:lang="en">
-    <title id="py217167bx">About Dynamic Loading</title>
+    <title id="py217167bx">关于动态加载</title>
     <body>
-      <p>You specify the name of the GPPC shared library in the SQL
-        <codeph>CREATE FUNCTION ... AS</codeph> command to register a GPPC
-        function in the shared library with Greenplum Database. The Greenplum
-        Database dynamic loader loads a GPPC shared library file into memory
-        the first time that a user invokes a user-defined function linked in
-        that shared library. If you do not provide an absolute path to the
-        shared library in the <codeph>CREATE FUNCTION ... AS</codeph>
-        command, Greenplum Database attempts to locate the library using these
-        ordered steps:</p><ol>
-        <li>If the shared library file path begins with the string
-          <codeph>$libdir</codeph>, Greenplum Database looks for the file
-          in the PostgreSQL package library directory. Run the
-          <codeph>pg_config --pkglibdir</codeph> command to determine the
-          location of this directory.</li>
-        <li>If the shared library file name is specified without a directory
-          prefix, Greenplum Database searches for the file in the directory
-          identified by the <codeph>dynamic_library_path</codeph> server
-          configuration parameter value.</li>
-        <li>The current working directory.</li></ol>
+      <p>您可以在<codeph>CREATE FUNCTION ... AS</codeph>命令中指定GPPC共享库的名称，
+        以在Greenplum数据库的共享库中注册GPPC函数。
+        Greenplum数据库动态加载程序在用户第一次调用在该共享库中链接的用户定义函数时将GPPC共享库文件加载到内存中。
+        如果在<codeph>CREATE FUNCTION ... AS</codeph>命令中未提供共享库的绝对路径，
+        Greenplum数据库将尝试使用以下有序步骤找到库：
+        </p><ol>
+        <li>如果共享库文件路径以字符串<codeph>$libdir</codeph>开头，
+          则Greenplum数据库将在PostgreSQL包库目录中查找该文件。
+          运行<codeph>pg_config --pkglibdir</codeph>命令以确定此目录的位置。
+          </li>
+        <li>如果指定了没有目录前缀的共享库文件名，
+          则Greenplum数据库将在<codeph>dynamic_library_path</codeph>服务器配置参数值标识的目录中搜索该文件。
+          </li>
+        <li>当前的工作目录。</li></ol>
     </body>
   </topic>
   </topic>
   <topic id="topic_deploy" xml:lang="en">
-      <title id="py21716799">Packaging and Deployment Considerations</title>
+      <title id="py21716799">打包和部署注意事项</title>
       <body>
-        <p>You must package the GPPC shared library and SQL function
-          registration script in a form suitable for deployment by the
-          Greenplum Database administrator in the Greenplum cluster.
-          Provide specific deployment instructions for your GPPC package.</p>
-        <p>When you construct the package and deployment instructions, take
-          into account the following:</p><ul>
-          <li>Consider providing a shell script or program that the Greenplum
-            Database administrator runs to both install the shared library to
-            the desired file system location and register the GPPC functions.</li>
-          <li>The GPPC shared library must be installed to the same file
-            system location on the master host and on every segment host in the
-            Greenplum Database cluster.</li>
-          <li>The <codeph>gpadmin</codeph> user must have permission to
-            traverse the complete file system path to the GPPC shared 
-            library file.</li>
-         <li>The file system location of your GPPC shared library after it
-           is installed in the Greenplum Database deployment determines how
-           you reference the shared library when you register a function in
-           the library with the <codeph>CREATE FUNCTION ... AS</codeph>
-           command.</li>
-          <li> Create a <codeph>.sql</codeph> script file that registers
-           a SQL UDF for each GPPC function in your GPPC shared library.
-           The functions that you create in the <codeph>.sql</codeph>
-           registration script must reference the deployment location of the
-           GPPC shared library. Include this script in your GPPC deployment package.</li>
-          <li>Document the instructions for running your GPPC package deployment
-             script, if you provide one.</li>
-          <li>Document the instructions for installing the GPPC shared library
-            if you do not include this task in a package deployment script.</li>
-          <li>Document the instructions for installing and running the function
-            registration script if you do not include this task in a package
-            deployment script.</li>
+        <p>您必须以适合Greenplum集群中Greenplum数据库管理员部署的形式打包GPPC共享库和SQL函数注册脚本。
+          提供GPPC包的特定部署说明。
+          </p>
+        <p>构建程序包和部署说明时，请考虑以下事项：
+          </p><ul>
+          <li>考虑提供Greenplum数据库管理员运行的shell脚本或程序，以便将共享库安装到所需的文件系统位置并注册GPPC函数。
+            </li>
+          <li>必须将GPPC共享库安装到master主机上的相同文件系统位置以及Greenplum数据库群集中的每个segment主机上。
+            </li>
+          <li><codeph>gpadmin</codeph>用户必须具有遍历GPPC共享库文件的完整文件系统路径的权限。
+            </li>
+         <li>安装在Greenplum数据库部署中后，
+           GPPC共享库的文件系统位置决定了在使用<codeph>CREATE FUNCTION ... AS</codeph>命令在库中注册函数时如何引用共享库。
+           </li>
+          <li>创建一个<codeph>.sql</codeph>脚本文件，为GPPC共享库中的每个GPPC函数注册一个SQL UDF。
+            您在<codeph>.sql</codeph>注册脚本中创建的函数必须引用GPPC共享库的部署位置。
+            在GPPC部署包中包含此脚本。
+            </li>
+          <li>记录运行GPPC包部署脚本的说明（如果提供）。
+            </li>
+          <li>如果未在程序包部署脚本中包含此任务，请记录有关安装GPPC共享库的说明。
+            </li>
+          <li>如果未在程序包部署脚本中包含此任务，请记录有关安装和运行函数注册脚本的说明。
+            </li>
         </ul>
       </body>
   </topic>
   <topic id="topic_example_text" xml:lang="en">
-    <title id="py217167">GPPC Text Function Example</title>
+    <title id="py217167">GPPC文本函数示例</title>
     <body>
-      <p>In this example, you develop, build, and deploy a GPPC shared library
-        and register and run a GPPC function named <codeph>concat_two_strings</codeph>.
-        This function uses the GPPC API to concatenate two string arguments
-        and return the result.</p>
-      <p>You will develop the GPPC function on your Greenplum Database master
-        host. Deploying the GPPC shared library that you create in this
-        example requires administrative access to your Greenplum Database
-        cluster.</p>
-      <p>Perform the following procedure to run the example:</p><ol>
-        <li>Log in to the Greenplum Database master host and set up your environment. For example:<codeblock>$ ssh gpadmin@&lt;gpmaster&gt;
+      <p>在此示例中，您将开发，构建和部署GPPC共享库，并注册并运行名为<codeph>concat_two_strings</codeph>的GPPC函数。
+        此函数使用GPPC API连接两个字符串参数并返回结果。
+        </p>
+      <p>您将在Greenplum数据库主控主机上开发GPPC函数。
+        部署您在此示例中创建的GPPC共享库需要对Greenplum数据库集群的管理访问权限。
+        </p>
+      <p>执行以下过程以运行该示例：</p><ol>
+        <li>登录Greenplum数据库主控主机并设置您的环境。例如：
+          <codeblock>$ ssh gpadmin@&lt;gpmaster&gt;
 gpadmin@gpmaster$ . /usr/local/greenplum-db/greenplum_path.sh</codeblock></li>
-        <li>Create a work directory and navigate to the new directory. For example:<codeblock>gpadmin@gpmaster$ mkdir gppc_work
+        <li>创建工作目录并导航到新目录。例如：<codeblock>gpadmin@gpmaster$ mkdir gppc_work
 gpadmin@gpmaster$ cd gppc_work</codeblock></li>
-        <li>Prepare a file for GPPC source code by opening the file in the editor of your choice. For example, to open a file named <codeph>gppc_concat.c</codeph> using <codeph>vi</codeph>:<codeblock>gpadmin@gpmaster$ vi gppc_concat.c</codeblock></li>
-        <li>Copy/paste the following code into the file:<codeblock>#include &lt;stdio.h&gt;
+        <li>通过在您选择的编辑器中打开文件，为GPPC源代码准备文件。
+          例如，要使用<codeph>vi</codeph>打开名为<codeph>gppc_concat.c</codeph>的文件：
+          <codeblock>gpadmin@gpmaster$ vi gppc_concat.c</codeblock></li>
+        <li>将以下代码复制/粘贴到文件中：<codeblock>#include &lt;stdio.h&gt;
 #include &lt;string.h&gt;
 #include "gppc.h"
 
@@ -1221,9 +1164,14 @@ concat_two_strings(GPPC_FUNCTION_ARGS)
     memcpy(GppcGetTextPointer(retstring) + arg0_len, GppcGetTextPointer(arg1), arg1_len);
 
     GPPC_RETURN_TEXT( retstring );
-}</codeblock><p>The code declares and implements the <codeph>concat_two_strings()</codeph> function. It uses GPPC data types, macros, and functions to get the function arguments, allocate memory for the concatenated string, copy the arguments into the new string, and return the result.</p></li>
-        <li>Save the file and exit the editor.</li>
-        <li>Open a file named <codeph>Makefile</codeph> in the editor of your choice. Copy/paste the following text into the file:<codeblock>MODULE_big = gppc_concat
+}</codeblock><p>代码声明并实现了<codeph>concat_two_strings()</codeph>函数。
+          它使用GPPC数据类型，宏和函数来获取函数参数，
+          为连接的字符串分配内存，将参数复制到新字符串中，然后返回结果。
+          </p></li>
+        <li>保存文件并退出编辑器。</li>
+        <li>在您选择的编辑器中打开名为<codeph>Makefile</codeph>的文件。
+          将以下文本复制/粘贴到文件中：
+          <codeblock>MODULE_big = gppc_concat
 OBJS = gppc_concat.o
 
 PG_CONFIG = pg_config
@@ -1232,15 +1180,26 @@ PGXS := $(shell $(PG_CONFIG) --pgxs)
 PG_CPPFLAGS = -I$(shell $(PG_CONFIG) --includedir)
 SHLIB_LINK = -L$(shell $(PG_CONFIG) --libdir) -lgppc
 include $(PGXS)</codeblock></li>
-        <li>Save the file and exit the editor.</li>
-        <li>Build a GPPC shared library for the <codeph>concat_two_strings()</codeph> function. For example:<codeblock>gpadmin@gpmaster$ make all</codeblock><p>The <codeph>make</codeph> command generates a shared library file named <codeph>gppc_concat.so</codeph> in the current working directory.</p></li>
-        <li>Copy the shared library to your Greenplum Database installation. You must have Greenplum Database administrative privileges to copy the file. For example:<codeblock>gpadmin@gpmaster$ cp gppc_concat.so /usr/local/greenplum-db/lib/postgresql/</codeblock></li>
-        <li>Copy the shared library to every host in your Greenplum Database installation. For example, if <codeph>seghostfile</codeph> contains a list, one-host-per-line, of the segment hosts in your Greenplum Database cluster:<codeblock>gpadmin@gpmaster$ gpscp -v -f seghostfile /usr/local/greenplum-db/lib/postgresql/gppc_concat.so =:/usr/local/greenplum-db/lib/postgresql/gppc_concat.so</codeblock></li>
-        <li>Open a <codeph>psql</codeph> session. For example:<codeblock>gpadmin@gpmaster$ psql -d testdb</codeblock></li>
-        <li>Register the GPPC function named <codeph>concat_two_strings()</codeph> with Greenplum Database, For example, to map the Greenplum Database function <codeph>concat_with_gppc()</codeph> to the GPPC <codeph>concat_two_strings()</codeph> function:<codeblock>testdb=# CREATE FUNCTION concat_with_gppc(text, text) RETURNS text
+        <li>保存文件并退出编辑器。</li>
+        <li>为<codeph>concat_two_strings()</codeph>函数构建GPPC共享库。例如：<codeblock>gpadmin@gpmaster$ make all</codeblock>
+          <p><codeph>make</codeph>命令在当前工作目录中生成名为<codeph>gppc_concat.so</codeph>的共享库文件。</p>
+          </li>
+        <li>将共享库复制到Greenplum数据库安装。
+          您必须具有Greenplum数据库管理权限才能复制该文件。
+          例如：
+          <codeblock>gpadmin@gpmaster$ cp gppc_concat.so /usr/local/greenplum-db/lib/postgresql/</codeblock></li>
+        <li>将共享库复制到Greenplum数据库安装中的每个主机。
+          例如，如果<codeph>seghostfile</codeph>包含Greenplum数据库集群中segment主机的列表，每个主机行：
+          <codeblock>gpadmin@gpmaster$ gpscp -v -f seghostfile /usr/local/greenplum-db/lib/postgresql/gppc_concat.so =:/usr/local/greenplum-db/lib/postgresql/gppc_concat.so</codeblock></li>
+        <li>打开<codeph>psql</codeph>会话。例如：
+          <codeblock>gpadmin@gpmaster$ psql -d testdb</codeblock></li>
+        <li>使用Greenplum数据库注册名为<codeph>concat_two_strings()</codeph>的GPPC函数。
+          例如，将Greenplum数据库函数<codeph>concat_with_gppc()</codeph>映射到GPPC <codeph>concat_two_strings()</codeph>函数：
+          <codeblock>testdb=# CREATE FUNCTION concat_with_gppc(text, text) RETURNS text
   AS 'gppc_concat', 'concat_two_strings'
 LANGUAGE C STRICT;</codeblock></li>
-        <li>Run the <codeph>concat_with_gppc()</codeph> function. For example:<codeblock>testdb=# SELECT concat_with_gppc( 'happy', 'monday' );
+        <li>运行<codeph>concat_with_gppc()</codeph>函数。例如：
+          <codeblock>testdb=# SELECT concat_with_gppc( 'happy', 'monday' );
  concat_with_gppc
 ------------------
  happymonday
@@ -1250,28 +1209,25 @@ LANGUAGE C STRICT;</codeblock></li>
     </body>
   </topic>
   <topic id="topic_example_srf" xml:lang="en">
-    <title id="py217167">GPPC Set-Returning Function Example</title>
+    <title id="py217167">GPPC Set-Returning函数示例</title>
     <body>
-      <p>In this example, you develop, build, and deploy a GPPC shared library.
-        You also create and run a <codeph>.sql</codeph> registration script
-        for a GPPC function named <codeph>return_tbl()</codeph>. This function
-        uses the GPPC API to take an input table with an integer and a text
-        column, determine if the integer column is greater than 13, and
-        returns a result table with the input integer column and a boolean
-        column identifying whether or not the integer is greater than 13.
-        <codeph>return_tbl()</codeph> utilizes GPPC API reporting and SRF
-        functions and macros.</p>
-      <p>You will develop the GPPC function on your Greenplum Database master
-        host. Deploying the GPPC shared library that you create in this
-        example requires administrative access to your Greenplum Database
-        cluster.</p>
-      <p>Perform the following procedure to run the example:</p><ol>
-        <li>Log in to the Greenplum Database master host and set up your environment. For example:<codeblock>$ ssh gpadmin@&lt;gpmaster&gt;
+      <p>在此示例中，您将开发，构建和部署GPPC共享库。
+        您还可以为名为<codeph>return_tbl()</codeph>的GPPC函数创建并运行<codeph>.sql</codeph>注册脚本。
+        此函数使用GPPC API获取带有整数和文本列的输入表，确定整数列是否大于13，
+        并返回带有输入整数列的结果表和一个标识整数是否为的整数的布尔列<codeph>return_tbl()</codeph>使用GPPC API报告和SRF函数和宏。
+        </p>
+      <p>您将在Greenplum数据库master主机上开发GPPC函数。
+        部署您在此示例中创建的GPPC共享库需要对Greenplum数据库集群的管理访问权限。
+        </p>
+      <p>执行以下过程以运行该示例：</p><ol>
+        <li>登录Greenplum数据库master主机并设置您的环境。例如：<codeblock>$ ssh gpadmin@&lt;gpmaster&gt;
 gpadmin@gpmaster$ . /usr/local/greenplum-db/greenplum_path.sh</codeblock></li>
-        <li>Create a work directory and navigate to the new directory. For example:<codeblock>gpadmin@gpmaster$ mkdir gppc_work
+        <li>创建工作目录并导航到新目录。例如：<codeblock>gpadmin@gpmaster$ mkdir gppc_work
 gpadmin@gpmaster$ cd gppc_work</codeblock></li>
-        <li>Prepare a source file for GPPC code by opening the file in the editor of your choice. For example, to open a file named <codeph>gppc_concat.c</codeph> using <codeph>vi</codeph>:<codeblock>gpadmin@gpmaster$ vi gppc_rettbl.c</codeblock></li>
-        <li>Copy/paste the following code into the file:<codeblock>#include &lt;stdio.h&gt;
+        <li>通过在您选择的编辑器中打开文件，为GPPC代码准备源文件。
+          例如，要使用<codeph>vi</codeph>打开名为<codeph>gppc_concat.c</codeph>的文件：
+          <codeblock>gpadmin@gpmaster$ vi gppc_rettbl.c</codeblock></li>
+        <li>将以下代码复制/粘贴到文件中：<codeblock>#include &lt;stdio.h&gt;
 #include &lt;string.h&gt;
 #include "gppc.h"
 
@@ -1352,9 +1308,14 @@ return_tbl(GPPC_FUNCTION_ARGS)
     result = GppcBuildHeapTupleDatum(out_tupdesc, values, nulls);
     GPPC_SRF_RETURN_NEXT(fctx, result);
 
-}</codeblock><p>The code declares and implements the <codeph>return_tbl()</codeph> function. It uses GPPC data types, macros, and functions to fetch the function arguments, examine tuple descriptors, build the return tuple, and return the result. The function also uses the SRF macros to keep track of the tuple context across function calls.</p></li>
-        <li>Save the file and exit the editor.</li>
-        <li>Open a file named <codeph>Makefile</codeph> in the editor of your choice. Copy/paste the following text into the file:<codeblock>MODULE_big = gppc_rettbl
+}</codeblock><p>代码声明并实现了<codeph>return_tbl()</codeph>函数。
+          它使用GPPC数据类型，宏和函数来获取函数参数，检查元组描述符，构建返回元组，并返回结果。
+          该函数还使用SRF宏来跟踪函数调用之间的元组上下文。
+          </p></li>
+        <li>保存文件并退出编辑器。</li>
+        <li>在您选择的编辑器中打开名为<codeph>Makefile</codeph>的文件。
+          将以下文本复制/粘贴到文件中：
+          <codeblock>MODULE_big = gppc_rettbl
 OBJS = gppc_rettbl.o
 
 PG_CONFIG = pg_config
@@ -1363,24 +1324,35 @@ PGXS := $(shell $(PG_CONFIG) --pgxs)
 PG_CPPFLAGS = -I$(shell $(PG_CONFIG) --includedir)
 SHLIB_LINK = -L$(shell $(PG_CONFIG) --libdir) -lgppc
 include $(PGXS)</codeblock></li>
-        <li>Save the file and exit the editor.</li>
-        <li>Build a GPPC shared library for the <codeph>return_tbl()</codeph> function. For example:<codeblock>gpadmin@gpmaster$ make all</codeblock><p>The <codeph>make</codeph> command generates a shared library file named <codeph>gppc_rettbl.so</codeph> in the current working directory.</p></li>
-        <li>Copy the shared library to your Greenplum Database installation. You must have Greenplum Database administrative privileges to copy the file. For example:<codeblock>gpadmin@gpmaster$ cp gppc_rettbl.so /usr/local/greenplum-db/lib/postgresql/</codeblock><p>This command copies the shared library to <codeph>$libdir</codeph></p></li>
-        <li>Copy the shared library to every host in your Greenplum Database installation. For example, if <codeph>seghostfile</codeph> contains a list, one-host-per-line, of the segment hosts in your Greenplum Database cluster:<codeblock>gpadmin@gpmaster$ gpscp -v -f seghostfile /usr/local/greenplum-db/lib/postgresql/gppc_rettbl.so =:/usr/local/greenplum-db/lib/postgresql/gppc_rettbl.so</codeblock></li>
-        <li>Create a <codeph>.sql</codeph> file to register the GPPC <codeph>return_tbl()</codeph> function. Open a file named <codeph>gppc_rettbl_reg.sql</codeph> in the editor of your choice.</li>
-        <li>Copy/paste the following text into the file:<codeblock>CREATE FUNCTION rettbl_gppc(anytable) RETURNS TABLE(id int4, thirteen bool)
+        <li>保存文件并退出编辑器。</li>
+        <li>为<codeph>return_tbl()</codeph>函数构建GPPC共享库。例如：<codeblock>gpadmin@gpmaster$ make all</codeblock>
+          <p><codeph>make</codeph>命令在当前工作目录中生成名为<codeph>gppc_rettbl.so</codeph>的共享库文件。</p></li>
+        <li>将共享库复制到Greenplum数据库安装。
+          您必须具有Greenplum数据库管理权限才能复制该文件。
+          例如：
+          <codeblock>gpadmin@gpmaster$ cp gppc_rettbl.so /usr/local/greenplum-db/lib/postgresql/</codeblock>
+          <p>此命令将共享库复制到<codeph>$libdir</codeph></p></li>
+        <li>将共享库复制到Greenplum数据库安装中的每个主机。
+          例如，如果<codeph>seghostfile</codeph>包含Greenplum数据库集群中segment主机的列表，每个主机一行：
+          <codeblock>gpadmin@gpmaster$ gpscp -v -f seghostfile /usr/local/greenplum-db/lib/postgresql/gppc_rettbl.so =:/usr/local/greenplum-db/lib/postgresql/gppc_rettbl.so</codeblock></li>
+        <li>创建<codeph>.sql</codeph>文件以注册GPPC <codeph>return_tbl()</codeph>函数。
+          在您选择的编辑器中打开名为<codeph>gppc_rettbl_reg.sql</codeph>的文件。
+          </li>
+        <li>将以下文本复制/粘贴到文件中：<codeblock>CREATE FUNCTION rettbl_gppc(anytable) RETURNS TABLE(id int4, thirteen bool)
   AS 'gppc_rettbl', 'return_tbl'
 LANGUAGE C STRICT;</codeblock></li>
-        <li>Register the GPPC function by running the script you just created. For example, to register the function in a database named <codeph>testdb</codeph>:<codeblock>gpadmin@gpmaster$ psql -d testdb -f gppc_rettbl_reg.sql</codeblock></li>
-        <li>Open a <codeph>psql</codeph> session. For example:<codeblock>gpadmin@gpmaster$ psql -d testdb</codeblock></li>
-        <li>Create a table with some test data. For example:<codeblock>CREATE TABLE gppc_testtbl( id int, msg text );
+        <li>通过运行刚刚创建的脚本来注册GPPC功能。
+          例如，要在名为<codeph>testdb</codeph>的数据库中注册该函数：
+          <codeblock>gpadmin@gpmaster$ psql -d testdb -f gppc_rettbl_reg.sql</codeblock></li>
+        <li>打开<codeph>psql</codeph>会话。例如：<codeblock>gpadmin@gpmaster$ psql -d testdb</codeblock></li>
+        <li>创建包含一些测试数据的表。例如：<codeblock>CREATE TABLE gppc_testtbl( id int, msg text );
 INSERT INTO gppc_testtbl VALUES (1, 'f1');
 INSERT INTO gppc_testtbl VALUES (7, 'f7');
 INSERT INTO gppc_testtbl VALUES (10, 'f10');
 INSERT INTO gppc_testtbl VALUES (13, 'f13');
 INSERT INTO gppc_testtbl VALUES (15, 'f15');
 INSERT INTO gppc_testtbl VALUES (17, 'f17');</codeblock></li>
-        <li>Run the <codeph>rettbl_gppc()</codeph> function. For example:<codeblock>testdb=# SELECT * FROM rettbl_gppc(TABLE(SELECT * FROM gppc_testtbl));
+        <li>运行<codeph>rettbl_gppc()</codeph>函数。例如：<codeblock>testdb=# SELECT * FROM rettbl_gppc(TABLE(SELECT * FROM gppc_testtbl));
  id | thirteen 
 ----+----------
   1 | f

@@ -1,64 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="ep20941">TRUNCATE</title><body><p id="sql_command_desc">Empties a table of all rows.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">TRUNCATE [TABLE] [ONLY] <varname>name</varname> [ * ] [, ...] 
-    [ RESTART IDENTITY | CONTINUE IDENTITY ] [CASCADE | RESTRICT]</codeblock></section>
-    <section id="section3"><title>Description</title><p><codeph>TRUNCATE</codeph> quickly removes
-        all rows from a table or set of tables. It has the same effect as an unqualified
-            <codeph><xref href="DELETE.xml#topic1" type="topic" format="dita"/></codeph> on each
-        table, but since it does not actually scan the tables it is faster. This is most useful on
-        large tables.</p>
-      <p>You must have the <codeph>TRUNCATE</codeph> privilege on the table to truncate table
-        rows.</p><p><codeph>TRUNCATE</codeph> acquires an access exclusive lock on the tables it
-        operates on, which blocks all other concurrent operations on the table. When <codeph>RESTART
-          IDENTITY</codeph> is specified, any sequences that are to be restarted are likewise locked
-        exclusively. If concurrent access to a table is required, then the <codeph>DELETE</codeph>
-          command should be used instead. </p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The name (optionally schema-qualified) of a table to truncate. If <codeph>ONLY</codeph> is
-            specified before the table name, only that table is truncated. If <codeph>ONLY</codeph>
-            is not specified, the table and all its descendant tables (if any) are truncated.
-            Optionally, <codeph>*</codeph> can be specified after the table name to explicitly
-            indicate that descendant tables are included.</pd></plentry><plentry><pt>CASCADE</pt><pd>Because this key word applies to foreign key references (which are not supported in Greenplum
-            Database) it has no effect.</pd></plentry>
-        <plentry>
-          <pt>RESTART IDENTITY</pt>
-          <pd>Automatically restart sequences owned by columns of the truncated table(s).</pd>
-        </plentry>
-        <plentry>
-          <pt>CONTINUE IDENTITY</pt>
-          <pd>Do not change the values of sequences. This is the default.</pd>
-        </plentry><plentry><pt>RESTRICT</pt><pd>Because this key word applies to foreign key references (which are not supported in Greenplum
-            Database) it has no effect.</pd></plentry></parml></section><section id="section5"><title>Notes</title><p><codeph>TRUNCATE</codeph> will not run any user-defined <codeph>ON
-              DELETE</codeph> triggers that might exist for the tables.</p><p><codeph>TRUNCATE</codeph> will not truncate any tables that inherit
-from the named table. Only the named table is truncated, not its child
-tables.</p><p><codeph>TRUNCATE</codeph> will not truncate any sub-tables of a partitioned
-table. If you specify a sub-table of a partitioned table, <codeph>TRUNCATE</codeph>
-  will not remove rows from the sub-table and its child tables.</p>
-              <p> <codeph>TRUNCATE</codeph> is not MVCC-safe. After truncation, the table will
-                appear empty to concurrent transactions, if they are using a snapshot
-                taken before the truncation occurred.</p>
-      <p><codeph>TRUNCATE</codeph> is transaction-safe with respect to the data in the tables: the
-        truncation will be safely rolled back if the surrounding transaction does not commit.</p>
-      <p><codeph>TRUNCATE</codeph> acquires an <codeph>ACCESS EXCLUSIVE</codeph> lock on each table
-        it operates on, which blocks all other concurrent operations on the table. If concurrent
-        access to a table is required, then the <codeph>DELETE</codeph> command should be used
-        instead. </p>
-      <p>When <codeph>RESTART IDENTITY</codeph> is specified, the implied <codeph>ALTER SEQUENCE
-          RESTART</codeph> operations are also done transactionally; that is, they will be rolled
-        back if the surrounding transaction does not commit. This is unlike the normal behavior of
-          <codeph>ALTER SEQUENCE RESTART</codeph>. Be aware that if any additional sequence
-        operations are done on the restarted sequences before the transaction rolls back, the
-        effects of these operations on the sequences will be rolled back, but not their effects on
-          <codeph>currval()</codeph>; that is, after the transaction <codeph>currval()</codeph> will
-        continue to reflect the last sequence value obtained inside the failed transaction, even
-        though the sequence itself may no longer be consistent with that. This is similar to the
-        usual behavior of <codeph>currval()</codeph> after a failed transaction.</p>
-</section><section id="section6"><title>Examples</title><p>Empty the tables <codeph>films</codeph> and <codeph>distributors</codeph>:</p><codeblock>TRUNCATE films, distributors;</codeblock>
-      <p>The same, and also reset any associated sequence generators:</p>
-  <codeblock>TRUNCATE films, distributors RESTART IDENTITY;</codeblock></section><section id="section7"><title>Compatibility</title>
-      <p>The SQL:2008 standard includes a <codeph>TRUNCATE</codeph> command with the syntax
-          <codeph>TRUNCATE TABLE <varname>tablename</varname></codeph>. The clauses <codeph>CONTINUE
-          IDENTITY</codeph>/<codeph>RESTART IDENTITY</codeph> also appear in that standard, but have
-        slightly different though related meanings. Some of the concurrency behavior of this command
-        is left implementation-defined by the standard, so the above notes should be considered and
-        compared with other implementations if necessary. </p></section><section id="section8"><title>See Also</title><p><codeph><xref href="DELETE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="DROP_TABLE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="ep20941">TRUNCATE</title>
+    <body>
+        <p id="sql_command_desc">清空表的所有行。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">TRUNCATE [TABLE] [ONLY] <varname>name</varname> [ * ] [, ...]
+     [ RESTART IDENTITY | CONTINUE IDENTITY ] [CASCADE | RESTRICT]
+            </codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>TRUNCATE</codeph>快速删除一个表或一组表中的所有行。
+                它与在每个表上进行不限定<codeph><xref href="DELETE.xml#topic1" type="topic" format="dita"/></codeph>的效果相同，
+                但是由于它实际上并不扫描表，因此速度更快。
+                这在大型表上最有用。
+            </p>
+            <p>您必须在表上具有<codeph>TRUNCATE</codeph>特权才能清空表行。
+            </p>
+            <p><codeph>TRUNCATE</codeph>在对其操作的表上获取访问排他锁，这将阻止该表上的所有其他并发操作。
+                如果指定了<codeph>RESTART IDENTITY</codeph>，则将要重新计数的所有序列都将被排他地锁定。
+                如果需要并发访问表，则应改用<codeph>DELETE</codeph>命令。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要清空的表的名称（可以用schema修饰）。
+                        如果在表名之前指定了<codeph>ONLY</codeph>，则仅该表被清空。
+                        如果未指定<codeph>ONLY</codeph>，则该表及其所有子表（如果有）将被清空。
+                        （可选）可以在表名称后指定<codeph>*</codeph>，以显式指示包括子表。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>CASCADE</pt>
+                    <pd>因为此关键字适用于外键引用（Greenplum数据库中不支持），所以它无效。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>RESTART IDENTITY</pt>
+                    <pd>自动重新启动被清空表的列所拥有的序列。</pd>
+                </plentry>
+                <plentry>
+                    <pt>CONTINUE IDENTITY</pt>
+                    <pd>不要更改序列的值。这是默认值。</pd>
+                </plentry>
+                <plentry>
+                    <pt>RESTRICT</pt>
+                    <pd>因为此关键字适用于外键引用（Greenplum数据库中不支持），所以它无效。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p><codeph>TRUNCATE</codeph>将不会运行表可能存在的任何用户定义的<codeph>ON DELETE</codeph>触发器。
+            </p>
+            <p><codeph>TRUNCATE</codeph>不会清空从指定表继承的任何表。
+                仅指定的表被清空，而不是其子表。
+            </p>
+            <p><codeph>TRUNCATE</codeph>不会清空分区表的任何子表。
+                如果指定分区表的子表，则<codeph>TRUNCATE</codeph>不会从该表及其子表中删除行。
+            </p>
+            <p><codeph>TRUNCATE</codeph>不是MVCC安全的。
+                清空后，如果并发事务使用清空发生之前获取的快照，则该表将对并发事务显示为空。
+            </p>
+            <p>对于表中的数据，<codeph>TRUNCATE</codeph>是事务安全的：如果所属的事务未提交，则清空将被安全地回滚。
+            </p>
+            <p><codeph>TRUNCATE</codeph>在其操作的每个表上获取<codeph>ACCESS EXCLUSIVE</codeph>锁，该锁将阻止该表上的所有其他并发操作。
+                如果需要并发访问表，则应改用<codeph>DELETE</codeph>命令。
+            </p>
+            <p>当指定了<codeph>RESTART IDENTITY</codeph>时，隐式的<codeph>ALTER SEQUENCE RESTART</codeph>操作也将以事务方式完成；
+                也就是说，如果所在的事务没有提交，它们将被回滚。
+                这不同于<codeph>ALTER SEQUENCE RESTART</codeph>的正常行为。
+                请注意，如果在事务回滚之前对重新启动的序列执行了任何其他序列操作，则这些操作对序列的影响将被回滚，但不会对<codeph>currval()</codeph>产生影响。
+                也就是说，在事务<codeph>currval()</codeph>之后，它将继续反映在失败的事务中获得的最后一个序列值，即使序列本身可能不再与此一致。
+                这类似于事务失败后<codeph>currval()</codeph>的通常行为。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>清空表<codeph>films</codeph>和<codeph>distributors</codeph>：
+            </p>
+            <codeblock>TRUNCATE films, distributors;</codeblock>
+            <p>相同，并重置所有关联的序列生成器：</p>
+            <codeblock>TRUNCATE films, distributors RESTART IDENTITY;</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p>SQL：2008标准包括带有语法<codeph>TRUNCATE TABLE <varname>tablename</varname></codeph>的<codeph>TRUNCATE</codeph>命令。
+                子句<codeph>CONTINUE IDENTITY</codeph>/<codeph>RESTART IDENTITY</codeph>也出现在该标准中，但是尽管具有相关的含义，但略有不同。
+                该命令的一些并发行为由标准实现定义，因此应考虑上述注意事项，并在必要时与其他实现进行比较。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="DELETE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="DROP_TABLE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

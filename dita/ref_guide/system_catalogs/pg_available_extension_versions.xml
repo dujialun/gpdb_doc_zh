@@ -4,11 +4,9 @@
 <topic xml:lang="en" id="topic_sln_wfx_tz">
   <title>pg_available_extension_versions</title>
   <body>
-    <p>The <codeph>pg_available_extension_versions</codeph> view lists the specific extension
-      versions that are available for installation. The <xref href="pg_extension.xml"
-          ><i>pg_extension</i></xref> system catalog table shows the extensions currently
-      installed.</p>
-    <p>The view is read only.</p>
+    <p><codeph>pg_available_extension_versions</codeph>视图列出了可用于安装的特定扩展版本。
+      <xref href="pg_extension.xml"><i>pg_extension</i></xref>系统目录表显示当前安装的扩展。</p>
+    <p>该视图是只读的。</p>
     <table id="table_tln_wfx_tz">
       <title>pg_catalog.pg_available_extension_versions</title>
       <tgroup cols="3">
@@ -17,56 +15,51 @@
         <colspec colnum="3" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
           <row>
             <entry colname="col1"><codeph>name</codeph></entry>
             <entry colname="col2">name</entry>
-            <entry colname="col4">Extension name.</entry>
+            <entry colname="col4">扩展名称。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>version</codeph></entry>
             <entry colname="col2">text</entry>
-            <entry colname="col4">Version name.</entry>
+            <entry colname="col4">版本名称。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>installed</codeph></entry>
             <entry colname="col2">boolean</entry>
-            <entry colname="col4"><codeph>True</codeph> if this version of this extension is
-              currently installed, <codeph>False</codeph> otherwise.</entry>
+            <entry colname="col4">如果此扩展程序的此版本已安装，则为<codeph>True</codeph>，否则为<codeph>False</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>superuser</codeph></entry>
             <entry colname="col2">boolean</entry>
-            <entry colname="col4"><codeph>True</codeph> if only superusers are allowed to install
-              the extension, <codeph>False</codeph> otherwise.</entry>
+            <entry colname="col4">如果只允许超级用户安装此扩展，则为<codeph>True</codeph>，否则为<codeph>False</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>relocatable</codeph></entry>
             <entry colname="col2">boolean</entry>
-            <entry colname="col4"><codeph>True</codeph> if extension can be relocated to another
-              schema, <codeph>False</codeph> otherwise.</entry>
+            <entry colname="col4">如果扩展可以重新定位到另一个schema，则为<codeph>True</codeph>，否则为<codeph>False</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>schema</codeph></entry>
             <entry colname="col2">name</entry>
-            <entry colname="col4">Name of the schema that the extension must be installed into, or
-                <codeph>NULL</codeph> if partially or fully relocatable.</entry>
+            <entry colname="col4">扩展必须装入的schema的名称，如果部分或完全可重定位，则为<codeph>NULL</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>requires</codeph></entry>
             <entry colname="col2">name[]</entry>
-            <entry colname="col4">Names of prerequisite extensions, or <codeph>NULL</codeph> if
-              none</entry>
+            <entry colname="col4">必备扩展的名称，如果没有则为<codeph>NULL</codeph>。</entry>
           </row>
           <row>
             <entry colname="col1"><codeph>comment</codeph></entry>
             <entry colname="col2">text</entry>
-            <entry colname="col4">Comment string from the extension control file.</entry>
+            <entry colname="col4">扩展控制文件的注释字符串。</entry>
           </row>
         </tbody>
       </tgroup>

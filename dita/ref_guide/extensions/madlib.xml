@@ -2,9 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="pz212122">Greenplum MADlib Extension for Analytics</title>
+  <title id="pz212122">用于分析的Greenplum MADlib扩展</title>
   <body>
-    <p>This chapter includes the following information:</p>
+    <p>本章节包含了以下信息：</p>
     <ul>
       <li id="pz219023"><xref href="#topic2" type="topic" format="dita"/></li>
       <li id="pz213664" otherprops="pivotal"><xref href="#topic3" type="topic" format="dita"/></li>
@@ -15,19 +15,19 @@
     </ul>
   </body>
   <topic id="topic2" xml:lang="en">
-    <title id="pz217886">About MADlib</title>
+    <title id="pz217886">关于 MADlib</title>
     <body>
-      <p>MADlib is an open-source library for scalable in-database analytics. With the Greenplum
-        Database MADlib extension, you can use MADlib functionality in a Greenplum Database. </p>
-      <p>MADlib provides data-parallel implementations of mathematical, statistical and
-        machine-learning methods for structured and unstructured data. It provides an suite of
-        SQL-based algorithms for machine learning, data mining and statistics that run at scale
-        within a database engine, with no need for transferring data between Greenplum Database and
-        other tools. </p>
-      <p>MADlib requires the <codeph>m4</codeph> macro processor version 1.4.13 or later.</p>
-      <p>MADlib can be used with PivotalR, an R package that enables users to interact with data
-        resident in Greenplum Database using the R client. See <xref href="#topic_dxp_vq2_sv"
-          format="dita"/>.</p>
+      <p>MADlib是一个可扩展数据库分析的开源库。
+          通过Greenplum的MADlib扩展，用户可以在Greenplum数据库中使用MADlib功能。
+        </p>
+      <p>MADlib为结构化数据以及非结构化数据提供了数学、统计学以及机器学习方法的数据并行的实现。
+          它提供了一整套基于SQL的机器学习、数据挖掘以及统计学算法，只需要运行在数据库引擎中，而不需要在Greenplum和其它工具之间进行数据的传递。
+        </p>
+      <p>MADlib需要<codeph>m4</codeph>宏处理器版本1.4.13或更高版本。
+        </p>
+      <p>MADlib可以与PivotalR一同使用，一个PivotalR包允许用户使用R客户端同Greenplum的数据进行交互。
+          见<xref href="#topic_dxp_vq2_sv" format="dita"/>。
+        </p>
     </body>
   </topic>
   <topic id="topic3" xml:lang="en" otherprops="pivotal">
@@ -160,22 +160,22 @@ psql <varname>db_name</varname> -c "DROP FUNCTION IF EXISTS <varname>schema</var
     </topic>
   </topic>
   <topic id="topic9" xml:lang="en">
-    <title id="pz215232">Examples</title>
+    <title id="pz215232">示例</title>
     <body>
-      <p>Following are examples using the Greenplum MADlib extension:</p>
+      <p>下面是使用GreenplumMADlib扩展的示例：</p>
       <ul id="ul_wr3_lss_bz">
-        <li><xref href="#topic9/mlogr" format="dita">Linear Regression</xref></li>
+        <li><xref href="#topic9/mlogr" format="dita">线性回归</xref></li>
         <li><xref href="#topic9/assoc_rules" format="dita"/></li>
         <li><xref href="#topic9/naive_bayes" format="dita"/></li>
       </ul>
-      <p>See the MADlib documentation for additional examples.</p>
+      <p>见MADlib文档获取更多的示例。</p>
       <section id="mlogr">
-        <title>Linear Regression</title>
-        <p>This example runs a linear regression on the table <codeph>regr_example</codeph>. The
-          dependent variable data are in the <codeph>y</codeph> column and the independent variable
-          data are in the <codeph>x1</codeph> and <codeph>x2</codeph> columns. </p>
-        <p>The following statements create the <codeph>regr_example</codeph> table and load some
-          sample data:</p>
+        <title>线性回归</title>
+        <p>该示例是在表<codeph>regr_example</codeph>执行一个线性回归。
+            因变量数据在<codeph>y</codeph>列中，独立变量数据在<codeph>x1</codeph>和<codeph>x2</codeph>列中。
+            </p>
+        <p>下面的语句创建<codeph>regr_example</codeph>表同时加载样本数据：
+            </p>
         <codeblock>DROP TABLE IF EXISTS regr_example;
 CREATE TABLE regr_example (
    id int,
@@ -188,10 +188,9 @@ INSERT INTO regr_example VALUES
    (2, 10, 7, 2),
    (3,  6, 4, 1),
    (4,  8, 3, 4);</codeblock>
-        <p>The MADlib <codeph>linregr_train()</codeph> function produces a regression model from an
-          input table containing training data. The following <codeph>SELECT</codeph> statement runs
-          a simple multivariate regression on the <codeph>regr_example</codeph> table and saves the
-          model in the <codeph>reg_example_model</codeph> table. </p>
+        <p>MADlib的<codeph>linregr_train()</codeph>函数产生一个根据一个输入表包含的训练数据产生一个回归模型。
+            下面的<codeph>SELECT</codeph>语句在表<codeph>regr_example</codeph>执行一个简单的多元回归同时保存模型在表<codeph>reg_example_model</codeph>中。
+            </p>
         <codeblock>SELECT madlib.linregr_train (
    'regr_example',         -- source table
    'regr_example_model',   -- output model table
@@ -199,12 +198,12 @@ INSERT INTO regr_example VALUES
    'ARRAY[1, x1, x2]'      -- independent variables
 );
 </codeblock>
-        <p>The <codeph>madlib.linregr_train()</codeph> function can have additional arguments to set
-          grouping columns and to calculate the heteroskedasticity of the model. </p>
-        <note type="note">The intercept is computed by setting one of the independent variables to a
-          constant <codeph>1</codeph>, as shown in the preceding example.</note>
-        <p> Running this query against the <codeph>regr_example</codeph> table creates the
-            <codeph>regr_example_model</codeph> table with one row of data: </p>
+        <p><codeph>madlib.linregr_train()</codeph>函数能够添加参数来设置分组的列以及计算模型的异方差性。
+            </p>
+        <note type="note">截距通过将一个独立变量设置为常数<codeph>1</codeph>来计算，如前一个例子所示。
+            </note>
+        <p>在表<codeph>regr_example</codeph>上执行该查询并创建带有一行数据的<codeph>regr_example_model</codeph>表：
+            </p>
         <codeblock>SELECT * FROM regr_example_model;
 -[ RECORD 1 ]------------+------------------------
 coef                     | {0.111111111111127,1.14814814814815,1.01851851851852}
@@ -218,9 +217,9 @@ num_missing_rows_skipped | 0
 variance_covariance      | {{2.23765432098598,-0.257201646090342,-0.437242798353582},
                             {-0.257201646090342,0.042866941015057,0.0342935528120456},
                             {-0.437242798353582,0.0342935528120457,0.12002743484216}}</codeblock>
-        <p>The model saved in the <codeph>regr_example_model</codeph> table can be used with the
-          MADlib linear regression prediction function, <codeph>madlib.linregr_predict()</codeph>,
-          to view the residuals: </p>
+        <p>被保存到<codeph>regr_example_model</codeph>表中的模型能够同MADlib线性回归预测函数使用，
+            <codeph>madlib.linregr_predict()</codeph>来查看残差：
+            </p>
         <codeblock>SELECT regr_example.*, 
         madlib.linregr_predict ( ARRAY[1, x1, x2], m.coef ) as predict,
         y - madlib.linregr_predict ( ARRAY[1, x1, x2], m.coef ) as residual
@@ -234,23 +233,23 @@ FROM regr_example, regr_example_model m;
 (4 rows)</codeblock>
       </section>
       <section id="assoc_rules">
-        <title>Association Rules</title>
-        <p>This example demonstrates the association rules data mining technique on a transactional
-          data set. Association rule mining is a technique for discovering relationships between
-          variables in a large data set. This example considers items in a store that are commonly
-          purchased together. In addition to market basket analysis, association rules are also used
-          in bioinformatics, web analytics, and other fields.</p>
-        <p>The example analyzes purchase information for seven transactions that are stored in a
-          table with the MADlib function <codeph>MADlib.assoc_rules</codeph>. The function assumes
-          that the data is stored in two columns with a single item and transaction ID per row.
-          Transactions with multiple items consist of multiple rows with one row per item.</p>
-        <p>These commands create the table.</p>
+        <title>关联规则</title>
+        <p>这个例子说明了关联规则的数据挖掘技术在交易数据集。
+            关联规则挖掘是发现大数据集中的变量之间关系的技术。
+            这个例子将考虑那些在商店中通常一起购买的物品。
+            除了购物篮分析，关联规则也应用在生物信息学中，网络分析，和其他领域。
+            </p>
+        <p>这个例子分析利用MADlib函数<codeph>MADlib.assoc_rules</codeph>分析存储在表中的关于七个交易的购买信息。
+            函数假定数据存储在两列中，每行有一个物品和交易ID。
+            多个物品的交易，包括多个行，每行一个物品。
+            </p>
+        <p>这些命令创建表。</p>
         <codeblock>DROP TABLE IF EXISTS test_data;
 CREATE TABLE test_data (
    trans_id INT,
    product text
 );</codeblock>
-        <p>This <codeph>INSERT</codeph> command adds the data to the table.</p>
+        <p>该<codeph>INSERT</codeph>命令向表中添加数据。</p>
         <codeblock>INSERT INTO test_data VALUES 
    (1, 'beer'),
    (1, 'diapers'),
@@ -267,17 +266,16 @@ CREATE TABLE test_data (
    (6, 'chips'),
    (7, 'beer'),
    (7, 'diapers');</codeblock>
-        <p>The MADlib function <codeph>madlib.assoc_rules()</codeph> analyzes the data and
-          determines association rules with the following characteristics.</p>
+        <p>MADlib函数<codeph>madlib.assoc_rules()</codeph>分析数据同时确定具有以下特征的关联规则。
+            </p>
         <ul>
-          <li id="pz218950">A support value of at least .40. Support is the ratio of transactions
-            that contain X to all transactions. </li>
-          <li id="pz218637">A confidence value of at least .75. Confidence is the ratio of
-            transactions that contain X to transactions that contain Y. One could view this metric
-            as the conditional probability of X given Y. </li>
+          <li id="pz218950">一个值至少为.40的支持率。支持率表示包含X的交易与所有交易的比。</li>
+          <li id="pz218637">一个值至少为.75的置信率。
+              置信率表示包含X的交易与包含Y的交易的比。可以将该度量看做给定Y下X的条件概率。
+              </li>
         </ul>
-        <p>This <codeph>SELECT</codeph> command determines association rules, creates the table
-            <codeph>assoc_rules</codeph>, and adds the statistics to the table.</p>
+        <p>该<codeph>SELECT</codeph>命令确定关联规则，创建表<codeph>assoc_rules</codeph>同时添加统计信息到表中。
+            </p>
         <codeblock>SELECT * FROM madlib.assoc_rules (
    .40,          -- support
    .75,          -- confidence
@@ -286,49 +284,49 @@ CREATE TABLE test_data (
    'test_data',  -- table name
    'public',     -- schema name
    false);       -- display processing details</codeblock>
-        <p>This is the output of the <codeph>SELECT</codeph> command. There are two rules that fit
-          the characteristics.</p>
+        <p>这是<codeph>SELECT</codeph>命令的输出。
+            这有两条符合特征的规则。
+            </p>
         <codeblock>
  output_schema | output_table | total_rules | total_time 
 --------------+--------------+-------------+-----------------  
 public        | assoc_rules  |           2 | 00:00:01.153283 
 (1 row)</codeblock>
-        <p>To view the association rules, you can run this <codeph>SELECT</codeph> command.</p>
+        <p>为了查看关联规则，用户可以使用该SELECT命令。</p>
         <codeblock>SELECT pre, post, support FROM assoc_rules 
    ORDER BY support DESC;</codeblock>
-        <p>This is the output. The <codeph>pre</codeph> and <codeph>post</codeph> columns are the
-          itemsets of left and right hand sides of the association rule respectively. </p>
+        <p>这是输出。<codeph>pre</codeph>和<codeph>post</codeph>列分别是关联规则左右两边的项集。
+            </p>
         <codeblock>    pre    |  post  |      support
 -----------+--------+-------------------
  {diapers} | {beer} | 0.714285714285714
  {chips}   | {beer} | 0.428571428571429
 (2 rows)</codeblock>
-        <p>Based on the data, beer and diapers are often purchased together. To increase sales, you
-          might consider placing beer and diapers closer together on the shelves. </p>
+        <p>基于数据，啤酒和尿布经常一起购买。
+            为了增加销售额，用户可以考虑将啤酒和尿布放在一个架子上。
+            </p>
       </section>
       <section id="naive_bayes">
-        <title>Naive Bayes Classification</title>
-        <p>Naive Bayes analysis predicts the likelihood of an outcome of a class variable, or
-          category, based on one or more independent variables, or attributes. The class variable is
-          a non-numeric categorial variable, a variable that can have one of a limited number of
-          values or categories. The class variable is represented with integers, each integer
-          representing a category. For example, if the category can be one of "true", "false", or
-          "unknown," the values can be represented with the integers 1, 2, or 3. </p>
-        <p>The attributes can be of numeric types and non-numeric, categorical, types. The training
-          function has two signatures – one for the case where all attributes are numeric and
-          another for mixed numeric and categorical types. Additional arguments for the latter
-          identify the attributes that should be handled as numeric values. The attributes are
-          submitted to the training function in an array. </p>
-        <p>The MADlib Naive Bayes training functions produce a features probabilities table and a
-          class priors table, which can be used with the prediction function to provide the
-          probability of a class for the set of attributes.</p>
+        <title>朴素贝叶斯分类</title>
+        <p>朴素贝叶斯分析，基于一个或多个独立变量或属性，预测一类变量或类结果的可能性。
+            类变量是非数值类型变量，一个变量可以有一个数量有限的值或类别。
+            类变量表示的整数，每个整数表示一个类别。
+            例如，如果类别可以是一个“真”、“假”，或“未知”的值，那么变量可以表示为整数1, 2或3。
+            </p>
+        <p>属性可以是数值类型、非数值类型以及类类型。
+            训练函数有两个签名 - 一个用于所有属性为数值 另外一个用于混合数值和类类型的情况。
+            后者的附加参数标识那些应该被当做数字值处理的属性。
+            属性以数组的形式提交给训练函数。
+            </p>
+        <p>MADlib朴素贝叶斯训练函数产生一个特征概率表和一个类的先验表，该表可以同预测函数使用为属性集提供一个类别的概率。
+            </p>
       </section>
-      <p><b>Naive Bayes Example 1 - Simple All-numeric Attributes</b></p>
-      <p>In the first example, the <codeph>class</codeph> variable is either 1 or 2 and there are
-        three integer attributes. </p>
+      <p><b>朴素贝叶斯示例 1 - 简单的所有都是数值属性</b></p>
+      <p>在第一个示例中，类变量取值为1或者2，同时这里有三个整型属性。
+        </p>
       <ol id="ol_ttz_13y_1z">
-        <li>The following commands create the input table and load sample
-            data.<codeblock>DROP TABLE IF EXISTS class_example CASCADE;
+        <li>下面的命令创建输入表以及加载样本数据。
+            <codeblock>DROP TABLE IF EXISTS class_example CASCADE;
 CREATE TABLE class_example (
    id int, class int, attributes int[]);
 INSERT INTO class_example VALUES
@@ -337,12 +335,12 @@ INSERT INTO class_example VALUES
    (3, 2, '{0, 2, 2}'),
    (4, 1, '{1, 2, 1}'),
    (5, 2, '{1, 2, 2}'),
-   (6, 2, '{0, 1, 3}');</codeblock><p>Actual
-            data in production scenarios is more extensive than this example data and yields better
-            results. Accuracy of classification improves significantly with larger training data
-            sets.</p></li>
-        <li>Train the model with the <codeph>create_nb_prepared_data_tables()</codeph>
-          function.<codeblock>SELECT * FROM madlib.create_nb_prepared_data_tables (
+   (6, 2, '{0, 1, 3}');</codeblock>
+            <p>在生产环境中的实际数据比该示例中的数据量更大，也能获得更好的结果。
+                更大的训练数据集能够显著地提高分类的精确度。
+                </p></li>
+        <li>使用<codeph>create_nb_prepared_data_tables()</codeph>函数训练模型。
+            <codeblock>SELECT * FROM madlib.create_nb_prepared_data_tables (
    'class_example',         -- name of the training table 
    'class',                 -- name of the class (dependent) column
    'attributes',            -- name of the attributes column
@@ -351,8 +349,8 @@ INSERT INTO class_example VALUES
    'example_priors'         -- name for the class priors output table
     );
 </codeblock></li>
-        <li>Create a table with data to classify using the
-          model.<codeblock>DROP TABLE IF EXISTS class_example_topredict;
+        <li>为了使用模型进行分类，创建带有数据的表。
+            <codeblock>DROP TABLE IF EXISTS class_example_topredict;
 CREATE TABLE class_example_topredict ( 
    id int, attributes int[]);
 INSERT INTO class_example_topredict VALUES 
@@ -360,8 +358,7 @@ INSERT INTO class_example_topredict VALUES
    (2, '{4, 2, 2}'),
    (3, '{2, 1, 1}');</codeblock>
         </li>
-        <li>Create a classification view using the feature probabilities, class priors, and
-            <codeph>class_example_topredict</codeph> tables.
+        <li>用特征概率、类的先验和<codeph>class_example_topredict</codeph>表创建一个分类视图。
           <codeblock>SELECT madlib.create_nb_probs_view (
    'example_feature_probs',    -- feature probabilities output table
    'example_priors',           -- class priors output table
@@ -372,8 +369,8 @@ INSERT INTO class_example_topredict VALUES
     'example_classified'       -- name of the view to create
     );
 </codeblock></li>
-        <li>Display the classification
-          results.<codeblock>SELECT * FROM example_classified;
+        <li>显示分类结果。
+            <codeblock>SELECT * FROM example_classified;
  key | class | nb_prob
 -----+-------+---------
    1 |     1 |     0.4
@@ -384,29 +381,27 @@ INSERT INTO class_example_topredict VALUES
    2 |     2 |    0.75
 (6 rows)</codeblock></li>
       </ol>
-      <p><b>Naive Bayes Example 2 – Weather and Outdoor Sports</b></p>
-      <p>This example calculates the probability that the user will play an outdoor sport, such as
-        golf or tennis, based on weather conditions. </p>
-      <p>The table <codeph>weather_example</codeph> contains the example values. </p>
-      <p>The identification column for the table is <codeph>day</codeph>, an integer type. </p>
-      <p>The <codeph>play</codeph> column holds the dependent variable and has two
-        classifications:</p>
+      <p><b>朴素贝叶斯示例 2 – 天气和户外运动</b></p>
+      <p>该示例计算在给定的天气条件下，用户要进行户外运动，例如高尔夫、网球等的概率。</p>
+      <p>表<codeph>weather_example</codeph>包含了样本值。</p>
+      <p>表的标识列是<codeph>day</codeph>，整型类型。</p>
+      <p><codeph>play</codeph>列包含了因变量以及两个类别：
+        </p>
       <ul id="ul_up1_v4y_1z">
         <li>0 - No</li>
         <li>1 - Yes</li>
       </ul>
-      <p>There are four attributes: outlook, temperature, humidity, and wind. These are categorical
-        variables. The MADlib <codeph>create_nb_classify_view()</codeph> function expects the
-        attributes to be provided as an array of <codeph>INTEGER</codeph>, <codeph>NUMERIC</codeph>,
-        or <codeph>FLOAT8</codeph> values, so the attributes for this example are encoded with
-        integers as follows: </p>
+      <p>有四个属性：outlook、temperature、humidity、以及wind。他们是类变量。
+          MADlib <codeph>create_nb_classify_view()</codeph>函数希望属性提供的是<codeph>INTEGER</codeph>、<codeph>NUMERIC</codeph>、或者<codeph>FLOAT8</codeph>值类型的数组，所以该示例的属性均用为整型进行编码：
+        </p>
       <ul id="ul_eq2_3py_1z">
-        <li><i>outlook</i> may be sunny (1), overcast (2), or rain (3). </li>
-        <li><i>temperature</i> may be hot (1), mild (2), or cool (3).</li>
-        <li><i>humidity</i> may be high (1) or normal (2). </li>
-        <li><i>wind</i> may be strong (1) or weak (2).</li>
+        <li><i>outlook</i> 可能取值为 sunny (1), overcast (2), 或 rain (3). </li>
+        <li><i>temperature</i> 可能取值为 hot (1), mild (2), 或 cool (3).</li>
+        <li><i>humidity</i> 可能取值为 high (1) 或 normal (2). </li>
+        <li><i>wind</i> 可能取值为 strong (1) 或 weak (2).</li>
       </ul>
-      <p>The following table shows the training data, before encoding the variables.</p>
+      <p>下表显示了编码变量之前的训练数据。
+        </p>
       <codeblock>  day | play | outlook  | temperature | humidity | wind
 -----+------+----------+-------------+----------+--------
  2   | No   | Sunny    | Hot         | High     | Strong
@@ -425,8 +420,8 @@ INSERT INTO class_example_topredict VALUES
 13   | Yes  | Overcast | Hot         | Normal   | Weak
 (14 rows)</codeblock>
       <ol id="ol_vj1_jrw_1z">
-        <li>Create the training
-          table.<codeblock>DROP TABLE IF EXISTS weather_example;
+        <li>创建一个训练表。
+            <codeblock>DROP TABLE IF EXISTS weather_example;
 CREATE TABLE weather_example (
    day int,
    play int,
@@ -447,8 +442,8 @@ INSERT INTO weather_example VALUES
    ( 9, 1, '{1,3,2,2}'),
    (11, 1, '{1,2,2,1}'),
    (13, 1, '{2,1,2,2}');</codeblock></li>
-        <li>Create the model from the training
-          table.<codeblock>SELECT madlib.create_nb_prepared_data_tables ( 
+        <li>根据训练表创建模型。
+            <codeblock>SELECT madlib.create_nb_prepared_data_tables (
    'weather_example',  -- training source table
    'play',             -- dependent class column 
    'attrs',            -- attributes column
@@ -456,8 +451,8 @@ INSERT INTO weather_example VALUES
    'weather_probs',    -- feature probabilities output table
    'weather_priors'    -- class priors
    );</codeblock></li>
-        <li>View the feature
-          probabilities:<codeblock>SELECT * FROM weather_probs;
+        <li>查看特征概率：
+            <codeblock>SELECT * FROM weather_probs;
  class | attr | value | cnt | attr_cnt
 -------+------+-------+-----+----------
      1 |    3 |     2 |   6 |        2
@@ -481,8 +476,8 @@ INSERT INTO weather_example VALUES
      1 |    2 |     2 |   4 |        3
      1 |    4 |     2 |   6 |        2
 (20 rows)</codeblock></li>
-        <li id="in191289">To classify a group of records with a model, first load the data into a
-          table. In this example, the table <codeph>t1</codeph> has four rows to classify.<p>
+        <li id="in191289">用模型分类一组记录，首先装载数据到一个表中。
+            在该示例中，表<codeph>t1</codeph>有四个行将要分类。<p>
             <codeblock>DROP TABLE IF EXISTS t1;
 CREATE TABLE t1 (
    id integer,
@@ -493,9 +488,8 @@ insert into t1 values
    (3, '{2, 1, 2, 2}'),
    (4, '{3, 1, 1, 2}');</codeblock>
           </p></li>
-        <li>Use the MADlib <codeph>create_nb_classify_view()</codeph> function to classify the rows
-          in the
-            table.<codeblock>SELECT madlib.create_nb_classify_view ( 
+        <li>使用MADlib <codeph>create_nb_classify_view()</codeph>函数对表中的行进行分类。
+            <codeblock>SELECT madlib.create_nb_classify_view (
    'weather_probs',      -- feature probabilities table
    'weather_priors',     -- classPriorsName
    't1',                 -- table containing values to classify
@@ -504,9 +498,8 @@ insert into t1 values
    4,                    -- number of attributes
    't1_out'              -- output table name
 );
-</codeblock><p>The
-            result is four rows, one for each record in the <codeph>t1</codeph>
-          table.</p><codeblock>SELECT * FROM t1_out ORDER BY key;
+</codeblock><p>结果有四行，每行对应表<codeph>t1</codeph>中的一条记录。
+                </p><codeblock>SELECT * FROM t1_out ORDER BY key;
  key | nb_classification
 -----+-------------------
  1 | {0}
@@ -518,44 +511,44 @@ insert into t1 values
     </body>
   </topic>
   <topic id="topic10" xml:lang="en">
-    <title id="pz213965">References</title>
+    <title id="pz213965">参考</title>
     <body>
-      <p>MADlib web site is at <xref href="http://madlib.apache.org/" format="html" scope="external"
-          >http://madlib.apache.org/</xref>.</p>
-      <p>MADlib documentation is at <xref href="http://madlib.apache.org/documentation.html"
-          format="html" scope="external">http://madlib.apache.org/documentation.html</xref>.</p>
-      <p>PivotalR is a first class R package that enables users to interact with data resident in
-        Greenplum Database and MADLib using an R client.</p>
+      <p>MADlib网站在<xref href="http://madlib.apache.org/" format="html" scope="external"
+          >http://madlib.apache.org/</xref>。</p>
+      <p>MADlib文档在<xref href="http://madlib.apache.org/documentation.html"
+          format="html" scope="external">http://madlib.apache.org/documentation.html</xref>。</p>
+      <p>PivotalR是第一类能够让用户使用R客户端对Greenplum驻留的数据和MADLib进行交互的R包。
+        </p>
     </body>
     <topic xml:lang="en" id="topic_dxp_vq2_sv">
-      <title>About MADlib, R, and PivotalR</title>
+      <title>关于MADlib、R、PivotalR</title>
       <body>
-        <p>The R language is an open-source language that is used for statistical computing.
-          PivotalR is an R package that enables users to interact with data resident in Greenplum
-          Database using the R client. Using PivotalR requires that MADlib is installed on the
-          Greenplum Database.</p>
-        <p>PivotalR allows R users to leverage the scalability and performance of in-database
-          analytics without leaving the R command line. The computational work is executed
-          in-database, while the end user benefits from the familiar R interface. Compared with
-          respective native R functions, there is an increase in scalability and a decrease in
-          running time. Furthermore, data movement, which can take hours for very large data sets,
-          is eliminated with PivotalR.</p>
-        <p>Key features of the PivotalR package:<ul id="ul_exp_vq2_sv">
-            <li>Explore and manipulate data in the database with R syntax. SQL translation is
-              performed by PivotalR.</li>
-            <li>Use the familiar R syntax for predictive analytics algorithms, for example linear
-              and logistic regression. PivotalR accesses the MADlib in-database analytics function
-              calls.</li>
-            <li>Comprehensive documentation package with examples in standard R format accessible
-              from an R client.</li>
-            <li>The PivotalR package also supports access to the MADlib functionality.</li>
+        <p>R语言是一门用于统计计算的开源编程语言。
+            PivotalR 是一个能够让用户通过R客户端与常驻Greenplum数据库的数据进行交互的R语言包。
+            使用PivotalR要求MADlib已经安装在了Greenplum数据库中。
+            </p>
+        <p>PivotalR允许R用户不用离开R命令行就能利用数据库内分析的可扩展性和性能。
+            计算工作在数据库内执行，而终端用户受益于熟悉的R语言接口。
+            与相应的原生R函数相比，在可扩展性上得到提升的同时在执行时间上有降低。
+            此外，PivotalR消除了对于非常大的数据集需要花费几个小时完成的数据移动。
+            </p>
+        <p>PivotalR包的关键特征：<ul id="ul_exp_vq2_sv">
+            <li>以R语法的方式探索和操作数据库内的数据。
+                SQL翻译由PivotalR来执行。</li>
+            <li>使用熟悉的R语法的预测分析算法，例如线性和逻辑回归。
+                PivotalR访问MADlib数据库内分析函数调用。
+                </li>
+            <li>对于广泛关于以标准R格式的示例文档包能够通过R客户端来访问。
+                </li>
+            <li>PivotalR包也支持MADlib函数的访问。</li>
           </ul></p>
-        <p>For information about PivotalR, including supported MADlib functionality, see <xref
+        <p>更多关于PivotalR的信息包括支持的MADlib功能的信息，见
+            <xref
             href="https://cwiki.apache.org/confluence/display/MADLIB/PivotalR" format="html"
-            scope="external">https://cwiki.apache.org/confluence/display/MADLIB/PivotalR</xref>.</p>
-        <p>The R package for PivotalR can be found at <xref
+            scope="external">https://cwiki.apache.org/confluence/display/MADLIB/PivotalR</xref>。</p>
+        <p>PivotalR的R语言包可以在<xref
             href="https://cran.r-project.org/web/packages/PivotalR/index.html" format="html"
-            scope="external">https://cran.r-project.org/web/packages/PivotalR/index.html</xref>.</p>
+            scope="external">https://cran.r-project.org/web/packages/PivotalR/index.html</xref>找到。</p>
       </body>
     </topic>
   </topic>

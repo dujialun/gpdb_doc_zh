@@ -2,18 +2,10 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic71">
-   <title>Defining a Command-Based Writable External Web Table</title>
+   <title>定义基于命令的可写外部Web表</title>
    <body>
-      <p>You can define writable external web tables to send output rows to an application or
-         script. The application must accept an input stream, reside in the same location on all of
-         the Greenplum segment hosts, and be executable by the <codeph>gpadmin</codeph> user. All
-         segments in the Greenplum system run the application or script, whether or not a segment
-         has output rows to process.</p>
-      <p>Use <codeph>CREATE WRITABLE EXTERNAL WEB TABLE</codeph> to define the external table and
-         specify the application or script to run on the segment hosts. Commands execute from within
-         the database and cannot access environment variables (such as <codeph>$PATH</codeph>). Set
-         environment variables in the <codeph>EXECUTE</codeph> clause of your writable external
-         table definition. For example:</p>
+      <p>用户可以定义可写的外部Web表把输出行发送到一个应用或者脚本。该应用必须接受一个输入流、在所有的Greenplum的Segment主机上位于相同位置并且对<codeph>gpadmin</codeph>用户可执行。Greenplum系统中的所有Segment都运行该应用或者脚本，不管Segment有没有输出行需要处理。</p>
+      <p>使用<codeph>CREATE WRITABLE EXTERNAL WEB TABLE</codeph>来定义外部表并且制定在Segment主机上运行的应用或者脚本。命令从数据库内部执行并且不能访问环境变量（例如<codeph>$PATH</codeph>）。在用户的可写外部表定义的<codeph>EXECUTE</codeph>子句中设置环境变量。例如：</p>
       <p>
          <codeblock>=# CREATE WRITABLE EXTERNAL WEB TABLE output (output text) 
     EXECUTE 'export PATH=$PATH:/home/<codeph>gpadmin</codeph>
@@ -23,100 +15,82 @@
     DISTRIBUTED RANDOMLY;
 </codeblock>
       </p>
-      <p>The following Greenplum Database variables are available for use in OS commands executed by
-         a web or writable external table. Set these variables as environment variables in the shell
-         that executes the command(s). They can be used to identify a set of requests made by an
-         external table statement across the Greenplum Database array of hosts and segment
-         instances.</p>
+      <p>下面的Greenplum数据库变量可以用在一个Web或者可写外部表所执行的OS命令中。把这些变量设置为执行命令的shell中的环境变量。它们可以被用来标识外部表语句在Greenplum数据库的主机和Segment实例阵列之间所作的一个要求集合。</p>
       <table id="du224024">
-         <title>External Table EXECUTE Variables</title>
+         <title>外部表EXECUTE变量</title>
          <tgroup cols="2">
             <colspec colnum="1" colname="col1" colwidth="1*"/>
             <colspec colnum="2" colname="col2" colwidth="2*"/>
             <thead>
                <row>
-                  <entry colname="col1">Variable</entry>
-                  <entry colname="col2">Description</entry>
+                  <entry colname="col1">变量</entry>
+                  <entry colname="col2">描述</entry>
                </row>
             </thead>
             <tbody>
                <row>
                   <entry colname="col1">$GP_CID</entry>
-                  <entry colname="col2">Command count of the transaction executing the external
-                     table statement.</entry>
+                  <entry colname="col2">执行外部表命令的事务的命令计数。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_DATABASE</entry>
-                  <entry colname="col2">The database in which the external table definition
-                     resides.</entry>
+                  <entry colname="col2">外部表定义所在的数据库。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_DATE</entry>
-                  <entry colname="col2">The date on which the external table command ran.</entry>
+                  <entry colname="col2">外部表命令被运行的日期。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_MASTER_HOST</entry>
-                  <entry colname="col2">The host name of the Greenplum master host from which the
-                     external table statement was dispatched.</entry>
+                  <entry colname="col2">分派外部表语句的Greenplum的Master主机的主机名。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_MASTER_PORT</entry>
-                  <entry colname="col2">The port number of the Greenplum master instance from which
-                     the external table statement was dispatched.</entry>
+                  <entry colname="col2">分派外部表语句的Greenplum的Master主机的端口号。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_QUERY_STRING</entry>
-                  <entry colname="col2">The SQL command (DML or SQL query) executed by Greenplum
-                     Database.</entry>
+                  <entry colname="col2">Greenplum数据库执行的SQL命令（DML或SQL查询）。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_SEG_DATADIR</entry>
-                  <entry colname="col2">The location of the data directory of the segment instance
-                     executing the external table command.</entry>
+                  <entry colname="col2">执行外部表命令的Segment实例的数据目录的位置。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_SEG_PG_CONF</entry>
-                  <entry colname="col2">The location of the <codeph>postgresql.conf</codeph> file of
-                     the segment instance executing the external table command.</entry>
+                  <entry colname="col2">执行外部表命令的Segment实例的postgresql.conf文件的位置。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_SEG_PORT</entry>
-                  <entry colname="col2">The port number of the segment instance executing the
-                     external table command.</entry>
+                  <entry colname="col2">执行外部表命令的Segment的端口号。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_SEGMENT_COUNT</entry>
-                  <entry colname="col2">The total number of primary segment instances in the
-                     Greenplum Database system.</entry>
+                  <entry colname="col2">Greenplum数据库系统中主要Segment实例的总数。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_SEGMENT_ID</entry>
-                  <entry colname="col2">The ID number of the segment instance executing the external
-                     table command (same as <codeph>dbid</codeph> in
-                        <codeph>gp_segment_configuration</codeph>).</entry>
+                  <entry colname="col2">执行外部表命令的Segment实例的ID号（与<codeph>gp_segment_configuration</codeph>中的<codeph>dbid</codeph>一样）。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_SESSION_ID</entry>
-                  <entry colname="col2">The database session identifier number associated with the
-                     external table statement.</entry>
+                  <entry colname="col2">与外部表语句相关的数据库会话标识号。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_SN</entry>
-                  <entry colname="col2">Serial number of the external table scan node in the query
-                     plan of the external table statement.</entry>
+                  <entry colname="col2">外部表语句执行计划中外部表扫描节点的序号。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_TIME</entry>
-                  <entry colname="col2">The time the external table command was executed.</entry>
+                  <entry colname="col2">外部表命令被执行的时间。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_USER </entry>
-                  <entry colname="col2">The database user executing the external table
-                     statement.</entry>
+                  <entry colname="col2">执行外部表语句的用户。</entry>
                </row>
                <row>
                   <entry colname="col1">$GP_XID</entry>
-                  <entry colname="col2">The transaction ID of the external table statement.</entry>
+                  <entry colname="col2">外部表语句的事务ID。</entry>
                </row>
             </tbody>
          </tgroup>

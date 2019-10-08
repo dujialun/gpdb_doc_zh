@@ -4,9 +4,9 @@
 <topic id="topic1" xml:lang="en">
   <title id="fs142834">foreign_table_options</title>
   <body>
-    <p>The <codeph>foreign_table_options</codeph> view contains all of the options defined for
-      foreign tables in the current database. Greenplum Database displays only those foreign
-       tables to which the current user has access (by way of being the owner or having some privilege).</p>
+    <p><codeph>foreign_table_options</codeph>视图包含为当前数据库中的外部表定义的所有选项。
+      Greenplum数据库仅显示当前用户可以访问的外部表（通过作为所有者或具有某些权限）。
+      </p>
     <table id="fs142842">
       <title>foreign_table_options</title>
       <tgroup cols="4">
@@ -16,10 +16,10 @@
         <colspec colnum="4" colname="col4" colwidth="145pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -29,8 +29,7 @@
             </entry>
             <entry colname="col2">sql_identifier</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Name of the database in which the foreign table
-              is defined (always the current database).</entry>
+            <entry colname="col4">定义外部表的数据库的名称（始终是当前数据库）。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -38,7 +37,7 @@
             </entry>
             <entry colname="col2">sql_identifier</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Name of the schema that contains the foreign table.</entry>
+            <entry colname="col4">包含外部表的schema的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -46,7 +45,7 @@
             </entry>
             <entry colname="col2">sql_identifier</entry>
             <entry colname="col3"></entry>
-            <entry colname="col4">Name of the foreign table.</entry>
+            <entry colname="col4">外部表的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -54,7 +53,7 @@
             </entry>
             <entry colname="col2">sql_identifier</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Name of an option.</entry>
+            <entry colname="col4">选项的名称。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -62,7 +61,7 @@
             </entry>
             <entry colname="col2">character_data</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Value of the option.</entry>
+            <entry colname="col4">选项的值。</entry>
           </row>
         </tbody>
       </tgroup>

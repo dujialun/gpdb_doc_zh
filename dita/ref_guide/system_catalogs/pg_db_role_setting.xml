@@ -4,12 +4,10 @@
 <topic id="topic1" xml:lang="en">
   <title id="gj143896">pg_db_role_setting</title>
   <body>
-    <p>The <codeph>pg_db_role_setting</codeph> system catalog table records the default
-      values of server configuration settings for each role and database combination.</p>
-    <p>There is a single copy of <codeph>pg_db_role_settings</codeph> per Greenplum
-      Database cluster. This system catalog table is shared across all databases.</p>
-    <p>You can view the server configuration settings for your Greenplum Database
-      cluster with <codeph>psql</codeph>'s <codeph>\drds</codeph> meta-command.</p>
+    <p><codeph>pg_db_role_setting</codeph>系统目录表记录每个角色和数据库组合的服务器配置设置的默认值。</p>
+    <p>每个Greenplum数据库集群都有一个<codeph>pg_db_role_settings</codeph>副本。
+      此系统目录表在所有数据库中共享。</p>
+    <p>您可以使用<codeph>psql</codeph>的<codeph>\drds</codeph>元命令查看Greenplum数据库集群的服务器配置设置。</p>
     <table id="gj143898">
       <title>pg_catalog.pg_database</title>
       <tgroup cols="4">
@@ -19,10 +17,10 @@
         <colspec colnum="4" colname="col4" colwidth="147pt"/>
         <thead>
           <row>
-            <entry colname="col1">column</entry>
-            <entry colname="col2">type</entry>
-            <entry colname="col3">references</entry>
-            <entry colname="col4">description</entry>
+            <entry colname="col1">列</entry>
+            <entry colname="col2">类型</entry>
+            <entry colname="col3">参考</entry>
+            <entry colname="col4">描述</entry>
           </row>
         </thead>
         <tbody>
@@ -32,8 +30,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_database.oid</entry>
-            <entry colname="col4">The database to which the setting is applicable, or
-              zero if the setting is not database-specific.</entry>
+            <entry colname="col4">设置适用的数据库，如果设置不是特定于数据库，则为零。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -41,8 +38,7 @@
             </entry>
             <entry colname="col2">oid</entry>
             <entry colname="col3">pg_authid.oid</entry>
-            <entry colname="col4">The role to which the setting is applicable, or
-              zero if the setting is not role-specific.</entry>
+            <entry colname="col4">设置适用的角色，如果设置不是特定于角色，则为零。</entry>
           </row>
           <row>
             <entry colname="col1">
@@ -50,8 +46,7 @@
             </entry>
             <entry colname="col2">text[]</entry>
             <entry colname="col3"/>
-            <entry colname="col4">Per-database- and per-role-specific defaults for
-              user-settable server configuration parameters.</entry>
+            <entry colname="col4">用户可设置的服务器配置参数的每个数据库和每个角色特定的默认值。</entry>
           </row>
         </tbody>
       </tgroup>

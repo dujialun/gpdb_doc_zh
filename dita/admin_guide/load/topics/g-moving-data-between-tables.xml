@@ -2,23 +2,15 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic60">
-   <title>Moving Data between Tables</title>
+   <title>在表之间移动数据</title>
    <body>
-      <p>You can use <codeph>CREATE TABLE AS</codeph> or
-                            <codeph>INSERT...SELECT</codeph> to load external and external web table
-                        data into another (non-external) database table, and the data will be loaded
-                        in parallel according to the external or external web table definition.</p>
-      <p>If an external table file or external web table data source has an error, one
-                        of the following will happen, depending on the isolation mode used:</p>
+      <p>用户可以使用<codeph>CREATE TABLE AS</codeph>或者<codeph>INSERT...SELECT</codeph>把外部表和外部Web表的数据装载到另一个（非外部）数据库表中，并且这些数据会被根据外部表或者外部Web表定义并行装载。</p>
+      <p>如果一个外部表文件或者外部Web表数据源有错误，根据使用的隔离模式将会发生下列情况之一：</p>
       <ul>
          <li id="du223917">
-            <b>Tables without error isolation mode</b>: any operation that reads from that table
-            fails. Loading from external and external web tables without error isolation mode is an
-            all or nothing operation.</li>
+            <b>没有错误隔离模式的表</b>：任何从该表中读取的操作都会失败。从没有错误隔离模式的外部表或者外部Web表装载是一种全做或者全不做的操作。</li>
          <li id="du223918">
-            <b>Tables with error isolation mode</b>: the entire file
-                            will be loaded, except for the problematic rows (subject to the
-                            configured REJECT_LIMIT)</li>
+            <b>有错误隔离模式的表</b>：整个文件都将被装载，除了其中有问题的行（服从于配置的REJECT_LIMIT）。</li>
       </ul>
    </body>
 </topic>
