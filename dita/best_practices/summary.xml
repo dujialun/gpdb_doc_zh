@@ -1,343 +1,272 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_kqw_prc_3r">
-  <title>Best Practices Summary</title>
-  <shortdesc>A summary of best practices for Greenplum Database.</shortdesc>
+  <title>最佳实践概要</title>
+  <shortdesc>本章包含Greenplum数据库的最佳实践概要。</shortdesc>
   <body>
     <section>
-      <title>Data Model</title>
+      <title>数据模型</title>
     </section>
-    <section>Greenplum Database is an analytical MPP shared-nothing database. This model is
-      significantly different from a highly normalized/transactional SMP database. Because of this,
-      the following best practices are recommended.<ul id="ul_knm_src_3r">
-        <li>Greenplum Database performs best with a denormalized schema design suited for MPP
-          analytical processing for example, Star or Snowflake schema, with large fact tables and
-          smaller dimension tables. </li>
-        <li>Use the same data types for columns used in joins between tables.</li>
-      </ul><p>See <xref href="schema.xml#schema_design"/>.</p></section>
+    <section>Greenplum数据库是一种shared nothing的分析型MPP数据库。这种模型与高度规范化的/事务型
+      的SMP数据库有显著区别。正因为如此，推荐以下几项最佳实践。
+      <ul id="ul_knm_src_3r">
+        <li>Greenplum数据库使用非规范化的模式设计会工作得最好，非规范化的模式适合于MPP分析型处理，例如
+          带有大型事实表和较小维度表的星形模式或者雪花模式。</li>
+        <li>表之间用于连接(join)的列采用相同的数据类型。</li>
+      </ul><p>详见<xref href="schema.xml#schema_design"/>。</p></section>
     <section>
-      <title>Heap vs. Append-Optimized Storage</title>
+      <title>堆存储 vs. 追加优化存储</title>
       <ul id="ul_ypm_src_3r">
-        <li>Use heap storage for tables and partitions that will receive iterative batch and
-          singleton <codeph>UPDATE</codeph>, <codeph>DELETE</codeph>, and <codeph>INSERT</codeph>
-          operations. </li>
-        <li>Use heap storage for tables and partitions that will receive concurrent
-            <codeph>UPDATE</codeph>, <codeph>DELETE</codeph>, and <codeph>INSERT</codeph>
-          operations.</li>
-        <li>Use append-optimized storage for tables and partitions that are updated infrequently
-          after the initial load and have subsequent inserts only performed in large batch
-          operations. </li>
-        <li>Avoid performing singleton <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or
-            <codeph>DELETE</codeph> operations on append-optimized tables. </li>
-        <li>Avoid performing concurrent batch <codeph>UPDATE</codeph> or <codeph>DELETE</codeph>
-          operations on append-optimized tables. Concurrent batch <codeph>INSERT</codeph> operations
-          are acceptable. </li>
+        <li>经常进行反复的批量或单一<codeph>UPDATE</codeph>，<codeph>DELETE</codeph>和<codeph>INSERT</codeph>
+          操作的表或分区使用堆存储。</li>
+        <li>经常进行并发<codeph>UPDATE</codeph>，<codeph>DELETE</codeph>和<codeph>INSERT</codeph>的表或分区
+          使用堆存储。</li>
+        <li>对于在初始装载后很少更新并且只会在大型批处理操作中进行后续插入的表和分区，使用追加优化存储。</li>
+        <li>绝不在追加优化表上执行单个<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>或
+            <codeph>DELETE</codeph>操作。</li>
+        <li>绝不在追加优化表上执行并发的批量<codeph>UPDATE</codeph>或<codeph>DELETE</codeph>操作。可以执行并发的
+          批量<codeph>INSERT</codeph>操作。</li>
       </ul>
-      <p>See <xref href="schema.xml#storage_model/heap_vs_ao"/>.</p>
+      <p>详见<xref href="schema.xml#storage_model/heap_vs_ao"/>。</p>
     </section>
     <section>
-      <title>Row vs. Column Oriented Storage</title>
+      <title>行存 vs. 列存</title>
       <ul id="ul_esm_src_3r">
-        <li>Use row-oriented storage for workloads with iterative transactions where updates are
-          required and frequent inserts are performed. </li>
-        <li>Use row-oriented storage when selects against the table are wide.</li>
-        <li>Use row-oriented storage for general purpose or mixed workloads.</li>
-        <li>Use column-oriented storage where selects are narrow and aggregations of data are
-          computed over a small number of columns.</li>
-        <li>Use column-oriented storage for tables that have single columns that are regularly
-          updated without modifying other columns in the row.</li>
+        <li>如果负载中有要求更新并且频繁执行插入的迭代事务，则对这种负载使用行存。</li>
+        <li>在对宽表选择时使用行存。</li>
+        <li>为一般目的或混合负载使用行存。</li>
+        <li>选择面很窄（很少的列）和在少量列上计算数据聚集时使用列存。</li>
+        <li>如果表中有单个列定期被更新而不修改行中的其他列，则对这种表使用列存。</li>
       </ul>
-      <p>See <xref href="schema.xml#storage_model/row_vs_column"/>.</p>
+      <p>详见<xref href="schema.xml#storage_model/row_vs_column"/>。</p>
     </section>
     <section>
-      <title>Compression</title>
+      <title>压缩</title>
       <ul id="ul_l5m_src_3r">
-        <li>Use compression on large append-optimized and partitioned tables to improve I/O across
-          the system.</li>
-        <li>Set the column compression settings at the level where the data resides.</li>
-        <li>Balance higher levels of compression with the time and CPU cycles needed to compress and
-          uncompress data.</li>
+        <li>在大型追加优化和分区表上使用压缩以改进系统范围的I/O。</li>
+        <li>在数据最终的存储位置表设置列压缩。</li>
+        <li>平衡压缩解压缩时间和CPU执行周期，选择性能最高的压缩级别。</li>
       </ul>
-      <p>See <xref href="schema.xml#topic_ebd_khx_z4"/>.</p>
+      <p>详见<xref href="schema.xml#topic_ebd_khx_z4"/>。</p>
     </section>
     <section>
-      <title>Distributions</title>
+      <title>数据分布</title>
       <ul id="ul_uwm_src_3r">
-        <li>Explicitly define a column or random distribution for all tables. Do not use the
-          default.</li>
-        <li>Use a single column that will distribute data across all segments evenly.</li>
-        <li>Do not distribute on columns that will be used in the <codeph>WHERE</codeph> clause of a
-          query. </li>
-        <li>Do not distribute on dates or timestamps. </li>
-        <li> Never distribute and partition tables on the same column. </li>
-        <li>Achieve local joins to significantly improve performance by distributing on the same
-          column for large tables commonly joined together.</li>
-        <li>To ensure there is no data skew, validate that data is evenly distributed after the
-          initial load and after incremental loads. </li>
+        <li>为所有的表显式定义一个列分布或者随机分布。不要使用默认值。</li>
+        <li>使用能将数据在所有segment上均匀分布的单个列作为分布键。</li>
+        <li>不要采用查询的<codeph>WHERE</codeph>条件中使用的列作为分布键。</li>
+        <li>不要采用日期或时间戳作为分布键。</li>
+        <li>不要将同一列同时用于数据分布和分区。</li>
+        <li>在经常做连接(join)操作的大表上采用相同的分布键，这样可以通过本地连接(join)来显著提高性能。</li>
+        <li>在初始装载数据以及增量装载数据之后验证数据没有明显倾斜。</li>
       </ul>
-      <p>See <xref href="schema.xml#distribution"/>.</p>
+      <p>详见<xref href="schema.xml#distribution"/>。</p>
     </section>
     <section>
-      <title>Resource Queue Memory Management</title>
+      <title>资源队列内存管理</title>
       <ul id="ul_ezm_src_3r">
-        <li> Set <codeph>vm.overcommit_memory</codeph> to 2.</li>
-        <li> Do not configure the OS to use huge pages. </li>
-        <li> Use <codeph>gp_vmem_protect_limit</codeph> to set the maximum memory that the instance
-          can allocate for <i>all</i> work being done in each segment database. </li>
-        <li> You can use <codeph>gp_vmem_protect_limit</codeph> by calculating:<ul
+        <li>设置<codeph>vm.overcommit_memory</codeph>为2。</li>
+        <li>不要配置OS使用大页。</li>
+        <li>使用<codeph>gp_vmem_protect_limit</codeph>设置实例可以为每个Segment数据库中执行的<i>所有</i>工作分配的最大内存。</li>
+        <li>可以通过以下计算方法来设置<codeph>gp_vmem_protect_limit</codeph>:<ul
             id="ul_bdj_xkq_kv">
-            <li><codeph>gp_vmem</codeph> – the total memory available to Greenplum
-              Database<codeblock>gp_vmem = ((SWAP + RAM) – (7.5GB + 0.05 * RAM)) / 1.7</codeblock>where
-                <codeph>SWAP</codeph> is the host's swap space in GB, and <codeph>RAM</codeph> is
-              the host's RAM in GB</li>
-            <li><codeph>max_acting_primary_segments</codeph> – the maximum number of primary
-              segments that could be running on a host when mirror segments are activated due to a
-              host or segment failure</li>
-            <li><codeph>gp_vmem_protect_limit</codeph><codeblock>gp_vmem_protect_limit = gp_vmem / acting_primary_segments</codeblock>Convert
-              to MB to set the value of the configuration parameter. </li>
+            <li><codeph>gp_vmem</codeph> – Greenplum数据库可用总内存
+              <codeblock>gp_vmem = ((SWAP + RAM) – (7.5GB + 0.05 * RAM)) / 1.7</codeblock>
+              其中<codeph>SWAP</codeph>是该主机的交换空间，单位GB，<codeph>RAM</codeph>是该主机的内存，单位GB</li>
+            <li><codeph>max_acting_primary_segments</codeph> – 当发生主机或主segment故障导致镜像segment切换时，
+              单台主机上可以运行的主segment上限。</li>
+            <li><codeph>gp_vmem_protect_limit</codeph><codeblock>gp_vmem_protect_limit = gp_vmem / acting_primary_segments</codeblock>
+              转换成MB来设置配置参数的值。</li>
           </ul></li>
-        <li>In a scenario where a large number of workfiles are generated calculate the
-            <codeph>gp_vmem</codeph> factor with this formulat to account for the
-          workfiles:<codeblock>gp_vmem = ((SWAP + RAM) – (7.5GB + 0.05 * RAM - (300KB *
+        <li>在有大量工作文件被生成的场景下用下面的公式计算将工作文件考虑在内的<codeph>gp_vmem</codeph>因子：
+          <codeblock>gp_vmem = ((SWAP + RAM) – (7.5GB + 0.05 * RAM - (300KB *
       <varname>total_#_workfiles</varname>))) / 1.7</codeblock>
         </li>
-        <li> Never set <codeph>gp_vmem_protect_limit</codeph> too high or larger than the physical
-          RAM on the system. </li>
-        <li>Use the calculated <codeph>gp_vmem</codeph> value to calculate the setting for the
-            <codeph>vm.overcommit_ratio</codeph> operating system
-          parameter:<codeblock>vm.overcommit_ratio = (RAM - 0.026 * gp_vmem) / RAM</codeblock></li>
-        <li>Use <codeph>statement_mem</codeph> to allocate memory used for a query per segment
-          db.</li>
-        <li> Use resource queues to set both the numbers of active queries
-            (<codeph>ACTIVE_STATEMENTS</codeph>) and the amount of memory
-            (<codeph>MEMORY_LIMIT</codeph>) that can be utilized by queries in the queue. </li>
-        <li> Associate all users with a resource queue. Do not use the default queue. </li>
-        <li> Set <codeph>PRIORITY</codeph> to match the real needs of the queue for the workload and
-          time of day. Avoid using MAX priority.</li>
-        <li> Ensure that resource queue memory allocations do not exceed the setting for
-            <codeph>gp_vmem_protect_limit</codeph>.</li>
-        <li> Dynamically update resource queue settings to match daily operations flow.</li>
+        <li>绝不将<codeph>gp_vmem_protect_limit</codeph>设置得过高或者比系统上的物理RAM大。</li>
+        <li>使用计算出的<codeph>gp_vmem</codeph>值来计算操作系统参数<codeph>vm.overcommit_ratio</codeph>
+          的设置：<codeblock>vm.overcommit_ratio = (RAM - 0.026 * gp_vmem) / RAM</codeblock></li>
+        <li>使用<codeph>statement_mem</codeph>来分配每个segment数据库中用于一个查询的内存。</li>
+        <li>使用资源队列设置活动查询的数目（<codeph>ACTIVE_STATEMENTS</codeph>）以及队列中查询所能利用的内存量
+          （<codeph>MEMORY_LIMIT</codeph>）。</li>
+        <li>把所有的用户都与一个资源队列关联。不要使用默认的队列。 </li>
+        <li>设置<codeph>PRIORITY</codeph>以匹配用于负载以及实际情况的队列的实际需要，避免使用MAX权限。</li>
+        <li>确保资源队列的内存分配不会超过<codeph>gp_vmem_protect_limit</codeph>的设置。
+            </li>
+        <li>动态更新资源队列设置以匹配日常操作流。</li>
       </ul>
-      <p>See <xref href="workloads.xml#topic_hhc_z5w_r4"/>.</p>
+      <p>见<xref href="workloads.xml#topic_hhc_z5w_r4"/>.</p>
     </section>
     <section>
-      <title>Partitioning</title>
+      <title>分区</title>
       <ul id="ul_ngn_src_3r">
-        <li>Partition large tables only. Do not partition small tables.</li>
-        <li>Use partitioning only if partition elimination (partition pruning) can be achieved based
-          on the query criteria.</li>
-        <li>Choose range partitioning over list partitioning.</li>
-        <li>Partition the table based on a commonly-used column, such as a date column.</li>
-        <li>Never partition and distribute tables on the same column. </li>
-        <li>Do not use default partitions. </li>
-        <li>Do not use multi-level partitioning; create fewer partitions with more data in each
-          partition.</li>
-        <li>Validate that queries are selectively scanning partitioned tables (partitions are being
-          eliminated) by examining the query <codeph>EXPLAIN</codeph> plan.</li>
-        <li>Do not create too many partitions with column-oriented storage because of the total
-          number of physical files on every segment: <codeph>physical files = segments x columns x
+        <li>只对大型表分区。不要分区小表。</li>
+        <li>只有能基于查询条件实现分区消除（分区裁剪）时才使用分区。</li>
+        <li>选择范围分区而舍弃列表分区。</li>
+        <li>基于查询谓词对表分区。</li>
+        <li>不要在同一列上对表进行分布和分区。</li>
+        <li>不要使用默认分区。</li>
+        <li>不要使用多级分区，创建较少的分区让每个分区中有更多数据。</li>
+        <li>通过检查查询的<codeph>EXPLAIN</codeph>计划验证查询有选择地扫描分区表（分区被裁剪）。</li>
+        <li>不要用列存储创建太多分区，因为每个Segment上的物理文件总数：<codeph>physical files = segments x columns x
             partitions</codeph></li>
       </ul>
-      <p>See <xref href="schema.xml#topic_fmc_lx1_3r"/>.</p>
+      <p>见<xref href="schema.xml#topic_fmc_lx1_3r"/>.</p>
     </section>
     <section>
-      <title>Indexes</title>
+      <title>索引</title>
       <ul id="ul_f2n_src_3r">
-        <li>In general indexes are not needed in Greenplum Database.</li>
-        <li>Create an index on a single column of a columnar table for drill-through purposes for
-          high cardinality tables that require queries with high selectivity. </li>
-        <li>Do not index columns that are frequently updated. </li>
-        <li>Consider dropping indexes before loading data into a table. After the load, re-create
-          the indexes for the table. </li>
-        <li>Create selective B-tree indexes. </li>
-        <li>Do not create bitmap indexes on columns that are updated. </li>
-        <li>Avoid using bitmap indexes for unique columns, very high or very low cardinality data.
-          Bitmap indexes perform best when the column has a low cardinality—100 to 100,000 distinct
-          values. </li>
-        <li>Do not use bitmap indexes for transactional workloads.</li>
-        <li>In general do not index partitioned tables. If indexes are needed, the index columns
-          must be different than the partition columns.</li>
+        <li>通常在Greenplum数据库中无需使用索引。</li>
+        <li>对高基数的表在列式表的单列上创建索引用于钻透目的要求查询具有较高的选择度。</li>
+        <li>不要索引被频繁更新的列。</li>
+        <li>总是在装载数据到表之前删除索引。在装载后，重新为该表创建索引。</li>
+        <li>创建具有选择性的B-树索引。</li>
+        <li>不要在被更新的列上创建位图索引。</li>
+        <li>不要为唯一列、基数非常高或者非常低的数据使用位图索引。位图索引在列值唯一性位于100-100,000之间时性能最好。</li>
+        <li>不要为事务性负载使用位图索引。</li>
+        <li>通常不要索引分区表。如果需要索引，索引列必须与分区列不同。</li>
       </ul>
-      <p>See <xref href="schema.xml#indexes"/>.</p>
+      <p>见<xref href="schema.xml#indexes"/>.</p>
     </section>
     <section id="_Toc286661611">
-      <title>Resource Queues</title>
+      <title>资源队列</title>
       <ul id="ul_nnn_src_3r">
-        <li> Use resource queues to manage the workload on the cluster.</li>
-        <li>Associate all roles with a user-defined resource queue. </li>
-        <li>Use the <codeph>ACTIVE_STATEMENTS</codeph> parameter to limit the number of active
-          queries that members of the particular queue can run concurrently. </li>
-        <li>Use the <codeph>MEMORY_LIMIT</codeph> parameter to control the total amount of memory
-          that queries running through the queue can utilize. </li>
-        <li>Alter resource queues dynamically to match the workload and time of day.</li>
+        <li>使用资源队列来管理集群上的负载。</li>
+        <li>将所有的角色都与一个用户定义的资源队列关联。</li>
+        <li>使用<codeph>ACTIVE_STATEMENTS</codeph>参数限制特定队列的成员能并发运行的活动查询数量。</li>
+        <li>使用<codeph>MEMORY_LIMIT</codeph>参数控制通过队列运行的查询所能利用的总内存量。</li>
+        <li>动态修改资源队列以匹配负载以及现状。</li>
       </ul>
-      <p>See <xref href="workloads.xml#topic_hhc_z5w_r4/configuring_rq"/>.</p>
+      <p>见<xref href="workloads.xml#topic_hhc_z5w_r4/configuring_rq"/>.</p>
     </section>
     <section>
-      <title>Monitoring and Maintenance</title>
+      <title>监控和维护</title>
       <ul id="ul_wd5_bj4_y4">
-        <li>Implement the "Recommended Monitoring and Maintenance Tasks" in the <i>Greenplum
-            Database Administrator Guide</i>.</li>
-        <li>Run <codeph>gpcheckperf</codeph> at install time and periodically thereafter, saving the
-          output to compare system performance over time. </li>
-        <li>Use all the tools at your disposal to understand how your system behaves under different
-          loads. </li>
-        <li>Examine any unusual event to determine the cause.</li>
-        <li>Monitor query activity on the system by running explain plans periodically to ensure the
-          queries are running optimally.</li>
-        <li>Review plans to determine whether index are being used and partition elimination is
-          occurring as expected.</li>
-        <li>Know the location and content of system log files and monitor them on a regular basis,
-          not just when problems arise.</li>
+        <li>实现<i>Greenplum数据库管理员指南</i>中的"推荐的监控和维护任务"。</li>
+        <li>安装时运行<codeph>gpcheckperf</codeph>并且在之后定期运行该工具，保存其输出用来比较系统性能随时间的变化。</li>
+        <li>使用手头的所有工具来理解系统在不同负载下的表现。</li>
+        <li>检查任何异常事件以判断成因。</li>
+        <li>通过定期运行执行计划监控查询活动以确保查询被以最优的方式运行。</li>
+        <li>检查执行计划以判断索引是否被使用以及分区消除是否按照预期发生。</li>
+        <li>了解系统日志文件的位置和内容并且定期监控它们，而不是只在问题出现时才去检查日志。</li>
       </ul>
-      <p>See <xref href="maintenance.xml#topic_yrk_bcx_r4"/>, <xref
+      <p>见<xref href="maintenance.xml#topic_yrk_bcx_r4"/>, <xref
           href="../admin_guide/query/topics/query-profiling.xml#topic39/in198649">Query
           Profiling</xref> and <xref href="logfiles.xml#topic_crh_2fc_3r"/>.</p>
     </section>
     <section id="_Toc286661612">
       <title>ANALYZE</title>
       <ul id="ul_spn_src_3r">
-        <li>Determine if analyzing the database is actually needed. Analyzing is not needed if
-            g<codeph>p_autostats_mode</codeph> is set to <codeph>on_no_stats</codeph> (the default)
-          and the table is not partitioned.</li>
-        <li>Use <codeph>analyzedb</codeph> in preference to <codeph>ANALYZE</codeph> when dealing
-          with large sets of tables, as it does not require analyzing the entire database. The
-            <codeph>analyzedb</codeph> utility updates statistics data for the specified tables
-          incrementally and concurrently. For append optimized tables, <codeph>analyzedb</codeph>
-          updates statistics incrementally only if the statistics are not current. For heap tables,
-          statistics are always updated. <codeph>ANALYZE</codeph> does not update the table metadata
-          that the <codeph>analyzedb</codeph> utility uses to determine whether table statistics are
-          up to date.</li>
-        <li>Selectively run <codeph>ANALYZE</codeph> at the table level when needed.</li>
-        <li>Always run <codeph>ANALYZE</codeph> after <codeph>INSERT</codeph>,
-            <codeph>UPDATE</codeph>. and <codeph>DELETE</codeph> operations that significantly
-          changes the underlying data. </li>
-        <li>Always run <codeph>ANALYZE</codeph> after <codeph>CREATE INDEX</codeph> operations. </li>
-        <li>If <codeph>ANALYZE</codeph> on very large tables takes too long, run
-            <codeph>ANALYZE</codeph> only on the columns used in a join condition,
-            <codeph>WHERE</codeph> clause, <codeph>SORT</codeph>, <codeph>GROUP BY</codeph>, or
-            <codeph>HAVING</codeph> clause. </li>
-        <li>When dealing with large sets of tables, use <codeph>analyzedb</codeph> instead of
-            <codeph>ANALYZE.</codeph></li>
+        <li>如果分析操作势在必行，那么请做出决定。如果<codeph>p_autostats_mode</codeph>设置为
+          <codeph>on_no_stats</codeph>（默认）并且表没有被分区，分析操作并不是必须的。</li>
+        <li>处理大量的表时，优先使用<codeph>analyzedb</codeph>工具而不是<codeph>ANALYZE</codeph>命令，
+          因为<codeph>analyzedb</codeph>工具不会分析整个数据库。<codeph>analyzedb</codeph>工具可以增量
+          并发地更新统计数据。针对堆表，统计数据会一直被更新。相较而言<codeph>ANALYZE</codeph>则不像
+          <codeph>analyzedb</codeph>一样去更新表的元数据（用来记录表统计信息是否是最新的）。</li>
+        <li>不要在整个数据库上运行<codeph>ANALYZE</codeph>。需要时，有选择地在表级别上运行<codeph>ANALYZE</codeph>。
+          </li>
+        <li>在显著改变底层数据的<codeph>INSERT</codeph>、<codeph>UPDATE</codeph>以及<codeph>DELETE</codeph>
+          操作之后总是运行<codeph>ANALYZE</codeph>。</li>
+        <li>在<codeph>CREATE INDEX</codeph>操作之后总是运行<codeph>ANALYZE</codeph>。</li>
+        <li>如果在非常大的表上运行<codeph>ANALYZE</codeph>需要太长时间，可以只在用于连接条件、
+          <codeph>WHERE</codeph>子句、<codeph>SORT</codeph>子句、<codeph>GROUP BY</codeph>
+          子句或者<codeph>HAVING</codeph>子句的列上运行<codeph>ANALYZE</codeph>。</li>
+        <li>当处理大批量表时，使用<codeph>analyzedb</codeph>工具而不是使用<codeph>ANALYZE</codeph>
+        命令</li>
       </ul>
-      <p>See <xref href="analyze.xml#analyze"/>.</p>
+      <p>见<xref href="analyze.xml#analyze"/>.</p>
     </section>
     <section id="_Toc286661609">
       <title>Vacuum</title>
       <ul id="ul_cjn_src_3r">
-        <li>Run <codeph>VACUUM</codeph> after large <codeph>UPDATE</codeph> and
-            <codeph>DELETE</codeph> operations.</li>
-        <li>Do not run <codeph>VACUUM FULL</codeph>. Instead run a <codeph>CREATE
-            TABLE...AS</codeph> operation, then rename and drop the original table.</li>
-        <li>Frequently run <codeph>VACUUM</codeph> on the system catalogs to avoid catalog bloat and
-          the need to run <codeph>VACUUM FULL</codeph> on catalog tables. </li>
-        <li>Never kill <codeph>VACUUM</codeph> on catalog tables.</li>
+        <li>在大量<codeph>UPDATE</codeph>和<codeph>DELETE</codeph>操作后运行
+          <codeph>VACUUM</codeph>。</li>
+        <li>不要运行<codeph>VACUUM FULL</codeph>。而是运行一个<codeph>CREATE TABLE...AS</codeph>
+          操作，然后重命名并且删掉原始表。</li>
+        <li>频繁地在系统目录上运行<codeph>VACUUM</codeph>以避免目录膨胀以及在目录上运行
+          <codeph>VACUUM FULL</codeph>的需要。</li>
+        <li>绝不要杀掉系统目录表上的<codeph>VACUUM</codeph>操作。</li>
       </ul>
-      <p>See <xref href="bloat.xml#topic_gft_h11_bp"/>.</p>
+      <p>见<xref href="bloat.xml#topic_gft_h11_bp"/>.</p>
     </section>
     <section id="_Toc286661610">
-      <title>Loading</title>
+      <title>装载</title>
       <ul id="ul_jln_src_3r">
-        <li> Maximize the parallelism as the number of segments increase. </li>
-        <li> Spread the data evenly across as many ETL nodes as possible. <ul id="ul_o1t_dqr_t1b">
-            <li>Split very large data files into equal parts and spread the data across as many file
-              systems as possible. </li>
-            <li> Run two <codeph>gpfdist</codeph> instances per file system. </li>
-            <li>Run <codeph>gpfdist</codeph> on as many interfaces as possible. </li>
-            <li>Use <codeph>gp_external_max_segs</codeph> to control the number of segments that
-              will request data from the <codeph>gpfdist</codeph> process. </li>
-            <li>Always keep <codeph>gp_external_max_segs</codeph> and the number of
-                <codeph>gpfdist</codeph> processes an even factor.</li>
+        <li>随着segment数目增加最大化并行度。</li>
+        <li>在尽可能多的ETL节点上均匀散布数据。<ul id="ul_o1t_dqr_t1b">
+          <li>把非常大型的数据文件分割成相等的部分，并且把数据散布在尽可能多的文件系统上。</li>
+          <li>每个文件系统运行两个<codeph>gpfdist</codeph>实例。</li>
+          <li>在尽可能多的接口上运行<codeph>gpfdist</codeph>。</li>
+          <li>使用<codeph>gp_external_max_segs</codeph>以控制每个<codeph>gpfdist</codeph>
+            服务的segment数量。</li>
+          <li>总是保持<codeph>gp_external_max_segs</codeph>和<codeph>gpfdist</codeph>
+            进程的数量为偶因子。</li>
           </ul></li>
-        <li> Always drop indexes before loading into existing tables and re-create the index after
-          loading. </li>
-        <li> Run <codeph>VACUUM</codeph> after load errors to recover space. </li>
+        <li>在装载到现有表之前总是删除索引并且在装载之后重建索引。</li>
+        <li>总是在对表装载之后运行<codeph>VACUUM</codeph>。</li>
       </ul>
-      <p>See <xref href="data_loading.xml#topic_fj5_b1x_r4"/>.</p>
+      <p>见<xref href="data_loading.xml#topic_fj5_b1x_r4"/>.</p>
     </section>
     <section>
-      <title>Security</title>
+      <title>安全性</title>
       <ul id="ul_ocm_zsx_kr">
-        <li> Secure the <codeph>gpadmin</codeph> user id and only allow essential system
-          administrators access to it. </li>
-        <li>Administrators should only log in to Greenplum as <codeph>gpadmin</codeph> when
-          performing certain system maintenance tasks (such as upgrade or expansion). </li>
-        <li>Limit users who have the <codeph>SUPERUSER</codeph> role attribute. Roles that are
-          superusers bypass all access privilege checks in Greenplum Database, as well as resource
-          queuing. Only system administrators should be given superuser rights. See "Altering Role
-          Attributes" in the <i>Greenplum Database Administrator Guide</i>. </li>
-        <li>Database users should never log on as <codeph>gpadmin</codeph>, and ETL or production
-          workloads should never run as <codeph>gpadmin</codeph>. </li>
-        <li>Assign a distinct Greenplum Database role to each user, application, or service that
-          logs in. </li>
-        <li>For applications or web services, consider creating a distinct role for each application
-          or service. </li>
-        <li>Use groups to manage access privileges. </li>
-        <li>Protect the root password.</li>
-        <li>Enforce a strong password password policy for operating system passwords.</li>
-        <li>Ensure that important operating system files are protected. </li>
+        <li>保护<codeph>gpadmin</codeph>用户ID并且只允许对它进行必需的系统管理员访问。</li>
+        <li>在执行特定的系统维护任务（例如升级或者扩容）时，管理员只应作为<codeph>gpadmin</codeph>
+          登入到Greenplum。</li>
+        <li>限制具有<codeph>SUPERUSER</codeph>角色属性的用户。成为超级用户的角色能绕过Greenplum
+          数据库中的所有访问特权检查以及资源队列。只有系统管理员应该被给予超级用户的权力。请见
+          <i>Greenplum数据库管理员指南</i>中的“修改角色属性”。</li>
+        <li>数据库用户绝不应该以<codeph>gpadmin</codeph>登录，且ETL或者生产负载也绝不应该以
+          <codeph>gpadmin</codeph>运行。</li>
+        <li>为每个登入的用户、应用和服务分派一个不同的角色。</li>
+        <li>对于应用或者Web服务，考虑为每个应用或服务创建一个不同的角色。</li>
+        <li>使用组管理访问特权。</li>
+        <li>保护root口令。</li>
+        <li>为操作系统口令强制一种强口令策略。</li>
+        <li>确保重要的操作系统文件受到保护。</li>
       </ul>
-      <p>See <xref href="security.xml#topic_nyc_mdf_jr"/>.</p>
+      <p>见<xref href="security.xml#topic_nyc_mdf_jr"/>.</p>
     </section>
     <section>
-      <title>Encryption</title>
+      <title>加密</title>
       <ul id="ul_sms_31r_bs">
-        <li>Encrypting and decrypting data has a performance cost; only encrypt data that requires
-          encryption.</li>
-        <li>Do performance testing before implementing any encryption solution in a production
-          system.</li>
-        <li>Server certificates in a production Greenplum Database system should be signed by a
-          certificate authority (CA) so that clients can authenticate the server. The CA may be
-          local if all clients are local to the organization.</li>
-        <li>Client connections to Greenplum Database should use SSL encryption whenever the
-          connection goes through an insecure link.</li>
-        <li>A symmetric encryption scheme, where the same key is used to both encrypt and decrypt,
-          has better performance than an asymmetric scheme and should be used when the key can be
-          shared safely.</li>
-        <li>Use crytographic functions to encrypt data on disk. The data is encrypted and decrypted
-          in the database process, so it is important to secure the client connection with SSL to
-          avoid transmitting unencrypted data.</li>
-        <li>Use the gpfdists protocol to secure ETL data as it is loaded into or unloaded from the
-          database. .</li>
+        <li>加密和解密数据需要性能作为代价，只加密需要加密的数据。</li>
+        <li>在生产系统中实现任何加密方案之前，先执行性能测试。</li>
+        <li>生产Greenplum数据库系统中的服务器证书应该由一个数字证书认证机构（CA）签发，这样客户端可以
+          认证该服务器。如果客户端都是机构中的本地客户端，CA可以是本地的。</li>
+        <li>只要客户端到Greenplum数据库的连接会通过不安全的链接，就应该对其使用SSL加密。</li>
+        <li>对称加密方案（加密和解密使用同样的密钥）具有比非对称方案更好的性能，因此在密钥能被安全共享时应当使用
+          对称加密方案。</li>
+        <li>使用crytographic函数来加密磁盘上的数据。数据在数据库进程中被加密和解密，因此有必要用SSL保护客户端
+          连接以避免传输未加密数据。</li>
+        <li>在ETL数据被装载到数据库中或者从数据库中卸载时，使用gpfdists而不是gpfdist。</li>
       </ul>
-      <p>See <xref href="encryption.xml"/></p>
+      <p>见<xref href="encryption.xml"/></p>
     </section>
     <section>
-      <title>High Availability</title>
-      <note>The following guidelines apply to actual hardware deployments, but not to public
-        cloud-based infrastructure, where high availability solutions may already exist.</note>
+      <title>高可用性</title>
+      <note>以下指导规则在真实硬件部署环境中总结而出，但是并不能直接移植到公有云架构下，该架构下本身
+        已经存在一些高可用手段。</note>
       <ul id="ul_ry5_syr_s4">
-        <li>Use a hardware RAID storage solution with 8 to 24 disks.</li>
-        <li>Use RAID 1, 5, or 6 so that the disk array can tolerate a failed disk.</li>
-        <li>Configure a hot spare in the disk array to allow rebuild to begin automatically when
-          disk failure is detected.</li>
-        <li>Protect against failure of the entire disk array and degradation during rebuilds by
-          mirroring the RAID volume.</li>
-        <li>Monitor disk utilization regularly and add additional space when needed. </li>
-        <li>Monitor segment skew to ensure that data is distributed evenly and storage is consumed
-          evenly at all segments.</li>
-        <li>Set up a standby master instance to take over if the primary master fails. </li>
-        <li>Plan how to switch clients to the new master instance when a failure occurs, for
-          example, by updating the master address in DNS.</li>
-        <li>Set up monitoring to send notifications in a system monitoring application or by email
-          when the primary fails.</li>
-        <li>Set up mirrors for all segments.</li>
-        <li>Locate primary segments and their mirrors on different hosts to protect against host
-          failure.</li>
-        <li>Recover failed segments promptly, using the <codeph>gprecoverseg</codeph> utility, to
-          restore redundancy and return the system to optimal balance.</li>
-        <li>Consider a Dual Cluster configuration to provide an additional level of redundancy and
-          additional query processing throughput. </li>
-        <li>Backup Greenplum databases regularly unless the data is easily restored from
-          sources.</li>
-        <li>If backups are saved to local cluster storage, move the files to a safe, off-cluster
-          location when the backup is complete. </li>
-        <li>If backups are saved to NFS mounts, use a scale-out NFS solution such as Dell EMC Isilon
-          to prevent IO bottlenecks.</li>
-        <li>Consider using Greenplum integration to stream backups to the Dell EMC Data Domain
-          enterprise backup platform.</li>
+        <li>使用带有8至24个磁盘的硬件RAID存储方案。</li>
+        <li>使用RAID 1、5或6，这样磁盘阵列能容忍一个失效的磁盘。</li>
+        <li>在磁盘阵列中配置一个热后备以允许在检测到磁盘失效时自动开始重建。</li>
+        <li>通过镜像RAID卷防止重建时整个磁盘阵列失效和退化。</li>
+        <li>定期监控磁盘使用并且在需要时增加额外的空间。</li>
+        <li>监控segment倾斜以确保数据被平均地分布并且在所有segment上存储被平均地消耗。</li>
+        <li>设置一个后备master以便在主master故障后接管。</li>
+        <li>规划当故障发生时，如何把客户端切换到新的master实例，例如，通过更新DNS中的master地址。</li>
+        <li>设置监控机制以便在主Master失效时在系统监控应用中或者通过email发出通知。</li>
+        <li>为所有的segment设置镜像。</li>
+        <li>将主segment和它们的镜像放置在不同的主机上以预防主机故障。
+        </li>
+        <li>迅速地使用<codeph>gprecoverseg</codeph>工具恢复故障的segment，以便恢复冗余并且让系统回到最佳平衡。</li>
+        <li>考虑双集群配置以提供额外层次上的冗余以及额外的查询处理吞吐。</li>
+        <li>除非数据库可以很容易地从源端恢复，否则定期备份Greenplum数据库。</li>
+        <li>如果堆表相对较小并且两次备份之间只有很少的追加优化或列存分区被修改，使用增量备份</li>
+        <li>如果备份被保存到NFS挂载点，使用例如Dell EMC Isilon之类的横向扩展NFS方案以避免IO瓶颈。</li>
+        <li>考虑使用Greenplum集成将备份流式传送给Dell EMC Data Domain或者 Veritas NetBackup企业级备份平台。</li>
       </ul>
-      <p>See <xref href="ha.xml#topic_q5g_pmj_s4"/>.</p>
+      <p>见<xref href="ha.xml#topic_q5g_pmj_s4"/>.</p>
     </section>
   </body>
 </topic>

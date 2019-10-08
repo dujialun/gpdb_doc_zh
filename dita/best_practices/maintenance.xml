@@ -1,110 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_yrk_bcx_r4">
-  <title>System Monitoring and Maintenance</title>
-  <shortdesc>Best practices for regular maintenance that will ensure Greenplum Database high
-    availability and optimal performance.</shortdesc>
+  <title>系统监控和维护</title>
+  <shortdesc>本节介绍日常运维相关的最佳实践，关注这些内容可以确保Greenplum数据库日常高可用性和性能保持
+    最佳状态。</shortdesc>
   <topic id="topic_izw_bwb_s4">
-    <title id="monitoring">Monitoring</title>
+    <title id="monitoring">监控</title>
     <body>
-      <p>Greenplum Database includes utilities that are useful for monitoring the system.</p>
-      <p>The <codeph>gp_toolkit</codeph> schema contains several views that can be accessed using
-        SQL commands to query system catalogs, log files, and operating environment for system
-        status information. </p>
-      <p>The <codeph>gp_stats_missing</codeph> view shows tables that do not have statistics and
-        require <codeph>ANALYZE</codeph> to be run.</p>
-      <p>For additional information on <codeph>gpstate</codeph> and <codeph>gpcheckperf</codeph>
-        refer to the <i>Greenplum Database Utility Guide</i>. For information about the
-          gp_<codeph>toolkit</codeph> schema, see the <i>Greenplum Database Reference Guide</i>. </p>
+      <p>Greenplum数据库提供了一些对监控系统非常有用的工具。</p>
+      <p><codeph>gp_toolkit</codeph>模式包含多个可以用SQL命令访问的视图，通过它们可以查询系统目录、日志
+        文件以及操作环境来获得系统状态信息。</p>
+      <p><codeph>gp_stats_missing</codeph>视图展示没有统计信息且要求运行<codeph>ANALYZE</codeph>的表。</p>
+      <p>更多<codeph>gpstate</codeph>和<codeph>gpcheckperf</codeph>工具的信息请参考<i>Greenplum数据库工具指南</i>。
+        有关gp_<codeph>toolkit</codeph>模式的信息，请见<i>Greenplum数据库参考指南</i>。</p>
       <section>
         <title>gpstate</title>
-        <p>The <codeph>gpstate</codeph> utility program displays the status of the Greenplum system,
-          including which segments are down, master and segment configuration information (hosts,
-          data directories, etc.), the ports used by the system, and mapping of primary segments to
-          their corresponding mirror segments.</p>
-        <p>Run <codeph>gpstate -Q</codeph> to get a list of segments that are marked "down" in the
-          master system catalog.</p>
-        <p>To get detailed status information for the Greenplum system, run <codeph>gpstate
-            -s</codeph>.</p>
+        <p><codeph>gpstate</codeph>工具显示Greenplum系统的状态，包括哪些segment宕掉了、saster和segment
+          的配置信息（hosts、数据目录等）、系统使用的端口以及主segment与它们对应的镜像segment之间的映射。</p>
+        <p>运行<codeph>gpstate -Q</codeph>可以得到一个segment的列表，这个列表列出了那些在master的系统目录
+          中被标记为"down"的segment。</p>
+        <p>要得到Greenplum系统的详细状态信息，可运行<codeph>gpstate -s</codeph>。</p>
       </section>
       <section>
         <title>gpcheckperf</title>
-        <p>The <codeph>gpcheckperf</codeph> utility tests baseline hardware performance for a list
-          of hosts. The results can help identify hardware issues. It performs the following checks:
+        <p><codeph>gpcheckperf</codeph>工具能用来测试主机硬件的基线性能。其结果可以帮助发现硬件问题。它会
+          执行下列检查：
             <ul id="ul_ic1_5xb_s4">
-            <li>disk I/O test &#8211; measures I/O performance by writing and reading a large file
-              using the <codeph>dd</codeph> operating system command. It reports read and write
-              rates in megabytes per second.</li>
-            <li>memory bandwidth test &#8211; measures sustainable memory bandwidth in megabytes per
-              second using the STREAM benchmark.</li>
-            <li>network performance test &#8211; runs the <codeph>gpnetbench</codeph> network
-              benchmark program (optionally <codeph>netperf)</codeph> to test network performance.
-              The test is run in one of three modes: parallel pair test (<codeph>-r N</codeph>),
-              serial pair test (<codeph>-r n</codeph>), or full-matrix test (<codeph>-r
-              M)</codeph>. The minimum, maximum, average, and median transfer rates are reported in
-              megabytes per second. </li>
-          </ul>To obtain valid numbers from <codeph>gpcheckperf</codeph>, the database system must
-          be stopped. The numbers from <codeph>gpcheckperf</codeph> can be inaccurate even if the
-          system is up and running with no query activity.</p>
-        <p><codeph>gpcheckperf</codeph> requires a trusted host setup between the hosts involved in
-          the performance test. It calls <codeph>gpssh</codeph> and <codeph>gpscp</codeph>, so these
-          utilities must also be in your <codeph>PATH</codeph>. Specify the hosts to check
-          individually (<codeph>-h <i>host1</i> -h <i>host2</i> ...</codeph>) or with <codeph>-f
-              <i>hosts_file</i></codeph>, where <codeph><i>hosts_file</i></codeph> is a text file
-          containing a list of the hosts to check. If you have more than one subnet, create a
-          separate host file for each subnet so that you can test the subnets separately. </p>
-        <p>By default, <codeph>gpcheckperf</codeph> runs the disk I/O test, the memory test, and a
-          serial pair network performance test. With the disk I/O test, you must use the
-            <codeph>-d</codeph> option to specify the file systems you want to test. The following
-          command tests disk I/O and memory bandwidth on hosts listed in the
-            <codeph>subnet_1_hosts</codeph>
-          file:<codeblock>$ gpcheckperf -f subnet_1_hosts -d /data1 -d /data2 -r ds</codeblock></p>
-        <p>The <codeph>-r</codeph> option selects the tests to run: disk I/O (<codeph>d</codeph>),
-          memory bandwidth (<codeph>s</codeph>), network parallel pair (<codeph>N</codeph>), network
-          serial pair test (<codeph>n</codeph>), network full-matrix test (<codeph>M</codeph>). Only
-          one network mode can be selected per execution. See the <i>Greenplum Database Reference
-            Guide</i> for the detailed <codeph>gpcheckperf</codeph> reference.</p>
+              <li>磁盘I/O测试 &#8211; 通过使用操作系统命令<codeph>dd</codeph>读写一个大型文件来测量I/O性能。
+                它报告以兆字节每秒为单位的读写速率。</li>
+              <li>内存带宽测试 &#8211; 使用STREAM基准测量以兆字节每秒为单位的可持续的内存带宽。</li>
+              <li>网络性能测试 &#8211; 运行<codeph>gpnetbench</codeph>网络基准程序（也可以选<codeph>netperf</codeph>）
+                来测试网络性能。这种测试可以运行在三种模式中：并行结对测试（<codeph>-r N</codeph>）、
+                串行结对测试（<codeph>-r n</codeph>）或者全矩阵测试（<codeph>-r M</codeph>）。报告
+                的最小、最大、平均和中值传输率将以兆字节每秒为单位。</li>
+            </ul>为了从<codeph>gpcheckperf</codeph>获得有效的数字，数据库系统必须被停止。即使系统仍在
+          运行且没有运行查询活动，从<codeph>gpcheckperf</codeph>得到的数字可能也不准确。</p>
+        <p><codeph>gpcheckperf</codeph>要求在参与性能测试的主机之间提前进行访问互信设置。因为工具会调用
+          <codeph>gpssh</codeph>以及<codeph>gpscp</codeph>，因此这些工具必须也位于用户的<codeph>PATH</codeph>
+          中。可以个别指定要检查的主机（<codeph>-h <i>host1</i> -h <i>host2</i> ...</codeph>）或者使用
+          <codeph>-f <i>hosts_file</i></codeph>，其中<codeph><i>hosts_file</i></codeph>是一个包含要
+          检查的主机列表的文本文件。如果用户有多个子网，为每个子网都创建一个单独的主机文件，这样用户可以单独测试
+          子网。</p>
+        <p><codeph>gpcheckperf</codeph>默认会运行磁盘I/O测试、内存测试和串行结对网络性能测试。对于磁盘I/O
+          测试，用户必须使用<codeph>-d</codeph>选项指定要测试的文件系统。下面的命令在<codeph>subnet_1_hosts</codeph>
+          文件中列出的主机上测试磁盘I/O和内存带宽：
+          <codeblock>$ gpcheckperf -f subnet_1_hosts -d /data1 -d /data2 -r ds</codeblock></p>
+        <p><codeph>-r</codeph>选项选择要运行的测试：磁盘I/O（<codeph>d</codeph>）、内存带宽（<codeph>s</codeph>）、
+          网络并行结对（<codeph>N</codeph>）、网络串行结对测试（<codeph>n</codeph>）、网络全矩阵测试（<codeph>M</codeph>）。
+          每次执行只能选择一种网络模式。详细的<codeph>gpcheckperf</codeph>参考信息请见<i>Greenplum数据库
+            参考指南</i>。</p>
       </section>
       <section>
-        <title>Monitoring with Operating System Utilities</title>
+        <title>用操作系统工具监控</title>
       </section>
-      <p>The following Linux/UNIX utilities can be used to assess host performance:<ul
+      <p>下面的Linux/UNIX工具可以被用来评估主机性能：<ul
           id="ul_hvv_sh4_y4">
-          <li><codeph>iostat</codeph> allows you to monitor disk activity on segment hosts.</li>
-          <li><codeph>top</codeph> displays a dynamic view of operating system processes.</li>
-          <li><codeph>vmstat</codeph> displays memory usage statistics.</li>
+        <li><codeph>iostat</codeph> 允许用户监控segment主机上的磁盘活动。</li>
+        <li><codeph>top</codeph> 显示操作系统进程的动态视图。</li>
+        <li><codeph>vmstat</codeph> 显示内存使用统计信息。</li>
         </ul></p>
-      <p>You can use <codeph>gpssh</codeph> to run utilities on multiple hosts.</p>
+      <p>用户可以使用<codeph>gpssh</codeph>在多台主机上运行相关工具。</p>
       <section>
-        <title>Best Practices</title>
+        <title>最佳实践</title>
         <ul id="ul_wd5_bj4_y4">
-          <li>Implement the "Recommended Monitoring and Maintenance Tasks" in the <i>Greenplum
-              Database Administrator Guide</i>.</li>
-          <li>Run <codeph>gpcheckperf</codeph> at install time and periodically thereafter, saving
-            the output to compare system performance over time. </li>
-          <li>Use all the tools at your disposal to understand how your system behaves under
-            different loads. </li>
-          <li>Examine any unusual event to determine the cause.</li>
-          <li>Monitor query activity on the system by running explain plans periodically to ensure
-            the queries are running optimally.</li>
-          <li>Review plans to determine whether index are being used and partition elimination is
-            occurring as expected.</li>
+          <li>实现<i>Greenplum数据库管理员指南</i>中的“推荐的监控和维护任务”。</li>
+          <li>在安装时运行<codeph>gpcheckperf</codeph>，并且在安装之后定期运行它，将其输出保存起来以对比
+            不同时刻的系统性能。</li>
+          <li>使用所有能支配的工具来理解系统在不同负载下的行为。</li>
+          <li>检查异常事件以确定原因。</li>
+          <li>通过定期运行执行计划监控系统上的查询活动，以确保查询以最优的方式运行。</li>
+          <li>检查执行计划以确定索引是否被使用以及分区裁剪是否按照预期发生。</li>
         </ul>
       </section>
       <section>
-        <title>Additional Information</title>
+        <title>附加信息</title>
         <ul id="ul_ynx_fmn_y4">
-          <li><codeph>gpcheckperf</codeph> reference in the <i>Greenplum Database Utility
-            Guide</i>.</li>
-          <li>"Recommended Monitoring and Maintenance Tasks" in the <i>Greenplum Database
-              Administrator Guide</i>.</li>
+          <li><codeph>gpcheckperf</codeph>详细信息请见<i>Greenplum数据库工具指南</i>。</li>
+          <li>"推荐的监控和日常运维任务"部分详情请柬<i>Greenplum数据库管理员指南</i>。</li>
           <li><xref href="http://www.cs.virginia.edu/%7Emccalpin/papers/bandwidth/bandwidth.html"
               format="html" scope="external">Sustainable Memory Bandwidth in Current High
               Performance Computers</xref>. John D. McCalpin. Oct 12, 1995.</li>
-          <li><xref href="http://www.netperf.org/netperf" format="html" scope="external"
-              >www.netperf.org</xref> to use <codeph>netperf</codeph>, netperf must be installed on
-            each host you test. See <codeph>gpcheckperf</codeph> reference for more
-            information.</li>
+          <li>请参考<xref href="http://www.netperf.org/netperf" format="html" scope="external"
+              >www.netperf.org</xref>来使用<codeph>netperf</codeph>, netperf必须被安装在所有测试
+            机器上。更多有关<codeph>gpcheckperf</codeph>的信息请移步命令详细出处。</li>
         </ul>
       </section>
     </body>

@@ -1,85 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="analyze">
-  <title>Updating Statistics with ANALYZE</title>
+  <title>用ANALYZE更新统计信息</title>
   <body>
-    <p>The most important prerequisite for good query performance is to begin with accurate
-      statistics for the tables. Updating stastistics with the <codeph>ANALYZE</codeph> statement
-      enables the query planner to generate optimal query plans. When a table is analyzed,
-      information about the data is stored in the system catalog tables. If the stored information
-      is out of date, the planner can generate inefficient plans.</p>
+    <p>良好查询性能的最重要的先决条件是从表的正确统计信息开始。用<codeph>ANALYZE</codeph>语句更新统计信息
+      让查询规划器能生成最优的查询计划。当表被分析时，有关数据的信息被存储在系统目录表中。如果存储的信息过时，
+      规划器可能会生成低效的执行计划。</p>
     <section>
-      <title>Generating Statistics Selectively</title>
-      <p>Running <codeph><xref href="../ref_guide/sql_commands/ANALYZE.xml">ANALYZE</xref></codeph>
-        with no arguments updates statistics for all tables in the database. This can be a very
-        long-running process and it is not recommended. You should <codeph>ANALYZE</codeph> tables
-        selectively when data has changed or use the <codeph><xref
-            href="../utility_guide/admin_utilities/analyzedb.xml">analyzedb</xref></codeph> utility. </p>
-      <p>Running <codeph>ANALYZE</codeph> on a large table can take a long time. If it is not
-        feasible to run <codeph>ANALYZE</codeph> on all columns of a very large table, you can
-        generate statistics for selected columns only using <codeph>ANALYZE table(column,
-          ...)</codeph>. Be sure to include columns used in joins, <codeph>WHERE</codeph> clauses,
-          <codeph>SORT</codeph> clauses, <codeph>GROUP BY</codeph> clauses, or
-          <codeph>HAVING</codeph> clauses. </p>
-      <p>For a partitioned table, you can run <codeph>ANALYZE</codeph> on just partitions that have
-        changed, for example, if you add a new partition. Note that for partitioned tables, you can
-        run <codeph>ANALYZE</codeph> on the parent (main) table, or on the leaf nodes&#8212;the
-        partition files where data and statistics are actually stored. The intermediate files for
-        sub-partitioned tables store no data or statistics, so running <codeph>ANALYZE</codeph> on
-        them does not work. You can find the names of the partition tables in the
-          <codeph>pg_partitions</codeph> system
-        catalog:<codeblock>SELECT partitiontablename from pg_partitions WHERE tablename='<i>parent_table</i>;</codeblock></p>
+      <title>有选择地生成统计信息</title>
+      <p>不带参数运行<codeph><xref href="../ref_guide/sql_commands/ANALYZE.xml">ANALYZE</xref></codeph>
+        会为数据库中所有的表更新统计信息。这样操作运行时间可能会非常长，因此不推荐这样做。当数据被改变时，使用者
+        应该有选择地<codeph>ANALYZE</codeph>表或者使用<codeph><xref
+          href="../utility_guide/admin_utilities/analyzedb.xml">analyzedb</xref></codeph>工具。</p>
+      <p>在大型表上运行<codeph>ANALYZE</codeph>可能需要很长时间。如果在非常大的表的所有列上运行<codeph>ANALYZE</codeph>
+        行不通，使用者可以只使用<codeph>ANALYZE table(column,...)</codeph>为选择的列生成统计信息。确保包括用在
+        连接、<codeph>WHERE</codeph>子句、<codeph>SORT</codeph>子句、<codeph>GROUP BY</codeph>子句或者
+        <codeph>HAVING</codeph>子句中的列都被收集了统计信息。</p>
+      <p>对于一个分区表，使用者可以只在更改过的分区（例如，使用者增加一个分区）上运行<codeph>ANALYZE</codeph>。
+        注意对于分区表，使用者可以在父（主）表上或者叶子节点（实际存储数据和统计信息的分区文件）上运行<codeph>ANALYZE</codeph>。
+        子分区表的中间文件没有存储数据或统计信息，因此在其上运行<codeph>ANALYZE</codeph>没有效果。使用者可以在
+        <codeph>pg_partitions</codeph>系统目录中寻找分区表的名字：
+        <codeblock>SELECT partitiontablename from pg_partitions WHERE tablename='<i>parent_table</i>;</codeblock></p>
     </section>
     <section>
-      <title>Improving Statistics Quality</title>
-      <p>There is a trade-off between the amount of time it takes to generate statistics and the
-        quality, or accuracy, of the statistics. </p>
-      <p>To allow large tables to be analyzed in a reasonable amount of time,
-          <codeph>ANALYZE</codeph> takes a random sample of the table contents, rather than
-        examining every row. To increase the number of sample values for all table columns adjust
-        the <codeph>default_statistics_target</codeph> configuration parameter. The target value
-        ranges from 1 to 1000; the default target value is 100. The
-          <codeph>default_statistics_target</codeph> variable applies to all columns by default, and
-        specifies the number of values that are stored in the list of common values. A larger target
-        may improve the quality of the query planner’s estimates, especially for columns with
-        irregular data patterns. <codeph>default_statistics_target</codeph> can be set at the
-        master/session level and requires a reload. </p>
+      <title>提升统计信息质量</title>
+      <p>在生成统计信息所花的时间和统计信息的质量或者准确性之间存在着权衡。</p>
+      <p>为了允许大型表能在合理的时间内被分析完，<codeph>ANALYZE</codeph>会对表内容做随机采样而不是检查每一行。
+        要对所有表列增加采样，可调整<codeph>default_statistics_target</codeph>配置参数。其目标值取值范围从
+        1到1000，默认的目标值是100。<codeph>default_statistics_target</codeph>变量默认会被应用到所有的列。
+        更大的目标值会增加执行ANALYZE所需的时间，但是可以提升查询规划器的评估质量。对于带有不规则数据模式的列尤
+        其如此。<codeph>default_statistics_target</codeph>可以在master或者会话级别设置，并且要求重新载入
+        配置。</p>
     </section>
     <section>
-      <title>When to Run ANALYZE</title>
+      <title>何时运行ANALYZE</title>
     </section>
-    <p>Run <codeph>ANALYZE</codeph>:<ul id="ul_f5c_gnj_bp">
-        <li>after loading data,</li>
-        <li>after <codeph>CREATE INDEX</codeph> operations,</li>
-        <li>and after <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, and <codeph>DELETE</codeph>
-          operations that significantly change the underlying data.</li>
-      </ul><codeph>ANALYZE</codeph> requires only a read lock on the table, so it may be run in
-      parallel with other database activity, but do not run <codeph>ANALYZE</codeph> while
-      performing loads, <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, <codeph>DELETE</codeph>,
-      and <codeph>CREATE INDEX</codeph> operations.</p>
+    <p>在下列时机运行<codeph>ANALYZE</codeph>：
+      <ul id="ul_f5c_gnj_bp">
+        <li>装载数据后；</li>
+        <li><codeph>CREATE INDEX</codeph>操作后；</li>
+        <li>在显著更改底层数据的<codeph>INSERT</codeph>、<codeph>UPDATE</codeph>以及<codeph>DELETE</codeph>
+          操作之后。</li>
+      </ul><codeph>ANALYZE</codeph>仅在表上要求一个读锁，因此它可以与其他数据库活动并行运行。但不要在执行
+      装载、<codeph>INSERT</codeph>、<codeph>UPDATE</codeph>、<codeph>DELETE</codeph>以及<codeph>CREATE INDEX</codeph>
+      操作期间运行<codeph>ANALYZE</codeph>。</p>
     <section>
-      <title>Configuring Automatic Statistics Collection</title>
-      <p>The <codeph>gp_autostats_mode</codeph> configuration parameter, together with the
-          <codeph>gp_autostats_on_change_threshold</codeph> parameter, determines when an automatic
-        analyze operation is triggered. When automatic statistics collection is triggered, the
-        planner adds an <codeph>ANALYZE</codeph> step to the query. </p>
-      <p>By default, <codeph>gp_autostats_mode</codeph> is <codeph>on_no_stats</codeph>, which
-        triggers statistics collection for <codeph>CREATE TABLE AS SELECT</codeph>,
-          <codeph>INSERT</codeph>, or <codeph>COPY</codeph> operations on any table that has no
-        existing statistics. </p>
-      <p>Setting <codeph>gp_autostats_mode</codeph> to <codeph>on_change</codeph> triggers
-        statistics collection only when the number of rows affected exceeds the threshold defined by
-          <codeph>gp_autostats_on_change_threshold</codeph>, which has a default value of
-        2147483647. Operations that can trigger automatic statistics collection with
-          <codeph>on_change</codeph> are: <codeph>CREATE TABLE AS SELECT</codeph>,
-          <codeph>UPDATE</codeph>, <codeph>DELETE</codeph>, <codeph>INSERT</codeph>, and
-          <codeph>COPY</codeph>.</p>
-      <p>Setting <codeph>gp_autostats_mode</codeph> to <codeph>none</codeph> disables automatics
-        statistics collection. </p>
-      <p> For partitioned tables, automatic statistics collection is not triggered if data is
-        inserted from the top-level parent table of a partitioned table. But automatic statistics
-        collection <i>is</i> triggered if data is inserted directly in a leaf table (where the data
-        is stored) of the partitioned table.</p>
+      <title>配置统计信息自动收集</title>
+      <p><codeph>gp_autostats_mode</codeph>配置参数与<codeph>gp_autostats_on_change_threshold</codeph>
+        参数一起决定何时触发自动分析操作。当自动统计信息收集被触发时，规划器会为查询增加一个<codeph>ANALYZE</codeph>
+        步骤。</p>
+      <p><codeph>gp_autostats_mode</codeph>默认为<codeph>on_no_stats</codeph>，这会为任何没有统计
+        信息的表上的<codeph>CREATE TABLE AS SELECT</codeph>、<codeph>INSERT</codeph>或者<codeph>COPY</codeph>
+        操作触发统计信息收集。</p>
+      <p>把<codeph>gp_autostats_mode</codeph>设置为<codeph>on_change</codeph>时，只有当受影响的行数超过由
+        <codeph>gp_autostats_on_change_threshold</codeph>定义的阈值时才会触发统计信息收集，该阈值参数的默认
+        值为2147483647。<codeph>on_change</codeph>设置下能触发自动统计信息收集的操作有：
+        CREATE TABLE AS SELECT、UPDATE、DELETE、INSERT以及COPY。
+        <codeph>CREATE TABLE AS SELECT</codeph>、<codeph>UPDATE</codeph>、<codeph>DELETE</codeph>、
+        <codeph>INSERT</codeph>以及<codeph>COPY</codeph>。</p>
+      <p>将<codeph>gp_autostats_mode</codeph>设置为<codeph>none</codeph>会禁用自动统计信息收集。</p>
+      <p>对于分区表，如果数据从分区表的顶层父表插入，则自动统计信息收集不会被触发。但是如果数据直接被插入在
+        分区表的叶子表（存储数据的地方）中，则自动统计信息收集会被触发。</p>
     </section>
   </body>
 </topic>

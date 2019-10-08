@@ -1,243 +1,171 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="schema_design">
-  <title>Schema Design</title>
-  <shortdesc>Best practices for designing Greenplum Database schemas.</shortdesc>
+  <title>模式设计</title>
+  <shortdesc>这一节包含设计Greenplum数据库模式的最佳实践。</shortdesc>
 
   <body>
-    <p>Greenplum Database is an analytical, shared-nothing database, which is much different than a
-      highly normalized, transactional SMP database. Greenplum Database performs best with a
-      denormalized schema design suited for MPP analytical processing, a star or snowflake schema,
-      with large centralized fact tables connected to multiple smaller dimension tables.</p>
+    <p>Greenplum数据库是一种分析型的shared-nothing数据库，它和高度规范化的事务型SMP数据库有很大不同。
+      Greenplum数据库使用非规范化的模式设计会工作得最好，例如带有大型事实表和多个较小维度表的星形模式或者雪花
+      模式。</p>
   </body>
   <topic id="data_types">
-    <title>Data Types</title>
+    <title>数据类型</title>
     <body>
       <section>
-        <title>Use Types Consistently</title>
-        <p>Use the same data types for columns used in joins between tables. If the data types
-          differ, Greenplum Database must dynamically convert the data type of one of the columns so
-          the data values can be compared correctly. With this in mind, you may need to increase the
-          data type size to facilitate joins to other common objects. </p>
+        <title>使用一致的数据类型</title>
+        <p>为表之间的连接列使用相同的数据类型。如果数据类型不同，Greenplum数据库必须动态地转换其中一列的数据类型，
+          这样数据值才能被正确地比较。出于这种考虑，用户可能需要增加数据类型尺寸以便与其他常用对象进行连接操作。</p>
       </section>
       <section>
-        <title>Choose Data Types that Use the Least Space</title>
-        <p>You can increase database capacity and improve query execution by choosing the most
-          efficient data types to store your data. </p>
-        <p>Use <codeph>TEXT</codeph> or <codeph>VARCHAR</codeph> rather than <codeph>CHAR</codeph>.
-          There are no performance differences among the character data types, but using
-            <codeph>TEXT</codeph> or <codeph>VARCHAR</codeph> can decrease the storage space used. </p>
-        <p>Use the smallest numeric data type that will accommodate your data. Using
-            <codeph>BIGINT</codeph> for data that fits in <codeph>INT</codeph> or
-            <codeph>SMALLINT</codeph> wastes storage space. </p>
+        <title>选择使用最小空间的数据类型</title>
+        <p>通过选择最有效的数据类型存储数据，用户可以增加数据库容量并且改进查询执行能力。</p>
+        <p>使用<codeph>TEXT</codeph>或者<codeph>VARCHAR</codeph>而不是<codeph>CHAR</codeph>。
+          在这些字符数据类型之间没有性能差异，但使用<codeph>TEXT</codeph>或<codeph>VARCHAR</codeph>
+          能够降低使用的存储空间。</p>
+        <p>使用能容纳数据的最小数字数据类型。对适合于<codeph>INT</codeph>或<codeph>SMALLINT</codeph>
+          的数据使用<codeph>BIGINT</codeph>会浪费存储空间。</p>
       </section>
     </body>
   </topic>
   <topic id="storage_model">
-    <title>Storage Model</title>
-
-
+    <title>存储模型</title>
     <body>
-      <p>Greenplum Database provides an array of storage options when creating tables. It is very
-        important to know when to use heap storage versus append-optimized (AO) storage, and when to
-        use row-oriented storage versus column-oriented storage. The correct selection of heap
-        versus AO and row versus column is extremely important for large fact tables, but less
-        important for small dimension tables. </p>
-      <p>The best practices for determining the storage model are:<ol id="ol_fvc_wdy_gr">
-          <li>Design and build an insert-only model, truncating a daily partition before load.</li>
-          <li>For large partitioned fact tables, evaluate and use optimal storage options for
-            different partitions. One storage option is not always right for the entire partitioned
-            table. For example, some partitions can be row-oriented while others are
-            column-oriented. </li>
-          <li>When using column-oriented storage, every column is a separate file on <i>every</i>
-            Greenplum Database segment. For tables with a large number of columns consider columnar
-            storage for data often accessed (hot) and row-oriented storage for data not often
-            accessed (cold). </li>
-          <li>Storage options should be set at the partition level.</li>
-          <li>Compress large tables to improve I/O performance and to make space in the
-            cluster.</li>
+      <p>在创建表时，Greenplum数据库提供了一些存储选项。非常有必要了解何时使用堆存储或追加优化（AO）存储，
+        还有何时使用行存储或列存储。在堆和AO以及行和列之间做出正确的选择对于大型的事实表来说极其重要，但是
+        对于小的维度表就不那么重要。</p>
+      <p>确定存储模型的最佳实践是：<ol id="ol_fvc_wdy_gr">
+        <li>设计并且构建一种只插入的模型，在装载前截断每天的分区。</li>
+        <li>对于大型的分区事实表，为不同的分区评估并且使用最优的存储选项。一种存储选项对于整个分区表并不总是
+          正确的。例如，有些分区可以是行存的而其他分区是列存的。</li>
+        <li>在使用面向列的存储时，每一列在<i>每个</i>Greenplum数据库Segment上都是一个单独的文件。对于具有
+          大量列的表，对经常访问的数据（热数据）考虑列存，对不经常访问的数据（冷数据）考虑面向行的存储。</li>
+        <li>存储选项应该在分区级别设置。</li>
+        <li>如果需要，压缩大型表以提升I/O性能并且在集群中腾出空间。</li>
         </ol></p>
       <section id="heap_vs_ao">
-        <title>Heap Storage or Append-Optimized Storage</title>
-        <p>Heap storage is the default model, and is the model PostgreSQL uses for all database
-          tables. Use heap storage for tables and partitions that will receive iterative
-            <codeph>UPDATE</codeph>, <codeph>DELETE</codeph>, and singleton <codeph>INSERT</codeph>
-          operations. Use heap storage for tables and partitions that will receive concurrent
-            <codeph>UPDATE</codeph>, <codeph>DELETE</codeph>, and <codeph>INSERT</codeph>
-          operations. </p>
-        <p>Use append-optimized storage for tables and partitions that are updated infrequently
-          after the initial load and have subsequent inserts performed only in batch operations.
-          Avoid performing singleton <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or
-            <codeph>DELETE</codeph> operations on append-optimized tables. Concurrent batch
-            <codeph>INSERT</codeph> operations are acceptable, but <i>never</i> perform concurrent
-          batch <codeph>UPDATE</codeph> or <codeph>DELETE</codeph> operations. </p>
-        <p>The append-optimized storage model is inappropriate for frequently updated tables,
-          because space occupied by rows that are updated and deleted in append-optimized tables is
-          not recovered and reused as efficiently as with heap tables. Append-optimized storage is
-          intended for large tables that are loaded once, updated infrequently, and queried
-          frequently for analytical query processing. </p>
+        <title>堆存储还是追加优化存储</title>
+        <p>堆存储是默认存储模型，并且是PostgreSQL为所有数据库表使用的模型。为频繁进行<codeph>UPDATE</codeph>、
+          <codeph>DELETE</codeph>以及单个<codeph>INSERT</codeph>操作的表和分区使用堆存储。为将收到并发
+          <codeph>UPDATE</codeph>、<codeph>DELETE</codeph>以及<codeph>INSERT</codeph>操作的表和分区
+          使用堆存储。</p>
+        <p>为初始装载后就很少被更新并且后续只会以批操作执行插入的表和分区使用追加优化存储。绝不要在追加优化表上
+          执行单个<codeph>INSERT</codeph>、<codeph>UPDATE</codeph>或者<codeph>DELETE</codeph>操作。
+          并发的批量<codeph>INSERT</codeph>操作可以被执行但是<i>绝不</i>执行并发的批量<codeph>UPDATE</codeph>
+          或者<codeph>DELETE</codeph>操作。</p>
+        <p>追加优化表中被更新和删除的行所占用的空间不会像堆表那样被有效地回收及重用，因此追加优化存储模型不适合
+          于频繁更新的表。它的设计目标是用于一次装载、很少更新且频繁进行分析查询处理的大型表。</p>
       </section>
 
       <section id="row_vs_column">
-        <title>Row or Column Orientation</title>
-        <p>Row orientation is the traditional way to store database tuples. The columns that
-          comprise a row are stored on disk contiguously, so that an entire row can be read from
-          disk in a single I/O. </p>
-        <p>Column orientation stores column values together on disk. A separate file is created for
-          each column. If the table is partitioned, a separate file is created for each column and
-          partition. When a query accesses only a small number of columns in a column-oriented table
-          with many columns, the cost of I/O is substantially reduced compared to a row-oriented
-          table; any columns not referenced do not have to be retrieved from disk. </p>
-        <p>Row-oriented storage is recommended for transactional type workloads with iterative
-          transactions where updates are required and frequent inserts are performed. Use
-          row-oriented storage when selects against the table are wide, where many columns of a
-          single row are needed in a query. If the majority of columns in the
-            <codeph>SELECT</codeph> list or <codeph>WHERE</codeph> clause is selected in queries,
-          use row-oriented storage. Use row-oriented storage for general purpose or mixed workloads,
-          as it offers the best combination of flexibility and performance. </p>
-        <p>Column-oriented storage is optimized for read operations but it is not optimized for
-          write operations; column values for a row must be written to different places on disk.
-          Column-oriented tables can offer optimal query performance on large tables with many
-          columns where only a small subset of columns are accessed by the queries. </p>
-        <p>Another benefit of column orientation is that a collection of values of the same data
-          type can be stored together in less space than a collection of mixed type values, so
-          column-oriented tables use less disk space (and consequently less disk I/O) than
-          row-oriented tables. Column-oriented tables also compress better than row-oriented tables. </p>
-        <p>Use column-oriented storage for data warehouse analytic workloads where selects are
-          narrow or aggregations of data are computed over a small number of columns. Use
-          column-oriented storage for tables that have single columns that are regularly updated
-          without modifying other columns in the row. Reading a complete row in a wide columnar
-          table requires more time than reading the same row from a row-oriented table. It is
-          important to understand that each column is a separate physical file on <i>every</i>
-          segment in Greenplum Database. </p>
+        <title>行存还是列存</title>
+        <p>按行存储数据是传统的存储数据库元组的方式。组成一行的列被连续地存储在磁盘上，因此整个行可以被以
+          单次I/O的形式从磁盘上读出。</p>
+        <p>面向列的方式把列值在磁盘上存在一起。对每一列都会创建一个单独的文件。如果表被分区，则会对每个列
+          和分区的组合创建一个单独的文件。当一个查询在一个有很多列的列存表中访问少量列时，I/O代价会比行存
+          表要减少很多，因为不必从磁盘上检索没有被引用的列。</p>
+        <p>对于包含要求更新并且频繁执行插入的事务的交易型负载，推荐使用面向行的存储。当对表的选择很宽
+          （即查询中需要单个行的很多列）时，应该使用面向行的存储。如果大部分列出现在查询的 <codeph>SELECT</codeph>
+          列表或者<codeph>WHERE</codeph>子句中，请使用行存储。对一般目的或者混合负载使用面向行的存储，
+          因为它能提供灵活性和性能的最佳组合。</p>
+        <p>面向列的存储是为了读操作而优化，但它并未对写操作优化，一行的列值必须被写入到磁盘上的不同位置。
+          对于有很多列的大型表，当查询中只访问列的一个小集合时，列存表可以提供最优查询性能。</p>
+        <p>列存的另一个好处是，同一种数据类型的值集合可以用比混合类型值集合更少的空间存储在一起，因此列存表
+          比行存表使用的磁盘空间更少（进而导致需要更少的磁盘I/O）。列存表的压缩效果也比行存表更好。</p>
+        <p>对于数据仓库的分析型负载，其中的选择很窄或者在少量列上计算数据聚集，请使用面向列的存储。对于定期
+          更新单个列但不修改行中其他列的表，使用面向列的存储。在一个很宽的列存表中读取一个完整的行比在行存表
+          中读取同样一行需要更多时间。有必要理解每个列都是Greenplum数据库中<i>每个</i>segment上一个单独
+          的物理文件。</p>
       </section>
     </body>
   </topic>
   <topic id="topic_ebd_khx_z4">
-    <title>Compression</title>
+    <title>压缩</title>
     <body>
-      <p>Greenplum Database offers a variety of options to compress append-optimized tables and
-        partitions. Use compression to improve I/O across the system by allowing more data to be
-        read with each disk read operation. The best practice is to set the column compression
-        settings at the partition level.</p>
-      <p>Note that new partitions added to a partitioned table do not automatically inherit
-        compression defined at the table level; you must <i>specifically</i> define compression when
-        you add new partitions. </p>
-      <p>Run-length encoding (RLE) compression provides the best levels of compression. Higher
-        levels of compression usually result in more compact storage on disk, but require additional
-        time and CPU cycles when compressing data on writes and uncompressing on reads. Sorting
-        data, in combination with the various compression options, can achieve the highest level of
-        compression. </p>
-      <p>Data compression should never be used for data that is stored on a compressed file system. </p>
-      <p>Test different compression types and ordering methods to determine the best compression for
-        your specific data. For example, you might start zstd compression at level 8 or 9 and adjust
-        for best results. RLE compression works best with files that contain repetitive data.</p>
+      <p>Greenplum数据库提供了多种选项以压缩追加优化表和分区。压缩数据允许在每次磁盘读取操作中读取更多的数据，
+        这样就能提高系统的I/O。最佳实践是在数据所在的层次设置列的压缩设置。</p>
+      <p>注意被增加到分区表的新分区不会自动继承表级定义的压缩，在增加新分区时，用户必须<i>明确地</i>定义压缩。</p>
+      <p>Run-length encoding (RLE)压缩提供了最好的压缩级别。较高的压缩级别通常会使数据在磁盘上更加紧凑的存储，
+        但是写入时的数据压缩和读取时的数据解压会要求额外的时间和CPU周期。排序数据并且结合多种压缩选项可以实现
+        最高的压缩级别。</p>
+      <p>绝不要对存储在压缩文件系统上的数据使用数据压缩。</p>
+      <p>测试不同的压缩类型和排序方法以确定对用户特定数据的最佳压缩方式。例如，客户可以从zstd 8级或9级压缩开始，
+        然后调整参数达到最理想的结果。RLE压缩在存储文件中包含大量重复数据时工作效果最好。</p>
     </body>
   </topic>
   <topic id="distribution">
-    <title>Distributions</title>
+    <title>分布</title>
     <body>
-      <p>An optimal distribution that results in evenly distributed data is the most important
-        factor in Greenplum Database. In an MPP shared nothing environment overall response time for
-        a query is measured by the completion time for all segments. The system is only as fast as
-        the slowest segment. If the data is skewed, segments with more data will take more time to
-        complete, so every segment must have an approximately equal number of rows and perform
-        approximately the same amount of processing. Poor performance and out of memory conditions
-        may result if one segment has significantly more data to process than other segments. </p>
-      <p>Consider the following best practices when deciding on a distribution strategy:<ul
+      <p>能让数据被均匀分布的最优分布方式是Greenplum数据库使用过程中的一个重要因素。在一个MPP无共享环境中，
+        一个查询的总体响应时间由所有segment的完成时间度量。整个系统的响应速度和最慢的segment正相关。如果
+        数据发生倾斜，拥有更多数据的segment将需要更多时间完成，因此每一个segment必须有大约相同数据量的行
+        并且执行大概相同量级的处理。如果一个Segment比其他segment有明显更多的数据要处理，将会导致糟糕的性能
+        和内存不足的情况。</p>
+      <p>在决定分布策略时，考虑下列最佳实践：<ul
           id="ul_nry_4lf_hr">
-          <li>Explicitly define a column or random distribution for all tables. Do not use the
-            default. </li>
-          <li>Ideally, use a single column that will distribute data across all segments evenly. </li>
-          <li>Do not distribute on columns that will be used in the <codeph>WHERE</codeph> clause of
-            a query. </li>
-          <li>Do not distribute on dates or timestamps. </li>
-          <li>The distribution key column data should contain unique values or very high
-            cardinality. </li>
-          <li>If a single column cannot achieve an even distribution, use a multi-column
-            distribution key with a maximum of two columns. Additional column values do not
-            typically yield a more even distribution and they require additional time in the hashing
-            process.</li>
-          <li>If a two-column distribution key cannot achieve an even distribution of data, use a
-            random distribution. Multi-column distribution keys in most cases require motion
-            operations to join tables, so they offer no advantages over a random distribution. </li>
+        <li>为所有的表明确定义一个分布列或者随机分布。不要使用默认分布。</li>
+        <li>理想情况下，使用单个将数据在所有Segment之间均匀分布的列作为分布列。</li>
+        <li>不要将查询的<codeph>WHERE</codeph>子句中将要使用的列作为分布列。</li>
+        <li>不要在日期或者时间戳上分布。</li>
+        <li>分布键列数据应该含有唯一值或者非常高的可辨别性。</li>
+        <li>如果单个列无法实现均匀分布，则使用多列分布键，但不要超过两列。额外的列值通常不会得到更均匀的分布，
+          而且它们要求额外的哈希处理时间。</li>
+        <li>如果两个列的分布键无法实现数据的均匀分布，则使用随机分布。大部分情况中的多列分布键都要求移动操作
+          来连接表，因此它们对于随机分布来说没有优势。</li>
         </ul></p>
-      <p>Greenplum Database random distribution is not round-robin, so there is no guarantee of an
-        equal number of records on each segment. Random distributions typically fall within a target
-        range of less than ten percent variation. </p>
-      <p>Optimal distributions are critical when joining large tables together. To perform a join,
-        matching rows must be located together on the same segment. If data is not distributed on
-        the same join column, the rows needed from one of the tables are dynamically redistributed
-        to the other segments. In some cases a broadcast motion, in which each segment sends its
-        individual rows to all other segments, is performed rather than a redistribution motion,
-        where each segment rehashes the data and sends the rows to the appropriate segments
-        according to the hash key. </p>
+      <p>Greenplum数据库的随机分布不是循环的，因此无法保证每个segment上的记录数相等。随机分布通常会落在变化
+        低于10个百分点的目标范围中。</p>
+      <p>在连接大型表时，最优分布非常关键。为了执行连接，匹配的行必须位于同一个segment上。如果数据没有按照同
+        一个连接列分布，其中一个表中需要的行会被动态重新分布到其他segment上。在一些情况下会执行一次广播移动而
+        不是执行重新分布移动，在这种情况下每个segment都会重新对数据进行哈希操作并根据哈希键将对应的行发送到
+        合适的segment上。</p>
       <section>
-        <title>Local (Co-located) Joins</title>
-        <p>Using a hash distribution that evenly distributes table rows across all segments and
-          results in local joins can provide substantial performance gains. When joined rows are on
-          the same segment, much of the processing can be accomplished within the segment instance.
-          These are called <i>local</i> or <i>co-located</i> joins. Local joins minimize data
-          movement; each segment operates independently of the other segments, without network
-          traffic or communications between segments. </p>
-        <p>To achieve local joins for large tables commonly joined together, distribute the tables
-          on the same column. Local joins require that both sides of a join be distributed on the
-          same columns (and in the same order) <i>and</i> that all columns in the distribution
-          clause are used when joining tables. The distribution columns must also be the same data
-          type—although some values with different data types may appear to have the same
-          representation, they are stored differently and hash to different values, so they are
-          stored on different segments.</p>
+        <title>本地（局内）连接</title>
+        <p>使用在所有segment之间均匀分布表行并且达到本地连接的哈希分布能够提供可观的性能受益。当被连接的行在
+          同一个segment上时，很多处理都可以在该segment实例内完成。这被称为<i>本地</i>或者<i>局内</i>连接。
+          本地连接能最小化数据移动，每一个segment都独立于其他segment操作，不需要segment之间的网络流量或通信。</p>
+        <p>为了在常被连接在一起的大型表上实现本地连接，请在相同的列上分布这些表。本地连接要求连接的两边都被按照
+          相同的列（以及相同的顺序）分布<i>并且</i>连接表时使用分布子句中的所有列。分布列还必须是同样的数据类型
+          ——虽然一些具有不同数据类型的值看起来有相同的表现形式，但它们的存储方式不同并且会被哈希为不同的值，因此
+          它们会被存放在不同的segment上。</p>
       </section>
       <section>
-        <title>Data Skew</title>
-        <p>Data skew is often the root cause of poor query performance and out of memory conditions.
-          Skewed data affects scan (read) performance, but it also affects all other query execution
-          operations, for instance, joins and group by operations. </p>
-        <p>It is very important to <i>validate</i> distributions to <i>ensure</i> that data is
-          evenly distributed after the initial load. It is equally important to <i>continue</i> to
-          validate distributions after incremental loads. </p>
-        <p>The following query shows the number of rows per segment as well as the variance from the
-          minimum and maximum numbers of rows:</p>
+        <title>数据倾斜</title>
+        <p>数据倾斜通常是糟糕查询和内存不足的根源。倾斜的数据会影响扫描（读取）性能，但它还影响所有其他的执行操作，
+          例如操作执行的连接和分组。</p>
+        <p>有必要<i>验证</i>分布以<i>确保</i>数据在初始装载之后被均匀地分布。在增量装载之后<i>继续</i>验证分布
+          也同等重要。</p>
+        <p>下列查询显示每个segment的行数以及与最大、最小行数之间的差异：</p>
         <codeblock>SELECT 'Example Table' AS "Table Name", 
     max(c) AS "Max Seg Rows", min(c) AS "Min Seg Rows", 
     (max(c)-min(c))*100.0/max(c) AS "Percentage Difference Between Max &amp; Min" 
 FROM (SELECT count(*) c, gp_segment_id FROM facts GROUP BY 2) AS a;</codeblock>
-        <p>The <codeph>gp_toolkit</codeph> schema has two views that you can use to check for
-            skew.<ul id="ul_cg4_1vp_y4">
-            <li>The <codeph>gp_toolkit.gp_skew_coefficients</codeph> view shows data distribution
-              skew by calculating the coefficient of variation (CV) for the data stored on each
-              segment. The <codeph>skccoeff</codeph>  column shows the coefficient of variation
-              (CV), which is calculated as the standard deviation divided by the average. It takes
-              into account both the average and variability around the average of a data series. The
-              lower the value, the better. Higher values indicate greater data skew.</li>
-            <li>The <codeph>gp_toolkit.gp_skew_idle_fractions</codeph> view shows data distribution
-              skew by calculating the percentage of the system that is idle during a table scan,
-              which is an indicator of computational skew. The <codeph>siffraction</codeph> column
-              shows the percentage of the system that is idle during a table scan. This is an
-              indicator of uneven data distribution or query processing skew. For example, a value
-              of 0.1 indicates  10% skew, a value of 0.5 indicates 50% skew, and so on. Tables that
-              have more than10% skew should have their distribution policies evaluated.</li>
+        <p><codeph>gp_toolkit</codeph>模式有两个可以用来检查倾斜的视图。 
+          <ul id="ul_cg4_1vp_y4">
+            <li><codeph>gp_toolkit.gp_skew_coefficients</codeph>视图通过计算存储在每个segment上的数据
+              的变异系数（CV）来显示数据分布倾斜。<codeph>skccoeff</codeph>列显示变异系数（CV），它由标准
+              偏差除以均值算出。它同时考虑均值和围绕一个数据序列的均值的变化性。值越低，情况就越好。值越高表明
+              数据倾斜越严重。</li>
+            <li><codeph>gp_toolkit.gp_skew_idle_fractions</codeph>视图通过计算一次表扫描期间系统空闲的
+              百分数来显示数据分布倾斜，这种数据是计算性倾斜的指示器。<codeph>siffraction</codeph>列显示在
+              一次表扫描期间系统处于空闲的百分数。这是一种非均匀数据分布或者查询处理倾斜的指示器。例如，值为0.1
+              表示10%的倾斜，值为0.5表示50%的倾斜等等。如果表的倾斜超过10%，就应该评估其分布策略。</li>
           </ul></p>
       </section>
       <section>
-        <title>Processing Skew</title>
-        <p>Processing skew results when a disproportionate amount of data flows to, and is processed
-          by, one or a few segments. It is often the culprit behind Greenplum Database performance
-          and stability issues. It can happen with operations such join, sort, aggregation, and
-          various OLAP operations. Processing skew happens in flight while a query is executing and
-          is not as easy to detect as data skew, which is caused by uneven data distribution due to
-          the wrong choice of distribution keys. Data skew is present at the table level, so it can
-          be easily detected and avoided by choosing optimal distribution keys. </p>
-        <p>If single segments are failing, that is, not all segments on a host, it may be a
-          processing skew issue. Identifying processing skew is currently a manual process. First
-          look for spill files. If there is skew, but not enough to cause spill, it will not become
-          a performance issue. If you determine skew exists, then find the query responsible for the
-          skew. Following are the steps and commands to use. (Change names like the host file name
-          passed to <codeph>gpssh</codeph> accordingly):</p>
+        <title>处理倾斜</title>
+        <p>当不成比例的数据量流入一个或者少数segment并被它们处理时，处理倾斜就会发生。它常常就是Greenplum数据库
+          性能和稳定性问题背后的罪人。它可能随着连接、排序、聚集和多种OLAP操作而发生。查询倾斜在查询执行时才会发生，
+          因此并不如数据倾斜那么容易检测，数据倾斜由于错误的分布键选择导致的非均匀数据分布而产生。数据倾斜存在于表
+          级别，因此它可以被很容易地检测到并且通过选择最优的分布键来避免。</p>
+        <p>如果单个segment故障（也就是说并非主机上所有segment失效），可能就会是一个处理倾斜问题。当前确定处理倾斜
+          还是一种手工处理。首先查看溢出文件。如果有倾斜但还不足以导致溢出，这将不会成为一种性能问题。如果使用者确定
+          倾斜存在，接着查找对该倾斜负责的查询。下面是这个处理过程要使用的步骤和命令（请相应地更改传递给<codeph>gpssh</codeph>
+          的主机文件名之类的东西）：</p>
         <ol id="ol_hqj_2mh_hr">
-          <li>Find the OID for the database that is to be monitored for skew
-              processing:<codeblock>SELECT oid, datname FROM pg_database;</codeblock><p>Example
-              output:<codeblock>  oid  |  datname
+          <li>查找要在其中监控倾斜处理的数据库的OID：
+            <codeblock>SELECT oid, datname FROM pg_database;</codeblock><p>其输出的例子：
+              <codeblock>  oid  |  datname
 -------+-----------
  17088 | gpadmin
  10899 | postgres
@@ -247,15 +175,14 @@ FROM (SELECT count(*) c, gp_segment_id FROM facts GROUP BY 2) AS a;</codeblock>
  39682 | gpperfmon
 (6 rows)
 </codeblock></p></li>
-          <li>Run a <codeph>gpssh</codeph> command to check file sizes across all of the segment
-            nodes in the system. Replace <codeph>&lt;OID&gt;</codeph> with the OID of the database
-            from the prior
-              command:<codeblock>[gpadmin@mdw kend]$ gpssh -f ~/hosts -e \
+          <li>运行一个<codeph>gpssh</codeph>命令以在系统中所有的Segment节点间检查文件尺寸。把<codeph>&lt;OID&gt;</codeph>
+            用前一个命令中得到的数据库OID替换：
+            <codeblock>[gpadmin@mdw kend]$ gpssh -f ~/hosts -e \
     "du -b /data[1-2]/primary/gpseg*/base/<varname>&lt;OID&gt;</varname>/pgsql_tmp/*" | \
     grep -v "du -b" | sort | awk -F" " '{ arr[$1] = arr[$1] + $2 ; tot = tot + $2 }; END \
     { for ( i in arr ) print "Segment node" i, arr[i], "bytes (" arr[i]/(1024**3)" GB)"; \
-    print "Total", tot, "bytes (" tot/(1024**3)" GB)" }' -</codeblock><p>Example
-              output:<codeblock>Segment node[sdw1] 2443370457 bytes (2.27557 GB)
+    print "Total", tot, "bytes (" tot/(1024**3)" GB)" }' -</codeblock><p>其输出的例子：
+      <codeblock>Segment node[sdw1] 2443370457 bytes (2.27557 GB)
 Segment node[sdw2] 1766575328 bytes (1.64525 GB)
 Segment node[sdw3] 1761686551 bytes (1.6407 GB)
 Segment node[sdw4] 1780301617 bytes (1.65804 GB)
@@ -263,21 +190,19 @@ Segment node[sdw5] 1742543599 bytes (1.62287 GB)
 Segment node[sdw6] 1830073754 bytes (1.70439 GB)
 Segment node[sdw7] 1767310099 bytes (1.64594 GB)
 Segment node[sdw8] 1765105802 bytes (1.64388 GB)
-Total 14856967207 bytes (13.8366 GB)</codeblock></p><p>If
-              there is a <i>significant and sustained</i> difference in disk usage, then the queries
-              being executed should be investigated for possible skew (the example output above does
-              not reveal significant skew). In monitoring systems, there will always be some skew,
-              but often it is <i>transient</i> and will be <i>short in duration</i>. </p></li>
-          <li>If significant and sustained skew appears, the next task is to identify the offending
-            query. <p>The command in the previous step sums up the entire node. This time, find the
-              actual segment directory. You can do this from the master or by logging into the
-              specific node identified in the previous step. Following is an example run from the
-              master. </p><p>This example looks specifically for sort files. Not all spill files or
-              skew situations are caused by sort files, so you will need to customize the
-              command:<codeblock>$ gpssh -f ~/hosts -e 
+Total 14856967207 bytes (13.8366 GB)</codeblock></p>
+            <p>如果在磁盘使用上有<i>显著</i>且持续的差别，那么应该研究正在被执行的查询看看有没有倾斜（上面的输出
+              例子并未表明明显的倾斜）。在被监控的系统中，总是会有一点倾斜，但通常它们是<i>短暂的</i>并且将会
+              <i>持续很短</i>的时间。</p></li>
+          <li>如果显著且持久的倾斜出现，下一个任务就是确定导致问题的查询。
+            <p>前一步的命令已经摘要了整个节点。这一次，要找到实际的segment目录。使用者可以从master或者通过登入
+              前一步确定的特定节点来做这些。下面是一个从master运行的例子。
+            </p>
+            <p>这个例子专门地查找排序文件。并非所有的溢出文件或者倾斜情况都由排序文件导致，因此使用者将需要自定义
+              这个命令：<codeblock>$ gpssh -f ~/hosts -e 
     "ls -l /data[1-2]/primary/gpseg*/base/19979/pgsql_tmp/*" 
-    | grep -i sort | awk '{sub(/base.*tmp\//, ".../", $10); print $1,$6,$10}' | sort -k2 -n</codeblock></p><p>Here
-              is output from this command:
+    | grep -i sort | awk '{sub(/base.*tmp\//, ".../", $10); print $1,$6,$10}' | sort -k2 -n</codeblock></p>
+            <p>下面是来自这个命令的输出：
               <codeblock>[sdw1] 288718848
       /data1/primary/gpseg2/.../pgsql_tmp_slice0_sort_17758_0001.0[sdw1] 291176448
       /data2/primary/gpseg5/.../pgsql_tmp_slice0_sort_17764_0001.0[sdw8] 924581888
@@ -300,179 +225,131 @@ Total 14856967207 bytes (13.8366 GB)</codeblock></p><p>If
       /data2/primary/gpseg45/.../pgsql_tmp_slice10_sort_15673_0006.5[sdw8] 1573741824
       /data2/primary/gpseg45/.../pgsql_tmp_slice10_sort_15673_0007.6[sdw8] 1573741824
       /data2/primary/gpseg45/.../pgsql_tmp_slice10_sort_15673_0008.7[sdw8] 1573741824
-      /data2/primary/gpseg45/.../pgsql_tmp_slice10_sort_15673_0009.8</codeblock></p><p>Scanning
-              this output reveals that segment <codeph>gpseg45</codeph> on host
-                <codeph>sdw8</codeph> is the culprit, as its sort files are larger than the others
-              in the output.</p></li>
-          <li>Log in to the offending node with <codeph>ssh</codeph> and become root. Use the
-              <codeph>lsof</codeph> command to find the PID for the process that owns one of the
-            sort
-            files:<codeblock>[root@sdw8 ~]# lsof /data2/primary/gpseg45/base/19979/pgsql_tmp/pgsql_tmp_slice10_sort_15673_0002.1
+      /data2/primary/gpseg45/.../pgsql_tmp_slice10_sort_15673_0009.8</codeblock></p>
+            <p>扫描这一输出将会揭示出主机<codeph>sdw8</codeph>上的名为<codeph>gpseg45</codeph>
+              的segment是罪魁祸首。</p></li>
+          <li>用<codeph>ssh</codeph>登入导致问题的节点并且成为root。使用<codeph>lsof</codeph>命令查找
+            拥有排序文件的进程的PID：
+            <codeblock>[root@sdw8 ~]# lsof /data2/primary/gpseg45/base/19979/pgsql_tmp/pgsql_tmp_slice10_sort_15673_0002.1
 COMMAND  PID    USER    FD   TYPE DEVICE  SIZE        NODE        NAME
 postgres 15673  gpadmin 11u  REG  8,48    1073741824  64424546751 /data2/primary/gpseg45/base/19979/pgsql_tmp/pgsql_tmp_slice10_sort_15673_0002.1</codeblock>The
-            PID, <codeph>15673</codeph>, is also part of the file name, but this may not always be
-            the case.</li>
-          <li>Use the <codeph>ps</codeph> command with the PID to identify the database and
-            connection
-            information:<codeblock>[root@sdw8 ~]# ps -eaf | grep 15673
+            PID <codeph>15673</codeph>也是文件名的一部分，但并不总是这样。</li>
+          <li>用该PID作为参数运行<codeph>ps</codeph>命令以确定数据库和连接信息：
+            <codeblock>[root@sdw8 ~]# ps -eaf | grep 15673
 gpadmin  15673 27471 28 12:05 ?        00:12:59 postgres: port 40003, sbaskin bdw
         172.28.12.250(21813) con699238 seg45 cmd32 slice10 MPPEXEC SELECT
 root     29622 29566  0 12:50 pts/16   00:00:00 grep 15673</codeblock>
           </li>
-          <li>On the master, check the <codeph>pg_log</codeph> log file for the user in the previous
-            command (<codeph>sbaskin</codeph>), connection (<codeph>con699238</codeph>, and command
-              (<codeph>cmd32</codeph>). The line in the log file with these three values
-              <i>should</i> be the line that contains the query, but occasionally, the command
-            number may differ slightly. For example, the <codeph>ps</codeph> output may show
-              <codeph>cmd32</codeph>, but in the log file it is <codeph>cmd34</codeph>. If the query
-            is still running, the last query for the user and connection is the offending query.
+          <li>在master上，在<codeph>pg_log</codeph>日志文件中查找上一个命令中的用户（<codeph>sbaskin</codeph>）、
+            连接（<codeph>con699238</codeph>）以及命令编号（<codeph>cmd32</codeph>）。日志文件中含有这三个
+            值的行<i>应该</i>是包含该查询的行，但偶尔命令编号可能会略有不同。例如，<codeph>ps</codeph>输出可能
+            显示<codeph>cmd32</codeph>，但在日志文件中是<codeph>cmd34</codeph>。如果该查询仍在运行，该用户
+            和连接的最后一个查询就是导致该问题的原因。
           </li>
         </ol>
-        <p>The remedy for processing skew in almost all cases is to rewrite the query. Creating
-          temporary tables can eliminate skew. Temporary tables can be randomly distributed to force
-          a two-stage aggregation. </p>
+        <p>对于处理倾斜的纠正几乎都是重写该查询。创建临时表可以消除倾斜。临时表可以被随机地分布以强制一种两阶段的聚集。</p>
       </section>
     </body>
   </topic>
   <topic id="topic_fmc_lx1_3r">
-    <title>Partitioning</title>
+    <title>分区</title>
     <body>
-      <p>A good partitioning strategy reduces the amount of data to be scanned by reading only the
-        partitions needed to satisfy a query. </p>
-      <p>Each partition is a separate physical file or set of tiles (in the case of column-oriented
-        tables) on <i>every</i> segment. Just as reading a complete row in a wide columnar table
-        requires more time than reading the same row from a heap table, <i>reading all partitions in
-          a partitioned table requires more time than reading the same data from a non-partitioned
-          table</i>. </p>
-      <p>Following are partitioning best practices:<ul id="ul_wfh_bbb_3r">
-          <li>Partition large tables only, do not partition small tables. </li>
-          <li>Use partitioning on large tables <i>only</i> when partition elimination (partition
-            pruning) can be achieved based on query criteria and is accomplished by partitioning the
-            table based on the query predicate. Whenever possible, use range partitioning instead of
-            list partitioning.</li>
-          <li>The query planner can selectively scan partitioned tables only when the query contains
-            a direct and simple restriction of the table using immutable operators, such as
-              <codeph>=</codeph>, <codeph>&lt;</codeph> , <codeph>&lt;= </codeph>,
-              <codeph>&gt;</codeph>, <codeph>&gt;=</codeph>, and <codeph>&lt;&gt;</codeph>.</li>
-          <li>Selective scanning recognizes <codeph>STABLE</codeph> and <codeph>IMMUTABLE</codeph>
-            functions, but does not recognize <codeph>VOLATILE</codeph> functions within a query.
-            For example, <codeph>WHERE</codeph> clauses such as
-            <codeblock>date &gt; CURRENT_DATE</codeblock> cause the query planner to selectively
-            scan partitioned tables, but a <codeph>WHERE</codeph> clause such as
-            <codeblock>time &gt; TIMEOFDAY</codeblock> does not. It is important to validate that
-            queries are selectively scanning partitioned tables (partitions are being eliminated) by
-            examining the query <codeph>EXPLAIN</codeph> plan. </li>
-          <li>Do not use default partitions. The default partition is always scanned but, more
-            importantly, in many environments they tend to overfill resulting in poor performance. </li>
-          <li><i>Never</i> partition and distribute tables on the same column. </li>
-          <li>Do not use multi-level partitioning. While sub-partitioning is supported, it is not
-            recommended because typically subpartitions contain little or no data. It is a myth that
-            performance increases as the number of partitions or subpartitions increases; the
-            administrative overhead of maintaining many partitions and subpartitions will outweigh
-            any performance benefits. For performance, scalability and manageability, balance
-            partition scan performance with the number of overall partitions.</li>
-          <li>Beware of using too many partitions with column-oriented storage.</li>
-          <li>Consider workload concurrency and the average number of partitions opened and scanned
-            for all concurrent queries. </li>
+      <p>一种好的分区策略可以通过只读取满足查询所需的分区来降低被扫描的数据量。</p>
+      <p>每个分区在<i>每一个</i>segment上都是一个单独的物理文件或文件集合（这种情况出现在列寸表上）。就像在
+        宽列存表中读取一整行比从堆表读取同一行需要更多时间一样，<i>在分区表中读取所有分区比从非分区表中读取相同
+          的数据要求更多的时间。</i></p>
+      <p>下面是分区的最佳实践：<ul id="ul_wfh_bbb_3r">
+        <li>只分区大型表，不要分区小型表。</li>
+        <li><i>仅</i>当可以基于查询条件实现分区消除（分区裁剪）并且可以基于查询谓词对表分区来完成分区消除时
+          才在大型表上使用分区。无论何时，优先使用范围分区而不是列表分区。</li>
+        <li>只有当查询中where选择条件包含表的分区列使用不可变操作符（例如<codeph>=</codeph>、<codeph>&lt;</codeph>、
+          <codeph>&lt;= </codeph> 、<codeph>&gt;</codeph>、<codeph>&gt;=</codeph>以及<codeph>&lt;&gt;</codeph>）
+          时，查询规划器才能有选择地扫描分区表。</li>
+        <li>选择性扫描会识别<codeph>STABLE</codeph>和<codeph>IMMUTABLE</codeph>函数，但是不识别查询中的
+          <codeph>VOLATILE</codeph>函数。例如，<codeblock>date &gt; CURRENT_DATE</codeblock>之类的<codeph>WHERE</codeph>
+          子句会导致查询规划器选择性地扫描分区表，但<codeblock>time &gt; TIMEOFDAY</codeblock>之类的<codeph>WHERE</codeph>
+          子句却不行。有必要通过<codeph>EXPLAIN</codeph>检查执行计划来验证查询是否选择性地扫描分区表（分区被裁剪）。</li>
+        <li>不要使用默认分区。默认分区总是会被扫描，但是更重要的是，在很多情况下它们会被填得太满导致糟糕的性能。</li>
+        <li><i>绝不</i>在相同的列上对表分区和分布。</li>
+        <li>不要使用多级分区。虽然支持子分区，但并不推荐使用这种特性，因为通常子分区包含很少的数据或者不包含数据。
+          分区或者子分区数量增加时性能也增加简直就是天方夜谭。维护很多分区和子分区的管理工作将会压过得到的性能收益。
+          为了性能、可扩展性以及可管理性，请在分区扫描性能和总体分区数量之间做出平衡。</li>
+        <li>谨防对列式存储使用太多分区。</li>
+        <li>考虑负载并发性以及为所有并发查询打开并且扫描的平均分区数。</li>
         </ul></p>
       <section>
-        <title>Number of Partition and Columnar Storage Files</title>
-        <p>The only hard limit for the number of files Greenplum Database supports is the operating
-          system's open file limit. It is important, however, to consider the total number of files
-          in the cluster, the number of files on every segment, and the total number of files on a
-          host. In an MPP shared nothing environment, every node operates independently of other
-          nodes. Each node is constrained by its disk, CPU, and memory. CPU and I/O constraints are
-          not common with Greenplum Database, but memory is often a limiting factor because the
-          query execution model optimizes query performance in memory. </p>
-        <p>The optimal number of files per segment also varies based on the number of segments on
-          the node, the size of the cluster, SQL access, concurrency, workload, and skew. There are
-          generally six to eight segments per host, but large clusters should have fewer segments
-          per host. When using partitioning and columnar storage it is important to balance the
-          total number of files in the cluster, but it is <i>more</i> important to consider the
-          number of files per segment and the total number of files on a node. </p>
-        <p>Example DCA V2 64GB Memory per Node</p>
+        <title>分区和列存文件的数量</title>
+        <p>Greenplum数据库支持的文件数的唯一硬限制是操作系统的打开文件限制。但是，有必要考虑集群中文件的总数、
+          每个segment上的文件数以及一台主机上的文件总数。在一个MPP无共享环境中，每一个节点都独立于其他节点操作。
+          每个节点受到其磁盘、CPU和内存的约束。CPU和I/O约束对Greenplum数据库并不常见，但内存常常是一种限制因素，
+          因为查询执行模型会在内存中优化查询性能。</p>
+        <p>每个segment上的最优文件数也基于该节点上的segment数量、集群的大小、SQL访问、并发、负载和倾斜等因素
+          而变化。通常在每台主机上有六到八个segment，大的集群中每台主机可能有很少的segment。当使用分区和列存时，
+          <i>更重要</i>的是考虑每个segment的文件数和节点上的文件总数。</p>
+        <p>例子 DCA V2 每节点64GB内存</p>
         <ul id="ul_nyy_tgb_3r">
-          <li>Number of nodes: 16</li>
-          <li>Number of segments per node: 8</li>
-          <li>Average number of files per segment: 10,000</li>
+          <li>节点数：16</li>
+          <li>每节点的segment数：8</li>
+          <li>每个segment的平均文件数：10,000</li>
         </ul>
-        <p>The total number of files per node is <codeph>8*10,000 = 80,000</codeph> and the total
-          number of files for the cluster is <codeph>8*16*10,000 = 1,280,000</codeph>. The number of
-          files increases quickly as the number of partitions and the number of columns increase. </p>
-        <p>As a general best practice, limit the total number of files per node to under 100,000. As
-          the previous example shows, the optimal number of files per segment and total number of
-          files per node depends on the hardware configuration for the nodes (primarily memory),
-          size of the cluster, SQL access, concurrency, workload and skew. </p>
+        <p>每节点上的文件总数是<codeph>8*10,000 = 80,000</codeph>，而该集群的文件总数是
+          <codeph>8*16*10,000 = 1,280,000</codeph>。随着分区数和列数的增加，文件数会快速增加。</p>
+        <p>作为最佳实践最推荐的设置，请把每节点的文件总数限制为低于100,000。如上一个例子所示，每个
+          segment的最优文件数和每节点的文件总数取决于节点的硬件配置（主要是内存）、集群的大小、SQL
+          访问、并发性、负载以及倾斜。</p>
       </section>
     </body>
   </topic>
   <topic id="indexes">
-    <title>Indexes</title>
+    <title>索引</title>
 
     <body>
-      <p>Indexes are not generally needed in Greenplum Database. Most analytical queries operate on
-        large volumes of data, while indexes are intended for locating single rows or small numbers
-        of rows of data. In Greenplum Database, a sequential scan is an efficient method to read
-        data as each segment contains an equal portion of the data and all segments work in parallel
-        to read the data. </p>
-      <p>If adding an index does not produce performance gains, drop it. Verify that every index you
-        create is used by the optimizer.</p>
-      <p>For queries with high selectivity, indexes may improve query performance. Create an index
-        on a single column of a columnar table for drill through purposes for high cardinality
-        columns that are required for highly selective queries. </p>
-      <p>Do not index columns that are frequently updated. Creating an index on a column that is
-        frequently updated increases the number of writes required on updates. </p>
-      <p>Indexes on expressions should be used only if the expression is used frequently in queries. </p>
-      <p>An index with a predicate creates a partial index that can be used to select a small number
-        of rows from large tables.</p>
-      <p>Avoid overlapping indexes. Indexes that have the same leading column are redundant. </p>
-      <p>Indexes can improve performance on compressed append-optimized tables for queries that
-        return a targeted set of rows. For compressed data, an index access method means only the
-        necessary pages are uncompressed. </p>
-      <p>Create selective B-tree indexes. Index selectivity is a ratio of the number of distinct
-        values a column has divided by the number of rows in a table. For example, if a table has
-        1000 rows and a column has 800 distinct values, the selectivity of the index is 0.8, which
-        is considered good. </p>
-      <p>As a general rule, drop indexes before loading data into a table. The load will run an
-        order of magnitude faster than loading data into a table with indexes. After the load,
-        re-create the indexes. </p>
-      <p>Bitmap indexes are suited for querying and not updating. Bitmap indexes perform best when
-        the column has a low cardinality—100 to 100,000 distinct values. Do not use bitmap indexes
-        for unique columns, very high, or very low cardinality data. Do not use bitmap indexes for
-        transactional workloads.</p>
-      <p>If indexes are needed on partitioned tables, the index columns must be different than the
-        partition columns. A benefit of indexing partitioned tables is that because the b-tree
-        performance degrades exponentially as the size of the b-tree grows, creating indexes on
-        partitioned tables creates smaller b-trees that perform better than with non-partitioned
-        tables.</p>
+      <p>在Greenplum数据库中通常不需要索引。大部分分析型查询会在大体量数据上操作，而索引是用于从多行数据中定位
+        某一行或某几行。在Greenplum数据库中，顺序扫描是一种读取数据的有效方法，因为每个segment都含有数据同等
+        大小的一部分并且所有的segment都并行工作以读取数据。</p>
+      <p>如果增加索引不能获得性能提升，马上删掉它。验证您创建的每个索引都被优化器使用到。</p>
+      <p>对于具有高选择性的查询，索引可能会提升查询性能。对于选择性查询所要求的高基数表，在一个列式表的单列上
+        创建用于钻透目的的索引。</p>
+      <p>不要在频繁更新的列上创建索引。在频繁被更新的列上创建索引会增加更新时所需的写次数。</p>
+      <p>只有当表达式被频繁地使用在查询中时，才应该在表达式上建立索引。</p>
+      <p>带有谓词的索引会创建一个部分索引，它可以被用来从大型表中选择少量行。</p>
+      <p>避免重叠的索引。具有相同前导列的索引是冗余的。</p>
+      <p>对于返回一个定向行集合的查询来说，索引能够提高在压缩追加优化表上的性能。对于压缩数据，采用索引访问
+        方法意味着只有必要的页面会被解压缩。</p>
+      <p>创建有选择性的B-树索引。索引选择度是一列中的唯一值数量除以表中的行数。例如，如果一个表有1000行并且
+        有一列中有800个唯一值，那么该索引的选择度就是0.8，这被认为是中不错的索引使用情形。</p>
+      <p>总是在向表中装载数据前删除索引。这样装载的运行速度将会比在带有索引的表中装载数据快一个数量级。
+        在装载之后，重新创建索引。</p>
+      <p>位图索引适合于查询但不适合于更新。当列具有较低的基数（100到100,000个唯一值）时位图索引表现得最好。
+        不要为唯一列、基数非常高或者非常低的数据使用位图索引。不要为事务性负载使用位图索引。</p>
+      <p>通常，不要索引分区表。如果需要索引，索引列必须不同于分区列。索引分区表的一个好处是因为当B-树尺寸增长时
+        其性能呈指数下降，在分区表上创建索引可以得到很多较小的B-树，其性能比未分区表上的B-树更好。</p>
     </body>
   </topic>
   <topic id="column_sequence">
-    <title>Column Sequence and Byte Alignment</title>
+    <title>列顺序与字节对齐</title>
     <body>
 
-      <p>For optimum performance lay out the columns of a table to achieve data type byte alignment.
-        Lay out the columns in heap tables in the following order: <ol>
-          <li>Distribution and partition columns</li>
-          <li>Fixed numeric types </li>
-          <li>Variable data types</li>
+      <p>为了最优性能，请布置表列以实现数据类型的字节对齐。以下面的顺序布置堆表中的列：
+        <ol>
+          <li>分布列和分区列</li>
+          <li>固定的数字类型</li>
+          <li>可变的数据类型</li>
         </ol></p>
 
 
-      <p>Lay out the data types from largest to smallest, so that <codeph>BIGINT</codeph> and
-          <codeph>TIMESTAMP</codeph> come before <codeph>INT</codeph> and <codeph>DATE</codeph>, and
-        all of these types come before <codeph>TEXT</codeph>, <codeph>VARCHAR</codeph>, or
-          <codeph>NUMERIC(x,y)</codeph>. For example, 8-byte types first (<codeph>BIGINT</codeph>,
-          <codeph>TIMESTAMP</codeph>), 4-byte types next (<codeph>INT</codeph>,
-          <codeph>DATE</codeph>), 2-byte types next (<codeph>SMALLINT</codeph>), and variable data
-        type last (<codeph>VARCHAR</codeph>). </p>
-      <p>Instead of defining columns in this sequence:</p>
+      <p>从大到小布置数据类型，这样<codeph>BIGINT</codeph>和<codeph>TIMESTAMP</codeph>会在<codeph>INT</codeph>
+        和<codeph>DATE</codeph>的前面，而所有这些类型都在<codeph>TEXT</codeph>、<codeph>VARCHAR</codeph>或者
+        <codeph>NUMERIC(x,y)</codeph>之前。例如，首先是8字节类型（<codeph>BIGINT</codeph>、<codeph>TIMESTAMP</codeph>），
+        接着是4字节类型（<codeph>INT</codeph>、<codeph>DATE</codeph>），再后面是2字节类型（<codeph>SMALLINT</codeph>），
+        而可变数据类型在最后（<codeph>VARCHAR</codeph>）。</p>
+      <p>不要以这种顺序定义列：</p>
       <p><codeph>Int</codeph>, <codeph>Bigint</codeph>, <codeph>Timestamp</codeph>,
-          <codeph>Bigint</codeph>, <codeph>Timestamp</codeph>, <codeph>Int</codeph> (distribution
-        key), <codeph>Date</codeph> (partition key), <codeph>Bigint</codeph>,
+          <codeph>Bigint</codeph>, <codeph>Timestamp</codeph>, <codeph>Int</codeph> （分布键）
+        , <codeph>Date</codeph>（分区键）, <codeph>Bigint</codeph>,
           <codeph>Smallint</codeph></p>
-      <p>define the columns in this sequence:</p>
-      <p><codeph>Int</codeph> (distribution key), <codeph>Date</codeph> (partition key),
+      <p>以这种顺序定义列：</p>
+      <p><codeph>Int</codeph>（分布键）, <codeph>Date</codeph>（分区键）,
           <codeph>Bigint</codeph>, <codeph>Bigint</codeph>, <codeph>Timestamp</codeph>,
           <codeph>Bigint</codeph>, <codeph>Timestamp</codeph>, <codeph>Int</codeph>,
           <codeph>Smallint</codeph></p>

@@ -1,447 +1,340 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_q5g_pmj_s4">
-  <title>High Availability</title>
-  <shortdesc>Greenplum Database supports highly available, fault-tolerant database services when you
-    enable and properly configure Greenplum high availability features. To guarantee a required
-    level of service, each component must have a standby ready to take its place if it should
-    fail.</shortdesc>
+  <title>高可用性</title>
+  <shortdesc>当用户启用并且正确地配置Greenplum高可用特性时，Greenplum数据库支持高度可用的、容错的数据库服务。
+    要保证达到要求的服务等级，每个组件都必须有一个备用组件以保证在它失效时及时顶上。</shortdesc>
   <topic id="topic_vrb_sxc_54">
-    <title>Disk Storage</title>
+    <title>磁盘存储</title>
     <body>
-      <p>With the Greenplum Database "shared-nothing" MPP architecture, the master host and segment
-        hosts each have their own dedicated memory and disk storage, and each master or segment
-        instance has its own independent data directory. For both reliability and high performance,
-        Pivotal recommends a hardware RAID storage solution with from 8 to 24 disks. A larger number
-        of disks improves I/O throughput when using RAID 5 (or 6) because striping increases
-        parallel disk I/O. The RAID controller can continue to function with a failed disk because
-        it saves parity data on each disk in a way that it can reconstruct the data on any failed
-        member of the array. If a hot spare is configured (or an operator replaces the failed disk
-        with a new one) the controller rebuilds the failed disk automatically. </p>
-      <p>RAID 1 exactly mirrors disks, so if a disk fails, a replacement is immediately available
-        with performance equivalent to that before the failure. With RAID 5 each I/O for data on the
-        failed array member must be reconstructed from data on the remaining active drives until the
-        replacement disk is rebuilt, so there is a temporary performance degradation. If the
-        Greenplum master and segments are mirrored, you can switch any affected Greenplum instances
-        to their mirrors during the rebuild to maintain acceptable performance. </p>
-      <p>A RAID disk array can still be a single point of failure, for example, if the entire RAID
-        volume fails. At the hardware level, you can protect against a disk array failure by
-        mirroring the array, using either host operating system mirroring or RAID controller
-        mirroring, if supported.</p>
-      <p>It is important to regularly monitor available disk space on each segment host. Query the
-          <codeph>gp_disk_free</codeph> external table in the <codeph>gptoolkit</codeph> schema to
-        view disk space available on the segments. This view runs the Linux <codeph>df</codeph>
-        command. Be sure to check that there is sufficient disk space before performing operations
-        that consume large amounts of disk, such as copying a large table. </p>
-      <p>See <codeph>gp_toolkit.gp_disk_free</codeph> in the <i>Greenplum Database Reference
-          Guide</i>.</p>
+      <p>源于Greenplum数据库的非共享MPP架构，每台master和segment主机都有它们自己独立的内存和磁盘存储空间，
+        每个master和segment实例都有它们自己独立的数据目录。为了兼顾可靠性和高性能，Pivotal推荐采用8到24块
+        磁盘的硬件RAID存储解决方案。当采用RAID5或RAID6时，大量的磁盘会提升I/O吞吐量，因为条带会增加并行的
+        磁盘I/O。有一个失效磁盘时，RAID控制器能够继续工作，因为它在每个磁盘上都保存了校验数据，这样它能够重构
+        阵列中任何失效磁盘上的数据。如果配置了热备盘（或者配置了能够用新磁盘替代故障磁盘的操作器），控制器能够
+        自动重建故障磁盘。</p>
+      <p>在RAID1模式下，实际上就是镜像一组磁盘，因此如果出现某块磁盘故障，替代磁盘立即可用，并且性能与出现磁盘
+        故障之前无二。在RAID5模式下，故障磁盘上的每一个数据I/O都必须从剩余活动磁盘上重建出来，直到故障磁盘重建
+        完成，因此会出现一段时间的性能下降。如果磁盘数据重建期间，Greenplum数据库master和segment配置了镜像
+        实例，您可以将任何受到影响的Greenplum数据库实例切换为它们的镜像以保证性能最优。</p>
+      <p>RAID磁盘阵列仍然可能会出现单点故障，例如整个RAID卷故障。在硬件级别上，可以通过RAID控制器提供的镜像功
+        能或操作系统提供的镜像功能来防范磁盘阵列故障。</p>
+      <p>定期监控每台主机的可用磁盘空间是很重要的。可以通过查询<codeph>gptoolkit</codeph>模式下的外部表
+        <codeph>gp_disk_free</codeph>来查看segment节点的磁盘可用空间。该视图会运行Linux命令<codeph>df</codeph>。
+        在执行占用大量磁盘空间的操作（例如copy大表）前要确保检查可用磁盘空间。</p>
+      <p>详见<i>Greenplum数据库参考指南</i>中的<codeph>gp_toolkit.gp_disk_free</codeph>部分。</p>
       <section>
-        <title>Best Practices</title>
+        <title>最佳实践</title>
         <ul id="ul_ry5_syr_s4">
-          <li>Use a hardware RAID storage solution with 8 to 24 disks.</li>
-          <li>Use RAID 1, 5, or 6 so that the disk array can tolerate a failed disk.</li>
-          <li>Configure a hot spare in the disk array to allow rebuild to begin automatically when
-            disk failure is detected.</li>
-          <li>Protect against failure of the entire disk array and degradation during rebuilds by
-            mirroring the RAID volume.</li>
-          <li>Monitor disk utilization regularly and add additional space when needed. </li>
-          <li>Monitor segment skew to ensure that data is distributed evenly and storage is consumed
-            evenly at all segments.</li>
+          <li>使用带有8到24个磁盘的硬件RAID存储方案。</li>
+          <li>使用RAID 1、5或6，这样磁盘阵列能容忍一个故障磁盘。</li>
+          <li>在磁盘阵列中配置一个热备盘以允许在检测到磁盘失效时自动开始重建。</li>
+          <li>通过镜像RAID磁盘组防止整个磁盘阵列的故障和重建期间的性能衰退。</li>
+          <li>定期监控磁盘利用率并且在需要时增加额外的磁盘空间。</li>
+          <li>监控segment数据倾斜以确保所有segment节点的数据均匀分布、空间合理利用。</li>
         </ul>
       </section>
     </body>
   </topic>
   <topic id="topic_b5s_txc_54">
-    <title>Master Mirroring</title>
+    <title>Master镜像</title>
     <body>
-      <p>The Greenplum Database master instance is clients' single point of access to the system.
-        The master instance stores the global system catalog, the set of system tables that store
-        metadata about the database instance, but no user data. If an unmirrored master instance
-        fails or becomes inaccessible, the Greenplum instance is effectively off-line, since the
-        entry point to the system has been lost. For this reason, a standby master must be ready to
-        take over if the primary master fails. </p>
-      <p>Master mirroring uses two processes, a sender on the active master host and a receiver on
-        the mirror host, to synchronize the mirror with the master. As changes are applied to the
-        master system catalogs, the active master streams its write-ahead log (WAL) to the mirror so
-        that each transaction applied on the master is applied on the mirror. </p>
-      <p>The mirror is a <i>warm standby</i>. If the primary master fails, switching to the standby
-        requires an administrative user to run the <codeph>gpactivatestandby</codeph> utility on the
-        standby host so that it begins to accept client connections. Clients must reconnect to the
-        new master and will lose any work that was not committed when the primary failed.</p>
-      <p>See "Enabling High Availability Features" in the <i>Greenplum Database Administrator
-          Guide</i> for more information. </p>
+      <p>Greenplum数据库的master实例是客户端访问系统的唯一入口。master实例存储全局系统目录，也就是存储有关
+        数据库实例的元数据的一系列系统表，但是它不存储用户数据。如果未配置镜像的master实例故障或不可访问，会
+        直接导致Greenplum数据库离线，不能正常提供服务。因此，必须配置备用master实例以防止主master故障。</p>
+      <p>Master镜像使用两个进程使镜像实例与master同步，一个sender位于活动master主机上，一个receiver位于
+        镜像主机上。随着客户端操作的变化数据被应用到master系统目录上，活动master会将预写日志（WAL）以流复制
+        的方式应用到备用master节点，以保证每一个应用到master实例的事务也同时应用到了备用master上。</p>
+      <p>镜像是一个<i>温备</i>。如果主master失效，要切换到备用master需要管理员用户在备用主机上运行
+        <codeph>gpactivatestandby</codeph>工具，这样它才会开始接受客户端连接。客户端此时必须重新连接到新
+        master，该客户端在主master故障时未提交的事务都会丢失。</p>
+      <p>更多信息请见<i>Greenplum数据库管理员指南</i>中的“启用高可用特性”。</p>
       <section>
-        <title>Best Practices</title>
+        <title>最佳实践</title>
         <ul id="ul_gpj_lzr_s4">
-          <li>Set up a standby master instance&#8212;a <i>mirror</i>&#8212;to take over if the
-            primary master fails. </li>
-          <li>The standby can be on the same host or on a different host, but it is best practice to
-            place it on a different host from the primary master to protect against host
-            failure.</li>
-          <li>Plan how to switch clients to the new master instance when a failure occurs, for
-            example, by updating the master address in DNS.</li>
-          <li>Set up monitoring to send notifications in a system monitoring application or by email
-            when the primary fails.</li>
+          <li>设置一个备用master实例&#8212;<i>镜像</i>&#8212;在主master故障时接手工作。</li>
+          <li>备用实例可以位于主实例同一或者不同主机上，但是最佳实践是把它放在不同于主master的不同主机上，这样
+            可以防止主机故障。</li>
+          <li>规划好当故障发生时如何把客户端切换到新的master实例，例如通过更新DNS中的master地址。</li>
+          <li>设置监控，当主Master故障时在系统监控应用中发送通知或者通过邮件通知。</li>
         </ul>
       </section>
     </body>
   </topic>
   <topic id="topic_cnm_vxc_54">
-    <title>Segment Mirroring</title>
+    <title>Segment镜像</title>
     <body>
-      <p>Greenplum Database segment instances each store and manage a portion of the database data,
-        with coordination from the master instance. If any unmirrored segment fails, the database
-        may have to be shutdown and recovered, and transactions occurring after the most recent
-        backup could be lost. Mirroring segments is, therefore, an essential element of a high
-        availability solution.</p>
-      <p>A segment mirror is a hot standby for a primary segment. Greenplum Database detects when a
-        segment is unavailable and automatically activates the mirror. During normal operation, when
-        the primary segment instance is active, data is replicated from the primary to the mirror in
-        two ways:<ul id="ul_aqq_fhv_t4">
+      <p>Greenplum数据库的每一个segment实例都在master实例的协调下存储和管理数据库数据的一部分。如果任何未配置
+        镜像的segment故障，数据库可能不得不被关闭然后恢复，并且在最近备份之后发生的事务可能会丢失。因此，镜像
+        segment是高可用方案的一个不可或缺的元素</p>
+      <p>Segment镜像是主segment的热备。Greenplum数据库会检测到segment何时不可用并且自动激活其镜像。在正常操作
+        期间，当主segment实例活动时，数据以两种方式从主segment复制到镜像segment：<ul id="ul_aqq_fhv_t4">
           <li>
-            <p>The transaction commit log is replicated from the primary to the mirror before the
-              transaction is committed. This ensures that if the mirror is activated, the changes
-              made by the last successful transaction at the primary are present at the mirror. When
-              the mirror is activated, transactions in the log are applied to tables in the mirror.
+            <p>在事务被提交之前，事务提交日志被从主segment复制到镜像segment。这会确保当镜像被激活时，主segment
+              上最后一个成功的事务所作的更改会出现在镜像上。当镜像被激活时，日志中的事务会被应用到镜像中的表上。
             </p>
           </li>
           <li>
-            <p>Second, segment mirroring uses physical file replication to update heap tables.
-              Greenplum Server stores table data on disk as fixed-size blocks packed with tuples. To
-              optimize disk I/O, blocks are cached in memory until the cache fills and some blocks
-              must be evicted to make room for newly updated blocks. When a block is evicted from
-              the cache it is written to disk and replicated over the network to the mirror. Because
-              of the caching mechanism, table updates at the mirror can lag behind the primary.
-              However, because the transaction log is also replicated, the mirror remains consistent
-              with the primary. If the mirror is activated, the activation process updates the
-              tables with any unapplied changes in the transaction commit log.</p>
+            <p>第二种，segment镜像使用物理文件复制来更新堆表。Greenplum服务器在磁盘上以打包了元组的固定尺寸块
+              的形式存储表数据。为了优化磁盘I/O，块被缓冲在内存中，直到缓存被填满并且一些块必须被挤出去为新更新
+              的块腾出空间。当块被从缓存中挤出时，它会被写入到磁盘并且通过网络复制到镜像。因为缓冲机制，镜像上的
+              表更新可能落后于主segment。不过，由于事务日志也被复制，镜像会与主segment保持一致。如果镜像被激活，
+              激活过程会用事务提交日志中未应用的更改更新表。</p>
           </li>
         </ul></p>
-      <p>When the acting primary is unable to access its mirror, replication stops and state of the
-        primary changes to "Change Tracking." The primary saves changes that have not been
-        replicated to the mirror in a system table to be replicated to the mirror when it is back
-        on-line.</p>
-      <p>The master automatically detects segment failures and activates the mirror. Transactions in
-        progress at the time of failure are restarted using the new primary. Depending on how
-        mirrors are deployed on the hosts, the database system may be unbalanced until the original
-        primary segment is recovered. For example, if each segment host has four primary segments
-        and four mirror segments, and a mirror is activated on one host, that host will have five
-        active primary segments. Queries are not complete until the last segment has finished its
-        work, so performance can be degraded until the balance is restored by recovering the
-        original primary. </p>
-      <p>Administrators perform the recovery while Greenplum Database is up and running by running
-        the <codeph>gprecoverseg</codeph> utility. This utility locates the failed segments, verifies
-        they are valid, and compares the transactional state with the currently active segment to
-        determine changes made while the segment was offline. <codeph>gprecoverseg</codeph>
-        synchronizes the changed database files with the active segment and brings the segment back
-        online.</p>
-      <p>It is important to reserve enough memory and CPU resources on segment hosts to allow for
-        increased activity from mirrors that assume the primary role during a failure. The formulas
-        provided in <xref href="workloads.xml#topic_hhc_z5w_r4/section_r52_rbl_zt"/> for configuring
-        segment host memory include a factor for the maximum number of primary hosts on any one
-        segment during a failure. The arrangement of mirrors on the segment hosts affects this
-        factor and how the system will respond during a failure. See <xref href="#topic_ngz_qf4_tt"
-          format="dita"/> for a discussion of segment mirroring options. </p>
+      <p>当活动的主segment不能访问其镜像时，复制会停止并且主segment的状态会改为“Change Tracking”。主segment
+        会把没有被复制到镜像的更改保存在一个系统表中，等到镜像重新在线时这些更改会被复制到镜像。</p>
+      <p>Master会自动检测segment故障并且激活镜像。故障时正在进行的事务会使用新的主segment重新开始。根据镜像被
+        部署在主机上的方式，数据库系统可能会不平衡直到原始的主segment被恢复。例如，如果每台segment主机有四个主
+        segment和四个镜像segment，并且在一台主机上有一个镜像segment被激活，那台主机将有五个活动的主segment。
+        查询直到最后一个Segment完成其工作才算结束，因此性能可能会退化直至原始的主segment被恢复使得系统恢复平衡。</p>
+      <p>当Greenplum数据库运行时，管理员通过运行<codeph>gprecoverseg</codeph>工具执行恢复。这个工具会定位
+        故障的segment、验证它们是否有效并且与当前活动的segment对比事务状态以确定segment离线期间发生的更改。
+        <codeph>gprecoverseg</codeph>会与活动segment同步更改过的数据库文件并且将该segment重新拉回到在线
+        状态。</p>
+      <p>在故障期间，有必要在segment主机上保留足够的内存和CPU资源，以允许承担了主segment觉得的镜像实例能提供
+        对应的活动负载。<xref href="workloads.xml#topic_hhc_z5w_r4/section_r52_rbl_zt"/>中提供的配置
+        segment主机内存的公式包括一个因子，它代表故障期间任一主机上的最大主segment数量。segment主机上的镜像
+        布置会影响这一因子以及系统在故障时将如何应对。Segment镜像选项的讨论请见<xref href="#topic_ngz_qf4_tt"
+          format="dita"/>。</p>
       <section>
-        <title>Best Practices</title>
+        <title>最佳实践</title>
         <ul id="ul_e5w_3ds_s4">
-          <li>Set up mirrors for all segments.</li>
-          <li>Locate primary segments and their mirrors on different hosts to protect against host
-            failure.</li>
-          <li>Mirrors can be on a separate set of hosts or co-located on hosts with primary
-            segments.</li>
-          <li>Set up monitoring to send notifications in a system monitoring application or by email
-            when a primary segment fails.</li>
-          <li>Recover failed segments promptly, using the <codeph>gprecoverseg</codeph> utility, to
-            restore redundancy and return the system to optimal balance.</li>
+          <li>为所有segment设置镜像。</li>
+          <li>将主segment及其镜像放置在不同主机上以防止主机失效。</li>
+          <li>镜像可以放在一组单独的主机上或者主segment所在的主机上。</li>
+          <li>设置监控，当主segment故障时在系统监控应用中发送通知或者通过邮件通知。</li>
+          <li>即使恢复失效的segment，使用<codeph>gprecoverseg</codeph>工具来恢复冗余并且让系统回到最佳的
+            平衡状态。</li>
         </ul>
       </section>
     </body>
   </topic>
   <topic id="topic_tlk_zw4_1s">
-    <title>Dual Clusters</title>
+    <title>双集群</title>
     <body>
-      <p>For some use cases, an additional level of redundancy can be provided by maintaining two
-        Greenplum Database clusters that store the same data. The decision to implement dual
-        clusters should be made with business requirements in mind.</p>
-      <p>There are two recommended methods for keeping the data synchronized in a dual cluster
-        configuration. The first method is called Dual ETL. ETL (extract, transform, and load) is
-        the common data warehousing process of cleansing, transforming, validating, and loading data
-        into a data warehouse. With Dual ETL, the ETL processes are performed twice, in parallel on
-        each cluster, and validated each time. Dual ETL provides for a complete standby cluster with
-        the same data. It also provides the capability to query the data on both clusters, doubling
-        the processing throughput. The application can take advantage of both clusters as needed and
-        also ensure that the ETL is successful and validated on both sides. </p>
-      <p>The second mechanism for maintaining dual clusters is backup and restore. The data is
-        backed­up on the primary cluster, then the backup is replicated to and restored on the
-        second cluster. The backup and restore mechanism has higher latency than Dual ETL, but
-        requires less application logic to be developed. Backup and restore is ideal for use cases
-        where data modifications and ETL are done daily or less frequently.</p>
+      <p>对于一些用例，可以通过维护两个存储同样数据的Greenplum数据库集群提供额外层次的冗余。实现双集群的决定
+        应该考虑到业务需求。</p>
+      <p>在双集群配置中为了保持数据同步，有两种推荐方法。第一种方法被称作双ETL。ETL（抽取、转换和装载）是常见
+        的清理、转换、验证并且将数据装载到数据仓库中的常见数据仓库处理。通过双ETL，ETL处理会被以并行的方式执行
+        两次，每个集群上一次，并且每一次都会做验证。双ETL提供了一个存有相同数据的备用集群。它还提供了在两个集群
+        上查询数据的能力，并使得处理吞吐量翻倍。应用可以根据需要利用两个集群，还要确保ETL在两边都成功并且被验证。</p>
+      <p>维护双集群的第二种机制是备份和恢复。数据在主集群上被备份，然后备份被复制到第二个集群并且在其上恢复。
+        备份和恢复机制比双ETL的延迟更高，但是需要开发的应用逻辑更少。对于按每天或者更低频率进行数据修改和ETL的
+        用例，备份和恢复是理想的方案。</p>
       <section>
-        <title>Best Practices</title>
+        <title>最佳实践</title>
         <ul id="ul_m41_y1p_1s">
-          <li>Consider a Dual Cluster configuration to provide an additional level of redundancy and
-            additional query processing throughput. </li>
+          <li>为了提供额外级别的冗余和额外的查询处理吞吐量，可以考虑双集群配置。</li>
         </ul>
       </section>
     </body>
   </topic>
   <topic id="topic_mc5_k1p_1s">
-    <title>Backup and Restore</title>
+    <title>备份和恢复</title>
     <body>
-      <p>Backups are recommended for Greenplum Database databases unless the data in the database
-        can be easily and cleanly regenerated from source data. Backups protect from operational,
-        software, or hardware errors.</p>
-      <p>The <codeph>gpbackup</codeph> utility makes backups in parallel across the segments, so
-        that backups scale as the cluster grows in hardware size. </p>
-      <p>A backup strategy must consider where the backups will be written and where they will be
-        stored. Backups can be taken to the local cluster disks, but they should not be stored there
-        permanently. If the database and its backup are on the same storage, they can be lost
-        simultaneously. The backup also occupies space that could be used for database storage or
-        operations. After performing a local backup, the files should be copied to a safe,
-        off-cluster location. </p>
-      <p>An alternative is to back up directly to an NFS mount. If each host in the cluster has an
-        NFS mount, the backups can be written directly to NFS storage. A scale-out NFS solution is
-        recommended to ensure that backups do not bottleneck on the IO throughput of the NFS device.
-        Dell EMC Isilon is an example of this type of solution and can scale alongside the Greenplum
-        cluster. </p>
-      <p>Finally, through native API integration, Greenplum Database can stream backups directly to
-        the Dell EMC Data Domain enterprise backup platform. </p>
+      <p>推荐为Greenplum数据库进行备份，除非数据库中的数据可以很容易并且很干净地从源数据再生。备份可以防止操作
+        错误、软件错误或者硬件错误。</p>
+      <p><codeph>gpbackup</codeph>工具在segment之间并行地做备份，因此随着集群的硬件尺寸增长备份的尺度也会放大。
+        </p>
+      <p>备份策略必须考虑备份将被写到什么地方以及它们将被存放在哪里。备份可以放置在本地集群的磁盘上，但是它们不应该
+        被永久存放在那里。如果数据库及其备份在同一种存储上，它们可能会同时丢失。备份还占据数据库存储或者操作所需的
+        空间。在执行本地备份后，备份文件应该被拷贝到一个安全的、集群外的位置。</p>
+      <p>另一种策略是直接备份到一个NFS挂载存储上。如果集群中的每台主机都有一个NFS挂载，备份可以被直接写到NFS存储上。
+        推荐使用一种可扩展的NFS方案以确保备份不会受到NFS设备的IO吞吐瓶颈限制。Dell EMC Isilon是这类方案的一个例子，
+        并且可以与Greenplum集群一同扩展。</p>
+      <p>最后，通过本地API集成，Greenplum数据库可以把备份直接流式传送到Dell EMC Data Domain或者Veritas NetBackup
+        企业级备份平台。</p>
       <section>
-        <title>Best Practices</title>
+        <title>最佳实践</title>
         <p>
           <ul id="ul_nry_scl_b1b">
             <li dir="ltr">
-              <p dir="ltr">Back up Greenplum databases regularly unless the data is easily restored
-                from sources.</p>
+              <p dir="ltr">定期备份Greenplum数据库，除非能很容易地从源数据恢复数据。</p>
             </li>
             <li dir="ltr">
-              <p dir="ltr">Use the <codeph>gpbackup</codeph> command to specify only the schema and
-                tables that you want backed up. See the <xref
+              <p dir="ltr">使用<codeph>gpbackup</codeph>备份您想要备份的模式和表。更多信息请见<xref
                   href="https://gpdb.docs.pivotal.io/latest/utility_guide/admin_utilities/gpbackup.html"
-                  format="html" scope="external">gpbackup</xref> reference in the <cite>Greenplum
-                  Database Utility Reference Guide</cite> for more information.</p>
+                  format="html" scope="external">gpbackup</xref><cite>Greenplum数据库工具参考指南</cite>中
+                的对应部分。</p>
             </li>
             <li dir="ltr">
-              <p dir="ltr"><codeph>gpbackup</codeph> places SHARED ACCESS locks on the set of tables
-                to back up. Backups with fewer tables are more efficient for selectively restoring
-                schemas and tables, since <codeph>gprestore</codeph> does not have to search through
-                the entire database.</p>
+              <p dir="ltr"><codeph>gpbackup</codeph>在要备份的表上放置SHARED ACCESS锁。拥有很少表的备份在选择恢复
+                模式和表时更有效，因为<codeph>gprestore</codeph>可以搜索整个数据库。</p>
             </li>
-            <li dir="ltr">If backups are saved to local cluster storage, move the files to a safe,
-              off-cluster location when the backup is complete. Backup files and database files that
-              reside on the same storage can be lost simultaneously.</li>
+            <li dir="ltr">如果备份被保存在本地存储，当备份完成后将备份文件移动到一个安全且非集群存储的位置。备份文件和
+              数据库文件存储在一起很容易一起丢失。</li>
             <li dir="ltr">
-              <p dir="ltr">If backups are saved to NFS mounts, use a scale-out NFS solution such as
-                Dell EMC Isilon to prevent IO bottlenecks.</p>
+              <p dir="ltr">如果备份被保存到NFS挂在存储上，请选用可扩展的NFS解决方案来防止IO瓶颈，例如Dell EMC Isilon。</p>
             </li>
-            <li dir="ltr" otherprops="pivotal">Consider using Pivotal Greenplum Database integration
-              to stream backups to the Dell EMC Data Domain enterprise backup platform.</li>
+            <li dir="ltr" otherprops="pivotal">考虑使用Pivotal Greenplum数据库集成解决方案以流式备份的方式备份到
+              EMC Data Domain企业级备份平台。</li>
           </ul>
         </p>
       </section>
     </body>
   </topic>
   <topic id="topic_wlw_wxc_54">
-    <title>Detecting Failed Master and Segment Instances</title>
+    <title>检测故障的master和segment实例</title>
     <body>
-      <p>Recovering from system failures requires intervention from a system administrator, even
-        when the system detects a failure and activates a standby for the failed component. In each
-        case, the failed component must be replaced or recovered to restore full redundancy. Until
-        the failed component is recovered, the active component lacks a standby, and the system may
-        not be executing optimally. For these reasons, it is important to perform recovery
-        operations promptly. Constant system monitoring and automated fault notifications through
-        SNMP and email ensure that administrators are aware of failures that demand their attention. </p>
-      <p>The Greenplum Database server <codeph>ftsprobe</codeph> subprocess handles fault detection.
-          <codeph>ftsprobe</codeph> connects to and scans all segments and database processes at
-        intervals that you can configure with the <codeph>gp_fts_probe_interval</codeph>
-        configuration parameter. If <codeph>ftsprobe</codeph> cannot connect to a segment, it marks
-        the segment “down” in the Greenplum Database system catalog. The segment remains down until
-        an administrator runs the <codeph>gprecoverseg</codeph> recovery utility. </p>
+      <p>即使系统已经检测到故障并为故障组件激活了它的备用节点，从系统故障中恢复回来仍然要求有系统管理员的干预。
+        在任何一种情况下，故障组件都必须被替换或恢复，以保证系统处于完全冗余状态。在故障组件被恢复之前，当前活动
+        组件会处于缺少备份状态，并且系统也并没有在最优的状态下运行。由于这些原因，及时执行恢复操作是必要的。
+        持续的系统监控和自动故障告警会通过SNMP和email确保管理员注意到系统故障并且采取行动。</p>
+      <p>Greenplum数据库服务器的<codeph>ftsprobe</codeph>子进程负责故障检测。每隔一段时间，<codeph>ftsprobe</codeph>
+        会连接到所有的segment并且扫描所有segment和数据库进程，这个时间间隔可以用<codeph>gp_fts_probe_interval</codeph>
+        配置参数设置。如果<codeph>ftsprobe</codeph>无法连接到一个segment，它会在Greenplum数据库系统目录中
+        把该segment标记为“down”。在管理员运行<codeph>gprecoverseg</codeph>恢复工具之前，该segment都会保持
+        down的状态。</p>
       <section>
-        <title>Best Practices</title>
+        <title>最佳实践</title>
         <ul id="ul_b4h_rxl_v4">
-          <li>Run the <codeph>gpstate</codeph> utility to see the overall state of the Greenplum
-            system.</li>
+          <li>运行<codeph>gpstate</codeph>工具查看Greenplum系统的总体状态。</li>
         </ul>
       </section>
-      <section><title>Additional Information</title><i>Greenplum Database Administrator Guide</i>:
+      <section><title>附加信息</title><i>Greenplum数据库管理员指南</i>:
           <ul id="ul_wff_k1m_v4">
-          <li>Monitoring a Greenplum System</li>
-          <li>Recovering a Failed Segment</li>
-        </ul><p><i>Greenplum Database Utility Guide</i>:<ul id="ul_fk2_hyl_v4">
-            <li><codeph>gpstate</codeph>&#8212;view state of the Greenplum system</li>
-            <li><codeph>gprecoverseg</codeph>&#8212;recover a failed segment</li>
-            <li><codeph>gpactivatestandby</codeph>&#8212;make the standby master the active
-              master</li>
+            <li>监控Greenplum系统</li>
+            <li>恢复故障的Segment</li>
+          </ul><p><i>Greenplum数据库工具指南</i>:<ul id="ul_fk2_hyl_v4">
+            <li><codeph>gpstate</codeph>&#8212;查看Greenplum系统的状态</li>
+            <li><codeph>gprecoverseg</codeph>&#8212;恢复故障的Segment</li>
+            <li><codeph>gpactivatestandby</codeph>&#8212;让备用master变成当前活动master
+              </li>
           </ul></p><p><xref href="http://tools.ietf.org/html/rfc1697" format="html" scope="external"
-            >RDBMS MIB Specification</xref></p></section>
+            >RDBMS MIB规范</xref></p></section>
     </body>
   </topic>
   <topic id="topic_ngz_qf4_tt">
-    <title>Segment Mirroring Configuration</title>
+    <title>Segment镜像配置</title>
     <body>
-      <p>Segment mirroring allows database queries to fail over to a backup segment if the primary
-        segment fails or becomes unavailable. Pivotal requires mirroring for supported production
-        Greenplum Database systems.</p>
-      <p>A primary segment and its mirror must be on different hosts to ensure high availability.
-        Each host in a Greenplum Database system has the same number of primary segments and mirror
-        segments. Multi-homed hosts should have the same numbers of primary and mirror segments on
-        each interface. This ensures that segment hosts and network resources are equally loaded
-        when all primary segments are operational and brings the most resources to bear on query
-        processing. </p>
-      <p>When a segment becomes unavailable, its mirror segment on another host becomes the active
-        primary and processing continues. The additional load on the host creates skew and degrades
-        performance, but should allow the system to continue. A database query is not complete until
-        all segments return results, so a single host with an additional active primary segment has
-        the same effect as adding an additional primary segment to every host in the cluster. </p>
-      <p>The least amount of performance degradation in a failover scenario occurs when no host has
-        more than one mirror assuming the primary role. If multiple segments or hosts fail, the
-        amount of degradation is determined by the host or hosts with the largest number of mirrors
-        assuming the primary role. Spreading a host's mirrors across the remaining hosts minimizes
-        degradation when any single host fails.</p>
-      <p>It is important, too, to consider the cluster's tolerance for multiple host failures and
-        how to maintain a mirror configuration when expanding the cluster by adding hosts. There is
-        no mirror configuration that is ideal for every situation. </p>
-      <p>You can allow Greenplum Database to arrange mirrors on the hosts in the cluster using one
-        of two standard configurations, or you can design your own mirroring configuration. </p>
-      <p>The two standard mirroring arrangements are <i>group mirroring</i> and <i>spread
-          mirroring</i>:<ul id="ul_uwr_gkv_tt">
-          <li><b>Group mirroring</b> — Each host mirrors another host's primary segments. This is
-            the default for <codeph><xref href="../utility_guide/admin_utilities/gpinitsystem.xml"
-                >gpinitsystem</xref></codeph> and <codeph>gpaddmirrors</codeph>.</li>
-          <li><b>Spread mirroring</b> — Mirrors are spread across the available hosts. This requires
-            that the number of hosts in the cluster is greater than the number of segments per
-            host.</li>
+      <p>Segment镜像允许数据库查询在主Segment故障或者不可用时转移到备份segment上。Pivotal要求在其支持的
+        Greenplum数据库生产环境中必须配置镜像。</p>
+      <p>为了确保高可用，主segment及其镜像必须位于不同主机上。Greenplum数据库系统中的每一台主机都有相同数量
+        的主segment和镜像segment。多宿主主机应该在每个接口上有相同数量的主segment和镜像segment。这能确保
+        所有主segment运行时，segment主机和网络资源的负载均衡，并且提供最多的资源承担查询处理。</p>
+      <p>当segment变得不可用时，它位于另一台主机上的镜像segment会变成活动的主segment继续处理请求。主机上的
+        额外负载会导致倾斜以及性能下降，但是最起码可以保证系统继续可用。数据库查询会等待系统中所有segment都
+        返回结果后结束，所以当台主机上将镜像提升为主segment和在系统中每台机器都增加一个segment实例是相同的
+        效果。</p>
+      <p>在故障场景下，每台主机上替代故障segment的镜像实例不超过一个时，整个数据库系统的性能下降最小。如果多个
+        segment或主机故障，性能下降的影响受那台唤起镜像实例最多的机器影响。将一台主机的镜像散布在其余的主机上
+        可以最小化任意单主机故障时的性能下降。</p>
+      <p>也有必要考虑集群对多主机故障的容忍能力，以及通过增加主机来扩展集群时如何维护镜像配置。没有一种镜像配置
+        是放之四海而皆准的解决方案。</p>
+      <p>您可以采用两种镜像标准配置方式中的任意一种来在主机上配置镜像方式，也可以设计您自己的镜像配置方案。</p>
+      <p>两种标准的镜像配置方式分别是<i>group mirroring</i>和<i>spread mirroring</i>：
+        <ul id="ul_uwr_gkv_tt">
+          <li><b>Group mirroring</b> — 每台主机镜像另外机器的主segment。这是
+            <codeph><xref href="../utility_guide/admin_utilities/gpinitsystem.xml"
+                >gpinitsystem</xref></codeph>和<codeph>gpaddmirrors</codeph>的默认选项。</li>
+          <li><b>Spread mirroring</b> — 镜像分散分布在另外的机器上。这要求集群中的主机数量多于每台主机上的
+            segment实例数量。</li>
         </ul></p>
-      <p>You can design a custom mirroring configuration and use the Greenplum <codeph><xref
-            href="../utility_guide/admin_utilities/gpaddmirrors.xml">gpaddmirrors</xref></codeph> or
-          <xref href="../utility_guide/admin_utilities/gpmovemirrors.xml">gpaddmirrors</xref>
-        utilities to set up the configuration.</p>
-      <p><i>Block mirroring</i> is a custom mirror configuration that divides hosts in the cluster
-        into equally sized blocks and distributes mirrors evenly to hosts within the block. If a
-        primary segment fails, its mirror on another host within the same block becomes the active
-        primary. If a segment host fails, mirror segments on each of the other hosts in the block
-        become active.</p>
-      <p>The following sections compare the group, spread, and block mirroring configurations. </p>
+      <p>您可以设计一个客户镜像配置文件然后使用Greenplum工具<codeph><xref
+            href="../utility_guide/admin_utilities/gpaddmirrors.xml">gpaddmirrors</xref></codeph>或
+          <xref href="../utility_guide/admin_utilities/gpmovemirrors.xml">gpmovemirrors</xref>进行
+        配置。</p>
+      <p><i>Block mirroring</i>一种自定义镜像配置，它把集群中的主机划分成相等尺寸的块并且在块内的主机上均匀
+        地分布镜像。如果一个主segment故障，其在同一个块的另一主机上的镜像会变成活动的主segment。如果一台segment
+        主机故障，在该块中其他每一台主机上的镜像segment都会变成活动segment。</p>
+      <p>以下部分比较group, spread, 和block mirroring镜像配置。</p>
       <section>
         <title>Group Mirroring</title>
-        <p>Group mirroring is easiest to set up and is the default Greenplum mirroring
-          configuration. It is least expensive to expand, since it can be done by adding as few as
-          two hosts. There is no need to move mirrors after expansion to maintain a consistent
-          mirror configuration. </p>
-        <p>The following diagram shows a group mirroring configuration with eight primary segments
-          on four hosts. </p>
+        <p>Group mirroring是最容易设置的镜像配置，并且是Greenplum的默认镜像配置。组镜像的扩展代价最低，因为
+          可以通过增加仅仅两台主机来完成扩展。在扩展之后无需移动镜像来维持镜像配置的一致性。
+          </p>
+        <p>下面的图显示了一个在四台主机上带有八个主segment的group mirroring配置。</p>
         <p>
           <image href="./graphics/group-mirrors.png" id="image_igx_wds_wt"/>
         </p>
-        <p>Unless both the primary and mirror of the same segment instance fail, up to half of your
-          hosts can fail and the cluster will continue to run as long as resources (CPU, memory, and
-          IO) are sufficient to meet the needs. </p>
-        <p>Any host failure will degrade performance by half or more because the host with the
-          mirrors will have twice the number of active primaries. If your resource utilization is
-          normally greater than 50%, you will have to adjust your workload until the failed host is
-          recovered or replaced. If you normally run at less than 50% resource utilization the
-          cluster can continue to operate at a degraded level of performance until the failure is
-          corrected.</p>
+        <p>除非同一个segment实例的主segment和镜像都出现故障，最多可以有一半的主机故障并且集群将继续运行，只要
+          资源（CPU、内存和IO）足以满足需求。</p>
+        <p>任何主机故障将会让性能退化一半以上，因为具有镜像的主机将承担两倍的活动主segment。如果用户的资源利用
+          通常会超过50%，用户将不得不调整其负载，直至故障主机被恢复或者替换。如果用户通常的资源利用低于50%，则
+          集群会继续以退化的性能水平运行，直至故障被修复。</p>
       </section>
       <section>
         <title>Spread Mirroring</title>
-        <p>With spread mirroring, mirrors for each host's primary segments are spread across as many
-          hosts as there are segments per host. Spread mirroring is easy to set up when the cluster
-          is initialized, but requires that the cluster have at least one more host than there are
-          segments per host.</p>
-        <p>The following diagram shows the spread mirroring configuration for a cluster with three
-          primaries on four hosts. </p>
+        <p>通过spread mirroring，每台主机的主要Segment的镜像被散布在若干台主机上，涉及到的主机数量与每台主机上
+          segment数量相同。在集群初始化时设置spread mirroring很容易，但是要求集群中的主机数至少为每台主机上的
+          segment数加一。</p>
+        <p>下面的图展示了一个在四台主机上有三个主segment的集群的spread mirroring配置。</p>
         <p>
           <image href="./graphics/spread-mirrors.png" id="image_src_r2s_wt"/>
         </p>
-        <p>Expanding a cluster with spread mirroring requires more planning and may take more time.
-          You must either add a set of hosts equal to the number of primaries per host plus one, or
-          you can add two nodes in a group mirroring configuration and, when the expansion is
-          complete, move mirrors to recreate the spread mirror configuration.</p>
-        <p>Spread mirroring has the least performance impact for a single failed host because each
-          host's mirrors are spread across the maximum number of hosts. Load is increased by
-            1/<i>Nth</i>, where <i>N</i> is the number of primaries per host. Spread mirroring is,
-          however, the most likely configuration to suffer catastrophic failure if two or more hosts
-          fail simultaneously. </p>
+        <p>扩展使用spread mirroring的集群要求更多的规划并且可能会花费更多时间。用户必须要么增加一组数量等于每台
+          主机上主segment数加一的主机，要么在group mirroring配置中增加两个节点并且在扩展完成后移动镜像来重建
+          spread mirror配置。
+          </p>
+        <p>对于单主机故障，spread mirroring的性能影响最小，因为每台主机的镜像都散布在多台主机上。负载的增加是
+          1/<i>Nth</i>，其中<i>N</i>是每台主机上主segment的数量。如果两台以上主机同时故障，spread mirroring
+          是最有可能遭受到灾难性故障的配置方案。
+          </p>
       </section>
       <section>
         <title>Block Mirroring</title>
-        <p>With block mirroring, nodes are divided into blocks, for example a block of four or eight
-          hosts, and the mirrors for segments on each host are placed on other hosts within the
-          block. Depending on the number of hosts in the block and the number of primary segments
-          per host, each host maintains more than one mirror for each other host's segments. </p>
-        <p>The following diagram shows a single block mirroring configuration for a block of four
-          hosts, each with eight primary segments:</p>
+        <p>对于block mirroring，节点被划分成块，例如具有四台或者八台主机的块，而每台主机上segment的镜像被放置在
+          块中的其他主机上。根据块中主机的数量以及每台主机上主segment的数量，每台主机会为其他每一台主机的segment
+          维护超过一个镜像。
+           </p>
+        <p>下面的图展示了单block mirroring配置，块中有四台主机，每台主机有八个主segment：
+          </p>
         <p>
           <image href="./graphics/block-mirrors-4x8.png" id="image_uy3_dfs_wt"/>
         </p>
-        <p>If there are eight hosts, an additional four-host block is added with the mirrors for
-          primary segments 32 through 63 set up in the same pattern. </p>
-        <p>A cluster with block mirroring is easy to expand because each block is a self-contained
-          primary mirror group. The cluster is expanded by adding one or more blocks. There is no
-          need to move mirrors after expansion to maintain a consistent mirror setup. This
-          configuration is able to survive multiple host failures as long as the failed hosts are in
-          different blocks.</p>
-        <p>Because each host in a block has multiple mirror instances for each other host in the
-          block, block mirroring has a higher performance impact for host failures than spread
-          mirroring, but a lower impact than group mirroring. The expected performance impact varies
-          by block size and primary segments per node. As with group mirroring, if the resources are
-          available, performance will be negatively impacted but the cluster will remain available.
-          If resources are insufficient to accommodate the added load you must reduce the workload
-          until the failed node is replaced. </p>
+        <p>如果有八台主机，则额外增加的一个四主机块中有32至63号主segment的镜像，其设置也是同样的模式。
+          </p>
+        <p>使用block mirroring的集群很容易扩展，因为每一个块都是一个自包含的主镜像组。集群可以通过增加一个或者多个
+          块来扩展。扩展之后无需移动镜像来维持镜像设置的一致。只要故障的主机处于不同的块中，这种配置就能够容忍多主机
+          故障。
+         </p>
+        <p>因为块中的每台主机都有块中其他每台主机的多个镜像实例，对于主机故障block mirroring的性能影响比spread
+          mirroring更大，但比group mirroring影响要小。预期的性能影响随着块尺寸和每节点主segment数变化。和group
+          mirroring类似，如果资源可用，性能将会受到负面的影响，但是集群仍将可用。如果资源不足以容纳增加的负载，用户
+          必须降低负载直至故障节点被替换。
+         </p>
       </section>
       <section>
-        <title>Implementing Block Mirroring</title>
-        <p>Block mirroring is not one of the automatic options Greenplum Database offers when you
-          set up or expand a cluster. To use it, you must create your own configuration. </p>
-        <p>For a new Greenplum system, you can initialize the cluster without mirrors, and then run
-            <codeph>gpaddmirrors -i <varname>mirror_config_file</varname></codeph> with a custom
-          mirror configuration file to create the mirrors for each block. You must create the file
-          system locations for the mirror segments before you run <codeph>gpaddmirrors</codeph>. See
-          the <codeph>gpaddmirrors</codeph> reference page in the <cite>Greenplum Database
-            Management Utility Guide</cite> for details. </p>
-        <p>If you expand a system that has block mirroring or you want to implement block mirroring
-          at the same time you expand a cluster, it is recommended that you complete the expansion
-          first, using the default grouping mirror configuration, and then use the
-            <codeph>gpmovemirrors</codeph> utility to move mirrors into the block configuration.</p>
-        <p>To implement block mirroring with an existing system that has a different mirroring
-          scheme, you must first determine the desired location for each mirror according to your
-          block configuration, and then determine which of the existing mirrors must be relocated.
-          Follow these steps: </p>
+        <title>实现Block Mirroring</title>
+        <p>在用户设置或者扩展集群时，block mirroring并非Greenplum数据库提供的一种自动选项。要使用block mirroring，
+          用户必须创建自己的配置。</p>
+        <p>对于一个新的Greenplum系统，用户可以把集群初始化为没有镜像，然后用一个自定义镜像配置文件运行
+          <codeph>gpaddmirrors -i <varname>mirror_config_file</varname></codeph>来为每一个块创建镜像。
+          在用户运行<codeph>gpaddmirrors</codeph>之前，用户必须为镜像segment创建文件系统位置。详见<cite>Greenplum
+            数据库管理工具指南</cite>中的<codeph>gpaddmirrors</codeph>参考页。</p>
+        <p>如果用户扩展一个有block mirroring的系统或者用户想要在扩展集群时实现block mirroring，推荐用户先用默认的
+          grouping mirror配置完成扩展，然后使用<codeph>gpmovemirrors</codeph>工具把镜像移到块配置中。</p>
+        <p>要在使用不同镜像方案的现有系统中实现block mirroring，用户必须首先根据其块配置确定每个镜像的位置，然后确定
+          哪些现有的镜像必须被重定位。按照下列步骤：
+         </p>
         <ol id="ol_qqn_nly_5t">
-          <li>Run the following query to find the current locations of the primary and mirror
-              segments:<codeblock>SELECT dbid, content, role, port, hostname, datadir FROM gp_segment_configuration WHERE content > -1 ;</codeblock><p>The
-                <codeph>gp_segment_configuration</codeph> system catalog table contains the current
-              segment configuration.</p></li>
-          <li>Create a list with the current mirror location and the desired block mirroring
-            location, then remove any mirrors from the list that are already on the correct
-            host.</li>
-          <li>Create an input file for the <codeph>gpmovemirrors</codeph> utility with an entry for
-            each mirror that must be moved.<p>The <codeph>gpmovemirrors</codeph> input file has the
-              following
-              format:<codeblock><varname>contentID</varname>:<varname>address</varname>:<varname>port</varname>:<varname>data_dir</varname> <varname>new_address</varname>:<varname>port</varname>:<varname>data_dir</varname></codeblock></p>Where
-              <varname>contentID</varname> is the segment instance content ID,
-              <varname>address</varname> is the host name or IP address of the segment host,
-              <varname>port</varname> is the communication port, and <codeph>data_dir</codeph> is
-            the segment instance data directory.<p>The following example
-                <codeph>gpmovemirrors</codeph> input file specifies three mirror segments to move.
+          <li>运行下列查询来查找主segment和镜像segment的当前位置：
+              <codeblock>SELECT dbid, content, role, port, hostname, datadir FROM gp_segment_configuration WHERE content > -1 ;</codeblock><p>The
+                <codeph>gp_segment_configuration</codeph>系统目录表包含当前的segment配置。
+                 </p></li>
+          <li>用当前镜像位置和想要的block mirroring位置创建一个列表，然后从中移除已经在正确主机上的镜像。
+            </li>
+          <li>用列表中必须要移动的每一个项（镜像）为<codeph>gpmovemirrors</codeph>工具创建一个输入文件。
+            <p><codeph>gpmovemirrors</codeph>输入文件的格式如下： 
+              <codeblock><varname>contentID</varname>:<varname>address</varname>:<varname>port</varname>:<varname>data_dir</varname> <varname>new_address</varname>:<varname>port</varname>:<varname>data_dir</varname></codeblock></p>Where
+              <varname>contentID</varname> 是segment实例的contentID，
+              <varname>address</varname>是对应主机的主机名或IP地址，
+              <varname>port</varname>是通信端口，<codeph>data_dir</codeph>是segment实例的数据目录<p>
+                下面的<codeph>gpmovemirrors</codeph>输入文件定义了三个需要移动的镜像segment。
               <codeblock>1:sdw2:50001:/data2/mirror/gpseg1 sdw3:50001:/data/mirror/gpseg1
 2:sdw2:50001:/data2/mirror/gpseg2 sdw4:50001:/data/mirror/gpseg2
 3:sdw3:50001:/data2/mirror/gpseg3 sdw1:50001:/data/mirror/gpseg3
 </codeblock></p></li>
-          <li>Run <codeph>gpmovemirrors</codeph> with a command like the
-            following:<codeblock>gpmovemirrors -i <varname>mirror_config_file</varname></codeblock></li>
+          <li>用以下命令运行<codeph>gpmovemirrors</codeph>：
+            <codeblock>gpmovemirrors -i <varname>mirror_config_file</varname></codeblock></li>
         </ol>
-        <p>The <codeph>gpmovemirrors</codeph> utility validates the input file, calls
-            <codeph>gp_recoverseg</codeph> to relocate each specified mirror, and removes the
-          original mirror. It creates a backout configuration file which can be used as input to
-            <codeph>gpmovemirrors</codeph> to undo the changes that were made. The backout file has
-          the same name as the input file, with the suffix
-              <codeph>_backout_<varname>timestamp</varname></codeph> added.</p>
-        <p>See the <cite>Greenplum Database Management Utility Reference</cite> for complete
-          information about the <codeph>gpmovemirrors</codeph> utility.</p>
+        <p><codeph>gpmovemirrors</codeph>工具会验证该输入文件、调用<codeph>gp_recoverseg</codeph>
+          来重定位每一个指定的镜像，并且移除原始的镜像。它会创建一个撤销配置文件，该文件可以被用作
+          <codeph>gpmovemirrors</codeph>的输入来撤销所作的更改。撤销文件和输入文件同名，但会增加后缀
+          <codeph>_backout_<varname>timestamp</varname></codeph>。
+         </p>
+        <p>关于<codeph>gpmovemirrors</codeph>工具的完整信息请见<cite>Greenplum数据库管理工具参考</cite>。</p>
       </section>
     </body>
   </topic>

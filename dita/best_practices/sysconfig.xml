@@ -1,86 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_dt3_fkv_r4">
-  <title>System Configuration</title>
-  <shortdesc>Requirements and best practices for system administrators who are configuring Greenplum
-    Database cluster hosts.</shortdesc>
+  <title>系统配置</title>
+  <shortdesc>这一节的主题描述配置Greenplum数据库集群主机的要求和最佳实践。</shortdesc>
   <body>
-    <p>Configuration of the Greenplum Database cluster is usually performed as root.</p>
+    <p>通常使用root用户配置Greenplum数据库集群。</p>
     <section id="topic_fvc_zh1_b2b">
-      <title>Configuring the Timezone</title>
-      <p>Greenplum Database selects a timezone to use from a set of internally stored PostgreSQL
-        timezones. The available PostgreSQL timezones are taken from the Internet Assigned Numbers
-        Authority (IANA) Time Zone Database, and Greenplum Database updates its list of available
-        timezones as necessary when the IANA database changes for PostgreSQL. </p>
-      <p>Greenplum selects the timezone by matching a PostgreSQL timezone with the user specified
-        time zone, or the host system time zone if no time zone is configured. For example, when
-        selecting a default timezone, Greenplum uses an algorithm to select a PostgreSQL timezone
-        based on the host system timezone files. If the system timezone includes leap second
-        information, Greenplum Database cannot match the system timezone with a PostgreSQL timezone.
-        In this case, Greenplum Database calculates a "best match" with a PostgreSQL timezone based
-        on information from the host system.</p>
-      <p>As a best practice, configure Greenplum Database and the host systems to use a known,
-        supported timezone. This sets the timezone for the Greenplum Database master and segment
-        instances, and prevents Greenplum Database from recalculating a "best match" timezone each
-        time the cluster is restarted, using the current system timezone and Greenplum timezone
-        files (which may have been updated from the IANA database since the last restart). Use the
-          <codeph>gpconfig</codeph> utility to show and set the Greenplum Database timezone. For
-        example, these commands show the Greenplum Database timezone and set the timezone to
-          <codeph>US/Pacific</codeph>.<codeblock># gpconfig -s TimeZone
-# gpconfig -c TimeZone -v 'US/Pacific'</codeblock>You
-        must restart Greenplum Database after changing the timezone. The command <codeph>gpstop
-          -ra</codeph> restarts Greenplum Database. The catalog view
-          <codeph>pg_timezone_names</codeph> provides Greenplum Database timezone information.</p>
+      <title>配置时区</title>
+      <p>Greenplum数据库会从存储在PostgreSQL内部的一个时区集合种选择一个时区使用。PostgreSQL中存储的可用时区
+        全部取自于Internet Assigned Numbers Authority (IANA) 时区数据库，一旦PostgreSQL的IANA数据库发生
+        改变，Greenplum数据库也会随之更新它的可用时区列表。</p>
+      <p>Greenplum通过将用户定义的时区与PostgreSQL的时区进行匹配来选择自身的时区，如果用户时区没配置，则会采用
+        操作系统主机时区。例如，当选择默认时区时，Greenplum会基于主机操作系统时区文件并根据算法来选择PostgreSQL
+        的时区。如果系统时区包含闰秒信息，Greenplum数据库便不能用PostgreSQL的时区匹配到系统时区。这种情形下，
+        Greenplum数据库会基于主机系统的相关信息来计算一个最佳的PostgreSQL时区匹配值。</p>
+      <p>作为最佳实践，应该配置Greenplum数据库和主机系统采用已知的被支持的时区。采用当前系统时区和Greenplum数据库
+        时区文件（该信息可能自上次重启后已经从IANA数据库更新）来匹配，这样做可以设置好Greenplum数据库master和
+        segment实例的时区，防止Greenplum数据库每次重启后都重新计算这个最佳匹配值。使用<codeph>gpconfig</codeph>工具
+        设置和显示Greenplum数据库时区。例如，以下命令显示Greenplum数据库时区并设置时区为<codeph>US/Pacific</codeph>。
+        <codeblock># gpconfig -s TimeZone
+# gpconfig -c TimeZone -v 'US/Pacific'</codeblock>
+        修改时区后必须重启Greenplum数据库。重启Greenplum数据库的命令为<codeph>gpstop -ra</codeph>。系统视图
+        <codeph>pg_timezone_names</codeph>提供Greenplum数据库时区相关的信息。</p>
     </section>
 
     <section id="file_system">
-      <title>File System</title>
-      <p>XFS is the file system used for Greenplum Database data directories. XFS should be mounted
-        with the following mount options:
+      <title>文件系统</title>
+      <p>XFS是Greenplum数据库数据目录的最佳实践文件系统。XFS应该用下列选项挂载：
         <codeblock>rw,nodev,noatime,nobarrier,inode64</codeblock></p>
     </section>
     <section id="port_config">
-      <title>Port Configuration</title>
-      <p>Set up <codeph>ip_local_port_range</codeph> so it does not conflict with the Greenplum
-        Database port ranges. For example, setting this range in
-          <systemoutput>/etc/sysctl.conf</systemoutput>:
+      <title>端口配置</title>
+      <p><codeph>ip_local_port_range</codeph>应该被设置为不与Greenplum数据库端口范围冲突。例如，
+          <systemoutput>/etc/sysctl.conf</systemoutput>文件中的设置：
         <codeblock>net.ipv4.ip_local_port_range = 10000  65535</codeblock></p>
-      <p>you could set the Greenplum Database base port numbers to these
-        values.<codeblock>PORT_BASE = 6000
+      <p>客户可以设置Greenplum数据库基础端口号为下列值。<codeblock>PORT_BASE = 6000
 MIRROR_PORT_BASE = 7000</codeblock></p>
     </section>
     <section id="io_config">
-      <title>I/O Configuration</title>
-      <p>Set the blockdev read-ahead size to 16384 on the devices that contain data directories.
-        This command sets the read-ahead size for <codeph>/dev/sdb</codeph>.</p>
+      <title>I/O配置</title>
+      <p>在含有数据目录的设备上，blockdev预读尺寸应该被设置为16384。
+        下列命令设置<codeph>/dev/sdb</codeph>的预读值大小。</p>
       <codeblock># /sbin/blockdev --setra 16384 /dev/sdb</codeblock>
-      <p>This command returns the read-ahead size for <codeph>/dev/sdb</codeph>.</p>
+      <p>下列命令显示<codeph>/dev/sdb</codeph>的预读值大小。</p>
       <codeblock># /sbin/blockdev --getra /dev/sdb
 16384</codeblock>
-      <p>The deadline IO scheduler should be set for all data directory devices. </p>
+      <p>应该为所有数据目录设备设置deadline IO调度器。</p>
       <codeblock> # cat /sys/block/sdb/queue/scheduler
  noop anticipatory [deadline] cfq </codeblock>
-      <p>The maximum number of OS files and processes should be increased in the
-          <codeph>/etc/security/limits.conf</codeph> file.
+      <p>应该在<codeph>/etc/security/limits.conf</codeph>文件中增加OS文件和进程的最大数量。
         <codeblock>* soft  nofile 65536
 * hard  nofile 65536
 * soft  nproc 131072
 * hard  nproc 131072</codeblock></p>
-      <p>Enable core files output to a known location and make sure <codeph>limits.conf</codeph>
-        allows core files.
+      <p>让内核文件输出到一个已知的位置并且确保<codeph>limits.conf</codeph>允许输出内核文件。
         <codeblock>kernel.core_pattern = /var/core/core.%h.%t
 # grep core /etc/security/limits.conf  
 * soft  core unlimited</codeblock></p>
     </section>
     <section id="os_mem_config">
-      <title>OS Memory Configuration</title>
-      <p>The Linux sysctl <codeph>vm.overcommit_memory</codeph> and
-          <codeph>vm.overcommit_ratio</codeph> variables affect how the operating system manages
-        memory allocation. These variables should be set as follows: </p>
-      <p><codeph>vm.overcommit_memory</codeph> determines the method the OS uses for determining how
-        much memory can be allocated to processes. This should be always set to 2, which is the only
-        safe setting for the database. <note>For information on configuration of overcommit memory,
-          refer to: <ul id="ul_pgp_4hz_m1b">
+      <title>OS内存配置</title>
+      <p>Linux中sysctl的变量<codeph>vm.overcommit_memory</codeph>和<codeph>vm.overcommit_ratio</codeph>
+        影响操作系统管理内存分配的方式。这些变量应该按照下面的方式设置：</p>
+      <p><codeph>vm.overcommit_memory</codeph>决定OS用于确定为进程可以分配多少内存的方法。这个变量应该总是被
+        设置为2，它是对数据库唯一安全的设置。<note>有关如何配置overcommit memory的信息，参见：
+          <ul id="ul_pgp_4hz_m1b">
             <li><xref
                 href="https://www.google.com/url?q=https://en.wikipedia.org/wiki/Memory_overcommitment&amp;sa=D&amp;ust=1499719618717000&amp;usg=AFQjCNErcHO7vErv4pn9fIhCxrR0XRiknA"
                 format="html" scope="external"
@@ -90,143 +74,113 @@ MIRROR_PORT_BASE = 7000</codeblock></p>
                 format="html" scope="external"
                 >https://www.kernel.org/doc/Documentation/vm/overcommit-accounting</xref></li>
           </ul></note></p>
-      <p><codeph>vm.overcommit_ratio</codeph> is the percent of RAM that is used for application
-        processes. The default is 50 on Red Hat Enterprise Linux. See <xref
-          href="#topic_dt3_fkv_r4/segment_mem_config" format="dita"/> for a formula to calculate an
-        optimal value.</p>
-      <p>Do not enable huge pages in the operating system.</p>
-      <p>See also <xref href="workloads.xml#topic_hhc_z5w_r4"/>.</p>
+      <p><codeph>vm.overcommit_ratio</codeph>是被用于应用进程的RAM的百分数。在Red Hat Enterprise Linux上默认是50。
+        为这一变量计算最优值的公式可见<xref href="#topic_dt3_fkv_r4/segment_mem_config" format="dita"/>。</p>
+      <p>不要启用操作系统大页设置。</p>
+      <p>另见<xref href="workloads.xml#topic_hhc_z5w_r4"/>。</p>
     </section>
     <section id="shared_mem_config">
-      <title>Shared Memory Settings </title>
-      <p>Greenplum Database uses shared memory to communicate between <codeph>postgres</codeph>
-        processes that are part of the same <codeph>postgres</codeph> instance. The following shared
-        memory settings should be set in <codeph>sysctl</codeph> and are rarely modified.</p>
+      <title>共享内存设置</title>
+      <p>Greenplum数据库使用共享内存在<codeph>postgres</codeph>进程之间通信，这些进程是同一个<codeph>postgres</codeph>
+        实例的组成部分。下面的共享内存设置应该在<codeph>sysctl</codeph>中设定并且很少会被修改。</p>
       <codeblock>kernel.shmmax = 500000000
 kernel.shmmni = 4096
 kernel.shmall = 4000000000</codeblock>
     </section>
     <section id="gpcheck">
-      <title>Validate the Operating System </title>
-      <p>Run <codeph>gpcheck</codeph> to validate the operating system configuration. See
-          <codeph>gpcheck</codeph> in the <i>Greenplum Database Utility Guide</i>.</p>
+      <title>验证操作系统</title>
+      <p>运行<codeph>gpcheck</codeph>来验证操作系统配置。更多信息请见<i>Greenplum数据库工具指南</i>中的
+        <codeph>gpcheck</codeph>部分。</p>
     </section>
     <section id="host_segs">
-      <title>Number of Segments per Host</title>
-      <p>Determining the number of segments to execute on each segment host has immense impact on
-        overall system performance. The segments share the host's CPU cores, memory, and NICs with
-        each other and with other processes running on the host. Over-estimating the number of
-        segments a server can accommodate is a common cause of suboptimal performance.</p>
-      <p>The factors that must be considered when choosing how many segments to run per host include
-        the following:<ul id="ul_z44_qfp_y4">
-          <li>Number of cores</li>
-          <li>Amount of physical RAM installed in the server</li>
-          <li>Number of NICs</li>
-          <li>Amount of storage attached to server</li>
-          <li>Mixture of primary and mirror segments</li>
-          <li>ETL processes that will run on the hosts</li>
-          <li>Non-Greenplum processes running on the hosts</li>
+      <title>每台主机上的Segment数量</title>
+      <p>每台segment主机上运行的segment数量对总体系统性能有着巨大的影响。这些segment之间以及主机上的其他进程
+        共享该主机的CPU核心、内存和网络接口。过高估计一台服务器能容纳的segment数量是导致非最优性能的常见原因。</p>
+      <p>在选择每台主机上运行多少Segment时必须要考虑的因素包括：<ul id="ul_z44_qfp_y4">
+        <li>核心数量</li>
+        <li>安装在该服务器上的物理RAM容量</li>
+        <li>NIC数量</li>
+        <li>附加到服务器的存储容量</li>
+        <li>主segment和镜像segment的混合</li>
+        <li>将在主机上运行的ETL进程</li>
+        <li>运行在主机上的非Greenplum进程</li>
         </ul></p>
     </section>
     <section id="segment_mem_config">
-      <title>Resource Queue Segment Memory Configuration</title>
-      <p>The <codeph>gp_vmem_protect_limit</codeph> server configuration parameter specifies the
-        amount of memory that all active postgres processes for a single segment can consume at any
-        given time. Queries that exceed this amount will fail. Use the following calculations to
-        estimate a safe value for <codeph>gp_vmem_protect_limit</codeph>.<ol id="ol_osx_srq_kv">
-          <li>Calculate <codeph>gp_vmem</codeph>, the host memory available to Greenplum Database,
-            using this
-            formula:<codeblock>gp_vmem = ((SWAP + RAM) – (7.5GB + 0.05 * RAM)) / 1.7</codeblock>where
-              <codeph>SWAP</codeph> is the host's swap space in GB and <codeph>RAM</codeph> is the
-            RAM installed on the host in GB.</li>
-          <li>Calculate <codeph>max_acting_primary_segments</codeph>. This is the maximum number of
-            primary segments that can be running on a host when mirror segments are activated due to
-            a segment or host failure on another host in the cluster. With mirrors arranged in a
-            4-host block with 8 primary segments per host, for example, a single segment host
-            failure would activate two or three mirror segments on each remaining host in the failed
-            host's block. The <codeph>max_acting_primary_segments</codeph> value for this
-            configuration is 11 (8 primary segments plus 3 mirrors activated on failure). </li>
-          <li>Calculate <codeph>gp_vmem_protect_limit</codeph> by dividing the total Greenplum
-            Database memory by the maximum number of acting
-            primaries:<codeblock>gp_vmem_protect_limit = gp_vmem / max_acting_primary_segments</codeblock>Convert
-            to megabytes to find the value to set for the <codeph>gp_vmem_protect_limit</codeph>
-            system configuration parameter. </li>
+      <title>资源队列的segment内存配置</title>
+      <p><codeph>gp_vmem_protect_limit</codeph>服务器配置参数指定单个segment的所有活动postgres进程在
+        任何给定时刻能够消耗的内存量。查询一旦超过该值则会失败。可使用下面的计算方法为<codeph>gp_vmem_protect_limit</codeph>
+        估计一个安全值。<ol id="ol_osx_srq_kv">
+          <li>使用这个公式计算<codeph>gp_vmem</codeph>（Greenplum数据库可用的主机内存）：
+            <codeblock>gp_vmem = ((SWAP + RAM) – (7.5GB + 0.05 * RAM)) / 1.7</codeblock>
+            其中<codeph>SWAP</codeph>是主机的交换空间（以GB为单位）而<codeph>RAM</codeph>是主机上安装的
+            内存（以GB为单位）。</li>
+          <li>计算<codeph>max_acting_primary_segments</codeph>。当镜像segment由于集群中其他主机上的
+            segment或者主机故障而被激活时，这是能在一台主机上运行的主segment的最大数量。例如，对于布置在
+            每台主机有8个主segment的四主机块中的镜像来说，单一segment主机失效将会在其所在块中剩余每台主机
+            上激活2个或者3个镜像segment。这一配置的<codeph>max_acting_primary_segments</codeph>值是11
+            （8个主Segment外加3个故障时激活的镜像）。</li>
+          <li>通过将总的Greenplum数据库内存除以活动主segment的最大数量来计算<codeph>gp_vmem_protect_limit</codeph>：
+            <codeblock>gp_vmem_protect_limit = gp_vmem / max_acting_primary_segments</codeblock>
+            转换成兆字节就是<codeph>gp_vmem_protect_limit</codeph>系统配置参数的设置。</li>
         </ol>
       </p>
-      <p dir="ltr">For scenarios where a large number of workfiles are generated, adjust the
-        calculation for <codeph>gp_vmem</codeph> to account for the
-        workfiles:<codeblock>gp_vmem = ((SWAP + RAM) – (7.5GB + 0.05 * RAM - (300KB * <varname>total_#_workfiles</varname>))) / 1.7</codeblock></p>
-      <p dir="ltr">For information about monitoring and managing workfile usage, see the
-          <i>Greenplum Database Administrator Guide</i>.</p>
-      <p dir="ltr">You can calculate the value of the <codeph>vm.overcommit_ratio</codeph> operating
-        system parameter from the value of <codeph>gp_vmem</codeph>:</p>
+      <p dir="ltr">对于有大量工作文件产生的场景，可调整<codeph>gp_vmem</codeph>的计算以增加工作文件条件：
+        <codeblock>gp_vmem = ((SWAP + RAM) – (7.5GB + 0.05 * RAM - (300KB * <varname>total_#_workfiles</varname>))) / 1.7</codeblock></p>
+      <p dir="ltr">有关监控和管理工作文件使用的信息请见<i>Greenplum数据库管理员指南</i>。</p>
+      <p dir="ltr">用户可以根据<codeph>gp_vmem</codeph>的值计算操作系统参数
+        <codeph>vm.overcommit_ratio</codeph>的值：</p>
       <codeblock>vm.overcommit_ratio = (RAM - 0.026 * gp_vmem) / RAM</codeblock>
-      <p>See <xref href="#topic_dt3_fkv_r4/os_mem_config" format="dita"/> for more about about
-          <codeph>vm.overcommit_ratio</codeph>.</p>
-      <p>See also <xref href="workloads.xml#topic_hhc_z5w_r4"/>.</p>
+      <p>更多有关vm.overcommit_ratio的信息请见<xref href="#topic_dt3_fkv_r4/os_mem_config" format="dita"/>。</p>
+      <p>另见<xref href="workloads.xml#topic_hhc_z5w_r4"/>。</p>
     </section>
     <section id="statement_mem_config">
-      <title>Resource Queue Statement Memory Configuration</title>
-      <p>The <codeph>statement_mem</codeph> server configuration parameter is the amount of
-        memory to be allocated to any single query in a segment database. If a statement requires
-        additional memory it will spill to disk. Calculate the value for
-          <codeph>statement_mem</codeph> with the following formula: </p>
+      <title>资源队列语句内存配置</title>
+      <p><codeph>statement_mem</codeph>服务器配置参数是分配给segment数据库中任何单个查询的内存量。如果一个
+        语句要求额外的内存，它将溢出到磁盘。用下面的公式计算<codeph>statement_mem</codeph>的值：</p>
       <p>
         <codeph>(gp_vmem_protect_limit * .9) / max_expected_concurrent_queries </codeph>
       </p>
-      <p>For example, for 40 concurrent queries with <codeph>gp_vmem_protect_limit</codeph> set to
-        8GB (8192MB), the calculation for <codeph>statement_mem</codeph> would be: </p>
+      <p>例如，如果<codeph>gp_vmem_protect_limit</codeph>被设置为8GB（8192MB），对于40个并发查询，
+        <codeph>statement_mem</codeph>的计算可以是：</p>
       <p>
         <codeph>(8192MB * .9) / 40 = 184MB</codeph>
       </p>
-      <p>Each query would be allowed 184MB of memory before it must spill to disk. </p>
-      <p>To increase <codeph>statement_mem</codeph> safely you must either increase
-          <codeph>gp_vmem_protect_limit</codeph> or reduce the number of concurrent queries. To
-        increase <codeph>gp_vmem_protect_limit</codeph>, you must add physical RAM and/or swap
-        space, or reduce the number of segments per host.</p>
-      <p>Note that adding segment hosts to the cluster cannot help out-of-memory errors unless you
-        use the additional hosts to decrease the number of segments per host.</p>
-      <p>Spill files are created when there is not enough memory to fit all the mapper output,
-        usually when 80% of the buffer space is occupied. </p>
-      <p>Also, see <xref href="workloads.xml#topic_hhc_z5w_r4">Resource Management</xref> for best
-        practices for managing query memory using resource queues.</p>
+      <p>在每个查询被溢出到磁盘之前，它被允许使用184MB内存。</p>
+      <p>要安全地增加<codeph>statement_mem</codeph>的值，用户必须增加<codeph>gp_vmem_protect_limit</codeph>
+        或者减少并发的查询数量。要增加<codeph>gp_vmem_protect_limit</codeph>，用户必须增加物理RAM或者交换空间，
+        也可以减少每台主机上的segment数量。</p>
+      <p>注意在集群中增加segment主机无助于内存不足错误，除非用户使用额外的主机来减少每台主机上的segment数量。
+        </p>
+      <p>当不能提供足够的内存来映射所有的输出时，才会创建溢出文件。通常发生在缓存空间占据达到80%以上时。</p>
+      <p>另外，使用资源队列管理查询内存的最佳实践可参考<xref href="workloads.xml#topic_hhc_z5w_r4">资源管理</xref>。</p>
     </section>
     <section id="spill_files">
-      <title>Resource Queue Spill File Configuration</title>
-      <p>Greenplum Database creates <i>spill files</i> (also called <i>workfiles</i>) on disk if a
-        query is allocated insufficient memory to execute in memory. A single query can create no
-        more than 100,000 spill files, by default, which is sufficient for the majority of queries. </p>
-      <p>You can control the maximum number of spill files created per query and per segment with
-        the configuration parameter <codeph>gp_workfile_limit_files_per_query</codeph>. Set the
-        parameter to 0 to allow queries to create an unlimited number of spill files. Limiting the
-        number of spill files permitted prevents run-away queries from disrupting the system. </p>
-      <p>A query could generate a large number of spill files if not enough memory is allocated to
-        it or if data skew is present in the queried data. If a query creates more than the
-        specified number of spill files, Greenplum Database returns this error: </p>
+      <title>资源队列溢出文件配置</title>
+      <p>如果查询没有被分配足够的内存，Greenplum数据库会在磁盘上创建<i>溢出文件</i>（也被称为<i>工作文件</i>）。
+        默认单个查询可以创建不超过100,000个溢出文件，这对大部分查询来说都是足够的。</p>
+      <p>用户可以用配置参数<codeph>gp_workfile_limit_files_per_query</codeph>控制每个查询和每个segment
+        创建的溢出文件最大数量。设置该参数为0将允许查询创建无限个溢出文件。限制允许的溢出文件数量可以防止失控的
+        查询损坏系统。</p>
+      <p>如果一个查询没有被分配足够的内存或者被查询数据中存在数据倾斜，查询可能会生成大量溢出文件。如果查询创建
+        超过指定数量的溢出文件，Greenplum数据库会返回这个错误：</p>
       <p>
         <codeph>ERROR: number of workfiles per query limit exceeded</codeph>
       </p>
-      <p>Before raising the <codeph>gp_workfile_limit_files_per_query</codeph>, try reducing the
-        number of spill files by changing the query, changing the data distribution, or changing the
-        memory configuration.</p>
-      <p>The <codeph>gp_toolkit</codeph> schema includes views that allow you to see information
-        about all the queries that are currently using spill files. This information can be used for
-        troubleshooting and for tuning queries:</p>
+      <p>在增加<codeph>gp_workfile_limit_files_per_query</codeph>的值之前，尝试通过更改查询、改变数据分布
+        或者更改内存配置来降低溢出文件的数量。</p>
+      <p><codeph>gp_toolkit</codeph>模式包括一些视图可以允许用户查看所有正在使用溢出文件的查询的信息。这些信息
+        可以被用来排查故障以及查询调优：</p>
       <ul id="ul_dyd_1qq_bp">
-        <li>The <codeph>gp_workfile_entries</codeph> view contains one row for each operator using
-          disk space for workfiles on a segment at the current time. See <xref
-            href="tuning_queries.xml#reading_explain_plan"/>for information about operators.</li>
-        <li>The <codeph>gp_workfile_usage_per_query</codeph> view contains one row for each query
-          using disk space for workfiles on a segment at the current time.</li>
-        <li>The <codeph>gp_workfile_usage_per_segment</codeph> view contains one row for each
-          segment. Each row displays the total amount of disk space used for workfiles on the
-          segment at the current time.</li>
+        <li><codeph>gp_workfile_entries</codeph>视图中包含当前在某个segment上使用工作文件的操作。有关操作
+          的信息请见<xref href="tuning_queries.xml#reading_explain_plan"/>。</li>
+        <li><codeph>gp_workfile_usage_per_query</codeph>视图包含当前在某个segment上使用工作文件的查询。</li>
+        <li><codeph>gp_workfile_usage_per_segment</codeph>视图为包含segment信息。每一行显示当前在该
+          segment上用于工作文件的磁盘空间总量。</li>
       </ul>
-      <p>See the <i>Greenplum Database Reference Guide</i> for descriptions of the columns in these
-        views.</p>
-      <p>The <codeph>gp_workfile_compression</codeph> configuration parameter specifies whether
-        the spill files are compressed. It is <codeph>off</codeph> by default. Enabling compression
-        can improve performance when spill files are used.</p>
+      <p>这些视图中列的描述请见<i>Greenplum数据库参考指南</i>。</p>
+      <p><codeph>gp_workfile_compression</codeph>配置参数指定是否压缩溢出文件。默认设置为<codeph>off</codeph>。
+        启用压缩可以提高文件溢出时的性能。</p>
     </section>
   </body>
 </topic>

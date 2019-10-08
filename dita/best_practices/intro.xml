@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_rz1_cyj_gr">
-  <title>Greenplum Database Best Practices</title>
+  <title>Greenplum数据库最佳实践</title>
   <body>
-    <p>A best practice is a method or technique that has consistently shown results superior to
-      those achieved with other means. Best practices are found through experience and are proven to
-      reliably lead to a desired result. Best practices are a commitment to use any product
-      correctly and optimally, by leveraging all the knowledge and expertise available to ensure
-      success. </p>
-    <p>This document does not teach you how to use Greenplum Database features. Links are provided
-      to other relevant parts of the Greenplum Database documentation for information on how to use
-      and implement specific Greenplum Database features. This document addresses the most important
-      best practices to follow when designing, implementing, and using Greenplum Database. </p>
-    <p>It is not the intent of this document to cover the entire product or compendium of features,
-      but rather to provide a summary of <i>what matters most</i> in Greenplum Database. This
-      document does not address <i>edge</i> use cases.  While edge use cases can further leverage
-      and benefit from Greenplum Database features, they require a proficient knowledge and
-      expertise with these features, as well as a deep understanding of your environment, including
-      SQL access, query execution, concurrency, workload, and other factors. </p>
-    <p>By mastering these best practices, you will increase the success of your Greenplum Database
-      clusters in the areas of maintenance, support, performance, and scalability. </p>
+    <p>最佳实践是一种方法或技术，它得到的结果始终比用其他方法得到的要好。最佳实践通过实践得来并且被证明
+      能可靠地得到想要的结果。通过利用所有可用来确保成功的知识和技能，最佳实践是一种正确且最佳使用任意
+      产品的保证。</p>
+    <p>本文档不教授用户如何使用Greenplum数据库的特性。关于如何使用和实现特定的Greenplum数据库特性，
+      请参考Greenplum数据库文档其他部分提供的参考连接。这份文档主要致力于描述在设计、实现和使用
+      Greenplum数据库时可遵循的最佳实践。</p>
+    <p>本文档的目的并非覆盖整个产品或者特性的概要，而是提供Greenplum数据库中<i>要点</i>的摘要。
+      本文档不会介绍<i>边缘</i>用例。当然边缘用例能更好的利用Greenplum数据库特性并从中受益，
+      但是这些用例要求熟练运用用户已有的Greenplum知识和技能，以及对环境（包括SQL访问、查询执行、
+      并发、负载和其他因素）的深入理解。</p>
+    <p>通过掌握这些最佳实践，用户将能提升其Greenplum数据库集群在维护、支持、性能和扩展性领域的
+      成功率。</p>
   </body>
 </topic>
