@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_nz5_lnf_kp">
-  <title>Greenplum Database Utility Guide</title>
+  <title>Greenplum数据库工具指南</title>
   <!--HTML-only page-->
   <titlealts>
-    <navtitle>Utility Guide</navtitle>
+    <navtitle>工具指南</navtitle>
   </titlealts>
-  <shortdesc>Reference information for command-line utilities and client programs.</shortdesc>
+  <shortdesc>本文档介绍命令行工具和客户端程序的参考信息。</shortdesc>
 </topic>

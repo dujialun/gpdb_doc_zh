@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_hhc_z5w_r4">
-  <title>Memory and Resource Management with Resource Queues</title>
-  <shortdesc>Avoid memory errors and manage Greenplum Database resources.</shortdesc>
+  <title>采用资源队列管理内存和资源</title>
+  <shortdesc>避免内存错误，管理Greenplum数据库资源。</shortdesc>
   <body>
-    <note>Resource groups are a newer resource management scheme that enforces memory, CPU, and concurrent transaction limits in Greenplum Database. The <xref href="../admin_guide/wlmgmt.xml" format="dita" type="topic" scope="peer" >Managing Resources</xref> topic provides a comparison of the resource queue and the resource group management schemes. Refer to <xref href="../admin_guide/workload_mgmt_resgroups.xml" format="dita" type="topic" scope="peer">Using Resource Groups</xref> for configuration and usage information for this resource management scheme.</note>
-    <p>Memory management has a significant impact on performance in a Greenplum Database cluster.
-      The default settings are suitable for most environments. Do not change the default settings
-      until you understand the memory characteristics and usage on your system. </p>
+    <note>资源组是Greenplum数据库提供的用来强制限制内存、CPU和并发事务的全新资源管理模式。
+     <xref href="../admin_guide/wlmgmt.xml" format="dita" type="topic" scope="peer" >
+        管理资源组</xref>这个话题提供了对资源队列和资源组管理模式的比较。有关资源管理模式的配置和使用方法请见 
+      <xref href="../admin_guide/workload_mgmt_resgroups.xml" format="dita" type="topic" scope="peer">
+        使用资源组</xref>。</note>
+    <p>Greenplum数据库集群中，内存管理对性能有显著的影响。默认设置适合于大部分环境。不要更改默认设置，除非
+      理解系统上的内存特点和使用方法。</p>
     <ul id="ul_agm_sbl_zt">
       <li>
         <xref href="#topic_hhc_z5w_r4/section_jqw_qbl_zt" format="dita"/>
@@ -23,194 +26,149 @@
       </li>
     </ul>
     <section id="section_jqw_qbl_zt">
-      <title>Resolving Out of Memory Errors</title>
-      <p>An out of memory error message identifies the Greenplum segment, host, and process that
-        experienced the out of memory error. For
-        example:<codeblock>Out of memory (seg27 host.example.com pid=47093)
+      <title>解决内存不足错误</title>
+      <p>内存不足错误消息表明Greenplum的segment、主机和进程遇到了内存不足错误。例如：
+        <codeblock>Out of memory (seg27 host.example.com pid=47093)
 VM Protect failed to allocate 4096 bytes, 0 MB available</codeblock></p>
-      <p>Some common causes of out-of-memory conditions in Greenplum Database are: <ul
+      <p>Greenplum数据库中一些常见的导致内存不足的情况有：<ul
           id="ul_p2w_xhb_3r">
-          <li>Insufficient system memory (RAM) available on the cluster</li>
-          <li>Improperly configured memory parameters</li>
-          <li>Data skew at the segment level</li>
-          <li>Operational skew at the query level</li>
+        <li>集群上可用的系统内存（RAM）不足</li>
+        <li>内存参数配置不当</li>
+        <li>segment级别有数据倾斜</li>
+        <li>查询级别有操作性倾斜</li>
         </ul></p>
-      <p>Following are possible solutions to out of memory conditions:</p>
+      <p>下面是内存不足情况的可用解决方案：</p>
       <ul id="ul_yrd_c1l_zt">
-        <li>Tune the query to require less memory</li>
-        <li>Reduce query concurrency using a resource queue</li>
-        <li>Validate the <codeph>gp_vmem_protect_limit</codeph> configuration parameter at the
-          database level. See calculations for the maximum safe setting in <xref
-            href="#topic_hhc_z5w_r4/section_r52_rbl_zt" format="dita"/>.</li>
-        <li> Set the memory quota on a resource queue to limit the memory used by queries executed
-          within the resource queue</li>
-        <li>Use a session setting to reduce the <codeph>statement_mem</codeph> used by specific
-          queries</li>
-        <li>Decrease <codeph>statement_mem</codeph> at the database level</li>
-        <li>Decrease the number of segments per host in the Greenplum Database cluster. This
-          solution requires a re-initializing Greenplum Database and reloading your data.</li>
-        <li>Increase memory on the host, if possible. (Additional hardware may be required.)</li>
+        <li>调优查询以要求较少的内存</li>
+        <li>使用资源队列降低查询并发</li>
+        <li>在数据库级别上验证<codeph>gp_vmem_protect_limit</codeph>配置参数。最大安全设置的计算请见
+          <xref href="#topic_hhc_z5w_r4/section_r52_rbl_zt" format="dita"/>。</li>
+        <li>在资源队列上设置内存限额以限制资源队列中执行的查询所使用的内存</li>
+        <li>使用会话设置来降低特定查询使用的<codeph>statement_mem</codeph></li>
+        <li>在数据库级别降低<codeph>statement_mem</codeph></li>
+        <li>降低Greenplum集群中每台主机上的Segment数量。该操作要求重新出实话集群并重新加载数据。</li>
+        <li>如果可能，增加主机上的内存。（要求增加额外的硬件。）</li>
       </ul>
-      <p>Adding segment hosts to the cluster will not in itself alleviate out of memory problems.
-        The memory used by each query is determined by the <codeph>statement_mem</codeph> parameter
-        and it is set when the query is invoked. However, if adding more hosts allows decreasing the
-        number of segments per host, then the amount of memory allocated in
-          <codeph>gp_vmem_protect_limit</codeph> can be raised.</p>
+      <p>向集群中增加segment主机本身不会缓解内存不足问题。每个查询使用的内存由<codeph>statement_mem</codeph>
+        参数决定，并且在查询被调用时会设置它。不过，如果增加更多的主机允许每台主机上的segment数量降低，那么
+        <codeph>gp_vmem_protect_limit</codeph>中分配的内存量就可以上升。</p>
     </section>
     <section id="section113x" xml:lang="en">
-      <title>Low Memory Queries</title>
-        <p>A low <codeph>statement_mem</codeph> setting (for example, in the
-          1-3MB range) has been shown
-          to increase the performance of queries with low memory requirements. Use
-          the <codeph>statement_mem</codeph> server configuration parameter to
-          override the setting on a per-query basis. For example:
+      <title>低内存查询</title>
+        <p>较低的<codeph>statement_mem</codeph>设置（例如，在1-3MB之间）可以提升低内存查询的性能。
+          可以在语句级别设置<codeph>statement_mem</codeph>配置参数来覆盖系统默认值。例如：
           <codeblock>SET statement_mem='2MB';</codeblock></p>
     </section>
     <section id="section_r52_rbl_zt">
-      <title>Configuring Memory for Greenplum Database</title>
-      <p>Most out of memory conditions can be avoided if memory is thoughtfully managed. </p>
-      <p>It is not always possible to increase system memory, but you can prevent out-of-memory
-        conditions by configuring memory use correctly and setting up resource queues to manage
-        expected workloads. </p>
-      <p>It is important to include memory requirements for mirror segments that become primary
-        segments during a failure to ensure that the cluster can continue when primary segments or
-        segment hosts fail. </p>
-      <p>The following are recommended operating system and Greenplum Database memory settings:</p>
+      <title>为Greenplum数据库配置内存</title>
+      <p>如果合理地管理内存，大部分内存不足的情况是可以避免的。</p>
+      <p>一直增加系统内存是不可能的，客户可以通过配置资源组来管理可预期的工作负载，这样能够避免
+        内存溢出的情况发生。</p>
+      <p>当您配置资源组内存时，提前考虑出现segment实例或segment主机宕机时，镜像segment变成
+        主segment对系统内存的占用。</p>
+      <p>下面是推荐的操作系统以及Greenplum数据库内存设置：</p>
       <ul id="ul_xv2_phn_1s">
-        <li>Do not configure the OS to use huge pages. </li>
+        <li>不要启用操作系统大页配置</li>
         <li>
           <b>vm.overcommit_memory</b>
-          <p>This is a Linux kernel parameter, set in <codeph>/etc/sysctl.conf</codeph>. It should
-            always be set to 2. It determines the method the OS uses for determining how much memory
-            can be allocated to processes and 2 is the only safe setting for Greenplum Database.
+          <p>该Linux内核参数在<codeph>/etc/sysctl.conf</codeph>文件中设置，用来指定操作系统
+            分配给系统进程使用多少内存的方法。<codeph>vm.overcommit_memory</codeph>在
+            Greenplum数据库所在的机器上必须设置为2。
           </p>
         </li>
         <li>
           <b>vm.overcommit_ratio</b>
-          <p>This is a Linux kernel parameter, set in <codeph>/etc/sysctl.conf</codeph>. It is the
-            percentage of RAM that is used for application processes. The remainder is reserved for
-            the operating system. The default on Red Hat is 50. </p><p>Setting
-              <codeph>vm.overcommit_ratio</codeph> too high may result in not enough memory being
-            reserved for the operating system, which can result in segment host failure or database
-            failure. Setting the value too low reduces the amount of concurrency and query
-            complexity that can be run by reducing the amount of memory available to Greenplum
-            Database. When increasing the setting it is important to remember to always reserve some
-            memory for operating system activities. </p><p>See <xref
-              href="sysconfig.xml#topic_dt3_fkv_r4/segment_mem_config"/> for instructions to
-            calculate a value for <codeph>vm.overcommit_ratio</codeph>.</p></li>
+          <p>该Linux内核参数在<codeph>/etc/sysctl.conf</codeph>文件中设置，用来执行应用进程
+            可以使用的内存百分比；剩余的内存留给操作系统。操作系统默认值（Red Hat上默认是50）。</p>
+          <p>把<codeph>vm.overcommit_ratio</codeph>设置得太高可能会导致没有为操作系统保留足够的内存，
+            进而导致segment主机故障或者数据库故障。将这个值设置得太低会降低并发量和通过降低Greenplum
+            数据库可用内存量能运行的查询复杂度。当增加这一设置时，有必要记住总是为操作系统活动保留一些内存。
+          </p><p>有关计算<codeph>vm.overcommit_ratio</codeph>值的步骤，请见<xref
+              href="sysconfig.xml#topic_dt3_fkv_r4/segment_mem_config"/>。</p></li>
         <li>
           <b>gp_vmem_protect_limit</b>
-          <p>Use <codeph>gp_vmem_protect_limit</codeph> to set the maximum memory that the instance
-            can allocate for <i>all</i> work being done in each segment database. Never set this
-            value larger than the physical RAM on the system. If
-              <codeph>gp_vmem_protect_limit</codeph> is too high, it is possible for memory to
-            become exhausted on the system and normal operations may fail, causing segment failures.
-            If <codeph>gp_vmem_protect_limit</codeph> is set to a safe lower value, true memory
-            exhaustion on the system is prevented; queries may fail for hitting the limit, but
-            system disruption and segment failures are avoided, which is the desired behavior.
-            </p><p>See <xref href="sysconfig.xml#topic_dt3_fkv_r4/segment_mem_config"/> for
-            instructions to calculate a safe value for <codeph>gp_vmem_protect_limit</codeph>.</p>
+          <p>使用<codeph>gp_vmem_protect_limit</codeph>设置实例能够为在每个segment数据库中完成的<i>所有</i>
+            工作分配的最大内存。不要把这个值设置得高于系统上的物理RAM。如果<codeph>gp_vmem_protect_limit</codeph>
+            太高，有可能耗尽系统上的内存并且正常的操作可能会失败，导致segment故障。如果<codeph>gp_vmem_protect_limit</codeph>
+            被设置为一个安全的较低值，系统上真正的内存耗尽就能避免。查询可能会因为达到限制而失败，但是系统崩溃和
+            segment故障可以避免，这也是我们想要的行为。
+          </p><p>有关计算<codeph>gp_vmem_protect_limit</codeph>安全值的步骤，请见
+            <xref href="sysconfig.xml#topic_dt3_fkv_r4/segment_mem_config"/>。</p>
         </li>
         <li>
           <b>runaway_detector_activation_percent</b>
-          <p>Runaway Query Termination, introduced in Greenplum Database 4.3.4, prevents out of
-            memory conditions. The <codeph>runaway_detector_activation_percent</codeph> system
-            parameter controls the percentage of <codeph>gp_vmem_protect_limit</codeph> memory
-            utilized that triggers termination of queries. It is set on by default at 90%. If the
-            percentage of <codeph>gp_vmem_protect_limit memory</codeph> that is utilized for a
-            segment exceeds the specified value, Greenplum Database terminates queries based on
-            memory usage, beginning with the query consuming the largest amount of memory. Queries
-            are terminated until the utilized percentage of <codeph> gp_vmem_protect_limit</codeph>
-            is below the specified percentage.</p>
+          <p>失控查询终止在Greenplum数据库4.3.4中被引入，它能防止内存不足的问题。
+            <codeph>runaway_detector_activation_percent</codeph>系统参数控制触发查询终止的
+            <codeph>gp_vmem_protect_limit</codeph>内存利用率。默认它被设置为90%。如果一个segment
+            利用的<codeph>gp_vmem_protect_limit memory</codeph>内存的百分比超过指定的值，Greenplum
+            数据库会基于内存使用终止查询，从消耗内存量最大的查询开始。查询会被挨个终止直至
+            <codeph> gp_vmem_protect_limit</codeph>的利用率重新低于指定的百分比。</p>
         </li>
         <li>
           <b>statement_mem</b>
-          <p>Use <codeph>statement_mem</codeph> to allocate memory used for a query per segment
-            database. If additional memory is required it will spill to disk. Set the optimal value
-            for <codeph>statement_mem</codeph> as follows:
-            <codeblock>(vmprotect * .9) / max_expected_concurrent_queries</codeblock></p><p>The
-            default value of <codeph>statement_mem</codeph> is 125MB. For example, a query running
-            on a Dell EMC DCA V2 system using the default <codeph>statement_mem</codeph> value will use
-            1GB of memory on each segment server (8 segments ⨉ 125MB). Set
-              <codeph>statement_mem</codeph> at the session level for specific queries that require
-            additional memory to complete. This setting works well to manage query memory on
-            clusters with low concurrency. For clusters with high concurrency also use resource
-            queues to provide additional control on what and how much is running on the system. </p>
+          <p>使用<codeph>statement_mem</codeph>分配每个segment数据库中一个查询所使用的内存。如果要求额外的内存，
+            将会溢出到磁盘。按照下面的方式为<codeph>statement_mem</codeph>设置最优值：
+            <codeblock>(vmprotect * .9) / max_expected_concurrent_queries</codeblock></p>
+          <p><codeph>statement_mem</codeph>的默认值是125MB。例如，一个使用默认<codeph>statement_mem</codeph>
+            值运行在Dell EMC DCA V2系统上的查询将在每台segment服务器上使用1GB内存（8个Segment ⨉ 125MB）。
+            为要求额外内存完成的特定查询在会话级别上设置<codeph>statement_mem</codeph>。在并发性低的集群上这种
+            设置可以很好地管理查询内存。对于高并发的集群还是要使用资源队列来控制在系统上运行什么以及运行多少。</p>
         </li>
         <li>
           <b>gp_workfile_limit_files_per_query</b>
-          <p>Set <codeph>gp_workfile_limit_files_per_query</codeph> to limit the maximum number of
-            temporary spill files (workfiles) allowed per query. Spill files are created when a
-            query requires more memory than it is allocated. When the limit is exceeded the query is
-            terminated. The default is zero, which allows an unlimited number of spill files and may
-            fill up the file system. </p>
+          <p>设置<codeph>gp_workfile_limit_files_per_query</codeph>以限制每个查询允许使用的临时溢出文件
+            （工作文件）的最大数量。当查询要求的内存比它能分配的更多时，它将创建溢出文件。当上述限制被超过时，查询
+            会被中止。默认值为零，允许无限多的溢出文件并且可能会填满文件系统。</p>
         </li>
         <li>
           <p>
             <b>gp_workfile_compression</b>
           </p>
-          <p>If there are numerous spill files then set
-              <codeph>gp_workfile_compression</codeph> to compress the spill files.
-            Compressing spill files may help to avoid overloading the disk subsystem with IO
-            operations. </p>
+          <p>如果有很多溢出文件，则设置<codeph>gp_workfile_compression</codeph>来压缩这些溢出文件。
+            压缩溢出文件可能有助于避免IO操作导致磁盘子系统过载。</p>
         </li>
       </ul>
     </section>
     <section id="configuring_rq">
-      <title>Configuring Resource Queues</title>
-      <p>Greenplum Database resource queues provide a powerful mechanism for managing the workload
-        of the cluster. Queues can be used to limit both the numbers of active queries and the
-        amount of memory that can be used by queries in the queue. When a query is submitted to
-        Greenplum Database, it is added to a resource queue, which determines if the query should be
-        accepted and when the resources are available to execute it. </p>
+      <title>配置资源队列</title>
+      <p>Greenplum数据库的资源队列为管理集群负载提供了一种强有力的机制。队列可以被用来限制活动查询的数量以及
+        队列中查询可使用的内存量。当查询被提交给Greenplum数据库时，它会被加入一个资源队列，资源队列会决定该查询
+        是否应该被接受并且何时有资源可用来执行它。</p>
       <ul id="ul_svy_b3n_1s">
         <li>
-          <p>Associate all roles with an administrator-defined resource queue.</p>
-          <p>Each login user (role) is associated with a single resource queue; any query the user
-            submits is handled by the associated resource queue. If a queue is not explicitly
-            assigned the user's queries are handed by the default queue,
-            <codeph>pg_default</codeph>. </p>
+          <p>为所有用户分配预定义好的资源队列。</p>
+          <p>每个登录用户（角色）都被关联到单个资源队列，任何该用户提交的查询都由关联的资源队列处理。如果没有为
+            用户的查询明确地分派一个队列，则会由默认队列<codeph>pg_default</codeph>处理。</p>
         </li>
         <li>
-          <p>Do not run queries with the gpadmin role or other superuser roles. </p>
-          <p>Superusers are exempt from resource queue limits, therefore superuser queries always
-            run regardless of the limits set on their assigned queue.</p>
+          <p>不要用gpadmin角色或者其他超级用户角色运行查询。</p>
+          <p>超级用户会被从资源队列限制中排除，因此超级用户的查询运行不会考虑在其所属队列上设置的限制。</p>
         </li>
         <li>
-          <p>Use the <codeph>ACTIVE_STATEMENTS</codeph> resource queue parameter to limit the number
-            of active queries that members of a particular queue can run concurrently. </p>
+          <p>使用<codeph>ACTIVE_STATEMENTS</codeph>资源队列参数来限制特定队列成员能够并发运行的活动查询数量。</p>
         </li>
         <li>
-          <p>Use the <codeph>MEMORY_LIMIT</codeph> parameter to control the total amount of memory
-            that queries running through the queue can utilize. By combining the
-              <codeph>ACTIVE_STATEMENTS</codeph> and <codeph>MEMORY_LIMIT</codeph> attributes an
-            administrator can fully control the activity emitted from a given resource queue. </p>
-          <p>The allocation works as follows: Suppose a resource queue,
-              <codeph>sample_queue</codeph>, has <codeph>ACTIVE_STATEMENTS</codeph> set to 10 and
-              <codeph>MEMORY_LIMIT</codeph> set to 2000MB. This limits the queue to approximately 2
-            gigabytes of memory per segment. For a cluster with 8 segments per server, the total
-            usage per server is 16 GB for <codeph>sample_queue</codeph> (2GB * 8 segments/server).
-            If a segment server has 64GB of RAM, there could be no more than four of this type of
-            resource queue on the system before there is a chance of running out of memory (4 queues
-            * 16GB per queue). </p>
-          <p>Note that by using <codeph>STATEMENT_MEM</codeph>, individual queries running in the
-            queue can allocate more than their "share" of memory, thus reducing the memory available
-            for other queries in the queue.</p>
+          <p>使用<codeph>MEMORY_LIMIT</codeph>参数控制通过队列运行的查询可以利用的内存总量。通过组合
+            <codeph>ACTIVE_STATEMENTS</codeph>和<codeph>MEMORY_LIMIT</codeph>属性，管理员可以完全控制
+            从一个给定资源队列发出的活动。</p>
+          <p>分配按如下方式进行：假定资源队列<codeph>sample_queue</codeph>的<codeph>ACTIVE_STATEMENTS</codeph>
+            被设置为10，而<codeph>MEMORY_LIMIT</codeph>被设置为2000MB。这限制该队列在每个segment上使用大约2GB内存。
+            对于每台服务器有8个segment的集群，<codeph>sample_queue</codeph>在每台服务器上的总用量是16GB
+            （2GB * 8 Segment/服务器）。如果segment服务器有64GB内存，系统中可以有不超过四个这种资源队列，
+            再多就会内存不足（4队列 * 16GB/队列）。</p>
+          <p>注意通过使用<codeph>STATEMENT_MEM</codeph>，运行在队列中的个体查询能够分配超过其内存“份额”的内存，
+            从而降低队列中其他查询可用的内存。</p>
         </li>
         <li>
-          <p>Resource queue priorities can be used to align workloads with desired outcomes. Queues
-            with <codeph>MAX</codeph> priority throttle activity in all other queues until the
-              <codeph>MAX</codeph> queue completes running all queries.</p>
+          <p>资源队列优先级可以被用来排列具有预期结果的负载。带有<codeph>MAX</codeph>优先权的队列会扼杀所有
+            其他队列中的活动，直至<codeph>MAX</codeph>队列完成所有查询的运行。</p>
         </li>
         <li>
-          <p>Alter resource queues dynamically to match the real requirements of the queue for the
-            workload and time of day. You can script an operational flow that changes based on the
-            time of day and type of usage of the system and add <codeph>crontab</codeph> entries to
-            execute the scripts.</p>
+          <p>根据负载和现状动态修改资源队列以匹配队列的实际需求。用户可以把这些更改写成脚本并且增加
+            <codeph>crontab</codeph>项来执行这些脚本。</p>
         </li>
         <li>
-          <p>Use gptoolkit to view resource queue usage and to understand how the queues are
-            working.</p>
+          <p>使用gptoolkit查看资源队列使用以及理解队列如何工作。</p>
         </li>
       </ul>
     </section>

@@ -1,99 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_fj5_b1x_r4">
-  <title>Loading Data</title>
-  <shortdesc>Description of the different ways to add data to Greenplum Database.</shortdesc>
+  <title>装载数据</title>
+  <shortdesc>本节描述了将数据装载到Greenplum数据库的不同方式。</shortdesc>
   <topic id="topic_tmf_t2t_bp">
-    <title>INSERT Statement with Column Values</title>
+    <title>带列值的INSERT语句</title>
     <body>
-      <p>A singleton <codeph>INSERT</codeph> statement with values adds a single row to a table. The
-        row flows through the master and is distributed to a segment. This is the slowest method and
-        is not suitable for loading large amounts of data.</p>
+      <p>带有值的单个<codeph>INSERT</codeph>语句会向表中加入一行。这个行会流过master并且被分布到一个segment上。
+        这是最慢的方法并且不适合装载大量数据。</p>
     </body>
   </topic>
   <topic id="topic_oqb_y2t_bp">
-    <title>COPY Statement</title>
+    <title>COPY语句</title>
     <body>
-      <p>The PostgreSQL <codeph>COPY</codeph> statement copies data from an external file into a
-        database table. It can insert multiple rows more efficiently than an <codeph>INSERT</codeph>
-        statement, but the rows are still passed through the master. All of the data is copied in
-        one command; it is not a parallel process.</p>
-      <p>Data input to the <codeph>COPY</codeph> command is from a file or the standard input. For
-        example: <codeblock>COPY table FROM '/data/mydata.csv' WITH CSV HEADER;</codeblock>Use
-          <codeph>COPY</codeph> to add relatively small sets of data, for example dimension tables
-        with up to ten thousand rows, or one-time data loads. </p>
-      <p>Use <codeph>COPY</codeph> when scripting a process that loads small amounts of data, less
-        than 10 thousand rows. </p>
-      <p>Since COPY is a single command, there is no need to disable autocommit when you use this
-        method to populate a table.</p>
-      <p>You can run multiple concurrent <codeph>COPY</codeph> commands to improve performance. </p>
+      <p>PostgreSQL的<codeph>COPY</codeph>语句从外部文件拷贝数据到数据表中。它比<codeph>INSERT</codeph>
+        语句插入多行的效率更高，但是行仍需流过master。所有数据都在一个命令中被拷贝，它并不是一种并行处理。</p>
+      <p><codeph>COPY</codeph>命令的数据输入来自于一个文件或者标准输入。例如：
+        <codeblock>COPY table FROM '/data/mydata.csv' WITH CSV HEADER;</codeblock>
+        使用<codeph>COPY</codeph>适合于增加相对较小的数据集合（例如多达上万行的维度表）或者一次性数据装载。</p>
+      <p>在编写脚本处理装载少于1万行的少量数据时使用<codeph>COPY</codeph>。</p>
+      <p>因为COPY是一个单一命令，在使用这种方法填充表时没有必要禁用自动提交。</p>
+      <p>使用者可以运行多个并发的<codeph>COPY</codeph>命令以提高性能。</p>
     </body>
   </topic>
   <topic id="topic_kgp_z2t_bp">
-    <title>External Tables</title>
+    <title>外部表</title>
     <body>
-      <p>External tables provide access to data in sources outside of Greenplum Database. They can
-        be accessed with <codeph>SELECT</codeph> statements and are commonly used with the Extract,
-        Load, Transform (ELT) pattern, a variant of the Extract, Transform, Load (ETL) pattern that
-        takes advantage of Greenplum Database's fast parallel data loading capability.</p>
-      <p>With ETL, data is extracted from its source, transformed outside of the database using
-        external transformation tools, such as Informatica or Datastage, and then loaded into the
-        database.</p>
-      <p>With ELT, Greenplum external tables provide access to data in external sources, which could
-        be read-only files (for example, text, CSV, or XML files), Web servers, Hadoop file systems,
-        executable OS programs, or the Greenplum <codeph>gpfdist</codeph> file server, described in
-        the next section. External tables support SQL operations such as select, sort, and join so
-        the data can be loaded and transformed simultaneously, or loaded into a <i>load table</i>
-        and transformed in the database into target tables. </p>
-      <p>The external table is defined with a <codeph>CREATE EXTERNAL TABLE</codeph> statement,
-        which has a <codeph>LOCATION</codeph> clause to define the location of the data and a
-          <codeph>FORMAT</codeph> clause to define the formatting of the source data so that the
-        system can parse the input data. Files use the <codeph>file://</codeph> protocol, and must
-        reside on a segment host in a location accessible by the Greenplum superuser. The data can
-        be spread out among the segment hosts with no more than one file per primary segment on each
-        host. The number of files listed in the <codeph>LOCATION</codeph> clause is the number of
-        segments that will read the external table in parallel. </p>
+      <p>外部表提供了对Greenplum数据库之外的数据来源的访问。可以用<codeph>SELECT</codeph>语句访问它们，外部表
+        通常被用于抽取、装载、转换（ELT）模式，这是一种抽取、转换、装载（ETL）模式的变种，这种模式可以利用
+        Greenplum数据库的快速并行数据装载能力。</p>
+      <p>通过ETL，数据被从其来源抽取，在数据库外部使用外部转换工具（Informatica或者Datastage）转换，然后
+        被装载到数据库中。</p>
+      <p>通过ELT，Greenplum外部表提供对外部来源中数据的访问，外部来源可以是只读文件（例如文本、CSV或者XML文件）、
+        Web服务器、Hadoop文件系统、可执行的OS程序或者Greenplum <codeph>gpfdist</codeph>文件服务器，这些在
+        下一节中描述。外部表支持选择、排序和连接这样的SQL操作，这样数据可以被同时装载和转换，或者被装载到一个
+        <i>装载表</i>并且在数据库内被转换成目标表。</p>
+      <p>外部表使用<codeph>CREATE EXTERNAL TABLE</codeph>语句定义，该语句有一个<codeph>LOCATION</codeph>
+        子句定义数据的位置以及一个<codeph>FORMAT</codeph>子句定义源数据的格式，这样系统才能够解析输入数据。
+        文件使用<codeph>file://</codeph>协议，并且文件必须位于一台segment主机上由Greenplum超级用户可访问
+        的位置。数据可以被分散在segment主机上，并且每台主机上的每个主segment有不超过一个文件。<codeph>LOCATION</codeph>
+        子句中列出的文件的数量是将并行读取该外部表的segment的数量。</p>
     </body>
   </topic>
   <topic id="topic_x2l_bft_bp">
-    <title>External Tables with Gpfdist</title>
+    <title>使用Gpfdist外部表</title>
     <body>
-      <p>The fastest way to load large fact tables is to use external tables with
-          <codeph>gpdist</codeph>. <codeph>gpfdist</codeph> is a file server program using an HTTP
-        protocol that serves external data files to Greenplum Database segments in parallel. A
-          <codeph>gpfdist</codeph> instance can serve 200 MB/second and many
-          <codeph>gpfdist</codeph> processes can run simultaneously, each serving up a portion of
-        the data to be loaded. When you begin the load using a statement such as <codeph>INSERT INTO
-          &lt;table> SELECT * FROM &lt;external_table></codeph>, the <codeph>INSERT</codeph>
-        statement is parsed by the master and distributed to the primary segments. The segments
-        connect to the <codeph>gpfdist</codeph> servers and retrieve the data in parallel, parse and
-        validate the data, calculate a hash from the distribution key data and, based on the hash
-        key, send the row to its destination segment. By default, each <codeph>gpfdist</codeph>
-        instance will accept up to 64 connections from segments. With many segments and
-          <codeph>gpfdist</codeph> servers participating in the load, data can be loaded at very
-        high rates. </p>
-      <p>Primary segments access external files in parallel when using <codeph>gpfdist</codeph> up
-        to the value of <codeph>gp_external_max_segments</codeph>. When optimizing
-          <codeph>gpfdist</codeph> performance, maximize the parallelism as the number of segments
-        increase. Spread the data evenly across as many ETL nodes as possible. Split very large data
-        files into equal parts and spread the data across as many file systems as possible. </p>
-      <p>Run two <codeph>gpfdist</codeph> instances per file system. <codeph>gpfdist</codeph> tends
-        to be CPU bound on the segment nodes when loading. But if, for example, there are eight
-        racks of segment nodes, there is lot of available CPU on the segments to drive more
-          <codeph>gpfdist</codeph> processes. Run <codeph>gpfdist</codeph> on as many interfaces as
-        possible. Be aware of bonded NICs and be sure to start enough <codeph>gpfdist</codeph>
-        instances to work them. </p>
-      <p>It is important to keep the work even across all these resources. The load is as fast as
-        the slowest node. Skew in the load file layout will cause the overall load to bottleneck on
-        that resource.</p>
-      <p>The <codeph>gp_external_max_segs</codeph> configuration parameter controls the number of
-        segments each <codeph>gpfdist</codeph> process serves. The default is 64. You can set a
-        different value in the <codeph>postgresql.conf</codeph> configuration file on the master.
-        Always keep <codeph>gp_external_max_segs</codeph> and the number of <codeph>gpfdist</codeph>
-        processes an even factor; that is, the <codeph>gp_external_max_segs</codeph> value should be
-        a multiple of the number of <codeph>gpfdist</codeph> processes. For example, if there are 12
-        segments and 4 <codeph>gpfdist</codeph> processes, the planner round robins the segment
-        connections as follows:
+      <p>装载大型事实表的最快方式是使用基于<codeph>gpdist</codeph>的外部表。<codeph>gpfdist</codeph>
+        是一个使用HTTP协议的文件服务器程序，它以并行的方式向Greenplum数据库的segment供应外部数据文件。
+        一个<codeph>gpfdist</codeph>实例每秒能供应200MB并且很多<codeph>gpfdist</codeph>进程可以
+        同时运行，每一个供应要被装载的数据的一部分。当使用者用<codeph>INSERT INTO &lt;table> SELECT * FROM &lt;external_table></codeph>
+        这样的语句开始装载时，<codeph>INSERT</codeph>语句会被master解析并且分布给主segment。segment
+        连接到<codeph>gpfdist</codeph>服务器并且并行检索数据，解析并验证数据，从分布键数据计算一个哈希值
+        并且基于哈希键把行发送给它的目标segment。每个<codeph>gpfdist</codeph>实例默认将接受最多64个
+        来自segment的连接。通过让更多的segment和<codeph>gpfdist</codeph>服务器参与到装载处理中，可以
+        以非常高的速度进行数据装载。</p>
+      <p>在使用<codeph>gpfdist</codeph>数量达到配置参数<codeph>gp_external_max_segments</codeph>
+        的最大值时，主segment会并行访问外部文件。在优化<codeph>gpfdist</codeph>的性能时，随着
+        segment的数量增加会最大化并行性。在尽可能多的ETL节点上均匀地散布数据。将非常大型的数据文件
+        分解成相等的部分，并且把数据分散在尽可能多的文件系统上。</p>
+      <p>在每个文件系统上运行两个<codeph>gpfdist</codeph>实例。在装载数据时，<codeph>gpfdist</codeph>
+        在segment节点上容易变成CPU密集型的操作。举个例子，如果有八个机架的segment节点，在segment上就有大量
+        可用的CPU来驱动更多的<codeph>gpfdist</codeph>进程。在尽可能多的接口上运行<codeph>gpfdist</codeph>。
+        要注意绑定网卡并且确保启动足够的<codeph>gpfdist</codeph>实例配合它们一起工作。</p>
+      <p>有必要在所有这些资源上保持工作处于均衡状态。装载的速度与最慢的节点相同。装载文件布局上的倾斜将导致
+        整体装载受制于资源瓶颈。</p>
+      <p><codeph>gp_external_max_segs</codeph>配置参数控制每个<codeph>gpfdist</codeph>进程能服务的
+        segment数量。默认值是64。使用者可以在saster上的<codeph>postgresql.conf</codeph>配置文件中设置
+        一个不同的值。总是保持<codeph>gp_external_max_segs</codeph>和<codeph>gpfdist</codeph>进程的
+        数量为一个偶因子，也就是说<codeph>gp_external_max_segs</codeph>值应该是<codeph>gpfdist</codeph>
+        进程数的倍数。例如，如果有12个segment和4个<codeph>gpfdist</codeph>进程，规划器会按照下面的方式
+        循环分配segment连接：
         <screen>Segment 1  - gpfdist 1 
 Segment 2  - gpfdist 2 
 Segment 3  - gpfdist 3 
@@ -106,92 +82,74 @@ Segment 9  - gpfdist 1
 Segment 10 - gpfdist 2 
 Segment 11 - gpfdist 3 
 Segment 12 - gpfdist 4</screen></p>
-      <p>Drop indexes before loading into existing tables and re-create the index after loading.
-        Creating an index on pre-existing data is faster than updating it incrementally as each row
-        is loaded. </p>
-      <p>Run <codeph>ANALYZE</codeph> on the table after loading. Disable automatic statistics
-        collection during loading by setting <codeph>gp_autostats_mode</codeph> to
-          <codeph>NONE</codeph>. Run <codeph>VACUUM</codeph> after load errors to recover space. </p>
-      <p>Performing small, high frequency data loads into heavily partitioned column-oriented tables
-        can have a high impact on the system because of the number of physical files accessed per
-        time interval.</p>
+      <p>在装载到已有表之前删除索引，并且在装载之后重建索引。在装载完数据后重新创建索引比装载每行时增量更新
+        索引更快。</p>
+      <p>装载后在表上运行<codeph>ANALYZE</codeph>。在装载期间通过设置<codeph>gp_autostats_mode</codeph>
+        为<codeph>NONE</codeph>来禁用自动统计信息收集。在装载出错后运行<codeph>VACUUM</codeph>来回收空间。</p>
+      <p>对重度分区的列存表执行少量高频的数据装载可能会对系统有很大影响，因为在每个时间间隔内被访问的物理文件会很多。</p>
     </body>
   </topic>
   <topic id="topic_xyt_cft_bp">
     <title>Gpload</title>
     <body>
-      <p><codeph>gpload</codeph> is a data loading utility that acts as an interface to the
-        Greenplum external table parallel loading feature. </p>
-      <p>Beware of using <codeph>gpload</codeph> as it can cause catalog bloat by creating and
-        dropping external tables. Use <codeph>gpfdist</codeph> instead, since it provides the best
-        performance. </p>
-      <p><codeph>gpload</codeph> executes a load using a specification defined in a YAML-formatted
-        control file. It performs the following operations:<ul id="ul_zrl_dnp_y4">
-          <li>Invokes <codeph>gpfdist</codeph> processes</li>
-          <li>Creates a temporary external table definition based on the source data defined</li>
-          <li>Executes an <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or
-              <codeph>MERGE</codeph> operation to load the source data into the target table in the
-            database</li>
-          <li>Drops the temporary external table</li>
-          <li>Cleans up <codeph>gpfdist</codeph> processes</li>
+      <p><codeph>gpload</codeph>是一种数据装载工具，它扮演着Greenplum外部表并行装载特性的接口的角色。
+        </p>
+      <p>要当心对<codeph>gpload</codeph>的使用，因为它会创建并且删除外部表，从而可能会导致系统目录膨胀。
+        可转而使用<codeph>gpfdist</codeph>，因为它能提供最好的性能。</p>
+      <p><codeph>gpload</codeph>使用定义在一个YAML格式的控制文件中的规范来执行一次装载。它会执行下列操作：
+        <ul id="ul_zrl_dnp_y4">
+          <li>调用<codeph>gpfdist</codeph>进程</li>
+          <li>基于定义的源数据创建一个临时的外部表定义</li>
+          <li>执行<codeph>INSERT</codeph>、<codeph>UPDATE</codeph>或者<codeph>MERGE</codeph>操作
+            将源数据载入数据库中的目标表</li>
+          <li>删除临时外部表</li>
+          <li>清除<codeph>gpfdist</codeph>进程</li>
         </ul></p>
-      <p>The load is accomplished in a single transaction. </p>
+      <p>装载会在单个事务中完成。</p>
     </body>
   </topic>
   <topic id="topic_ryr_2ft_bp">
-    <title>Best Practices</title>
+    <title>最佳实践</title>
     <body>
       <ul id="ul_kvl_jvs_x4">
-        <li>Drop any indexes on an existing table before loading data and recreate the indexes after
-          loading. Newly creating an index is faster than updating an index incrementally as each
-          row is loaded.</li>
-        <li>Disable automatic statistics collection during loading by setting the
-            <codeph>gp_autostats_mode</codeph> configuration parameter to
-          <codeph>NONE</codeph>.</li>
-        <li>External tables are not intended for frequent or ad hoc access.</li>
-        <li>External tables have no statistics to inform the optimizer. You can set rough estimates
-          for the number of rows and disk pages for the external table in the
-            <codeph>pg_class</codeph> system catalog with a statement like the
-          following:<codeblock>UPDATE pg_class SET reltuples=400000, relpages=400
+        <li>在装载数据之前删掉现有表上的任何索引，并且在装载之后重建那些索引。新创建索引比装载每行时
+          增量更新索引更快。</li>
+        <li>在装载期间通过将<codeph>gp_autostats_mode</codeph>配置参数设置为<codeph>NONE</codeph>
+          禁用自动统计信息收集。</li>
+        <li>外部表并非为频繁访问或者ad hoc访问而设计。</li>
+        <li>外部表没有统计信息来告知优化器。可以用下面这样的语句在<codeph>pg_class</codeph>系统目录中为
+          外部表设置粗略的行数和磁盘页数估计：
+          <codeblock>UPDATE pg_class SET reltuples=400000, relpages=400
 WHERE relname='myexttable';</codeblock></li>
-        <li>When using <codeph>gpfdist</codeph>, maximize network bandwidth by running one
-            <codeph>gpfdist</codeph> instance for each NIC on the ETL server. Divide the source data
-          evenly between the <codeph>gpfdist</codeph> instances.</li>
-        <li>When using <codeph>gpload</codeph>, run as many simultaneous <codeph>gpload</codeph>
-          instances as resources allow. Take advantage of the CPU, memory, and networking resources
-          available to increase the amount of data that can be transferred from ETL servers to the
-          Greenplum Database.</li>
-        <li>Use the <codeph>SEGMENT REJECT LIMIT</codeph> clause of the <codeph>COPY</codeph>
-          statement to set a limit for the number or percentage of rows that can have errors before
-          the <codeph>COPY FROM</codeph> command is aborted. The reject limit is per segment; when
-          any one segment exceeds the limit, the command is aborted and no rows are added. Use the
-            <codeph>LOG ERRORS</codeph> clause to save error rows. If a row has errors in the
-          formatting&#8212;for example missing or extra values, or incorrect data
-          types&#8212;Greenplum Database stores the error information and row internally. Use the
-            <codeph>gp_read_error_log()</codeph> built-in SQL function to access this stored
-          information.</li>
-        <li>If the load has errors, run <codeph>VACUUM</codeph> on the table to recover space.</li>
-        <li>After you load data into a table, run <codeph>VACUUM</codeph> on heap tables, including
-          system catalogs, and <codeph>ANALYZE</codeph> on all tables. It is not necessary to run
-            <codeph>VACUUM</codeph> on append-optimized tables. If the table is partitioned, you can
-          vacuum and analyze just the partitions affected by the data load. These steps clean up any
-          rows from aborted loads, deletes, or updates and update statistics for the table.</li>
-        <li>Recheck for segment skew in the table after loading a large amount of data. You can use
-          a query like the following to check for
-          skew:<codeblock outputclass="language-sql">SELECT gp_segment_id, count(*) 
+        <li>在使用<codeph>gpfdist</codeph>时，通过为ETL服务器上的每一块NIC运行一个<codeph>gpfdist</codeph>
+          实例以最大化网络带宽。在<codeph>gpfdist</codeph>实例之间均匀地划分源数据。</li>
+        <li>在使用<codeph>gpload</codeph>时，在资源允许的情况下同时运行尽可能多的<codeph>gpload</codeph>
+          实例。利用可用的CPU、内存和网络资源以增加能从ETL服务器传输到Greenplum数据库的数据量。</li>
+        <li>使用<codeph>COPY</codeph>语句的<codeph>SEGMENT REJECT LIMIT</codeph>子句设置在
+          <codeph>COPY FROM</codeph>命令被中止之前可以出现错误的行的百分数限制。这个拒绝限制是针对每个
+          segment的，当任意一个segment超过该限制时，命令将被中止且不会有行被增加。使用<codeph>LOG ERRORS</codeph>
+          子句可以保存错误行。如果有一行在格式上有错误&#8212;例如缺少值或者有多余的值，或者数据类型不对&#8212;
+          Greenplum数据库会在内部存储错误信息和行。使用内建SQL函数<codeph>gp_read_error_log()</codeph>
+          可以访问这种存储下来的信息。</li>
+        <li>如果装载出现错误，在该表上运行<codeph>VACUUM</codeph>以恢复空间。</li>
+        <li>在用户装载数据到表中后，在堆表（包括系统目录）上运行<codeph>VACUUM</codeph>，并且在所有的表上运行
+          <codeph>ANALYZE</codeph>。没有必要在追加优化表上运行<codeph>VACUUM</codeph>。如果表已经被分过区，
+          用户可以只清理和分析受数据装载影响的分区。这些步骤会清除来自于被中止的装载、删除或者更新中的行并且为表
+          更新统计信息。</li>
+        <li>在装载大量数据之后重新检查表中的segment倾斜。用户可以使用下面这样的查询来检查倾斜：
+          <codeblock outputclass="language-sql">SELECT gp_segment_id, count(*) 
 FROM <i>schema.table</i> 
 GROUP BY gp_segment_id ORDER BY 2;</codeblock></li>
-        <li>By default, <codeph>gpfdist</codeph> assumes a maximum record size of 32K. To load data
-          records larger than 32K, you must increase the maximum row size parameter by specifying
-          the <codeph>-m &lt;<i>bytes</i>></codeph> option on the <codeph>gpfdist</codeph> command
-          line. If you use <codeph>gpload</codeph>, set the <codeph>MAX_LINE_LENGTH</codeph>
-          parameter in the <codeph>gpload</codeph> control file.<note>Integrations with Informatica
-            Power Exchange are currently limited to the default 32K record length.</note></li>
+        <li><codeph>gpfdist</codeph>默认假定最大记录尺寸为32K。要装载大于32K的数据记录，用户必须通过在
+          <codeph>gpfdist</codeph>命令行上指定<codeph>-m &lt;<i>bytes</i></codeph>选项来增加最大行
+          尺寸参数。如果用户使用的是<codeph>gpload</codeph>，在<codeph>gpload</codeph>控制文件中设置
+          <codeph>MAX_LINE_LENGTH</codeph>参数。
+          <note>与Informatica Power Exchange的集成当前被限制为默认的32K记录长度。</note></li>
       </ul>
       <section>
-        <title>Additional Information</title>
-        <p>See the <i>Greenplum Database Reference Guide</i> for detailed instructions for loading
-          data using <codeph>gpfdist</codeph> and <codeph>gpload</codeph>.</p>
+        <title>额外信息</title>
+        <p>使用<codeph>gpfdist</codeph>和<codeph>gpload</codeph>装载数据的详细指导步骤请见
+          <i>Greenplum数据库参考指南</i>。</p>
       </section>
     </body>
   </topic>
