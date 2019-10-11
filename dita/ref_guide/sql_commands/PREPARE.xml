@@ -1,75 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="dx20941">PREPARE</title><body><p id="sql_command_desc">Prepare a statement for execution.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">PREPARE <varname>name</varname> [ (<varname>datatype</varname> [, ...] ) ] AS <varname>statement</varname></codeblock></section><section id="section3"><title>Description</title>
-  <p><codeph>PREPARE</codeph> creates a prepared statement. A prepared
-  statement is a server-side object that can be used to optimize
-  performance. When the <codeph>PREPARE</codeph> statement is
-  executed, the specified statement is parsed, analyzed, and rewritten.
-  When an <codeph>EXECUTE</codeph> command is subsequently
-  issued, the prepared statement is planned and executed. This division
-  of labor avoids repetitive parse analysis work, while allowing
-  the execution plan to depend on the specific parameter values supplied.</p>
-  <p>Prepared statements can take parameters: values that are substituted into the statement when it
-        is executed. When creating the prepared statement, refer to parameters by position, using
-          <codeph>$1</codeph>, <codeph>$2</codeph>, etc. A corresponding list of parameter data
-        types can optionally be specified. When a parameter's data type is not specified or is
-        declared as unknown, the type is inferred from the context in which the parameter is first
-        used (if possible). When executing the statement, specify the actual values for these
-        parameters in the <codeph>EXECUTE</codeph> statement.</p><p>Prepared statements only last for the duration of the current database session. When the session
-        ends, the prepared statement is forgotten, so it must be recreated before being used again.
-        This also means that a single prepared statement cannot be used by multiple simultaneous
-        database clients; however, each client can create their own prepared statement to use. 
-        Prepared statements can be manually cleaned up using the <codeph><xref
-            href="DEALLOCATE.xml#topic1" type="topic" format="dita"/></codeph> command. </p><p>Prepared statements have the largest performance advantage when a
-single session is being used to execute a large number of similar statements.
-The performance difference will be particularly significant if the statements
-are complex to plan or rewrite, for example, if the query involves a
-join of many tables or requires the application of several rules. If
-the statement is relatively simple to plan and rewrite but relatively
-expensive to execute, the performance advantage of prepared statements
-will be less noticeable.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>An arbitrary name given to this particular prepared statement. It
-must be unique within a single session and is subsequently used to execute
-or deallocate a previously prepared statement.</pd></plentry><plentry><pt><varname>datatype</varname></pt><pd>The data type of a parameter to the prepared statement. If the data type of a particular
-            parameter is unspecified or is specified as unknown, it will be inferred from the
-            context in which the parameter is first used. To refer to the parameters in the prepared
-            statement itself, use <codeph>$1</codeph>, <codeph>$2</codeph>, etc. </pd></plentry><plentry><pt><varname>statement</varname></pt><pd>Any <codeph>SELECT</codeph>, <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>,
-<codeph>DELETE</codeph>, or <codeph>VALUES</codeph> statement.</pd></plentry></parml></section><section id="section5"><title>Notes</title>
-      <p>If a prepared statement is executed enough times, the server may eventually decide to save
-        and re-use a generic plan rather than re-planning each time. This will occur immediately if
-        the prepared statement has no parameters; otherwise it occurs only if the generic plan
-        appears to be not much more expensive than a plan that depends on specific parameter values.
-        Typically, a generic plan will be selected only if the query's performance is estimated to
-        be fairly insensitive to the specific parameter values supplied.</p>
-      <p>To examine the query plan Greenplum Database is using for a prepared statement, use <xref
-          href="EXPLAIN.xml#topic1">EXPLAIN</xref>. If a generic plan is in use, it will contain
-        parameter symbols <codeph>$<varname>n</varname></codeph>, while a custom plan will have the
-        current actual parameter values substituted into it. </p>
-  <p>For more information on query planning and the statistics collected by Greenplum Database for
-        that purpose, see the <codeph>ANALYZE</codeph> documentation.</p>
-  <p>Although the main point of a prepared statement is to avoid repeated parse analysis and
-        planning of the statement, Greenplum will force re-analysis and re-planning of the statement
-        before using it whenever database objects used in the statement have undergone definitional
-        (DDL) changes since the previous use of the prepared statement. Also, if the value of
-          <codeph>search_path</codeph> changes from one use to the next, the statement will be
-        re-parsed using the new search_path. (This latter behavior is new as of Greenplum 6.) These
-        rules make use of a prepared statement semantically almost equivalent to re-submitting the
-        same query text over and over, but with a performance benefit if no object definitions are
-        changed, especially if the best plan remains the same across uses. An example of a case
-        where the semantic equivalence is not perfect is that if the statement refers to a table by
-        an unqualified name, and then a new table of the same name is created in a schema appearing
-        earlier in the <codeph>search_path</codeph>, no automatic re-parse will occur since no
-        object used in the statement changed. However, if some other change forces a re-parse, the
-        new table will be referenced in subsequent uses. </p><p>You can see all prepared statements available in the session by querying the
-          <codeph>pg_prepared_statements</codeph> system view.</p></section><section id="section6"><title>Examples</title><p>Create a prepared statement for an <codeph>INSERT</codeph> statement,
-and then execute it:</p><codeblock>PREPARE fooplan (int, text, bool, numeric) AS INSERT INTO 
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="dx20941">PREPARE</title>
+    <body>
+        <p id="sql_command_desc">准备要执行的语句。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">PREPARE <varname>name</varname> [ (<varname>datatype</varname> [, ...] ) ] AS <varname>statement</varname></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>PREPARE</codeph>创建一个预编译语句。
+                预编译语句是可用于优化性能的服务器端对象。
+                当执行<codeph>PREPARE</codeph>语句时，将解析、分析和重写指定的语句。
+                随后发出<codeph>EXECUTE</codeph>命令时，将计划并执行预编译语句。
+                这种分工避免了重复的解析分析工作，同时允许执行计划取决于所提供的特定参数值。
+            </p>
+            <p>预编译语句可以采用参数：执行语句时将用值替换。
+                创建预编译语句时，请使用<codeph>$1</codeph>，<codeph>$2</codeph>等按位置引用参数。
+                可以选择指定相应的参数数据类型列表。
+                如果未指定参数的数据类型或将其声明为未知，则从首次使用该参数的上下文中推断该类型（如果可能）。
+                执行该语句时，请在<codeph>EXECUTE</codeph>语句中指定这些参数的实际值。
+            </p>
+            <p>预编译语句仅在当前数据库会话期间有效。
+                会话结束时，预编译语句将废弃，因此必须在重新使用之前重新创建它。
+                这也意味着单个预编译语句不能被多个同时的数据库客户端使用。
+                但是，每个客户端可以创建自己预编译语句来使用。
+                可以使用<codeph><xref href="DEALLOCATE.xml#topic1" type="topic" format="dita"/></codeph>命令手动清除预编译语句。
+            </p>
+            <p>当使用单个会话执行大量相似的语句时，预备语句具有最大的性能优势。
+                如果语句计划或重写很复杂，那么性能差异将特别显着，例如，查询涉及多个表的连接或需要应用多个规则。
+                如果该语句的计划和重写相对简单，但是执行成本相对较高，则预编译语句的性能优势将不太明显。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>为此特定的预编译语句提供的任意名称。
+                        它在单个会话中必须是唯一的，并随后用于执行或取消分配先前预编译语句。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>datatype</varname>
+                    </pt>
+                    <pd>预编译语句的参数的数据类型。
+                        如果未指定特定参数的数据类型或将其指定为未知，则将从首次使用该参数的上下文中推断出来。
+                        要在预编译语句本身中引用参数，请使用<codeph>$1</codeph>，<codeph>$2</codeph>等。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>statement</varname>
+                    </pt>
+                    <pd>任何<codeph>SELECT</codeph>，<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>，<codeph>DELETE</codeph>或<codeph>VALUES</codeph>语句。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p>如果预编译语句执行了足够的时间，则服务器可能最终决定保存并重新使用通用计划，而不是每次都重新计划。
+                如果预编译语句没有参数，这将立即发生；
+                否则，仅当通用计划看起来并不比依赖于特定参数值的计划昂贵得多时，它才会发生。
+                通常，仅当估计查询的性能对提供的特定参数值相当不敏感时，才会选择通用计划。
+            </p>
+            <p>要检查Greenplum数据库用于预编译语句的查询计划，请使用<xref href="EXPLAIN.xml#topic1">EXPLAIN</xref>。
+                如果正在使用通用计划，它将包含参数符号<codeph>$<varname>n</varname></codeph>，
+                而自定义计划将使用当前的实际参数值替代它。
+            </p>
+            <p>有关查询计划和Greenplum数据库为此目的收集的统计信息的更多信息，请参阅<codeph>ANALYZE</codeph>文档。
+            </p>
+            <p>尽管预编译语句的主要目的是避免重复分析和规划语句，
+                但只要语句中使用的数据库对象自上次使用预处理语句以来发生了定义（DDL）更改，
+                Greenplum都会在使用之前强制重新分析和重新规划语句。
+                同样，如果<codeph>search_path</codeph>的值从一个更改为下一个，则将使用新的search_path重新解析该语句。
+                （后一种行为自Greenplum 6起是新的。）
+                这些规则使用预编译语句在语义上几乎等同于一次又一次地重新提交相同的查询文本，
+                这在语义上几乎等同于使用预编译语句，
+                但是如果不更改对象定义，则可以提高性能，特别是如果最佳计划在不同用途之间保持不变。
+                语义对等不完美的情况的一个示例是，如果该语句使用不合格的名称引用表，
+                然后在较早出现在<codeph>search_path</codeph>中的模式中创建了一个具有相同名称的新表，
+                则不会自动重新解析，因为语句中使用的对象没有变化。
+                但是，如果其他更改迫使重新解析，则在随后的使用中将引用新表。
+            </p>
+            <p>您可以通过查询<codeph>pg_prepared_statements</codeph>系统视图来查看会话中所有可用的预编译语句。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>为<codeph>INSERT</codeph>语句创建一个预编译语句，然后执行它：
+            </p>
+            <codeblock>PREPARE fooplan (int, text, bool, numeric) AS INSERT INTO
 foo VALUES($1, $2, $3, $4);
-EXECUTE fooplan(1, 'Hunter Valley', 't', 200.00);</codeblock><p>Create a prepared statement for a <codeph>SELECT</codeph> statement, and
-then execute it. Note that the data type of the second parameter is not
-specified, so it is inferred from the context in which <codeph>$2</codeph>
-is used:</p><codeblock>PREPARE usrrptplan (int) AS SELECT * FROM users u, logs l 
+EXECUTE fooplan(1, 'Hunter Valley', 't', 200.00);</codeblock>
+            <p>为<codeph>SELECT</codeph>语句创建一个预编译语句，然后执行它。
+                请注意，未指定第二个参数的数据类型，因此可以从使用<codeph>$2</codeph>的上下文中推断出它：
+            </p>
+            <codeblock>PREPARE usrrptplan (int) AS SELECT * FROM users u, logs l
 WHERE u.usrid=$1 AND u.usrid=l.usrid AND l.date = $2;
-EXECUTE usrrptplan(1, current_date);</codeblock></section><section id="section7"><title>Compatibility</title><p>The SQL standard includes a <codeph>PREPARE</codeph> statement, but
-it is only for use in embedded SQL. This version of the <codeph>PREPARE</codeph>
-statement also uses a somewhat different syntax.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="EXECUTE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="DEALLOCATE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+EXECUTE usrrptplan(1, current_date);</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p>SQL标准包括一个<codeph>PREPARE</codeph>语句，但仅用于嵌入式SQL。
+                此版本的<codeph>PREPARE</codeph>语句还使用了一些不同的语法。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="EXECUTE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="DEALLOCATE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

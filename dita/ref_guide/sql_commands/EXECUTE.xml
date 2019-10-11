@@ -1,22 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="dp20941">EXECUTE</title><body><p id="sql_command_desc">Executes a prepared SQL statement.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">EXECUTE <varname>name</varname> [ (<varname>parameter</varname> [, ...] ) ]</codeblock></section><section id="section3"><title>Description</title><p><codeph>EXECUTE</codeph> is used to execute a previously prepared statement.
-Since prepared statements only exist for the duration of a session, the
-prepared statement must have been created by a <codeph>PREPARE</codeph>
-statement executed earlier in the current session. </p><p>If the <codeph>PREPARE</codeph> statement that created the statement
-specified some parameters, a compatible set of parameters must be passed
-to the <codeph>EXECUTE</codeph> statement, or else an error is raised.
-Note that (unlike functions) prepared statements are not overloaded based
-on the type or number of their parameters; the name of a prepared statement
-must be unique within a database session.</p><p>For more information on the creation and usage of prepared statements,
-see <codeph>PREPARE</codeph>.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The name of the prepared statement to execute. </pd></plentry><plentry><pt><varname>parameter</varname></pt><pd>The actual value of a parameter to the prepared statement. This must
-be an expression yielding a value that is compatible with the data type
-of this parameter, as was determined when the prepared statement was
-created.</pd></plentry></parml></section><section id="section5"><title>Examples</title><p>Create a prepared statement for an <codeph>INSERT</codeph> statement,
-and then execute it:</p><codeblock>PREPARE fooplan (int, text, bool, numeric) AS INSERT INTO 
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="dp20941">EXECUTE</title>
+    <body>
+        <p id="sql_command_desc">执行准备好的SQL语句。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">EXECUTE <varname>name</varname> [ (<varname>parameter</varname> [, ...] ) ]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>EXECUTE</codeph>用于执行先前准备的语句。
+                由于准备好的语句仅在会话期间存在，因此准备好的语句必须由当前会话中较早执行的<codeph>PREPARE</codeph>语句创建。
+            </p>
+            <p>如果创建该语句的<codeph>PREPARE</codeph>语句指定了一些参数，则必须将一组兼容的参数传递给<codeph>EXECUTE</codeph>语句，否则会引发错误。
+                请注意（与函数不同），准备好的语句不会基于其参数的类型或数量而重载。
+                在数据库会话中，准备好的语句的名称必须唯一。
+            </p>
+            <p>有关准备语句的创建和使用的更多信息，请参见<codeph>PREPARE</codeph>。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要执行的准备好的语句的名称。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>parameter</varname>
+                    </pt>
+                    <pd>准备语句的参数的实际值。
+                        该表达式必须是产生与该参数的数据类型兼容的值的表达式，这是在创建准备语句时确定的。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>为<codeph>INSERT</codeph>语句创建一个准备语句，然后执行它：
+            </p>
+            <codeblock>PREPARE fooplan (int, text, bool, numeric) AS INSERT INTO
 foo VALUES($1, $2, $3, $4);
-EXECUTE fooplan(1, 'Hunter Valley', 't', 200.00);</codeblock></section><section id="section6"><title>Compatibility</title><p>The SQL standard includes an <codeph>EXECUTE</codeph> statement, but
-it is only for use in embedded SQL. This version of the <codeph>EXECUTE</codeph>
-statement also uses a somewhat different syntax. </p></section><section id="section7"><title>See Also</title><p><codeph><xref href="DEALLOCATE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="./PREPARE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+EXECUTE fooplan(1, 'Hunter Valley', 't', 200.00);</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p>SQL标准包含一个<codeph>EXECUTE</codeph>语句，但仅用于嵌入式SQL。
+                此版本的<codeph>EXECUTE</codeph>语句还使用了一些不同的语法。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="DEALLOCATE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="./PREPARE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

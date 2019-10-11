@@ -7,8 +7,7 @@
         <p id="sql_command_desc">在当前事务中定义一个新的保存点。</p>
         <section id="section2">
             <title>概要</title>
-            <codeblock id="sql_command_synopsis">SAVEPOINT <varname>savepoint_name</varname>
-            </codeblock>
+            <codeblock id="sql_command_synopsis">SAVEPOINT <varname>savepoint_name</varname></codeblock>
         </section>
         <section id="section3">
             <title>描述</title>

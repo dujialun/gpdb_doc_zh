@@ -4,13 +4,13 @@
 <topic id="topic1">
   <title id="dq20941">EXPLAIN</title>
   <body>
-    <p id="sql_command_desc">Shows the query plan of a statement.</p>
+    <p id="sql_command_desc">显示语句的查询计划。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">EXPLAIN [ ( <varname>option</varname> [, ...] ) ] <varname>statement</varname>
 EXPLAIN [ANALYZE] [VERBOSE] <varname>statement</varname></codeblock>
-      <p>where <varname>option</varname> can be one
-        of:<codeblock>    ANALYZE [ <varname>boolean</varname> ]
+      <p>其中<varname>option</varname>可以是以下之一：
+          <codeblock>    ANALYZE [ <varname>boolean</varname> ]
     VERBOSE [ <varname>boolean</varname> ]
     COSTS [ <varname>boolean</varname> ]
     BUFFERS [ <varname>boolean</varname> ]
@@ -18,175 +18,162 @@ EXPLAIN [ANALYZE] [VERBOSE] <varname>statement</varname></codeblock>
     FORMAT { TEXT | XML | JSON | YAML }</codeblock></p>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>EXPLAIN</codeph> displays the query plan that the Greenplum or Postgres planner
-        generates for the supplied statement. Query plans are a tree plan of nodes. Each node in the
-        plan represents a single operation, such as table scan, join, aggregation or a sort.</p>
-      <p>Plans should be read from the bottom up as each node feeds rows into the node directly
-        above it. The bottom nodes of a plan are usually table scan operations (sequential, index or
-        bitmap index scans). If the query requires joins, aggregations, or sorts (or other
-        operations on the raw rows) then there will be additional nodes above the scan nodes to
-        perform these operations. The topmost plan nodes are usually the Greenplum Database motion
-        nodes (redistribute, explicit redistribute, broadcast, or gather motions). These are the
-        operations responsible for moving rows between the segment instances during query
-        processing.</p>
-      <p>The output of <codeph>EXPLAIN</codeph> has one line for each node in the plan tree, showing
-        the basic node type plus the following cost estimates that the planner made for the
-        execution of that plan node:</p>
+      <title>描述</title>
+      <p><codeph>EXPLAIN</codeph>显示Greenplum或Postgres优化器为提供的语句生成的查询计划。
+          查询计划是节点的查询树计划。
+          计划中的每个节点代表一个单独的操作，例如表扫描，连接，聚合或排序。
+          </p>
+      <p>应从下至上阅读计划，因为每个节点都会向其上方的节点中发送行。
+          计划的最底层节点通常是表扫描操作（顺序扫描，索引扫描或位图索引扫描）。
+          如果查询需要连接，聚集或排序（或原始行上的其他操作），则扫描节点上方将有其他节点来执行这些操作。
+          最顶层的计划节点通常是Greenplum数据库motion节点（重新分发，显式重新分发，广播或收集motion）。
+          这些操作负责在查询处理期间在segment实例之间移动行。
+          </p>
+      <p><codeph>EXPLAIN</codeph>的输出对于计划树中的每个节点都有一行，
+          显示基本节点类型以及计划者为执行该计划节点而进行的以下成本估算：
+          </p>
       <ul>
-        <li id="dq155475"><b>cost</b> — the planner's guess at how long it will take to run the
-          statement (measured in cost units that are arbitrary, but conventionally
-          mean disk page fetches). Two cost numbers
-          are shown: the start-up cost before the first row can be returned, and
-          the total cost to return all the rows. Note that the total cost assumes that all
-          rows will be retrieved, which may not always be the case (if using <codeph>LIMIT</codeph>
-          for example).</li>
-        <li id="dq155476"><b>rows</b> — the total number of rows output by this plan node. This is
-          usually less than the actual number of rows processed or scanned by the plan node,
-          reflecting the estimated selectivity of any <codeph>WHERE</codeph> clause conditions.
-          Ideally the top-level nodes estimate will approximate the number of rows actually
-          returned, updated, or deleted by the query.</li>
-        <li id="dq155477"><b>width</b> — total bytes of all the rows output by this plan node.</li>
+        <li id="dq155475"><b>cost</b> — 优化器对运行该语句要花费多长时间的猜测（以任意成本单位衡量，但通常是指磁盘页获取）。
+            显示了两个成本编号：可以返回第一行之前的启动成本，以及返回所有行的总成本。
+            请注意，总成本假定将检索所有行，但并非总是如此（例如，如果使用<codeph>LIMIT</codeph>）。
+            </li>
+        <li id="dq155476"><b>rows</b> — 此计划节点输出的总行数。
+            这通常少于计划节点处理或扫描的实际行数，反映了任何<codeph>WHERE</codeph>子句条件的估计选择性。
+            理想情况下，顶级节点估计将近似查询实际返回，更新或删除的行数。
+          </li>
+        <li id="dq155477"><b>width</b> — 此计划节点输出的所有行的总字节数。</li>
       </ul>
-      <p>It is important to note that the cost of an upper-level node includes the cost of all its
-        child nodes. The topmost node of the plan has the estimated total execution cost for the
-        plan. This is this number that the planner seeks to minimize. It is also important to
-        realize that the cost only reflects things that the query optimizer cares about. In
-        particular, the cost does not consider the time spent transmitting result rows to the
-        client.</p>
-      <p><codeph>EXPLAIN ANALYZE</codeph> causes the statement to be actually executed, not only
-        planned. The <codeph>EXPLAIN ANALYZE</codeph> plan shows the actual results along with the
-        planner's estimates. This is useful for seeing whether the planner's estimates are close to
-        reality. In addition to the information shown in the <codeph>EXPLAIN</codeph> plan,
-          <codeph>EXPLAIN ANALYZE</codeph> will show the following additional information:</p>
+      <p>重要的是要注意，上级节点的成本包括其所有子节点的成本。
+          计划的最高节点具有该计划的估计总执行成本。
+          这是计划者要尽量减少的数字。
+          同样重要的是要意识到，成本只反映查询优化器关心的事情。
+          特别是，成本不考虑将结果行传输到客户端所花费的时间。
+          </p>
+      <p><codeph>EXPLAIN ANALYZE</codeph>导致语句实际执行，而不仅仅是做计划。
+          <codeph>EXPLAIN ANALYZE</codeph>优化器会显示实际结果以及计划者的估计。
+          这对于查看优化器的估计是否接近实际很有用。
+          除了<codeph>EXPLAIN</codeph>计划中显示的信息之外，<codeph>EXPLAIN ANALYZE</codeph>还将显示以下附加信息：
+          </p>
       <ul>
-        <li id="dq155498">The total elapsed time (in milliseconds) that it took to run the
-          query.</li>
-        <li id="dq155499">The number of <i>workers</i> (segments) involved in a plan node operation.
-          Only segments that return rows are counted.</li>
-        <li id="dq155500">The maximum number of rows returned by the segment that produced the most
-          rows for an operation. If multiple segments produce an equal number of rows, the one with
-          the longest <i>time to end</i> is the one chosen.</li>
-        <li id="dq155501">The segment id number of the segment that produced the most rows for an
-          operation.</li>
-        <li id="dq155554">For relevant operations, the <varname>work_mem</varname> used by the
-          operation. If <codeph>work_mem</codeph> was not sufficient to perform the operation in
-          memory, the plan will show how much data was spilled to disk and how many passes over the
-          data were required for the lowest performing segment. For
-          example:<codeblock>Work_mem used: 64K bytes avg, 64K bytes max (seg0).
+        <li id="dq155498">运行查询所花费的总时间（以毫秒为单位）。</li>
+        <li id="dq155499">计划节点操作中涉及的<i>workers</i>（segment）数。仅计算返回行的segment。</li>
+        <li id="dq155500">操作产生最多行的segment所返回的最大行数。
+            如果多个segment产生相等数量的行，则结束时间最长的一个就是选择的那个。
+            </li>
+        <li id="dq155501">为一个操作生成最多行的segment的segment ID号。
+            </li>
+        <li id="dq155554">对于相关操作，该操作使用的<varname>work_mem</varname>。
+            如果<varname>work_mem</varname>不足以在内存中执行该操作，则该计划将显示有多少数据溢出到磁盘，
+            以及最低性能segment需要多少次数据传递。
+            例如：
+            <codeblock>Work_mem used: 64K bytes avg, 64K bytes max (seg0).
 Work_mem wanted: 90K bytes avg, 90K bytes max (seg0) to abate workfile 
 I/O affecting 2 workers.
 [seg0] pass 0: 488 groups made from 488 rows; 263 rows written to 
 workfile
 [seg0] pass 1: 263 groups made from 263 rows</codeblock></li>
-        <li id="dq155502">The time (in milliseconds) it took to retrieve the first row from the
-          segment that produced the most rows, and the total time taken to retrieve all rows from
-          that segment. The <i>&lt;time&gt; to first row</i> may be omitted if it is the same as the
-            <i>&lt;time&gt; to end</i>.</li>
+        <li id="dq155502">从产生最多行的segment中检索第一行所花费的时间（以毫秒为单位），以及从该segment中检索所有行所花费的总时间。
+            如果<i>&lt;time&gt; to first row</i>与<i>&lt;time&gt; to end</i>相同，则可以省略。
+            </li>
       </ul>
-      <note type="important">Keep in mind that the statement is actually executed when
-          <codeph>ANALYZE</codeph> is used. Although <codeph>EXPLAIN ANALYZE</codeph> will discard
-        any output that a <codeph>SELECT</codeph> would return, other side effects of the statement
-        will happen as usual. If you wish to use <codeph>EXPLAIN ANALYZE</codeph> on a DML statement
-        without letting the command affect your data, use this
-        approach:<codeblock>BEGIN;
+      <note type="important">请记住，使用<codeph>ANALYZE</codeph>时实际上会执行该语句。
+          尽管<codeph>EXPLAIN ANALYZE</codeph>将丢弃<codeph>SELECT</codeph>将返回的任何输出，但是该语句的其他副作用将照常发生。
+          如果希望在DML语句上使用<codeph>EXPLAIN ANALYZE</codeph>而不让命令影响您的数据，请使用以下方法：
+          <codeblock>BEGIN;
 EXPLAIN ANALYZE ...;
 ROLLBACK;</codeblock></note>
-      <p>Only the <codeph>ANALYZE</codeph> and <codeph>VERBOSE</codeph> options can be specified,
-        and only in that order, without surrounding the option list in parentheses.</p>
+      <p>仅可以指定<codeph>ANALYZE</codeph>和<codeph>VERBOSE</codeph>选项，并且只能按该顺序指定，而不要在括号中包含选项列表。
+        </p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>ANALYZE</pt>
-          <pd>Carry out the command and show the actual run times and other statistics. This
-            parameter defaults to <codeph>FALSE</codeph> if you omit it; specify <codeph>ANALYZE
-              true</codeph> to enable it. </pd>
+          <pd>执行命令并显示实际运行时间和其他统计信息。
+              如果省略此参数，则默认为<codeph>FALSE</codeph>。
+              指定<codeph>ANALYZE true</codeph>可以启用它。
+              </pd>
         </plentry>
         <plentry>
           <pt>VERBOSE</pt>
-          <pd>Display additional information regarding the plan. Specifically, include the output
-            column list for each node in the plan tree, schema-qualify table and function names,
-            always label variables in expressions with their range table alias, and always print the
-            name of each trigger for which statistics are displayed. This parameter defaults to
-              <codeph>FALSE</codeph>if you omit it; specify <codeph>VERBOSE true</codeph> to enable
-            it.</pd>
+          <pd>显示有关计划的其他信息。
+              具体来说，包括计划树中每个节点的输出列列表，模式限定表和函数名称，
+              始终在表达式中使用范围表别名标记变量，并始终打印要显示其统计信息的每个触发器的名称。
+              如果省略此参数，则默认为<codeph>FALSE</codeph>；
+              指定<codeph>VERBOSE true</codeph>启用它。
+              </pd>
         </plentry>
         <plentry>
           <pt>COSTS</pt>
-          <pd>Include information on the estimated startup and total cost of each plan node, as well
-            as the estimated number of rows and the estimated width of each row. This parameter
-            defaults to <codeph>TRUE</codeph> if you omit it; specify <codeph>COSTS false</codeph>
-            to disable it.</pd>
+          <pd>包括有关每个计划节点的估计启动成本和总成本以及估计的行数和估计的每行宽度的信息。
+              如果省略此参数，则默认为<codeph>TRUE</codeph>；
+              指定<codeph>COSTS false</codeph>禁用它。
+              </pd>
         </plentry>
         <plentry>
           <pt>BUFFERS</pt>
-          <pd>Include information on buffer usage. Specifically, include the number of shared blocks
-            hit, read, dirtied, and written, the number of local blocks hit, read, dirtied, and
-            written, and the number of temp blocks read and written. A <i>hit</i> means that a read
-            was avoided because the block was found already in cache when needed. Shared blocks
-            contain data from regular tables and indexes; local blocks contain data from temporary
-            tables and indexes; while temp blocks contain short-term working data used in sorts,
-            hashes, Materialize plan nodes, and similar cases. The number of blocks <i>dirtied</i>
-            indicates the number of previously unmodified blocks that were changed by this query;
-            while the number of blocks <i>written</i> indicates the number of previously-dirtied
-            blocks evicted from cache by this backend during query processing. The number of blocks
-            shown for an upper-level node includes those used by all its child nodes. In text
-            format, only non-zero values are printed. This parameter may only be used when
-              <codeph>ANALYZE</codeph> is also enabled. This parameter defaults to <codeph>FALSE</codeph>
-            if you omit it; specify <codeph>BUFFERS true</codeph> to enable it.</pd>
+          <pd>包括有关缓冲区使用情况的信息。
+              具体来说，包括命中，读取，弄脏和写入的共享块的数量，命中，读取，弄脏和写入的局部块的数量以及读写的临时块的数量。
+              命中表示避免读取，因为在需要时已在高速缓存中找到该块。
+              共享块包含来自常规表和索引的数据；本地块包含来自临时表和索引的数据；
+              临时块包含用于排序，哈希，物化计划节点和类似情况的短期工作数据。
+              被弄脏的块数表示此查询已更改的先前未修改的块数；
+              而写入的块数则表示此后端在查询处理期间从缓存中逐出的先前处理的块数。
+              上级节点显示的块数包括其所有子节点使用的块数。
+              在文本格式中，仅打印非零值。
+              仅当还启用了<codeph>ANALYZE</codeph>时，才可以使用此参数。
+              如果省略此参数，则默认为<codeph>FALSE</codeph>；
+              指定<codeph>BUFFERS true</codeph>启用它。
+              </pd>
         </plentry>
         <plentry>
           <pt>TIMING</pt>
-          <pd>Include actual startup time and time spent in each node in the output. The overhead of
-            repeatedly reading the system clock can slow down the query significantly on some
-            systems, so it may be useful to set this parameter to <codeph>FALSE</codeph> when only
-            actual row counts, and not exact times, are needed. Run time of the entire statement is
-            always measured, even when node-level timing is turned off with this option. This
-            parameter may only be used when <codeph>ANALYZE</codeph> is also enabled. It defaults to
-              <codeph>TRUE</codeph>. </pd>
+          <pd>在输出中包括实际的启动时间和在每个节点上花费的时间。
+              重复读取系统时钟的开销可能会在某些系统上显着降低查询速度，
+              因此，当仅需要实际的行计数而不是确切的时间时，将此参数设置为<codeph>FALSE</codeph>可能会很有用。
+              即使使用此选项关闭了节点级计时，也始终会测量整个语句的运行时间。
+              仅当还启用了<codeph>ANALYZE</codeph>时，才可以使用此参数。
+              默认为<codeph>TRUE</codeph>。
+              </pd>
         </plentry>
         <plentry>
           <pt>FORMAT</pt>
-          <pd>Specify the output format, which can be <codeph>TEXT</codeph>, <codeph>XML</codeph>,
-              <codeph>JSON</codeph>, or <codeph>YAML</codeph>. Non-text output contains the same
-            information as the text output format, but is easier for programs to parse. This
-            parameter defaults to <codeph>TEXT</codeph>.</pd>
+          <pd>指定输出格式，可以是<codeph>TEXT</codeph>，<codeph>XML</codeph>，<codeph>JSON</codeph>或<codeph>YAML</codeph>。
+              非文本输出包含与文本输出格式相同的信息，但程序更易于解析。
+              此参数默认为<codeph>TEXT</codeph>。
+              </pd>
         </plentry>
         <plentry>
           <pt><varname>boolean</varname></pt>
-          <pd>Specifies whether the selected option should be turned on or off. You can write
-              <codeph>TRUE</codeph>, <codeph>ON</codeph>, or <codeph>1</codeph> to enable the
-            option, and <codeph>FALSE</codeph>, <codeph>OFF</codeph>, or <codeph>0</codeph> to
-            disable it. The boolean value can also be omitted, in which case <codeph>TRUE</codeph>
-            is assumed.</pd>
+          <pd>指定是打开还是关闭所选选项。
+              您可以写入<codeph>TRUE</codeph>，<codeph>ON</codeph>或<codeph>1</codeph>以启用该选项，
+              而可以写入<codeph>FALSE</codeph>，<codeph>OFF</codeph>或<codeph>0</codeph>以禁用该选项。
+              布尔值也可以省略，在这种情况下，假定为<codeph>TRUE</codeph>。
+              </pd>
         </plentry>
         <plentry>
           <pt><varname>statement</varname></pt>
-          <pd>Any <codeph>SELECT</codeph>, <codeph>INSERT</codeph>, <codeph>UPDATE</codeph>,
-              <codeph>DELETE</codeph>, <codeph>VALUES</codeph>, <codeph>EXECUTE</codeph>,
-              <codeph>DECLARE</codeph>, or <codeph>CREATE TABLE AS</codeph> statement, whose
-            execution plan you wish to see.</pd>
+          <pd>您希望查看其执行计划的任何<codeph>SELECT</codeph>，<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>，
+              <codeph>DELETE</codeph>，<codeph>VALUES</codeph>，<codeph>EXECUTE</codeph>，
+              <codeph>DECLARE</codeph>或<codeph>CREATE TABLE AS</codeph>语句。
+              </pd>
         </plentry>
       </parml>
     </section>
-    <section id="section5"><title>Notes</title><p>In order to allow the query optimizer to make
-        reasonably informed decisions when optimizing queries, the <codeph>ANALYZE</codeph>
-        statement should be run to record statistics about the distribution of data within the
-        table. If you have not done this (or if the statistical distribution of the data in the
-        table has changed significantly since the last time <codeph>ANALYZE</codeph> was run), the
-        estimated costs are unlikely to conform to the real properties of the query, and
-        consequently an inferior query plan may be chosen.</p>An SQL statement that is run during
-      the execution of an <codeph>EXPLAIN ANALYZE</codeph> command is excluded from Greenplum
-      Database resource queues.<p>For more information about query profiling, see "Query Profiling"
-        in the <cite>Greenplum Database Administrator Guide</cite>. For more information about
-        resource queues, see "Resource Management with Resource Queues" in the <cite>Greenplum
-          Database Administrator Guide</cite>.</p></section>
+    <section id="section5"><title>注解</title>
+        <p>为了使查询优化器在优化查询时能够做出合理的决策，应运行<codeph>ANALYZE</codeph>语句以记录有关表内数据分布的统计信息。
+            如果您尚未执行此操作（或者自上次运行<codeph>ANALYZE</codeph>以来，表中数据的统计分布已发生重大变化），
+            则估计成本不太可能符合查询的实际属性，因此可能会选一个较差的查询计划。
+            </p>
+        在执行<codeph>EXPLAIN ANALYZE</codeph>命令期间运行的SQL语句从Greenplum数据库资源队列中排除。
+        <p>有关查询分析的更多信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的“查询分析”。
+            有关资源队列的更多信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的“使用资源队列进行资源管理”。
+        </p></section>
     <section id="section6">
-      <title>Examples</title>
-      <p>To illustrate how to read an <codeph>EXPLAIN</codeph> query plan, consider the following
-        example for a very simple query:</p>
+      <title>示例</title>
+      <p>为了说明如何读取<codeph>EXPLAIN</codeph>查询计划，请考虑一个非常简单的查询的示例：
+        </p>
       <codeblock>EXPLAIN SELECT * FROM names WHERE name = 'Joelle';
                                   QUERY PLAN
 -------------------------------------------------------------------------------
@@ -196,20 +183,20 @@ ROLLBACK;</codeblock></note>
  Optimizer: Pivotal Optimizer (GPORCA) version 3.23.0
 (4 rows)</codeblock>
 
-      <p>If we read the plan from the bottom up, the query optimizer starts by doing a sequential
-        scan of the <codeph>names</codeph> table. Notice that the <codeph>WHERE</codeph> clause is
-        being applied as a <i>filter</i> condition. This means that the scan operation checks the
-        condition for each row it scans, and outputs only the ones that pass the condition. </p>
-      <p>The results of the scan operation are passed up to a <i>gather motion</i> operation. In
-        Greenplum Database, a gather motion is when segments send rows up to the master. In this
-        case we have 3 segment instances sending to 1 master instance (3:1). This operation is
-        working on <codeph>slice1</codeph> of the parallel query execution plan. In Greenplum
-        Database a query plan is divided into <i>slices</i> so that portions of the query plan can
-        be worked on in parallel by the segments.</p>
-      <p>The estimated startup cost for this plan is <codeph>00.00</codeph> (no cost) and a total
-        cost of <codeph>431.27</codeph>. The planner is estimating that this query will return one
-        row.</p>
-      <p>Here is the same query, with cost estimates suppressed:</p>
+      <p>如果我们自下而上阅读计划，则查询优化器将从对<codeph>names</codeph>表的顺序扫描开始。
+          请注意，<codeph>WHERE</codeph>子句被用作过滤条件。
+          这意味着扫描操作将检查其扫描的每一行的条件，并仅输出通过条件的行。
+          </p>
+      <p>扫描操作的结果将传递到<i>gather motion</i>操作。
+          在Greenplum数据库中，<i>gather motion</i>是将segment行发送到master。
+          在这种情况下，我们有3个segment实例发送到1个master实例（3：1）。
+          该操作在并行查询执行计划的<codeph>slice1</codeph>上进行。
+          在Greenplum数据库中，查询计划分为多个切片，以便查询计划的各个部分可以由这些segment并行处理。
+          </p>
+      <p>该计划的估计启动成本为<codeph>00.00</codeph>（无成本），总成本为<codeph>431.27</codeph>。
+          优化器估计此查询将返回一行。
+          </p>
+      <p>这是相同的查询，但成本估算被抑制：</p>
       <codeblock>EXPLAIN (COSTS FALSE) SELECT * FROM names WHERE name = 'Joelle';
                 QUERY PLAN
 ------------------------------------------
@@ -219,7 +206,7 @@ ROLLBACK;</codeblock></note>
  Optimizer: Pivotal Optimizer (GPORCA) version 3.23.0
 (4 rows)</codeblock> 
 
-      <p>Here is the same query, with JSON formatting:</p>
+      <p>这是使用JSON格式的相同查询：</p>
       <codeblock>EXPLAIN (FORMAT JSON) SELECT * FROM names WHERE name = 'Joelle';
                   QUERY PLAN
 -----------------------------------------------
@@ -259,10 +246,9 @@ ROLLBACK;</codeblock></note>
    }                                          +
  ]
 (1 row)</codeblock>
-      <p>If there is an index and we use a query with an indexable <codeph>WHERE</codeph> condition,
-          <codeph>EXPLAIN</codeph> might show a different plan. This query generates a plan with an
-        index scan, with YAML
-        formatting:<codeblock>EXPLAIN (FORMAT YAML) SELECT * FROM NAMES WHERE LOCATION='Sydney, Australia';
+      <p>如果存在索引，并且我们使用带有可索引<codeph>WHERE</codeph>条件的查询，则<codeph>EXPLAIN</codeph>可能会显示不同的计划。
+          此查询使用YAML格式生成带有索引扫描的计划：
+          <codeblock>EXPLAIN (FORMAT YAML) SELECT * FROM NAMES WHERE LOCATION='Sydney, Australia';
                           QUERY PLAN
 --------------------------------------------------------------
  - Plan:                                                     +
@@ -295,11 +281,11 @@ ROLLBACK;</codeblock></note>
      Optimizer: "Pivotal Optimizer (GPORCA) version 3.23.0"
 (1 row)</codeblock></p>    </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p>There is no <codeph>EXPLAIN</codeph> statement defined in the SQL standard.</p>
+      <title>兼容性</title>
+      <p>在SQL标准中没有定义<codeph>EXPLAIN</codeph>语句。</p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="ANALYZE.xml#topic1" type="topic" format="dita"/></codeph></p>
     </section>
   </body>
