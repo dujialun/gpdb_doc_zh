@@ -116,7 +116,7 @@ REVOKE [ADMIN OPTION FOR] <varname>parent_role</varname> [, ...]
         </section>
         <section id="section4a">
             <title>参数</title>
-            <p>See<codeph><xref href="GRANT.xml#topic1" type="topic" format="dita"/></codeph>.
+            <p>参见<codeph><xref href="GRANT.xml#topic1" type="topic" format="dita"/></codeph>。
             </p>
         </section>
         <section id="section4">
