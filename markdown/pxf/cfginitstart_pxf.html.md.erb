@@ -1,5 +1,5 @@
 ---
-title: Starting, Stopping, and Restarting PXF
+title: PXF的启动、停止和重启
 ---
 
 <!--
@@ -22,111 +22,111 @@ under the License.
 -->
 
 
-PXF provides two management commands:
+PXF提供了两个管理命令:
 
-- `pxf cluster` - manage all PXF service instances in the Greenplum Database cluster
-- `pxf` - manage the PXF service instance on a specific Greenplum Database host
+- `pxf cluster` - 管理Greenplum数据库集群中的所有PXF服务实例
+- `pxf` - 在特定的Greenplum数据库主机上管理PXF服务实例
 
-The [`pxf cluster`](ref/pxf-cluster.html) command supports `init`, `start`, `stop`, and `sync` subcommands. When you run a `pxf cluster` subcommand on the Greenplum Database master host, you perform the operation on all segment hosts in the Greenplum Database cluster.
+[`pxf cluster`](ref/pxf-cluster.html)支持 `init`, `start`, `stop`, and `sync` 子命令。在Greenplum数据库master主机上运行 `pxf cluster` 子命令时，将在Greenplum数据库集群中的所有segment主机上执行该操作。
 
-The [`pxf`](ref/pxf.html) command supports `init`, `start`, `stop`, `restart`, and `status` operations. These operations run locally. That is, if you want to start or stop the PXF agent on a specific Greenplum Database segment host, you log in to the host and run the command. 
+[`pxf`](ref/pxf.html)支持`init`, `start`, `stop`, `restart`, `status` 操作。这些操作在本地执行，也就是说，如果要在特定的Greenplum数据库segment主机上启动或停止PXF代理，需要登录到该主机并运行命令。
 
 
-## <a id="start_pxf"></a>Starting PXF
+## <a id="start_pxf"></a>启动PXF
 
-After initializing PXF, you must start PXF on each segment host in your Greenplum Database cluster. The PXF service, once started, runs as the `gpadmin` user on default port 5888. Only the `gpadmin` user can start and stop the PXF service.
+初始化PXF之后，必须在Greenplum数据库集群中的每个segment主机上启动PXF。PXF服务启动后，将以`gpadmin`用户身份在默认端口5888上运行。只有`gpadmin`用户可以启动和停止pxf服务。
 
-If you want to change the default PXF configuration, you must update the configuration before you start PXF.
+如果要更改默认的PXF配置，则必须在启动PXF之前更新配置。
 
-`$PXF_CONF/conf` includes these user-customizable configuration files:
+`$PXF_CONF/conf` 包含用户自定义的配置文件：
 
-- `pxf-env.sh` - runtime configuration parameters
-- `pxf-log4j.properties` - logging configuration parameters
-- `pxf-profiles.xml` - custom profile definitions
+- `pxf-env.sh` - 运行时配置参数
+- `pxf-log4j.properties` - 日志记录配置参数
+- `pxf-profiles.xml` - 自定义配置文件定义
 
-The `pxf-env.sh` file exposes the following PXF runtime configuration parameters:
+`pxf-env.sh` 包含以下用户可自定义的配置文件:
 
 | Parameter  | Description | Default Value |
 |-----------|---------------| ------------|
-| JAVA_HOME    | The Java JRE home directory. | /usr/java/default |
-| PXF_LOGDIR   | The PXF log directory. | $PXF_CONF/logs |
-| PXF_JVM_OPTS  | Default options for the PXF Java virtual machine. | -Xmx2g -Xms1g |
-| PXF_KEYTAB  | The absolute path to the PXF service Kerberos principal keytab file. | $PXF_CONF/keytabs/pxf.service.keytab |
-| PXF_PRINCIPAL  | The PXF service Kerberos principal. | gpadmin/\_HOST@EXAMPLE.COM |
+| JAVA_HOME    | Java JRE家目录 | /usr/java/default |
+| PXF_LOGDIR   | PXF日志目录 | $PXF_CONF/logs |
+| PXF_JVM_OPTS | PXF Java虚拟机的默认选项 | -Xmx2g -Xms1g |
+| PXF_KEYTAB   | PXF服务Kerberos主体密钥表文件的绝对路径 | $PXF_CONF/keytabs/pxf.service.keytab |
+| PXF_PRINCIPAL | PXF服务Kerberos主体 | gpadmin/\_HOST@EXAMPLE.COM |
 
-You must synchronize any changes that you make to `pxf-env.sh`, `pxf-log4j.properties`, or `pxf-profiles.xml` to each Greenplum Database segment host, and (re)start PXF on each host.
+您必须将对`pxf-env.sh`，`pxf-log4j.properties`或`pxf-profiles.xml`所做的所有变更同步到每个segment主机，并在每个节点上（重新）启动PXF。
 
-### <a id="start_pxf_prereq" class="no-quick-link"></a>Prerequisites
+### <a id="start_pxf_prereq" class="no-quick-link"></a>准备
 
-Before you start PXF in your Greenplum Database cluster, ensure that:
+在Greenplum数据库集群中启动PXF之前，请确保：
 
-- Your Greenplum Database cluster is up and running.
-- You have previously initialized PXF.
- 
-### <a id="start_pxf_proc" class="no-quick-link"></a>Procedure
+- Greenplum数据库集群已启动并正在运行
+- PXF已经被初始化
 
-Perform the following procedure to start PXF on each segment host in your Greenplum Database cluster.
+### <a id="start_pxf_proc" class="no-quick-link"></a>过程
 
-1. Log in to the Greenplum Database master node:
+执行以下过程以在Greenplum数据库集群中的每个segment主机上启动PXF。
+
+1. 登录greenplum master节点
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-3. Run the `pxf cluster start` command to start PXF on each segment host. For example:
+3. 在每个segment主机上运行`pxf cluster start`命令启动pxf服务
 
     ```shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster start
     ```
 
-## <a id="stop_pxf"></a>Stopping PXF
+## <a id="stop_pxf"></a>停止PXF
 
-If you must stop PXF, for example if you are upgrading PXF, you must stop PXF on each segment host in your Greenplum Database cluster. Only the `gpadmin` user can stop the PXF service.
+如果必须停止PXF,例如如果要升级PXF，则必须在Greenplum数据库集群中的每个segment主机上停止PXF。只有`gpadmin`用户可以停止PXF服务
 
-### <a id="stop_pxf_prereq" class="no-quick-link"></a>Prerequisites
+### <a id="stop_pxf_prereq" class="no-quick-link"></a>准备
 
-Before you stop PXF in your Greenplum Database cluster, ensure that your Greenplum Database cluster is up and running.
- 
-### <a id="stop_pxf_proc" class="no-quick-link"></a>Procedure
+在Greenplum数据库集群中停止PXF之前，请确保Greenplum数据库集群已启动并正在运行。
 
-Perform the following procedure to stop PXF on each segment host in your Greenplum Database cluster.
+### <a id="stop_pxf_proc" class="no-quick-link"></a>过程
 
-1. Log in to the Greenplum Database master node:
+执行以下过程在Greenplum数据库集群中的每个segment主机上停止PXF。
+
+1. 登录greenplum master节点
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-3. Run the `pxf cluster stop` command to stop PXF on each segment host. For example:
+3. 在每个segment主机上运行`pxf cluster stop`命令停止pxf服务。 例如:
 
     ```shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster stop
     ```
 
-## <a id="restart_pxf"></a>Restarting PXF
+## <a id="restart_pxf"></a>重启PXF
 
-If you must restart PXF, for example if you updated PXF user configuration files in `$PXF_CONF/conf`, you can stop, and then start, PXF in your Greenplum Database cluster.
+如果必须重新启动PXF，例如在`$PXF_CONF/conf`中更新了PXF用户配置文件，则可以在Greenplum数据库集群中先停止服务然后再启动PXF服务。
 
-Only the `gpadmin` user can restart the PXF service.
+只有`gpadmin`用户可以重启PXF服务。
 
-### <a id="restart_pxf_prereq" class="no-quick-link"></a>Prerequisites
 
-Before you restart PXF in your Greenplum Database cluster, ensure that your Greenplum Database cluster is up and running.
- 
-### <a id="restart_pxf_proc" class="no-quick-link"></a>Procedure
+### <a id="restart_pxf_prereq" class="no-quick-link"></a>准备
 
-Perform the following procedure to restart PXF in your Greenplum Database cluster.
+在Greenplum数据库集群中重新启动PXF之前，请确保Greenplum数据库集群已启动并正在运行。
 
-1. Log in to the Greenplum Database master node:
+### <a id="restart_pxf_proc" class="no-quick-link"></a>过程
+
+执行以下过程在Greenplum数据库集群中的每个segment上重启PXF。
+
+1. 登录greenplum master节点:
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. Restart PXF:
+2. 重启PXF:
 
     ```shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster stop
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster start
     ```
-
