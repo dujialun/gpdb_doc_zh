@@ -1,46 +1,46 @@
 ---
-title: Configuring the PXF Agent Host and Port (Optional)
+title: 配置PXF客户端主机和端口(可选)
 ---
 
 By default, a PXF agent started on a segment host listens on port number `5888` on `localhost`. You can configure PXF to start on a different port number, or use a different hostname or IP address. To change the default configuration, you will set one or both of the environment variables identified below:
+默认情况下，在segment主机上启动的PXF代理侦听localhost上的5888端口。您可以将PXF配置为从其他端口号启动，或使用其他主机名或IP地址。要更改默认配置，您将设置以下标识的一个或两个环境变量：
 
 |   Environment Variable  |  Description      |
 --------------------------+--------------------
-|   PXF_HOST  | The name of the host or IP address. The default host name is `localhost`.  |
-|   PXF_PORT  | The port number on which the PXF agent listens for requests on the host. The default port number is `5888`.  |
+|   PXF_HOST  | 主机名或IP地址。 默认主机名是`localhost` |
+|   PXF_PORT  | PXF代理用来侦听主机上的请求的端口号。 默认端口号是`5888`  |
 
-Set the environment variables in the `gpadmin` user's `.bashrc` shell login file on each segment host.
+在每个segment主机上的gpadmin用户的.bashrc shell登录文件中设置环境变量。
 
-<div class="note">You must restart both Greenplum Database and PXF when you configure the agent host and/or port in this manner. Consider performing this configuration during a scheduled down time.</div>
+<div class="note">以这种方式配置代理程序主机(和/或)端口时，必须重新启动Greenplum数据库和PXF。考虑在计划的停机时间内执行此配置。</div>
 
-## <a id="proc"></a>Procedure
+## <a id="proc"></a>过程
 
-Perform the following procedure to configure the PXF agent host and/or port number on one or more Greenplum Database segment hosts:
+执行以下过程以在一台或多台Greenplum数据库主机上配置PXF代理主机（和/或）端口号：
 
-1. Log in to your Greenplum Database master node:
+1. 登录到您的Greenplum数据库主节点
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. For each Greenplum Database segment host:
+2. 对于每个Greenplum数据库segment主机
 
-    1. Identify the host name or IP address of the PXF agent.
-    2. Identify the port number on which you want the PXF agent to run.
-    3. Log in to the Greenplum Database segment host:
+    1. 指定PXF代理的主机名或IP地址。
+    2. 指定要在其上运行PXF代理的端口号。
+    3. 登录到Greenplum segment主机：
 
         ``` shell
         $ ssh gpadmin@<seghost>
         ```
-    4. Open the `~/.bashrc` file in the editor of your choice.
-    5. Set the `PXF_HOST` and/or `PXF_PORT` environment variables. For example, to set the PXF agent port number to 5998, add the following to the `.bashrc` file:
+    4. 使用编辑器中打开`~/.bashrc`文件
+    5. 设置`PXF_HOST`(和/或)`PXF_PORT`环境变量。例如，要将PXF代理端口号设置为5998，请将以下内容添加到`.bashrc`文件中
 
         ``` shell
         export PXF_PORT=5998
         ```
-    4. Save the file and exit the editor.
+    4. 保存修改并退出。
 
-3. Restart Greenplum Database as described in [Restarting Greenplum Database](../admin_guide/managing/startstop.html#task_gpdb_restart).
+3. 重启数据库。参阅[Restarting Greenplum Database](../admin_guide/managing/startstop.html#task_gpdb_restart).
 
-4. Restart PXF on each Greenplum Database segment host as described in [Restarting PXF](cfginitstart_pxf.html#restart_pxf).
-
+4. 重启每个segment上部署的PXF,参阅[Restarting PXF](cfginitstart_pxf.html#restart_pxf).
