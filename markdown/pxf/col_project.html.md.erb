@@ -1,22 +1,21 @@
 ---
-title: About Column Projection in PXF
+title: PXF列投影
 ---
 
-PXF supports column projection, and it is always enabled. With column projection, only the columns required by a `SELECT` query on an external table are returned from the external data source. This process can improve query performance, and can also reduce the amount of data that is transferred to Greenplum Database.
+PXF支持列投影，始终是启用状态。使用列投影时，只从外部数据源返回外部表上的`SELECT`查询所需的列。此过程可以提高查询性能，还可以减少传输到Greenplum数据库的数据量。
 
-**Note:** Some external data sources do not support column projection. If a query accesses a data source that does not support column projection, the query is instead executed without it, and the data is filtered after it is transferred to Greenplum Database.
+**Note:** 某些外部数据源不支持列投影。 如果查询访问不支持列投影的数据源，则在没有列投影的情况下执行查询，并且在将数据传输到Greenplum数据库之后对数据进行过滤。
 
-Column projection is automatically enabled for the `pxf` external table protocol. PXF accesses external data sources using different connectors, and column projection support is also determined by the specific connector implementation. The following PXF connector and profile combinations support column projection on read operations:
-
+`pxf`外部表协议自动启用列投影。PXF使用不同的连接器访问外部数据源，列投影支持也由特定的连接器实现决定。 以下PXF连接器和配置文件组合支持读取操作的列投影:
 - PXF Hive Connector, `HiveORC` profile
 - PXF JDBC Connector, `Jdbc` profile
 - PXF Hadoop and Object Store Connectors, `hdfs:parquet`, `adl:parquet`, `gs:parquet`,`s3:parquet`, and `wasbs:parquet` profiles
 
-**Note:** PXF may disable column projection in cases where it cannot successfully serialize a query filter; for example, when the `WHERE` clause resolves to a `boolean` type.
+**Note:** 如果无法成功序列化查询过滤条件，PXF可能会禁用列投影; 例如，当WHERE子句解析为布尔类型时。
 
-To summarize, all of the following criteria must be met for column projection to occur:
 
-* The external data source that you are accessing must support column projection. For example, Hive supports column projection for ORC-format data, and certain SQL databases support column projection.
-* The underlying PXF connector and profile implementation must also support column projection. For example, the PXF Hive and JDBC connector profiles identified above support column projection, as do the PXF connectors that support reading Parquet data.
-* PXF must be able to serialize the query filter.
+总而言之，必须满足以下所有条件才能进行列投影：
 
+* 外部数据源必须支持列投影。例如，Hive支持ORC格式数据的列投影，某些SQL数据库支持列投影。
+* 底层PXF连接器和配置文件实现必须支持列投影。例如，上面标识的PXF Hive和JDBC连接器配置文件支持列投影，支持读取Parquet数据的PXF连接器也支持列投影。
+* PXF必须能够序列化查询过滤条件
