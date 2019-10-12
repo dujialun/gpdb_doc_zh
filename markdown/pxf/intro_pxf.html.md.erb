@@ -1,34 +1,36 @@
 ---
-title: Introduction to PXF
+title: PXF介绍
 ---
 
-The Greenplum Platform Extension Framework (PXF) provides *connectors* that enable you to access data stored in sources external to your Greenplum Database deployment. These connectors map an external data source to a Greenplum Database *external table* definition. When you create the Greenplum Database external table, you identify the external data store and the format of the data via a *server* name and a *profile* name that you provide in the command.
+Greenplum Platform Extension Framework(PXF)提供的连接器(connectors)可以用于访问存储在Greenplum数据库外部源中的数据。这些连接器将外部数据源映射到Greenplum数据库的外部表(external table)中。创建Greenplum数据库外部表时，你可以通过在命令中提供服务器名称和配置文件名称来标识外部数据存储和数据格式。
 
-You can query the external table via Greenplum Database, leaving the referenced data in place. Or, you can use the external table to load the data into Greenplum Database for higher performance.
-
-
-## <a id="arch"></a> Architectural Overview
-
-Your Greenplum Database deployment consists of a master node and multiple segment hosts. A single PXF agent process on each Greenplum Database segment host allocates a worker thread for each segment instance on a segment host that participates in a query against an external table. The PXF agents on multiple segment hosts communicate with the external data store in parallel.
+您可以通过Greenplum数据库查询外部表引用的数据,您也可以使用外部表将数据加载到Greenplum数据库中以获得更高的性能。
 
 
-## <a id="more"></a> About Connectors, Servers, and Profiles
+## <a id="arch"></a> 架构概述
 
-*Connector* is a generic term that encapsulates the implementation details required to read from or write to an external data store. PXF provides built-in connectors to Hadoop (HDFS, Hive, HBase), object stores (Azure, Google Cloud Storage, Minio, S3), and SQL databases (JDBC).
+GPDB集群包含一个master节点(master node)和多个segment主机(segment host)。GPDB segment主机上的PXF客户端进程为对外部表进行查询的每个segment instance分配工作线程。多个segment主机的PXF代理与外部数据存储并行通信。
 
-A PXF *server* is a named configuration for Hadoop or an object store connector. A server definition provides the information required for PXF to access an external data source. This configuration information is data-store-specific, and may include server location and access credentials.
 
-<div class="note">PXF supports storing object store credentials in clear text in configuration files at this time.</div>
+## <a id="more"></a> 连接器(Connector),服务器(Servers)和配置文件(Profiles)
 
-The default PXF server is named `default`, and when configured provides the information required for PXF to access Hadoop services including HDFS, Hive, and HBase.
+连接器是一个通用的术语,他封装了读取和写入外部数据存储所需要的实现细节。PXF提供创建了与Hadoop (HDFS,Hive,Hbase),对象存储(Azure,Google Cloud Storage, Minio, S3)和sql数据库(通过jdbc)的连接器。
 
-The Greenplum Database administrator will configure at least one server definition for each object store that they will permit Greenplum Database users to access, and will publish the available server names as appropriate.
+A PXF *server* is a named configuration for Hadoop or an object store connector. A server definition provides the information required for PXF to access a external data source. This configuration information is data-store-specific, and may include server location and access credentials.
+PXF服务是连接器的命名配置，他定义提供PXF访问外部数据源所需要的信息，此类配置信息是特定于数据存储的，并且可以包含服务器位置,访问凭证和其他属性。
 
-Finally, a PXF *profile* is a named mapping identifying a specific data format supported by a specific external data store. PXF supports text, Avro, JSON, RCFile, Parquet, SequenceFile, and ORC data formats, and provides several built-in profiles as discussed in the following section.
+<div class="note">PXF目前支持以明文形式在配置文件中存储对象存储凭证。</div>
 
-## <a id="create_external_table"></a>Creating an External Table
+默认的PXF服务是default(保留)，在没有配置SERVER=<server_name>时提供外部数据源的位置和访问信息。
+
+GPDB数据库管理员将为每个允许GPDB用户访问的外部数据存储配置至少一个服务定义,并将根据需求发布可用的服务名。
+
+最后,PXF配置文件是一个命名映射，用于指定特定的外部数据存储支持的特定数据格式和协议。PXF支持text,Avro,JSON,RCFile,Parquet,SequenceFile和ORC数据格式以及JDBC协议，并且提供了几个内置的配置文件。
+
+## <a id="create_external_table"></a> 创建一个外部表
 
 PXF implements a Greenplum Database protocol named `pxf` that you can use to create an external table that references data in an external data store. The syntax for a [`CREATE EXTERNAL TABLE`](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command that specifies the `pxf` protocol follows:
+PXF实现了一个叫做pxf的GPDB协议,你可以使用这个协议去创建一个外部表。指定pxf协议的[`CREATE EXTERNAL TABLE`](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令语法如下:
 
 ``` sql
 CREATE [WRITABLE] EXTERNAL TABLE <table_name>
@@ -37,31 +39,30 @@ LOCATION('pxf://<path-to-data>?PROFILE=<profile_name>[&SERVER=<server_name>][&<c
 FORMAT '[TEXT|CSV|CUSTOM]' (<formatting-properties>);
 ```
 
-The `LOCATION` clause in a `CREATE EXTERNAL TABLE` statement specifying the `pxf` protocol is a URI. This URI identifies the path to, or other information describing, the location of the external data. For example, if the external data store is HDFS, the \<path-to-data\> identifies the absolute path to a specific HDFS file. If the external data store is Hive, \<path-to-data\> identifies a schema-qualified Hive table name.
+在创建语句`CREATE EXTERNAL TABLE`中的`LOCATION`子句是一个URI。这个URI标识描述外部数据位置的路径和其他信息。例如:如果外部数据存储的是HDFS,则<path-to-data>填写指定HDFS文件的绝对路径。如果外部数据存储的是HIVE，则<path-to-data>需要指定符合模式的HIVE表名称。
 
-You use the query portion of the URI, introduced by the question mark (?), to identify the PXF server and profile names.
+使用问号(?)引入的URI的查询部分来标识PXF服务器和配置文件名称。
 
 PXF may require additional information to read or write certain data formats. You provide profile-specific information using the optional \<custom-option\>=\<value\> component of the `LOCATION` string and formatting information via the \<formatting-properties\> component of the string. The custom options and formatting properties supported by a specific profile vary; they are identified in usage documentation for the profile.
+PXF可能需要额外的信息来读取和写入某些数据格式，可以使用LOCATION字符串的可选组件<custom-option> = <value>来提供配置文件的信息，并通过字符串的<formatting-properties>组件提供格式信息。
 
-<caption><span class="tablecap">Table 1. CREATE EXTERNAL TABLE Parameter Values and Descriptions</span></caption>
+<caption><span class="tablecap">Table 1. CREATE EXTERNAL TABLE参数值和描述</span></caption>
 
 <a id="creatinganexternaltable__table_pfy_htz_4p"></a>
 
 | Keyword               | Value and Description                                                                                                                                                                                                                                                          |
 |-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| \<path&#8209;to&#8209;data\>        | A directory, file name, wildcard pattern, table name, etc. The syntax of \<path-to-data\> is dependent upon the external data source.                                                                                                                                                                                                                    |
-| PROFILE=\<profile_name\>  | The profile that PXF uses to access the data. PXF supports profiles that access text, Avro, JSON, RCFile, Parquet, SequenceFile, and ORC data in [Hadoop services](access_hdfs.html), [object stores](access_objstore.html), and [other SQL databases](jdbc_pxf.html).  |
-| SERVER=\<server_name\>   | The named server configuration that PXF uses to access the data. The default server is a Hadoop server named `default`. The Greenplum Database administrator may configure other servers. |
-| \<custom&#8209;option\>=\<value\> | Additional options and their values supported by the profile or the server. |
-| FORMAT&nbsp;\<value\>| PXF profiles support the `TEXT`, `CSV`, and `CUSTOM` formats.  |
-| \<formatting&#8209;properties\> | Formatting properties supported by the profile; for example, the `FORMATTER` or `delimiter`.                                                                   |
+| \<path&#8209;to&#8209;data\>        | 目录，文件名，通配符模式，表名等。<path-to-data>的语法取决于外部数据源    |
+| PROFILE=\<profile_name\>  | PXF用于访问数据的配置文件。 PXF支持[Hadoop services](access_hdfs.html), [object stores](access_objstore.html), and [other SQL databases](jdbc_pxf.html).  |
+| SERVER=\<server_name\>   | PXF用于访问数据的命名服务器配置。 可选的; 如果未指定，PXF将使用default服务 |
+| \<custom&#8209;option\>=\<value\> | 配置文件或服务器支持的其他选项及其值 |
+| FORMAT&nbsp;\<value\>| PXF支持`TEXT`,`CSV`和`CUSTOM`格式  |
+| \<formatting&#8209;properties\> | 格式化配置文件支持的属性; 例如, `FORMATTER`或`delimiter` |
 
-**Note:** When you create a PXF external table, you cannot use the `HEADER` option in your formatter specification.
+**Note:** 创建PXF外部表时，不能在格式化程序规范中使用HEADER选项
 
-## <a id="other"></a> Other PXF Features
+## <a id="other"></a> PXF的其他特性
 
-Certain PXF connectors and profiles support filter pushdown and column projection. Refer to the following topics for detailed information about this support:
-
+某些PXF连接器和配置文件支持谓词下推和列投影。 有关此支持的详细信息，请参阅以下主题：
 - [About PXF Filter Pushdown](filter_push.html)
 - [About Column Projection in PXF](col_project.html)
-
