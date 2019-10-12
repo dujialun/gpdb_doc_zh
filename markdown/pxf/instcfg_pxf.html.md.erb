@@ -1,22 +1,22 @@
 ---
-title: Configuring PXF
+title: 配置PXF
 ---
 
-Your Greenplum Database deployment consists of a master node and multiple segment hosts. When you initialize and configure the Greenplum Platform Extension Framework (PXF), you start a single PXF JVM process on each Greenplum Database segment host.
+GPDB集群包括一个master节点和多个segment节点。初始化和配置PXF时，可以在每个GPDB的segment上启动单个PXF JVM进程。
 
-PXF provides connectors to Hadoop, Hive, HBase, object stores, and external SQL data stores. You must configure PXF to support the connectors that you plan to use.
+PXF提供到Hadoop，Hive，HBase，对象存储和外部SQL数据存储的连接器。 您必须配置PXF以支持您计划使用的连接器。
 
-To configure PXF, you must:
+配置PXF,你必须:
 
-1. Install Java packages on each Greenplum Database segment host as described in [Installing Java for PXF](install_java.html).
+1. 在每个Greenplum数据库段主机上安装Java包,详情参见[Installing Java for PXF](install_java.html)。
 
-2. [Initialize the PXF Service](init_pxf.html).
+2. [Initialize the PXF Service](init_pxf.html)。
 
-3. If you plan to use the Hadoop, Hive, or HBase PXF connectors, you must perform the configuration procedure described in [Configuring PXF Hadoop Connectors](client_instcfg.html).
+3. 如果您计划使用Hadoop，Hive或HBase PXF连接器，则必须执行配置PXF Hadoop连接器中所述的配置过程。[Configuring PXF Hadoop Connectors](client_instcfg.html)。
 
-3. If you plan to use the PXF connectors to access the Azure, Google Cloud Storage, Minio, or S3 object store(s), you must perform the configuration procedure described in [Configuring Connectors to Azure, Google Cloud Storage, Minio, and S3 Object Stores](objstore_cfg.html).
+3. 如果您计划使用PXF连接器访问Azure，Google云端存储，Minio或S3对象存储，则必须执行配置Azure连接，Google云端存储，Minio和S3对象存储中所述的配置过程。详见[Configuring Connectors to Azure, Google Cloud Storage, Minio, and S3 Object Stores](objstore_cfg.html)。
 
-3. If you plan to use the PXF JDBC Connector to access an external SQL database, perform the configuration procedure described in [Configuring the JDBC Connector](jdbc_cfg.html).
+3. 如果计划使用PXF JDBC Connector访问外部SQL数据库，请执行配置JDBC连接器中所述的配置过程。详见[Configuring the JDBC Connector](jdbc_cfg.html)。
 
-4. [Start PXF](cfginitstart_pxf.html).
+4. [Start PXF](cfginitstart_pxf.html)
 
