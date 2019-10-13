@@ -1,5 +1,5 @@
 ---
-title: Troubleshooting PXF
+title: PXF故障排查
 ---
 
 <!--
@@ -22,49 +22,50 @@ under the License.
 -->
 
 
-## <a id="pxf-errors"></a>PXF Errors
-The following table describes some errors you may encounter while using PXF:
+## <a id="pxf-errors"></a>PXF错误
+下表描述了使用PXF时可能会遇到的一些错误：
 
 | Error Message                 | Discussion                     |
 |-------------------------------|---------------------------------|
-| Protocol "pxf" does not exist | **Cause**: The `pxf` extension was not registered.<br>**Solution**: Create (enable) the PXF extension for the database as described in the PXF [Enable Procedure](using_pxf.html#enable-pxf-ext).|
-| Invalid URI pxf://\<path-to-data\>: missing options section | **Cause**: The `LOCATION` URI does not include the profile or other required options.<br>**Solution**: Provide the profile and required options in the URI. |
-| org.apache.hadoop.mapred.InvalidInputException: Input path does not exist: hdfs://\<namenode\>:8020/\<path-to-file\> | **Cause**: The HDFS file that you specified in \<path-to-file\> does not exist. <br>**Solution**: Provide the path to an existing HDFS file. |
-| NoSuchObjectException(message:\<schema\>.\<hivetable\> table not found) | **Cause**: The Hive table that you specified with \<schema\>.\<hivetable\> does not exist. <br>**Solution**: Provide the name of an existing Hive table. |
-| Failed to connect to \<segment-host\> port 5888: Connection refused (libchurl.c:944)  (\<segment-id\> slice\<N\> \<segment-host\>:40000 pid=\<process-id\>)<br> ... |**Cause**: PXF is not running on \<segment-host\>.<br>**Solution**: Restart PXF on \<segment-host\>. |
-| *ERROR*: failed to acquire resources on one or more segments<br>*DETAIL*:  could not connect to server: Connection refused<br>&nbsp;&nbsp;&nbsp;&nbsp;Is the server running on host "\<segment-host\>" and accepting<br>&nbsp;&nbsp;&nbsp;&nbsp;TCP/IP connections on port 40000?(seg\<N\> \<segment-host\>:40000) | **Cause**: The Greenplum Database segment host \<segment-host\> is down. |
-| org.apache.hadoop.security.AccessControlException: Permission denied: user=<user>, access=READ, inode=&quot;<filepath>&quot;:<user>:<group>:-rw------- | **Cause**: The Greenplum Database user that executed the PXF operation does not have permission to access the underlying Hadoop service (HDFS or Hive). See [Configuring User Impersonation and Proxying](pxfuserimpers.html). |
+| Protocol "pxf" does not exist | **Cause**: pxf扩展名未注册。<br>**Solution**: 按照PXF启用过程中的说明为[Enable Procedure](using_pxf.html#enable-pxf-ext) 为数据库创建（启用）PXF扩展 |
+| Invalid URI pxf://\<path-to-data\>: missing options section | **Cause**: `LOCATION` URI配置项不包括配置或其他需要的信息。<br>**Solution**:在URI中提供配置和必需的选项。|
+| org.apache.hadoop.mapred.InvalidInputException: Input path does not exist: hdfs://\<namenode\>:8020/\<path-to-file\> | **Cause**: 在\<path-to-file\>中指定的HDFS文件不存在。<br>**Solution**: 指定现有HDFS文件的路径|
+| NoSuchObjectException(message:\<schema\>.\<hivetable\> table not found) | **Cause**: \<schema\>.\<hivetable\>指定的Hive表不存在。<br>**Solution**: 提供存在的Hive表的名称。|
+| Failed to connect to \<segment-host\> port 5888: Connection refused (libchurl.c:944)  (\<segment-id\> slice\<N\> \<segment-host\>:40000 pid=\<process-id\>)<br> ... |**Cause**: 在\<segment-host\>主机上PXF未运行。 <br>**Solution**: \<segment-host\>主机上重启PXF|
+| *ERROR*: failed to acquire resources on one or more segments<br>*DETAIL*:  could not connect to server: Connection refused<br>&nbsp;&nbsp;&nbsp;&nbsp;Is the server running on host "\<segment-host\>" and accepting<br>&nbsp;&nbsp;&nbsp;&nbsp;TCP/IP connections on port 40000?(seg\<N\> \<segment-host\>:40000) | **Cause**: GPDB集群 \<segment-host\> 节点down |
+| org.apache.hadoop.security.AccessControlException: Permission denied: user=<user>, access=READ, inode=&quot;<filepath>&quot;:<user>:<group>:-rw------- | **Cause**: 执行PXF操作的Greenplum数据库用户无权访问基础Hadoop服务（HDFS或Hive）。参阅[Configuring User Impersonation and Proxying](pxfuserimpers.html). |
 
-## <a id="pxf-logging"></a>PXF Logging
-Enabling more verbose logging may aid PXF troubleshooting efforts. PXF provides two categories of message logging: service-level and client-level.
+## <a id="pxf-logging"></a>PXF日志
 
-### <a id="pxfsvclogmsg"></a>Service-Level Logging
+启用更详细的日志记录可能有助于PXF故障排除工作。 PXF提供了两类消息日志记录：服务级别和客户端级别。
 
-PXF utilizes `log4j` for service-level logging. PXF-service-related log messages are captured in a log file specified by PXF's `log4j` properties file, `$PXF_CONF/conf/pxf-log4j.properties`. The default PXF logging configuration will write `INFO` and more severe level logs to `$PXF_CONF/logs/pxf-service.log`. You can configure the logging level and the log file location.
+### <a id="pxfsvclogmsg"></a>服务级别日志记录
 
-PXF provides more detailed logging when the `DEBUG` level is enabled. To configure PXF `DEBUG` logging and examine the output:
+PXF利用`log4j`进行服务级别的日志记录。PXF-service-related日志消息捕获由`$PXF_CONF/conf/pxf-log4j.properties`文件中的`log4j`控制。默认的PXF日志记录配置会将INFO和更严格的日志记录写入`$PXF_CONF/logs/pxf-service.log`。您可以配置日志记录级别和日志文件位置。
 
-1. Log in to your Greenplum Database master node:
+启用`DEBUG`级别时，PXF提供更详细的日志记录。要配置PXF`DEBUG`日志记录并检查输出，请执行以下操作：
+
+1. 登录gpdb集群的master主机
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-1. Open `$PXF_CONF/conf/pxf-log4j.properties` in an editor, uncomment the following line, save the file, and exit the editor:
+1. 使用编辑器打开 `$PXF_CONF/conf/pxf-log4j.properties`，取消以下行的注释，保存文件，然后退出编辑器：
 
     ``` shell
     #log4j.logger.org.greenplum.pxf=DEBUG
     ```
 
-2. Use the `pxf cluster sync` command to copy the updated `pxf-log4j.properties` file to each segment host. For example:
+2. 使用 `pxf cluster sync` 命令拷贝更新的文件 `pxf-log4j.properties` 到每个segment主机。例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
     ```
 
-3. Restart PXF on each Greenplum Database segment host as described in [Restarting PXF](cfginitstart_pxf.html#restart_pxf).
+3. 依照[Restarting PXF](cfginitstart_pxf.html#restart_pxf)章节描述，重启gpdb集群的每个segment节点的pxf
 
-4. With `DEBUG` level logging now enabled, you can perform your PXF operations. Be sure to make note of the time; this will direct you to the relevant log messages in `$PXF_CONF/logs/pxf-service.log`.
+4. 现在启用了`DEBUG`级别的日志记录，您可以执行PXF操作。 确保记下时间； 这会将信息定向输出到 `$PXF_CONF/logs/pxf-service.log`中的相关日志。
 
     ``` shell
     $ date
@@ -72,7 +73,7 @@ PXF provides more detailed logging when the `DEBUG` level is enabled. To configu
     $ psql -d <dbname>
     ```
 
-4. Create and query an external table. For example:
+4. 创建和查询外部表。例如：
 
     ``` sql
     dbname=> CREATE EXTERNAL TABLE hdfstest(id int, newid int)
@@ -82,16 +83,16 @@ PXF provides more detailed logging when the `DEBUG` level is enabled. To configu
     <select output>
     ```
 
-5. Finally, examine/collect the log messages from `pxf-service.log`.
+5. 最后，从`pxf-service.log`检查/收集日志消息。
 
-**Note**: `DEBUG` logging is quite verbose and has a performance impact.  Remember to turn off PXF service `DEBUG` logging after you have collected the desired information.
+**Note**: `DEBUG` 记录非常冗长，并且会对性能产生影响. 在收集了所需的信息之后，请关闭PXF服务的`DEBUG`日志记录。
 
 
-### <a id="pxfdblogmsg"></a>Client-Level Logging
+### <a id="pxfdblogmsg"></a>客户端级别日志记录
 
-Database-level client logging may provide insight into internal PXF service operations.
+数据库级客户端日志记录可以提供对内部PXF服务操作的了解。
 
-Enable Greenplum Database and PXF debug message logging during operations on PXF external tables by setting the `client_min_messages` server configuration parameter to `DEBUG2` in your `psql` session.
+在psql会话中将`client_min_messages`服务器配置参数设置为`DEBUG2`，可以在对PXF外部表进行操作期间启用Greenplum数据库及PXF调试消息日志记录。
 
 ``` shell
 $ psql -d <dbname>
@@ -112,9 +113,9 @@ CONTEXT:  External table hdfstest
 ...
 ```
 
-Examine/collect the log messages from `stdout`.
+检查/收集来自stdout的日志消息
 
-**Note**: `DEBUG2` database session logging has a performance impact.  Remember to turn off `DEBUG2` logging after you have collected the desired information.
+**Note**: `DEBUG2`数据库会话日志记录会影响性能。记住，在收集了所需的信息之后，请关闭`DEBUG2`日志记录。
 
 ``` sql
 dbname=# SET client_min_messages=NOTICE;
