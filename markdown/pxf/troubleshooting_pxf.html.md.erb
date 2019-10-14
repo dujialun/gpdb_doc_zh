@@ -121,67 +121,67 @@ CONTEXT:  External table hdfstest
 dbname=# SET client_min_messages=NOTICE;
 ```
 
-## <a id="pxf-memcfg"></a>Addressing PXF Memory Issues
+## <a id="pxf-memcfg"></a>解决PXF内存问题
 
-Because a single PXF agent (JVM) serves multiple segments on a segment host, the PXF heap size can be a limiting runtime factor. This will be more evident under concurrent workloads and/or queries against large files. You may run into situations where a query will hang or fail due to insufficient memory or the Java garbage collector impacting response times. To avert or remedy these situations, first try increasing the Java maximum heap size or decreasing the Tomcat maximum number of threads, depending upon what works best for your system configuration.
+因为单个PXF客户端服务（JVM）为segment主机上的多个segment实例提供服务，所以PXF堆大小可能是限制运行的瓶颈。在并发工作负载时针对大文件的查询，影响更加明显。您可能会遇到由于内存不足或Java垃圾收集器影响响应时间而导致查询挂起或失败的情况。要避免或纠正这些情况，请首先尝试增加Java最大堆大小或减少Tomcat最大线程数，这取决于最适合您系统配置的方式。
 
-**Note**: The configuration changes described in this topic require modifying config files on *each* segment node in your Greenplum Database cluster. After you perform the updates, be sure to synchronize the PXF configuration to each segment host in the cluster.
+**Note**: 本主题中描述的配置更改需要在Greenplum数据库集群中的每个segment节点上修改配置文件。执行更新后，请确保将PXF配置同步到群集中的每个segment主机。
 
-You will need to re-apply these configuration changes after any PXF version upgrades.
+在任何PXF版本升级之后，您将需要重新加载这些配置更改。
 
-### <a id="pxf-heapcfg"></a>Increasing the JVM Memory for PXF
+### <a id="pxf-heapcfg"></a>为PXF增加JVM内存
 
-Each PXF agent running on a segment host is configured with a default maximum Java heap size of 2GB and an initial heap size of 1GB. If the segment hosts in your Greenplum Database cluster have an ample amount of memory, try increasing the maximum heap size to a value between 3-4GB. Set the initial and maximum heap size to the same value if possible.
+在segment主机上运行的每个PXF代理都配置有默认的最大Java堆大小2GB和初始堆大小1GB。 如果Greenplum数据库群集中的segment主机具有足够的内存，请尝试将最大堆大小增加到3-4GB之间的值。 如果可以，将初始堆大小和最大堆大小设置为相同的值最佳。
 
-Perform the following procedure to increase the heap size for the PXF agent running on each segment host in your Greenplum Database cluster.
+执行以下过程来增加在Greenplum数据库集群中每个segment主机上运行的PXF代理服务的堆大小。
 
-1. Log in to your Greenplum Database master node:
+1. 登录gpdb集群的master主机
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. Recall the location of the PXF user configuration directory ($PXF_CONF). Edit the `$PXF_CONF/conf/pxf-env.sh` file. For example:
+2. 重新进入PXF用户配置目录的位置（$ PXF_CONF）。编辑`$PXF_CONF/conf/pxf-env.sh`文件。 例如：
 
     ``` shell
     gpadmin@gpmaster$ vi $PXF_CONF/conf/pxf-env.sh
     ```
 
-3. Locate the `PXF_JVM_OPTS` setting in the `pxf-env.sh` file, and update the `-Xmx` and/or `-Xms` options to the desired value. For example:
+3. 在p`xf-env.sh`文件中找到`PXF_JVM_OPTS`设置，然后将 `-Xmx` 和/或 `-Xms` 选项更新为所需的值。 例如：
 
     ``` shell
     PXF_JVM_OPTS="-Xmx3g -Xms3g"
     ```
 
-4. Use the `pxf cluster sync` command to copy the updated `pxf-env.sh` file to each Greenplum Database segment host. For example:
+4. 使用`pxf cluster sync` 命令将更新的`pxf-env.sh`文件复制到每个Greenplum数据库segment主机。 例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
     ```
 
-5. Restart PXF on each Greenplum Database segment host as described in [Restarting PXF](cfginitstart_pxf.html#restart_pxf).
+5. 依照[Restarting PXF](cfginitstart_pxf.html#restart_pxf)描述，重启每个segment主机上的pxf服务。
 
-### <a id="pxf-threadcfg"></a>Another Option for Resource-Constrained PXF Segment Hosts
+### <a id="pxf-threadcfg"></a>资源受限的PXF segment主机的另一种选择
 
-If increasing the maximum heap size is not suitable for your Greenplum Database deployment, try decreasing the number of concurrent working threads configured for PXF's underlying Tomcat web application. A decrease in the number of running threads will prevent any PXF node from exhausting its memory, while ensuring that current queries run to completion (albeit a bit slower). Tomcat's default behavior is to queue requests until a thread is free, or the queue is exhausted.
+如果增加最大堆大小不适合您的Greenplum数据库部署，请尝试减少PXF的的并发工作线程数。正在运行的线程数量的减少将防止任何PXF节点耗尽其内存，同时确保当前查询运行完毕（尽管速度稍慢）。 Tomcat的默认行为是将请求排队，直到线程空闲或队列耗尽为止。
 
-The Tomcat default maximum number of threads is 300. Decrease the maximum number of threads to a value that works optimally for your Greenplum Database deployment. (If you plan to run large workloads on a large number of files in an external Hive data store, specify an even lower value.)
+Tomcat的默认最大线程数为300。将最大线程数减少为最适合您的Greenplum数据库部署的值。（如果计划在外部Hive数据存储中的大量文件上运行大型工作负载，请指定一个更低的值。）
 
-Perform the following procedure to decrease the maximum number of Tomcat threads for the PXF agent running on each segment host in your Greenplum Database deployment.
+执行以下过程，以减少在Greenplum数据库部署中每个segment主机上运行的PXF代理的Tomcat线程的最大数量。
 
-1. Log in to your Greenplum Database master node:
+1. 登录到gpdb集群的master节点
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. Edit the `$GPHOME/pxf/pxf-service/conf/server.xml` file. For example:
+2. 编辑`$GPHOME/pxf/pxf-service/conf/server.xml`。例如:
 
     ``` shell
     gpadmin@gpmaster$ vi $GPHOME/pxf/pxf-service/conf/server.xml
     ```
 
-3. Locate the `Catalina` `Executor` block and update the `maxThreads` setting to the desired value. For example:
+3. 找到`Catalina` `Executor`区域，并将`maxThreads`设置更新为所需值。 例如：
 
     ``` xml
     <Executor maxThreads="100"
@@ -190,19 +190,19 @@ Perform the following procedure to decrease the maximum number of Tomcat threads
               namePrefix="tomcat-http--"/>
     ```
 
-4. Copy the updated `server.xml` file to each Greenplum Database segment host. For example, if `seghostfile` contains a list, one-host-per-line, of the segment hosts in your Greenplum Database cluster:
+4. 将更新的`server.xml`文件复制到每个Greenplum数据库segment主机。 例如，如果`seghostfile`包含Greenplum数据库集群中seg主机的列表：
 
     ``` shell
     gpadmin@gpmaster$ gpscp -v -f seghostfile $GPHOME/pxf/pxf-service/conf/server.xml =:/usr/local/greenplum-db/pxf/pxf-service/conf/server.xml
     ```
 
-5. Restart PXF on each Greenplum Database segment host as described in [Restarting PXF](cfginitstart_pxf.html#restart_pxf).
+5. 依照[Restarting PXF](cfginitstart_pxf.html#restart_pxf)描述重启PXF服务
 
-## <a id="pxf-timezonecfg"></a>Addressing PXF JDBC Connector Time Zone Errors
+## <a id="pxf-timezonecfg"></a>解决PXF JDBC连接器时区错误
 
-You use the PXF JDBC connector to access data stored in an external SQL database. Depending upon the JDBC driver, the driver may return an error if there is a mismatch between the default time zone set for the PXF server and the time zone set for the external SQL database.
+您可以使用PXF JDBC连接器访问存储在外部SQL数据库中的数据。如果为PXF服务器设置的默认时区与为外部SQL数据库设置的时区不匹配，则取决于JDBC驱动程序，该程序可能会返回错误。
 
-For example, if you use the PXF JDBC connector to access an Oracle database with a conflicting time zone, PXF logs an error similar to the following:
+例如，如果使用PXF JDBC连接器访问时区冲突的Oracle数据库，则PXF会记录类似于以下内容的错误：
 
 ``` pre
 SEVERE: Servlet.service() for servlet [PXF REST Service] in context with path [/pxf] threw exception
@@ -210,13 +210,13 @@ java.io.IOException: ORA-00604: error occurred at recursive SQL level 1
 ORA-01882: timezone region not found
 ```
 
-Should you encounter this error, you can set default time zone option(s) for the PXF server in the `$PXF_CONF/conf/pxf-env.sh` configuration file, `PXF_JVM_OPTS` property setting. For example, to set the time zone:
+如果遇到此错误，可以在`$PXF_CONF/conf/pxf-env.sh`配置文件中的`PXF_JVM_OPTS`属性设置中为PXF服务器设置默认时区选项。 例如，要设置时区：
 
 ``` pre
 export PXF_JVM_OPTS="<current_settings> -Duser.timezone=America/Chicago"
 ```
 
-You can use the `PXF_JVM_OPTS` property to set other Java options as well.
+您也可以使用`PXF_JVM_OPTS`属性来设置其他Java选项。
 
-As described in previous sections, you must synchronize the updated PXF configuration to each Greenplum Database segment host and restart the PXF server on each host.
+如前几节所述，您必须将更新的PXF配置同步到每个Greenplum数据库segment主机，然后在每个主机上重新启动PXF服务。
 
