@@ -4,170 +4,158 @@
 <topic id="topic1">
   <title id="cm20941">DECLARE</title>
   <body>
-    <p id="sql_command_desc">Defines a cursor.</p>
+    <p id="sql_command_desc">定义一个游标。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">DECLARE <varname>name</varname> [BINARY] [INSENSITIVE] [NO SCROLL] CURSOR 
      [{WITH | WITHOUT} HOLD] 
      FOR <varname>query</varname> [FOR READ ONLY]</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>DECLARE</codeph> allows a user to create cursors, which can be used to retrieve a
-        small number of rows at a time out of a larger query. Cursors can return data either in text
-        or in binary format using <codeph><xref href="./FETCH.xml#topic1" type="topic" format="dita"
-          /></codeph>. </p>
-      <note>This page describes usage of cursors at the SQL command level. If you are trying to use
-        cursors inside a PL/pgSQL function, the rules are different. See <xref
-          href="../extensions/pl_sql.xml#topic1"/>.</note>
-      <p>Normal cursors return data in text format, the same as a <codeph>SELECT</codeph> would
-        produce. Since data is stored natively in binary format, the system must do a conversion to
-        produce the text format. Once the information comes back in text form, the client
-        application may need to convert it to a binary format to manipulate it. In addition, data in
-        the text format is often larger in size than in the binary format. Binary cursors return the
-        data in a binary representation that may be more easily manipulated. Nevertheless, if you
-        intend to display the data as text anyway, retrieving it in text form will save you some
-        effort on the client side.</p>
-      <p>As an example, if a query returns a value of one from an integer column, you would get a
-        string of 1 with a default cursor whereas with a binary cursor you would get a 4-byte field
-        containing the internal representation of the value (in big-endian byte order). </p>
-      <p>Binary cursors should be used carefully. Many applications, including psql, are not
-        prepared to handle binary cursors and expect data to come back in the text format. </p>
+      <title>描述</title>
+      <p><codeph>DECLARE</codeph>允许用户创建游标，该游标可用于一次从较大查询中检索少量行。
+        游标可以使用<codeph><xref href="./FETCH.xml#topic1" type="topic" format="dita"/></codeph>以文本或二进制格式返回数据。
+        </p>
+      <note>本页在SQL命令级别描述游标的用法。
+        如果试图在PL/pgSQL函数中使用游标，则规则是不同的。
+        参见<xref href="../extensions/pl_sql.xml#topic1"/>。
+        </note>
+      <p>普通游标以文本格式返回数据，与<codeph>SELECT</codeph>会产生相同的结果。
+        由于数据本身以二进制格式存储，因此系统必须进行转换以产生文本格式。
+        一旦信息以文本形式返回，客户端应用程序可能需要将其转换为二进制格式以进行操作。
+        另外，文本格式的数据通常比二进制格式的数据大。
+        二进制游标以二进制表示形式返回数据，可能更易于操作。
+        但是，如果您仍然打算将数据显示为文本，则以文本形式检索数据将节省您在客户端的工作量。
+        </p>
+      <p>例如，如果查询从整数列返回值1，则将使用默认游标获得字符串1，而使用二进制游标将获得包含值的内部表示形式的4字节字段（在大端字节序）。
+        </p>
+      <p>二进制游标应谨慎使用。许多应用程序，包括psql，都不准备处理二进制游标，并希望数据以文本格式返回。
+        </p>
       <note type="note">
-        <p>When the client application uses the 'extended query' protocol to issue a
-            <codeph>FETCH</codeph> command, the Bind protocol message specifies whether data is to
-          be retrieved in text or binary format. This choice overrides the way that the cursor is
-          defined. The concept of a binary cursor as such is thus obsolete when using extended query
-          protocol — any cursor can be treated as either text or binary.</p>
+        <p>当客户端应用程序使用“扩展查询”协议发出<codeph>FETCH</codeph>命令时，“绑定协议”消息指定是以文本还是二进制格式检索数据。
+          此选择将覆盖定义光标的方式。
+          因此，当使用扩展查询协议时，二进制游标的概念就已过时了 - 任何游标都可以视为文本或二进制。
+          </p>
       </note>
-      <p>A cursor can be specified in the <codeph>WHERE CURRENT OF</codeph> clause of the
-            <codeph><xref href="./UPDATE.xml#topic1" type="topic" format="dita"/></codeph> or
-            <codeph><xref href="./DELETE.xml#topic1" type="topic" format="dita"/></codeph> statement
-        to update or delete table data. The <codeph>UPDATE</codeph> or <codeph>DELETE</codeph>
-        statement can only be executed on the server, for example in an interactive psql session or
-        a script. Language extensions such as PL/pgSQL do not have support for updatable cursors.
+      <p>可以在<codeph><xref href="./UPDATE.xml#topic1" type="topic" format="dita"/></codeph>或<codeph><xref href="./DELETE.xml#topic1" type="topic" format="dita"/></codeph>语句的<codeph>WHERE CURRENT OF</codeph>子句中指定游标，以更新或删除表数据。
+        <codeph>UPDATE</codeph>或<codeph>DELETE</codeph>语句只能在服务器上执行，例如在交互式psql会话或脚本中。
+        语言扩展（例如PL/pgSQL）不支持可更新的游标。
       </p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>
             <varname>name</varname>
           </pt>
-          <pd>The name of the cursor to be created. </pd>
+          <pd>要创建的游标的名称。</pd>
         </plentry>
         <plentry>
           <pt>BINARY</pt>
-          <pd>Causes the cursor to return data in binary rather than in text format. </pd>
+          <pd>使光标返回二进制而不是文本格式的数据。</pd>
         </plentry>
         <plentry>
           <pt>INSENSITIVE</pt>
-          <pd>Indicates that data retrieved from the cursor should be unaffected by updates to the
-            tables underlying the cursor while the cursor exists. In Greenplum Database, all cursors
-            are insensitive. This key word currently has no effect and is present for compatibility
-            with the SQL standard. </pd>
+          <pd>指示在存在游标时，从游标检索的数据应不受游标基于的表更新的影响。
+            在Greenplum数据库中，所有游标都不敏感。
+            该关键字当前不起作用，出现是为了与SQL标准兼容。
+            </pd>
         </plentry>
         <plentry>
           <pt>NO SCROLL</pt>
-          <pd>A cursor cannot be used to retrieve rows in a nonsequential fashion. This is the
-            default behavior in Greenplum Database, since scrollable cursors
-              (<codeph>SCROLL</codeph>) are not supported.</pd>
+          <pd>游标不能用于以非顺序方式检索行。
+            这是Greenplum数据库中的默认行为，因为不支持滚动游标（<codeph>SCROLL</codeph>）。
+            </pd>
         </plentry>
         <plentry>
           <pt>WITH HOLD</pt>
           <pt>WITHOUT HOLD</pt>
-          <pd><codeph>WITH HOLD</codeph> specifies that the cursor may continue to be used after the
-            transaction that created it successfully commits. <codeph>WITHOUT HOLD</codeph>
-            specifies that the cursor cannot be used outside of the transaction that created it.
-              <codeph>WITHOUT HOLD</codeph> is the default. </pd>
-          <pd><codeph>WITH HOLD</codeph> cannot not be specified when the <codeph>query</codeph>
-            includes a <codeph>FOR UPDATE</codeph> or <codeph>FOR SHARE</codeph> clause. </pd>
+          <pd><codeph>WITH HOLD</codeph>指定在成功创建游标的事务提交后可以继续使用游标。
+            <codeph>WITHOUT HOLD</codeph>指定不能在创建游标的事务之外使用游标。
+            默认为<codeph>WITHOUT HOLD</codeph>。
+            </pd>
+          <pd>当<codeph>query</codeph>包含<codeph>FOR UPDATE</codeph>或<codeph>FOR SHARE</codeph>子句时，不能指定<codeph>WITH HOLD</codeph>。
+            </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>query</varname>
           </pt>
-          <pd>A <codeph><xref href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph> or
-                <codeph><xref href="./VALUES.xml#topic1" type="topic" format="dita"/></codeph>
-            command which will provide the rows to be returned by the cursor.<p>If the cursor is
-              used in the <codeph>WHERE CURRENT OF</codeph> clause of the <codeph><xref
-                  href="./UPDATE.xml#topic1" type="topic" format="dita"/></codeph> or <codeph><xref
-                  href="./DELETE.xml#topic1" type="topic" format="dita"/></codeph> command, the
-                <codeph>SELECT</codeph> command must satisfy the following conditions:</p><ul
+          <pd><codeph><xref href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph>或<codeph><xref href="./VALUES.xml#topic1" type="topic" format="dita"/></codeph>命令，它将提供游标要返回的行。
+            <p>如果在<codeph><xref href="./UPDATE.xml#topic1" type="topic" format="dita"/></codeph>或<codeph><xref href="./DELETE.xml#topic1" type="topic" format="dita"/></codeph>命令的<codeph>WHERE CURRENT OF</codeph>子句中使用了游标，
+              则<codeph>SELECT</codeph>命令必须满足以下条件：
+              </p>
+            <ul
               id="ul_rq1_vr2_m4">
-              <li id="cm153794">Cannot reference a view or external table.</li>
-              <li id="cm153795">References only one table. <p>The table must be updatable. For
-                  example, the following are not updatable: table functions, set-returning
-                  functions, append-only tables, columnar tables.</p></li>
-              <li id="cm153797">Cannot contain any of the following:<ul id="ul_phn_nvj_dp">
-                  <li>A grouping clause</li>
-                  <li>A set operation such as <codeph>UNION ALL</codeph> or <codeph>UNION
-                      DISTINCT</codeph></li>
-                  <li>A sorting clause</li>
-                  <li>A windowing clause</li>
-                  <li>A join or a self-join</li>
-                </ul><p>Specifying the <codeph>FOR UPDATE</codeph> clause in the
-                    <codeph>SELECT</codeph> command prevents other sessions from changing the rows
-                  between the time they are fetched and the time they are updated. Without the
-                    <codeph>FOR UPDATE</codeph> clause, a subsequent use of the
-                    <codeph>UPDATE</codeph> or <codeph>DELETE</codeph> command with the
-                    <codeph>WHERE CURRENT OF</codeph> clause has no effect if the row was changed
-                  since the cursor was created. </p><note>Specifying the <codeph>FOR UPDATE</codeph>
-                  clause in the <codeph>SELECT</codeph> command locks the entire table, not just the
-                  selected rows. </note></li>
+              <li id="cm153794">无法引用视图或外部表。</li>
+              <li id="cm153795">仅引用一张表。
+                <p>该表必须是可更新的。例如，以下内容不可更新：表函数，返回集合的函数，仅追加表，列式表。
+                  </p></li>
+              <li id="cm153797">不能包含以下任何内容：<ul id="ul_phn_nvj_dp">
+                  <li>分组子句</li>
+                  <li>集合操作，例如<codeph>UNION ALL</codeph>或<codeph>UNION DISTINCT</codeph></li>
+                  <li>排序子句</li>
+                  <li>窗口子句</li>
+                  <li>连接或自连接</li>
+                </ul>
+                <p>在<codeph>SELECT</codeph>命令中指定<codeph>FOR UPDATE</codeph>子句可防止其他会话在获取行和更新行之间更改行。
+                  如果没有<codeph>FOR UPDATE</codeph>子句，则在创建游标以后更改了行，
+                  随后将<codeph>UPDATE</codeph>或<codeph>DELETE</codeph>命令与<codeph>WHERE CURRENT OF</codeph>子句一起使用将无效。
+                  </p>
+                <note>在<codeph>SELECT</codeph>命令中指定<codeph>FOR UPDATE</codeph>子句将锁定整个表，而不只是选定的行。
+                  </note></li>
             </ul></pd>
         </plentry>
       </parml>
       <parml>
         <plentry>
           <pt>FOR READ ONLY</pt>
-          <pd><codeph>FOR READ ONLY</codeph> indicates that the cursor is used in a read-only
-            mode.</pd>
+          <pd><codeph>FOR READ ONLY</codeph>表示光标以只读模式使用。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Notes</title>
-      <p>Unless <codeph>WITH HOLD</codeph> is specified, the cursor created by this command can only
-        be used within the current transaction. Thus, <codeph>DECLARE</codeph> without <codeph>WITH
-          HOLD</codeph> is useless outside a transaction block: the cursor would survive only to the
-        completion of the statement. Therefore Greenplum Database reports an error if this command
-        is used outside a transaction block. Use <codeph>BEGIN</codeph> and <codeph>COMMIT</codeph>
-        (or <codeph>ROLLBACK</codeph>) to define a transaction block.</p>
-      <p>If <codeph>WITH HOLD</codeph> is specified and the transaction that created the cursor
-        successfully commits, the cursor can continue to be accessed by subsequent transactions in
-        the same session. (But if the creating transaction is aborted, the cursor is removed.) A
-        cursor created with <codeph>WITH HOLD</codeph> is closed when an explicit
-          <codeph>CLOSE</codeph> command is issued on it, or the session ends. In the current
-        implementation, the rows represented by a held cursor are copied into a temporary file or
-        memory area so that they remain available for subsequent transactions. </p>
-      <p>If you create a cursor with the <codeph>DECLARE</codeph> command in a transaction, you
-        cannot use the <codeph>SET</codeph> command in the transaction until you close the cursor
-        with the <codeph>CLOSE</codeph> command.</p>
-      <p>Scrollable cursors are not currently supported in Greenplum Database. You can only use
-          <codeph>FETCH</codeph> to move the cursor position forward, not backwards.</p>
-      <p><codeph>DECLARE...FOR UPDATE</codeph> is not supported with append-optimized tables.</p>
-      <p>You can see all available cursors by querying the <codeph>pg_cursors</codeph> system view.
+      <title>注解</title>
+      <p>除非指定了<codeph>WITH HOLD</codeph>，否则此命令创建的游标只能在当前事务中使用。
+        因此，不带<codeph>WITH HOLD</codeph>的<codeph>DECLARE</codeph>在事务块之外是无用的：游标只能生存到语句完成。
+        因此，如果在事务块外部使用此命令，Greenplum数据库将报告错误。
+        使用<codeph>BEGIN</codeph>和<codeph>COMMIT</codeph>（或<codeph>ROLLBACK</codeph>）定义事务块。
+        </p>
+      <p>如果指定了<codeph>WITH HOLD</codeph>，并且成功提交了创建游标的事务，则该游标可以继续被同一会话中的后续事务访问。
+        （但是，如果创建事务被中止，则删除游标。）当对它发出显式<codeph>CLOSE</codeph>命令或会话结束时，将关闭用<codeph>WITH HOLD</codeph>创建的游标。
+        在当前实现中，由保留的游标表示的行被复制到临时文件或存储区中，以便它们可用于后续事务。
+        </p>
+      <p>如果在事务中使用<codeph>DECLARE</codeph>命令创建游标，
+        则只有在使用<codeph>CLOSE</codeph>命令关闭游标后才能在事务中使用<codeph>SET</codeph>命令。
+        </p>
+      <p>Greenplum数据库当前不支持可滚动光标。
+        您只能使用<codeph>FETCH</codeph>将光标位置向前移动，而不能向后移动。
+        </p>
+      <p>追加优化表不支持<codeph>DECLARE...FOR UPDATE</codeph>。</p>
+      <p>您可以通过查询<codeph>pg_cursors</codeph>系统视图来查看所有可用的游标。
       </p>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>Declare a cursor: </p>
+      <title>示例</title>
+      <p>声明一个游标：</p>
       <codeblock>DECLARE mycursor CURSOR FOR SELECT * FROM mytable;</codeblock>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p>SQL standard allows cursors only in embedded SQL and in modules. Greenplum Database permits
-        cursors to be used interactively. </p>
-      <p>Greenplum Database does not implement an <codeph>OPEN</codeph> statement for cursors. A
-        cursor is considered to be open when it is declared.</p>
-      <p>The SQL standard allows cursors to move both forward and backward. All Greenplum Database
-        cursors are forward moving only (not scrollable).</p>
-      <p>Binary cursors are a Greenplum Database extension. </p>
+      <title>兼容性</title>
+      <p>SQL标准仅允许在嵌入式SQL和模块中使用游标。
+        Greenplum数据库允许以交互方式使用游标。
+        </p>
+      <p>Greenplum数据库未为游标实现<codeph>OPEN</codeph>语句。
+        当游标被声明时，它被认为是打开的。
+        </p>
+      <p>SQL标准允许游标向前和向后移动。
+        所有Greenplum数据库游标仅向前移动（不可滚动）。
+        </p>
+      <p>二进制游标是Greenplum数据库扩展。</p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="CLOSE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
             href="./DELETE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
             href="./FETCH.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
