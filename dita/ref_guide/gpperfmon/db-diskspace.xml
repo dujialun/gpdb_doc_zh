@@ -2,34 +2,34 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="db-diskspac">
-   <title> diskspace_* </title>
+   <title> diskspace_* 表</title>
    <body>
-      <p>The <codeph>diskspace_*</codeph> tables store diskspace metrics.</p>
+      <p> <codeph>diskspace_*</codeph> 表存储磁盘空间指标。</p>
       <ul>
          <li>
-            <codeph>diskspace_now</codeph> is an external table whose data files are stored in
-               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. Current diskspace metrics are
-            stored in <codeph>database_now</codeph> during the period between data collection from
-            the <codeph>gpperfmon</codeph> agents and automatic commitment to the
-               <codeph>diskspace_history</codeph> table.</li>
+            <codeph>diskspace_now</codeph> 是一个外部表, 其数据文件位于
+               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>.
+               在数据从 <codeph>gpperfmon</codeph> 数据采集代理程序获得数据以后，自动提交到 
+               <codeph>diskspace_history</codeph> 表之前，
+            当前磁盘空间指标数据存储在 <codeph>database_now</codeph> 表中。</li>
          <li>
-            <codeph>diskspace_tail</codeph> is an external table whose data files are stored in
-               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. This is a transitional table
-            for diskspace metrics that have been cleared from <codeph>diskspace_now</codeph> but has
-            not yet been committed to <codeph>diskspace_history</codeph>. It typically only contains
-            a few minutes worth of data.</li>
+            <codeph>diskspace_tail</codeph> 是一个外部表, 其数据文件位于
+               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. 它是一个过渡表，当数据已经从 
+               <codeph>diskspace_now</codeph> 中清除，但还没有提交到
+               <codeph>diskspace_history</codeph>表中时，暂存在这里。它通常仅包含数据几分钟时间。</li>
          <li>
-            <codeph>diskspace_history</codeph> is a regular table that stores historical diskspace
-            metrics. It is pre-partitioned into monthly partitions. Partitions are automatically
-            added in two month increments as needed. </li>
+            <codeph>diskspace_history</codeph> 是一个常规表，
+            用于存储历史磁盘空间指标。
+            它已预先设置为按月分区。
+            分区会根据需要以两个月为增量自动添加。 </li>
       </ul>
       <table>
          <tgroup cols="2">
             <thead>
                <row>
-                  <entry>Column</entry>
-                  <entry>Type</entry>
-                  <entry>Description</entry>
+                  <entry>列</entry>
+                  <entry>类型</entry>
+                  <entry>说明</entry>
                </row>
             </thead>
             <tbody>
@@ -38,42 +38,42 @@
                      <codeph>ctime</codeph>
                   </entry>
                   <entry>timestamp(0) without time zone </entry>
-                  <entry>Time of diskspace measurement.</entry>
+                  <entry>磁盘空间测量时间.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>hostname</codeph>
                   </entry>
                   <entry> varchar(64)</entry>
-                  <entry>The hostname associated with the diskspace measurement.</entry>
+                  <entry>磁盘空间测量对应的主机名称.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>Filesystem </codeph>
                   </entry>
                   <entry>text</entry>
-                  <entry>Name of the filesystem for the diskspace measurement.</entry>
+                  <entry>磁盘空间测量对应的文件系统名称.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>total_bytes</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Total bytes in the file system.</entry>
+                  <entry>文件系统的总字节数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>bytes_used</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Total bytes used in the file system.</entry>
+                  <entry>文件系统中已使用字节数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>bytes_available</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Total bytes available in file system.</entry>
+                  <entry>文件系统中可用的字节数.</entry>
                </row>
             </tbody>
          </tgroup>

@@ -2,22 +2,19 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="CommandCenterDatabaseReference-dynamic_memory_info">
-   <title>dynamic_memory_info </title>
+   <title>dynamic_memory_info 视图</title>
    <body>
-      <p>The <codeph>dynamic_memory_info</codeph> view shows a sum of the used and available dynamic
-         memory for all segment instances on a segment host. Dynamic memory refers to the maximum
-         amount of memory that Greenplum Database instance will allow the query processes of a
-         single segment instance to consume before it starts cancelling processes. This limit,
-         determined by the currently active resource management scheme (resource group-based
-         or resource queue-based), is
-         evaluated on a per-segment basis.</p>
+      <p> <codeph>dynamic_memory_info</codeph> 视图展示一个 segment 主机上所有 segment 实例已用内存和可用动态内存的总和。
+      动态内存指 Greenplum 数据库实例在启动取消进程前，
+      允许一个 segment 实例上查询进程使用的内存(超过该数量则启动取消进程)。
+      这个限制有当前所使用的资源管理方案决定 (基于资源组或基于资源队列), 按每个 segment 进行评估.</p>
       <table>
          <tgroup cols="2">
             <thead>
                <row>
-                  <entry>Column</entry>
-                  <entry>Type</entry>
-                  <entry>Description</entry>
+                  <entry>列</entry>
+                  <entry>类型</entry>
+                  <entry>说明</entry>
                </row>
             </thead>
             <tbody>
@@ -26,35 +23,32 @@
                      <codeph>ctime</codeph>
                   </entry>
                   <entry>timestamp(0) without time zone</entry>
-                  <entry>Time this row was created in the <codeph>segment_history</codeph>
-                     table.</entry>
+                  <entry>在 <codeph>segment_history</codeph>
+                     表中的创建时间.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>hostname</codeph>
                   </entry>
                   <entry>varchar(64)</entry>
-                  <entry>Segment or master hostname associated with these system memory
-                     metrics.</entry>
+                  <entry>与这些系统内存指标相关的 Segment 或 master 主机名称.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>dynamic_memory_used_mb</codeph>
                   </entry>
                   <entry>numeric</entry>
-                  <entry>The amount of dynamic memory in MB allocated to query processes running on
-                     this segment.</entry>
+                  <entry>segment 节点上分配给查询进程的动态内存大小(单位: MB).</entry>
                </row>
                <row>
                   <entry>
                      <codeph>dynamic_memory_available_mb</codeph>
                   </entry>
                   <entry>numeric</entry>
-                  <entry>The amount of additional dynamic memory (in MB) available to the query
-                     processes running on this segment host. Note that this value is a sum of the
-                     available memory for all segments on a host. Even though this value reports
-                     available memory, it is possible that one or more segments on the host have
-                     exceeded their memory limit.</entry>
+                  <entry>segment 节点上可分配给查询进程的动态内存大小(单位: MB).
+                  注意这个值是所有 segment 节点上可分配内存的总和. 虽然报告了这么多可分配内存，
+                  也可能一个或多个 segment 
+                  在主机上分配的内存已经超过了它们的限制。</entry>
                </row>
             </tbody>
          </tgroup>

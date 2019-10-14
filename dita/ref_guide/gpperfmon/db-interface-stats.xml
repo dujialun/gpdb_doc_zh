@@ -2,35 +2,37 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="db-interface_stats">
-   <title> interface_stats_* </title>
+   <title> interface_stats_* 表</title>
    <body>
-      <p>The <codeph>interface_stats_*</codeph> tables store statistical metrics about
-         communications over each active interface for a Greenplum Database instance.</p>
-      <p>These tables are in place for future use and are not currently populated.</p>
-      <p>There are three <codeph>interface_stats</codeph> tables, all having the same columns:</p>
+      <p> <codeph>interface_stats_*</codeph> 表存储
+      一个 Greenplum 数据库实例在每个活动网络接口上
+      的通信统计指标。</p>
+      <p>这些表为将来使用保留，当前没有填充信息。</p>
+      <p>一共有三张 <codeph>interface_stats</codeph> 表,
+      它们具有相同的结构(列):</p>
       <ul>
          <li>
-            <codeph>interface_stats_now</codeph> is an external table whose data files are stored in
-               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>.</li>
+            <codeph>interface_stats_now</codeph> 是一个外部表, 其数据文件位于
+            <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>.</li>
          <li>
-            <codeph>interface_stats_tail</codeph> is an external table whose data files are stored
-            in <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. This is a transitional table
-            for statistical interface metrics that has been cleared from
-               <codeph>interface_stats_now</codeph> but has not yet been committed to
-               <codeph>interface_stats_history</codeph>. It typically only contains a few minutes
-            worth of data.</li>
+            <codeph>interface_stats_tail</codeph> 是一个外部表, 其数据文件位于
+            in <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. 它是一个存储接口统计指标的过渡表，当数据已经从
+            <codeph>interface_stats_now</codeph> 中清除，但还没有提交到
+            <codeph>interface_stats_history</codeph>表中时，暂存在这里。
+            它通常仅包含数据几分钟时间。</li>
          <li>
-            <codeph>interface_stats_history</codeph> is a regular table that stores statistical
-            interface metrics. It is pre-partitioned into monthly partitions. Partitions are
-            automatically added in one month increments as needed. </li>
+            <codeph>interface_stats_history</codeph> 是一个常规表，
+            用于存储历史接口统计指标。
+            它已预先设置为按月分区。
+            分区会根据需要以两个月为增量自动添加。</li>
       </ul>
       <table>
          <tgroup cols="2">
             <thead>
                <row>
-                  <entry>Column</entry>
-                  <entry>Type</entry>
-                  <entry>Description</entry>
+                  <entry>列</entry>
+                  <entry>类型</entry>
+                  <entry>说明</entry>
                </row>
             </thead>
             <tbody>
@@ -39,130 +41,119 @@
                      <codeph>interface_name</codeph>
                   </entry>
                   <entry>string</entry>
-                  <entry>Name of the interface. For example: eth0, eth1, lo.</entry>
+                  <entry>接口名称. 例如: eth0, eth1, lo.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>bytes_received</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Amount of data received in bytes.</entry>
+                  <entry>接收字节数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>packets_received</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Number of packets received.</entry>
+                  <entry>接收报文数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>receive_errors</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Number of errors encountered while data was being received.</entry>
+                  <entry>接收数据时，发生的错误数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>receive_drops</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Number of times packets were dropped while data was being received.</entry>
+                  <entry>接收数据时，丢弃报文的次数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>receive_fifo_errors</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Number of times FIFO (first in first out) errors were encountered while
-                     data was being received.</entry>
+                  <entry>接收数据时，FIFO (先进先出) 错误发生的次数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>receive_frame_errors</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Number of frame errors while data was being received.</entry>
+                  <entry>接收数据时，帧错误发生的次数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>receive_compressed_packets</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Number of packets received in compressed format.</entry>
+                  <entry>接受的压缩格式报文数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>receive_multicast_packets</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Number of multicast packets received.</entry>
+                  <entry>接受的多播报文数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>bytes_transmitted</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Amount of data transmitted in bytes.</entry>
+                  <entry>传输字节数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>packets_transmitted</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Amount of data transmitted in bytes.</entry>
-               </row>
-               <row>
-                  <entry>
-                     <codeph>packets_transmitted</codeph>
-                  </entry>
-                  <entry>bigint</entry>
-                  <entry>Number of packets transmitted.</entry>
+                  <entry>传输报文数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>transmit_errors</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Number of errors encountered during data transmission.</entry>
+                  <entry>数据传输时，发生的错误数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>transmit_drops</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Number of times packets were dropped during data transmission.</entry>
+                  <entry>数据传输时，丢弃报文的次数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>transmit_fifo_errors</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Number of times fifo errors were encountered during data
-                     transmission.</entry>
+                  <entry>数据传输时，FIFO (先进先出) 错误发生的次数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>transmit_collision_errors</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Number of times collision errors were encountered during data
-                     transmission.</entry>
+                  <entry>数据传输时，碰撞错误发生的次数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>transmit_carrier_errors</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>Number of times carrier errors were encountered during data
-                     transmission.</entry>
+                  <entry>数据传输时，载波错误发生的次数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>transmit_compressed_packets</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Number of packets transmitted in compressed format.</entry>
+                  <entry>传输的压缩格式报文数.</entry>
                </row>
             </tbody>
          </tgroup>
