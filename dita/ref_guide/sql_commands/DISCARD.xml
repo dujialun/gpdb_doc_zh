@@ -1,24 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="dn20941">DISCARD</title><body><p id="sql_command_desc">Discards the session state.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">DISCARD { ALL | PLANS | TEMPORARY | TEMP }</codeblock></section><section id="section3">
-      <title>Description</title>
-  <p><codeph>DISCARD</codeph> releases internal resources associated with a database session. This command is useful for partially or fully
-    resetting the session's state. There are several subcommands to
-    release different types of resources; the <codeph>DISCARD ALL</codeph>
-      variant subsumes all the others, and also resets additional state.
-  </p>
-</section><section id="section4"><title>Parameters</title><parml><plentry><pt>PLANS</pt><pd>Releases all cached query plans, forcing re-planning to occur
-  the next time the associated prepared statement is used.</pd></plentry><plentry><pt>SEQUENCES</pt><pd>Discards all cached sequence-related state, including any preallocated sequence values that have
-            not yet been returned by <codeph>nextval()</codeph>. (See <codeph>CREATE
-              SEQUENCE</codeph> for a description of preallocated sequence values.) </pd></plentry>
-        <plentry>
-          <pt>TEMPORARY/TEMP</pt>
-          <pd>Drops all temporary tables created in the current session.</pd>
-        </plentry><plentry><pt>ALL</pt><pd>Releases all temporary resources associated with the current session and resets the session to
-            its initial state. Currently, this has the same effect as executing the following
-            sequence of statements:
-            <codeblock>SET SESSION AUTHORIZATION DEFAULT;
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="dn20941">DISCARD</title>
+    <body>
+        <p id="sql_command_desc">放弃会话状态。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">DISCARD { ALL | PLANS | TEMPORARY | TEMP }</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>DISCARD</codeph>释放与数据库会话关联的内部资源。
+                此命令对于部分或全部重置会话状态很有用。
+                有几个子命令可以释放不同类型的资源。
+                <codeph>DISCARD ALL</codeph>变体包含所有其他变体，并且还重置其他状态。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>PLANS</pt>
+                    <pd>释放所有缓存的查询计划，并在下一次使用关联的预编译语句时强制进行重新计划。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>SEQUENCES</pt>
+                    <pd>丢弃所有与缓存序列相关的状态，包括尚未由<codeph>nextval()</codeph>返回的任何预分配序列值。
+                        （有关预分配序列值的描述，请参见<codeph>CREATE SEQUENCE</codeph>。）
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>TEMPORARY/TEMP</pt>
+                    <pd>删除在当前会话中创建的所有临时表。</pd>
+                </plentry>
+                <plentry>
+                    <pt>ALL</pt>
+                    <pd>释放与当前会话关联的所有临时资源，并将会话重置为其初始状态。
+                        当前，这与执行以下语句序列具有相同的效果：
+                        <codeblock>SET SESSION AUTHORIZATION DEFAULT;
 RESET ALL;
 DEALLOCATE ALL;
 CLOSE ALL;
@@ -26,4 +47,20 @@ UNLISTEN *;
 SELECT pg_advisory_unlock_all();
 DISCARD PLANS;
 DISCARD SEQUENCES;
-DISCARD TEMP;</codeblock></pd></plentry></parml></section><section id="section5"><title>Notes</title><p><codeph>DISCARD ALL</codeph> cannot be executed inside a transaction block.</p></section><section id="section6"><title>Compatibility</title><p><codeph>DISCARD</codeph>  is a Greenplum Database extension.</p></section></body></topic>
+DISCARD TEMP;</codeblock>
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p><codeph>DISCARD ALL</codeph>不能在事务块内执行。
+            </p>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p><codeph>DISCARD</codeph>是Greenplum数据库扩展。
+            </p>
+        </section>
+    </body>
+</topic>
