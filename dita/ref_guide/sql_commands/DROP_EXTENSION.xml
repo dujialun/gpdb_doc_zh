@@ -4,64 +4,67 @@
 <topic id="topic1">
   <title id="cw20941">DROP EXTENSION</title>
   <body>
-    <p id="sql_command_desc">Removes an extension from a Greenplum database.</p>
+    <p id="sql_command_desc">从Greenplum数据库中删除扩展。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">DROP EXTENSION [ IF EXISTS ] <varname>name</varname> [, ...] [ CASCADE | RESTRICT ]</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>DROP EXTENSION</codeph> removes extensions from the database. Dropping an extension
-        causes its component objects to be dropped as well. </p>
-      <note>The required supporting extension files what were installed to create the extension are
-        not deleted. The files must be manually removed from the Greenplum Database hosts.</note>
-      <p>You must own the extension to use <codeph>DROP EXTENSION</codeph>.</p>
-      <p>This command fails if any of the extension objects are in use in the database. For example,
-        if a table is defined with columns of the extension type. Add the <codeph>CASCADE</codeph>
-        option to forcibly remove those dependent objects.</p>
-      <note type="important">Before issuing a <codeph>DROP EXTENSION</codeph> with the
-          <codeph>CASCADE</codeph> keyword, you should be aware of all object that depend on the
-        extension to avoid unintended consequences.</note>
+      <title>描述</title>
+      <p><codeph>DROP EXTENSION</codeph>从数据库中删除扩展。
+        删除扩展会导致其组成对象也被删除。
+        </p>
+      <note>创建扩展所需的支持扩展文件没有被删除。
+        必须从Greenplum数据库主机中手动删除文件。
+        </note>
+      <p>您必须拥有该扩展才能使用<codeph>DROP EXTENSION</codeph>。</p>
+      <p>如果数据库中正在使用任何扩展的对象，则此命令将失败。
+        例如，如果用扩展类型的列定义了表。
+        添加<codeph>CASCADE</codeph>选项以强制删除那些依赖对象。
+        </p>
+      <note type="important">在使用<codeph>CASCADE</codeph>关键字发出<codeph>DROP EXTENSION</codeph>之前，
+        您应该了解所有依赖于扩展名的对象，以避免意外的结果。
+        </note>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>IF EXISTS</pt>
           <pd>
-            <p>Do not throw an error if the extension does not exist. A notice is issued.</p>
+            <p>如果扩展名不存在，请不要报错。发出通知。</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>name</varname></pt>
           <pd>
-            <p>The name of an installed extension.</p>
+            <p>已安装扩展的名称。</p>
           </pd>
         </plentry>
         <plentry>
           <pt>CASCADE</pt>
           <pd>
-            <p>Automatically drop objects that depend on the extension, and in turn all objects that
-              depend on those objects. See the PostgreSQL information about <xref
-                href="https://www.postgresql.org/docs/9.6/ddl-depend.html" format="html"
-                scope="external">Dependency Tracking</xref>.</p>
+            <p>自动删除依赖于扩展的对象，并删除依赖于这些对象的所有对象。
+              请参阅有关<xref href="https://www.postgresql.org/docs/9.6/ddl-depend.html" format="html" scope="external">依赖跟踪</xref>的PostgreSQL信息。
+              </p>
           </pd>
         </plentry>
         <plentry>
           <pt>RESTRICT</pt>
           <pd>
-            <p>Refuse to drop an extension if any objects depend on it, other than the extension
-              member objects. This is the default.</p>
+            <p>如果扩展成员对象以外的任何对象依赖扩展，则拒绝删除该扩展。
+              这是默认值。
+              </p>
           </pd>
         </plentry>
       </parml>
     </section>
     <section id="section6">
-      <title>Compatibility</title>
-      <p><codeph>DROP EXTENSION</codeph> is a Greenplum Database extension. </p>
+      <title>兼容性</title>
+      <p><codeph>DROP EXTENSION</codeph>是Greenplum数据库扩展。</p>
     </section>
     <section id="section7">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="CREATE_EXTENSION.xml#topic1">CREATE EXTENSION</xref></codeph>,
             <codeph><xref href="ALTER_EXTENSION.xml#topic1">ALTER EXTENSION</xref></codeph></p>
     </section>
