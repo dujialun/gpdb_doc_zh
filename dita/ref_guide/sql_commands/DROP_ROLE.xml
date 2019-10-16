@@ -1,21 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="dd20941">DROP ROLE</title><body><p id="sql_command_desc">Removes a database role.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">DROP ROLE [IF EXISTS] <varname>name</varname> [, ...]</codeblock></section><section id="section3"><title>Description</title><p><codeph>DROP ROLE</codeph> removes the specified role(s). To drop a
-superuser role, you must be a superuser yourself. To drop non-superuser
-roles, you must have <codeph>CREATEROLE</codeph> privilege.</p><p>A role cannot be removed if it is still referenced in any database; an error will be raised if
-        so. Before dropping the role, you must drop all the objects it owns (or reassign their
-        ownership) and revoke any privileges the role has been granted on other objects. The
-            <codeph><xref href="REASSIGN_OWNED.xml#topic1">REASSIGN OWNED</xref></codeph> and
-            <codeph><xref href="DROP_OWNED.xml#topic1">DROP OWNED</xref></codeph> commands can be
-        useful for this purpose. </p><p>However, it is not necessary to remove role memberships involving
-the role; <codeph>DROP ROLE</codeph> automatically revokes any memberships
-of the target role in other roles, and of other roles in the target role.
-The other roles are not dropped nor otherwise affected.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt>IF EXISTS</pt><pd>Do not throw an error if the role does not exist. A notice is issued
-in this case.</pd></plentry><plentry><pt><varname>name</varname></pt><pd>The name of the role to remove.</pd></plentry></parml></section><section id="section5"><title>Examples</title><p>Remove the roles named <codeph>sally</codeph> and <codeph>bob</codeph>:</p><codeblock>DROP ROLE sally, bob;</codeblock></section><section id="section6"><title>Compatibility</title><p>The SQL standard defines <codeph>DROP ROLE</codeph>, but it allows only
-one role to be dropped at a time, and it specifies different privilege
-requirements than Greenplum Database uses. </p></section><section id="section7"><title>See Also</title><p><codeph><xref href="./REASSIGN_OWNED.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="DROP_OWNED.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="./SET_ROLE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="dd20941">DROP ROLE</title>
+    <body>
+        <p id="sql_command_desc">删除数据库角色。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">DROP ROLE [IF EXISTS] <varname>name</varname> [, ...]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>DROP ROLE</codeph>删除指定的角色。
+                要删除超级用户角色，您必须自己是超级用户。
+                要删除非超级用户角色，您必须具有<codeph>CREATEROLE</codeph>特权。
+            </p>
+            <p>如果仍在任何数据库中引用角色，则无法删除该角色；如果是这样，将引发错误。
+                在删除角色之前，必须删除其拥有的所有对象（或重新分配其所有权），并撤消已授予该角色在其他对象上的所有特权。
+                <codeph><xref href="REASSIGN_OWNED.xml#topic1">REASSIGN OWNED</xref></codeph>和<codeph><xref href="DROP_OWNED.xml#topic1">DROP OWNED</xref></codeph>命令可用于此目的。
+            </p>
+            <p>但是，不必删除涉及该角色的角色成员资格；
+                <codeph>DROP ROLE</codeph>自动撤消其他角色中的目标角色以及目标角色中的其他角色的所有成员身份。
+                其他角色不会丢失，也不会受到其他影响。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>IF EXISTS</pt>
+                    <pd>如果该角色不存在，请不要报错。在这种情况下会发出通知。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要删除的角色名称。</pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>删除名为<codeph>sally</codeph>和<codeph>bob</codeph>的角色：
+            </p>
+            <codeblock>DROP ROLE sally, bob;</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p>SQL标准定义了<codeph>DROP ROLE</codeph>，但一次只允许删除一个角色，
+                并且它指定的特权要求与Greenplum数据库使用的特权要求不同。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="./REASSIGN_OWNED.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="DROP_OWNED.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="CREATE_ROLE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="ALTER_ROLE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./SET_ROLE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

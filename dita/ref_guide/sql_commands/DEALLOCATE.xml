@@ -1,9 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="ck20941">DEALLOCATE</title><body><p id="sql_command_desc">Deallocates a prepared statement.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">DEALLOCATE [PREPARE] <varname>name</varname></codeblock></section><section id="section3"><title>Description</title><p><codeph>DEALLOCATE</codeph> is used to deallocate a previously prepared
-SQL statement. If you do not explicitly deallocate a prepared statement,
-it is deallocated when the session ends. </p><p>For more information on prepared statements, see <codeph><xref href="./PREPARE.xml#topic1"
-            type="topic" format="dita"/></codeph>. </p></section><section id="section4"><title>Parameters</title><parml><plentry><pt>PREPARE</pt><pd>Optional key word which is ignored. </pd></plentry><plentry><pt><varname>name</varname></pt><pd>The name of the prepared statement to deallocate. </pd></plentry></parml></section><section id="section5"><title>Examples</title><p>Deallocated the previously prepared statement named <codeph>insert_names</codeph>:</p><codeblock>DEALLOCATE insert_names;</codeblock></section><section id="section6"><title>Compatibility</title><p>The SQL standard includes a <codeph>DEALLOCATE</codeph> statement, but
-it is only for use in embedded SQL.</p></section><section id="section7"><title>See Also</title><p><codeph><xref href="./EXECUTE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="./PREPARE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="ck20941">DEALLOCATE</title>
+    <body>
+        <p id="sql_command_desc">取消分配预编译语句。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">DEALLOCATE [PREPARE] <varname>name</varname></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>DEALLOCATE</codeph>用于取消分配先前预编译的SQL语句。
+                如果未显式取消分配预编译语句，则在会话结束时将其释放。
+            </p>
+            <p>有关预编译语句的更多信息，请参见<codeph><xref href="./PREPARE.xml#topic1" type="topic" format="dita"/></codeph>。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>PREPARE</pt>
+                    <pd>可选关键字，将被忽略。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要取消分配的预编译语句的名称。</pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>取消分配先前预编译的名为<codeph>insert_names</codeph>的语句：
+            </p>
+            <codeblock>DEALLOCATE insert_names;</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p>SQL标准包括<codeph>DEALLOCATE</codeph>语句，但仅用于嵌入式SQL。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph><xref href="./EXECUTE.xml#topic1" type="topic" format="dita"/></codeph>
+                ,
+                <codeph><xref href="./PREPARE.xml#topic1" type="topic" format="dita"/></codeph>
+            </p>
+        </section>
+    </body>
+</topic>

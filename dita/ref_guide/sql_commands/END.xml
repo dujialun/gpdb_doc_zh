@@ -6,7 +6,7 @@
     <body>
         <p id="sql_command_desc">提交当前事务。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">END [WORK | TRANSACTION]</codeblock>
         </section>
         <section id="section3">

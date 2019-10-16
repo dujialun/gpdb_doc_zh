@@ -1,18 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="db20941">DROP OWNED</title><body><p id="sql_command_desc">Removes database objects owned by a database role.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">DROP OWNED BY <varname>name</varname> [, ...] [CASCADE | RESTRICT]</codeblock></section><section id="section3"><title>Description</title><p><codeph>DROP OWNED</codeph> drops all the objects in the current database
-that are owned by one of the specified roles. Any privileges granted
-to the given roles on objects in the current database will also be revoked.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The name of a role whose objects will be dropped, and whose privileges
-will be revoked.</pd></plentry><plentry><pt>CASCADE</pt><pd>Automatically drop objects that depend on the affected objects.</pd></plentry><plentry><pt>RESTRICT</pt><pd>Refuse to drop the objects owned by a role if any other database
-objects depend on one of the affected objects. This is the default.</pd></plentry></parml></section><section id="section5"><title>Notes</title><p><codeph>DROP OWNED</codeph> is often used to prepare for the removal
-of one or more roles. Because <codeph>DROP OWNED</codeph> only affects
-the objects in the current database, it is usually necessary to execute
-this command in each database that contains objects owned by a role that
-is to be removed.</p><p>Using the <codeph>CASCADE</codeph> option may make the command recurse
-to objects owned by other users.</p><p>The <xref href="REASSIGN_OWNED.xml#topic1"><codeph>REASSIGN OWNED</codeph></xref> command is an
-        alternative that reassigns the ownership of all the database objects owned by one or more
-        roles. However, <codeph>REASSIGN OWNED</codeph> does not deal with
-          privileges for other objects.
-</p></section><section id="section6"><title>Examples</title><p>Remove any database objects owned by the role named <codeph>sally</codeph>:</p><codeblock>DROP OWNED BY sally;</codeblock></section><section id="section7"><title>Compatibility</title><p>The <codeph>DROP OWNED</codeph> command is a Greenplum Database extension. </p></section><section id="section8"><title>See Also</title><p><codeph><xref href="./REASSIGN_OWNED.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="./DROP_ROLE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="db20941">DROP OWNED</title>
+    <body>
+        <p id="sql_command_desc">删除数据库角色拥有的数据库对象。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">DROP OWNED BY <varname>name</varname> [, ...] [CASCADE | RESTRICT]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>DROP OWNED</codeph>删除当前数据库中由指定角色之一拥有的所有对象。
+                在当前数据库中的对象上授予给定角色的任何特权也将被撤销。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>一个角色的名称，该角色的对象将被删除，其特权将被撤销。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>CASCADE</pt>
+                    <pd>自动删除依赖于受影响对象的对象。</pd>
+                </plentry>
+                <plentry>
+                    <pt>RESTRICT</pt>
+                    <pd>如果任何其他数据库对象依赖于受影响的对象之一，则拒绝删除角色拥有的对象。
+                        这是默认值。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p><codeph>DROP OWNED</codeph>通常用于准备删除一个或多个角色。
+                由于<codeph>DROP OWNED</codeph>仅影响当前数据库中的对象，因此通常需要在每个数据库中执行此命令，该数据库包含要删除的角色拥有的对象。
+            </p>
+            <p>使用<codeph>CASCADE</codeph>选项可能会使命令递归到其他用户拥有的对象。
+            </p>
+            <p><xref href="REASSIGN_OWNED.xml#topic1"><codeph>REASSIGN OWNED</codeph></xref>命令是一种替代方法，
+                它重新分配一个或多个角色拥有的所有数据库对象的所有权。
+                但是，<codeph>REASSIGN OWNED</codeph>不处理其他对象的特权。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>删除名称为<codeph>sally</codeph>的角色拥有的所有数据库对象：
+            </p>
+            <codeblock>DROP OWNED BY sally;</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p><codeph>DROP OWNED</codeph>命令是Greenplum数据库扩展。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="./REASSIGN_OWNED.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./DROP_ROLE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

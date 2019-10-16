@@ -4,51 +4,56 @@
 <topic id="topic1">
     <title id="bv20941">DROP USER MAPPING</title>
     <body>
-        <p id="sql_command_desc">Removes a user mapping for a foreign server.</p>
+        <p id="sql_command_desc">删除外部服务器的用户映射。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">DROP USER MAPPING [ IF EXISTS ] { <varname>username</varname> | USER | CURRENT_USER | PUBLIC } 
     SERVER <varname>servername</varname></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>DROP USER MAPPING</codeph> removes an existing user mapping from a foreign
-                server. To execute this command, the current user must be the owner of the server
-                containing the mapping.</p>
+            <title>描述</title>
+            <p><codeph>DROP USER MAPPING</codeph>从外部服务器中删除现有的用户映射。
+                要执行此命令，当前用户必须是包含映射的服务器的所有者。
+                </p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt>IF EXISTS</pt>
                     <pd>
-                        <p>Do not throw an error if the user mapping does not exist. Greenplum Database issues a notice in this case.</p>
+                        <p>如果该用户映射不存在，请不要报错。在这种情况下会发出通知。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>username</varname></pt>
                     <pd>
-                        <p>User name of the mapping. <codeph>CURRENT_USER</codeph> and <codeph>USER</codeph> match the name of the current user. <codeph>PUBLIC</codeph> is used to match all present and future user names in the system.</p>
+                        <p>映射的用户名。
+                            <codeph>CURRENT_USER</codeph>和<codeph>USER</codeph>与当前用户的名称匹配。
+                            <codeph>PUBLIC</codeph>用于匹配系统中所有当前和将来的用户名。
+                        </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>servername</varname></pt>
                     <pd>
-                        <p>Server name of the user mapping.</p>
+                        <p>用户映射的服务器名称。</p>
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section6">
-            <title>Examples</title>
-            <p>Drop the user mapping named <codeph>bob</codeph>, server <codeph>foo</codeph> if it exists:</p><codeblock>DROP USER MAPPING IF EXISTS FOR bob SERVER foo;</codeblock>
+            <title>示例</title>
+            <p>删除名为<codeph>bob</codeph>的用户映射，如果存在，则删除服务器<codeph>foo</codeph>：</p>
+            <codeblock>DROP USER MAPPING IF EXISTS FOR bob SERVER foo;</codeblock>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p><codeph>DROP SERVER</codeph> conforms to ISO/IEC 9075-9 (SQL/MED). The <codeph>IF EXISTS</codeph> clause is a Greenplum Database extension.</p>
+            <title>兼容性</title>
+            <p><codeph>DROP SERVER</codeph>符合ISO/IEC 9075-9（SQL/MED）。
+                <codeph>IF EXISTS</codeph>子句是Greenplum数据库扩展。</p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="CREATE_USER_MAPPING.xml#topic1">CREATE USER MAPPING</xref></codeph>,
                         <codeph><xref href="ALTER_USER_MAPPING.xml#topic1">ALTER
                     USER MAPPING</xref></codeph></p>
