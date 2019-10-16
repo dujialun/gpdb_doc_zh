@@ -4,23 +4,23 @@
 <topic id="topic1">
   <title id="cw20941">DROP GROUP</title>
   <body>
-    <p id="sql_command_desc">Removes a database role.</p>
+    <p id="sql_command_desc">删除数据库角色。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">DROP GROUP [IF EXISTS] <varname>name</varname> [, ...]</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>DROP GROUP</codeph> is an alias for <codeph>DROP ROLE</codeph>. See <codeph><xref
-            href="./DROP_ROLE.xml#topic1" type="topic" format="dita"/></codeph> for more
-        information.</p>
+      <title>描述</title>
+      <p><codeph>DROP GROUP</codeph>是<codeph>DROP ROLE</codeph>的别名。
+        有关更多信息，请参见<codeph><xref href="./DROP_ROLE.xml#topic1" type="topic" format="dita"/></codeph>。
+        </p>
     </section>
     <section id="section5">
-      <title>Compatibility</title>
-      <p>There is no <codeph>DROP GROUP</codeph> statement in the SQL standard.</p>
+      <title>兼容性</title>
+      <p>SQL标准中没有<codeph>DROP GROUP</codeph>语句。</p>
     </section>
     <section id="section6">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="./DROP_ROLE.xml#topic1" type="topic" format="dita"/></codeph></p>
     </section>
   </body>
