@@ -48,7 +48,7 @@
         </section>
         <section id="section5">
             <title>示例</title>
-            <p>删除表<codeph>sales</codeph>上的重写规则<codeph>sales_2006</codeph>：
+			<p>删除表<codeph>sales</codeph>上的重写规则<codeph>sales_2006</codeph>：</p>
             <codeblock>DROP RULE sales_2006 ON sales;</codeblock>
         </section>
         <section id="section6">
