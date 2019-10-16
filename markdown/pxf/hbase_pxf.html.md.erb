@@ -1,34 +1,34 @@
 ---
-title: Reading HBase Table Data
+title: 读取HBase表数据
 ---
 
-Apache HBase is a distributed, versioned, non-relational database on Hadoop.
+Apache HBase是Hadoop上的分布式、版本化的非关系型数据库。
 
-The PXF HBase connector reads data stored in an HBase table. The HBase connector supports filter pushdown.
+PXF HBase连接器读取存储在HBase表中的数据。HBase连接器支持过滤器下推。
 
-This section describes how to use the PXF HBase connector.
+本节介绍如何使用PXF HBase连接器
 
-## <a id="prereq"></a>Prerequisites
+## <a id="prereq"></a>先决条件
 
-Before working with HBase table data, ensure that you have:
+使用HBase表数据前，请确保您已满足：
 
-- Copied `$GPHOME/pxf/lib/pxf-hbase-*.jar` to each node in your HBase cluster, and that the location of this PXF JAR file is in the `$HBASE_CLASSPATH`. This configuration is required for the PXF HBase connector to support filter pushdown.
-- Met the PXF Hadoop [Prerequisites](access_hdfs.html#hadoop_prereq).
+- 将 `$GPHOME/pxf/lib/pxf-hbase-*.jar` 复制到HBase集群中的每个节点，并且该PXF JAR文件位于 `$HBASE_CLASSPATH` 中。 PXF HBase 连接器需要此配置才能支持过滤器下推。
+- 满足PXF Hadoop [先决条件](access_hdfs.html#hadoop_prereq).
 
-## <a id="hbase_primer"></a>HBase Primer
+## <a id="hbase_primer"></a>HBase入门
 
-This topic assumes that you have a basic understanding of the following HBase concepts:
+本主题假设您对以下HBase概念有基本的了解：
  
-- An HBase column includes two components: a column family and a column qualifier. These components are delimited by a colon `:` character, \<column-family\>:\<column-qualifier\>.
-- An HBase row consists of a row key and one or more column values. A row key is a unique identifier for the table row.
-- An HBase table is a multi-dimensional map comprised of one or more columns and rows of data. You specify the complete set of column families when you create an HBase table.
-- An HBase cell is comprised of a row (column family, column qualifier, column value) and a timestamp. The column value and timestamp in a given cell represent a version of the value.
+- HBase 列包含两个组件：列簇和列限定词。 这些组件由冒号 `:` 分隔， \<column-family\>:\<column-qualifier\>
+- HBase 行由一个行键和一个或多个列值组成。 行键是表行的唯一标识符
+- HBase 表是由具有一个或多个列的数据行组成的多维映射。 创建HBase表时，可以指定一组完整的列簇
+- HBase 单元由行(列簇, 列限定词, 列值)和时间戳组成。 给定单元格中的列值和时间戳表示该值的版本
 
-For detailed information about HBase, refer to the [Apache HBase Reference Guide](http://hbase.apache.org/book.html).
+有关HBase的详细信息，请参阅[Apache HBase Reference Guide](http://hbase.apache.org/book.html)。
 
 ## <a id="hbase_shell"></a>HBase Shell
 
-The HBase shell is a subsystem similar to that of `psql`. To start the HBase shell:
+HBase shell 是一个类似 `psql` 的子系统。 要启动HBase shell：
 
 ``` shell
 $ hbase shell
@@ -36,19 +36,19 @@ $ hbase shell
 hbase(main):001:0>
 ```
 
-The default HBase namespace is named `default`. 
+HBase默认的命名空间为 `default`。
 
-### <a id="hbaseshell_example" class="no-quick-link"></a>Example: Creating an HBase Table
+### <a id="hbaseshell_example" class="no-quick-link"></a>示例: 创建一个HBase表
 
-Create a sample HBase table.
+创建一个示例HBase表。
 
-1. Create an HBase table named `order_info` in the `default` namespace. `order_info` has two column families: `product` and `shipping_info`:
+1. 在 `default` 命名空间中创建一个名为 `order_info` 的HBase表。 `order_info` 具有两个列簇: `product` 和 `shipping_info`：
 
     ``` pre
     hbase(main):> create 'order_info', 'product', 'shipping_info'
     ```
 
-2. The `order_info` `product` column family has qualifiers named `name` and `location`. The `shipping_info` column family has qualifiers named `state` and `zipcode`. Add some data to the `order_info` table:
+2. `order_info` `product` 列簇具有名为 `name` 和 `location` 的列标识符。 `shipping_info` 列簇具有名为 `state` 和 `zipcode` 的列标识符。 将一些数据添加到 `order_info` 表中：
 
     ``` pre
     put 'order_info', '1', 'product:name', 'tennis racquet'
@@ -65,9 +65,9 @@ Create a sample HBase table.
     put 'order_info', '3', 'shipping_info:zipcode', '34567'
     ```
     
-    You will access the `orders_info` HBase table directly via PXF in examples later in this topic.
+    在本主题后面的示例中，您将通过PXF直接访问 `orders_info` HBase 表。
 
-3. Display the contents of the `order_info` table:
+3. 显示 `order_info` 表的内容：
 
     ``` pre
     hbase(main):> scan 'order_info'
@@ -81,11 +81,11 @@ Create a sample HBase table.
     3 row(s) in 0.0400 seconds                                         
     ```
 
-## <a id="syntax3"></a>Querying External HBase Data
+## <a id="syntax3"></a>查询外部HBase数据
 
-The PXF HBase connector supports a single profile named `HBase`.
+PXF HBase 连接器支持一个名为的 `HBase` 的配置文件。
 
-Use the following syntax to create a Greenplum Database external table that references an HBase table:
+使用以下语法创建引用HBase表的Greenplum数据库外部表：
 
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
@@ -94,37 +94,37 @@ LOCATION ('pxf://<hbase-table-name>?PROFILE=HBase')
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
-HBase connector-specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) call are described below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) 命令中HBase连接器使用的特定关键字和值见下表描述。
 
-| Keyword  | Value |
+| 关键字  | 值 |
 |-------|-------------------------------------|
-| \<hbase&#8209;table&#8209;name\>    | The name of the HBase table. |
-| PROFILE    | The `PROFILE` keyword must specify `HBase`. |
-| FORMAT  | The `FORMAT` clause must specify `'CUSTOM' (FORMATTER='pxfwritable_import')`.   |
+| \<hbase&#8209;table&#8209;name\>    | HBase表的名称 |
+| PROFILE    | `PROFILE` 关键字必须指定为 `HBase` |
+| FORMAT  | `FORMAT` 子句必须指定为 `'CUSTOM' (FORMATTER='pxfwritable_import')`   |
 
 
 
-## <a id="datatypemapping"></a>Data Type Mapping
+## <a id="datatypemapping"></a>数据类型映射
 
-HBase is byte-based; it stores all data types as an array of bytes. To represent HBase data in Greenplum Database, select a data type for your Greenplum Database column that matches the underlying content of the HBase column qualifier values.
+HBase是基于字节的; 它将所有数据类型存储为字节数组。 要在Greenplum数据库中表示HBase数据，请为Greenplum数据库列选择与HBase列标识符值的底层内容匹配的数据类型。
 
-**Note**: PXF does not support complex HBase objects.
+**注意**: PXF不支持复杂HBase对象
 
 
-## <a id="columnmapping"></a>Column Mapping
+## <a id="columnmapping"></a>列映射
 
-You can create a Greenplum Database external table that references all, or a subset of, the column qualifiers defined in an HBase table. PXF supports direct or indirect mapping between a Greenplum Database table column and an HBase table column qualifier.
+您可以创建一个引用HBase表定义中全部或部分列标识符的Greenplum数据库外部表。PXF支持Greenplum数据库表列和HBase表列标识符之间的直接或间接映射。
 
-### <a id="directmapping" class="no-quick-link"></a>Direct Mapping
+### <a id="directmapping" class="no-quick-link"></a>直接映射
 
-When you use direct mapping to map Greenplum Database external table column names to HBase qualifiers, you specify column-family-qualified HBase qualifier names as quoted values. The PXF HBase connector passes these column names as-is to HBase as it reads the table data.
+当您使用直接映射将Greenplum数据库外部表的列名映射到HBase标识符时，您可以将列簇限定的HBase标识符名称指定为带引号的值。 PXF HBase连接器在读取表数据时将这些列名按原样传递给HBase。
 
-For example, to create a Greenplum Database external table accessing the following data:
+例如, 创建一个访问以下数据的Greenplum数据库外部表：
 
--   qualifier `name` in the column family named `product`
--   qualifier `zipcode` in the column family named `shipping_info` 
+-   列簇 `product` 中的 `name` 标识符
+-   列簇 `shipping_info` 中的 `zipcode` 标识符
 
-from the `order_info` HBase table that you created in [Example: Creating an HBase Table](#hbaseshell_example), use this `CREATE EXTERNAL TABLE` syntax:
+从此前您在[示例: 创建一个HBase表](#hbaseshell_example) 创建的 `order_info` HBase 表中访问数据，使用以下 `CREATE EXTERNAL TABLE` 语法：
 
 ``` sql
 CREATE EXTERNAL TABLE orderinfo_hbase ("product:name" varchar, "shipping_info:zipcode" int)
@@ -132,34 +132,34 @@ CREATE EXTERNAL TABLE orderinfo_hbase ("product:name" varchar, "shipping_info:zi
     FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
-### <a id="indirectmappingvialookuptable" class="no-quick-link"></a>Indirect Mapping via Lookup Table
+### <a id="indirectmappingvialookuptable" class="no-quick-link"></a>通过查找表间接映射
 
-When you use indirect mapping to map Greenplum Database external table column names to HBase qualifiers, you specify the mapping in a lookup table that you create in HBase. The lookup table maps a \<column-family\>:\<column-qualifier\> to a column name alias that you specify when you create the Greenplum Database external table. 
+当您使用间接映射将Greenplum数据库外部表列名映射到HBase标识符时，您可以在HBase中创建的查找表中指定映射。 查找表将 \<column-family\>:\<column-qualifier\> 映射到在创建Greenplum数据库外部表时指定的列名别名。
 
-You must name the HBase PXF lookup table `pxflookup`. And you must define this table with a single column family named `mapping`. For example:
+您必须将HBase PXF查找表命名为 `pxflookup` 。 并且您必须使用一个名为 `mapping` 的单列簇定义此表。例如:
 
 ``` pre
 hbase(main):> create 'pxflookup', 'mapping'
 ```
 
-While the direct mapping method is fast and intuitive, using indirect mapping allows you to create a shorter, character-based alias for the HBase \<column-family\>:\<column-qualifier\> name. This better reconciles HBase column qualifier names with Greenplum Database due to the following:
+尽管直接映射既快速又直观， 使用间接映射可以让您为HBase \<column-family\>:\<column-qualifier\> 名称创建一个较短的，基于字符的别名。由于以下原因，这可以更好的使HBase标识符与Greenplum数据库保持一致:
 
--   HBase qualifier names can be very long. Greenplum Database has a 63 character limit on the size of the column name.
--   HBase qualifier names can include binary or non-printable characters. Greenplum Database column names are character-based.
+-   HBase 标识符可能非常长。 Greenplum数据库列名大小限制为63各字符。
+-   HBase 标识符名称可以包含二进制或不可打印的字符。 Greenplum数据库列名称是基于字符的。
 
-When populating the `pxflookup` HBase table, add rows to the table such that the:
+填充 `pxflookup` HBase表时, 向表中添加行, 以便:
 
-- row key specifies the HBase table name
-- `mapping` column family qualifier identifies the Greenplum Database column name, and the value identifies the HBase `<column-family>:<column-qualifier>` for which you are creating the alias.
+- 行键指定为HBase表名
+- `mapping` 列簇标识符定义为Greenplum数据库列名, 值标识为需要创建别名的HBase `<column-family>:<column-qualifier>`
 
-For example, to use indirect mapping with the `order_info` table, add these entries to the `pxflookup` table:
+例如，要在 `order_info` 表上使用间接映射，将以下条目添加到 `pxflookup` 表：
 
 ``` pre
 hbase(main):> put 'pxflookup', 'order_info', 'mapping:pname', 'product:name'
 hbase(main):> put 'pxflookup', 'order_info', 'mapping:zip', 'shipping_info:zipcode'
 ```
 
-Then create a Greenplum Database external table using the following `CREATE EXTERNAL TABLE` syntax:
+使用以下 `CREATE EXTERNAL TABLE` 语法创建Greenplum数据库外部表
 
 ``` sql
 CREATE EXTERNAL TABLE orderinfo_map (pname varchar, zip int)
@@ -167,15 +167,15 @@ CREATE EXTERNAL TABLE orderinfo_map (pname varchar, zip int)
     FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
-## <a id="rowkey"></a>Row Key
+## <a id="rowkey"></a>行键
 
-The HBase table row key is a unique identifier for the table row. PXF handles the row key in a special way. 
+HBase 表行键是表行的唯一标识符。 PXF 以特殊方式处理行键。
 
-To use the row key in the Greenplum Database external table query, define the external table using the PXF reserved column named `recordkey.` The `recordkey` column name instructs PXF to return the HBase table record key for each row.
+要在Greenplum数据库外部表查询中使用行键，请使用名为 `recordkey` 的PXF保留列定义外部表。 `recordkey` 列名指示PXF返回每一行的HBase表记录键。
 
-Define the `recordkey` using the Greenplum Database data type `bytea`.
+使用Greenplum数据库数据类型`bytea` 定义 `recordkey`
 
-For example:
+例如:
 
 ``` sql
 CREATE EXTERNAL TABLE <table_name> (recordkey bytea, ... ) 
@@ -183,6 +183,6 @@ CREATE EXTERNAL TABLE <table_name> (recordkey bytea, ... )
     FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
-After you have created the external table, you can use the `recordkey` in a `WHERE` clause to filter the HBase table on a range of row key values.
+在您创建外部表之后，您可以在 `WHERE` 子句中使用 `recordkey` 在一系列键值上过滤HBase表
 
-**Note**: To enable filter pushdown on the `recordkey`, define the field as `text`.
+**注意**: 若要在 `recordkey` 上启用过滤器下推，请将字段定义为 `text`
