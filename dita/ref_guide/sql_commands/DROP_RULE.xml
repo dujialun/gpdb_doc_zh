@@ -1,9 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="de20941">DROP RULE</title><body><p id="sql_command_desc">Removes a rewrite rule.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">DROP RULE [IF EXISTS] <varname>name</varname> ON <varname>table_name</varname> [CASCADE | RESTRICT]</codeblock></section><section id="section3"><title>Description</title><p><codeph>DROP RULE</codeph> drops a rewrite rule from a table or view.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt>IF EXISTS</pt><pd>Do not throw an error if the rule does not exist. A notice is issued
-in this case.</pd></plentry><plentry><pt><varname>name</varname></pt><pd>The name of the rule to remove.</pd></plentry><plentry><pt><varname>table_name</varname></pt><pd>The name (optionally schema-qualified) of the table or view that
-the rule applies to. </pd></plentry><plentry><pt>CASCADE</pt><pd>Automatically drop objects that depend on the rule. </pd></plentry><plentry><pt>RESTRICT</pt><pd>Refuse to drop the rule if any objects depend on it. This is the
-default. </pd></plentry></parml></section><section id="section5"><title>Examples</title><p>Remove the rewrite rule <codeph>sales_2006</codeph> on the table <codeph>sales</codeph>:</p><codeblock>DROP RULE sales_2006 ON sales;</codeblock></section><section id="section6"><title>Compatibility</title><p><codeph>DROP RULE</codeph> is a Greenplum Database language extension, as is the entire query
-        rewrite system.</p></section><section id="section7"><title>See Also</title><p><codeph><xref href="ALTER_RULE.xml#topic1"/></codeph>, <codeph><xref
-            href="CREATE_RULE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="de20941">DROP RULE</title>
+    <body>
+        <p id="sql_command_desc">删除重写规则。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">DROP RULE [IF EXISTS] <varname>name</varname> ON <varname>table_name</varname> [CASCADE | RESTRICT]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>DROP RULE</codeph>删除表或视图中的重写规则。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>IF EXISTS</pt>
+                    <pd>如果该规则不存在，请不要报错。在这种情况下会发出通知。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要删除的规则的名称。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>table_name</varname>
+                    </pt>
+                    <pd>规则适用的表或视图的名称（可以由模式指定）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>CASCADE</pt>
+                    <pd>自动删除依赖于规则的对象。</pd>
+                </plentry>
+                <plentry>
+                    <pt>RESTRICT</pt>
+                    <pd>如果有任何对象依赖该规则，则拒绝删除该规则。这是默认值。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>删除表<codeph>sales</codeph>上的重写规则<codeph>sales_2006</codeph>：
+            <codeblock>DROP RULE sales_2006 ON sales;</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p><codeph>DROP RULE</codeph>是Greenplum数据库语言的扩展，整个查询重写系统也是如此。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_RULE.xml#topic1"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="CREATE_RULE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>
