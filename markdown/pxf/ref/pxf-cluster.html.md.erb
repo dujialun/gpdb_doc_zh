@@ -2,9 +2,9 @@
 title: pxf cluster
 ---
 
-Manage the PXF service instance on all Greenplum Database segment hosts.
+管理godb 所有segment节点的PXF服务。
 
-## <a id="topic1__section2"></a>Synopsis
+## <a id="topic1__section2"></a>概要
 
 ``` pre
 pxf cluster <command>
@@ -20,34 +20,35 @@ stop
 sync
 ```
 
-## <a id="topic1__section3"></a>Description
+## <a id="topic1__section3"></a>描述
 
-The `pxf cluster` utility command manages the PXF service instance on all Greenplum Database segment hosts. You can use the utility to initialize, start, and stop the PXF service instance on all segment hosts. You can also sync PXF configuration from the Greenplum Database master host to all segment hosts.
+`pxf cluster`命令管理所有Greenplum数据库segment主机上的PXF服务实例。您可以使用该工具在所有segment主机上初始化、启动和停止PXF服务实例。您也可以将PXF配置从Greenplum数据库master主机同步到所有segment主机。
 
-`pxf cluster` requires a running Greenplum Database cluster. You must run the utility on the Greenplum Database master host.
+`pxf cluster`需要一个正在运行的Greenplum数据库集群。 您必须在Greenplum数据库master主机上运行该程序。
 
 If you want to manage the PXF service instance on a specific segment host, use the `pxf` utility. See [`pxf`](pxf.html#topic1).
+如果要管理特定segment主机上的PXF服务实例，请使用pxf程序，详见 [`pxf`](pxf.html#topic1)。
 
 ## <a id="commands"></a>Commands
 
 <dt>help</dt>
-<dd>Display the `pxf cluster` help message and then exit.</dd>
+<dd> 显示`pxf cluster`帮助消息，然后退出</dd>
 
 <dt>init</dt>
-<dd>Initialize the PXF service instance on the master and on all segment hosts. When you initialize PXF across your Greenplum Database cluster, you must identify the PXF user configuration directory via an environment variable named `$PXF_CONF`. If you do not set `$PXF_CONF` prior to initializing PXF, PXF returns an error.</dd>
+<dd>在master节点和所有segment主机上初始化PXF服务实例。在Greenplum数据库集群中初始化PXF时，必须通过名为`$PXF_CONF`的环境变量来标识PXF用户配置目录。 如果在初始化PXF之前未设置`$PXF_CONF`，则PXF返回错误。</dd>
 
 <dt>start</dt>
-<dd>Start the PXF service instance on all segment hosts.</dd>
+<dd>在所有segment主机上启动PXF服务实例。</dd>
 
 <dt>stop  </dt>
-<dd>Stop the PXF service instance on all segment hosts.</dd>
+<dd>在所有段主机上停止PXF服务实例。</dd>
 
 <dt>sync  </dt>
-<dd>Synchronize PXF configuration from the master to all Greenplum Database segment hosts. If you have updated the PXF user configuration or added JAR files, you must also restart PXF after you synchronize PXF configuration.</dd>
+<dd>将PXF配置从master服务器同步到所有Greenplum数据库segment主机。 如果您更新了PXF用户配置或添加了JAR文件，则在同步PXF配置后还必须重新启动PXF。</dd>
 
-## <a id="topic1__section5"></a>Examples
+## <a id="topic1__section5"></a>举例
 
-Stop the PXF service instance on all segment hosts:
+在所有segment主机上停止PXF服务
 
 ``` shell
 $ $GPHOME/pxf/bin/pxf cluster stop

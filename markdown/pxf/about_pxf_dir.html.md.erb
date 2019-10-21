@@ -1,43 +1,42 @@
 ---
-title: About the PXF Installation and Configuration Directories
+title: PXF安装和配置目录
 ---
 
-PXF is installed on your master node when you install Greenplum Database. You install PXF on your Greenplum Database segment hosts when you invoke the `gpseginstall` command.
+在你安装Greenplum数据库时，PXF被安装在master节点。在调用gpseginstall命令时会安装PXF到GPDB的各个节点的主机上。
 
-## <a id="installed"></a>PXF Installation Directories
+## <a id="installed"></a>PXF安装目录
 
-The following PXF files and directories are installed in your Greenplum Database cluster when you install Greenplum. These files/directories are relative to the PXF installation directory `$GPHOME/pxf`:
-
-| Directory | Description                                                                                                                                                                                                                                |
-|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| apache&#8209;tomcat/     | The PXF Tomcat directory.  |
-| bin/                | The PXF script and executable directory.                                                                                                                                                                                                                       |
-| conf/                | The PXF internal configuration directory. This directory contains the `pxf-env-default.sh` and `pxf-profiles-default.xml` configuration files. After initializing PXF, this directory will also include the `pxf-private.classpath` file. |
-| lib/                 | The PXF library directory.                                                                                                                                                                                                                       |
-| templates/                | Configuration templates for PXF. |
-
-
-## <a id="runtime"></a>PXF Runtime Directories
-
-During initialization and startup, PXF creates the following internal directories in `$GPHOME/pxf`:
-
+在安装Greenplum时，以下配置文件和目录将被安装在你的GPDB实例中。这些文件/目录在PXF的安装目录$GPHOME/pxf:
 
 | Directory | Description                                                                                                                                                                                                                                |
 |--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| pxf&#8209;service/         | After initializing PXF, the PXF service instance directory.                                                                                                                                                                                                              |
-| run/         | After starting PXF, the PXF run directory. Includes a PXF catalina process id file.                                                                                                                                                                                                              |
+| apache&#8209;tomcat/ | PXF的Tomcat目录  |
+| bin/                 | PXF脚本和可执行文件目录 |
+| conf/                | PXF内部配置目录，这个目录包含`pxf-env-default.sh`和`pxf-profiles-default.xml`配置文件。在初始化pxf后，这个目录也会包括`pxf-private.classpath`文件 |
+| lib/                 | PXF库目录 |
+| templates/           | PXF的配置模板 |
 
-## <a id="usercfg"></a>PXF User Configuration Directories
 
-Also during initialization, PXF populates a user configuration directory that you choose (`$PXF_CONF`) with the following subdirectories and template files:
+## <a id="runtime"></a>PXF运行目录
+
+在初始化和启动过程中，PXF在$GPHOME/pxf创建了如下内部目录:
+
+| Directory | Description                                                                                                                                                                                                                                
+|--------------------------------|------------------------------------------------------------------------------|
+| pxf&#8209;service/         | 	PXF初始化之后的PXF服务实例目录   |
+| run/         | 启动pxf后，pxf的运行目录。包含PXF catalina进程ID文件 |
+
+## <a id="usercfg"></a>PXF用户配置目录
+
+在pxf初始化过程中，PXF使用以下的子目录和模板文件填充你选择的用户配置目录(`$PXF_CONF`)
 
 | Directory | Description   |
 |-----------|---------------|
-| conf/     | The location of user-customizable PXF configuration files: `pxf-env.sh`, `pxf-log4j.properties`, and `pxf-profiles.xml`. |
-| keytabs/  | The default location for the PXF service Kerberos principal keytab file.  |
-| lib/     | The default PXF user runtime library directory. |
-| logs/     | The PXF runtime log file directory. Includes `pxf-service.log` and the Tomcat-related log `catalina.out`. The `logs/` directory and log files are readable only by the `gpadmin` user. |
-| servers/  | The server configuration directory; each subdirectory identifies the name of a server. PXF supports a default Hadoop server configuration named `default`. The Greenplum Database administrator may configure other servers. |
-| templates/  | The configuration directory for Hadoop and object store template files. |
+| conf/     | 用户可自定义的PXF配置文件位置：`pxf-env.sh`，`pxf-log4j.properties`和`pxf-profiles.xml` |
+| keytabs/  | PXF服务Kerberos秘钥文件的默认位置 |
+| lib/      | 默认的PXF用户运行库目录 |
+| logs/     | PXF运行时间日志文件目录，包括`pxf-service.log`和`Tomcat`相关日志`catalina.out`. logs目录和日志文件都是`gpadmin`用户创建的只读文件 |
+| servers/  | 服务配置目录，每一个子目录标识服务名称。PXF支持默认的hadoop服务配置`default`。数据库管理员也可以配置其他服务 |
+| templates/ | hadoop和对象存储的配置目录 |
 
-Refer to [Initializing PXF](init_pxf.html) and [Starting PXF](cfginitstart_pxf.html#start_pxf) for detailed information about the PXF initialization and startup commands and procedures.
+参数 [初始化PXF](init_pxf.html) and [启动PXF](cfginitstart_pxf.html#start_pxf) 了解PXF初始化和启动命令和过程的详细信息
