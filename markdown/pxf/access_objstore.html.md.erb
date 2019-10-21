@@ -1,5 +1,5 @@
 ---
-title: Accessing Azure, Google Cloud Storage, Minio, and S3 Object Stores with PXF
+title: 使用PXF访问Azure, Google Cloud Storage, Minio和S3对象存储
 ---
 
 <!--
@@ -21,20 +21,20 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-PXF is installed with connectors to Azure Blob Storage, Azure Data Lake, Google Cloud Storage, Minio, and S3 object stores.
+PXF安装了Azure Blob Storage, Azure Data Lake, Google Cloud Storage, Minio和S3对象存储的连接器
 
-## <a id="objstore_prereq"></a>Prerequisites
+## <a id="objstore_prereq"></a>先决条件
 
-Before working with object store data using PXF, ensure that:
+在使用PXF处理对象存储数据之前，请确保：
 
-- You have configured and initialized PXF on your Greenplum Database segment hosts, and PXF is running on each host. See [Configuring PXF](instcfg_pxf.html) for additional information.
-- You have configured the PXF Object Store Connectors that you plan to use on each Greenplum Database segment host. Refer to [Configuring Connectors to Azure, Google Cloud Storage, Minio, and S3 Object Stores](objstore_cfg.html) for instructions.
-- Time is synchronized between the Greenplum Database segment hosts and the external object store systems.
+- 您已经在Greenplum 数据库segment主机上配置并初始化了PXF，并且PXF正在每台主机上运行。有关其他信息，请参阅[配置PXF](instcfg_pxf.html)
+- 您已经配置了计划在每个Greenplum数据库segment主机上使用的PXF对象存储连接器。 有关说明，请参阅[配置Azure、Google云端存储、Minio和S3对象存储的连接器](objstore_cfg.html)。
+- Greenplum数据库segment主机与外部对象存储系统之间的时间是同步的。
 
 
-## <a id="objstore_connectors"></a>Connectors, Data Formats, and Profiles
+## <a id="objstore_connectors"></a>连接器、数据格式和配置文件
 
-The PXF object store connectors provide built-in profiles to support the following data formats:
+PXF对象存储连接器提供内置配置文件支持以下数据格式：
 
 - Text
 - Avro
@@ -43,23 +43,23 @@ The PXF object store connectors provide built-in profiles to support the followi
 - AvroSequenceFile
 - SequenceFile
 
-The PXF connectors to Azure, Google Cloud Storage, Minio, and S3 expose the following profiles to read, and in many cases write, these supported data formats:
+与Azure、Google Cloud Storage、Minio和S3的PXF连接器提供了以下配置文件以读取、写入（在许多情况下）这些受支持的数据格式：
 
-| Data Format | Azure Blob Storage | Azure Data Lake | Google Cloud Storage | S3 or Minio |
+| 数据格式 | Azure Blob Storage | Azure Data Lake | Google Cloud Storage | S3 或 Minio |
 |-----|------|---------|------------|----------------|
-| delimited single line [plain text](objstore_text.html) | wasbs:text | adl:text | gs:text | s3:text |
-| delimited [text with quoted linefeeds](objstore_text.html) | wasbs:text:multi | adl:text:multi | gs:text:multi | s3:text:multi |
+| 分隔的单行[纯文本](objstore_text.html) | wasbs:text | adl:text | gs:text | s3:text |
+| 分隔的[带引号的换行符文本](objstore_text.html) | wasbs:text:multi | adl:text:multi | gs:text:multi | s3:text:multi |
 | [Avro](objstore_avro.html) | wasbs:avro | adl:avro | gs:avro | s3:avro |
 | [JSON](objstore_json.html) | wasbs:json | adl:json | gs:json | s3:json |
 | [Parquet](objstore_parquet.html) | wasbs:parquet | adl:parquet | gs:parquet | s3:parquet |
 | AvroSequenceFile | wasbs:AvroSequenceFile | adl:AvroSequenceFile | gs:AvroSequenceFile | s3:AvroSequenceFile |
 | [SequenceFile](objstore_seqfile.html) | wasbs:SequenceFile | adl:SequenceFile | gs:SequenceFile | s3:SequenceFile |
 
-You provide the profile name when you specify the `pxf` protocol on a `CREATE EXTERNAL TABLE` command to create a Greenplum Database external table that references a file or directory in the specific object store.
+在 `CREATE EXTERNAL TABLE` 命令中指定 `pxf` 协议以创建引用特定对象存储中的文件或目录的Greenplum数据库外部表时，可以提供配置文件名称。
 
-## <a id="sample_ddl"></a>Sample CREATE EXTERNAL TABLE Commands
+## <a id="sample_ddl"></a>示例CREATE EXTERNAL TABLE命令
 
-The following command creates an external table that references a text file on S3. It specifies the profile named `s3:text` and the server configuration named `s3srvcfg`:
+以下命令创建了一个引用S3上的文本文件的外部表。指定名为 `s3:text` 的配置文件和名为 `s3srvcfg` 的服务配置：
 
 <pre>
 CREATE EXTERNAL TABLE pxf_s3_text(location text, month text, num_orders int, total_sales float8)
@@ -67,7 +67,7 @@ CREATE EXTERNAL TABLE pxf_s3_text(location text, month text, num_orders int, tot
 FORMAT 'TEXT' (delimiter=E',');
 </pre>
 
-The following command creates an external table that references a text file on Azure Blob Storage. It specifies the profile named `wasbs:text` and the server configuration named `wasbssrvcfg`. You would provide the Azure Blob Storage container identifier and your Azure Blob Storage account name.
+以下命令创建了一个引用Azure Blob Storage上文本文件的外部表。 指定名为 `wasbs:text` 的配置文件和名为 `wasbssrvcfg` 的服务配置。 您将提供Azure Blob Storage 容器标识和您的 Azure Blob Storage 账户。
 
 <pre>
 CREATE EXTERNAL TABLE pxf_wasbs_text(location text, month text, num_orders int, total_sales float8)
@@ -75,7 +75,7 @@ CREATE EXTERNAL TABLE pxf_wasbs_text(location text, month text, num_orders int, 
 FORMAT 'TEXT';
 </pre>
 
-The following command creates an external table that references a text file on Azure Data Lake. It specifies the profile named `adl:text` and the server configuration named `adlsrvcfg`. You would provide your Azure Data Lake account name.
+以下命令创建了一个引用Azure Data Lake上文本文件的外部表。 指定名为 `adl:text` 的配置文件和名为 `adlsrvcfg` 的服务配置。 您将提供您的Azure Data Lake 账户。
 
 <pre>
 CREATE EXTERNAL TABLE pxf_adl_text(location text, month text, num_orders int, total_sales float8)
@@ -83,7 +83,7 @@ CREATE EXTERNAL TABLE pxf_adl_text(location text, month text, num_orders int, to
 FORMAT 'TEXT';
 </pre>
 
-The following command creates an external table that references a JSON file on Google Cloud Storage. It specifies the profile named `gs:json` and the server configuration named `gcssrvcfg`:
+以下命令创建了一个引用Google Cloud Storage上JSON文件的外部表。 指定名为 `gs:json` 的配置文件和名为 `gcssrvcfg` 的服务配置：
 
 <pre>
 CREATE EXTERNAL TABLE pxf_gsc_json(location text, month text, num_orders int, total_sales float8)
@@ -91,21 +91,20 @@ CREATE EXTERNAL TABLE pxf_gsc_json(location text, month text, num_orders int, to
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 </pre>
 
-## <a id="s3_override"></a>Overriding the S3 Server Configuration
+## <a id="s3_override"></a>覆盖S3服务配置
 
-If you are accessing an S3 object store, you can override the S3 server configuration by directly specifying the S3 access ID and secret key via these custom options in the `CREATE EXTERNAL TABLE` `LOCATION` clause:
+如果您访问S3对象存储, 可以通过 `CREATE EXTERNAL TABLE` `LOCATION` 子句中的以下自定义选项直接指定S3访问ID和密钥，从而覆盖S3服务配置：
 
-| Custom Option  | Value Description |
+| 自定义选项  | 值描述 |
 |-------|-------------------------------------|
-| accesskey    | The AWS account access key ID. |
-| secretkey    | The secret key associated with the AWS access key ID. |
+| accesskey    | AWS账户访问密钥ID |
+| secretkey    | 与AWS访问密钥ID关联的密钥. |
 
 For example:
 <pre>CREATE EXTERNAL TABLE pxf_ext_tbl(name text, orders int)
   LOCATION ('pxf://S3_BUCKET/dir/file.txt?PROFILE=s3:text&SERVER=s3srvcfg<b>&accesskey=YOURKEY&secretkey=YOURSECRET</b>')
 FORMAT 'TEXT' (delimiter=E',');</pre>
 
-<div class="note warning">Credentials that you provide in this manner are visible as part of the external table definition. Do not use this method of passing credentials in a production environment.</div>
+<div class="note warning">已这种方式提供的凭据在外部表定义中可见。不要在生产环境中使用这种传递凭据的方法。</div>
 
-PXF does not support overriding Azure, Google Cloud Storage, and Minio server credentials in this manner at this time.
-
+PXF目前不支持以这种方式覆盖 Azure、 Google Cloud Storage和Minio服务器凭据。
