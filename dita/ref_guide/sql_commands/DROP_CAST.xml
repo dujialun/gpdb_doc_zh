@@ -4,16 +4,16 @@
 <topic id="topic1">
     <title id="cp20941">DROP CAST</title>
     <body>
-        <p id="sql_command_desc">删除一个类型转换。</p>
+        <p id="sql_command_desc">删除一个造型。</p>
         <section id="section2">
             <title>概要</title>
             <codeblock id="sql_command_synopsis">DROP CAST [IF EXISTS] (<varname>sourcetype</varname> AS <varname>targettype</varname>) [CASCADE | RESTRICT]</codeblock>
         </section>
         <section id="section3">
             <title>描述</title>
-            <p><codeph>DROP CAST</codeph>将删除先前定义的类型转换。
-                为了能够删除类型转换，您必须拥有源或目标数据类型。
-                这些与创建类型转换所需的特权相同。
+            <p><codeph>DROP CAST</codeph>将删除先前定义的造型。
+                为了能够删除造型，您必须拥有源或目标数据类型。
+                这些与创建造型所需的特权相同。
             </p>
         </section>
         <section id="section4">
@@ -21,32 +21,32 @@
             <parml>
                 <plentry>
                     <pt>IF EXISTS</pt>
-                    <pd>如果类型转换不存在，请不要抛出错误。在这种情况下会发出通知。
+                    <pd>如果造型不存在，请不要抛出错误。在这种情况下会发出通知。
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>
                         <varname>sourcetype</varname>
                     </pt>
-                    <pd>类型转换的源数据类型的名称。</pd>
+                    <pd>造型的源数据类型的名称。</pd>
                 </plentry>
                 <plentry>
                     <pt>
                         <varname>targettype</varname>
                     </pt>
-                    <pd>类型转换的目标数据类型的名称。</pd>
+                    <pd>造型的目标数据类型的名称。</pd>
                 </plentry>
                 <plentry>
                     <pt>CASCADE</pt>
                     <pt>RESTRICT</pt>
-                    <pd>这些关键字没有任何作用，因为不依赖类型转换。
+                    <pd>这些关键字没有任何作用，因为不依赖造型。
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
             <title>示例</title>
-            <p>删除从<codeph>text</codeph>类型转换为<codeph>int</codeph>类型的类型转换：
+            <p>删除从<codeph>text</codeph>类型到<codeph>int</codeph>类型的造型：
             </p>
             <codeblock>DROP CAST (text AS int);</codeblock>
         </section>
