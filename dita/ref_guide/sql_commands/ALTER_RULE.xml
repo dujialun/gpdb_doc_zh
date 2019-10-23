@@ -4,40 +4,44 @@
 <topic id="topic1">
   <title>ALTER RULE</title>
   <body>
-    <p id="sql_command_desc">修改一个规则的定义。</p>
+    <p id="sql_command_desc">Changes the definition of a rule.</p>
     <section id="section2">
-      <title>概要</title>
+      <title>Synopsis</title>
       <codeblock id="sql_command_synopsis">ALTER RULE <varname>name</varname> ON <varname>table_name</varname> RENAME TO <varname>new_name</varname></codeblock>
     </section>
     <section id="section3">
-      <title>描述</title>
-      <p><codeph>ALTER RULE</codeph> 更改一个存在的规则的属性，当前可用的操作时修改规则的名称。</p>
-      <p>要使用<codeph>ALTER RULE</codeph>用户必须是这个规则应用的表或视图拥有者。</p>
+      <title>Description</title>
+      <p><codeph>ALTER RULE</codeph> changes properties of an existing rule. Currently, the only
+        available action is to change the rule's name. </p>
+      <p>To use <codeph>ALTER RULE</codeph>, you must own the table or view that the rule applies
+        to. </p>
     </section>
     <section id="section4">
-      <title>参数</title>
+      <title>Parameters</title>
       <parml>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd>要更改的存在的规则的名称。 </pd>
+          <pd>The name of an existing rule to alter. </pd>
         </plentry>
         <plentry>
           <pt><varname>table_name</varname></pt>
-          <pd>规则应用的表或者视图名称（可选的限定模式）。
+          <pd>The name (optionally schema-qualified) of the table or view that the
+            rule applies to.
           </pd>
         </plentry>
         <plentry>
           <pt><varname>new_name</varname></pt>
-          <pd> 规则的新名称。</pd>
+          <pd> The new name for the rule.</pd>
         </plentry>
       </parml>
     </section>
     <section id="section7">
-      <title>兼容性</title>
-      <p><codeph>ALTER RULE</codeph> 是Greenplum数据库语言的扩展，是一个完整的查询重写系统。</p>
+      <title>Compatibility</title>
+      <p><codeph>ALTER RULE</codeph> is a Greenplum Database language extension, as is the entire
+        query rewrite system. </p>
     </section>
     <section>
-      <title>另见</title>
+      <title>See Also</title>
       <p><codeph><xref href="CREATE_RULE.xml#topic1"/></codeph>, <codeph><xref
             href="DROP_RULE.xml#topic1"/></codeph>
       </p>

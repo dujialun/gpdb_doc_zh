@@ -4,52 +4,51 @@
 <topic id="topic1">
     <title id="bv20941">ALTER USER MAPPING</title>
     <body>
-        <p id="sql_command_desc">更改外部服务器的用户映射的定义。</p>
+        <p id="sql_command_desc">Changes the definition of a user mapping for a foreign server.</p>
         <section id="section2">
-            <title>概要</title>
+            <title>Synopsis</title>
             <codeblock id="sql_command_synopsis">ALTER USER MAPPING FOR { <varname>username</varname> | USER | CURRENT_USER | PUBLIC }
     SERVER <varname>servername</varname>
     OPTIONS ( [ ADD | SET | DROP ] <varname>option</varname> ['<varname>value</varname>'] [, ... ] )</codeblock>
         </section>
         <section id="section3">
             <title>Description</title>
-            <p><codeph>ALTER USER MAPPING</codeph>更改外部服务器的用户映射的定义。</p>
-            <p>外部服务器的所有者可以为任何用户更改该服务器的用户映射。 同样，在服务器上被授予<codeph>USAGE</codeph>特权的用户可以更改其自己的用户名的用户映射。</p>
+            <p><codeph>ALTER USER MAPPING</codeph> changes the definition of a user mapping for a foreign server.</p>
+            <p>The owner of a foreign server can alter user mappings for that server for any user. Also, a user granted <codeph>USAGE</codeph> privilege on the server can alter a user mapping for their own user name.</p>
         </section>
         <section id="section4">
-            <title>参数</title>
+            <title>Parameters</title>
             <parml>
                 <plentry>
                     <pt><varname>username</varname></pt>
                     <pd>
-                        <p>映射的用户名。 <codeph>CURRENT_USER</codeph>和<codeph>USER</codeph>与当前用户的名称匹配。 <codeph>PUBLIC</codeph> 用于匹配系统中所有当前和将来的用户名。</p>
+                        <p>User name of the mapping. <codeph>CURRENT_USER</codeph> and <codeph>USER</codeph> match the name of the current user. <codeph>PUBLIC</codeph> is used to match all present and future user names in the system.</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>servername</varname></pt>
                     <pd>
-                        <p>用户映射的服务器名称。</p>
+                        <p>Server name of the user mapping.</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>OPTIONS ( [ ADD | SET | DROP ] <varname>option</varname> ['<varname>value</varname>'] [, ... ] )</pt>
                     <pd>
-                        <p>
-						更改用户映射的选项。 新选项将覆盖所有先前指定的选项。 <codeph>ADD</codeph>, <codeph>SET</codeph>和<codeph>DROP</codeph>指定要执行的操作。 如果未明确指定任何操作，则默认操作为<codeph>ADD</codeph>。 选项名称必须唯一。 Greenplum数据库使用服务器的外部数据包装器来验证名称和值。</p>
+                        <p>Change options for the user mapping. The new options override any previously specified options. <codeph>ADD</codeph>, <codeph>SET</codeph>, and <codeph>DROP</codeph> specify the action to perform. If no operation is explicitly specified, the default operation is <codeph>ADD</codeph>. Option names must be unique. Greenplum Database validates names and values using the server's foreign-data wrapper.</p>
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section6">
-            <title>示例</title>
-            <p>更改用户映射<codeph>bob</codeph>，服务器<codeph>foo</codeph>的密码：</p><codeblock>ALTER USER MAPPING FOR bob SERVER foo OPTIONS (SET password 'public');</codeblock>
+            <title>Examples</title>
+            <p>Change the password for user mapping <codeph>bob</codeph>, server <codeph>foo</codeph>:</p><codeblock>ALTER USER MAPPING FOR bob SERVER foo OPTIONS (SET password 'public');</codeblock>
         </section>
         <section id="section7">
-            <title>兼容性</title>
-            <p><codeph>ALTER USER MAPPING</codeph>符合ISO / IEC 9075-9（SQL / MED）。 存在一个微妙的语法问题：标准省略了<codeph>FOR</codeph> 关键字。 由于<codeph>CREATE USER MAPPING</codeph>和<codeph>DROP USER MAPPING</codeph>都在相似的位置使用<codeph>FOR</codeph>，因此Greenplum Database在此处出于一致性和互操作性而与标准有所不同。</p>
+            <title>Compatibility</title>
+            <p><codeph>ALTER USER MAPPING</codeph> conforms to ISO/IEC 9075-9 (SQL/MED). There is a subtle syntax issue: The standard omits the <codeph>FOR</codeph> key word. Since both <codeph>CREATE USER MAPPING</codeph> and <codeph>DROP USER MAPPING</codeph> use <codeph>FOR</codeph> in analogous positions, Greenplum Database diverges from the standard here in the interest of consistency and interoperability.</p>
         </section>
         <section id="section8">
-            <title>另见</title>
+            <title>See Also</title>
             <p><codeph><xref href="CREATE_USER_MAPPING.xml#topic1">CREATE USER MAPPING</xref></codeph>,
                         <codeph><xref href="DROP_USER_MAPPING.xml#topic1">DROP
                     USER MAPPING</xref></codeph></p>

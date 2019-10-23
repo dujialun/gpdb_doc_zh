@@ -4,9 +4,9 @@
 <topic id="topic1">
   <title id="bd20941">ANALYZE</title>
   <body>
-    <p id="sql_command_desc">收集有关一个数据库的统计信息。</p>
+    <p id="sql_command_desc">Collects statistics about a database.</p>
     <section id="section2">
-      <title>概要</title>
+      <title>Synopsis</title>
       <codeblock id="sql_command_synopsis">ANALYZE [VERBOSE] [<varname>table</varname> [ (<varname>column</varname> [, ...] ) ]]
 
 ANALYZE [VERBOSE] {<varname>root_partition</varname>|<varname>leaf_partition</varname>} [ (<varname>column</varname> [, ...] )] 
@@ -14,123 +14,256 @@ ANALYZE [VERBOSE] {<varname>root_partition</varname>|<varname>leaf_partition</va
 ANALYZE [VERBOSE] ROOTPARTITION {ALL | <varname>root_partition</varname> [ (<varname>column</varname> [, ...] )]}</codeblock>
     </section>
     <section id="section3">
-      <title>描述</title>
-      <p><codeph>ANALYZE</codeph>收集有关数据库中表内容的统计信息，并将结果存储在系统表<i>pg_statistic</i>中。 随后，Greenplum数据库使用这些统计信息来帮助确定最有效的查询执行计划。 有关收集的表统计信息的信息，请参阅<xref
-          href="#topic1/section5" format="dita">Notes</xref>。</p>
-      <p>如果不使用任何参数，则<codeph>ANALYZE</codeph>会收集当前数据库中每个表的统计信息。 您可以指定表名称以收集单个表的统计信息。 您可以指定一组列名，在这种情况下，仅收集这些列的统计信息。</p>
-      <p><codeph>ANALYZE</codeph>不会收集外部表的统计信息。</p>
-      <p>对于分区表，<codeph>ANALYZE</codeph>在叶子分区上收集其他统计信息，即HyperLogLog（HLL）统计信息。 HLL统计信息用于得出针对分区表的查询的不同值（NDV）数量。<ul
+      <title>Description</title>
+      <p><codeph>ANALYZE</codeph> collects statistics about the contents of tables in the database,
+        and stores the results in the system table <i>pg_statistic</i>. Subsequently, Greenplum
+        Database uses these statistics to help determine the most efficient execution plans for
+        queries. For information about the table statistics that are collected, see <xref
+          href="#topic1/section5" format="dita">Notes</xref>.</p>
+      <p>With no parameter, <codeph>ANALYZE</codeph> collects statistics for every table in the
+        current database. You can specify a table name to collect statistics for a single table. You
+        can specify a set of column names, in which case the statistics only for those columns are
+        collected.</p>
+      <p><codeph>ANALYZE</codeph> does not collect statistics on external tables. </p>
+      <p>For partitioned tables, <codeph>ANALYZE</codeph> collects additional statistics,
+        HyperLogLog (HLL) statistics, on the leaf child partitions. HLL statistics are used are used
+        to derive number of distinct values (NDV) for queries against partitioned tables.<ul
           id="ul_nxx_p3p_x2b">
-          <li>当汇总多个叶子分区的NDV估计值时，HLL统计信息比标准表统计信息生成更准确的NDV估计值。 </li>
-          <li>更新HLL统计信息时，仅在已更改的叶子分区上才需要<codeph>ANALYZE</codeph>操作。 例如，如果叶子子分区数据已更改，或者叶子子分区已与另一个表交换，则ANALYZE是必需的。 有关更新分区表统计信息的更多信息，请参见<xref href="#topic1/section5" format="dita">Notes</xref>。</li>
+          <li>When aggregating NDV estimates across multiple leaf child partitions, HLL statistics
+            generate a more accurate NDV estimates than the standard table statistics. </li>
+          <li>When updating HLL statistics, <codeph>ANALYZE</codeph> operations are required only on
+            leaf child partitions that have changed. For example, <codeph>ANALYZE</codeph> is
+            required if the leaf child partition data has changed, or if the leaf child partition
+            has been exchanged with another table. For more information about updating partitioned
+            table statistics, see <xref href="#topic1/section5" format="dita">Notes</xref>.</li>
         </ul></p>
-      <note type="important">
-	  如果要在启用GPORCA的分区表上执行查询（默认设置），则必须使用<codeph>ANALYZE</codeph>或<codeph>ANALYZE ROOTPARTITION</codeph>命令在分区表的根分区上收集统计信息。 有关收集分区表上的统计信息以及何时需要<codeph>ROOTPARTITION</codeph>关键字的信息，请参阅<xref
-          href="#topic1/section5" format="dita">Notes</xref>。 有关GPORCA的信息，请参阅<ph otherprops="op-print"><cite>Greenplum Database Administrator Guide</cite></ph>中的<xref href="../../admin_guide/query/topics/query-piv-opt-overview.xml"/>。</note>
-      <note>您还可以使用Greenplum数据库实用程序<codeph>analyzedb</codeph>更新表统计信息。 <codeph>analyzedb</codeph> 可以同时更新多个表的统计信息。 该实用程序还可以检查表统计信息并仅在统计信息不是当前统计信息或不存在时更新统计信息。 有关该实用程序的信息，请参阅<cite>Greenplum Database Utility Guide</cite>。</note>
+      <note type="important">If you intend to execute queries on partitioned tables with GPORCA
+        enabled (the default), then you must collect statistics on the root partition of the
+        partitioned table with the <codeph>ANALYZE</codeph> or <codeph>ANALYZE
+          ROOTPARTITION</codeph> command. For information about collecting statistics on partitioned
+        tables and when the <codeph>ROOTPARTITION</codeph> keyword is required, see <xref
+          href="#topic1/section5" format="dita">Notes</xref>. For information about GPORCA, see
+          <xref href="../../admin_guide/query/topics/query-piv-opt-overview.xml"/><ph
+          otherprops="op-print"> in the <cite>Greenplum Database Administrator Guide</cite></ph>. </note>
+      <note>You can also use the Greenplum Database utility <codeph>analyzedb</codeph> to update
+        table statistics. The <codeph>analyzedb</codeph> utility can update statistics for multiple
+        tables concurrently. The utility can also check table statistics and update statistics only
+        if the statistics are not current or do not exist. For information about the utility, see
+        the <cite>Greenplum Database Utility Guide</cite>.</note>
     </section>
     <section id="section4">
-      <title>参数</title>
+      <title>Parameters</title>
       <parml>
         <plentry>
           <pt>{ <varname>root_partition</varname> | <varname>leaf_partition</varname> } [
               (<varname>column</varname> [, ...] ) ]</pt>
-          <pd>收集分区表的统计信息，包括HLL统计信息。 HLL统计信息仅在叶子分区上收集。</pd>
-          <pd><codeph>ANALYZE <varname>root_partition</varname></codeph>, 收集所有叶子分区和根分区的统计信息。</pd>
-          <pd><codeph>ANALYZE <varname>leaf_partition</varname></codeph>, 收集有关叶子分区的统计信息。 </pd>
-          <pd>默认情况下，如果指定叶子分区，并且所有其他叶子分区都具有统计信息，则<codeph>ANALYZE</codeph>更新根分区统计信息。 如果不是所有叶子子分区都具有统计信息，则<codeph>ANALYZE</codeph>记录有关没有统计信息的叶子子分区的信息。 有关何时收集根分区统计信息的信息，请参阅<xref href="#topic1/section5" format="dita"
-              >Notes</xref>。</pd>
+          <pd>Collect statistics for partitioned tables including HLL statistics. HLL statistics are
+            collected only on leaf child partitions. </pd>
+          <pd><codeph>ANALYZE <varname>root_partition</varname></codeph>, collects statistics on all
+            leaf child partitions and the root partition. </pd>
+          <pd><codeph>ANALYZE <varname>leaf_partition</varname></codeph>, collects statistics on the
+            leaf child partition. </pd>
+          <pd>By default, if you specify a leaf child partition, and all other leaf child partitions
+            have statistics, <codeph>ANALYZE</codeph> updates the root partition statistics. If not
+            all leaf child partitions have statistics, <codeph>ANALYZE</codeph> logs information
+            about the leaf child partitions that do not have statistics. For information about when
+            root partition statistics are collected, see <xref href="#topic1/section5" format="dita"
+              >Notes</xref>.</pd>
         </plentry>
         <plentry>
           <pt>ROOTPARTITION [ALL]</pt>
-          <pd>仅基于分区表中的数据收集分区表的根分区上的统计信息。 如果可能，<codeph>ANALYZE</codeph>使用叶子分区统计信息生成根分区统计信息。 否则，<codeph>ANALYZE</codeph>通过对叶子分区数据进行采样来收集统计信息。 未在叶子分区上收集统计信息，仅对数据进行采样。 不会收集HLL统计信息。</pd>
-          <pd>有关何时需要<codeph>ROOTPARTITION</codeph>关键字的信息，请参阅<xref href="#topic1/section5" format="dita">Notes</xref>。</pd>
-          <pd>指定<codeph>ROOTPARTITION</codeph>时，必须指定ALL或分区表的名称。</pd>
-          <pd>如果将<codeph>ROOTPARTITION</codeph>指定为<codeph>ALL</codeph>，则Greenplum Database会收集数据库中所有分区表的根分区的统计信息。如果数据库中没有分区表，则会返回一条消息，指出没有分区表。对于不是分区表的表，不会收集统计信息。</pd>
-          <pd>如果使用<codeph>ROOTPARTITION</codeph>指定表名，并且该表不是分区表，则不会为该表收集任何统计信息，并且会返回警告消息。</pd>
-          <pd><codeph>ROOTPARTITION</codeph>子句不适用于<codeph>VACUUM
-              ANALYZE</codeph>。 <codeph>VACUUM ANALYZE ROOTPARTITION</codeph>命令返回错误。 </pd>
-          <pd>运行<codeph>ANALYZE ROOTPARTITION</codeph>的时间类似于分析具有相同数据的非分区表的时间，因为<codeph>ANALYZE
-              ROOTPARTITION</codeph>仅采样叶子分区数据。</pd>
-          <pd>对于分区表 <i>sales_curr_yr</i>，此示例命令仅在分区表的根分区上收集统计信息。<codeph>ANALYZE
-              ROOTPARTITION sales_curr_yr; </codeph>;</pd>
-          <pd>此示例<codeph>ANALYZE</codeph>命令收集有关数据库中所有分区表的根分区的统计信息。
+          <pd>Collect statistics only on the root partition of partitioned tables based on the data
+            in the partitioned table. If possible, <codeph>ANALYZE</codeph> uses leaf child
+            partition statistics to generate root partition statistics. Otherwise,
+              <codeph>ANALYZE</codeph> collects the statistics by sampling leaf child partition
+            data. Statistics are not collected on the leaf child partitions, the data is only
+            sampled. HLL statistics are not collected. </pd>
+          <pd>For information about when the <codeph>ROOTPARTITION</codeph> keyword is required, see
+              <xref href="#topic1/section5" format="dita">Notes</xref>.</pd>
+          <pd>When you specify <codeph>ROOTPARTITION</codeph>, you must specify either
+              <codeph>ALL</codeph> or the name of a partitioned table. </pd>
+          <pd>If you specify <codeph>ALL</codeph> with <codeph>ROOTPARTITION</codeph>, Greenplum
+            Database collects statistics for the root partition of all partitioned tables in the
+            database. If there are no partitioned tables in the database, a message stating that
+            there are no partitioned tables is returned. For tables that are not partitioned tables,
+            statistics are not collected. </pd>
+          <pd>If you specify a table name with <codeph>ROOTPARTITION</codeph> and the table is not a
+            partitioned table, no statistics are collected for the table and a warning message is
+            returned.</pd>
+          <pd>The <codeph>ROOTPARTITION</codeph> clause is not valid with <codeph>VACUUM
+              ANALYZE</codeph>. The command <codeph>VACUUM ANALYZE ROOTPARTITION</codeph> returns an
+            error. </pd>
+          <pd>The time to run <codeph>ANALYZE ROOTPARTITION</codeph> is similar to the time to
+            analyze a non-partitioned table with the same data since <codeph>ANALYZE
+              ROOTPARTITION</codeph> only samples the leaf child partition data. </pd>
+          <pd>For the partitioned table <i>sales_curr_yr</i>, this example command collects
+            statistics only on the root partition of the partitioned table. <codeph>ANALYZE
+              ROOTPARTITION sales_curr_yr; </codeph></pd>
+          <pd>This example <codeph>ANALYZE</codeph> command collects statistics on the root
+            partition of all the partitioned tables in the database.
             <codeblock>ANALYZE ROOTPARTITION ALL;</codeblock></pd>
         </plentry>
         <plentry>
           <pt>VERBOSE</pt>
-          <pd>启用显示进度消息。 启用显示进度消息。 指定时，<codeph>ANALYZE</codeph> 发出此信息<ul id="ul_phq_1n2_jr">
-              <li>正在处理的表。</li>
-              <li>执行该查询以生成示例表。</li>
-              <li>要为其计算统计信息的列。</li>
-              <li>发出以收集单个列的不同统计信息的查询。</li>
-              <li>收集的统计信息。</li>
+          <pd>Enables display of progress messages. Enables display of progress messages. When
+            specified, <codeph>ANALYZE</codeph> emits this information <ul id="ul_phq_1n2_jr">
+              <li>The table that is being processed.</li>
+              <li>The query that is executed to generate the sample table.</li>
+              <li>The column for which statistics is being computed.</li>
+              <li>The queries that are issued to collect the different statistics for a single
+                column.</li>
+              <li>The statistics that are collected.</li>
             </ul></pd>
         </plentry>
         <plentry>
           <pt>
             <varname>table</varname>
           </pt>
-          <pd>要分析的特定表的名称（可能是模式限定的）。 如果省略，则分析当前数据库中的所有常规表（而不是外部表）。</pd>
+          <pd>The name (possibly schema-qualified) of a specific table to analyze. If omitted, all regular tables (but not foreign tables)
+            in the current database are analyzed. </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>column</varname>
           </pt>
-          <pd>要分析的特定列的名称。 默认为所有列。</pd>
+          <pd>The name of a specific column to analyze. Defaults to all columns. </pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>注意</title>
-      <p>仅在明确选择外表时才进行分析。 并非所有外部数据包装器都支持<codeph>ANALYZE</codeph>。 如果表的包装器不支持<codeph>ANALYZE</codeph>，则该命令将显示警告并且不执行任何操作。</p>
-      <p>最好定期或在对表内容进行重大更改之后立即运行<codeph>ANALYZE</codeph>。 准确的统计信息有助于Greenplum数据库选择最合适的查询计划，从而提高查询处理的速度。 只读数据库的常见策略是在一天的低使用时间内每天运行一次 <codeph><xref href="./VACUUM.xml#topic1"
-            type="topic" format="dita"/></codeph> 和<codeph>ANALYZE</codeph>。 （如果有大量更新活动，这是不够的。）您可以使用<codeph>gp_toolkit</codeph>模式中的<codeph>gp_stats_missing</codeph>视图来检查缺少统计信息的表：</p>
+      <title>Notes</title>
+      <p>Foreign tables are analyzed only when explicitly selected. Not all foreign data wrappers
+        support <codeph>ANALYZE</codeph>. If the table's wrapper does not support
+          <codeph>ANALYZE</codeph>, the command prints a warning and does nothing.</p>
+      <p>It is a good idea to run <codeph>ANALYZE</codeph> periodically, or just after making major
+        changes in the contents of a table. Accurate statistics helps Greenplum Database choose the
+        most appropriate query plan, and thereby improve the speed of query processing. A common
+        strategy for read-mostly databases is to run <codeph><xref href="./VACUUM.xml#topic1"
+            type="topic" format="dita"/></codeph> and <codeph>ANALYZE</codeph> once a day during a
+        low-usage time of day. (This will not be sufficient if there is heavy update activity.) You
+        can check for tables with missing statistics using the <codeph>gp_stats_missing</codeph>
+        view, which is in the <codeph>gp_toolkit</codeph> schema:</p>
       <codeblock>SELECT * from gp_toolkit.gp_stats_missing;</codeblock>
-      <p><codeph>ANALYZE</codeph>要求对目标表进行<codeph>SHARE UPDATE EXCLUSIVE</codeph>锁定。 此锁与以下锁冲突：<codeph>SHARE UPDATE EXCLUSIVE</codeph>,
+      <p><codeph>ANALYZE</codeph> requires <codeph>SHARE UPDATE EXCLUSIVE</codeph> lock on the
+        target table. This lock conflicts with these locks: <codeph>SHARE UPDATE EXCLUSIVE</codeph>,
           <codeph>SHARE</codeph>, <codeph>SHARE ROW EXCLUSIVE</codeph>, <codeph>EXCLUSIVE</codeph>,
-          <codeph>ACCESS EXCLUSIVE</codeph>。</p>
-      <p>如果您在不包含数据的表上运行<codeph>ANALYZE</codeph>，则不会为该表收集统计信息。 例如，如果您对具有统计信息的表执行<codeph>TRUNCATE</codeph>操作，然后对该表运行<codeph>ANALYZE</codeph>，则统计信息不会更改。</p>
-      <p>对于分区表，如果分区表具有大量已分析的分区，而只有几个叶子分区具有分区，则指定要分析的表部分，根分区或子分区（叶子分区表）可能会有用 改变了。<note>
-	  当您使用<codeph>CREATE
-            TABLE</codeph>命令创建分区表时，Greenplum数据库将创建您指定的表（根分区或父表），并根据您指定的分区层次结构（子表）创建表层次结构。</note></p>
+          <codeph>ACCESS EXCLUSIVE</codeph>.</p>
+      <p>If you run <codeph>ANALYZE</codeph> on a table that does not contain data, statistics are
+        not collected for the table. For example, if you perform a <codeph>TRUNCATE</codeph>
+        operation on a table that has statistics, and then run <codeph>ANALYZE</codeph> on the
+        table, the statistics do not change.</p>
+      <p>For a partitioned table, specifying which portion of the table to analyze, the root
+        partition or subpartitions (leaf child partition tables) can be useful if the partitioned
+        table has a large number of partitions that have been analyzed and only a few leaf child
+        partitions have changed. <note>When you create a partitioned table with the <codeph>CREATE
+            TABLE</codeph> command, Greenplum Database creates the table that you specify (the root
+          partition or parent table), and also creates a hierarchy of tables based on the partition
+          hierarchy that you specified (the child tables). </note></p>
       <ul>
-        <li id="bd138200">在根分区表上运行<codeph>ANALYZE</codeph>时，将收集所有叶子分区的统计信息。 叶子子分区是Greenplum数据库创建供子表使用的子表层次结构中的最低级表。 </li>
-        <li id="bd138204">在叶子分区上运行<codeph>ANALYZE</codeph>时，仅收集该叶子分区和根分区的统计信息。 如果叶子分区中的数据已更改（例如，您对叶子子分区数据进行了重大更新或交换了叶子子分区），则可以在叶子子分区上运行ANALYZE来收集表统计信息。 默认情况下，如果所有其他叶子分区都具有统计信息，则该命令将更新根分区统计信息。
-            <p>例如，如果您在具有大量分区的分区表上收集统计信息，然后仅在几个叶子分区中更新数据，则可以仅在那些分区上运行<codeph>ANALYZE</codeph>来更新分区的统计信息和根分区的统计信息。</p></li>
-        <li>在不是叶子分区的子表上运行<codeph>ANALYZE</codeph>时，不会收集统计信息。<p>例如，您可以创建一个分区表，其中包含2006年至2016年的分区以及每年每个月的子分区。 如果您在2013年的子表上运行<codeph>ANALYZE</codeph>，则不会收集任何统计信息。 如果您在2013年3月在叶子分区上运行<codeph>ANALYZE</codeph>，则仅收集该叶子分区的统计信息。</p></li>
+        <li id="bd138200">When you run <codeph>ANALYZE</codeph> on the root partitioned table,
+          statistics are collected for all the leaf child partitions. Leaf child partitions are the
+          lowest-level tables in the hierarchy of child tables created by Greenplum Database for use
+          by the partitioned table. </li>
+        <li id="bd138204">When you run <codeph>ANALYZE</codeph> on a leaf child partition,
+          statistics are collected only for that leaf child partition and the root partition. If
+          data in the leaf partition has changed (for example, you made significant updates to the
+          leaf child partition data or you exchanged the leaf child partition), then you can run
+          ANALYZE on the leaf child partition to collect table statistics. By default, if all other
+          leaf child partitions have statistics, the command updates the root partition statistics.
+            <p>For example, if you collected statistics on a partitioned table with a large number
+            partitions and then updated data in only a few leaf child partitions, you can run
+              <codeph>ANALYZE</codeph> only on those partitions to update statistics on the
+            partitions and the statistics on the root partition.</p></li>
+        <li>When you run <codeph>ANALYZE</codeph> on a child table that is not a leaf child
+          partition, statistics are not collected. <p>For example, you can create a partitioned
+            table with partitions for the years 2006 to 2016 and subpartitions for each month in
+            each year. If you run <codeph>ANALYZE</codeph> on the child table for the year 2013 no
+            statistics are collected. If you run <codeph>ANALYZE</codeph> on the leaf child
+            partition for March of 2013, statistics are collected only for that leaf child
+            partition. </p></li>
       </ul>
-      <p>对于包含已被交换以使用外部表的叶子分区的分区表，<codeph>ANALYZE</codeph>不会收集外部表分区的统计信息：</p>
+      <p>For a partitioned table that contains a leaf child partition that has been exchanged to use
+        an external table, <codeph>ANALYZE</codeph> does not collect statistics for the external
+        table partition:</p>
       <ul id="ol_x5n_2ff_ss">
-        <li>如果在外部表分区上运行<codeph>ANALYZE</codeph>，则不会分析该分区。</li>
-        <li>如果在根分区上运行<codeph>ANALYZE</codeph>或<codeph>ANALYZE ROOTPARTITION</codeph>，则不对外部表分区进行采样，并且根表统计信息不包括外部表分区。 </li>
-        <li>如果指定了<codeph>VERBOSE</codeph>子句，则会显示一条参考消息：<codeph>skipping external table</codeph>。</li>
+        <li>If <codeph>ANALYZE</codeph> is run on an external table partition, the partition is not
+          analyzed.</li>
+        <li>If <codeph>ANALYZE</codeph> or <codeph>ANALYZE ROOTPARTITION</codeph> is run on the root
+          partition, external table partitions are not sampled and root table statistics do not
+          include external table partition. </li>
+        <li>If the <codeph>VERBOSE</codeph> clause is specified, an informational message is
+          displayed: <codeph>skipping external table</codeph>.</li>
       </ul>
-      <p>Greenplum数据库服务器配置参数<codeph><xref
+      <p>The Greenplum Database server configuration parameter <codeph><xref
             href="../config_params/guc-list.xml#optimizer_analyze_root_partition"
-            >optimizer_analyze_root_partition</xref></codeph>影响何时在分区表的根分区上收集统计信息。 如果该参数为<codeph>on</codeph>（默认值），则在运行<codeph>ANALYZE</codeph>时，不需要<codeph>ROOTPARTITION</codeph>关键字来收集根分区上的统计信息。 在根分区上运行<codeph>ANALYZE</codeph>或在分区表的子叶分区上运行<codeph>ANALYZE</codeph>且其他子叶分区具有统计信息时，将收集根分区统计信息。 如果该参数是<codeph>off</codeph>，则必须运行<codeph>ANALZYE ROOTPARTITION</codeph>来收集根分区统计信息。</p>
-      <p><codeph>ANALYZE</codeph>收集的统计信息通常包括每列中一些最常用值的列表以及显示每列中近似数据分布的直方图。 如果<codeph>ANALYZE</codeph>认为它们不重要（例如，在唯一键列中没有公共值），或者列数据类型不支持适当的运算符，则可以忽略其中一个或两个。</p>
-      <p>对于大型表，<codeph>ANALYZE</codeph>会从表内容中随机抽取一个样本，而不是检查每一行。这样就可以在很短的时间内分析非常大的表。但是请注意，统计信息仅是近似的，并且每次运行<codeph>ANALYZE</codeph>都会略有变化，即使实际的表内容没有变化。这可能会导致<codeph>EXPLAIN</codeph>所显示的计划者估算成本发生细微变化。在极少数情况下，这种不确定性将导致查询优化器在<codeph>ANALYZE</codeph>运行之间选择不同的查询计划。为了避免这种情况，请通过调整<varname>default_statistics_target</varname>配置参数来提高<codeph>ANALYZE</codeph>收集的统计信息的数量，或者通过使用<codeph>ALTER TABLE
-          ... ALTER COLUMN ... SET (n_distinct ...)</codeph>（请参阅<codeph>ALTER TABLE</codeph>）。目标值设置最常用值列表中的最大条目数和直方图中的最大bin数。默认目标值是100，但是可以向上或向下调整该值以权衡规划器估计的准确性与<codeph>ANALYZE</codeph>v所花费的时间以及<codeph>pg_statistic</codeph>中占用的空间量。特别是，将统计目标设置为零会禁用该列的统计收集。对于从未用作查询的<codeph>WHERE</codeph>, <codeph>GROUP BY</codeph>或<codeph>ORDER BY</codeph>子句一部分的列，执行此操作可能很有用，因为计划器将不会使用此类列的统计信息。</p>
-      <p>要分析的列中最大的统计信息目标确定为准备统计信息而采样的表行数。 增加目标会导致进行<codeph>ANALYZE</codeph>所需的时间和空间成比例增加。</p>
-      <p><codeph>ANALYZE</codeph>估计的值之一是出现在每列中的不同值的数量。 因为仅检查了行的子集，所以即使使用最大可能的统计目标，此估计有时也可能非常不准确。 如果此错误导致查询计划不正确，则可以手动确定更准确的值，然后与<codeph>ALTER TABLE ... ALTER COLUMN ... SET STATISTICS DISTINCT</codeph>一起安装（请参阅<xref href="ALTER_TABLE.xml#topic1"/>）。</p>
-      <p>当Greenplum数据库执行<codeph>ANALYZE</codeph>操作以收集表的统计信息并检测到所有采样的表数据页均为空（不包含有效数据）时，Greenplum数据库将显示一条消息，指出应该执行<codeph>VACUUM
-          FULL</codeph>操作。 如果采样页为空，则表统计信息将不准确。 对表进行大量更改（例如删除大量行）后，页面将变为空。 <codeph>VACUUM
-          FULL</codeph>操作可删除空白页，并允许<codeph>ANALYZE</codeph>操作收集准确的统计信息。</p>
-      <p>如果该表没有统计信息，则服务器配置参数<codeph><xref
-            href="../config_params/guc-list.xml#gp_enable_relsize_collection"/></codeph>将控制Postgres查询优化器使用默认统计信息文件还是使用<codeph>pg_relation_size</codeph>函数估计表的大小。 默认情况下，如果统计信息不可用，Postgres优化器将使用默认的统计信息文件来估计行数。</p>
+            >optimizer_analyze_root_partition</xref></codeph> affects when statistics are collected
+        on the root partition of a partitioned table. If the parameter is <codeph>on</codeph> (the
+        default), the <codeph>ROOTPARTITION</codeph> keyword is not required to collect statistics
+        on the root partition when you run <codeph>ANALYZE</codeph>. Root partition statistics are
+        collected when you run <codeph>ANALYZE</codeph> on the root partition, or when you run
+          <codeph>ANALYZE</codeph> on a child leaf partition of the partitioned table and the other
+        child leaf partitions have statistics. If the parameter is <codeph>off</codeph>, you must
+        run <codeph>ANALZYE ROOTPARTITION</codeph> to collect root partition statistics.</p>
+      <p>The statistics collected by <codeph>ANALYZE</codeph> usually include a list of some of the
+        most common values in each column and a histogram showing the approximate data distribution
+        in each column. One or both of these may be omitted if <codeph>ANALYZE</codeph> deems them
+        uninteresting (for example, in a unique-key column, there are no common values) or if the
+        column data type does not support the appropriate operators.</p>
+      <p>For large tables, <codeph>ANALYZE</codeph> takes a random sample of the table contents,
+        rather than examining every row. This allows even very large tables to be analyzed in a
+        small amount of time. Note, however, that the statistics are only approximate, and will
+        change slightly each time <codeph>ANALYZE</codeph> is run, even if the actual table contents
+        did not change. This may result in small changes in the planner's estimated costs shown by
+          <codeph>EXPLAIN</codeph>. In rare situations, this non-determinism will cause the query
+        optimizer to choose a different query plan between runs of <codeph>ANALYZE</codeph>. To
+        avoid this, raise the amount of statistics collected by <codeph>ANALYZE</codeph> by
+        adjusting the <varname>default_statistics_target</varname> configuration parameter, or on a
+        column-by-column basis by setting the per-column statistics target with <codeph>ALTER TABLE
+          ... ALTER COLUMN ... SET (n_distinct ...)</codeph> (see <codeph>ALTER TABLE</codeph>). The
+        target value sets the maximum number of entries in the most-common-value list and the
+        maximum number of bins in the histogram. The default target value is 100, but this can be
+        adjusted up or down to trade off accuracy of planner estimates against the time taken for
+          <codeph>ANALYZE</codeph> and the amount of space occupied in
+        <codeph>pg_statistic</codeph>. In particular, setting the statistics target to zero disables
+        collection of statistics for that column. It may be useful to do that for columns that are
+        never used as part of the <codeph>WHERE</codeph>, <codeph>GROUP BY</codeph>, or
+          <codeph>ORDER BY</codeph> clauses of queries, since the planner will have no use for
+        statistics on such columns. </p>
+      <p>The largest statistics target among the columns being analyzed determines the number of
+        table rows sampled to prepare the statistics. Increasing the target causes a proportional
+        increase in the time and space needed to do <codeph>ANALYZE</codeph>.</p>
+      <p>One of the values estimated by <codeph>ANALYZE</codeph> is the number of distinct values
+        that appear in each column. Because only a subset of the rows are examined, this estimate
+        can sometimes be quite inaccurate, even with the largest possible statistics target. If this
+        inaccuracy leads to bad query plans, a more accurate value can be determined manually and
+        then installed with <codeph>ALTER TABLE ... ALTER COLUMN ... SET STATISTICS
+          DISTINCT</codeph> (see <xref href="ALTER_TABLE.xml#topic1"/>).</p>
+      <p>When Greenplum Database performs an <codeph>ANALYZE</codeph> operation to collect
+        statistics for a table and detects that all the sampled table data pages are empty (do not
+        contain valid data), Greenplum Database displays a message that a <codeph>VACUUM
+          FULL</codeph> operation should be performed. If the sampled pages are empty, the table
+        statistics will be inaccurate. Pages become empty after a large number of changes to the
+        table, for example deleting a large number of rows. A <codeph>VACUUM FULL</codeph> operation
+        removes the empty pages and allows an <codeph>ANALYZE</codeph> operation to collect accurate
+        statistics. </p>
+      <p>If there are no statistics for the table, the server configuration parameter <codeph><xref
+            href="../config_params/guc-list.xml#gp_enable_relsize_collection"/></codeph> controls
+        whether the Postgres query optimizer uses a default statistics file or estimates the size of a
+        table using the <codeph>pg_relation_size</codeph> function. By default, the Postgres optimizer
+        uses the default statistics file to estimate the number of rows if statistics are not
+        available.</p>
     </section>
     <section id="section6">
-      <title>示例</title>
-      <p>收集表<codeph>mytable</codeph>的统计信息：</p>
+      <title>Examples</title>
+      <p>Collect statistics for the table <codeph>mytable</codeph>:</p>
       <codeblock>ANALYZE mytable;</codeblock>
     </section>
     <section id="section7">
-      <title>兼容性</title>
-      <p>SQL标准中没有<codeph>ANALYZE</codeph>语句。</p>
+      <title>Compatibility</title>
+      <p>There is no <codeph>ANALYZE</codeph> statement in the SQL standard. </p>
     </section>
     <section id="section8">
-      <title>另见</title>
+      <title>See Also</title>
       <p><codeph><xref href="ALTER_TABLE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./EXPLAIN.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./VACUUM.xml#topic1" type="topic" format="dita"/></codeph>,

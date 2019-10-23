@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="as20941">ALTER OPERATOR FAMILY</title><body><p id="sql_command_desc">更改操作符族的定义。</p><section id="section2"><title>概要</title><codeblock id="sql_command_synopsis">ALTER OPERATOR FAMILY <varname>name</varname> USING <varname>index_method</varname> ADD
+<topic id="topic1"><title id="as20941">ALTER OPERATOR FAMILY</title><body><p id="sql_command_desc">Changes the definition of an operator family.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">ALTER OPERATOR FAMILY <varname>name</varname> USING <varname>index_method</varname> ADD
   {  OPERATOR <varname>strategy_number</varname> <varname>operator_name</varname> ( <varname>op_type</varname>, <varname>op_type</varname> ) [ FOR SEARCH | FOR ORDER BY <varname>sort_family_name</varname> ]
     | FUNCTION <varname>support_number</varname> [ ( <varname>op_type</varname> [ , <varname>op_type</varname> ] ) ] <varname>funcname</varname> ( <varname>argument_type</varname> [, ...] )
   } [, ... ]
@@ -15,63 +15,102 @@ ALTER OPERATOR FAMILY <varname>name</varname> USING <varname>index_method</varna
 
 ALTER OPERATOR FAMILY <varname>name</varname> USING <varname>index_method</varname> OWNER TO <varname>new_owner</varname>
 
-ALTER OPERATOR FAMILY <varname>name</varname> USING <varname>index_method</varname> SET SCHEMA <varname>new_schema</varname></codeblock></section><section id="section3"><title>描述</title><p><codeph>ALTER OPERATOR FAMILY</codeph>更改操作符族的定义。 用户能够向族中添加操作符并提供函数支持、从族中删除它们，或者更改族的名称或所有者。</p>
-      <p>当通过<codeph>ALTER OPERATOR FAMILY</codeph>将操作符和函数支持添加到族中， 则在族中它们不是任何指定操作符类的一部分，而仅是“松散”的存在于族内。
-		这表示这些操作符和函数与该族的语义兼 容，但是没有被任何特定索引的正确功能所要求。（要求操作符和函数作为操作符类的部分声明；参见 <xref href="CREATE_OPERATOR_CLASS.xml#topic1" type="topic"
-          format="dita"/>。）用户可以在任何时候将一个族中松散的成员从族中删除，但是除非
-		  将整个类和所有依赖于这个类的索引都删除，否则一个操作符类的成员不能被删除。
-		  具有代表性的是，单一数据类型的操作符和函数是操作类的一部分，因为在指定数据类型上的索引需要他们支持，
-		  而多数据类型操作符和函数则被作为该族的松散成员。</p>
-      <p>用户必须是超级用户才能使用<codeph>ALTER OPERATOR FAMILY</codeph>。（做这样的限制是因为一个错误的操作符族定义可能会迷惑服务器甚至让它崩溃）</p>
-      <p><codeph>ALTER OPERATOR FAMILY</codeph> 目前不检测操作符族 定义是否包括该索引方法所要求的所有操作符和函数，也不检查操作符和函数是 否形成了一个有理的集合。定义合法的操作符族是用户的责任。</p>
-      <p><codeph>OPERATOR</codeph> 和 <codeph>FUNCTION</codeph>子句可以以任何顺序出现。</p></section><section id="section4"><title>参数</title><parml><plentry><pt><varname>name</varname></pt><pd>现有操作符族的名称（可选限定模式）。</pd></plentry><plentry><pt><varname>index_method</varname></pt><pd>操作符族所应用的索引方法的名称。</pd></plentry>
+ALTER OPERATOR FAMILY <varname>name</varname> USING <varname>index_method</varname> SET SCHEMA <varname>new_schema</varname></codeblock></section><section id="section3"><title>Description</title><p><codeph>ALTER OPERATOR FAMILY</codeph> changes the definition of an operator family. You can add
+        operators and support functions to the family, remove them from the family, or change the
+        family's name or owner.</p>
+      <p>When operators and support functions are added to a family with <codeph>ALTER OPERATOR
+          FAMILY</codeph>, they are not part of any specific operator class within the family, but
+        are just "loose" within the family. This indicates that these operators and functions are
+        compatible with the family's semantics, but are not required for correct functioning of any
+        specific index. (Operators and functions that are so required should be declared as part of
+        an operator class, instead; see <xref href="CREATE_OPERATOR_CLASS.xml#topic1" type="topic"
+          format="dita"/>.) You can drop loose members of a family  from the family at any time, but
+        members of an operator class cannot be dropped without dropping the whole class and any
+        indexes that depend on it. Typically, single-data-type operators and functions are part of
+        operator classes because they are needed to support an index on that specific data type,
+        while cross-data-type operators and functions are made loose members of the family.</p>
+      <p>You must be a superuser to use <codeph>ALTER OPERATOR FAMILY</codeph>. (This restriction is
+        made because an erroneous operator family definition could confuse or even crash the
+        server.)</p>
+      <p><codeph>ALTER OPERATOR FAMILY</codeph> does not presently check whether the operator family
+        definition includes all the operators and functions required by the index method, nor
+        whether the operators and functions form a self-consistent set. It is the user's
+        responsibility to define a valid operator family.</p>
+      <p><codeph>OPERATOR</codeph> and <codeph>FUNCTION</codeph> clauses can appear in any
+        order.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The name (optionally schema-qualified) of an existing operator family. </pd></plentry><plentry><pt><varname>index_method</varname></pt><pd>The name of the index method this operator family is for. </pd></plentry>
         <plentry>
           <pt><varname>strategy_number</varname></pt>
-          <pd>与操作符族相关联的一个操作符的索引方法策略号。</pd>
+          <pd>The index method's strategy number for an operator associated with the operator
+            family.</pd>
         </plentry>
         <plentry>
           <pt><varname>operator_name</varname></pt>
-          <pd>与操作符族相关联的一个操作符的名称（可选限定模式）。</pd>
+          <pd>The name (optionally schema-qualified) of an operator associated with the operator
+            family.</pd>
         </plentry>
         <plentry>
           <pt>op_type</pt>
-          <pd>
-		  在一个<codeph>OPERATOR</codeph>子句中， 操作符的操作数的数据类型，或者用<codeph>NONE</codeph>来表示一个左一元或者右一元操作符。不同于<codeph>CREATE OPERATOR CLASS</codeph>中类似的语法， 操作数数据 类型总是必须被指定。在一个<codeph>ADD FUNCTION</codeph>子句中, 指定该函数意图支持的操作数 数据类型（如果不同于该函数的输入数据类型）。对于 B-树比较函数和哈希 函数，有必要指定<varname>op_type</varname> ，因为该函数的输入数据类型 总是正确的。 对于 B-树排序支持函数和GIN和GiST 操作符类中 的所有函数，有必要指定该函数要使用的操作数数据类型。在一个 DROP FUNCTION 子句中, 必须指定该函数要支持的操 作数数据类型。</pd> 
+          <pd>In an  <codeph>OPERATOR</codeph> clause, the operand data type(s) of the operator, or
+              <codeph>NONE</codeph> to signify a left-unary or right-unary operator. Unlike the
+            comparable syntax in <codeph>CREATE OPERATOR CLASS</codeph>, the operand data types must
+            always be specified. In an <codeph>ADD FUNCTION</codeph> clause, the operand data type(s)
+            the function is intended to support, if different from the input data type(s) of the
+            function. For B-tree comparison functions it is not necessary to specify <varname>op_type</varname> since the
+            function's input data type(s) are always the correct ones to use.  For B-tree sort
+            support functions and all functions in GiST, SP-GiST and GIN operator
+            classes, it is necessary to specify the operand data type(s) the function
+            is to be used with.</pd> 
         </plentry>
         <plentry>
           <pt><varname>sort_family_name</varname></pt>
-          <pd>在排序操作符中关联的描述排序顺序的现有<codeph>btree</codeph> 操作符名称。
+          <pd>The name (optionally schema-qualified) of an existing <codeph>btree</codeph> operator
+            family that describes the sort ordering associated with an ordering operator.
           </pd>
-          <pd>如果即未指定<codeph>FOR SEARCH</codeph>也未指定<codeph>FOR ORDER BY</codeph>，则默认为<codeph>FOR SEARCH</codeph>。</pd>
+          <pd>If neither <codeph>FOR SEARCH</codeph> nor <codeph>FOR ORDER BY</codeph> is
+            specified, <codeph>FOR SEARCH</codeph> is the default.</pd>
         </plentry>
         <plentry>
           <pt>support_number</pt>
-          <pd>索引方法与操作员族相关联的函数的支持程序编号。</pd>
+          <pd>The index method's support procedure number for a function associated with the
+            operator family.</pd>
         </plentry>
         <plentry>
           <pt>funcname</pt>
-          <pd>作为该操作符族的一种索引方法支持过程的函数的名称（可以是方案限定的）。</pd>
+          <pd>The name (optionally schema-qualified) of a function that is an index method support
+            procedure for the operator family.</pd>
         </plentry>
         <plentry>
           <pt>argument_types</pt>
-          <pd>该函数的参数数据类型。</pd>
-        </plentry><plentry><pt><varname>new_name</varname></pt><pd>该操作符族的新名称。</pd></plentry><plentry><pt><varname>new_owner</varname></pt><pd>该操作符族的新拥有者。</pd></plentry>
+          <pd>The parameter data type(s) of the function.</pd>
+        </plentry><plentry><pt><varname>new_name</varname></pt><pd>The new name of the operator family. </pd></plentry><plentry><pt><varname>new_owner</varname></pt><pd>The new owner of the operator family. </pd></plentry>
         <plentry>
           <pt><varname>new_schema</varname></pt>
-          <pd>该操作族中的新模式。</pd>
-        </plentry></parml></section><section id="section5"><title>兼容性</title><p>在SQL标准中没有<codeph>ALTER OPERATOR FAMILY</codeph>语句。</p></section>
+          <pd>The new schema for the operator family. </pd>
+        </plentry></parml></section><section id="section5"><title>Compatibility</title><p>There is no <codeph>ALTER OPERATOR FAMILY</codeph> statement in the SQL standard. </p></section>
     <section id="section6">
-      <title>注意</title>
-      <p>
-	  注意<codeph>DROP</codeph>语法只通过策略或者支持号以及输入数据类型指定该 操作符族中的"slot"。占用这个槽的操作符或函数的名称不会被提及。还有，对于<codeph>DROP FUNCTION</codeph>要指定的类型是该函数意图支持 的输入数据类型； 对于<codeph>SP_GiST</codeph>和<codeph>GIN</codeph>索引可能无需对该函数的实际输入参数类型做任何事情。 </p>
-      <p>因为索引机制在使用函数之前不会检查其上的访问权限，包括一个操作符族中的 函数或操作符都等同于授予了其上的公共执行权限。这对于操作符族中很有用的 这类函数来说，这通常不成问题。</p>
-      <p>操作符不应该由 SQL 函数定义。一个 SQL 函数很可能被内联到调用查询中，这将 阻止优化器识别出该查询匹配一个索引。</p>
-      <p>在Greenplum Database 6.0之前，  <codeph>OPERATOR</codeph> 子句可以包括一个<codeph>RECHECK</codeph> 选项。
-	  这个选项不再被支持了。Greenplum数据库现在运行中决定一个索引操作符是否是动态有损，这将允许更多有效处理那些操作符的是否有损的情况。</p>
+      <title>Notes</title>
+      <p>Notice that the <codeph>DROP</codeph> syntax only specifies the "slot" in the operator
+        family, by strategy or support number and input data type(s). The name of the operator or
+        function occupying the slot is not mentioned. Also, for <codeph>DROP FUNCTION</codeph> the
+        type(s) to specify are the input data type(s) the function is intended to support; for
+          <codeph>GiST</codeph>, <codeph>SP_GiST</codeph> and <codeph>GIN</codeph> indexes this
+        might have nothing to do with the actual input argument types of the function. </p>
+      <p>Because the index machinery does not check access permissions on functions before using
+        them, including a function or operator in an operator family is tantamount to granting
+        public execute permission on it. This is usually not an issue for the sorts of functions
+        that are useful in an operator family.</p>
+      <p>The operators should not be defined by SQL functions. A SQL function is likely to be
+        inlined into the calling query, which will prevent the optimizer from recognizing that the
+        query matches an index.</p>
+      <p>Before Greenplum Database 6.0, the <codeph>OPERATOR</codeph> clause could include a
+          <codeph>RECHECK</codeph> option. This option is no longer supported. Greenplum Database
+        now determines whether an index operator is "lossy" on-the-fly at run time. This allows more
+        efficient handling of cases where an operator might or might not be lossy.</p>
     </section>
     <section id="section7">
-      <title>示例</title>
-      <p>下列示例命令为一个操作符族增加跨数据类型的操作符和支持函数，该操 作符族已经包含用于数据类型int4以及int2的 B-树 操作符类：</p>
+      <title>Examples</title>
+      <p>The following example command adds cross-data-type operators and support functions to an
+        operator family that already contains B-tree operator classes for data types int4 and int2.: </p>
       <codeblock>ALTER OPERATOR FAMILY integer_ops USING btree ADD
 
   -- int4 vs int2
@@ -90,7 +129,7 @@ ALTER OPERATOR FAMILY <varname>name</varname> USING <varname>index_method</varna
   OPERATOR 5 > (int2, int4) ,
   FUNCTION 1 btint24cmp(int2, int4) ;</codeblock>
     </section>
-    <p>再次移除这些项：
+    <p>To remove these entries:
       <codeblock>ALTER OPERATOR FAMILY integer_ops USING btree DROP
 
   -- int4 vs int2
@@ -107,7 +146,7 @@ ALTER OPERATOR FAMILY <varname>name</varname> USING <varname>index_method</varna
   OPERATOR 3 (int2, int4) ,
   OPERATOR 4 (int2, int4) ,
   OPERATOR 5 (int2, int4) ,
-  FUNCTION 1 (int2, int4) ;</codeblock></p><section id="section8"><title>另见</title><p><codeph><xref href="./CREATE_OPERATOR_FAMILY.xml#topic1" type="topic" format="dita"/></codeph>,
+  FUNCTION 1 (int2, int4) ;</codeblock></p><section id="section8"><title>See Also</title><p><codeph><xref href="./CREATE_OPERATOR_FAMILY.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_OPERATOR_FAMILY.xml#topic1" type="topic" format="dita"
           /></codeph>, <codeph><xref href="ALTER_OPERATOR_CLASS.xml#topic1" type="topic"
             format="dita"/></codeph>, <codeph><xref href="CREATE_OPERATOR_CLASS.xml#topic1"

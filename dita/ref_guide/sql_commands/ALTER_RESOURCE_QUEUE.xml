@@ -4,11 +4,11 @@
 <topic id="topic1">
   <title id="au20941">ALTER RESOURCE QUEUE</title>
   <body>
-    <p id="sql_command_desc">更改资源队列的限制。</p>
+    <p id="sql_command_desc">Changes the limits of a resource queue.</p>
     <section id="section2">
-      <title>概要</title>
+      <title>Synopsis</title>
       <codeblock id="sql_command_synopsis">ALTER RESOURCE QUEUE <varname>name</varname> WITH ( <varname>queue_attribute</varname>=<varname>value</varname> [, ... ] ) </codeblock>
-      <p>其中 <varname>queue_attribute</varname> 是：</p>
+      <p>where <varname>queue_attribute</varname> is:</p>
       <codeblock>   ACTIVE_STATEMENTS=<varname>integer</varname>
    MEMORY_LIMIT='<varname>memory_units</varname>'
    MAX_COST=<varname>float</varname>
@@ -17,105 +17,126 @@
    PRIORITY={MIN|LOW|MEDIUM|HIGH|MAX}</codeblock>
       <p/>
       <codeblock>ALTER RESOURCE QUEUE <varname>name</varname> WITHOUT ( <varname>queue_attribute</varname> [, ... ] )</codeblock>
-      <p>其中 <varname>queue_attribute</varname> 是：</p>
+      <p>where <varname>queue_attribute</varname> is:</p>
       <codeblock>   ACTIVE_STATEMENTS
    MEMORY_LIMIT
    MAX_COST
    COST_OVERCOMMIT
    MIN_COST</codeblock>
-      <note>一个资源队列必须拥有 <codeph>ACTIVE_STATEMENTS</codeph> 或
-          <codeph>MAX_COST</codeph> 其中的一个值。不能将两者都从资源队列的
-          <codeph>queue_attributes</codeph> 中删除。</note>
+      <note>A resource queue must have either an <codeph>ACTIVE_STATEMENTS</codeph> or a
+          <codeph>MAX_COST</codeph> value. Do not remove both these
+          <codeph>queue_attributes</codeph> from a resource queue. </note>
     </section>
     <section id="section3">
-      <title>描述</title>
-      <p><codeph>ALTER RESOURCE QUEUE</codeph> 更改一个资源队列的限制，只有超级用户才能更改资源队列。
-		一个资源队列必须拥有
-          <codeph>ACTIVE_STATEMENTS</codeph> 或者 <codeph>MAX_COST</codeph> 值 （或者两者都有）。
-		  用户可以设置或者重置一个资源队列的优先级来控制与资源队列相关的查询所使用的CPU可用资源，
-		  或者设置资源队列的内存限制来控制资源队列中所有提交的查询在一个segment主机上可以使用的内存总量。</p>
-      <p><codeph>ALTER RESOURCE QUEUE WITHOUT</codeph> 删除之前在资源上指定的限制。一个资源队列必须拥有
-	  <codeph>ACTIVE_STATEMENTS</codeph> 或者 <codeph>MAX_COST</codeph> 其中一个值。不能两者都从资源队列的
-	  <codeph>queue_attributes</codeph> 中删除。</p>
+      <title>Description</title>
+      <p><codeph>ALTER RESOURCE QUEUE</codeph> changes the limits of a resource queue. Only a
+        superuser can alter a resource queue. A resource queue must have either an
+          <codeph>ACTIVE_STATEMENTS</codeph> or a <codeph>MAX_COST</codeph> value (or it can have
+        both). You can also set or reset priority for a resource queue to control the relative share
+        of available CPU resources used by queries associated with the queue, or memory limit of a
+        resource queue to control the amount of memory that all queries submitted through the queue
+        can consume on a segment host.</p>
+      <p><codeph>ALTER RESOURCE QUEUE WITHOUT</codeph> removes the specified limits on a resource
+        that were previously set. A resource queue must have either an
+          <codeph>ACTIVE_STATEMENTS</codeph> or a <codeph>MAX_COST</codeph> value. Do not remove
+        both these <codeph>queue_attributes</codeph> from a resource queue.</p>
     </section>
     <section id="section4">
-      <title>参数</title>
+      <title>Parameters</title>
       <parml>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd>要更改其限制的资源队列的名称。 </pd>
+          <pd>The name of the resource queue whose limits are to be altered. </pd>
         </plentry>
         <plentry>
           <pt>ACTIVE_STATEMENTS <varname>integer</varname></pt>
-          <pd>任何时刻系统中允许在该资源队列中的用户提交的活动语句的数量。
-		  <codeph>ACTIVE_STATEMENTS</codeph> 的值应该是一个大于0的整数。要把<codeph>ACTIVE_STATEMENTS</codeph> 
-		  重置为没有限制，则指定值为 <codeph>-1</codeph>。</pd>
+          <pd>The number of active statements submitted from users in this resource queue allowed on
+            the system at any one time. The value for <codeph>ACTIVE_STATEMENTS</codeph> should be
+            an integer greater than 0. To reset <codeph>ACTIVE_STATEMENTS</codeph> to have no limit,
+            enter a value of <codeph>-1</codeph>.</pd>
         </plentry>
         <plentry>
           <pt>MEMORY_LIMIT '<varname>memory_units</varname>'</pt>
-          <pd>设置从此资源队列中的用户提交的所有语句的总内存配额。
-		  内存单位可以指定为kB，MB或GB。资源队列的最小内存配额为10MB。没有最大值；
-		  然而，查询执行时间的上边界受到segment主机的物理内存的限制。默认值为无限制(<codeph>-1</codeph>)。</pd>
+          <pd>Sets the total memory quota for all statements submitted from users in this resource
+            queue. Memory units can be specified in kB, MB or GB. The minimum memory quota for a
+            resource queue is 10MB. There is no maximum; however the upper boundary at query
+            execution time is limited by the physical memory of a segment host. The default value is
+            no limit (<codeph>-1</codeph>).</pd>
         </plentry>
         <plentry>
           <pt>MAX_COST <varname>float</varname></pt>
-          <pd>
-		  任何时刻系统中允许在该资源队列中的用户提交的语句的查询优化器总代价。<codeph>MAX_COST</codeph>的
-		  值被指定为一个浮点数（例如100.00）或者还可以被指定为一个指数（例如1e+2）。要把<codeph>MAX_COST</codeph>重置为没有限制，输入一个值<codeph>-1.0</codeph>。</pd>
+          <pd>The total query optimizer cost of statements submitted from users in this resource
+            queue allowed on the system at any one time. The value for <codeph>MAX_COST</codeph> is
+            specified as a floating point number (for example 100.0) or can also be specified as an
+            exponent (for example 1e+2). To reset <codeph>MAX_COST</codeph> to have no limit, enter
+            a value of <codeph>-1.0</codeph>.</pd>
         </plentry>
         <plentry>
           <pt>COST_OVERCOMMIT <varname>boolean</varname></pt>
-          <pd>
-		  如果资源队列受到基于查询代价的限制，那么管理员可以允许代价过量使用
-		  （默认<codeph>COST_OVERCOMMIT=TRUE</codeph>）。这意味着一个超过允许的代价阈值的查询将被允许运行，
-		  但只能在系统空闲时运行。如果指定<codeph>COST_OVERCOMMIT=FALSE</codeph>，超过代价限制的查询将总是被拒绝并且绝不会被允许运行。</pd>
+          <pd>If a resource queue is limited based on query cost, then the administrator can allow
+            cost overcommit (<codeph>COST_OVERCOMMIT=TRUE</codeph>, the default). This means that a
+            query that exceeds the allowed cost threshold will be allowed to run but only when the
+            system is idle. If <codeph>COST_OVERCOMMIT=FALSE</codeph> is specified, queries that
+            exceed the cost limit will always be rejected and never allowed to run.</pd>
         </plentry>
         <plentry>
           <pt>MIN_COST <varname>float</varname></pt>
-          <pd>
-		  代价低于此限制的查询将不会排队而是立即运行。代价是以取得的磁盘页为单位来衡量的。1.0等于一次顺序磁盘页面读取。<codeph>MIN_COST</codeph>的值被指定为浮点数（例如100.00）或者还能被指定为一个指数（例如1e+2）。要把<codeph>MIN_COST</codeph>重置为没有限制，输入一个值
-            <codeph>-1.0</codeph>。</pd>
+          <pd>Queries with a cost under this limit will not be queued and run immediately. Cost is
+            measured in units of disk page fetches; 1.0 equals one sequential disk page read. The
+            value for <codeph>MIN_COST</codeph> is specified as a floating point number (for example
+            100.0) or can also be specified as an exponent (for example 1e+2). To reset
+              <codeph>MIN_COST</codeph> to have no limit, enter a value of
+            <codeph>-1.0</codeph>.</pd>
         </plentry>
         <plentry>
           <pt>PRIORITY={MIN|LOW|MEDIUM|HIGH|MAX}</pt>
-          <pd>设置与资源队列关联的查询的优先级。具有较高优先级的队列中的查询或语句将在竞争中获得更多的可用CPU资源份额。
-		  低优先级队列中的查询可能会被延迟，同时执行更高优先级的查询</pd>
+          <pd>Sets the priority of queries associated with a resource queue. Queries or statements
+            in queues with higher priority levels will receive a larger share of available CPU
+            resources in case of contention. Queries in low-priority queues may be delayed while
+            higher priority queries are executed.</pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>注意</title>
-        <p>GPORCA和Greenplum数据库原生优化器利用不同的查询耗费模型，所以同样的查询可能会
-		计算出不同的消耗值。Greenplum数据库资源队列资源管理模型既不区分也不调整GPORCA和
-		Postgres优化器的成本，它会直接使用优化器返回的消耗值来限制查询。</p>
-        <p>当基于资源队列的资源管理处于活动状态时，请使用资源队列的
-		<codeph>MEMORY_LIMIT</codeph>和 <codeph>ACTIVE_STATEMENTS</codeph>限制，而不是配置基于成本的限制。
-		即使在使用GPORCA时，Greenplum数据库可能会回到使用postgres规划器进行某些查询，因此使用基于成本的
-		限制可能会导致意外的结果。</p>
+      <title>Notes</title>
+        <p>GPORCA and the legacy Greenplum Database query optimizer utilize different
+           query costing models and may compute different costs for the same query.
+           The Greenplum Database resource queue resource management scheme neither
+           differentiates nor aligns costs between GPORCA and the Postgres optimizer; it
+           uses the literal cost value returned from the optimizer to throttle
+           queries.</p>
+        <p>When resource queue-based resource management is active, use the
+           <codeph>MEMORY_LIMIT</codeph> and <codeph>ACTIVE_STATEMENTS</codeph> limits for
+           resource queues rather than configuring cost-based limits. Even when using GPORCA,
+           Greenplum Database may fall back to using the Postgres query optimizer for certain
+           queries, so using cost-based limits can lead to unexpected results.</p>
     </section>
     <section id="section6">
-      <title>示例</title>
-      <p>更改资源队列的活动查询限制： </p>
+      <title>Examples</title>
+      <p>Change the active query limit for a resource queue: </p>
       <codeblock>ALTER RESOURCE QUEUE myqueue WITH (ACTIVE_STATEMENTS=20);</codeblock>
-      <p>更改资源队列的内存限制： </p>
+      <p>Change the memory limit for a resource queue: </p>
       <codeblock>ALTER RESOURCE QUEUE myqueue WITH (MEMORY_LIMIT='2GB');</codeblock>
-      <p>将资源队列的最大和最小查询代价限制重置为无限制： </p>
+      <p>Reset the maximum and minimum query cost limit for a resource queue to no limit: </p>
       <codeblock>ALTER RESOURCE QUEUE myqueue WITH (MAX_COST=-1.0, 
   MIN_COST= -1.0);</codeblock>
-      <p>将资源队列的查询代价限制重置为 3<sup>10</sup> (或者是 30000000000.0) 不允许过量使用：</p>
+      <p>Reset the query cost limit for a resource queue to 3<sup>10</sup> (or 30000000000.0) and do
+        not allow overcommit:</p>
       <codeblock>ALTER RESOURCE QUEUE myqueue WITH (MAX_COST=3e+10, 
   COST_OVERCOMMIT=FALSE);</codeblock>
-      <p>将与资源队列关联的查询的优先级重置为最小级别：</p>
+      <p>Reset the priority of queries associated with a resource queue to the minimum level:</p>
       <codeblock>ALTER RESOURCE QUEUE myqueue WITH (PRIORITY=MIN);</codeblock>
-      <p>从资源队列中去除 <codeph>MAX_COST</codeph> 和 <codeph>MEMORY_LIMIT</codeph> 限制：</p>
+      <p>Remove the <codeph>MAX_COST</codeph> and <codeph>MEMORY_LIMIT</codeph> limits from a
+        resource queue:</p>
       <codeblock>ALTER RESOURCE QUEUE myqueue WITHOUT (MAX_COST, MEMORY_LIMIT);</codeblock>
     </section>
     <section id="section7">
-      <title>兼容性</title>
-      <p><codeph>ALTER RESOURCE QUEUE</codeph> 语句是 Greenplum数据库的扩展，在标准PostgreSQL中不存在这个命令。</p>
+      <title>Compatibility</title>
+      <p>The <codeph>ALTER RESOURCE QUEUE</codeph> statement is a Greenplum Database extension. This
+        command does not exist in standard PostgreSQL.</p>
     </section>
     <section id="section8">
-      <title>另见</title>
+      <title>See Also</title>
       <p><codeph><xref href="./CREATE_RESOURCE_QUEUE.xml#topic1" type="topic" format="dita"
           /></codeph>, <codeph><xref href="./DROP_RESOURCE_QUEUE.xml#topic1" type="topic"
             format="dita"/></codeph>, <codeph><xref href="./CREATE_ROLE.xml#topic1" type="topic"

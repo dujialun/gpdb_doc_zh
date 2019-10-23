@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="ax20941">ALTER SEQUENCE</title><body><p id="sql_command_desc">更改一个序列发生器的定义。</p><section id="section2"><title>概要</title><codeblock id="sql_command_synopsis">ALTER SEQUENCE [ IF EXISTS ] <varname>name</varname> [INCREMENT [ BY ] <varname>increment</varname>] 
+<topic id="topic1"><title id="ax20941">ALTER SEQUENCE</title><body><p id="sql_command_desc">Changes the definition of a sequence generator.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">ALTER SEQUENCE [ IF EXISTS ] <varname>name</varname> [INCREMENT [ BY ] <varname>increment</varname>] 
      [MINVALUE <varname>minvalue</varname> | NO MINVALUE] 
      [MAXVALUE <varname>maxvalue</varname> | NO MAXVALUE] 
      [START [ WITH ] <varname>start</varname> ]
@@ -13,26 +13,84 @@ ALTER SEQUENCE [ IF EXISTS ] <varname>name</varname> OWNER TO <varname>new_owner
 
 ALTER SEQUENCE [ IF EXISTS ] <varname>name</varname> RENAME TO <varname>new_name</varname>
 
-ALTER SEQUENCE [ IF EXISTS ] <varname>name</varname> SET SCHEMA <varname>new_schema</varname></codeblock></section><section id="section3"><title>描述</title><p><codeph>ALTER SEQUENCE</codeph> 更改一个现有序列发生器的参数。任何没有被明确设置的参数在 <codeph>ALTER SEQUENCE</codeph> 命中，都要维持他们之前的设置。</p><p>用户必须拥有该序列才能使用<codeph>ALTER SEQUENCE</codeph>。 要更改一个序列 的模式，用户还必须拥有新模式上的<codeph>CREATE</codeph>特权。 注意超级用户自动拥有所有的特权。.</p>
-      <p>要改变所有者，用户必须是新角色的直接或者间接成员，而且新角色必须在序列的模式上拥有<codeph>CREATE</codeph>权限 (这些限制迫使更改所有者不能执行删除和重新创建序列所无法做的任何事情。 但是，超级用户仍然可以更改任何序列的所有权。)</p></section><section id="section4"><title>参数</title><parml><plentry><pt><varname>name</varname></pt><pd>要修改的序列的名称（可选方案限定）。
+ALTER SEQUENCE [ IF EXISTS ] <varname>name</varname> SET SCHEMA <varname>new_schema</varname></codeblock></section><section id="section3"><title>Description</title><p><codeph>ALTER SEQUENCE</codeph> changes the parameters of an existing
+sequence generator. Any parameters not specifically set in the <codeph>ALTER
+SEQUENCE</codeph> command retain their prior settings.</p><p>You must own the sequence to use <codeph>ALTER SEQUENCE</codeph>.
+To change a sequence's schema, you must also have <codeph>CREATE</codeph>
+privilege on the new schema. Note that superusers have all these privileges
+automatically.</p>
+      <p>To alter the owner, you must be a direct or indirect member of the new owning role, and
+        that role must have <codeph>CREATE</codeph> privilege on the sequence's schema. (These
+        restrictions enforce that altering the owner does not do anything you could not do by
+        dropping and recreating the sequence. However, a superuser can alter ownership of any
+        sequence anyway.)</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The name (optionally schema-qualified) of a sequence to be altered.
 </pd></plentry>
         <plentry>
           <pt>IF EXISTS</pt>
-          <pd>如果序列不存在不会抛出错误，而只会触发一次提醒。</pd>
-        </plentry><plentry><pt><varname>increment</varname></pt><pd>子句 <codeph>INCREMENT BY <varname>increment</varname></codeph> 是可选的。一个正值将产生一个上升序列，一个负值会产生一个下降序列。如果未被指定，则旧的增量值将被保持。</pd></plentry><plentry><pt><varname>minvalue</varname></pt><pt>NO MINVALUE</pt><pd> 可选的子句 <codeph>MINVALUE <varname>minvalue</varname></codeph> 决定一个序列 能产生的最小值。 如果 <codeph>NO MINVALUE</codeph> 被指定, 上升序列和下降序列的默认值分别是 1 和 -263-1。如果这些选项都没有被指定，将保持当前的 最小值。</pd></plentry><plentry><pt><varname>maxvalue</varname></pt><pt>NO MAXVALUE</pt><pd>可选子句 <codeph>MAXVALUE <varname>maxvalue</varname></codeph> 决定一个序列 能产生的最大值。 如果 <codeph>NO MAXVALUE</codeph> 被指定, 上升序列和下降序列的默认值分别是 263-1 和 -1。如果这些选项都没有被指定，将保持当前的最大值。</pd></plentry>
+          <pd>Do not throw an error if the sequence does not exist. A notice is issued in this
+            case.</pd>
+        </plentry><plentry><pt><varname>increment</varname></pt><pd>The clause <codeph>INCREMENT BY <varname>increment</varname></codeph> is optional. A positive value will
+            make an ascending sequence, a negative one a descending sequence. If unspecified, the
+            old increment value will be maintained. </pd></plentry><plentry><pt><varname>minvalue</varname></pt><pt>NO MINVALUE</pt><pd>The optional clause <codeph>MINVALUE <varname>minvalue</varname></codeph> determines the minimum value a
+            sequence can generate. If <codeph>NO MINVALUE</codeph> is specified, the defaults of 1
+            and -263-1 for ascending and descending sequences, respectively, will be used. If
+            neither option is specified, the current minimum value will be maintained. </pd></plentry><plentry><pt><varname>maxvalue</varname></pt><pt>NO MAXVALUE</pt><pd>The optional clause <codeph>MAXVALUE <varname>maxvalue</varname></codeph> determines the maximum value for
+            the sequence. If <codeph>NO MAXVALUE</codeph> is specified, the defaults are 263-1 and
+            -1 for ascending and descending sequences, respectively, will be used. If neither option
+            is specified, the current maximum value will be maintained.</pd></plentry>
         <plentry>
           <pt>start</pt>
-          <pd>可选子句START WITH <varname>start</varname>更改记录的序列起始值。 这对<i>current</i> 序列值没有影响。 它只是设置将来的<codeph>ALTER SEQUENCE RESTART</codeph> 命令将使用的值。</pd>
-        </plentry><plentry><pt><varname>restart</varname></pt><pd>可选子句 <codeph>RESTART [ WITH <varname>restart</varname> ]</codeph> 更改序列的当前值。 这等效于使用 <codeph><varname>is_called</varname> = false</codeph> 调用  <codeph>setval(<varname>sequence</varname>, <varname>start_val</varname>, <varname>is_called</varname>)</codeph> 函数。 指定的值将由 <codeph>nextval(<varname>sequence</varname>)</codeph> 函数的下一次调用返回。 在没有 <varname>restart</varname> 值的情况下写入<codeph>RESTART</codeph>等同于提供由 <codeph>CREATE SEQUENCE</codeph> 记录或由 <codeph>ALTER SEQUENCE START WITH</codeph> 最后设置的开始值。</pd></plentry>
+          <pd>The optional clause START WITH <varname>start</varname> changes the recorded start
+            value of the sequence. This has no effect on the <i>current</i> sequence value;  it
+            simply sets the value that future <codeph>ALTER SEQUENCE RESTART</codeph> commands will
+            use.</pd>
+        </plentry><plentry><pt><varname>restart</varname></pt><pd>The optional clause <codeph>RESTART [ WITH <varname>restart</varname> ]</codeph> changes the
+            current value of the sequence. This is equivalent to calling the
+                <codeph>setval(<varname>sequence</varname>, <varname>start_val</varname>,
+                <varname>is_called</varname>)</codeph> function with
+                <codeph><varname>is_called</varname> = false</codeph>. The specified value will be
+            returned by the next call of the <codeph>nextval(<varname>sequence</varname>)</codeph>
+            function. Writing <codeph>RESTART</codeph> with no <varname>restart</varname> value is
+            equivalent to supplying the start value that was recorded by <codeph>CREATE
+              SEQUENCE</codeph> or last set by <codeph>ALTER SEQUENCE START WITH</codeph>.</pd></plentry>
         <plentry>
           <pt><varname>new_owner</varname></pt>
-          <pd>序列新所有者的用户名。</pd>
-        </plentry><plentry><pt><varname>cache</varname></pt><pd><codeph>CACHE <varname>cache</varname></codeph>子句中使序列号可以预先分配并存储在内存中，以加快访问速度。 最小值为1（一次只能生成一个值，即没有高速缓存）。 如果未指定，则将保留旧的缓存值</pd></plentry><plentry><pt>CYCLE</pt><pd>可选的<codeph>CYCLE</codeph>关键字可用于在序列由升序或降序达到<varname>maxvalue</varname>或<varname>minvalue</varname>时使序列回绕。 如果达到限制，则生成的下一个数字将是各自的<varname>minvalue</varname>或<varname>maxvalue</varname>。</pd></plentry><plentry><pt>NO CYCLE</pt><pd>如果指定了可选的<codeph>NO CYCLE</codeph>关键字，则在序列达到最大值后，对<codeph>nextval()</codeph>的任何调用都将返回错误。 如果未指定<codeph>CYCLE</codeph>或<codeph>NO CYCLE</codeph>，则将保留旧的循环行为。</pd></plentry><plentry><pt>OWNED BY <varname>table.column</varname></pt><pt>OWNED BY NONE</pt><pd><codeph>OWNED BY</codeph>选项使序列与特定的表列相关联，这样，如果该列（或其整个表）被删除，该序列也将被自动删除。 如果指定，则此关联替换该序列的任何先前指定的关联。 指定的表必须具有相同的所有者，并且与序列具有相同的架构。 指定<codeph>OWNED BY NONE</codeph>会删除任何现有的表列关联。</pd></plentry>
+          <pd>The user name of the new owner of the sequence.</pd>
+        </plentry><plentry><pt><varname>cache</varname></pt><pd>The clause <codeph>CACHE <varname>cache</varname></codeph> enables sequence numbers to be preallocated and
+            stored in memory for faster access. The minimum value is 1 (only one value can be
+            generated at a time, i.e., no cache). If unspecified, the old cache value will be
+            maintained.</pd></plentry><plentry><pt>CYCLE</pt><pd>The optional <codeph>CYCLE</codeph> key word may be used to enable
+the sequence to wrap around when the <varname>maxvalue</varname> or <varname>minvalue</varname>
+has been reached by an ascending or descending sequence. If the limit
+is reached, the next number generated will be the respective <varname>minvalue</varname>
+or <varname>maxvalue</varname>. </pd></plentry><plentry><pt>NO CYCLE</pt><pd>If the optional <codeph>NO CYCLE</codeph> key word is specified,
+any calls to <codeph>nextval()</codeph> after the sequence has reached
+its maximum value will return an error. If neither <codeph>CYCLE</codeph>
+or <codeph>NO CYCLE</codeph> are specified, the old cycle behavior will
+be maintained.</pd></plentry><plentry><pt>OWNED BY <varname>table.column</varname></pt><pt>OWNED BY NONE</pt><pd>The <codeph>OWNED BY</codeph> option causes the sequence to be associated
+with a specific table column, such that if that column (or its whole
+table) is dropped, the sequence will be automatically dropped as well.
+If specified, this association replaces any previously specified association
+for the sequence. The specified table must have the same owner and be
+in the same schema as the sequence. Specifying <codeph>OWNED BY NONE</codeph>
+removes any existing table column association.</pd></plentry>
         <plentry>
           <pt><varname>new_name</varname></pt>
-          <pd>序列的新名称。</pd>
-        </plentry><plentry><pt><varname>new_schema</varname></pt><pd>序列的新模式。</pd></plentry></parml></section><section id="section5"><title>注意</title><p>为了避免阻塞从同一序列中获取数字的并发事务，永远不会回滚<codeph>ALTER SEQUENCE</codeph>对序列生成参数的影响。 这些更改将立即生效，并且不可逆。 但是，<codeph>OWNED BY</codeph>， <codeph>OWNER TO</codeph>， <codeph>RENAME TO</codeph> 和<codeph>SET SCHEMA</codeph>子句是普通的目录更新，可以回滚。</p><p><codeph>ALTER SEQUENCE</codeph> 不会立即影响除当前会话以外的具有预分配（缓存）序列值的会话中的<codeph>nextval()</codeph>结果。 在注意到更改的序列生成参数之前，它们将用尽所有缓存的值。 当前会话将立即受到影响。</p><p>由于历史原因， <codeph>ALTER TABLE</codeph> 也可以与序列一起使用。 但是序列允许的 <codeph>ALTER TABLE</codeph>的唯一变体与上述形式等效。</p></section><section id="section6"><title>示例</title><p>重启一个被称为<codeph>serial</codeph>的序列在<codeph>105</codeph>：</p><codeblock>ALTER SEQUENCE serial RESTART WITH 105;</codeblock></section><section id="section7"><title>兼容性</title><p><codeph>ALTER SEQUENCE</codeph>符合SQL标准，<codeph>START
+          <pd>The new name for the sequence.</pd>
+        </plentry><plentry><pt><varname>new_schema</varname></pt><pd>The new schema for the sequence.</pd></plentry></parml></section><section id="section5"><title>Notes</title><p>To avoid blocking of concurrent transactions that obtain numbers from the same sequence,
+          <codeph>ALTER SEQUENCE</codeph>'s effects on the sequence generation parameters are never
+        rolled back; those changes take effect immediately and are not reversible. However, the
+          <codeph>OWNED BY</codeph>, <codeph>OWNER TO</codeph>, <codeph>RENAME TO</codeph>, and
+          <codeph>SET SCHEMA</codeph> clauses are ordinary catalog updates and can be rolled
+        back.</p><p><codeph>ALTER SEQUENCE</codeph> will not immediately affect <codeph>nextval()</codeph>
+results in sessions, other than the current one, that have preallocated
+(cached) sequence values. They will use up all cached values prior to
+noticing the changed sequence generation parameters. The current session
+will be affected immediately.</p><p>For historical reasons, <codeph>ALTER TABLE</codeph> can be used with sequences too; but the only
+        variants of <codeph>ALTER TABLE</codeph> that are allowed with sequences are equivalent to
+        the forms shown above.</p></section><section id="section6"><title>Examples</title><p>Restart a sequence called <codeph>serial</codeph> at <codeph>105</codeph>:</p><codeblock>ALTER SEQUENCE serial RESTART WITH 105;</codeblock></section><section id="section7"><title>Compatibility</title><p><codeph>ALTER SEQUENCE</codeph> conforms to the SQL standard, except for the <codeph>START
           WITH</codeph>, <codeph>OWNED BY</codeph>, <codeph>OWNER TO</codeph>, <codeph>RENAME
-          TO</codeph>和 <codeph>SET SCHEMA</codeph>子句除外，它们是Greenplum数据库的扩展。</p></section><section id="section8"><title>另见</title><p><codeph><xref href="./CREATE_SEQUENCE.xml#topic1" type="topic" format="dita"/></codeph>,
+          TO</codeph>, and <codeph>SET SCHEMA</codeph> clauses, which are Greenplum Database
+        extensions.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="./CREATE_SEQUENCE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_SEQUENCE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./ALTER_TABLE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
