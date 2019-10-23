@@ -3,10 +3,10 @@
 <topic id="topic1">
   <title id="af20941">CREATE COLLATION</title>
   <body>
-    <p id="sql_command_desc">Defines a new collation using the specified operating system
-      locale settings, or by copying an existing collation.</p>
+    <p id="sql_command_desc">使用指定的操作系统区域设置或通过复制现有的排序规则来定义新的排序规则。
+      </p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">CREATE COLLATION <varname>name</varname> (    
     [ LOCALE = <varname>locale</varname>, ]    
     [ LC_COLLATE = <varname>lc_collate</varname>, ]    
@@ -15,85 +15,86 @@
 CREATE COLLATION <varname>name</varname> FROM <varname>existing_collation</varname></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p> To be able to create a collation, you must have <codeph>CREATE</codeph> privilege on the
-        destination schema.</p>
+      <title>描述</title>
+      <p>为了能够创建排序规则，您必须在目标模式上具有<codeph>CREATE</codeph>特权。
+        </p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>
             <varname>name</varname>
           </pt>
-          <pd> The name of the collation. The collation name can be schema-qualified. If it is not,
-            the collation is defined in the current schema. The collation name must be unique within
-            that schema. (The system catalogs can contain collations with the same name for other
-            encodings, but these are ignored if the database encoding does not match.) </pd>
+          <pd>排序规则的名称。排序规则名称可以由模式指定。
+            如果不是，则在当前模式中定义排序规则。
+            排序规则名称在该模式中必须唯一。
+            （系统catalog可以包含与其他编码相同名称的排序规则，但是如果数据库编码不匹配，则将忽略这些排序规则。）
+            </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>locale</varname>
           </pt>
-          <pd> This is a shortcut for setting <codeph>LC_COLLATE</codeph> and
-              <codeph>LC_CTYPE</codeph> at once. If you specify this, you cannot specify either of
-            those parameters.</pd>
+          <pd>这是一次设置<codeph>LC_COLLATE</codeph>和<codeph>LC_CTYPE</codeph>的快捷方式。
+            如果指定此选项，则不能指定这些参数中的任何一个。
+            </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>lc_collate</varname>
           </pt>
-          <pd>Use the specified operating system locale for the <codeph>LC_COLLATE</codeph> locale
-            category. The locale must be applicable to the current database encoding. (See <xref
-              href="CREATE_DATABASE.xml#topic1" format="dita" type="topic"/> for the precise rules.)
+          <pd>将指定的操作系统区域设置用于<codeph>LC_COLLATE</codeph>区域设置类别。
+            区域设置必须适用于当前数据库编码。
+            （有关详细规则，请参见<xref href="CREATE_DATABASE.xml#topic1" format="dita" type="topic"/>。）
           </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>lc_ctype</varname>
           </pt>
-          <pd>Use the specified operating system locale for the <codeph>LC_CTYPE</codeph> locale
-            category. The locale must be applicable to the current database encoding. (See <xref
-              href="CREATE_DATABASE.xml#topic1" format="dita" type="topic"/> for the precise
-            rules.)</pd>
+          <pd>将指定的操作系统区域设置用于<codeph>LC_CTYPE</codeph>区域设置类别。
+            区域设置必须适用于当前数据库编码。
+            （有关详细规则，请参见<xref href="CREATE_DATABASE.xml#topic1" format="dita" type="topic"/>。）
+            </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>existing_collation</varname>
           </pt>
-          <pd> The name of an existing collation to copy. The new collation will have the same
-            properties as the existing one, but it will be an independent object.</pd>
+          <pd>要复制的现有排序规则的名称。
+            新的归类将具有与现有归类相同的属性，但是它将是一个独立的对象。
+            </pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Notes</title>
-      <p>To be able to create a collation, you must have <codeph>CREATE</codeph> privilege on the
-        destination schema.</p>
-      <p>Use <codeph>DROP COLLATION</codeph> to remove user-defined collations.</p>
-      <p>See <xref href="https://www.postgresql.org/docs/9.4/collation.html" format="html"
-          scope="external">Collation Support</xref> in the PostgreSQL documentation for more
-        information about collation support in Greenplum Database.</p>
+      <title>注解</title>
+      <p>为了能够创建排序规则，您必须在目标模式上具有<codeph>CREATE</codeph>特权。
+        </p>
+      <p>使用<codeph>DROP COLLATION</codeph>删除用户定义的排序规则。</p>
+      <p>有关Greenplum数据库中归类支持的更多信息，
+        请参见PostgreSQL文档中的<xref href="https://www.postgresql.org/docs/9.4/collation.html" format="html" scope="external">归类支持</xref>。
+        </p>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>To create a collation from the operating system locale <codeph>fr_FR.utf8</codeph>
-        (assuming the current database encoding is
+      <title>示例</title>
+      <p>要从操作系统区域设置<codeph>fr_FR.utf8</codeph>创建排序规则（假设当前数据库编码为<codeph>UTF8</codeph>）：
         <codeph>UTF8</codeph>):<codeblock>CREATE COLLATION french (LOCALE = 'fr_FR.utf8');</codeblock>
       </p>
-      <p>To create a collation from an existing
-        collation:<codeblock>CREATE COLLATION german FROM "de_DE";</codeblock> This can be
-        convenient to be able to use operating-system-independent collation names in applications.
+      <p>要从现有排序规则创建排序规则：
+        <codeblock>CREATE COLLATION german FROM "de_DE";</codeblock>
+        能够在应用程序中使用独立于操作系统的排序规则名称可能很方便。
       </p>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p>There is a <codeph>CREATE COLLATION</codeph> statement in the SQL standard, but it is
-        limited to copying an existing collation. The syntax to create a new collation is a
-        Greenplum Database extension.</p>
+      <title>兼容性</title>
+      <p>SQL标准中有一个<codeph>CREATE COLLATION</codeph>语句，但是它仅限于复制现有的排序规则。
+        创建新排序规则的语法是Greenplum数据库扩展。
+        </p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p>
         <codeph><xref href="./ALTER_COLLATION.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="DROP_COLLATION.xml#topic1"/></codeph>
