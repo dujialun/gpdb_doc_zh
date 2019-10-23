@@ -4,9 +4,9 @@
 <topic id="topic1">
         <title id="ay20941">ALTER TABLE</title>
         <body>
-                <p id="sql_command_desc">Changes the definition of a table.</p>
+                <p id="sql_command_desc">更改一个表的定义。</p>
                 <section id="section2">
-                        <title>Synopsis</title>
+                        <title>概要</title>
                         <codeblock id="sql_command_synopsis">ALTER TABLE [IF EXISTS] [ONLY] <varname>name</varname> 
     <varname>action</varname> [, ... ]
 
@@ -36,7 +36,7 @@ ALTER TABLE <varname>name</varname>
    | FOR (<varname>value</varname>) } <varname>partition_action</varname> [...] ] 
    <varname>partition_action</varname>
 
-where <varname>action</varname> is one of:
+其中 <varname>action</varname> 是下列之一：
                         
   ADD [COLUMN] <varname>column_name data_type</varname> [ DEFAULT <varname>default_expr</varname> ]
       [<varname>column_constraint</varname> [ ... ]]
@@ -128,372 +128,94 @@ where <varname>action</varname> is one of:
    oids[=TRUE|FALSE]</codeblock>
                 </section>
                 <section id="section3">
-                        <title>Description</title>
-                        <p><codeph>ALTER TABLE</codeph> changes the definition of an existing table.
-                                There are several subforms: </p>
+                        <title>描述</title>
+                        <p><codeph>ALTER TABLE</codeph> 更改一个表的定义。下文描述了几种形式： </p>
                         <ul>
-                                <li id="ay136723"><b>ADD COLUMN</b> — Adds a new column to the
-                                        table, using the same syntax as <codeph><xref
+                                <li id="ay136723"><b>ADD COLUMN</b> — 向表中增加一个新列，使用和<codeph><xref
                                                   href="CREATE_TABLE.xml">CREATE
-                                                TABLE</xref></codeph>. The <codeph>ENCODING</codeph>
-                                        clause is valid only for append-optimized, column-oriented
-                                        tables.</li>
-                                <li><b>DROP COLUMN [IF EXISTS]</b> — Drops a column from a table.
-                                        Note that if you drop table columns that are being used as
-                                        the Greenplum Database distribution key, the distribution
-                                        policy for the table will be changed to <codeph>DISTRIBUTED
-                                                RANDOMLY</codeph>. Indexes and table constraints
-                                        involving the column are automatically dropped as well. You
-                                        need to say <codeph>CASCADE</codeph> if anything outside the
-                                        table depends on the column (such as views). If <codeph>IF
-                                                EXISTS</codeph> is specified and the column does not
-                                        exist, no error is thrown; a notice is issued instead.</li>
-                                <li><b>IF EXISTS</b> — Do not throw an error if the table does not
-                                        exist. A notice is issued in this case. </li>
-                                <li id="ay136879"><b>SET DATA TYPE</b> — This form changes the data
-                                        type of a column of a table. Note that you cannot alter
-                                        column data types that are being used as distribution or
-                                        partitioning keys. Indexes and simple table constraints
-                                        involving the column will be automatically converted to use
-                                        the new column type by reparsing the originally supplied
-                                        expression. The optional <codeph>COLLATE</codeph> clause
-                                        specifies a collation for the new column; if omitted, the
-                                        collation is the default for the new column type. The
-                                        optional <codeph>USING</codeph> clause specifies how to
-                                        compute the new column value from the old. If omitted, the
-                                        default conversion is the same as an assignment cast from
-                                        old data type to new. A <codeph>USING</codeph> clause must
-                                        be provided if there is no implicit or assignment cast from
-                                        old to new type.<note>GPORCA supports collation only when
-                                                all columns in the query use the same collation. If
-                                                columns in the query use different collations, then
-                                                Greenplum uses the Postgres query
-                                        planner.</note></li>
-                                <li id="ay136904"><b>SET/DROP DEFAULT</b> — Sets or removes the
-                                        default value for a column. Default values only apply in
-                                        subsequent <codeph>INSERT</codeph> or
-                                                <codeph>UPDATE</codeph> commands; they do not cause
-                                        rows already in the table to change. </li>
-                                <li id="ay136929"><b>SET/DROP NOT NULL</b> — Changes whether a
-                                        column is marked to allow null values or to reject null
-                                        values. You can only use <codeph>SET NOT NULL</codeph> when
-                                        the column contains no null values.</li>
-                                <li id="ay136944"><b>SET STATISTICS</b> — Sets the per-column
-                                        statistics-gathering target for subsequent
-                                                <codeph>ANALYZE</codeph> operations. The target can
-                                        be set in the range 100 to 10000, or set to -1 to revert to
-                                        using the system default statistics target
-                                                (<codeph>default_statistics_target</codeph>).</li>
+                                                TABLE</xref></codeph>相同的语义。<codeph>ENCODING</codeph>
+                                        子句只有在追加和列存储表中有效</li>
+                                <li><b>DROP COLUMN [IF EXISTS]</b> — 从表中删除列。 请注意，如果删除用作Greenplum数据库分配键的表列，则表的分配策略将更改为<codeph>DISTRIBUTED RANDOMLY</codeph>.。 涉及该列的索引和表约束也会自动删除。 如果表外的任何内容都取决于列（例如视图），则需要指定<codeph>CASCADE</codeph>。 如果指定了<codeph>IF
+                                                EXISTS</codeph>且该列不存在，则不会引发任何错误； 而是发出通知。</li>
+                                <li><b>IF EXISTS</b> — 如果表不存在，请不要抛出错误。 在这种情况下发出通知。</li>
+                                <li id="ay136879"><b>SET DATA TYPE</b> — 此表单更改表的列的数据类型。 请注意，您不能更改用作分发键或分区键的列数据类型。 通过重新解析最初提供的表达式，涉及该列的索引和简单表约束将自动转换为使用新的列类型。 可选的<codeph>COLLATE</codeph>子句为新列指定排序规则，如果省略，则排序规则是新列类型的默认排序规则。 可选的<codeph>USING</codeph>子句指定如何从旧的值计算新的列值。 如果省略，则默认转换与从旧数据类型到新数据类型的转换相同。 如果没有从旧类型转换为新类型的隐式或赋值，则必须提供<codeph>USING</codeph>子句。<note>仅当查询中的所有列使用相同的排序规则时，GPORCA才支持排序规则。 如果查询中的列使用不同的排序规则，则Greenplum使用Postgres Planner。</note></li>
+                                <li id="ay136904"><b>SET/DROP DEFAULT</b> — 设置或删除列的默认值。 默认值仅适用于后续的<codeph>INSERT</codeph>或<codeph>UPDATE</codeph>命令。 它们不会导致表中已有的行发生更改。</li>
+                                <li id="ay136929"><b>SET/DROP NOT NULL</b> — 更改是将列标记为允许空值还是拒绝空值。 当列不包含空值时，只能使用<codeph>SET NOT NULL</codeph>。</li>
+                                <li id="ay136944"><b>SET STATISTICS</b> — 为后续的<codeph>ANALYZE</codeph>操作设置每个列的统计信息收集目标。 可以在100到10000的范围内设置目标，也可以设置为-1以使用系统默认统计信息目标（<codeph>default_statistics_target</codeph>）恢复为目标。</li>
                                 <li>
                                         <p><b>SET ( <varname>attribute_option</varname> =
                                                   <varname>value</varname> [, ... ]) </b></p>
                                         <p><b>RESET ( <varname>attribute_option [, ...]
-                                                  )</varname></b>— Sets or resets per-attribute
-                                                options. Currently, the only defined per-attribute
-                                                options are <codeph>n_distinct</codeph> and
-                                                  <codeph>n_distinct_inherited</codeph>, which
-                                                override the number-of-distinct-values estimates
-                                                made by subsequent <codeph><xref
-                                                  href="ANALYZE.xml#topic1">ANALYZE</xref></codeph>
-                                                operations. <codeph>n_distinct</codeph> affects the
-                                                statistics for the table itself, while
-                                                  <codeph>n_distinct_inherited</codeph> affects the
-                                                statistics gathered for the table plus its
-                                                inheritance children. When set to a positive value,
-                                                  <codeph>ANALYZE</codeph> will assume that the
-                                                column contains exactly the specified number of
-                                                distinct non-null values. When set to a negative
-                                                value, which must be greater than or equal to -1,
-                                                  <codeph>ANALYZE</codeph> will assume that the
-                                                number of distinct non-null values in the column is
-                                                linear in the size of the table; the exact count is
-                                                to be computed by multiplying the estimated table
-                                                size by the absolute value of the given number. For
-                                                example, a value of -1 implies that all values in
-                                                the column are distinct, while a value of -0.5
-                                                implies that each value appears twice on the
-                                                average. This can be useful when the size of the
-                                                table changes over time, since the multiplication by
-                                                the number of rows in the table is not performed
-                                                until query planning time. Specify a value of 0 to
-                                                revert to estimating the number of distinct values
-                                                normally.</p>
+                                                  )</varname></b>— 
+												设置或重置每个属性选项。当前，唯一定义的按属性的选项是 <codeph>n_distinct</codeph> 和<codeph>n_distinct_inherited</codeph>，它们覆盖了后续 <codeph><xref
+                                                  href="ANALYZE.xml#topic1">ANALYZE</xref></codeph> 操作所做的不同值估计数。 <codeph>n_distinct</codeph>  影响表本身的统计信息，而<codeph>n_distinct_inherited</codeph>影响表及其继承子级收集的统计信息。当设置为正值时，<codeph>ANALYZE</codeph>将假定该列恰好包含指定数量的不同非空值。当设置为负值（必须大于或等于-1）时，<codeph>ANALYZE</codeph>将假定列中不同的非空值的数量在表的大小中是线性的；确切的计数应通过将估计的表大小乘以给定数字的绝对值来计算。例如，值-1表示该列中的所有值都是不同的，而值-0.5表示每个值平均出现两次。当表的大小随时间变化时，这很有用，因为直到查询计划时间才执行表中行数的乘法。将值指定为0可恢复为通常估计不同值的数量</p>
                                 </li>
                                 <li id="ay137022"><b>ADD <varname>table_constraint</varname> [NOT
-                                                VALID]</b> — Adds a new constraint to a table (not
-                                        just a partition) using the same syntax as <codeph>CREATE
-                                                TABLE</codeph>. The <codeph>NOT VALID</codeph>
-                                        option is currently only allowed for foreign key and
-                                                <codeph>CHECK</codeph> constraints. If the
-                                        constraint is marked <codeph>NOT VALID</codeph>, Greenplum
-                                        Database skips the potentially-lengthy initial check to
-                                        verify that all rows in the table satisfy the constraint.
-                                        The constraint will still be enforced against subsequent
-                                        inserts or updates (that is, they'll fail unless there is a
-                                        matching row in the referenced table, in the case of foreign
-                                        keys; and they'll fail unless the new row matches the
-                                        specified check constraints). But the database will not
-                                        assume that the constraint holds for all rows in the table,
-                                        until it is validated by using the <codeph>VALIDATE
-                                                CONSTRAINT</codeph> option. Constraint checks are
-                                        skipped at create table time, so the <xref
-                                                href="CREATE_TABLE.xml#topic1"/> syntax does not
-                                        include this option. </li>
-                                <li><b>VALIDATE CONSTRAINT</b> — This form validates a foreign key
-                                        constraint that was previously created as <codeph>NOT
-                                                VALID</codeph>, by scanning the table to ensure
-                                        there are no rows for which the constraint is not satisfied.
-                                        Nothing happens if the constraint is already marked valid.
-                                        The advantage of separating validation from initial creation
-                                        of the constraint is that validation requires a lesser lock
-                                        on the table than constraint creation does.</li>
+                                                VALID]</b> — 使用与<codeph>CREATE
+                                                TABLE</codeph>相同的语法向表（不仅仅是分区）添加新约束。 当前仅将<codeph>NOT VALID</codeph>选项用于外键和<codeph>CHECK</codeph>约束。 如果约束标记为<codeph>NOT VALID</codeph>，则Greenplum数据库将跳过可能冗长的初始检查，以验证表中的所有行均满足约束。 约束将仍然针对后续的插入或更新（即，对于外键而言，除非在引用表中有匹配的行，否则它们将失败；对于外键，除非新行与指定的检查匹配，否则它们将失败） 约束）。 但是，除非使用<codeph>VALIDATE
+                                                CONSTRAINT</codeph>选项对其进行验证，否则数据库将不假定该约束对表中的所有行均有效。 创建表时将跳过约束检查，因此<xref
+                                                href="CREATE_TABLE.xml#topic1"/>语法不包括此选项。</li>
+                                <li><b>VALIDATE CONSTRAINT</b> — 该形式通过扫描表以确保没有不满足该约束的行，从而验证了以前创建为<codeph>NOT
+                                                VALID</codeph>的外键约束。 如果约束已被标记为有效，则什么也不会发生。 将验证与约束的初始创建分开的好处是，与约束创建相比，验证对表的锁定更少。</li>
                                 <li><b>ADD <varname>table_constraint_using_index</varname></b> —
-                                        Adds a new <codeph>PRIMARY KEY</codeph> or
-                                                <codeph>UNIQUE</codeph> constraint to a table based
-                                        on an existing unique index. All the columns of the index
-                                        will be included in the constraint. The index cannot have
-                                        expression columns nor be a partial index. Also, it must be
-                                        a b-tree index with default sort ordering. These
-                                        restrictions ensure that the index is equivalent to one that
-                                        would be built by a regular <codeph>ADD PRIMARY KEY</codeph>
-                                        or <codeph>ADD UNIQUE</codeph> command. <p>If
-                                                  <codeph>PRIMARY KEY</codeph> is specified, and the
-                                                index's columns are not already marked <codeph>NOT
-                                                  NULL</codeph>, then this command will attempt to
-                                                do <codeph>ALTER COLUMN SET NOT NULL</codeph>
-                                                against each such column. That requires a full table
-                                                scan to verify the column(s) contain no nulls. In
-                                                all other cases, this is a fast operation. </p><p>If
-                                                a constraint name is provided then the index will be
-                                                renamed to match the constraint name. Otherwise the
-                                                constraint will be named the same as the
-                                                index.</p><p>After this command is executed, the
-                                                index is "owned" by the constraint, in the same way
-                                                as if the index had been built by a regular
-                                                  <codeph>ADD PRIMARY KEY</codeph> or <codeph>ADD
-                                                  UNIQUE</codeph> command. In particular, dropping
-                                                the constraint will make the index disappear
-                                                too.</p><note> Adding a constraint using an existing
-                                                index can be helpful in situations where a new
-                                                constraint needs to be added without blocking table
-                                                updates for a long time. To do that, create the
-                                                index using <codeph>CREATE INDEX
-                                                  CONCURRENTLY</codeph>, and then install it as an
-                                                official constraint using this syntax. See the
-                                                example below.</note>
+                                        根据现有的唯一索引将新的 <codeph>PRIMARY KEY</codeph> 或 <codeph>UNIQUE</codeph> 约束添加到表中。 索引的所有列都将包含在约束中。 索引不能具有表达式列，也不能是部分索引。 另外，它必须是具有默认排序顺序的b树索引。 这些限制确保索引等于由常规<codeph>ADD PRIMARY KEY</codeph>或<codeph>ADD UNIQUE</codeph>命令建立的索引。<p>如果指定了 <codeph>PRIMARY KEY</codeph>，并且索引的列尚未标记为<codeph>NOT
+                                                  NULL</codeph>，则此命令将尝试对每个此类列执行<codeph>ALTER COLUMN SET NOT NULL</codeph>。 这需要全表扫描，以验证列不包含空值。 在所有其他情况下，这是一个快速的操作。</p><p>如果提供了约束名称，那么索引将被重命名以匹配约束名称。 否则，约束将被命名为与索引相同。</p><p>执行此命令后，索引将由约束“拥有”，就像使用常规 <codeph>ADD PRIMARY KEY</codeph>或<codeph>ADD
+                                                  UNIQUE</codeph>命令构建索引一样。 特别是，删除约束将使索引也消失。</p><note>在需要添加新约束而不长时间阻止表更新的情况下，使用现有索引添加约束可能会有所帮助。 为此，请使用<codeph> CREATE INDEX CONCURRENTLY </codeph>创建索引，然后使用此语法将其安装为正式约束。 请参见下面的示例。</note>
                                 </li>
-                                <li id="ay137038"><b>DROP CONSTRAINT [IF EXISTS]</b> — Drops the
-                                        specified constraint on a table. If <codeph>IF
-                                                EXISTS</codeph> is specified and the constraint does
-                                        not exist, no error is thrown. In this case a notice is
-                                        issued instead.</li>
-                                <li id="ay137055"><b>DISABLE/ENABLE TRIGGER</b> — Disables or
-                                        enables trigger(s) belonging to the table. A disabled
-                                        trigger is still known to the system, but is not executed
-                                        when its triggering event occurs. For a deferred trigger,
-                                        the enable status is checked when the event occurs, not when
-                                        the trigger function is actually executed. One may disable
-                                        or enable a single trigger specified by name, or all
-                                        triggers on the table, or only user-created triggers.
-                                        Disabling or enabling constraint triggers requires superuser
-                                                privileges.<note> triggers are not supported in
-                                                Greenplum Database. Triggers in general have very
-                                                limited functionality due to the parallelism of
-                                                Greenplum Database.</note></li>
-                                <li id="ay137071"><b>CLUSTER ON/SET WITHOUT CLUSTER</b> — Selects or
-                                        removes the default index for future
-                                                <codeph>CLUSTER</codeph> operations. It does not
-                                        actually re-cluster the table. Note that
-                                                <codeph>CLUSTER</codeph> is not the recommended way
-                                        to physically reorder a table in Greenplum Database because
-                                        it takes so long. It is better to recreate the table with
-                                                  <codeph><xref href="./CREATE_TABLE_AS.xml#topic1"
-                                                  type="topic" format="dita"/></codeph> and order it
-                                        by the index column(s). <note><codeph>CLUSTER ON</codeph> is
-                                                not supported on append-optimized
-                                        tables.</note></li>
-                                <li><b>SET WITH OIDS</b> — Adds an <codeph>oid</codeph> system
-                                        column to the table. It does nothing if the table already
-                                        has OIDs. This is not equivalent to <codeph>ADD COLUMN oid
-                                                oid</codeph>; that would add a normal column that
-                                        happened to be named <codeph>oid</codeph>, not a system
-                                        column. OIDS are not allowed on partitioned tables or
-                                        append-optimized column-oriented tables. <note
-                                                type="warning">Greenplum strongly recommends that
-                                                you do not enable OIDS when creating a table. On
-                                                large tables, such as those in a typical Greenplum
-                                                Database system, using OIDs for table rows can cause
-                                                wrap-around of the 32-bit OID counter. Once the
-                                                counter wraps around, OIDs can no longer be assumed
-                                                to be unique, which not only makes them useless to
-                                                user applications, but can also cause problems in
-                                                the Greenplum Database system catalog tables. In
-                                                addition, excluding OIDs from a table reduces the
-                                                space required to store the table on disk by 4 bytes
-                                                per row, slightly improving performance.</note>
+                                <li id="ay137038"><b>DROP CONSTRAINT [IF EXISTS]</b> — 将指定的约束放在表上。 如果指定了<codeph>IF
+                                                EXISTS</codeph>且该约束不存在，则不会引发任何错误。 在这种情况下，将发出通知。</li>
+                                <li id="ay137055"><b>DISABLE/ENABLE TRIGGER</b> — 禁用或启用属于该表的触发器。 禁用的触发器对于系统仍然是已知的，但是在其触发事件发生时不会执行。 对于延迟的触发器，将在事件发生时而不是在实际执行触发器功能时检查启用状态。 可以禁用或启用由名称指定的单个触发器，或表上的所有触发器，或仅由用户创建的触发器。 禁用或启用约束触发器需要超级用户特权。<note> Greenplum数据库中不支持触发器。 由于Greenplum数据库的并行性，触发器通常具有非常有限的功能。</note></li>
+                                <li id="ay137071"><b>CLUSTER ON/SET WITHOUT CLUSTER</b> — 选择或删除默认索引以用于将来的<codeph>CLUSTER</codeph>操作。 它实际上并没有重新群集表。 请注意，建议不要使用<codeph>CLUSTER</codeph>对Greenplum数据库中的表进行物理重新排序，因为它会花费很长时间。 最好使用<codeph><xref href="./CREATE_TABLE_AS.xml#topic1"
+                                                  type="topic" format="dita"/></codeph>重新创建表并按索引列对其进行排序。<note>追加优化表不支持<codeph>CLUSTER ON</codeph>。</note></li>
+                                <li><b>SET WITH OIDS</b> — 往表中添加一个系统列 <codeph>oid</codeph>。如果表中已有OID列则不会做任何操作，
+								这与<codeph>ADD COLUMN oid oid</codeph>的操作并不相等，<codeph>ADD COLUMN oid oid</codeph>会增加一个正常的名为<codeph>oid</codeph>的正常列，而不是增加一个系统列。OIDs不允许增加在分区表或者追加优化列组织表。<note
+                                                type="warning">Greenplum强烈建议您在创建表时不要启用OIDS。 在大型表（例如典型的Greenplum数据库系统中的表）上，对表行使用OID可能会导致32位OID计数器的折回。 一旦计数器回绕，就不能再认为OID是唯一的，这不仅使OID对用户应用程序无用，而且还会在Greenplum数据库系统目录表中引起问题。 此外，从表中排除OID会使每行将表存储在磁盘上所需的空间减少了每行4个字节，从而略微提高了性能。</note>
                                 </li>
-                                <li id="ay137152"><b>SET WITHOUT OIDS</b> — Removes the OID system
-                                        column from the table.</li>
+                                <li id="ay137152"><b>SET WITHOUT OIDS</b> — 从表中删除OID系统列。</li>
                                 <li id="ay137192"><b>SET ( FILLFACTOR = <varname>value</varname>) /
-                                                RESET (FILLFACTOR)</b> — Changes the fillfactor for
-                                        the table. The fillfactor for a table is a percentage
-                                        between 10 and 100. 100 (complete packing) is the default.
-                                        When a smaller fillfactor is specified,
-                                                <codeph>INSERT</codeph> operations pack table pages
-                                        only to the indicated percentage; the remaining space on
-                                        each page is reserved for updating rows on that page. This
-                                        gives <codeph>UPDATE</codeph> a chance to place the updated
-                                        copy of a row on the same page as the original, which is
-                                        more efficient than placing it on a different page. For a
-                                        table whose entries are never updated, complete packing is
-                                        the best choice, but in heavily updated tables smaller
-                                        fillfactors are appropriate. Note that the table contents
-                                        will not be modified immediately by this command. You will
-                                        need to rewrite the table to get the desired effects. That
-                                        can be done with <xref href="VACUUM.xml#topic1"/> or one of
-                                        the forms of <xref href="#topic1" format="dita"/> that
-                                        forces a table rewrite.</li>
-                                <li id="ay141947"><b>SET DISTRIBUTED</b> — Changes the distribution
-                                        policy of a table. Changing a hash distribution policy, or
-                                        changing to or from a replicated policy, will cause the
-                                        table data to be physically redistributed on disk, which can
-                                        be resource intensive.</li>
+                                                RESET (FILLFACTOR)</b> — 更改表的填充因子。 表格的填充系数是10到100之间的百分比。默认值为100（完全打包）。 当指定较小的填充因子时，<codeph>INSERT</codeph>操作仅将表页面打包到指定的百分比； 每个页面上的剩余空间都保留用于更新该页面上的行。 这样，<codeph>UPDATE</codeph>就有机会将行的更新副本与原始副本放置在同一页面上，这比将其放置在另一页面上更为有效。 对于一个条目从不更新的表，完全打包是最佳选择，但在更新频繁的表中，较小的填充因子是合适的。 请注意，此命令不会立即修改表内容。 您将需要重写表以获得所需的效果。 可以使用<xref href="VACUUM.xml#topic1"/>或强制表重写的<xref href="#topic1" format="dita"/>形式之一来完成。</li>
+                                <li id="ay141947"><b>SET DISTRIBUTED</b> — 更改表的分配策略。 更改哈希分发策略，或更改为复制策略或从复制策略更改将导致表数据在磁盘上进行物理重新分发，这可能会占用大量资源。</li>
                                 <li id="ay137232"><b>INHERIT <varname>parent_table</varname> / NO
-                                                INHERIT <varname>parent_table</varname></b> — Adds
-                                        or removes the target table as a child of the specified
-                                        parent table. Queries against the parent will include
-                                        records of its child table. To be added as a child, the
-                                        target table must already contain all the same columns as
-                                        the parent (it could have additional columns, too). The
-                                        columns must have matching data types, and if they have
-                                                <codeph>NOT NULL</codeph> constraints in the parent
-                                        then they must also have <codeph>NOT NULL</codeph>
-                                        constraints in the child. There must also be matching
-                                        child-table constraints for all <codeph>CHECK</codeph>
-                                        constraints of the parent, except those marked
-                                        non-inheritable (that is, created with <codeph>ALTER TABLE
-                                                ... ADD CONSTRAINT ... NO INHERIT</codeph>) in the parent, which are ignored; all
-                                        child-table constraints matched must not be marked
-                                        non-inheritable. Currently <codeph>UNIQUE</codeph>,
-                                                <codeph>PRIMARY KEY</codeph>, and <codeph>FOREIGN
-                                                KEY</codeph> constraints are not considered, but
-                                        this may change in the future.</li>
-                                <li>OF <varname>type_name</varname> — This form links the table to a
-                                        composite type as though <codeph>CREATE TABLE OF</codeph>
-                                        had formed it. The table's list of column names and types
-                                        must precisely match that of the composite type; the
-                                        presence of an <codeph>oid</codeph> system column is
-                                        permitted to differ. The table must not inherit from any
-                                        other table. These restrictions ensure that <codeph>CREATE
-                                                TABLE OF</codeph> would permit an equivalent table
-                                        definition. </li>
-                                <li><b>NOT OF</b> — This form dissociates a typed table from its
-                                        type. </li>
-                                <li id="ay137262"><b>OWNER</b> — Changes the owner of the table,
-                                        sequence, or view to the specified user. </li>
-                                <li id="ay137271"><b>SET TABLESPACE</b> — Changes the table's
-                                        tablespace to the specified tablespace and moves the data
-                                        file(s) associated with the table to the new tablespace.
-                                        Indexes on the table, if any, are not moved; but they can be
-                                        moved separately with additional <codeph>SET
-                                                TABLESPACE</codeph> commands. All tables in the
-                                        current database in a tablespace can be moved by using the
-                                                <codeph>ALL IN TABLESPACE</codeph> form, which will
-                                        lock all tables to be moved first and then move each one.
-                                        This form also supports <codeph>OWNED BY</codeph>, which
-                                        will only move tables owned by the roles specified. If the
-                                                <codeph>NOWAIT</codeph> option is specified then the
-                                        command will fail if it is unable to acquire all of the
-                                        locks required immediately. Note that system catalogs are
-                                        not moved by this command, use <codeph>ALTER
-                                                DATABASE</codeph> or explicit <codeph>ALTER
-                                                TABLE</codeph> invocations instead if desired. The
-                                                <codeph>information_schema</codeph> relations are
-                                        not considered part of the system catalogs and will be
-                                        moved. See also <codeph>CREATE TABLESPACE</codeph>. If
-                                        changing the tablespace of a partitioned table, all child
-                                        table partitions will also be moved to the new tablespace.
+                                                INHERIT <varname>parent_table</varname></b> — 添加或删除目标表作为指定父表的子表。 对父级的查询将包括其子表的记录。 要作为子项添加，目标表必须已经包含与父项相同的所有列（它也可以具有其他列）。 这些列必须具有匹配的数据类型，并且如果它们在父级中具有<codeph>NOT NULL</codeph>约束，那么它们在子级中也必须具有<codeph>NOT NULL</codeph>约束。 对于父级的所有CHECK约束，还必须有匹配的子表约束，但在父级中标记为不可继承的（即用<codeph>ALTER TABLE
+                                                ... ADD CONSTRAINT ... NO INHERIT</codeph>创建）的约束除外。 匹配的所有子表约束均不得标记为不可继承。 当前不考虑<codeph>UNIQUE</codeph>,
+                                                <codeph>PRIMARY KEY</codeph>和 <codeph>FOREIGN
+                                                KEY</codeph>约束，但是将来可能会改变。</li>
+                                <li>OF <varname>type_name</varname> — 这种形式将表链接到复合类型，就像<codeph>CREATE TABLE OF</codeph>已经形成了它一样。 该表的列名和类型列表必须与组合类型的列表完全匹配； <codeph>oid</codeph>系统列的存在可以不同。 该表不得从任何其他表继承。 这些限制确保 <codeph>CREATE
+                                                TABLE OF</codeph>将允许等效的表定义。</li>
+                                <li><b>NOT OF</b> — 这种形式将类型化表与其类型分离。 </li>
+                                <li id="ay137262"><b>OWNER</b> — 将表，序列或视图的所有者更改为指定的用户。 </li>
+                                <li id="ay137271"><b>SET TABLESPACE</b> — 
+								将表的表空间更改为指定的表空间，并将与表关联的数据文件移动到新表空间。表中的索引（如果有）不会移动；但是可以使用其他<codeph>SET
+                                                TABLESPACE</codeph>命令分别移动它们。可以使用<codeph>ALL IN TABLESPACE</codeph>表单移动表空间中当前数据库中的所有表，该表单将锁定所有要先移动的表，然后再移动每个表。此表单还支持<codeph>OWNED BY</codeph>，该操作仅移动指定角色所拥有的表。如果指定了<codeph>NOWAIT</codeph>选项，则如果该命令无法立即获取所有必需的锁，则该命令将失败。请注意，此命令不会移动系统目录，请根据需要使用<codeph>ALTER
+                                                DATABASE</codeph>或显式<codeph>ALTER
+                                                TABLE</codeph>调用。  <codeph>information_schema</codeph>关系不视为系统目录的一部分，将被移动。另请参见<codeph>CREATE TABLESPACE</codeph>。如果更改分区表的表空间，则所有子表分区也将移至新表空间。
                                 </li>
-                                <li id="ay137292"><b>RENAME</b> — Changes the name of a table (or an
-                                        index, sequence, or view), the name of an individual column
-                                        in a table, or the name of a constraint of the table. There
-                                        is no effect on the stored data. Note that Greenplum
-                                        Database distribution key columns cannot be renamed.</li>
-                                <li id="ay137307"><b>SET SCHEMA</b> — Moves the table into another
-                                        schema. Associated indexes, constraints, and sequences owned
-                                        by table columns are moved as well. </li>
+                                <li id="ay137292"><b>RENAME</b> — 更改表（或索引，序列或视图）的名称，表中单个列的名称或表的约束的名称。 对存储的数据没有影响。 请注意，Greenplum数据库分发密钥列不能重命名。</li>
+                                <li id="ay137307"><b>SET SCHEMA</b> — 将表移到另一个架构。 表列拥有的关联索引，约束和序列也将移动。 </li>
                                 <li id="ay139526"><b>ALTER PARTITION | DROP PARTITION | RENAME
                                                 PARTITION | TRUNCATE PARTITION | ADD PARTITION |
                                                 SPLIT PARTITION | EXCHANGE PARTITION | SET
-                                                SUBPARTITION TEMPLATE </b>— Changes the structure of
-                                        a partitioned table. In most cases, you must go through the
-                                        parent table to alter one of its child table
-                                        partitions.</li>
+                                                SUBPARTITION TEMPLATE </b>— 更改分区表的结构。 在大多数情况下，您必须遍历父表才能更改其子表分区之一。</li>
                         </ul>
-                        <note>If you add a partition to a table that has subpartition encodings, the
-                                new partition inherits the storage directives for the subpartitions.
-                                For more information about the precedence of compression settings,
-                                see "Using Compression" in the <cite>Greenplum Database
-                                        Administrator Guide</cite>.</note>
-                        <p>All the forms of ALTER TABLE that act on a single table, except
-                                        <codeph>RENAME</codeph> and <codeph>SET SCHEMA</codeph>, can
-                                be combined into a list of multiple alterations to apply together.
-                                For example, it is possible to add several columns and/or alter the
-                                type of several columns in a single command. This is particularly
-                                useful with large tables, since only one pass over the table need be
-                                made. </p>
-                        <p>You must own the table to use <codeph>ALTER TABLE</codeph>. To change the
-                                schema or tablespace of a table, you must also have <codeph>CREATE</codeph>
-                                privilege on the new schema or tablespace. To add the table as a new child of a
-                                parent table, you must own the parent table as well. To alter the
-                                owner, you must also be a direct or indirect member of the new
-                                owning role, and that role must have <codeph>CREATE</codeph>
-                                privilege on the table's schema. To add a column or alter a column
-                                type or use the <codeph>OF</codeph> clause, you must also have
-                                        <codeph>USAGE</codeph> privilege on the data type. A
-                                superuser has these privileges automatically.</p>
-                        <note>Memory usage increases significantly when a table has many partitions,
-                                if a table has compression, or if the blocksize for a table is
-                                large. If the number of relations associated with the table is
-                                large, this condition can force an operation on the table to use
-                                more memory. For example, if the table is a CO table and has a large
-                                number of columns, each column is a relation. An operation like
-                                        <codeph>ALTER TABLE ALTER COLUMN</codeph> opens all the
-                                columns in the table allocates associated buffers. If a CO table has
-                                40 columns and 100 partitions, and the columns are compressed and
-                                the blocksize is 2 MB (with a system factor of 3), the system
-                                attempts to allocate 24 GB, that is (40 ×100) × (2 ×3) MB or 24
-                                GB.</note>
+                        <note>如果将分区添加到具有子分区编码的表中，则新分区将继承该子分区的存储指令。 有关压缩设置优先级的更多信息，请参阅<cite>Greenplum Database Administrator Guide</cite>中的“使用压缩”。</note>
+                        <p>除 <codeph>RENAME</codeph>和<codeph>SET SCHEMA</codeph>之外，所有作用于单个表的ALTER TABLE形式都可以组合成多个更改列表以一起应用。 例如，可以在单个命令中添加几列和/或更改几列的类型。 这对于大型表尤其有用，因为只需要对表进行一次遍历。</p>
+                        <p>
+						您必须拥有该表才能使用<codeph>ALTER TABLE</codeph>。 要更改表的架构或表空间，您还必须对新架构或表空间具有<codeph>CREATE</codeph>特权。 要将表添加为父表的新子级，您还必须拥有父表。 要更改所有者，您还必须是新拥有角色的直接或间接成员，并且该角色必须对表的架构具有<codeph>CREATE</codeph>特权。 要添加列或更改列类型或使用<codeph>OF</codeph>子句，您还必须对数据类型具有<codeph>USAGE</codeph>特权。 超级用户自动具有这些特权。</p>
+                        <note>如果表具有多个分区，表具有压缩功能或表的块大小很大，则内存使用量会显着增加。 如果与该表关联的关系的数量很大，则这种情况可能会迫使对该表进行的操作使用更多的内存。 例如，如果该表是一个CO表并具有大量列，则每个列都是一个关系。 诸如<codeph>ALTER TABLE ALTER COLUMN</codeph>之类的操作将打开表中的所有列，以分配关联的缓冲区。 如果CO表具有40列和100个分区，并且这些列被压缩并且块大小为2 MB（系统系数为3），则系统尝试分配24 GB，即（40×100）×（2× 3）MB或24 GB。</note>
                 </section>
                 <section id="section4">
-                        <title>Parameters</title>
+                        <title>参数</title>
                         <parml>
                                 <plentry>
                                         <pt>ONLY</pt>
-                                        <pd>Only perform the operation on the table name specified.
-                                                If the <codeph>ONLY</codeph> keyword is not used,
-                                                the operation will be performed on the named table
-                                                and any child table partitions associated with that
-                                                table. <note>Adding or dropping a column, or
-                                                  changing a column's type, in a parent or
-                                                  descendant table only is not permitted. The parent
-                                                  table and its descendents must always have the
-                                                  same columns and types.</note></pd>
+                                        <pd>仅对指定的表名执行操作。 如果不使用 <codeph>ONLY</codeph>关键字，则将在命名表以及与该表关联的任何子表分区上执行该操作。<note>只允许在父表或子表中添加或删除列，或更改列的类型。 父表及其后代必须始终具有相同的列和类型。</note></pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>name</varname>
                                         </pt>
-                                        <pd>The name (possibly schema-qualified) of an existing
-                                                table to alter. If <codeph>ONLY</codeph> is
-                                                specified, only that table is altered. If
-                                                  <codeph>ONLY</codeph> is not specified, the table
-                                                and all its descendant tables (if any) are updated.
-                                                <note type="note">Constraints can only be added to
-                                                  an entire table, not to a partition. Because of
-                                                  that restriction, the <varname>name</varname>
-                                                  parameter can only contain a table name, not a
-                                                  partition name. </note></pd>
+                                        <pd>要更改的现有表的名称（可能是模式限定的）。 如果<codeph>ONLY</codeph>指定，则仅更改该表。 如果未指定<codeph>ONLY</codeph>，则更新表及其所有后代表（如果有）。
+                                                <note type="note">约束只能添加到整个表，不能添加到分区。 由于该限制，<varname>name</varname>参数只能包含表名，而不能包含分区名。</note></pd>
                                 </plentry>
                         </parml>
                         <parml>
@@ -501,501 +223,239 @@ where <varname>action</varname> is one of:
                                         <pt>
                                                 <varname>column_name</varname>
                                         </pt>
-                                        <pd>Name of a new or existing column. Note that Greenplum
-                                                Database distribution key columns must be treated
-                                                with special care. Altering or dropping these
-                                                columns can change the distribution policy for the
-                                                table.</pd>
+                                        <pd>新列或现有列的名称。 请注意，Greenplum数据库分发键列必须格外小心。 更改或删除这些列可以更改表的分发策略。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>new_column_name</varname>
                                         </pt>
-                                        <pd>New name for an existing column.</pd>
+                                        <pd>现有列的新名称。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>new_name</varname>
                                         </pt>
-                                        <pd>New name for the table. </pd>
+                                        <pd>表的新名称。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>type</varname>
                                         </pt>
-                                        <pd>Data type of the new column, or new data type for an
-                                                existing column. If changing the data type of a
-                                                Greenplum distribution key column, you are only
-                                                allowed to change it to a compatible type (for
-                                                example, <codeph>text</codeph> to
-                                                  <codeph>varchar</codeph> is OK, but
-                                                  <codeph>text</codeph> to <codeph>int</codeph> is
-                                                not).</pd>
+                                        <pd>新列的数据类型，或现有列的新数据类型。 如果更改Greenplum分布键列的数据类型，则只能将其更改为兼容类型（例如，<codeph>text</codeph>到<codeph>varchar</codeph>可以，但<codeph>text</codeph>到<codeph>int</codeph>则不能）。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>table_constraint</varname>
                                         </pt>
-                                        <pd>New table constraint for the table. Note that foreign
-                                                key constraints are currently not supported in
-                                                Greenplum Database. Also a table is only allowed one
-                                                unique constraint and the uniqueness must be within
-                                                the Greenplum Database distribution key.</pd>
+                                        <pd>表的新表约束。 请注意，Greenplum数据库当前不支持外键约束。 此外，表仅允许一个唯一约束，并且唯一性必须在Greenplum数据库分发密钥内。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>constraint_name</varname>
                                         </pt>
-                                        <pd>Name of an existing constraint to drop.</pd>
+                                        <pd>要删除的现有约束的名称。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>CASCADE</pt>
-                                        <pd>Automatically drop objects that depend on the dropped
-                                                column or constraint (for example, views referencing
-                                                the column). </pd>
+                                        <pd>自动删除依赖于已删除列或约束的对象（例如，引用该列的视图）。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>RESTRICT</pt>
-                                        <pd>Refuse to drop the column or constraint if there are any
-                                                dependent objects. This is the default behavior.
+                                        <pd>如果有任何相关对象，则拒绝删除列或约束。 这是默认行为。
                                         </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>trigger_name</varname>
                                         </pt>
-                                        <pd>Name of a single trigger to disable or enable. Note that
-                                                Greenplum Database does not support triggers.</pd>
+                                        <pd>要禁用或启用的单个触发器的名称。 请注意，Greenplum数据库不支持触发器。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>ALL</pt>
-                                        <pd>Disable or enable all triggers belonging to the table
-                                           including constraint related triggers. This requires superuser privilege 
-                                           if any of the triggers are internally generated constraint triggers such 
-                                           as those that are used to implement foreign key constraints or deferrable 
-                                           uniqueness and exclusion constraints.</pd>
+                                        <pd>禁用或启用属于该表的所有触发器，包括与约束相关的触发器。 如果任何触发器是内部生成的约束触发器（例如用于实现外键约束或可延迟的唯一性和排除约束的触发器），则这需要超级用户特权。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>USER</pt>
-                                        <pd>Disable or enable all triggers belonging to the table except for 
-                                            internally generated constraint triggers such as those that are used
-                                            to implement foreign key constraints or deferrable uniqueness and
-                                            exclusion constraints.
+                                        <pd>禁用或启用属于该表的所有触发器，但内部生成的约束触发器（例如用于实现外键约束或可延迟的唯一性和排除约束的触发器除外）除外。
                                         </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>index_name</varname>
                                         </pt>
-                                        <pd>The index name on which the table should be marked for
-                                                clustering. Note that <codeph>CLUSTER</codeph> is
-                                                not the recommended way to physically reorder a
-                                                table in Greenplum Database because it takes so
-                                                long. It is better to recreate the table with
-                                                  <codeph><xref href="./CREATE_TABLE_AS.xml#topic1"
-                                                  type="topic" format="dita"/></codeph> and order it
-                                                by the index column(s).</pd>
+                                        <pd>表应标记为集群的索引名称。 请注意，建议不要使用<codeph>CLUSTER</codeph>对Greenplum数据库中的表进行物理重新排序，因为它会花费很长时间。 最好使用<codeph><xref href="./CREATE_TABLE_AS.xml#topic1"
+                                                  type="topic" format="dita"/></codeph>重新创建表并按索引列对其进行排序。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>FILLFACTOR</pt>
-                                        <pd>Set the fillfactor percentage for a table.</pd>
+                                        <pd>设置表格的填充系数百分比。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>value</varname>
                                         </pt>
-                                        <pd>The new value for the <codeph>FILLFACTOR</codeph>
-                                                parameter, which is a percentage between 10 and 100.
-                                                100 is the default.</pd>
+                                        <pd> <codeph>FILLFACTOR</codeph>参数的新值，介于10到100之间的百分比。默认值为100。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>DISTRIBUTED BY ({<varname>column_name</varname>
                                                   [<varname>opclass</varname>]}) | DISTRIBUTED
                                                 RANDOMLY | DISTRIBUTED REPLICATED</pt>
-                                        <pd>Specifies the distribution policy for a table. Changing
-                                                a hash distribution policy causes the table data to
-                                                be physically redistributed, which can be resource
-                                                intensive. If you declare the same hash distribution
-                                                policy or change from hash to random distribution,
-                                                data will not be redistributed unless you declare
-                                                  <codeph>SET WITH (REORGANIZE=true)</codeph>.</pd>
-                                        <pd>Changing to or from a replicated distribution policy
-                                                causes the table data to be redistributed.</pd>
+                                        <pd>指定表的分发策略。 更改哈希分发策略会导致物理上重新分配表数据，这可能会占用大量资源。 如果声明相同的哈希分配策略或从哈希更改为随机分配，则除非声明<codeph>SET WITH (REORGANIZE=true)</codeph>，否则不会重新分配数据。</pd>
+                                        <pd>更改为复制的分发策略或从复制的分发策略更改将导致表数据被重新分发。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>REORGANIZE=true|false</pt>
-                                        <pd>Use <codeph>REORGANIZE=true</codeph> when the hash
-                                                distribution policy has not changed or when you have
-                                                changed from a hash to a random distribution, and
-                                                you want to redistribute the data anyways.</pd>
+                                        <pd>当哈希分配策略未更改或从哈希更改为随机分配，并且无论如何都希望重新分配数据时，请使用<codeph>REORGANIZE=true</codeph> 。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>parent_table</varname>
                                         </pt>
-                                        <pd>A parent table to associate or de-associate with this
-                                                table. </pd>
+                                        <pd>父表要与此表关联或取消关联。 </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>new_owner</varname>
                                         </pt>
-                                        <pd>The role name of the new owner of the table. </pd>
+                                        <pd>表的新所有者的角色名称。 </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>new_tablespace</varname>
                                         </pt>
-                                        <pd>The name of the tablespace to which the table will be
-                                                moved. </pd>
+                                        <pd>该表将被移动到的表空间的名称。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>new_schema</varname>
                                         </pt>
-                                        <pd>The name of the schema to which the table will be moved.
+                                        <pd>表将被移动到的模式的名称。
                                         </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>parent_table_name</varname>
                                         </pt>
-                                        <pd>When altering a partitioned table, the name of the
-                                                top-level parent table.</pd>
+                                        <pd>更改分区表时，顶级父表的名称。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>ALTER [DEFAULT] PARTITION</pt>
-                                        <pd>If altering a partition deeper than the first level of
-                                                partitions, the <codeph>ALTER PARTITION</codeph>
-                                                clause is used to specify which subpartition in the
-                                                hierarchy you want to alter.</pd>
+                                        <pd>如果要更改的分区比第一级分区深，请使用<codeph>ALTER PARTITION</codeph>子句指定要更改层次结构中的哪个子分区</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>DROP [DEFAULT] PARTITION</pt>
-                                        <pd>Drops the specified partition. If the partition has
-                                                subpartitions, the subpartitions are automatically
-                                                dropped as well.</pd>
+                                        <pd>删除指定的分区。 如果分区具有子分区，则子分区也会自动删除。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>TRUNCATE [DEFAULT] PARTITION</pt>
-                                        <pd>Truncates the specified partition. If the partition has
-                                                subpartitions, the subpartitions are automatically
-                                                truncated as well.</pd>
+                                        <pd>截断指定的分区。 如果分区具有子分区，则子分区也会自动被截断。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>RENAME [DEFAULT] PARTITION</pt>
-                                        <pd>Changes the partition name of a partition (not the
-                                                relation name). Partitioned tables are created using
-                                                the naming convention:
+                                        <pd>更改分区的分区名称（而不是关系名称）。 分区表是使用以下命名约定创建的：
                                                   <codeph>&lt;</codeph><varname>parentname</varname><codeph>&gt;_&lt;</codeph><varname>level</varname><codeph>&gt;_prt_&lt;</codeph><varname>partition_name</varname><codeph>&gt;</codeph>.</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>ADD DEFAULT PARTITION</pt>
-                                        <pd>Adds a default partition to an existing partition
-                                                design. When data does not match to an existing
-                                                partition, it is inserted into the default
-                                                partition. Partition designs that do not have a
-                                                default partition will reject incoming rows that do
-                                                not match to an existing partition. Default
-                                                partitions must be given a name.</pd>
+                                        <pd>将默认分区添加到现有分区设计中。 当数据与现有分区不匹配时，会将其插入默认分区。 没有默认分区的分区设计将拒绝与现有分区不匹配的传入行。 必须为默认分区指定名称。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>ADD PARTITION</pt>
-                                        <pd><varname>partition_element</varname> - Using the
-                                                existing partition type of the table (range or
-                                                list), defines the boundaries of new partition you
-                                                are adding.</pd>
-                                        <pd><varname>name</varname> - A name for this new
-                                                partition.</pd>
-                                        <pd><b>VALUES</b> - For list partitions, defines the
-                                                value(s) that the partition will contain.</pd>
-                                        <pd><b>START</b> - For range partitions, defines the
-                                                starting range value for the partition. By default,
-                                                start values are <codeph>INCLUSIVE</codeph>. For
-                                                example, if you declared a start date of
-                                                  '<codeph>2016-01-01</codeph>', then the partition
-                                                would contain all dates greater than or equal to
-                                                  '<codeph>2016-01-01</codeph>'. Typically the data
-                                                type of the <codeph>START</codeph> expression is the
-                                                same type as the partition key column. If that is
-                                                not the case, then you must explicitly cast to the
-                                                intended data type.</pd>
-                                        <pd><b>END</b> - For range partitions, defines the ending
-                                                range value for the partition. By default, end
-                                                values are <codeph>EXCLUSIVE</codeph>. For example,
-                                                if you declared an end date of
-                                                  '<codeph>2016-02-01</codeph>', then the partition
-                                                would contain all dates less than but not equal to
-                                                  '<codeph>2016-02-01</codeph>'. Typically the data
-                                                type of the <codeph>END</codeph> expression is the
-                                                same type as the partition key column. If that is
-                                                not the case, then you must explicitly cast to the
-                                                intended data type.</pd>
-                                        <pd><b>WITH</b> - Sets the table storage options for a
-                                                partition. For example, you may want older
-                                                partitions to be append-optimized tables and newer
-                                                partitions to be regular heap tables. See
-                                                  <codeph><xref href="./CREATE_TABLE.xml#topic1"
-                                                  type="topic" format="dita"/></codeph> for a
-                                                description of the storage options.</pd>
-                                        <pd><b>TABLESPACE</b> - The name of the tablespace in which
-                                                the partition is to be created.</pd>
-                                        <pd><varname>subpartition_spec</varname> - Only allowed on
-                                                partition designs that were created without a
-                                                subpartition template. Declares a subpartition
-                                                specification for the new partition you are adding.
-                                                If the partitioned table was originally defined
-                                                using a subpartition template, then the template
-                                                will be used to generate the subpartitions
-                                                automatically.</pd>
+                                        <pd><varname>partition_element</varname> - 使用表（范围或列表）的现有分区类型，定义要添加的新分区的边界。</pd>
+                                        <pd><varname>name</varname> - 此新分区的名称。</pd>
+                                        <pd><b>VALUES</b> - 对于列表分区，定义分区将包含的值。</pd>
+                                        <pd><b>START</b> - 对于范围分区，定义分区的起始范围值。 默认情况下，起始值为<codeph>INCLUSIVE</codeph>。 例如，如果您声明开始日期为“ <codeph>2016-01-01</codeph>”，则分区将包含所有大于或等于“ <codeph>2016-01-01</codeph>”的日期。 通常，<codeph>START</codeph>表达式的数据类型与分区键列的类型相同。 如果不是这种情况，则必须显式转换为预期的数据类型。</pd>
+                                        <pd><b>END</b> - 对于范围分区，定义分区的结束范围值。 默认情况下，最终值为<codeph>EXCLUSIVE</codeph>。 例如，如果您声明结束日期为“ '<codeph>2016-02-01</codeph>”，则分区将包含所有小于但不等于“ '<codeph>2016-02-01</codeph>”的日期。 通常， <codeph>END</codeph>表达式的数据类型与分区键列的类型相同。 如果不是这种情况，则必须显式转换为预期的数据类型。</pd>
+                                        <pd><b>WITH</b> - 设置分区的表存储选项。 例如，您可能希望将较旧的分区作为追加优化表，而将较新的分区作为常规堆表。 有关存储选项的说明，请参见<codeph><xref href="./CREATE_TABLE.xml#topic1"
+                                                  type="topic" format="dita"/></codeph>。</pd>
+                                        <pd><b>TABLESPACE</b> - 要在其中创建分区的表空间的名称。</pd>
+                                        <pd><varname>subpartition_spec</varname> - 仅允许在没有子分区模板的情况下创建的分区设计。 声明要添加的新分区的子分区规范。 如果分区表最初是使用子分区模板定义的，则该模板将用于自动生成子分区。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>EXCHANGE [DEFAULT] PARTITION</pt>
-                                        <pd>Exchanges another table into the partition hierarchy
-                                                into the place of an existing partition. In a
-                                                multi-level partition design, you can only exchange
-                                                the lowest level partitions (those that contain
-                                                data). </pd>
-                                        <pd>The Greenplum Database server configuration parameter
-                                                  <codeph>gp_enable_exchange_default_partition</codeph>
-                                                controls availability of the <codeph>EXCHANGE
-                                                  DEFAULT PARTITION</codeph> clause. The default
-                                                value for the parameter is <codeph>off</codeph>. The
-                                                clause is not available and Greenplum Database
-                                                returns an error if the clause is specified in an
-                                                  <codeph>ALTER TABLE</codeph> command.</pd>
-                                        <pd>For information about the parameter, see <xref
+                                        <pd>将另一个表交换到分区层次结构中，替换为现有分区的位置。 在多级分区设计中，您只能交换最低级别的分区（包含数据的分区）。</pd>
+                                        <pd>Greenplum数据库服务器配置参数<codeph>gp_enable_exchange_default_partition</codeph>控制<codeph>EXCHANGE
+                                                  DEFAULT PARTITION</codeph>子句的可用性。 该参数的默认值是<codeph>off</codeph>。 该子句不可用，如果在<codeph>ALTER TABLE</codeph>命令中指定了该子句，则Greenplum数据库将返回错误。</pd>
+                                        <pd>有关该参数的信息，请参阅<xref
                                                   href="../config_params/guc_config.xml#topic1"
-                                                  />.<note type="warning">Before you exchange the
-                                                  default partition, you must ensure the data in the
-                                                  table to be exchanged, the new default partition,
-                                                  is valid for the default partition. For example,
-                                                  the data in the new default partition must not
-                                                  contain data that would be valid in other leaf
-                                                  child partitions of the partitioned table.
-                                                  Otherwise, queries against the partitioned table
-                                                  with the exchanged default partition that are
-                                                  executed by GPORCA might return incorrect
-                                                  results.</note></pd>
+                                                  />.<note type="warning">交换默认分区之前，必须确保要交换的表中的数据（新的默认分区）对默认分区有效。 例如，新的默认分区中的数据不得包含在分区表的其他叶子分区中有效的数据。 否则，由GPORCA执行的具有交换的默认分区的分区表查询可能会返回错误的结果。</note></pd>
                                         <pd><b>WITH TABLE</b>
-                                                <varname>table_name</varname> - The name of the
-                                                table you are swapping into the partition design.
-                                                You can exchange a table where the table data is
-                                                stored in the database. For example, the table is
-                                                created with the <codeph>CREATE TABLE</codeph>
-                                                command. The table must have the same number of
-                                                columns, column order, column names, column types,
-                                                and distribution policy as the parent table.</pd>
-                                        <pd>With the <codeph>EXCHANGE PARTITION</codeph> clause, you
-                                                can also exchange a readable external table (created
-                                                with the <codeph>CREATE EXTERNAL TABLE</codeph>
-                                                command) into the partition hierarchy in the place
-                                                of an existing leaf child partition. If you specify
-                                                a readable external table, you must also specify the
-                                                  <codeph>WITHOUT VALIDATION</codeph> clause to skip
-                                                table validation against the <codeph>CHECK</codeph>
-                                                constraint of the partition you are exchanging.</pd>
-                                        <pd>Exchanging a leaf child partition with an external table
-                                                is not supported if the partitioned table contains a
-                                                column with a check constraint or a <codeph>NOT
-                                                  NULL</codeph> constraint.</pd>
-                                        <pd>You cannot exchange a partition with a replicated table.
-                                                Exchanging a partition with a partitioned table or a child partition of a partitioned
-                                                table is not supported.</pd>
-                                        <pd><b>WITH</b> | <b>WITHOUT VALIDATION</b> - Validates that
-                                                the data in the table matches the
-                                                  <codeph>CHECK</codeph> constraint of the partition
-                                                you are exchanging. The default is to validate the
-                                                data against the <codeph>CHECK</codeph> constraint.
-                                                  <note type="warning">If you specify the
-                                                  <codeph>WITHOUT VALIDATION</codeph> clause, you
-                                                  must ensure that the data in table that you are
-                                                  exchanging for an existing child leaf partition is
-                                                  valid against the <codeph>CHECK</codeph>
-                                                  constraints on the partition. Otherwise, queries
-                                                  against the partitioned table might return
-                                                  incorrect results.</note></pd>
+                                                <varname>table_name</varname> - 
+												您要交换到分区设计中的表的名称。 您可以交换一个表，其中表数据存储在数据库中。 例如，该表是使用<codeph>CREATE TABLE</codeph>命令创建的。 该表必须具有与父表相同的列数，列顺序，列名，列类型和分发策略。</pd>
+                                        <pd>使用<codeph>EXCHANGE PARTITION</codeph>子句，您还可以将可读的外部表（使用<codeph>CREATE EXTERNAL TABLE</codeph>命令创建）交换到分区层次结构中，而不是现有的叶子子分区。 如果您指定了可读的外部表，则还必须指定<codeph>WITHOUT VALIDATION</codeph>子句，以针对要交换的分区的 <codeph>CHECK</codeph>约束跳过表验证。</pd>
+                                        <pd>如果分区表包含具有检查约束或<codeph>NOT
+                                                  NULL</codeph>约束的列，则不支持与外部表交换叶子分区。</pd>
+                                        <pd>您无法与复制表交换分区。 不支持将分区与分区表或分区表的子分区交换。</pd>
+                                        <pd><b>WITH</b> | <b>WITHOUT VALIDATION</b> - 验证表中的数据是否与您要交换的分区的<codeph>CHECK</codeph>约束相匹配。 默认设置是根据<codeph>CHECK</codeph>约束验证数据。
+                                                  <note type="warning">如果指定<codeph>WITHOUT VALIDATION</codeph>子句，则必须确保针对现有子叶分区交换的表中的数据对于分区上的<codeph>CHECK</codeph>约束是有效的。</note></pd>
                                 </plentry>
                                 <plentry>
                                         <pt>SET SUBPARTITION TEMPLATE</pt>
-                                        <pd>Modifies the subpartition template for an existing
-                                                partition. After a new subpartition template is set,
-                                                all new partitions added will have the new
-                                                subpartition design (existing partitions are not
-                                                modified).</pd>
+                                        <pd>修改现有分区的子分区模板。 设置新的子分区模板后，所有添加的新分区将具有新的子分区设计（现有分区不会被修改）。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>SPLIT DEFAULT PARTITION</pt>
-                                        <pd>Splits a default partition. In a multi-level partition,
-                                                only a range partition can be split, not a list
-                                                partition, and you can only split the lowest level
-                                                default partitions (those that contain data).
-                                                Splitting a default partition creates a new
-                                                partition containing the values specified and leaves
-                                                the default partition containing any values that do
-                                                not match to an existing partition.</pd>
-                                        <pd><b>AT</b> - For list partitioned tables, specifies a
-                                                single list value that should be used as the
-                                                criteria for the split. </pd>
-                                        <pd><b>START</b> - For range partitioned tables, specifies a
-                                                starting value for the new partition. </pd>
-                                        <pd><b>END</b> - For range partitioned tables, specifies an
-                                                ending value for the new partition.</pd>
-                                        <pd><b>INTO</b> - Allows you to specify a name for the new
-                                                partition. When using the <codeph>INTO</codeph>
-                                                clause to split a default partition, the second
-                                                partition name specified should always be that of
-                                                the existing default partition. If you do not know
-                                                the name of the default partition, you can look it
-                                                up using the <varname>pg_partitions</varname>
-                                                view.</pd>
+                                        <pd>分割默认分区。 在多级分区中，只能拆分范围分区，而不能拆分列表分区，并且只能拆分最低级别的默认分区（包含数据的分区）。 拆分默认分区将创建一个包含指定值的新分区，并保留默认分区，其中包含与现有分区不匹配的任何值。</pd>
+                                        <pd><b>AT</b> - 对于列表分区表，指定一个列表值，该值应用作拆分条件。 </pd>
+                                        <pd><b>START</b> - 对于范围分区表，指定新分区的起始值。 </pd>
+                                        <pd><b>END</b> - 对于范围分区表，指定新分区的结束值。</pd>
+                                        <pd><b>INTO</b> - 允许您为新分区指定名称。 使用<codeph>INTO</codeph>子句拆分默认分区时，指定的第二个分区名称应始终为现有默认分区的名称。 如果您不知道默认分区的名称，则可以使用<varname>pg_partitions</varname>视图进行查找。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>SPLIT PARTITION</pt>
-                                        <pd>Splits an existing partition into two partitions. In a
-                                                multi-level partition, only a range partition can be
-                                                split, not a list partition, and you can only split
-                                                the lowest level partitions (those that contain
-                                                data). </pd>
-                                        <pd><b>AT</b> - Specifies a single value that should be used
-                                                as the criteria for the split. The partition will be
-                                                divided into two new partitions with the split value
-                                                specified being the starting range for the
-                                                  <varname>latter</varname> partition.</pd>
-                                        <pd><b>INTO</b> - Allows you to specify names for the two
-                                                new partitions created by the split.</pd>
+                                        <pd>将现有分区分为两个分区。 在多级别分区中，只能拆分范围分区，而不能拆分列表分区，并且只能拆分最低级别的分区（包含数据的分区）。 </pd>
+                                        <pd><b>AT</b> - 指定一个单一值，该值应用作分割条件。 该分区将分为两个新分区，指定的分割值是后一个分区的起始范围。</pd>
+                                        <pd><b>INTO</b> - 允许用户为分裂创建两个新分区指定名字。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>partition_name</varname>
                                         </pt>
-                                        <pd>The given name of a partition. </pd>
+                                        <pd>给定的分区名称。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>FOR (RANK(number))</pt>
-                                        <pd>For range partitions, the rank of the partition in the
-                                                range. </pd>
+                                        <pd>对于范围分区，分区在范围中的排名。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>FOR ('<varname>value</varname>')</pt>
-                                        <pd>Specifies a partition by declaring a value that falls
-                                                within the partition boundary specification. If the
-                                                value declared with <codeph>FOR</codeph> matches to
-                                                both a partition and one of its subpartitions (for
-                                                example, if the value is a date and the table is
-                                                partitioned by month and then by day), then
-                                                  <codeph>FOR</codeph> will operate on the first
-                                                level where a match is found (for example, the
-                                                monthly partition). If your intent is to operate on
-                                                a subpartition, you must declare so as follows:
-                                                  <codeph>ALTER TABLE <varname>name</varname> ALTER
+                                        <pd>通过声明一个落在分区边界说明中的值来指定一个分区。如果用<codeph>FOR</codeph>声明的值匹配一个分区和它的一个子分区（例如，如果值是一个日期并且表先按月分区然后按日分区），那么<codeph>FOR</codeph>将在第一个找到匹配的层次上操作（例如，每月的分区）。如果用户的目的是在子分区上操作，则必须按如下的方式声明：<codeph>ALTER TABLE <varname>name</varname> ALTER
                                                   PARTITION FOR ('2016-10-01') DROP PARTITION FOR
                                                   ('2016-10-01');</codeph></pd>
                                 </plentry>
                         </parml>
                 </section>
                 <section id="section5">
-                        <title>Notes</title>
-                        <p>The table name specified in the <codeph>ALTER TABLE</codeph> command
-                                cannot be the name of a partition within a table. </p>
-                        <p>Take special care when altering or dropping columns that are part of the
-                                Greenplum Database distribution key as this can change the
-                                distribution policy for the table.</p>
-                        <p>Greenplum Database does not currently support foreign key constraints.
-                                For a unique constraint to be enforced in Greenplum Database, the
-                                table must be hash-distributed (not <codeph>DISTRIBUTED
-                                        RANDOMLY</codeph>), and all of the distribution key columns
-                                must be the same as the initial columns of the unique constraint
-                                columns.</p>
-                        <p>Adding a <codeph>CHECK</codeph> or <codeph>NOT NULL</codeph> constraint
-                                requires scanning the table to verify that existing rows meet the
-                                constraint, but does not require a table rewrite.</p>
-                        <p>When a column is added with <codeph>ADD COLUMN</codeph>, all existing
-                                rows in the table are initialized with the column's default value,
-                                or <codeph>NULL</codeph> if no <codeph>DEFAULT</codeph> clause is
-                                specified. Adding a column with a non-null default or changing the
-                                type of an existing column will require the entire table and indexes
-                                to be rewritten. As an exception, if the <codeph>USING</codeph>
-                                clause does not change the column contents and the old type is
-                                either binary coercible to the new type or an unconstrained domain
-                                over the new type, a table rewrite is not needed, but any indexes on
-                                the affected columns must still be rebuilt. Adding or removing a
-                                system <codeph>oid</codeph> column also requires rewriting the
-                                entire table. Table and/or index rebuilds may take a significant
-                                amount of time for a large table; and will temporarily require as
-                                much as double the disk space. </p>
-                        <p>You can specify multiple changes in a single <codeph>ALTER TABLE</codeph>
-                                command, which will be done in a single pass over the table. </p>
-                        <p>The <codeph>DROP COLUMN</codeph> form does not physically remove the
-                                column, but simply makes it invisible to SQL operations. Subsequent
-                                insert and update operations in the table will store a null value
-                                for the column. Thus, dropping a column is quick but it will not
-                                immediately reduce the on-disk size of your table, as the space
-                                occupied by the dropped column is not reclaimed. The space will be
-                                reclaimed over time as existing rows are updated. If you drop the
-                                system <codeph>oid</codeph> column, however, the table is rewritten
-                                immediately.</p>
-                        <p> To force immediate reclamation of space occupied by a dropped column,
-                                you can execute one of the forms of <codeph>ALTER TABLE</codeph>
-                                that performs a rewrite of the whole table. This results in
-                                reconstructing each row with the dropped column replaced by a null
-                                value. </p>
-                        <p> The rewriting forms of <codeph>ALTER TABLE</codeph> are not MVCC-safe.
-                                After a table rewrite, the table will appear empty to concurrent
-                                transactions, if they are using a snapshot taken before the rewrite
-                                occurred. See <xref
+                        <title>注解</title>
+                        <p><codeph>ALTER TABLE</codeph> 命令中指定的表名不能是一个表中的分区名。 </p>
+                        <p>在修改或者删除作为Greenplum数据库分布键一部分的列时要特别小心，因为这可能会改变表的分布策略。.</p>
+                        <p>Greenplum数据库当前不支持外键约束。对于要在Greenplum数据库中实施的唯一约束，表必须被哈希分布（不能用<codeph>DISTRIBUTED
+                                        RANDOMLY</codeph>），并且所有的分布键列必须和唯一约束列中前部的列相同。</p>
+                        <p>增加<codeph>CHECK</codeph>或者codeph>NOT NULL</codeph>约束要求扫描表以验证现有的行是否符合约束。</p>
+                        <p>当使用<codeph>ADD COLUMN</codeph>添加列时，表中的所有现有行都使用该列的默认值初始化，如果未指定<codeph>DEFAULT</codeph>子句，则初始化为<codeph>NULL</codeph>。添加具有非空默认值的列或更改现有列的类型将需要重写整个表和索引。作为例外，如果<codeph>USING</codeph>子句不更改列的内容，并且旧类型可以强制转换为新类型或新类型不受限制的域，则不需要重写表，但是受影响列上的任何索引都必须仍在重建中。添加或删除系统<codeph>oid</codeph>列还需要重写整个表。对于大型表，表和/或索引的重建可能会花费大量时间；并且暂时需要多达两倍的磁盘空间。</p>
+                        <p>您可以在单个codeph>ALTER TABLE</codeph>命令中指定多个更改，这些更改将在表上一次传递。</p>
+                        <p><codeph>DROP COLUMN</codeph> 表单不会物理删除列，而只是使它对SQL操作不可见。表中随后的插入和更新操作将为该列存储一个空值。因此，删除列很快，但是不会立即减小表的磁盘大小，因为删除的列所占用的空间不会被回收。随着现有行的更新，空间将随着时间的推移而回收。但是，如果删除系统<codeph>oid</codeph>列，则表将立即被重写。</p>
+                        <p> 要强制立即回收被删除的列占用的空间，您可以执行<codeph>ALTER TABLE</codeph>的一种形式来重写整个表。这将导致重建的每一行，并将删除的列替换为空值。</p>
+                        <p> <codeph>ALTER TABLE</codeph>的重写形式不是MVCC安全的。在表重写之后，如果并发事务使用的是在重写发生之前拍摄的快照，则该表将对并发事务显示为空。有关更多详细信息，请参见<xref
                                         href="https://www.postgreql.org/docs/9.4/mvcc-caveats.html"
-                                        scope="external" format="html">MVCC Caveats</xref> for more
-                                details. </p>
-                        <p> The <codeph>USING</codeph> option of <codeph>SET DATA TYPE</codeph> can
-                                actually specify any expression involving the old values of the row;
-                                that is, it can refer to other columns as well as the one being
-                                converted. This allows very general conversions to be done with the
-                                        <codeph>SET DATA TYPE</codeph> syntax. Because of this
-                                flexibility, the <codeph>USING</codeph> expression is not applied to
-                                the column's default value (if any); the result might not be a
-                                constant expression as required for a default. This means that when
-                                there is no implicit or assignment cast from old to new type,
-                                        <codeph>SET DATA TYPE</codeph> might fail to convert the
-                                default even though a <codeph>USING</codeph> clause is supplied. In
-                                such cases, drop the default with <codeph>DROP DEFAULT</codeph>,
-                                perform the <codeph>ALTER TYPE</codeph>, and then use <codeph>SET
-                                        DEFAULT</codeph> to add a suitable new default. Similar
-                                considerations apply to indexes and constraints involving the
-                                column. </p>
-                        <p>If a table is partitioned or has any descendant tables, it is not
-                                permitted to add, rename, or change the type of a column, or rename
-                                an inherited constraint in the parent table without doing the same
-                                to the descendants. This ensures that the descendants always have
-                                columns matching the parent. </p>
-                        <p>To see the structure of a partitioned table, you can use the view
-                                                <codeph><xref
+                                        scope="external" format="html">MVCC Caveats</xref> 。</p>
+                        <p><codeph>SET DATA TYPE</codeph>的<codeph>USING</codeph>选项实际上可以指定涉及该行的旧值的任何表达式。也就是说，它可以引用其他列以及要转换的列。这允许使用<codeph>SET DATA TYPE</codeph>语法完成非常通用的转换。由于具有这种灵活性，因此<codeph>USING</codeph>表达式不会应用于列的默认值（如果有）；结果可能不是默认值所需的常量表达式。这意味着当没有从旧类型到新类型的隐式或赋值转换时，即使提供了<codeph>USING</codeph>子句，<codeph>SET DATA TYPE</codeph>也可能无法转换默认值。在这种情况下，请使用<codeph>DROP DEFAULT</codeph>删除默认值，执行<codeph>ALTER TYPE</codeph>，然后使用<codeph>SET
+                                        DEFAULT</codeph>添加合适的新默认值。类似的考虑适用于涉及该列的索引和约束。</p>
+                        <p>如果表已分区或具有任何后代表，则不允许在父表中添加，重命名或更改列的类型或重命名继承的约束，而无需对后代进行相同的操作。这样可以确保后代始终具有与父代匹配的列。 </p>
+                        <p>要查看分区表的结构，可以使用视图<codeph><xref
                                                 href="../system_catalogs/pg_partitions.xml"
-                                                type="topic" format="dita"/></codeph>. This view can
-                                help identify the particular partitions you may want to alter.</p>
-                        <p>A recursive <codeph>DROP COLUMN</codeph> operation will remove a
-                                descendant table's column only if the descendant does not inherit
-                                that column from any other parents and never had an independent
-                                definition of the column. A nonrecursive <codeph>DROP
-                                        COLUMN</codeph> (<codeph>ALTER TABLE ONLY ... DROP
-                                        COLUMN</codeph>) never removes any descendant columns, but
-                                instead marks them as independently defined rather than inherited. </p>
-                        <p>The <codeph>TRIGGER</codeph>, <codeph>CLUSTER</codeph>,
-                                        <codeph>OWNER</codeph>, and <codeph>TABLESPACE</codeph>
-                                actions never recurse to descendant tables; that is, they always act
-                                as though <codeph>ONLY</codeph> were specified. Adding a constraint
-                                recurses only for <codeph>CHECK</codeph> constraints that are not
-                                marked <codeph>NO INHERIT</codeph>.</p>
-                        <p>These <codeph>ALTER PARTITION</codeph> operations are supported if no
-                                data is changed on a partitioned table that contains a leaf child
-                                partition that has been exchanged to use an external table.
-                                Otherwise, an error is returned.<ul id="ul_hcw_mrn_qs">
+                                                type="topic" format="dita"/></codeph>。该视图可以帮助您识别您可能要更改的特定分区。</p>
+                        <p>仅当后代不从任何其他父级继承该列并且从未对该列进行独立定义时，递归<codeph>DROP
+                                        COLUMN</codeph>操作才会删除后代表的列。非递归<codeph>DROP
+                                        COLUMN</codeph>（仅<codeph>ALTER TABLE ONLY ... DROP
+                                        COLUMN</codeph>）从不删除任何后代列，而是将它们标记为独立定义而不是继承。</p>
+                        <p><codeph>TRIGGER</codeph>, <codeph>CLUSTER</codeph>,
+                                        <codeph>OWNER</codeph>和 <codeph>TABLESPACE</codeph>操作永远不会递归到后代表。也就是说，它们始终像指定<codeph>ONLY</codeph>那样起作用。仅对未标记为<codeph>NO INHERIT</codeph>的<codeph>CHECK</codeph>约束重复添加约束。</p>
+                        <p>如果包含已被交换以使用外部表的叶子分区的分区表上的数据没有更改，则支持这些<codeph>ALTER PARTITION</codeph>操作。否则，将返回错误。<ul id="ul_hcw_mrn_qs">
                                         <li>Adding or dropping a column.</li>
                                         <li>Changing the data type of column.</li>
                                 </ul></p>
-                        <p>These <codeph>ALTER PARTITION</codeph> operations are not supported for a
-                                partitioned table that contains a leaf child partition that has been
-                                exchanged to use an external table:<ul id="ul_edw_mrn_qs">
+                        <p>分区表不支持这些<codeph>ALTER PARTITION</codeph>操作，该分区表包含已被交换以使用外部表的叶子分区：<ul id="ul_edw_mrn_qs">
                                         <li>Setting a subpartition template.</li>
                                         <li>Altering the partition properties.</li>
                                         <li>Creating a default partition.</li>
@@ -1005,86 +465,75 @@ where <varname>action</varname> is one of:
                                         <li>Adding or dropping constraints.</li>
                                         <li>Splitting an external partition.</li>
                                 </ul></p>
-                        <p>Changing any part of a system catalog table is not permitted.</p>
+                        <p>不允许更改系统目录表的任何部分。</p>
                 </section>
                 <section id="section6">
                         <title>Examples</title>
-                        <p>Add a column to a table:</p>
+                        <p>向列中添加列：</p>
                         <codeblock>ALTER TABLE distributors ADD COLUMN address varchar(30);</codeblock>
-                        <p>Rename an existing column:</p>
+                        <p>重命名现有列：</p>
                         <codeblock>ALTER TABLE distributors RENAME COLUMN address TO city;</codeblock>
-                        <p>Rename an existing table:</p>
+                        <p>重命名现有表：</p>
                         <codeblock>ALTER TABLE distributors RENAME TO suppliers;</codeblock>
-                        <p>Add a not-null constraint to a column:</p>
-                        <p>To rename an existing constraint:</p>
+                        <p>向列添加非空约束：</p>
+						<codeblock>ALTER TABLE distributors ALTER COLUMN street SET NOT NULL;</codeblock>
+                        <p>重命名现有约束：</p>
                         <codeblock>ALTER TABLE distributors RENAME CONSTRAINT zipchk TO zip_check;</codeblock>
-                        <codeblock>ALTER TABLE distributors ALTER COLUMN street SET NOT NULL;</codeblock>
-                        <p>Add a check constraint to a table and all of its children:</p>
+                        <p>向表及其所有子级添加检查约束：</p>
                         <codeblock>ALTER TABLE distributors ADD CONSTRAINT zipchk CHECK 
 (char_length(zipcode) = 5);</codeblock>
-                        <p>To add a check constraint only to a table and not to its children:</p>
+                        <p>要将检查约束仅添加到表而不是其子表，请执行以下操作：</p>
                         <codeblock>ALTER TABLE distributors ADD CONSTRAINT zipchk CHECK (char_length(zipcode) = 5) NO INHERIT;</codeblock>
-                        <p>(The check constraint will not be inherited by future children, either.)</p>
+                        <p>（检查约束也不会被将来的子代继承。）</p>
 
-                        <p>Remove a check constraint from a table and all of its children:</p>
+                        <p>从表及其所有子级中删除检查约束：</p>
                         <codeblock>ALTER TABLE distributors DROP CONSTRAINT zipchk;</codeblock>
-                        <p>Remove a check constraint from one table only:</p>
+                        <p>仅从一个表中删除检查约束：</p>
                         <codeblock>ALTER TABLE ONLY distributors DROP CONSTRAINT zipchk;</codeblock>
-                        <p>(The check constraint remains in place for any child tables that inherit
-                                        <codeph>distributors</codeph>.)</p>
-                        <p>Move a table to a different schema:</p>
+                        <p>（对于任何继承<codeph>distributors</codeph>的子表，检查约束仍然存在。）</p>
+                        <p>将表移动到不同的模式：</p>
                         <codeblock>ALTER TABLE myschema.distributors SET SCHEMA yourschema;</codeblock>
-                        <p>Change the distribution policy of a table to replicated:</p>
+                        <p>将表的分发策略更改为已复制：</p>
                         <codeblock>ALTER TABLE myschema.distributors SET DISTRIBUTED REPLICATED;</codeblock>
-                        <p>Add a new partition to a partitioned table:</p>
+                        <p>将新分区添加到分区表：</p>
                         <codeblock>ALTER TABLE sales ADD PARTITION 
             START (date '2017-02-01') INCLUSIVE 
             END (date '2017-03-01') EXCLUSIVE;</codeblock>
-                        <p>Add a default partition to an existing partition design:</p>
+                        <p>向现有分区设计添加默认分区：</p>
                         <codeblock>ALTER TABLE sales ADD DEFAULT PARTITION other;</codeblock>
-                        <p>Rename a partition:</p>
+                        <p>重命名分区：</p>
                         <codeblock>ALTER TABLE sales RENAME PARTITION FOR ('2016-01-01') TO 
 jan08;</codeblock>
-                        <p>Drop the first (oldest) partition in a range sequence:</p>
+                        <p>删除范围序列中的第一个（最旧的）分区：</p>
                         <codeblock>ALTER TABLE sales DROP PARTITION FOR (RANK(1));</codeblock>
-                        <p>Exchange a table into your partition design:</p>
+                        <p>将表交换到用户的分区设计中：</p>
                         <codeblock>ALTER TABLE sales EXCHANGE PARTITION FOR ('2016-01-01') WITH 
 TABLE jan08;</codeblock>
-                        <p>Split the default partition (where the existing default partition's name
-                                is <codeph>other</codeph>) to add a new monthly partition for
-                                January 2017:</p>
+                        <p>拆分默认分区(现有的默认分区名称<codeph>other</codeph>)为2017年1月添加新的每月分区：</p>
                         <codeblock>ALTER TABLE sales SPLIT DEFAULT PARTITION 
 START ('2017-01-01') INCLUSIVE 
 END ('2017-02-01') EXCLUSIVE 
 INTO (PARTITION jan09, PARTITION other);</codeblock>
-                        <p>Split a monthly partition into two with the first partition containing
-                                dates January 1-15 and the second partition containing dates January
-                                16-31:</p>
+                        <p>将每月分区分成两个分区，第一个分区包含日期1月1日至15日，第二个分区包含日期1月16日至31日：</p>
                         <codeblock>ALTER TABLE sales SPLIT PARTITION FOR ('2016-01-01')
 AT ('2016-01-16')
 INTO (PARTITION jan081to15, PARTITION jan0816to31);</codeblock>
-                        <p> To recreate a primary key constraint, without blocking updates while the
-                                index is rebuilt: </p>
+                        <p>要重新创建主键约束，而在重建索引时不阻止更新：</p>
                         <codeblock>CREATE UNIQUE INDEX CONCURRENTLY dist_id_temp_idx ON distributors (dist_id);
 ALTER TABLE distributors DROP CONSTRAINT distributors_pkey,
 ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
                         </codeblock>
                 </section>
                 <section id="section7">
-                        <title>Compatibility</title>
-                        <p>The forms <codeph>ADD</codeph> (without <codeph>USING INDEX</codeph>),
-                                        <codeph>DROP</codeph>, <codeph>SET DEFAULT</codeph>, and
-                                        <codeph>SET DATA TYPE</codeph> (without
-                                        <codeph>USING</codeph>) conform with the SQL standard. The
-                                other forms are Greenplum Database extensions of the SQL standard.
-                                Also, the ability to specify more than one manipulation in a single
-                                        <codeph>ALTER TABLE</codeph> command is an extension.</p>
-                        <p><codeph>ALTER TABLE DROP COLUMN</codeph> can be used to drop the only
-                                column of a table, leaving a zero-column table. This is an extension
-                                of SQL, which disallows zero-column tables.</p>
+                        <title>兼容性</title>
+                        <p><codeph>ADD</codeph> (不包含 <codeph>USING INDEX</codeph>),
+                                        <codeph>DROP</codeph>, <codeph>SET DEFAULT</codeph>和
+                                        <codeph>SET DATA TYPE</codeph> (不包含
+                                        <codeph>USING</codeph>) 符合SQL标准。 其他形式是SQL标准的Greenplum数据库扩展。 同样，在单个<codeph>ALTER TABLE</codeph>命令中指定多个操纵的功能也是一种扩展。</p>
+                        <p><codeph>ALTER TABLE DROP COLUMN</codeph>可用于删除表的唯一列，而保留零列表。 这是SQL的扩展，不允许使用零列表。</p>
                 </section>
                 <section id="section8">
-                        <title>See Also</title>
+                        <title>另见</title>
                         <p><codeph><xref href="./CREATE_TABLE.xml#topic1" type="topic" format="dita"
                                         /></codeph>, <codeph><xref href="./DROP_TABLE.xml#topic1"
                                                 type="topic" format="dita"/></codeph></p>

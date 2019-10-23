@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="am137232">ALTER VIEW</title><body><p id="sql_command_desc">Changes properties of a view.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">ALTER VIEW [ IF EXISTS ] <varname>name</varname> ALTER [ COLUMN ] <varname>column_name</varname> SET DEFAULT <varname>expression</varname>
+<topic id="topic1"><title id="am137232">ALTER VIEW</title><body><p id="sql_command_desc">更改一个视图的定义。</p><section id="section2"><title>概要</title><codeblock id="sql_command_synopsis">ALTER VIEW [ IF EXISTS ] <varname>name</varname> ALTER [ COLUMN ] <varname>column_name</varname> SET DEFAULT <varname>expression</varname>
 
 ALTER VIEW [ IF EXISTS ] <varname>name</varname> ALTER [ COLUMN ] <varname>column_name</varname> DROP DEFAULT
 
@@ -14,78 +14,63 @@ ALTER VIEW [ IF EXISTS ] <varname>name</varname> SET SCHEMA <varname>new_schema<
 ALTER VIEW [ IF EXISTS ] <varname>name</varname> SET ( <varname>view_option_name</varname> [= <varname>view_option_value</varname>] [, ... ] )
 
 ALTER VIEW [ IF EXISTS ] <varname>name</varname> RESET ( <varname>view_option_name</varname> [, ... ] )</codeblock></section><section id="section3">
-      <title>Description</title>
-      <p><codeph>ALTER VIEW</codeph> changes various auxiliary properties of a view. (If you want to
-        modify the view's defining query, use <codeph>CREATE OR REPLACE VIEW</codeph>. </p>
-      <p>To execute this command you must be the owner of the view. To change a view's schema you
-        must also have <codeph>CREATE</codeph> privilege on the new schema. To alter the owner, you
-        must also be a direct or indirect member of the new owning role, and that role must have
-          <codeph>CREATE</codeph> privilege on the view's schema. These restrictions enforce that
-        altering the owner does not do anything you could not do by dropping and recreating the
-        view. However, a superuser can alter ownership of any view.</p>
-    </section><section id="section4"><title>Parameters</title><parml>
+      <title>描述</title>
+      <p><codeph>ALTER VIEW</codeph>更改视图的各种辅助属性。 （如果要修改视图的定义查询，请使用<codeph>CREATE OR REPLACE VIEW</codeph>。） </p>
+      <p>要执行此命令，您必须是视图的所有者。 要更改视图的架构，您还必须对新架构具有<codeph>CREATE</codeph>特权。 要更改所有者，您还必须是新拥有角色的直接或间接成员，并且该角色必须在视图的架构上具有<codeph>CREATE</codeph>特权。 这些限制迫使更改所有者不能执行删除和重新创建视图所无法做的任何事情。 但是，超级用户可以更改任何视图的所有权。</p>
+    </section><section id="section4"><title>参数</title><parml>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd>The name (optionally schema-qualified) of an existing view.</pd>
+          <pd>现有视图的名称（可选，由模式限定）。</pd>
         </plentry>
         <plentry>
           <pt><codeph>IF EXISTS</codeph></pt>
-          <pd>Do not throw an error if the view does not exist. A notice is issued in this
-            case.</pd>
+          <pd>如果该视图不存在，不会抛出错误，而是发出通知。</pd>
         </plentry><plentry><pt><codeph>SET</codeph>/<codeph>DROP DEFAULT</codeph></pt>
-          <pd>These forms set or remove the default value for a column. A view column's default
-            value is substituted into any <codeph>INSERT</codeph> or <codeph>UPDATE</codeph> command
-            whose target is the view, before applying any rules or triggers for the view. The view's
-            default will therefore take precedence over any default values from underlying
-            relations.</pd></plentry>
+          <pd>这些表格设置或删除列的默认值。 在为视图应用任何规则或触发器之前，将视图列的默认值替换为目标为视图的任何<codeph>INSERT</codeph> 或<codeph>UPDATE</codeph>命令。 因此，视图的默认值将优先于基础关系中的任何默认值。</pd></plentry>
         <plentry>
           <pt><varname>new_owner</varname></pt>
-          <pd>The new owner for the view. </pd>
+          <pd>视图的新所有者。</pd>
         </plentry>
         <plentry>
           <pt><varname>new_name</varname></pt>
-          <pd>The new name of the view.</pd>
+          <pd>视图的新名称。</pd>
         </plentry>
         <plentry>
           <pt><varname>new_schema</varname></pt>
-          <pd>The new schema for the view.</pd>
+          <pd>视图的新架构。</pd>
         </plentry>
         <plentry>
           <pt><codeph>SET ( <varname>view_option_name</varname> [=
                 <varname>view_option_value</varname>] [, ... ] )</codeph></pt>
           <pt><codeph>RESET ( <varname>view_option_name</varname> [, ... ] )</codeph></pt>
-          <pd>Sets or resets a view option. Currently supported options are:<parml>
+          <pd>设置或重置视图选项。 当前支持的选项是：<parml>
               <plentry>
                 <pt><codeph>check_option</codeph> (string)</pt>
-                <pd>Changes the check option of the view. The value must be <codeph>local</codeph>
-                  or <codeph>cascaded</codeph>.</pd>
+                <pd>更改视图的检查选项。 该值必须是 <codeph>local</codeph>或<codeph>cascaded</codeph>。</pd>
               </plentry>
             </parml><parml>
               <plentry>
                 <pt><codeph>security_barrier</codeph> (boolean)</pt>
-                <pd>Changes the security-barrier property of the view. The value must be a Boolean
-                  value, such as <codeph>true</codeph> or <codeph>false</codeph>.</pd>
+                <pd>更改视图的安全屏障属性。 该值必须是布尔值，例如 <codeph>true</codeph>或<codeph>false</codeph>。</pd>
               </plentry>
             </parml></pd>
         </plentry></parml></section>
     <section>
-      <title>Notes</title>
-      <p>For historical reasons, <codeph>ALTER TABLE</codeph> can be used with views, too; however,
-        the only variants of <codeph>ALTER TABLE</codeph> that are allowed with views are equivalent
-        to the statements shown above.</p>
-      <p>Rename the view <codeph>myview</codeph> to <codeph>newview</codeph>:</p>
+      <title>注意</title>
+      <p>由于历史原因，<codeph>ALTER TABLE</codeph> 也可以与视图一起使用； 但是，视图允许的<codeph>ALTER TABLE</codeph> 的唯一变体与上面显示的语句等效。</p>
+      <p>将视图<codeph>myview</codeph>重命名为<codeph>newview</codeph>：Rename the view <codeph>myview</codeph> to <codeph>newview</codeph>:</p>
       <codeblock>ALTER VIEW myview RENAME TO newview;</codeblock>
     </section>
-    <section id="examples"><title>Examples</title>
-      <p>To rename the view <codeph>foo</codeph> to <codeph>bar</codeph>:</p>
+    <section id="examples"><title>示例</title>
+      <p>要将视图<codeph>foo</codeph>重命名为<codeph>bar</codeph>：</p>
       <codeblock>ALTER VIEW foo RENAME TO bar;</codeblock>
-      <p>To attach a default column value to an updatable view:</p>
+      <p>要将默认列值附加到可更新视图：</p>
       <codeblock>CREATE TABLE base_table (id int, ts timestamptz);
 CREATE VIEW a_view AS SELECT * FROM base_table;
 ALTER VIEW a_view ALTER COLUMN ts SET DEFAULT now();
 INSERT INTO base_table(id) VALUES(1);  -- ts will receive a NULL
 INSERT INTO a_view(id) VALUES(2);  -- ts will receive the current time</codeblock>
     </section>
-  <section id="section6"><title>Compatibility</title><p><codeph>ALTER VIEW</codeph> is a Greenplum Database extension of the SQL standard.</p></section><section id="section7"><title>See Also</title><p><codeph><xref href="CREATE_VIEW.xml#topic1/cj20941">CREATE VIEW</xref></codeph>, <codeph><xref
+  <section id="section6"><title>兼容性</title><p><codeph>ALTER VIEW</codeph>是SQL标准的Greenplum数据库扩展。</p></section><section id="section7"><title>另见</title><p><codeph><xref href="CREATE_VIEW.xml#topic1/cj20941">CREATE VIEW</xref></codeph>, <codeph><xref
             href="DROP_VIEW.xml#topic1/dn20941">DROP VIEW</xref></codeph> in the <i>Greenplum
           Database Utility Guide</i></p></section></body></topic>
