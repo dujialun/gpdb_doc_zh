@@ -4,12 +4,12 @@
 <topic id="topic1">
   <title id="av20941">ALTER ROLE</title>
   <body>
-    <p id="sql_command_desc">Changes a database role (user or group).</p>
+    <p id="sql_command_desc">更改一个数据库角色（用户或组）。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">ALTER ROLE <varname>name</varname> [ [ WITH ] <varname>option</varname> [ ... ] ]
 
-where <varname>option</varname> can be:
+其中 <varname>option</varname> 可以是：
 
     SUPERUSER | NOSUPERUSER
   | CREATEDB | NOCREATEDB
@@ -36,140 +36,101 @@ ALTER ROLE <varname>name</varname> RESOURCE GROUP {<varname>group_name</varname>
 </codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>ALTER ROLE</codeph> changes the attributes of a Greenplum Database role. There are
-        several variants of this command.</p>
+      <title>描述</title>
+      <p><codeph>ALTER ROLE</codeph>更改Greenplum数据库角色的属性。此命令有几种变体</p>
       <parml>
         <plentry>
           <pt id="av137061"><b>WITH <varname>option</varname></b></pt>
-          <pd>Changes many of the role attributes that can be specified in <codeph><xref
-                href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>. (All of the
-            possible attributes are covered, execept that there are no options for adding or
-            removing memberships; use <codeph><xref href="GRANT.xml#topic1">GRANT</xref></codeph>
-            and <codeph><xref href="REVOKE.xml#topic1">REVOKE</xref></codeph> for that.) Attributes
-            not mentioned in the command retain their previous settings. Database superusers can
-            change any of these settings for any role. Roles having <codeph>CREATEROLE</codeph>
-            privilege can change any of these settings, but only for non-superuser and
-            non-replication roles. Ordinary roles can only change their own password.</pd>
+          <pd>修改可以在<codeph><xref href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>中指定的大多数角色属性。
+		    (包含了所有可能的属性，但不包括添加或删除成员身份的选项；为那些选项使用
+			<codeph><xref href="GRANT.xml#topic1">GRANT</xref></codeph>
+            和 <codeph><xref href="REVOKE.xml#topic1">REVOKE</xref></codeph> 。) 在这个命令中没提到
+			的属性将保留她们原来的值。超级用户可以为任何角色修改任何设置。
+			拥有 <codeph>CREATEROLE</codeph> 权限的角色可以修改任意的这些设置，但是仅限于非超级用户
+			和非replication角色。 普通用户只可以修改自己的密码。</pd>
         </plentry>
         <plentry id="av136726">
           <pt><b>RENAME</b></pt>
-          <pd>Changes the name of the role. Database superusers can
-          rename any role. Roles having <codeph>CREATEROLE</codeph> privilege can rename
-          non-superuser roles. The current session user cannot be renamed (connect as a different
-          user to rename a role). Because MD5-encrypted passwords use the role name as cryptographic
-          salt, renaming a role clears its password if the password is MD5-encrypted.</pd></plentry>
-        <plentry><pt id="av136604"><b>SET | RESET</b></pt><pd>Changes a role's session default for a 
-          specified configuration parameter, either for all
-            databases or, when the <codeph>IN DATABASE</codeph> clause is specified, only for
-            sessions in the named database. If <codeph>ALL</codeph> is specified instead of a role
-            name, this changes the setting for all roles. Using <codeph>ALL</codeph> with <codeph>IN
-              DATABASE</codeph> is effectively the same as using the command <codeph>ALTER
-              DATABASE...SET...</codeph>. <p>Whenever the role subsequently starts a new session,
-              the specified value becomes the session default, overriding whatever setting is
-              present in the server configuration file (<codeph>postgresql.conf</codeph>) or has
-              been received from the <codeph>postgres</codeph> command line. This only happens at
-              login time; executing <xref href="SET_ROLE.xml#topic1">SET ROLE</xref> or <xref
-                href="SET_SESSION_AUTHORIZATION.xml#topic1">SET SESSION AUTHORIZATION</xref> does
-              not cause new configuration values to be set. </p><p>Database-specific settings
-                attached to a role override settings for all databases. Settings for specific 
-                databases or specific roles override
-                settings for all roles.</p><p>For a role without
-                <codeph>LOGIN</codeph> privilege, session defaults have no effect. Ordinary roles
-              can change their own session defaults. Superusers can change anyone's session
-              defaults. Roles having <codeph>CREATEROLE</codeph> privilege can change defaults for
-              non-superuser roles. Ordinary roles can only set defaults for themselves. Certain
-              configuration variables cannot be set this way, or can only be set if a superuser
-              issues the command. See the <i>Greenplum Database Reference Guide</i> for information
-                  about all user-settable configuration parameters. Only superusers can change a setting
-                  for all roles in all databases.</p></pd>
+          <pd>更改角色的名称。数据库超级用户可以重命名任何角色。角色有 <codeph>CREATEROLE</codeph> 特权
+		  可以重命名非超级用户角色。无法重命名当前会话用户（以其他用户身份连接重命名角色）。
+		  因为MD5加密的密码使用角色名称作为密钥，如果密码为MD5加密，则重命名角色将清除其密码。</pd></plentry>
+        <plentry><pt id="av136604"><b>SET | RESET</b></pt><pd>为指定的配置参数更改角色的会话默认值，
+		对于所有数据库，或者在<codeph>IN DATABASE</codeph>子句指定数据库时，仅对命名数据库中的会话
+		进行更改。如果指定了all而不是角色名，则会更改所有角色的设置。在<codeph>IN DATABASE</codeph>
+		使用<codeph>ALL</codeph>实际上与使用命令<codeph>ALTER DATABASE...SET...</codeph>一样。
+		<p>每当角色随后启动新会话时，指定的值将成为会话默认值，覆盖服务器配置文件
+		（<codeph>postgresql.conf</codeph>）中存在的,或从<codeph>postgres</codeph>命令行接收到的任何设置。
+		这只会发生在登录时，执行<xref href="SET_ROLE.xml#topic1">SET ROLE</xref> 或者 <xref
+                href="SET_SESSION_AUTHORIZATION.xml#topic1">SET SESSION AUTHORIZATION</xref> 不会触发设置新的值</p>
+				<p>附加到角色的数据库特定设置将覆盖所有数据库的设置。特定数据库或特定角色的设置将覆盖所有角色的设置。</p>
+				<p>对于没有<codeph>LOGIN</codeph>权限的角色，会话默认值无效。普通角色可以更改自己的会话默认值。超级用户可以更改任何人的会话默认值。具有<codeph>CREATEROLE</codeph>权限的角色可以更改非超级用户角色的默认值。普通角色只能为自己设置默认值。某些配置变量不能这样设置，或者只能在超级用户发出命令时设置。有关所有用户可设置配置参数的信息，请参阅<i>Greenplum数据库参考指南</i>。只有超级用户才能更改所有数据库中所有角色的设置。</p></pd>
         </plentry>
-        <plentry><pt id="av137058"><b>RESOURCE QUEUE</b></pt><pd>Assigns the role to a resource
-          queue. The role would then be subject to the limits assigned to the resource queue when
-          issuing queries. Specify <codeph>NONE</codeph> to assign the role to the default resource
-          queue. A role can only belong to one resource queue. For a role without
-            <codeph>LOGIN</codeph> privilege, resource queues have no effect. See <codeph><xref
-              href="./CREATE_RESOURCE_QUEUE.xml#topic1" type="topic" format="dita"/></codeph> for
-          more information.</pd></plentry>
-        <plentry><pt id="av1370583"><b>RESOURCE GROUP</b></pt><pd>Assigns a resource group to the role. The role
-          would then be subject to the concurrent transaction, memory, and CPU limits configured for
-          the resource group. You can assign a single resource group to one or more roles. You
-          cannot assign a resource group that you create for an external component to a role. See
-              <codeph><xref href="./CREATE_RESOURCE_GROUP.xml#topic1" type="topic" format="dita"
-            /></codeph> for additional information.  </pd></plentry>
+        <plentry><pt id="av137058"><b>RESOURCE QUEUE</b></pt><pd>
+		将角色分配给工作负载管理资源队列。 在发出查询时，角色将受到分配资源队列的限制。指定<codeph>NONE</codeph>将角色分配给默认资源队列。一个角色只能属于一个资源队列。对于没有<codeph>LOGIN</codeph>特权的角色，会话默认值没有任何作用。 参考<codeph><xref
+              href="./CREATE_RESOURCE_QUEUE.xml#topic1" type="topic" format="dita"/></codeph> 获取更多信息。</pd>
+			  </plentry>
+        <plentry><pt id="av1370583"><b>RESOURCE GROUP</b></pt><pd>
+		为角色分配资源组。然后，角色将受制于为资源组配置的并发事务、内存和CPU限制。可以将单个资源组分配给一个或多个角色。不能将为外部组件创建的资源组分配给角色。参考<codeph><xref href="./CREATE_RESOURCE_GROUP.xml#topic1" type="topic" format="dita"
+            /></codeph>获取更多信息。</pd></plentry>
       </parml>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd>The name of the role whose attributes are to be altered. </pd>
+          <pd>将被修改属性的角色名。</pd>
         </plentry>
         <plentry>
           <pt><varname>new_name</varname></pt>
-          <pd>The new name of the role. </pd>
+          <pd>该角色的新名称。</pd>
         </plentry>
         <plentry>
           <pt><varname>database_name</varname></pt>
-          <pd>The name of the database in which to set the configuration parameter.</pd>
+          <pd>将要设置配置参数的数据库名。</pd>
         </plentry>
         <plentry>
           <pt><varname>config_parameter=value</varname></pt>
-          <pd>Set this role's session default for the specified configuration parameter to the given
-            value. If <varname>value</varname> is <codeph>DEFAULT</codeph> or if
-              <codeph>RESET</codeph> is used, the role-specific parameter setting is removed, so the
-            role will inherit the system-wide default setting in new sessions. Use <codeph>RESET
-              ALL</codeph> to clear all role-specific settings. <codeph>SET FROM CURRENT</codeph>
-            saves the session's current value of the parameter as the role-specific value. If
-              <codeph>IN DATABASE</codeph> is specified, the configuration parameter is set or
-            removed for the given role and database only. Whenever the role subsequently starts a
-            new session, the specified value becomes the session default, overriding whatever
-            setting is present in <codeph>postgresql.conf</codeph> or has been received from the
-            <codeph>postgres</codeph> command line.</pd>
-          <pd>Role-specific variable settings take effect only at login; <codeph>SET
-                ROLE</codeph> and <codeph><xref
-                href="SET_SESSION_AUTHORIZATION.xml#topic1"/></codeph> do not process role-specific
-            variable settings. </pd>
-          <pd>See <xref href="../config_params/guc_config.xml" type="topic"
-              format="dita"/> for information about user-settable configuration
-            parameters. </pd>
+          <pd>将指定配置参数的此角色会话默认值设置为给定值。如果 <varname>value</varname>是<codeph>DEFAULT</codeph> 指或者指定
+              <codeph>RESET</codeph> ，则角色的指定参数设置会被删除，角色将在新会话里面继承系统层面的默认值，使用<codeph>RESET
+              ALL</codeph> 可以清除所有的角色特殊配置。 <codeph>SET FROM CURRENT</codeph>
+            保存会话的当前参数值作为角色指定的值。如果指定了<codeph>IN DATABASE</codeph> ，则只会为指定的角色数据库。当随后角色
+			开启新的会话时，指定的参数值成为会话的默认值，覆盖服务器配置文件（<codeph>postgresql.conf</codeph>）中存在的,或从
+			<codeph>postgres</codeph>命令行接收到的任何设置。</pd>
+          <pd>角色指定的变量设置只会在登录时生效; <codeph>SET
+                ROLE</codeph> 和 <codeph><xref
+                href="SET_SESSION_AUTHORIZATION.xml#topic1"/></codeph>不会处理指定角色的变量设置。</pd>
+          <pd>参阅 <xref href="../config_params/guc_config.xml" type="topic"
+              format="dita"/> 来获取更多关于用户可设置参数的信息。 </pd>
         </plentry>
         <plentry>
           <pt><varname>group_name</varname></pt>
-          <pd>The name of the resource group to assign to this role. Specifying the
-              <varname>group_name</varname>
-            <codeph>NONE</codeph> removes the role's current resource group assignment and assigns a
-            default resource group based on the role's capability. <codeph>SUPERUSER</codeph> roles
-            are assigned the <codeph>admin_group</codeph> resource group, while the
-              <codeph>default_group</codeph> resource group is assigned to non-admin roles.</pd>
-          <pd>You cannot assign a resource group that you create for an external component to a role.</pd>
+          <pd>分配给该角色的资源组名称。指定<varname>group_name</varname>为
+            <codeph>NONE</codeph> 删除角色当前分配的资源组，基于角色的能力分配一个默认资源组。
+			<codeph>SUPERUSER</codeph> 角色分配 <codeph>admin_group</codeph> 资源组，而<codeph>default_group</codeph> 资源组则分配给非admin 角色。</pd>
+          <pd>不能将为外部组件创建的资源组分配给角色。</pd>
         </plentry>
         <plentry>
           <pt><varname>queue_name</varname></pt>
-          <pd>The name of the resource queue to which the user-level role is to be assigned. Only
-            roles with <codeph>LOGIN</codeph> privilege can be assigned to a resource queue. To
-            unassign a role from a resource queue and put it in the default resource queue, specify
-              <codeph>NONE</codeph>. A role can only belong to one resource queue.</pd>
+          <pd>要分配用户级角色的资源队列的名称。 只有<codeph>LOGIN</codeph>特权的角色
+		  可以分配给资源队列。要从资源队列中取消分配角色并将其置于默认资源队列中，
+		  请指定<codeph>NONE</codeph>。 角色只能属于一个资源队列。</pd>
         </plentry>
         <plentry>
           <pt>SUPERUSER | NOSUPERUSER</pt>
           <pt>CREATEDB | NOCREATEDB</pt>
           <pt>CREATEROLE | NOCREATEROLE</pt>
           <pt>CREATEUSER | NOCREATEUSER</pt>
-          <pd><codeph>CREATEUSER</codeph> and <codeph>NOCREATEUSER</codeph> are obsolete, but still
-            accepted, spellings of <codeph>SUPERUSER</codeph> and <codeph>NOSUPERUSER</codeph>. Note
-            that they are not equivalent to the <codeph>CREATEROLE and</codeph>
-            <codeph>NOCREATEROLE</codeph> clauses.</pd>
+          <pd><codeph>CREATEUSER</codeph> 和 <codeph>NOCREATEUSER</codeph> 已经过期，但是
+		  仍被接受为<codeph>SUPERUSER</codeph>和 <codeph>NOSUPERUSER</codeph>。注意，它们
+		  不等同于<codeph>CREATEROLE and</codeph>和<codeph>NOCREATEROLE</codeph>子句。</pd>
         </plentry>
         <plentry>
           <pt>CREATEEXTTABLE | NOCREATEEXTTABLE [(attribute='value')]</pt>
-          <pd>If <codeph>CREATEEXTTABLE</codeph> is specified, the role being defined is allowed to
-            create external tables. The default <codeph>type</codeph> is <codeph>readable</codeph>
-            and the default <codeph>protocol</codeph> is <codeph>gpfdist</codeph> if not specified.
-              <codeph>NOCREATEEXTTABLE</codeph> (the default) denies the role the ability to create
-            external tables. Note that external tables that use the <codeph>file</codeph> or
-              <codeph>execute</codeph> protocols can only be created by superusers.</pd>
+          <pd>如果<codeph>CREATEEXTTABLE</codeph> 被指定， 允许定义的角色创建外部表。如果没
+		  被指定，默认<codeph>类型</codeph>是<codeph>readable</codeph>，并且默认<codeph>协议</codeph>
+		  是<codeph>gpfdist</codeph>。 <codeph>NOCREATEEXTTABLE</codeph>（默认）拒绝角色有创建外部表的能力。 
+		  注意使用的外部表<codeph>file</codeph>或<codeph>execute</codeph>协议只能由超级用户创建。</pd>
         </plentry>
         <plentry>
           <pt>INHERIT | NOINHERIT</pt>
@@ -180,90 +141,73 @@ ALTER ROLE <varname>name</varname> RESOURCE GROUP {<varname>group_name</varname>
           <pt>PASSWORD password</pt>
           <pt>ENCRYPTED | UNENCRYPTED</pt>
           <pt>VALID UNTIL 'timestamp'</pt>
-          <pd>These clauses alter role attributes originally set by <codeph><xref
-                href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>. </pd>
+          <pd>这些子句通过<codeph><xref
+                href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>改变了原来设置的角色属性。</pd>
         </plentry>
         <plentry>
           <pt>DENY deny_point</pt>
           <pt>DENY BETWEEN deny_point AND deny_point</pt>
-          <pd>The <codeph>DENY</codeph> and <codeph>DENY BETWEEN</codeph> keywords set time-based
-            constraints that are enforced at login. <codeph>DENY</codeph>sets a day or a day and
-            time to deny access. <codeph>DENY BETWEEN</codeph> sets an interval during which access
-            is denied. Both use the parameter <varname>deny_point</varname> that has following
-            format:<codeblock>DAY day [ TIME 'time' ]</codeblock></pd>
-          <pd>The two parts of the <codeph>deny_point</codeph> parameter use the following
-              formats:<p>For
-              day:</p><codeblock>{'Sunday' | 'Monday' | 'Tuesday' |'Wednesday' | 'Thursday' | 'Friday' | 
-'Saturday' | 0-6 }</codeblock><p>For
-                <codeph>time:</codeph></p><p>{ 00-23 : 00-59 | 01-12 : 00-59 { AM | PM }}</p></pd>
-          <pd>The <codeph>DENY BETWEEN</codeph> clause uses two <varname>deny_point</varname>
-            parameters.</pd>
+          <pd>
+		 <codeph>DENY</codeph>和<codeph>DENY BETWEEN</codeph>关键字设置了在登录时强制执行的基于时间的约束。<codeph>DENY</codeph>设置一天或一天​​的时间来拒绝访问。<codeph>DENY BETWEEN</codeph>设置访问被拒绝的间隔。 两者都使用以下格式的参数<varname>deny_point</varname> ：<codeblock>DAY day [ TIME 'time' ]</codeblock></pd>
+          <pd><codeph>deny_point</codeph>两部分参数使用以下格式：:<p>对于
+              day：</p><codeblock>{'Sunday' | 'Monday' | 'Tuesday' |'Wednesday' | 'Thursday' | 'Friday' | 
+'Saturday' | 0-6 }</codeblock><p>对于<codeph>time：</codeph></p><p>{ 00-23 : 00-59 | 01-12 : 00-59 { AM | PM }}</p></pd>
+          <pd><codeph>DENY BETWEEN</codeph>子句使用两种<varname>deny_point</varname>参数。</pd>
           <pd>
             <codeblock>DENY BETWEEN <varname>deny_point</varname> AND <varname>deny_point</varname></codeblock>
           </pd>
-          <pd>For more information about time-based constraints and examples, see "Managing Roles
-            and Privileges" in the <i>Greenplum Database Administrator Guide</i>.</pd>
+          <pd>有关基于时间的约束和示例的更多信息，参阅<i>Greenplum数据库管理员指南</i>中的“管理角色和特权”。</pd>
         </plentry>
         <plentry>
           <pt>DROP DENY FOR deny_point</pt>
-          <pd>The <codeph>DROP DENY FOR</codeph> clause removes a time-based constraint from the
-            role. It uses the <varname>deny_point</varname> parameter described above. </pd>
-          <pd>For more information about time-based constraints and examples, see "Managing Roles
-            and Privileges" in the <i>Greenplum Database Administrator Guide</i>.</pd>
+          <pd>
+		  该<codeph>DROP DENY FOR</codeph>子句从角色中删除基于时间的约束。它使用上述的<varname>deny_point</varname>参数。</pd>
+          <pd>有关基于时间的约束和示例的更多信息，参阅<i>Greenplum数据库管理员指南</i>中的“管理角色和特权”。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Notes</title>
-      <p>Use <codeph><xref href="CREATE_ROLE.xml#topic1">CREATE ROLE</xref></codeph> to add new
-        roles, and <codeph><xref href="DROP_ROLE.xml#topic1">DROP ROLE</xref></codeph> to remove a
-        role. </p>
-      <p>Use <codeph><xref href="./GRANT.xml#topic1" type="topic" format="dita"/></codeph> and
-            <codeph><xref href="./REVOKE.xml#topic1" type="topic" format="dita"/></codeph> for
-        adding and removing role memberships.</p>
-      <p>Caution must be exercised when specifying an unencrypted password with this command. The
-        password will be transmitted to the server in clear text, and it might also be logged in the
-        client's command history or the server log. The <codeph>psql</codeph> command-line client
-        contains a meta-command <codeph>\password</codeph> that can be used to change a role's
-        password without exposing the clear text password. </p>
-      <p>It is also possible to tie a session default to a specific database rather than to a role;
-        see <codeph><xref href="ALTER_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>. If
-        there is a conflict, database-role-specific settings override role-specific ones, which in
-        turn override database-specific ones. </p>
+      <title>注意</title>
+      <p>使用 <codeph><xref href="CREATE_ROLE.xml#topic1">CREATE ROLE</xref></codeph> 新增角色，
+		使用<codeph><xref href="DROP_ROLE.xml#topic1">DROP ROLE</xref></codeph> 删除角色。</p>
+      <p>使用 <codeph><xref href="./GRANT.xml#topic1" type="topic" format="dita"/></codeph> 和
+            <codeph><xref href="./REVOKE.xml#topic1" type="topic" format="dita"/></codeph> 来增加和删除角色成员。</p>
+      <p>使用此命令指定未加密的密码时，必须小心。密码将以明文形式发送到服务器，也可能会记录在客户端的命令历史记录或服务器日志中。 该 <codeph>psql</codeph>命令行客户端包含一个元命令<codeph>\password</codeph>可用于安全地更改角色的密码。</p>
+      <p>还可以将会话默认值与特定数据库而不是角色绑定。如果存在冲突，则特定于角色的设置将覆盖数据库特定的设置。参阅 <codeph><xref href="ALTER_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>。 </p>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>Change the password for a role: </p>
+      <title>示例</title>
+      <p>更改角色的密码：</p>
       <codeblock>ALTER ROLE daria WITH PASSWORD 'passwd123';</codeblock>
-      <p>Remove a role's password:</p>
+      <p>删除角色的密码：</p>
       <codeblock>ALTER ROLE daria WITH PASSWORD NULL;</codeblock>
-      <p>Change a password expiration date:</p>
+      <p>更改密码失效日期：</p>
       <codeblock>ALTER ROLE scott VALID UNTIL 'May 4 12:00:00 2015 +1';</codeblock>
-      <p>Make a password valid forever:</p>
+      <p>使密码永久有效：</p>
       <codeblock>ALTER ROLE luke VALID UNTIL 'infinity';</codeblock>
-      <p>Give a role the ability to create other roles and new databases: </p>
+      <p>赋予角色创建其他角色和新数据库的能力：</p>
       <codeblock>ALTER ROLE joelle CREATEROLE CREATEDB;</codeblock>
-      <p>Give a role a non-default setting of the <codeph>maintenance_work_mem</codeph> parameter: </p>
+      <p>给角色一个非默认设置<codeph>maintenance_work_mem</codeph>参数：</p>
       <codeblock>ALTER ROLE admin SET maintenance_work_mem = 100000;</codeblock>
-      <p>Give a role a non-default, database-specific setting of the <codeph>client_min_messages</codeph> parameter: </p>
+      <p>给角色一个非默认，指定数据库的参数<codeph>client_min_messages</codeph> 值：</p>
       <codeblock>ALTER ROLE fred IN DATABASE devel SET client_min_messages = DEBUG;</codeblock>
-      <p>Assign a role to a resource queue: </p>
+      <p>将角色分配给资源队列：</p>
       <codeblock>ALTER ROLE sammy RESOURCE QUEUE poweruser;</codeblock>
-      <p>Give a role permission to create writable external tables:</p>
+      <p>授予创建可写外部表的角色权限：</p>
       <codeblock>ALTER ROLE load CREATEEXTTABLE (type='writable');</codeblock>
-      <p>Alter a role so it does not allow login access on Sundays:</p>
+      <p>更改角色在星期日不允许登录访问：</p>
       <codeblock>ALTER ROLE user3 DENY DAY 'Sunday';</codeblock>
-      <p>Alter a role to remove the constraint that does not allow login access on Sundays:</p>
+      <p>改变角色以消除星期日不允许登录访问的约束：</p>
       <codeblock>ALTER ROLE user3 DROP DENY FOR DAY 'Sunday';</codeblock>
-      <p>Assign a new resource group to a role: </p>
+      <p>指定一个新的资源组给角色：</p>
       <codeblock>ALTER ROLE parttime_user RESOURCE GROUP rg_light;</codeblock>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p>The <codeph>ALTER ROLE</codeph> statement is a Greenplum Database extension.</p>
+      <title>兼容性</title>
+      <p> <codeph>ALTER ROLE</codeph> 语句是 Greenplum 数据库的扩展</p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_ROLE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./ALTER_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>,

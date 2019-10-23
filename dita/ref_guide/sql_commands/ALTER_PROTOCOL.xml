@@ -4,56 +4,52 @@
 <topic id="topic1">
   <title id="at136704">ALTER PROTOCOL</title>
   <body>
-    <p id="sql_command_desc">Changes the definition of a protocol.</p>
+    <p id="sql_command_desc">更改一个协议的定义。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">ALTER PROTOCOL <varname>name</varname> RENAME TO <varname>newname</varname>
 
 ALTER PROTOCOL <varname>name</varname> OWNER TO <varname>newowner</varname></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>ALTER PROTOCOL</codeph> changes the definition of a protocol. Only the protocol
-        name or owner can be altered.</p>
-      <p>You must own the protocol to use <codeph>ALTER PROTOCOL</codeph>. To alter the owner, you
-        must also be a direct or indirect member of the new owning role, and that role must have
-          <codeph>CREATE</codeph> privilege on schema of the conversion. </p>
-      <p>These restrictions are in place to ensure that altering the owner only makes changes that
-        could by made by dropping and recreating the protocol. Note that a superuser can alter
-        ownership of any protocol. </p>
+      <title>描述</title>
+      <p><codeph>ALTER PROTOCOL</codeph> 更改一个协议的定义，只有协议的名字和所有者可以被更改。</p>
+      <p>用户必须拥有协议才可以使用<codeph>ALTER PROTOCOL</codeph>。要更改所有者，用户还必须是新角色的
+		直接或者间接成员，而且新角色必须在该转换模式下拥有<codeph>CREATE</codeph>权限。</p>
+      <p>这些限制适当的确保修改所有者只能通过删除或重建协议。注意一个超级用户可以修改任何协议的所属关系。 </p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd>The name (optionally schema-qualified) of an existing protocol.</pd>
+          <pd>现有协议的名称（可选方案限定）。</pd>
         </plentry>
         <plentry>
           <pt><varname>newname</varname></pt>
-          <pd>The new name of the protocol. </pd>
+          <pd>协议的新名称 </pd>
         </plentry>
         <plentry>
           <pt><varname>newowner</varname></pt>
-          <pd>The new owner of the protocol. </pd>
+          <pd>协议的新所有者。 </pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Examples</title>
-      <p>To rename the conversion <codeph>GPDBauth</codeph> to
-        <codeph>GPDB_authentication</codeph>:</p>
+      <title>示例</title>
+      <p>重命名转换<codeph>GPDBauth</codeph>为
+        <codeph>GPDB_authentication</codeph>：</p>
       <codeblock>ALTER PROTOCOL GPDBauth RENAME TO GPDB_authentication;</codeblock>
-      <p>To change the owner of the conversion <codeph>GPDB_authentication</codeph> to
-          <codeph>joe</codeph>:</p>
+      <p>更改转换<codeph>GPDB_authentication</codeph> 的所有者为
+          <codeph>joe</codeph>：</p>
       <codeblock>ALTER PROTOCOL GPDB_authentication OWNER TO joe;</codeblock>
     </section>
     <section id="section6">
-      <title>Compatibility</title>
-      <p>There is no <codeph>ALTER PROTOCOL</codeph> statement in the SQL standard. </p>
+      <title>兼容性</title>
+      <p>SQL标准中没有 <codeph>ALTER PROTOCOL</codeph> 语句。</p>
     </section>
     <section>
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="CREATE_EXTERNAL_TABLE.xml#topic1"/></codeph>, <codeph><xref
             href="CREATE_PROTOCOL.xml#topic1"/></codeph></p>
     </section>

@@ -4,43 +4,42 @@
   <title>ALTER TEXT SEARCH PARSER</title>
   <body>
     <section>
-      <title>Description</title>
-      <p id="sql_command_desc">Changes the definition of a text search parser.</p>
+      <title>描述</title>
+      <p id="sql_command_desc">更改文本搜索解析器的定义。</p>
     </section>
     <section>
-      <title>Synopsis</title>
+      <title>概要</title>
     </section>
     <codeblock id="sql_command_synopsis">ALTER TEXT SEARCH PARSER <varname>name</varname> RENAME TO <varname>new_name</varname>
 ALTER TEXT SEARCH PARSER <varname>name</varname> SET SCHEMA <varname>new_schema</varname></codeblock>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>ALTER TEXT SEARCH PARSER</codeph> changes the definition of a text search parser.
-        Currently, the only supported functionality is to change the parser's name.</p>
-      <p>You must be a superuser to use <codeph>ALTER TEXT SEARCH PARSER</codeph>.</p>
+      <title>描述</title>
+      <p><codeph>ALTER TEXT SEARCH PARSER</codeph>更改文本搜索解析器的定义。 当前，唯一支持的功能是更改解析器的名称。</p>
+      <p>您必须是超级用户才能使用<codeph>ALTER TEXT SEARCH PARSER</codeph>.</p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd>The name (optionally schema-qualified) of an existing text search parser.</pd>
+          <pd>现有文本搜索解析器的名称（可选，由模式限定）。</pd>
         </plentry>
         <plentry>
           <pt><varname>new_name</varname></pt>
-          <pd>The new name of the text search parser.</pd>
+          <pd>文本搜索解析器的新名称。</pd>
         </plentry>
         <plentry>
           <pt><varname>new_schema</varname></pt>
-          <pd>The new schema for the text search parser.</pd>
+          <pd>文本搜索解析器的新架构。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p>There is no <codeph>ALTER TEXT SEARCH PARSER</codeph> statement in the SQL standard.</p>
+      <title>兼容性</title>
+      <p>SQL标准中没有<codeph>ALTER TEXT SEARCH PARSER</codeph>语句。</p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="CREATE_TEXT_SEARCH_PARSER.xml#topic1" type="topic" format="dita"
           /></codeph>, <codeph><xref href="DROP_TEXT_SEARCH_PARSER.xml#topic1" type="topic"
             format="dita"/></codeph></p>

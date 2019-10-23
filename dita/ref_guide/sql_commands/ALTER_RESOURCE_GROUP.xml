@@ -4,9 +4,9 @@
 <topic id="topic1">
   <title id="au20941">ALTER RESOURCE GROUP</title>
   <body>
-    <p id="sql_command_desc">Changes the limits of a resource group.</p>
+    <p id="sql_command_desc">更改一个资源组的限制项。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">ALTER RESOURCE GROUP <varname>name</varname> SET <varname>group_attribute</varname> <varname>value</varname></codeblock>
 <p>where <varname>group_attribute</varname> is one of:</p>
       <codeblock>CONCURRENCY <varname>integer</varname>
@@ -17,105 +17,91 @@ MEMORY_SHARED_QUOTA <varname>integer</varname>
 MEMORY_SPILL_RATIO <varname>integer</varname></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>ALTER RESOURCE GROUP</codeph> changes the limits of a resource group. 
-        Only a superuser can alter a resource group.</p>
-        <p>You can set or reset the concurrency limit of a resource group that you create for roles to control the maximum
-        number of active concurrent statements in that group. You can also reset the memory or CPU
-        resources of a resource group to control the amount of memory or CPU resources that all
-        queries submitted through the group can consume on each segment host.</p>
-        <p>When you alter the CPU resource management mode or limit of a resource group, the new mode or limit is immediately applied.</p>
-        <p>When you alter a memory limit of a resource group that you create for roles, the new resource limit is immediately applied if current resource usage is less than or equal to the new value and there are no running transactions in the resource group. If the current resource usage exceeds the new memory limit value, or if there are running transactions in other resource groups that hold some of the resource, then Greenplum Database defers assigning the new limit until resource usage falls within the range of the new value.</p>
-        <p>When you increase the memory limit of a resource group that you create for external components, the new resource limit is phased in as system memory resources become available. If you decrease the memory limit of a resource group that you create for external components, the behavior is component-specific. For example, if you decrease the memory limit of a resource group that you create for a PL/Container runtime, queries in a running container may fail with an out of memory error.</p>
-        <p>You can alter one limit type in a single <codeph>ALTER RESOURCE GROUP</codeph> call.</p>
+      <title>描述</title>
+      <p><codeph>ALTER RESOURCE GROUP</codeph>更改一个资源组的限制项。
+        只有超级用户才能修改资源组。</p>
+        <p>用户可以为控制角色最大活动并行度的资源组设置或者重置并行度的限制。用户还可以通过
+		为资源组重置内存或者CPU资源来控制所有通过资源组提交的查询在每个Segment主机上可以使用
+		的内存或CPU总量。</p>
+        <p>当用户更改资源组CPU资源的模式或者限制时，新的模式或限制会立即生效。</p>
+        <p>当用户更改为角色创建的资源组的内存限制时，如果当前资源使用率小于或等于新值且资源组中没有正在运行的事务，则会立即应用新的资源限制。 如果当前资源使用量超过新内存限制值，或者其他资源组中存在运行事务在持有某些资源，则Greenplum数据库会推迟分配新限制，直到资源使用率落在新值的范围内。</p>
+        <p>当用户提升为外部组件创建的资源组的内存限制时，新的资源限制会随着资源可用而逐步生效。如果用户降低为外部组件创建的资源组的内存限制时，则表现是基于特定组件的。
+		比如说，如果用户降低为PL / Container运行时创建的资源组的内存限制，则正在运行的容器中的查询可能会因内存不足的错误而失败。</p>
+        <p>用户可以在单个 <codeph>ALTER RESOURCE GROUP</codeph> 调用中更改限制的类型。</p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd>The name of the resource group to alter. </pd>
+          <pd>要更改的资源组的名称。</pd>
         </plentry>
         <plentry>
           <pt>CONCURRENCY <varname>integer</varname></pt>
-          <pd>The maximum number of concurrent transactions, including active and idle transactions, that are permitted for resource groups that you assign to roles.
-            Any transactions submitted after the <codeph>CONCURRENCY</codeph> value limit is
-            reached are queued. When a running transaction completes, the earliest queued
-            transaction is executed.</pd>
-          <pd> The <codeph>CONCURRENCY</codeph> value
-            must be an integer in the range [0 .. <codeph>max_connections</codeph>]. The default 
-            <codeph>CONCURRENCY</codeph> value for a resource group that you create for roles is 20.</pd>
-            <pd><note>You cannot set the <codeph>CONCURRENCY</codeph> value for the <codeph>admin_group</codeph> to zero (0).</note></pd>
+          <pd>用户为角色分配的资源组的允许的最大的事务并行数，包括活动和空闲的事务。
+		  任何在 <codeph>CONCURRENCY</codeph> 的限制值达到后要提交的事务都会进入队列，
+		  当一个运行的事务结束后，最早排队的事务会被执行。</pd>
+          <pd><codeph>CONCURRENCY</codeph> 值必须是在[0 .. <codeph>max_connections</codeph>]范围内的整数。用户为角色创建的资源组默认的
+            <codeph>CONCURRENCY</codeph> 值为 20。</pd>
+            <pd><note>用户不可以将 <codeph>admin_group</codeph> 的 <codeph>CONCURRENCY</codeph> 值设为零 (0)。</note></pd>
         </plentry>
         <plentry>
           <pt>CPU_RATE_LIMIT <varname>integer</varname></pt>
-          <pd>The percentage of CPU resources to allocate to
-            this resource group. The minimum CPU percentage for a resource group is 1.
-            The maximum is 100. The sum of the
-            <codeph>CPU_RATE_LIMIT</codeph>s of all resource groups defined in the
-            Greenplum Database cluster must not exceed 100.</pd>
-          <pd>If you alter the <codeph>CPU_RATE_LIMIT</codeph> of a resource group in which
-            you previously configured a <codeph>CPUSET</codeph>, <codeph>CPUSET</codeph> is disabled, the reserved CPU cores are returned to Greenplum Database, and <codeph>CPUSET</codeph> is set to -1.</pd>
+          <pd>为当前资源组分配的CPU资源的百分比。资源组的CPU资源最小百分比为 1，最大为 100。
+		  为Greenplum数据库集群设置的所有资源租的 <codeph>CPU_RATE_LIMIT</codeph>值总共不能超过 100。</pd>
+          <pd>如果用户为之前设置过<codeph>CPUSET</codeph>的资源组修改<codeph>CPU_RATE_LIMIT</codeph>，<codeph>CPUSET</codeph> 会被禁用， 保留的 CPU 核返回给 Greenplum 数据库，<codeph>CPUSET</codeph> 被设置成 -1。</pd>
         </plentry>
         <plentry>
           <pt>CPUSET <varname>tuple</varname></pt>
-          <pd>The CPU cores to reserve for this resource group. The CPU cores that you specify in <varname>tuple</varname> must be available in the system and cannot overlap with any CPU cores that you specify for other resource groups.</pd>
-          <pd><varname>tuple</varname> is a comma-separated list of single core numbers or core intervals. You must enclose <varname>tuple</varname> in single quotes, for example, '1,3-4'.</pd>
-          <pd>If you alter the <codeph>CPUSET</codeph> value of a resource group for which
-            you previously configured a <codeph>CPU_RATE_LIMIT</codeph>, <codeph>CPU_RATE_LIMIT</codeph> is disabled, the reserved CPU resources are returned to Greenplum Database, and <codeph>CPU_RATE_LIMIT</codeph> is set to -1.</pd>
-          <pd>You can alter <codeph>CPUSET</codeph> for a resource group only after you have enabled resource group-based resource management for your Greenplum Database cluster.</pd>
+          <pd>为当前资源组保留的CPU核。用户在 <varname>tuple</varname> 中指定的CPU核必须在系统上是可用的，而且用户不能将其他资源组中已指定的CPU核交叠分配给当前资源组</pd>
+          <pd><varname>tuple</varname> 是以逗号分隔的单核数或核心间隔列表。 您必须用单引号括起<varname>tuple</varname>，例如'1,3-4'。</pd>
+          <pd>如果用户为之前设置过<codeph>CPU_RATE_LIMIT</codeph>的资源组修改<codeph>CPUSET</codeph> ，<codeph>CPU_RATE_LIMIT</codeph> 会被禁用，保留的CPU资源会返还给Greeplum数据库，然后
+		  <codeph>CPU_RATE_LIMIT</codeph> 会被设置为 -1。</pd>
+          <pd>用户只能在启用了基于组管理资源的Greenplum数据库集群中为资源组修改<codeph>CPUSET</codeph>。</pd>
         </plentry>
         <plentry>
           <pt>MEMORY_LIMIT <varname>integer</varname></pt>
-          <pd>The percentage of memory resources to allocate to
-            this resource group. The minimum memory percentage for a resource group is 1.
-            The maximum is 100. The sum of the
-            <codeph>MEMORY_LIMIT</codeph>s of all resource groups defined in the
-            Greenplum Database cluster must not exceed 100.</pd>
+          <pd>为当前资源组分配的内存资源的百分比。资源组的内存资源最小百分比为 1，最大为 100，
+		  为Greenplum数据库集群中所有资源组定义的<codeph>MEMORY_LIMIT</codeph>总值不能超过100。</pd>
         </plentry>
         <plentry>
           <pt>MEMORY_SHARED_QUOTA <varname>integer</varname></pt>
-          <pd>The percentage of memory resources to share among transactions in
-            the resource group. The minimum memory shared quota percentage for a
-            resource group is 0. The maximum is 100. The default
-            <codeph>MEMORY_SHARED_QUOTA</codeph> value is 20.</pd>
+          <pd>为当前资源组中分配事务间共享的内存资源的百分比。
+		  资源组中最小的共享内存分配比为0，最大为100，默认的<codeph>MEMORY_SHARED_QUOTA</codeph>值为20。</pd>
         </plentry>
         <plentry>
           <pt>MEMORY_SPILL_RATIO <varname>integer</varname></pt>
-          <pd>The memory usage threshold for memory-intensive operators in a transaction
-            issued in the resource group. The minimum memory spill ratio percentage for a
-            resource group is 0. The maximum is 100. The default
-            <codeph>MEMORY_SPILL_RATIO</codeph> value is 20.</pd>
+          <pd>资源组中发出的事务中内存密集型运算符的内存使用量阈值。 资源组的最小内存溢出率百分比为0.最大值为100。
+            <codeph>MEMORY_SPILL_RATIO</codeph> 的默认值是 20。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Notes</title>
-      <p>Use <codeph><xref href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph> or
-            <codeph><xref href="./ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph> to
-        assign a specific resource group to a role (user).</p>
-      <p>You cannot submit an <codeph>ALTER RESOURCE GROUP</codeph> command in an explicit transaction or sub-transaction.</p>
+      <title>注意</title>
+      <p>用 <codeph><xref href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph> 或者
+            <codeph><xref href="./ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph> 来将一个指定资源组分配给角色（用户）。
+	  </p>
+      <p>用户不能在显式事务或者子事务中提交<codeph>ALTER RESOURCE GROUP</codeph> 命令。</p>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>Change the active transaction limit for a resource group: </p>
+      <title>示例</title>
+      <p>更改资源组的活动事务限制： </p>
       <codeblock>ALTER RESOURCE GROUP rgroup1 SET CONCURRENCY 13;</codeblock>
-      <p>Update the CPU limit for a resource group: </p>
+      <p>更新资源组的CPU限制： </p>
       <codeblock>ALTER RESOURCE GROUP rgroup2 SET CPU_RATE_LIMIT 45;</codeblock>
-      <p>Update the memory limit for a resource group: </p>
+      <p>更新资源组的内存限制： </p>
       <codeblock>ALTER RESOURCE GROUP rgroup3 SET MEMORY_LIMIT 30;</codeblock>
-      <p>Increase the memory spill ratio for a resource group from the default: </p>
+      <p>从默认值中提升资源组的内存溢出率：</p>
       <codeblock>ALTER RESOURCE GROUP rgroup4 SET MEMORY_SPILL_RATIO 25;</codeblock>
-      <p>Reserve CPU core 1 for a resource group: </p>
+      <p>为资源组保留CPU核 1：</p>
       <codeblock>ALTER RESOURCE GROUP rgroup5 SET CPUSET '1';</codeblock>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p>The <codeph>ALTER RESOURCE GROUP</codeph> statement is a Greenplum Database extension. This
-        command does not exist in standard PostgreSQL.</p>
+      <title>兼容性</title>
+      <p><codeph>ALTER RESOURCE GROUP</codeph> 语句是Greenplum数据库的扩展，在PostgreSQL标准中没有该命令。</p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="./CREATE_RESOURCE_GROUP.xml#topic1" type="topic" format="dita"
           /></codeph>, <codeph><xref href="./DROP_RESOURCE_GROUP.xml#topic1" type="topic"
             format="dita"/></codeph>, <codeph><xref href="./CREATE_ROLE.xml#topic1" type="topic"

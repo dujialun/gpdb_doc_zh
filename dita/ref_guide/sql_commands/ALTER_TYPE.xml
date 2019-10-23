@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="bb137420">ALTER TYPE</title><body><p id="sql_command_desc">Changes the definition of a data type.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">
+<topic id="topic1"><title id="bb137420">ALTER TYPE</title><body><p id="sql_command_desc">更改一个数据类型的定义。</p><section id="section2"><title>概要</title><codeblock id="sql_command_synopsis">
 ALTER TYPE <varname>name</varname> <varname>action</varname> [, ... ]
 ALTER TYPE <varname>name</varname> OWNER TO <varname>new_owner</varname>
 ALTER TYPE <varname>name</varname> RENAME ATTRIBUTE <varname>attribute_name</varname> TO <varname>new_attribute_name</varname> [ CASCADE | RESTRICT ]
@@ -10,127 +10,80 @@ ALTER TYPE <varname>name</varname> SET SCHEMA <varname>new_schema</varname>
 ALTER TYPE <varname>name</varname> ADD VALUE [ IF NOT EXISTS ] <varname>new_enum_value</varname> [ { BEFORE | AFTER } <varname>existing_enum_value</varname> ]
 ALTER TYPE <varname>name</varname> SET DEFAULT ENCODING ( <varname>storage_directive</varname> )
 
-where <varname>action</varname> is one of:
+其中 <varname>action</varname>是下列选项之一：
   
   ADD ATTRIBUTE <varname>attribute_name</varname> <varname>data_type</varname> [ COLLATE <varname>collation</varname> ] [ CASCADE | RESTRICT ]
   DROP ATTRIBUTE [ IF EXISTS ] <varname>attribute_name</varname> [ CASCADE | RESTRICT ]
   ALTER ATTRIBUTE <varname>attribute_name</varname> [ SET DATA ] TYPE <varname>data_type</varname> [ COLLATE <varname>collation</varname> ] [ CASCADE | RESTRICT ]
 </codeblock>
-<p>where <varname>storage_directive</varname> is:</p>
+<p>其中 <varname>storage_directive</varname>是：</p>
       <codeblock>   COMPRESSTYPE={ZLIB | ZSTD | QUICKLZ | RLE_TYPE | NONE}
    COMPRESSLEVEL={0-19}
    BLOCKSIZE={8192-2097152}</codeblock></section>
-    <section id="section3"><title>Description</title><p><codeph>ALTER TYPE</codeph> changes the
-        definition of an existing type. There are several subforms:</p>
+    <section id="section3"><title>描述</title><p><codeph>ALTER TYPE</codeph>更改现有类型的定义。 有几个子形式：</p>
       <ul>
         <li>
-          <b><codeph>ADD ATTRIBUTE</codeph></b> — Adds a new attribute to a composite
-          type, using the same syntax as <codeph>CREATE TYPE</codeph>. </li>
+          <b><codeph>ADD ATTRIBUTE</codeph></b> — 使用与<codeph>CREATE TYPE</codeph>相同的语法向复合类型添加新属性。</li>
         <li>
-          <b><codeph>DROP ATTRIBUTE [ IF EXISTS ]</codeph></b> — Drops an attribute from a
-          composite type. If <codeph>IF EXISTS</codeph> is specified and the attribute does not
-          exist, no error is thrown. In this case a notice is issued instead. </li>
-        <li><b><codeph>SET DATA TYPE</codeph></b> — Changes the type of an attribute of a
-          composite type. </li>
+          <b><codeph>DROP ATTRIBUTE [ IF EXISTS ]</codeph></b> — 从复合类型中删除属性。 如果指定了<codeph>IF EXISTS</codeph>且该属性不存在，则不会引发任何错误。 在这种情况下，将发出通知。</li>
+        <li><b><codeph>SET DATA TYPE</codeph></b> — 更改复合类型的属性的类型。</li>
         <li>
-          <b><codeph>OWNER</codeph></b> — Changes the owner of the type. </li>
+          <b><codeph>OWNER</codeph></b> — 更改类型的所有者。</li>
         <li>
-          <b><codeph>RENAME</codeph></b> — Changes the name of the type or the name of an
-          individual attribute of a composite type. </li>
+          <b><codeph>RENAME</codeph></b> — 更改类型的名称或复合类型的单个属性的名称。 </li>
         <li>
-          <b><codeph>SET SCHEMA</codeph></b> — Moves the type into another schema. </li>
+          <b><codeph>SET SCHEMA</codeph></b> — 将类型移动到另一个架构。</li>
         <li>
-          <b><codeph>ADD VALUE [ IF NOT EXISTS ] [ BEFORE | AFTER ]</codeph></b> — Adds a new value
-          to an enum type. The new value's place in the enum's ordering can be specified as being
-            <codeph>BEFORE</codeph> or <codeph>AFTER</codeph> one of the existing values. Otherwise,
-          the new item is added at the end of the list of values. <p>If <codeph>IF NOT
-              EXISTS</codeph> is specified, it is not an error if the type already contains the new
-            value; a notice is issued but no other action is taken. Otherwise, an error will occur
-            if the new value is already present.</p>
+          <b><codeph>ADD VALUE [ IF NOT EXISTS ] [ BEFORE | AFTER ]</codeph></b> — 将新值添加到枚举类型。 可以将新值在枚举顺序中的位置指定为现有值之一<codeph>BEFORE</codeph>或<codeph>AFTER</codeph>。 否则，新项目将添加到值列表的末尾。<p>如果指定了<codeph>IF NOT
+              EXISTS</codeph>，则该类型已经包含新值就不是错误； 发出通知，但不采取其他措施。 否则，如果新值已经存在，将发生错误。</p>
         </li>
         <li>
-          <b><codeph>CASCADE</codeph></b> — Automatically propagate the operation to typed tables of
-          the type being altered, and their descendants. </li>
+          <b><codeph>CASCADE</codeph></b> — 自动将操作传播到要更改的类型的类型表及其后代。 </li>
         <li>
-          <b><codeph>RESTRICT</codeph></b> — Refuse the operation if the type being altered is the
-          type of a typed table. This is the default. </li>
+          <b><codeph>RESTRICT</codeph></b> — 如果要更改的类型是类型表的类型，则拒绝该操作。 这是默认值。 </li>
       </ul>
-      <p> The <codeph>ADD ATTRIBUTE</codeph>, <codeph>DROP ATTRIBUTE</codeph>, and <codeph>ALTER
-          ATTRIBUTE</codeph> actions can be combined into a list of multiple alterations to apply in
-        parallel. For example, it is possible to add several attributes and/or alter the type of
-        several attributes in a single command. </p>
-      <p>You can change the name, the owner, and the schema of a type. You can also add or update
-        storage options for a scalar type.<note>Greenplum Database does not support adding storage
-          options for row or composite types.</note></p><p>You must own the type to use <codeph>ALTER TYPE</codeph>. To change the schema of a type, you
-        must also have <codeph>CREATE</codeph> privilege on the new schema. To alter the owner, you
-        must also be a direct or indirect member of the new owning role, and that role must have
-          <codeph>CREATE</codeph> privilege on the type's schema. (These restrictions enforce that
-        altering the owner does not do anything that could be done by dropping and recreating the
-        type. However, a superuser can alter ownership of any type.) To add an attribute or alter an attribute type, you must also
-        have <codeph>USAGE</codeph> privilege on the data type.</p>
-      <p><codeph>ALTER TYPE ... ADD VALUE</codeph> (the form that adds a new value to an enum type)
-        cannot be executed inside a transaction block.</p>
-      <p> Comparisons involving an added enum value will sometimes be slower than comparisons
-        involving only original members of the enum type. This will usually only occur if
-          <codeph>BEFORE</codeph> or <codeph>AFTER</codeph> is used to set the new value's sort
-        position somewhere other than at the end of the list. However, sometimes it will happen even
-        though the new value is added at the end (this occurs if the OID counter "wrapped around"
-        since the original creation of the enum type). The slowdown is usually insignificant; but if
-        it matters, optimal performance can be regained by dropping and recreating the enum type, or
-        by dumping and reloading the database. </p>
-    </section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The name (optionally schema-qualified) of an existing type to alter.
-</pd></plentry><plentry><pt><varname>new_name</varname></pt><pd>The new name for the type.</pd></plentry><plentry><pt><varname>new_owner</varname></pt><pd>The user name of the new owner of the type. </pd></plentry><plentry><pt><varname>new_schema</varname></pt><pd>The new schema for the type. </pd></plentry>
+      <p>可以将<codeph>ADD ATTRIBUTE</codeph>, <codeph>DROP ATTRIBUTE</codeph>和<codeph>ALTER
+          ATTRIBUTE</codeph>操作组合为多个更改列表，以并行应用。 例如，可以在单个命令中添加多个属性和/或更改多个属性的类型。 </p>
+      <p>您可以更改名称，所有者和类型的架构。 您还可以添加或更新标量类型的存储选项。<note>Greenplum数据库不支持为行或复合类型添加存储选项。</note></p><p>您必须拥有该类型才能使用<codeph>ALTER TYPE</codeph>。 要更改类型的架构，您还必须对新架构具有<codeph>CREATE</codeph>特权。 要更改所有者，您还必须是新拥有角色的直接或间接成员，并且该角色必须对类型的架构具有<codeph>CREATE</codeph>特权。 （这些限制迫使更改所有者不能执行删除和重新创建类型的任何操作。但是，超级用户可以更改任何类型的所有权。）要添加属性或更改属性类型，还必须具有<codeph>USAGE</codeph>数据类型的特权。</p>
+      <p><codeph>ALTER TYPE ... ADD VALUE</codeph> （向枚举类型添加新值的形式）不能在事务块内执行。</p>
+      <p>涉及增加的枚举值的比较有时会比仅涉及枚举类型的原始成员的比较慢。 通常只有在使用<codeph>BEFORE</codeph>或<codeph>AFTER</codeph>设置新值的排序位置（而不是列表的末尾）时，才会发生这种情况。 但是，有时即使将新值添加到末尾也会发生（如果自从最初创建枚举类型以来，OID计数器“环绕”，就会发生这种情况）。 增长速度通常很小。 但是，如果重要的话，可以通过删除并重新创建枚举类型，或者通过转储并重新加载数据库来获得最佳性能。</p>
+    </section><section id="section4"><title>参数</title><parml><plentry><pt><varname>name</varname></pt><pd>要更改的现有类型的名称（可选的模式限定）。
+</pd></plentry><plentry><pt><varname>new_name</varname></pt><pd>类型的新名称。</pd></plentry><plentry><pt><varname>new_owner</varname></pt><pd>该类型的新所有者的用户名。 </pd></plentry><plentry><pt><varname>new_schema</varname></pt><pd>类型的新架构。</pd></plentry>
           <plentry>
             <pt><varname>attribute_name</varname></pt>
-            <pd>The name of the attribute to add, alter, or drop.            
+            <pd>要添加，更改或删除的属性的名称。          
             </pd>
           </plentry>         
           <plentry>
             <pt><varname>new_attribute_name</varname></pt>
-            <pd>The new name of the attribute to be renamed.             
+            <pd>要重命名的属性的新名称。         
             </pd>
           </plentry>         
           <plentry>
             <pt><varname>data_type</varname></pt>
-            <pd>The data type of the attribute to add, or the new type of the
-                attribute to alter.             
+            <pd>要添加的属性的数据类型，或要更改的属性的新类型。             
             </pd>
           </plentry>         
           <plentry>
             <pt><varname>new_enum_value</varname></pt>
-            <pd>The new value to be added to an enum type's list of values.
-                Like all enum literals, it needs to be quoted.             
+            <pd>要添加的属性的数据类型，或要更改的属性的新类型。         
             </pd>
           </plentry>         
         <plentry>
           <pt><varname>existing_enum_value</varname></pt>
-          <pd>The existing enum value that the new value should be added immediately before or after
-            in the enum type's sort ordering. Like all enum literals, it needs to be quoted. </pd>
+          <pd>应该在枚举类型的排序顺序之前或之后立即添加新值的现有枚举值。 像所有枚举文字一样，也需要用引号引起来。 </pd>
         </plentry>
-         <plentry><pt><varname>storage_directive</varname></pt><pd>Identifies default storage options for the type when specified in a table column definition. Options include <codeph>COMPRESSTYPE</codeph>, <codeph>COMPRESSLEVEL</codeph>, and <codeph>BLOCKSIZE</codeph>.</pd><pd><b>COMPRESSTYPE</b> — Set to <codeph>ZLIB</codeph> (the default), <codeph>ZSTD</codeph>,
-              <codeph>RLE_TYPE</codeph>, or <codeph>QUICKLZ</codeph><sup>1</sup> to specify the type
-              of compression used.<note type="note"><sup>1</sup>QuickLZ compression is available only in the commercial
-                release of Pivotal Greenplum Database.</note></pd><pd><b>COMPRESSLEVEL</b> — For Zstd compression, set to an
-              integer value from 1 (fastest compression) to 19 (highest compression ratio).
-              For zlib compression, the valid range is from 1 to 9. The QuickLZ
-            compression level can only be set to 1. For
-              <codeph>RLE_TYPE</codeph>, the compression level can be set to an integer value from 1
-            (fastest compression) to 4 (highest compression ratio). The default compression level is 1.</pd>
-          <pd><b>BLOCKSIZE</b> — Set to the size, in bytes, for each block in the column. The
-              <codeph>BLOCKSIZE</codeph> must be between 8192 and 2097152 bytes, and be a multiple
-            of 8192. The default block size is 32768.<note><varname>storage_directives</varname> defined at the table- or column-level override the default storage options defined for a type.</note></pd></plentry></parml></section>
-    <section id="section5"><title>Examples</title><p>To rename the data type named
-          <codeph>electronic_mail</codeph>:
-        </p><codeblock>ALTER TYPE electronic_mail RENAME TO email;</codeblock><p>To change the owner
-        of the user-defined type <codeph>email</codeph> to <codeph>joe</codeph>:
-        </p><codeblock>ALTER TYPE email OWNER TO joe;</codeblock><p>To change the schema of the
-        user-defined type <codeph>email</codeph> to <codeph>customers</codeph>:
-        </p><codeblock>ALTER TYPE email SET SCHEMA customers;</codeblock><p>To set or alter the
-        compression type and compression level of the user-defined type named
-        <codeph>int33</codeph>: </p><codeblock>ALTER TYPE int33 SET DEFAULT ENCODING (compresstype=zlib, compresslevel=7);</codeblock>
-      <p> To add a new attribute to a type:</p>
+         <plentry><pt><varname>storage_directive</varname></pt><pd>
+		 在表列定义中指定时，标识该类型的默认存储选项。 选项包括<codeph>COMPRESSTYPE</codeph>，<codeph>COMPRESSLEVEL</codeph>和<codeph>BLOCKSIZE</codeph>。</pd><pd><b>COMPRESSTYPE</b> — 设置为<codeph>ZLIB</codeph>（默认设置），<codeph>ZSTD</codeph>，<codeph>RLE_TYPE</codeph>或codeph>QUICKLZ</codeph><sup>1</sup>以指定使用的压缩类型。<note type="note"><sup>1</sup>QuickLZ压缩仅在商业版本的Pivotal Greenplum数据库中可用。</note></pd><pd><b>COMPRESSLEVEL</b> — 
+		 对于Zstd压缩，将其设置为1（最快压缩）到19（最高压缩率）之间的整数值。 对于zlib压缩，有效范围是1到9。QuickLZ压缩级别只能设置为1。对于<codeph>RLE_TYPE</codeph>，压缩级别可以设置为从1（最快压缩）到4（最高压缩率）的整数值。 。 缺省压缩级别为1。</pd>
+          <pd><b>BLOCKSIZE</b> — 设置为列中每个块的大小（以字节为单位）。 <codeph>BLOCKSIZE</codeph>必须介于8192和2097152字节之间，并且是8192的倍数。默认块大小为32768。<note>在表或列级别定义的<varname>storage_directives</varname> 会覆盖为类型定义的默认存储选项。</note></pd></plentry></parml></section>
+    <section id="section5"><title>示例</title><p>要重命名名为<codeph>electronic_mail</codeph>的数据类型：
+        </p><codeblock>ALTER TYPE electronic_mail RENAME TO email;</codeblock><p>更改用户自定义类型<codeph>email</codeph>的所有者为<codeph>joe</codeph>：
+        </p><codeblock>ALTER TYPE email OWNER TO joe;</codeblock><p>更改用户自定义类型<codeph>email</codeph>的模式为<codeph>customers</codeph>：
+        </p><codeblock>ALTER TYPE email SET SCHEMA customers;</codeblock><p>设置或更改名为<codeph>int33</codeph>的用户定义类型的压缩类型和压缩级别：</p><codeblock>ALTER TYPE int33 SET DEFAULT ENCODING (compresstype=zlib, compresslevel=7);</codeblock>
+      <p> 要将新属性添加到类型：</p>
       <codeblock>ALTER TYPE compfoo ADD ATTRIBUTE f3 int;</codeblock>
-      <p> To add a new value to an enum type in a particular sort position:</p>
+      <p>要将新值添加到特定排序位置的枚举类型：</p>
       <codeblock>ALTER TYPE colors ADD VALUE 'orange' AFTER 'red';</codeblock>
-    </section><section id="section6"><title>Compatibility</title><p>The variants to add and drop attributes are part of the SQL standard; the other variants are Greenplum Database extensions.</p></section><section id="section7"><title>See Also</title><p><codeph><xref href="./CREATE_TYPE.xml#topic1" type="topic" format="dita"/></codeph>,
+    </section><section id="section6"><title>兼容性</title><p>添加和删除属性的变体是SQL标准的一部分。 其他变体是Greenplum数据库扩展。</p></section><section id="section7"><title>另见</title><p><codeph><xref href="./CREATE_TYPE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_TYPE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>

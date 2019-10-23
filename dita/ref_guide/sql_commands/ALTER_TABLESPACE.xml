@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="az137232">ALTER TABLESPACE</title><body><p id="sql_command_desc">Changes the definition of a tablespace.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">ALTER TABLESPACE <varname>name</varname> RENAME TO <varname>new_name</varname>
+<topic id="topic1"><title id="az137232">ALTER TABLESPACE</title><body><p id="sql_command_desc">更改表空间的定义。</p><section id="section2"><title>概要</title><codeblock id="sql_command_synopsis">ALTER TABLESPACE <varname>name</varname> RENAME TO <varname>new_name</varname>
 
 ALTER TABLESPACE <varname>name</varname> OWNER TO <varname>new_owner</varname>
 
@@ -9,25 +9,15 @@ ALTER TABLESPACE <varname>name</varname> SET ( <varname>tablespace_option</varna
 
 ALTER TABLESPACE <varname>name</varname> RESET ( <varname>tablespace_option</varname> [, ... ] )
 
-</codeblock></section><section id="section3"><title>Description</title><p><codeph>ALTER TABLESPACE</codeph> changes the definition of a tablespace.
-</p><p>You must own the tablespace to use <codeph>ALTER TABLESPACE</codeph>.
-To alter the owner, you must also be a direct or indirect member of the
-new owning role. (Note that superusers have these privileges automatically.)</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The name of an existing tablespace. </pd></plentry><plentry><pt><varname>new_name</varname></pt><pd>The new name of the tablespace. The new name cannot begin with <varname>pg_</varname>
-or <varname>gp_</varname> (reserved for system tablespaces). </pd></plentry><plentry><pt><varname>new_owner</varname></pt><pd>The new owner of the tablespace.</pd></plentry>
+</codeblock></section><section id="section3"><title>描述</title><p><codeph>ALTER TABLESPACE</codeph>更改表空间的定义。
+</p><p>您必须拥有表空间才能使用<codeph>ALTER TABLESPACE</codeph>。 要更改所有者，您还必须是新拥有角色的直接或间接成员。 （请注意，超级用户会自动拥有这些特权。）</p></section><section id="section4"><title>参数</title><parml><plentry><pt><varname>name</varname></pt><pd>一个现有表空间的名称。</pd></plentry><plentry><pt><varname>new_name</varname></pt><pd>新的表空间的名称。新的表空间名称不能以<varname>pg_</varname>或<varname>gp_</varname>开头。(这类名称保留用于系统表空间)。 </pd></plentry><plentry><pt><varname>new_owner</varname></pt><pd>该表空间的新拥有者。</pd></plentry>
         <plentry>
           <pt><varname>tablespace_parameter</varname></pt>
-          <pd>A tablespace parameter to be set or reset. Currently, the only available parameters
-                        are <varname>seq_page_cost</varname> and
-                        <varname>random_page_cost</varname>. Setting either value for a particular
-                        tablespace will override the planner's usual estimate of the cost of reading
-                        pages from tables in that tablespace, as established by the configuration
-                        parameters of the same name (see <xref
+          <pd>要设置或重置的表空间参数。 当前，唯一可用的参数是<varname>seq_page_cost</varname>和<varname>random_page_cost</varname>。 为特定表空间设置这两个值将覆盖计划者通常对从该表空间中的表读取页面的开销的估计，这是由同名的配置参数确定的（请参见<xref
                                 href="../config_params/guc-list.xml#seq_page_cost" format="dita" scope="local"
                                 >seq-page-cost</xref>, <xref
                                 href="../config_params/guc-list.xml#random_page_cost"
-                                format="dita" scope="local">random-page-cost</xref>). This may be useful if one
-                        tablespace is located on a disk which is faster or slower than the remainder
-                        of the I/O subsystem. </pd>
-        </plentry></parml></section><section id="section5"><title>Examples</title><p>Rename tablespace <codeph>index_space</codeph> to <codeph>fast_raid</codeph>:</p><codeblock>ALTER TABLESPACE index_space RENAME TO fast_raid;</codeblock><p>Change the owner of tablespace <codeph>index_space</codeph>:</p><codeblock>ALTER TABLESPACE index_space OWNER TO mary;</codeblock></section><section id="section6"><title>Compatibility</title><p>There is no <codeph>ALTER TABLESPACE</codeph> statement in the SQL standard.</p></section><section id="section7"><title>See Also</title><p><codeph><xref href="./CREATE_TABLESPACE.xml#topic1" type="topic" format="dita"/></codeph>,
+                                format="dita" scope="local">random-page-cost</xref>）。 如果一个表空间位于比I / O子系统的其余部分更快或更慢的磁盘上，则这可能很有用。</pd>
+        </plentry></parml></section><section id="section5"><title>示例</title><p>重命名表空间 <codeph>index_space</codeph> 为 <codeph>fast_raid</codeph>:</p><codeblock>ALTER TABLESPACE index_space RENAME TO fast_raid;</codeblock><p>更改表空间<codeph>index_space</codeph>的所有者:</p><codeblock>ALTER TABLESPACE index_space OWNER TO mary;</codeblock></section><section id="section6"><title>兼容性</title><p>在SQL标准中没有<codeph>ALTER TABLESPACE</codeph>语句。</p></section><section id="section7"><title>另见</title><p><codeph><xref href="./CREATE_TABLESPACE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_TABLESPACE.xml#topic1" type="topic" format="dita"
         /></codeph></p></section></body></topic>
