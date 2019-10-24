@@ -3,7 +3,7 @@
 <topic id="topic1">
   <title id="af20941">CREATE COLLATION</title>
   <body>
-    <p id="sql_command_desc">使用指定的操作系统区域设置或通过复制现有的排序规则来定义新的排序规则。
+    <p id="sql_command_desc">使用指定的操作系统语言环境或通过复制现有的排序规则来定义新的排序规则。
       </p>
     <section id="section2">
       <title>概要</title>
@@ -44,8 +44,8 @@ CREATE COLLATION <varname>name</varname> FROM <varname>existing_collation</varna
           <pt>
             <varname>lc_collate</varname>
           </pt>
-          <pd>将指定的操作系统区域设置用于<codeph>LC_COLLATE</codeph>区域设置类别。
-            区域设置必须适用于当前数据库编码。
+          <pd>将指定的操作系统语言环境用于<codeph>LC_COLLATE</codeph>语言环境类别。
+            语言环境必须适用于当前数据库编码。
             （有关详细规则，请参见<xref href="CREATE_DATABASE.xml#topic1" format="dita" type="topic"/>。）
           </pd>
         </plentry>
@@ -53,8 +53,8 @@ CREATE COLLATION <varname>name</varname> FROM <varname>existing_collation</varna
           <pt>
             <varname>lc_ctype</varname>
           </pt>
-          <pd>将指定的操作系统区域设置用于<codeph>LC_CTYPE</codeph>区域设置类别。
-            区域设置必须适用于当前数据库编码。
+          <pd>将指定的操作系统语言环境用于<codeph>LC_CTYPE</codeph>语言环境类别。
+            语言环境必须适用于当前数据库编码。
             （有关详细规则，请参见<xref href="CREATE_DATABASE.xml#topic1" format="dita" type="topic"/>。）
             </pd>
         </plentry>
@@ -79,7 +79,7 @@ CREATE COLLATION <varname>name</varname> FROM <varname>existing_collation</varna
     </section>
     <section id="section6">
       <title>示例</title>
-      <p>要从操作系统区域设置<codeph>fr_FR.utf8</codeph>创建排序规则（假设当前数据库编码为<codeph>UTF8</codeph>）：
+      <p>要从操作系统语言环境<codeph>fr_FR.utf8</codeph>创建排序规则（假设当前数据库编码为<codeph>UTF8</codeph>）：
         <codeph>UTF8</codeph>):<codeblock>CREATE COLLATION french (LOCALE = 'fr_FR.utf8');</codeblock>
       </p>
       <p>要从现有排序规则创建排序规则：

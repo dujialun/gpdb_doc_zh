@@ -6,7 +6,7 @@
     <body>
         <p id="sql_command_desc">Registers an extension in a Greenplum database.</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">CREATE EXTENSION [ IF NOT EXISTS ] <varname>extension_name</varname>
   [ WITH ] [ SCHEMA <varname>schema_name</varname> ]
            [ VERSION <varname>version</varname> ]
@@ -14,132 +14,113 @@
            [ CASCADE ]</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>CREATE EXTENSION</codeph> loads a new extension into the current database.
-                There must not be an extension of the same name already loaded.</p>
-            <p>Loading an extension essentially amounts to running the extension script file. The
-                script typically creates new SQL objects such as functions, data types, operators
-                and index support methods. The <codeph>CREATE EXTENSION</codeph> command also
-                records the identities of all the created objects, so that they can be dropped again
-                if <codeph>DROP EXTENSION</codeph> is issued.</p>
-            <p>Loading an extension requires the same privileges that would be required to create
-                the component extension objects. For most extensions this means superuser or
-                database owner privileges are required. The user who runs <codeph>CREATE
-                    EXTENSION</codeph> becomes the owner of the extension for purposes of later
-                privilege checks, as well as the owner of any objects created by the extension
-                script.</p>
+            <title>描述</title>
+            <p><codeph>CREATE EXTENSION</codeph>将新的扩展名加载到当前数据库中。
+                不可以已加载具有相同名称的扩展名。
+                </p>
+            <p>加载扩展实质上等于运行扩展脚本文件。
+                该脚本通常创建新的SQL对象，例如函数，数据类型，运算符和索引支持方法。
+                <codeph>CREATE EXTENSION</codeph>命令还记录所有已创建对象的标识，
+                因此，如果执行<codeph>DROP EXTENSION</codeph>，则可以再次删除它们。
+                </p>
+            <p>加载扩展需要与创建组件扩展对象相同的特权。
+                对于大多数扩展，这意味着需要超级用户或数据库所有者特权。
+                运行<codeph>CREATE EXTENSION</codeph>的用户将成为扩展的所有者，
+                以进行以后的权限检查，以及该扩展脚本创建的任何对象的所有者。
+                </p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt>IF NOT EXISTS</pt>
                     <pd>
-                        <p>Do not throw an error if an extension with the same name already exists.
-                            A notice is issued in this case. There is no guarantee that the existing
-                            extension is similar to the extension that would have been installed.
+                        <p>如果已经存在具有相同名称的扩展名，请不要报错。
+                            在这种情况下发出通知。
+                            无法保证现有扩展与安装的扩展类似。
                         </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>extension_name</varname></pt>
                     <pd>
-                        <p>The name of the extension to be installed. The name must be unique within
-                            the database. An extension is created from the details in the extension
-                            control file
-                                    <codeph><varname>SHAREDIR</varname>/extension/<varname>extension_name</varname>.control</codeph>. </p>
-                        <p><varname>SHAREDIR</varname> is the installation shared-data directory,
-                            for example <codeph>/usr/local/greenplum-db/share/postgresql</codeph>.
-                            The command <codeph>pg_config --sharedir</codeph> displays the
-                            directory.</p>
+                        <p>要安装的扩展名。该名称在数据库中必须唯一。
+                            根据扩展控制文件<codeph><varname>SHAREDIR</varname>/extension/<varname>extension_name</varname>.control</codeph>中的详细信息创建扩展。
+                            </p>
+                        <p><varname>SHAREDIR</varname>是安装共享数据目录，例如<codeph>/usr/local/greenplum-db/share/postgresql</codeph>。
+                            命令<codeph>pg_config --sharedir</codeph>显示目录。
+                            </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>SCHEMA <varname>schema_name</varname></pt>
                     <pd>
-                        <p>The name of the schema in which to install the extension objects. This
-                            assumes that the extension allows its contents to be relocated. The
-                            named schema must already exist. If not specified, and the extension
-                            control file does not specify a schema, the current default object
-                            creation schema is used.</p>
-                        <p>If the extension specifies a schema parameter in its control file, then
-                            that schema cannot be overridden with a <codeph>SCHEMA</codeph> clause.
-                            Normally, an error is raised if a <codeph>SCHEMA</codeph> clause is
-                            given and it conflicts with the extension schema parameter. However, if
-                            the <codeph>CASCADE</codeph> clause is also given, then
-                                <varname>schema_name</varname> is ignored when it conflicts. The
-                            given <varname>schema_name</varname> is used for the installation of any
-                            needed extensions that do not a specify schema in their control
-                            files.</p>
-                        <p>The extension itself is not within any schema. Extensions have
-                            unqualified names that must be unique within the database. But objects
-                            belonging to the extension can be within a schema.</p>
+                        <p>在其中安装扩展对象的模式名称。
+                            假定扩展名允许其内容重定位。
+                            命名模式必须已经存在。
+                            如果未指定，并且扩展控制文件未指定模式，则使用当前的默认模式创建对象。
+                            </p>
+                        <p>如果扩展名在其控制文件中指定了模式参数，则无法使用<codeph>SCHEMA</codeph>子句覆盖该模式。
+                            通常，如果给定了<codeph>SCHEMA</codeph>子句，并且与扩展模式参数冲突，则会引发错误。
+                            但是，如果还给出了<codeph>CASCADE</codeph>子句，则<varname>schema_name</varname>在冲突时将被忽略。
+                            给定的<varname>schema_name</varname>用于安装所有需要的扩展，这些扩展在其控制文件中未指定架构。
+                            </p>
+                        <p>扩展本身不在任何模式内。
+                            扩展名具有非限定名称，这些名称在数据库中必须唯一。
+                            但是属于扩展名的对象可以在模式内。
+                            </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>VERSION <varname>version</varname></pt>
                     <pd>
-                        <p>The version of the extension to install. This can be written as either an
-                            identifier or a string literal. The default version is value that is
-                            specified in the extension control file.</p>
+                        <p>要安装的扩展程序的版本。
+                            可以将其写为标识符或字符串文字。
+                            默认版本是扩展控制文件中指定的值。
+                            </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>FROM <varname>old_version</varname></pt>
                     <pd>
-                        <p>Specify <codeph>FROM <varname>old_version</varname></codeph> only if you
-                            are attempting to install an extension that replaces an <i>old-style</i>
-                            module that is a collection of objects that is not packaged into an
-                            extension. If specified, <codeph>CREATE EXTENSION</codeph> runs an
-                            alternative installation script that absorbs the existing objects into
-                            the extension, instead of creating new objects. Ensure that
-                                <codeph>SCHEMA</codeph> clause specifies the schema containing these
-                            pre-existing objects.</p>
-                        <p>The value to use for <varname>old_version</varname> is determined by the
-                            extension author, and might vary if there is more than one version of
-                            the old-style module that can be upgraded into an extension. For the
-                            standard additional modules supplied with pre-9.1 PostgreSQL, specify
-                                <codeph>unpackaged</codeph> for the <varname>old_version</varname>
-                            when updating a module to extension style.</p>
+                        <p>仅在尝试安装扩展来替换旧模块（该扩展是未打包到扩展中的对象集合）的扩展时，才指定<codeph>FROM <varname>old_version</varname></codeph>。
+                            如果指定，则<codeph>CREATE EXTENSION</codeph>运行替代安装脚本，该脚本将现有对象吸收到扩展中，而不是创建新对象。
+                            确保<codeph>SCHEMA</codeph>子句指定了包含这些预先存在的对象的模式。
+                            </p>
+                        <p>用于<varname>old_version</varname>的值由扩展作者确定，如果可以将多个旧版本的模块升级为扩展，则该值可能会有所不同。
+                            对于9.1之前的PostgreSQL提供的标准附加模块，在将模块更新为扩展样式时，
+                            请为<varname>old_version</varname>指定<codeph>unpackaged</codeph>。
+                            </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>CASCADE</pt>
                     <pd>
-                        <p>Automatically install dependent extensions are not already installed.
-                            Dependent extensions are checked recursively and those dependencies are
-                            also installed automatically. If the <varname>SCHEMA</varname> clause is
-                            specified, the schema applies to the extension and all dependent
-                            extensions that are installed. Other options that are specified are not
-                            applied to the automatically-installed dependent extensions. In
-                            particular, default versions are always selected when installing
-                            dependent extensions.</p>
+                        <p>尚未安装自动安装相关扩展。
+                            递归检查相关的扩展，并且这些从属扩展也将自动安装。
+                            如果指定了<varname>SCHEMA</varname>子句，则该模式适用于扩展和已安装的所有从属扩展。
+                            指定的其他选项不适用于自动安装的从属扩展。
+                            特别是，在安装从属扩展时始终选择默认版本。
+                            </p>
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Notes</title>
-            <p>The extensions currently available for loading can be identified from the <i><xref
-                        href="../system_catalogs/pg_available_extensions.xml#topic1"
-                        >pg_available_extensions</xref></i> or <i><xref
-                        href="../system_catalogs/pg_available_extension_versions.xml#topic_sln_wfx_tz"
-                        >pg_available_extension_versions</xref></i> system views.</p>
-            <p>Before you use <codeph>CREATE EXTENSION</codeph> to load an extension into a
-                database, the supporting extension files must be installed including an extension
-                control file and at least one least one SQL script file. The support files must be
-                installed in the same location on all Greenplum Database hosts. For information
-                about creating new extensions, see PostgreSQL information about <xref
-                    href="https://www.postgresql.org/docs/9.6/extend-extensions.html"
-                    format="html" scope="external">Packaging Related Objects into an
-                    Extension</xref>.</p>
+            <title>注解</title>
+            <p>当前可用于加载的扩展名可以从<i><xref href="../system_catalogs/pg_available_extensions.xml#topic1">pg_available_extensions</xref></i>或<i><xref href="../system_catalogs/pg_available_extension_versions.xml#topic_sln_wfx_tz">pg_available_extension_versions</xref></i>系统视图中识别。
+                </p>
+            <p>在使用<codeph>CREATE EXTENSION</codeph>将扩展加载到数据库之前，必须安装支持的扩展文件，包括扩展控制文件和至少一个SQL脚本文件。
+                支持文件必须安装在所有Greenplum数据库主机上的相同位置。
+                有关创建新扩展的信息，请参见PostgreSQL有关<xref href="https://www.postgresql.org/docs/9.6/extend-extensions.html" format="html" scope="external">将相关对象打包到扩展中</xref>的信息。
+                </p>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p><codeph>CREATE EXTENSION</codeph> is a Greenplum Database extension. </p>
+            <title>兼容性</title>
+            <p><codeph>CREATE EXTENSION</codeph>是Greenplum数据库扩展。</p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="ALTER_EXTENSION.xml#topic1">ALTER EXTENSION</xref></codeph>,
                         <codeph><xref href="DROP_EXTENSION.xml#topic1">DROP
                     EXTENSION</xref></codeph></p>
