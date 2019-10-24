@@ -189,7 +189,7 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 | \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径 |
 | PROFILE    | `PROFILE`关键字必须指定为`hdfs:json` |
 | \<custom&#8209;option\>  | \<custom-option\>描述见下方|
-| FORMAT 'CUSTOM' | 对`hdfs:json`配置文件使用`FORMAT` `'CUSTOM'`。 `CUSTOM` `FORMAT` 要求您指定为 `(FORMATTER='pxfwritable_import')`。 |
+| FORMAT 'CUSTOM' | 在 `hdfs:json`配置文件中使用 `FORMAT` `'CUSTOM'` 。 `CUSTOM` `FORMAT` 要求您指定为 `(FORMATTER='pxfwritable_import')`。 |
 
 <a id="customopts"></a>
 PXF支持单行和多行JSON记录。当您想读取多行JSON记录时，必须提供`IDENTIFIER` \<custom-option\> 和值。 使用这个\<custom-option\>标识JSON记录对象中第一个字段的成员名称：

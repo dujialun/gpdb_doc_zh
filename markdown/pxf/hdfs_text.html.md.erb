@@ -246,7 +246,7 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 |-------|-------------------------------------|
 | COMPRESSION_CODEC    | 压缩编解码器Java类名。 如果未提供此选项，Greenplum数据库不会执行压缩编码。支持的压缩编解码器包括：<br>`org.apache.hadoop.io.compress.DefaultCodec`<br>`org.apache.hadoop.io.compress.BZip2Codec`<br>`org.apache.hadoop.io.compress.GzipCodec` |
 | COMPRESSION_TYPE    | 采用的压缩类型; 支持的值为 `RECORD` (默认) 或 `BLOCK` |
-| THREAD-SAFE | 确定表查询是否可以在多线程模式下运行的布尔值。 默认为 `TRUE`。 将此选项设置为 `FALSE` 以处理单个线程中非线程安全操作 (例如，压缩)的所有请求。|
+| THREAD-SAFE | 确定表查询是否可以在多线程模式下运行的布尔值。 默认为 `TRUE`。 将此选项设置为 `FALSE` 以处理单个线程中所有非线程安全操作 (例如，压缩)的请求。|
 
 ### <a id="write_hdfstextsimple_example"></a>示例：将文本数据写入HDFS
 

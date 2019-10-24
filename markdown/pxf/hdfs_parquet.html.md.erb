@@ -76,7 +76,7 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 | PROFILE    | `PROFILE`关键字必须指定为`hdfs:parquet`|
 | \<custom&#8209;option\>=\<value\>  | \<custom-option\>描述见下方|
 | FORMAT 'CUSTOM' | 使用`FORMAT` '`CUSTOM`'时指定`(FORMATTER='pxfwritable_export')` (写入) 或 `(FORMATTER='pxfwritable_import')` (读取). |
-| DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或<字段名>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。 |
+| DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或\<字段名\>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。 |
 
 <a id="customopts"></a>
 PXF `hdfs:parquet` 配置文件支持与编码和压缩有关的写入选项。您可以在`CREATE WRITABLE EXTERNAL TABLE` `LOCATION`子句中指定这些写入选项。`hdfs:parquet`配置文件支持以下自定义选项：

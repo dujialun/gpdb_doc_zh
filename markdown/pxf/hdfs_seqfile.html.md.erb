@@ -52,7 +52,7 @@ FORMAT 'CUSTOM' (<formatting-properties>)
 | PROFILE    | `PROFILE` 关键字必须指定为 `hdfs:SequenceFile`. |
 | \<custom&#8209;option\>  | \<custom-option\> 描述见下方.|
 | FORMAT | 使用 `FORMAT` '`CUSTOM`' 时指定 `(FORMATTER='pxfwritable_export')` (写入) 或 `(FORMATTER='pxfwritable_import')` (读取). |
-| DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或<字段名>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。 |
+| DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或\<字段名\>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。 |
 
 <a id="customopts"></a>
 SequenceFile 格式数据可以选择采用record或block压缩。 PXF `hdfs:SequenceFile` 配置支持以下压缩编解码器：
@@ -67,9 +67,9 @@ SequenceFile 格式数据可以选择采用record或block压缩。 PXF `hdfs:Seq
 | 选项  | 值描述|
 |-------|-------------------------------------|
 | COMPRESSION_CODEC    | 压缩编码器类名称。 如果此选项未提供，Greenplum 数据库不执行数据压缩。 支持的压缩编解码器包括：<br>`org.apache.hadoop.io.compress.DefaultCodec`<br>`org.apache.hadoop.io.compress.BZip2Codec`<br>`org.apache.hadoop.io.compress.GzipCodec` |
-| COMPRESSION_TYPE    | 使用的压缩类型; 支持的值有 `RECORD` (默认) 或 `BLOCK`. |
+| COMPRESSION_TYPE    | 采用的压缩类型; 支持的值有 `RECORD` (默认) 或 `BLOCK`. |
 | DATA-SCHEMA    | 编写器序列化/反序列化类的名称。 此类所在的jar文件必须位于PXF类路径中。 `hdfs:SequenceFile` 配置文件需要此选项，并且没有默认值。 |
-| THREAD-SAFE | 确定表查询是否可以在多线程模式下运行的布尔值。 默认为 `TRUE`。 将此选项设置为 `FALSE` 以处理单个线程中非线程安全操作 (例如，压缩)的所有请求。 |
+| THREAD-SAFE | 确定表查询是否可以在多线程模式下运行的布尔值。 默认为 `TRUE`。 将此选项设置为 `FALSE` 以处理单个线程中所有非线程安全操作 (例如，压缩)的请求。 |
 
 
 ## <a id="write_binary"></a>读写二进制数据

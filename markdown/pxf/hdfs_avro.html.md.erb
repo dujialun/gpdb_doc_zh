@@ -83,7 +83,7 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 | \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径 |
 | PROFILE    | `PROFILE`关键字必须指定为`hdfs:avro`. |
 | \<custom&#8209;option\>  | \<custom-option\>描述见下方|
-| FORMAT 'CUSTOM' | 对`hdfs:avro`配置文件使用`FORMAT` `'CUSTOM'`。`CUSTOM` `FORMAT` 要求您指定为 `(FORMATTER='pxfwritable_import')`。 |
+| FORMAT 'CUSTOM' | 在 `hdfs:avro`配置文件中使用`FORMAT` `'CUSTOM'` 。`CUSTOM` `FORMAT` 要求您指定为 `(FORMATTER='pxfwritable_import')`。 |
 
 <a id="customopts"></a>
 对于复杂数据类型，PXF`hdfs:avro`配置文件在集合项和值之间插入默认分隔符。您可以通过指定在`CREATE EXTERNAL TABLE`命令中指定`hdfs:avro`自定义选项来使用非默认分隔符。

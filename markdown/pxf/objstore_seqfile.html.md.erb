@@ -1,5 +1,5 @@
 ---
-title: Reading and Writing SequenceFile Data in an Object Store
+title: 在对象存储中读写SequenceFile数据
 ---
 
 <!--
@@ -21,20 +21,20 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The PXF object store connectors support SequenceFile format binary data. This section describes how to use PXF to read and write SequenceFile data, including how to create, insert, and query data in external tables that reference files in an object store.
+PXF 对象存储连接器支持SequenceFile格式二进制数据。 本节描述如何使用PXF读写SequenceFile数据，包括如何创建、写入以及查询引用对象存储文件的外部表。
 
-**Note**: Accessing SequenceFile-format data from an object store is very similar to accessing SequenceFile-format data in HDFS. This topic identifies object store-specific information required to read and write SequenceFile data, and links to the PXF HDFS SequenceFile documentation where appropriate for common information.
+**注意**: 从对象存储访问SequenceFile格式数据与访问HDFS中的SequenceFile格式数据非常相似。  本主题标识了读取对象存储所需的特定信息，并在通用信息的位置链接到[PXF HDFS SequenceFile 文档](hdfs_seqfile.html)
 
 
-## <a id="prereq"></a>Prerequisites
+## <a id="prereq"></a>先决条件
 
-Ensure that you have met the PXF Object Store [Prerequisites](access_objstore.html#objstore_prereq) before you attempt to read data from or write data to an object store.
+在您尝试从对象存储中读取数据前，确保已满足PXF 对象存储[先决条件](access_objstore.html#objstore_prereq) 。
 
-## <a id="hdfswrite_writeextdata"></a>Creating the External Table
+## <a id="hdfswrite_writeextdata"></a>创建外部表
 
-The PXF `<objstore>:SequenceFile` profiles support reading and writing binary data in SequenceFile-format. PXF supports the following `<objstore>` profile prefixes:
+PXF `<objstore>:SequenceFile` 配置文件支持以SequenceFile格式读取和写入数据。 PXF 支持以下 `<objstore>` 配置文件前缀：
 
-| Object Store  | Profile Prefix |
+| 对象存储  | 配置前缀 |
 |-------|-------------------------------------|
 | Azure Blob Storage   | wasbs |
 | Azure Data Lake    | adl |
@@ -42,7 +42,7 @@ The PXF `<objstore>:SequenceFile` profiles support reading and writing binary da
 | Minio    | s3 |
 | S3    | s3 |
 
-Use the following syntax to create a Greenplum Database external table that references an HDFS directory. When you insert records into a writable external table, the block(s) of data that you insert are written to one or more files in the directory that you specified.
+使用以下语法创建引用S3目录的Greenplum数据库外部表。 当您将记录插入可写外部表中时，您插入的数据块将写入指定目录中一个或多个文件。
 
 ``` sql
 CREATE [WRITABLE] EXTERNAL TABLE <table_name> 
@@ -53,24 +53,24 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export')
 [DISTRIBUTED BY (<column_name> [, ... ] ) | DISTRIBUTED RANDOMLY];
 ```
 
-The specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command are described in the table below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字  | 值 |
 |-------|-------------------------------------|
-| \<path&#8209;to&#8209;dir\>    | The absolute path to the directory in the object store. |
-| PROFILE=\<objstore\>:SequenceFile    | The `PROFILE` keyword must identify the specific object store. For example, `s3:SequenceFile`. |
-| SERVER=\<server_name\>    | The named server configuration that PXF uses to access the data. |
-| \<custom&#8209;option\>=\<value\> | SequenceFile-specific custom options are described in the [PXF HDFS SequenceFile documentation](hdfs_seqfile.html#customopts). |
-| FORMAT 'CUSTOM' | Use `FORMAT` '`CUSTOM`' with `(FORMATTER='pxfwritable_export')` (write) or `(FORMATTER='pxfwritable_import')` (read). |
-| DISTRIBUTED BY    | If you plan to load the writable external table with data from an existing Greenplum Database table, consider specifying the same distribution policy or \<column_name\> on the writable external table as that defined for the table from which you plan to load the data. Doing so will avoid extra motion of data between segments on the load operation. |
+| \<path&#8209;to&#8209;dir\>    | 对象存储中文件或目录的绝对路径 |
+| PROFILE=\<objstore\>:SequenceFile    | `PROFILE` 必须指定为特定的对象存储。例如，`s3:SequenceFile` |
+| SERVER=\<server_name\>    | PXF 访问数据时使用的服务配置 |
+| \<custom&#8209;option\>=\<value\> | 特定于SequenceFile的自定义选项描述见 [PXF HDFS SequenceFile 文档](hdfs_seqfile.html#customopts) |
+| FORMAT 'CUSTOM' | 使用`FORMAT` '`CUSTOM`'时指定`(FORMATTER='pxfwritable_export')` (写入) 或 `(FORMATTER='pxfwritable_import')` (读取) |
+| DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或\<字段名\>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。 |
 
-If you are accessing an S3 object store, you can provide S3 credentials directly in the `CREATE EXTERNAL TABLE` command as described in [Overriding the S3 Server Configuration](access_objstore.html#s3_override).
+如果要访问S3 对象存储，则可以如 [覆盖S3服务配置](access_objstore.html#s3_override) 中所述直接在 `CREATE EXTERNAL TABLE` 命令中提供S3凭据。
 
-## <a id="example"></a>Example
+## <a id="example"></a>示例
 
-Refer to [Example: Writing Binary Data to HDFS](hdfs_seqfile.html#write_seqfile_example) in the PXF HDFS SequenceFile documentation for a write/read example. Modifications that you must make to run the example with an object store include:
+有关SequenceFile读取/写入的示例，请参阅PXF HDFS SequenceFile 文档中的 [示例: 将二进制数据写入HDFS](hdfs_seqfile.html#write_seqfile_example)。 在对象存储中运行示例，必要的修改如下：
 
-- Using the `CREATE EXTERNAL TABLE` syntax and `LOCATION` keywords and settings described above for the writable external table. For example, if your server name is `s3srvcfg`:
+- 使用上述的 `CREATE EXTERNAL TABLE` 语法和 `LOCATION` 关键字及设置。例如， 假设您的服务名为 `s3srvcfg` ：
 
     ``` sql
     CREATE WRITABLE EXTERNAL TABLE pxf_tbl_seqfile_s3(location text, month text, number_of_orders integer, total_sales real)
@@ -78,7 +78,7 @@ Refer to [Example: Writing Binary Data to HDFS](hdfs_seqfile.html#write_seqfile_
     FORMAT 'CUSTOM' (FORMATTER='pxfwritable_export');
     ```
 
-- Using the `CREATE EXTERNAL TABLE` syntax and `LOCATION` keywords and settings described above for the readable external table. For example, if your server name is `s3srvcfg`:
+- 使用上述的 `CREATE EXTERNAL TABLE` 语法和 `LOCATION` 关键字及设置。例如， 假设您的服务名为 `s3srvcfg` ：
 
     ``` sql
     CREATE EXTERNAL TABLE read_pxf_tbl_seqfile_s3(location text, month text, number_of_orders integer, total_sales real)
