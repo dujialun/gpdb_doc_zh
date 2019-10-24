@@ -74,8 +74,8 @@ ALTER TYPE <varname>name</varname> SET DEFAULT ENCODING ( <varname>storage_direc
           <pd>应该在枚举类型的排序顺序之前或之后立即添加新值的现有枚举值。 像所有枚举文字一样，也需要用引号引起来。 </pd>
         </plentry>
          <plentry><pt><varname>storage_directive</varname></pt><pd>
-		 在表列定义中指定时，标识该类型的默认存储选项。 选项包括<codeph>COMPRESSTYPE</codeph>，<codeph>COMPRESSLEVEL</codeph>和<codeph>BLOCKSIZE</codeph>。</pd><pd><b>COMPRESSTYPE</b> — 设置为<codeph>ZLIB</codeph>（默认设置），<codeph>ZSTD</codeph>，<codeph>RLE_TYPE</codeph>或codeph>QUICKLZ</codeph><sup>1</sup>以指定使用的压缩类型。<note type="note"><sup>1</sup>QuickLZ压缩仅在商业版本的Pivotal Greenplum数据库中可用。</note></pd><pd><b>COMPRESSLEVEL</b> — 
-		 对于Zstd压缩，将其设置为1（最快压缩）到19（最高压缩率）之间的整数值。 对于zlib压缩，有效范围是1到9。QuickLZ压缩级别只能设置为1。对于<codeph>RLE_TYPE</codeph>，压缩级别可以设置为从1（最快压缩）到4（最高压缩率）的整数值。 。 缺省压缩级别为1。</pd>
+				 在表列定义中指定时，标识该类型的默认存储选项。 选项包括<codeph>COMPRESSTYPE</codeph>，<codeph>COMPRESSLEVEL</codeph>和<codeph>BLOCKSIZE</codeph>。</pd><pd><b>COMPRESSTYPE</b> — 设置为<codeph>ZLIB</codeph>（默认设置），<codeph>ZSTD</codeph>，<codeph>RLE_TYPE</codeph>或<codeph>QUICKLZ</codeph><sup>1</sup>以指定使用的压缩类型。<note type="note"><sup>1</sup>QuickLZ压缩仅在商业版本的Pivotal Greenplum数据库中可用。</note></pd><pd><b>COMPRESSLEVEL</b> — 
+	 对于Zstd压缩，将其设置为1（最快压缩）到19（最高压缩率）之间的整数值。 对于zlib压缩，有效范围是1到9。QuickLZ压缩级别只能设置为1。对于<codeph>RLE_TYPE</codeph>，压缩级别可以设置为从1（最快压缩）到4（最高压缩率）的整数值。缺省压缩级别为1。</pd>
           <pd><b>BLOCKSIZE</b> — 设置为列中每个块的大小（以字节为单位）。 <codeph>BLOCKSIZE</codeph>必须介于8192和2097152字节之间，并且是8192的倍数。默认块大小为32768。<note>在表或列级别定义的<varname>storage_directives</varname> 会覆盖为类型定义的默认存储选项。</note></pd></plentry></parml></section>
     <section id="section5"><title>示例</title><p>要重命名名为<codeph>electronic_mail</codeph>的数据类型：
         </p><codeblock>ALTER TYPE electronic_mail RENAME TO email;</codeblock><p>更改用户自定义类型<codeph>email</codeph>的所有者为<codeph>joe</codeph>：

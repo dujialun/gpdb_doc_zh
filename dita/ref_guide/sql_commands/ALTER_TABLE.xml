@@ -431,9 +431,9 @@ ALTER TABLE <varname>name</varname>
                         <p>在修改或者删除作为Greenplum数据库分布键一部分的列时要特别小心，因为这可能会改变表的分布策略。.</p>
                         <p>Greenplum数据库当前不支持外键约束。对于要在Greenplum数据库中实施的唯一约束，表必须被哈希分布（不能用<codeph>DISTRIBUTED
                                         RANDOMLY</codeph>），并且所有的分布键列必须和唯一约束列中前部的列相同。</p>
-                        <p>增加<codeph>CHECK</codeph>或者codeph>NOT NULL</codeph>约束要求扫描表以验证现有的行是否符合约束。</p>
+								<p>增加<codeph>CHECK</codeph>或者<codeph>NOT NULL</codeph>约束要求扫描表以验证现有的行是否符合约束。</p>
                         <p>当使用<codeph>ADD COLUMN</codeph>添加列时，表中的所有现有行都使用该列的默认值初始化，如果未指定<codeph>DEFAULT</codeph>子句，则初始化为<codeph>NULL</codeph>。添加具有非空默认值的列或更改现有列的类型将需要重写整个表和索引。作为例外，如果<codeph>USING</codeph>子句不更改列的内容，并且旧类型可以强制转换为新类型或新类型不受限制的域，则不需要重写表，但是受影响列上的任何索引都必须仍在重建中。添加或删除系统<codeph>oid</codeph>列还需要重写整个表。对于大型表，表和/或索引的重建可能会花费大量时间；并且暂时需要多达两倍的磁盘空间。</p>
-                        <p>您可以在单个codeph>ALTER TABLE</codeph>命令中指定多个更改，这些更改将在表上一次传递。</p>
+						<p>您可以在单个<codeph>ALTER TABLE</codeph>命令中指定多个更改，这些更改将在表上一次传递。</p>
                         <p><codeph>DROP COLUMN</codeph> 表单不会物理删除列，而只是使它对SQL操作不可见。表中随后的插入和更新操作将为该列存储一个空值。因此，删除列很快，但是不会立即减小表的磁盘大小，因为删除的列所占用的空间不会被回收。随着现有行的更新，空间将随着时间的推移而回收。但是，如果删除系统<codeph>oid</codeph>列，则表将立即被重写。</p>
                         <p> 要强制立即回收被删除的列占用的空间，您可以执行<codeph>ALTER TABLE</codeph>的一种形式来重写整个表。这将导致重建的每一行，并将删除的列替换为空值。</p>
                         <p> <codeph>ALTER TABLE</codeph>的重写形式不是MVCC安全的。在表重写之后，如果并发事务使用的是在重写发生之前拍摄的快照，则该表将对并发事务显示为空。有关更多详细信息，请参见<xref
