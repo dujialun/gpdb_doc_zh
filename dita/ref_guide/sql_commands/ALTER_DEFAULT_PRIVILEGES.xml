@@ -4,9 +4,9 @@
 <topic id="topic1">
  <title>ALTER DEFAULT PRIVILEGES</title>
 <body>
-  <p id="sql_command_desc">Changes default access privileges.</p>
+  <p id="sql_command_desc">修改默认的访问权限。</p>
 <section id="section2">
- <title>Synopsis</title>
+ <title>概要</title>
 <codeblock id="sql_command_synopsis">
 ALTER DEFAULT PRIVILEGES
     [ FOR { ROLE | USER } <varname>target_role</varname> [, ...] ]
@@ -61,88 +61,74 @@ REVOKE [ GRANT OPTION FOR ]
 </codeblock>
 </section>
  <section id="section3">
-  <title>Description</title>
+  <title>描述</title>
 
   <p>
-   <codeph>ALTER DEFAULT PRIVILEGES</codeph> allows you to set the privileges
-   that will be applied to objects created in the future.  (It does not
-   affect privileges assigned to already-existing objects.)  Currently,
-   only the privileges for tables (including views and foreign tables),
-   sequences, functions, and types (including domains) can be altered.
+   <codeph>ALTER DEFAULT PRIVILEGES</codeph>允许你为将来会创建的对象赋予
+   权限。（不会影响那些已经赋予存在对象的权限。）目前只有表（包括视图和
+   外键表）、序列、函数、类型的权限可以被修改。
   </p>
 
   <p>
-   You can change default privileges only for objects that will be created by
-   yourself or by roles that you are a member of.  The privileges can be set
-   globally (i.e., for all objects created in the current database),
-   or just for objects created in specified schemas.  Default privileges
-   that are specified per-schema are added to whatever the global default
-   privileges are for the particular object type.
+   你只可以修改那些你自己或者你所在角色会创建的对象的权限。这些权限既可
+   以在全局范围内设置（例如：在当前数据库创建的所有对象。），也可以为指
+   定模式下的对象设置。每个模式指定的默认权限将添加到特定对象类型的全局
+   默认权限。
   </p>
 
   <p>
-   As explained under <xref href="GRANT.xml" format="dita"/>,
-   the default privileges for any object type normally grant all grantable
-   permissions to the object owner, and may grant some privileges to
-   <codeph>PUBLIC</codeph> as well.  However, this behavior can be changed by
-   altering the global default privileges with
-   <codeph>ALTER DEFAULT PRIVILEGES</codeph>.
+   如<xref href="GRANT.xml" format="dita"/>中介绍的，任何对象的默认权限通
+   常都会被授予所有可授予的权限，也可能会被授予一些<codeph>PUBLIC</codeph>
+   权限。不管怎样，这些都可以通过<codeph>ALTER DEFAULT PRIVILEGES</codeph>
+   来修改全局默认权限来设置。
   </p>
  </section>
  <section>
-  <title>Parameters</title>
+  <title>参数</title>
 
   <parml>
    <plentry>
     <pt><varname>target_role</varname></pt>
     <pd>
-      The name of an existing role of which the current role is a member.
-      If <codeph>FOR ROLE</codeph> is omitted, the current role is assumed.
+      当前的角色是一个成员时，那么target_role为要修改的角色名，如果<codeph>FOR ROLE</codeph> 
+	  被省略，那么会将当前的角色当为目标角色。
     </pd>
    </plentry>
 
    <plentry>
     <pt><varname>schema_name</varname></pt>
-    <pd> The name of an existing schema. If specified, the default privileges are altered for
-      objects later created in that schema. If <codeph>IN SCHEMA</codeph> is omitted, the global
-      default privileges are altered. </pd>
+    <pd> 模式名，如果指定了模式名，那么之后在这个模式下面创建的所有对象默认的权限都会被修改。如果
+	<codeph>IN SCHEMA</codeph>被省略，那么全局权限会被修改。</pd>
    </plentry>
 
    <plentry>
     <pt><varname>role_name</varname></pt>
-    <pd> The name of an existing role to grant or revoke privileges for. This parameter, and all the
-      other parameters in <varname>abbreviated_grant_or_revoke</varname>, act as described under
-       <xref href="GRANT.xml" format="dita"/> or <xref href="REVOKE.xml" format="dita"/>, except
-      that one is setting permissions for a whole class of objects rather than specific named
-      objects. </pd>
+    <pd> 授予或撤消权限的现有角色的名称。这个参数和所有在 <varname>abbreviated_grant_or_revoke</varname>
+	中的参数，按照<xref href="GRANT.xml" format="dita"/> 或 <xref href="REVOKE.xml" format="dita"/>描述中
+	进行操作，除非这个是为整个对象类而不是特定的命名对象设置权限。</pd>
    </plentry>
   </parml>
  </section>
 
 
  <section id="sql-alterdefaultprivileges-notes">
-  <title>Notes</title>
+  <title>注意</title>
 
-  <p> Use <xref href="../../utility_guide/client_utilities/psql.xml" scope="peer" format="dita">psql</xref>'s
-     <codeph>\ddp</codeph> command to obtain information about existing assignments of default
-    privileges. The meaning of the privilege values is the same as explained for
-     <codeph>\dp</codeph> under <xref href="GRANT.xml"/>. </p>
+  <p> 用 <xref href="../../utility_guide/client_utilities/psql.xml" scope="peer" format="dita">psql</xref>的
+     <codeph>\ddp</codeph> 命令来获取有关默认权限的现有分配信息，权限值的含义与在 <xref href="GRANT.xml"/>
+	 中<codeph>\dp</codeph>命令的解释相同。 </p>
 
   <p>
-   If you wish to drop a role for which the default privileges have been
-   altered, it is necessary to reverse the changes in its default privileges
-   or use <codeph>DROP OWNED BY</codeph> to get rid of the default privileges entry
-   for the role.
+   如果你想删除一个被修改了默认权限的角色，必须撤消其默认权限的更改，或使用<codeph>DROP OWNED BY</codeph>
+   删除该角色的默认权限条目。
   </p>
  </section>
 
  <section id="sql-alterdefaultprivileges-examples">
-  <title>Examples</title>
+  <title>示例</title>
 
   <p>
-   Grant SELECT privilege to everyone for all tables (and views) you
-   subsequently create in schema <codeph>myschema</codeph>, and allow
-   role <codeph>webuser</codeph> to INSERT into them too:
+   为随后在<codeph>myschema</codeph>中创建的所有表（和视图）的每个人授予SELECT权限，并允许角色 <codeph>webuser</codeph> 也插入到它们中：
 
 <codeblock>
 ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT SELECT ON TABLES TO PUBLIC;
@@ -151,9 +137,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT INSERT ON TABLES TO webuser;
   </p>
 
   <p>
-   Undo the above, so that subsequently-created tables won't have any
-   more permissions than normal:
-
+   撤销上面的操作，那样随后创建的表不会拥有比正常权限更多的权限：
 <codeblock>
 ALTER DEFAULT PRIVILEGES IN SCHEMA myschema REVOKE SELECT ON TABLES FROM PUBLIC;
 ALTER DEFAULT PRIVILEGES IN SCHEMA myschema REVOKE INSERT ON TABLES FROM webuser;
@@ -161,8 +145,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA myschema REVOKE INSERT ON TABLES FROM webuser
   </p>
 
   <p>
-   Remove the public EXECUTE permission that is normally granted on functions,
-   for all functions subsequently created by role <codeph>admin</codeph>:
+   将所有在<codeph>admin</codeph>角色上随后创建的函数上删除正常在函数上赋予的公有的执行权限：
 
 <codeblock>
 ALTER DEFAULT PRIVILEGES FOR ROLE admin REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
@@ -170,16 +153,15 @@ ALTER DEFAULT PRIVILEGES FOR ROLE admin REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
  </section>
 
  <section>
-  <title>Compatibility</title>
+  <title>兼容性</title>
 
   <p>
-   There is no <codeph>ALTER DEFAULT PRIVILEGES</codeph> statement in the SQL
-   standard.
+   在标准SQL语句中没有<codeph>ALTER DEFAULT PRIVILEGES</codeph>语句。
   </p>
  </section>
 
  <section id="see-also">
-  <title>See Also</title>
+  <title>另见</title>
 
   <p>
    <codeph><xref href="GRANT.xml" format="dita"/></codeph>, 

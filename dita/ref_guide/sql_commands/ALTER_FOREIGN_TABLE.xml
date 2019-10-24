@@ -4,9 +4,9 @@
 <topic id="topic1">
     <title id="bv20941">ALTER FOREIGN TABLE</title>
     <body>
-        <p id="sql_command_desc">Changes the definition of a foreign table.</p>
+        <p id="sql_command_desc">修改外表的定义。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">ALTER FOREIGN TABLE [ IF EXISTS ] <varname>name</varname>
     <varname>action</varname> [, ... ]
 ALTER FOREIGN TABLE [ IF EXISTS ] <varname>name</varname>
@@ -17,7 +17,7 @@ ALTER FOREIGN TABLE [ IF EXISTS ] <varname>name</varname>
     SET SCHEMA <varname>new_schema</varname>
 </codeblock>
 
-<p>where <varname>action</varname> is one of:</p><codeblock>
+<p><varname>action</varname>是下列中的一个：</p><codeblock>
     ADD [ COLUMN ] <varname>column_name</varname> <varname>column_type</varname> [ COLLATE <varname>collation</varname> ] [ <varname>column_constraint</varname> [ ... ] ]
     DROP [ COLUMN ] [ IF EXISTS ] <varname>column_name</varname> [ RESTRICT | CASCADE ]
     ALTER [ COLUMN ] <varname>column_name</varname> [ SET DATA ] TYPE <varname>data_type</varname>
@@ -36,66 +36,55 @@ ALTER FOREIGN TABLE [ IF EXISTS ] <varname>name</varname>
     OPTIONS ( [ ADD | SET | DROP ] <varname>option</varname> ['<varname>value</varname>'] [, ... ] )</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>ALTER FOREIGN TABLE</codeph> changes the definition of an existing foreign table. There are several subforms of the command:</p>
+            <title>描述</title>
+            <p><codeph>ALTER FOREIGN TABLE</codeph> 修改一个已存在的外表的定义，命令有以下的几种形式：</p>
             <parml>
                 <plentry>
                     <pt>ADD COLUMN</pt>
                     <pd>
-                        <p>This form adds a new column to the foreign table, using the same syntax
-                            as <codeph><xref href="CREATE_FOREIGN_TABLE.xml#topic1">CREATE FOREIGN
-                                    TABLE</xref></codeph>. Unlike the case when you add a column to
-                            a regular table, nothing happens to the underlying storage: this action
-                            simply declares that some new column is now accessible through the
-                            foreign table.</p>
+                        <p>这种方式往外表中新增一列，和<codeph><xref href="CREATE_FOREIGN_TABLE.xml#topic1">CREATE FOREIGN
+                                    TABLE</xref></codeph>使用相同的语法。这个不像往通常的表中新加一列，它其实在存储层面
+						不做任何操作，仅仅只是往现在访问的外表中定义了一些新列。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>DROP COLUMN [ IF EXISTS ]</pt>
                     <pd>
-                        <p>This form drops a column from a foreign table. You must specify
-                                <codeph>CASCADE</codeph> if any objects outside of the table depend
-                            on the column; for example, views. If you specify <codeph>IF
-                                EXISTS</codeph> and the column does not exist, no error is thrown.
-                            Greenplum Database issues a notice instead.</p>
+                        <p>这种形式从外表中删除一列，如果有表之外的其他对象，比如说视图依赖于此列，必须指定
+						<codeph>CASCADE</codeph>关键字。如果指定了<codeph>IF
+                                EXISTS</codeph>关键字而这个列不存在，Greenplum数据库只会产生一个提醒而不是抛出错误。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>IF EXISTS</pt>
                     <pd>
-                        <p>If you specify <codeph>IF EXISTS</codeph> and the foreign table does not
-                            exist, no error is thrown. Greenplum Database issues a notice
-                            instead.</p>
+                        <p>如果指定了<codeph>IF EXISTS</codeph>关键字而外表不存在，Greenplum数据库只会产生一个提醒而不是抛出错误。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>SET DATA TYPE</pt>
                     <pd>
-                        <p>This form changes the type of a column of a foreign table.</p>
+                        <p>这种形式修改外表中一列的类型。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>SET/DROP DEFAULT</pt>
                     <pd>
-                        <p>These forms set or remove the default value for a column. Default values
-                            apply only in subsequent <codeph>INSERT</codeph> or
-                                <codeph>UPDATE</codeph> commands; they do not cause rows already in
-                            the table to change.</p>
+                        <p>这种形式设置或者删除了列的默认值，默认值只会应用在随后的<codeph>INSERT</codeph>或者
+                                <codeph>UPDATE</codeph>命令；不会触发那些表中已经存在的行做修改。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>SET/DROP NOT NULL</pt>
                     <pd>
-                        <p>Mark a column as allowing, or not allowing, null values.</p>
+                        <p>标志一个列允许或者不允许空值。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>SET STATISTICS</pt>
                     <pd>
-                        <p>This form sets the per-column statistics-gathering target for subsequent
-                                <codeph>ANALYZE</codeph> operations. See the similar form of
-                                    <codeph><xref href="ALTER_TABLE.xml#topic1">ALTER
-                                TABLE</xref></codeph> for more details.</p>
+                        <p>这种形式为随后的<codeph>ANALYZE</codeph>操作设置每列的统计信息收集目标。更多细节参考<codeph><xref href="ALTER_TABLE.xml#topic1">ALTER
+                                TABLE</xref></codeph>中类似的形式。</p>
                     </pd>
                 </plentry>
                 <plentry>
@@ -103,157 +92,148 @@ ALTER FOREIGN TABLE [ IF EXISTS ] <varname>name</varname>
                         ] )</pt>
                     <pt>RESET ( <varname>attribute_option</varname> [, ... ] )</pt>
                     <pd>
-                        <p>This form sets or resets per-attribute options. See the similar form of
-                                    <codeph><xref href="ALTER_TABLE.xml#topic1">ALTER
-                                TABLE</xref></codeph> for more details.</p>
+                        <p>这种形式设置或者重置了每个属性的选项。更多细节参考<codeph><xref href="ALTER_TABLE.xml#topic1">ALTER
+                                TABLE</xref></codeph>中类似的形式。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>DISABLE/ENABLE [ REPLICA | ALWAYS ] TRIGGER</pt>
                     <pd>
-                        <p>These forms configure the firing of trigger(s) belonging to the foreign
-                            table. See the similar form of <xref href="ALTER_TABLE.xml#topic1">ALTER
-                                TABLE</xref> for more details.</p>
+                        <p>这些形式配置了触发那些属于外表的触发器。更多细节参考<xref href="ALTER_TABLE.xml#topic1">ALTER
+                                TABLE</xref>中类似的形式。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>OWNER</pt>
                     <pd>
-                        <p>This form changes the owner of the foreign table to the specified
-                            user.</p>
+                        <p>这种形式修改外表的所有者为指定的用户。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>RENAME</pt>
                     <pd>
-                        <p>The <codeph>RENAME</codeph> forms change the name of a foreign table or
-                            the name of an individual column in a foreign table.</p>
+                        <p><codeph>RENAME</codeph>修改一个外表的名字或者外表中个别列的名字。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>SET SCHEMA</pt>
                     <pd>
-                        <p>This form moves the foreign table into another schema.</p>
+                        <p>这种形式将外表移到其他的模式下。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>OPTIONS ( [ ADD | SET | DROP ] <varname>option</varname>
                             ['<varname>value</varname>'] [, ... ] )</pt>
                     <pd>
-                        <p>Change options for the foreign table. <codeph>ADD</codeph>,
-                                <codeph>SET</codeph>, and <codeph>DROP</codeph> specify the action
-                            to perform. If no operation is explicitly specified, the default
-                            operation is <codeph>ADD</codeph>. Option names must be unique.
-                            Greenplum Database validates names and values using the server's
-                            foreign-data wrapper.</p>
+                        <p>为外表修改选项。<codeph>ADD</codeph>,
+                                <codeph>SET</codeph>和<codeph>DROP</codeph> 指定了要执行的操作。
+								如果没有明确指出操作，默认的操作是<codeph>ADD</codeph>。选项名
+								必须是唯一的。Greenplum数据库用外部数据包装器来验证名字和值。</p>
                     </pd>
                 </plentry>
             </parml>
-            <p>You can combine all of the actions except <codeph>RENAME</codeph> and <codeph>SET SCHEMA</codeph> into a list of multiple alterations for Greenplum Database to apply in parallel. For example, it is possible to add several columns and/or alter the type of several columns in a single command.</p>
-            <p>You must own the table to use <codeph>ALTER FOREIGN TABLE</codeph>. To change the schema of a foreign table, you must also have <codeph>CREATE</codeph> privilege on the new schema. To alter the owner, you must also be a direct or indirect member of the new owning role, and that role must have <codeph>CREATE</codeph> privilege on the table's schema. (These restrictions enforce that altering the owner doesn't do anything you couldn't do by dropping and recreating the table. However, a superuser can alter ownership of any table anyway.) To add a column or to alter a column type, you must also have <codeph>USAGE</codeph> privilege on the data type.</p>
+            <p>你可以将除You can combine all of the actions except <codeph>RENAME</codeph> 和 <codeph>SET SCHEMA</codeph>之外的所有操作写在一个列表里让Greemplum数据库来并行的应用这些修改。
+			比如，可以在一个命令中增加多列或者修改多列的属性。</p>
+            <p>你必须是拥有这个表才能使用<codeph>ALTER FOREIGN TABLE</codeph>操作。为了修改外表的模式，你还必须在新的模式下拥有<codeph>CREATE</codeph>的权限。为了修改所有者，你必须是新的角色的直接或者间接成员，而且那个角色必须在表的模式下拥有<codeph>CREATE</codeph>权限。（这些限制强制要求通过删除和重新创建表来更改所有者不会执行任何操作。 但是，超级用户无论如何都可以更改任何表的所有权。）为了新增或者修改一个列的类型，你必须在数据类型上拥有<codeph>USAGE</codeph>权限。</p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt><varname>name</varname></pt>
                     <pd>
-                        <p>The name (possibly schema-qualified) of an existing foreign table to alter.</p>
+                        <p>要更改的现有外部表的名称（可能是模式限定的）。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>column_name</varname></pt>
                     <pd>
-                        <p>The name of a new or existing column.</p>
+                        <p>新的或者已存在的列的名称。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>new_column_name</varname></pt>
                     <pd>
-                        <p>The new name for an existing column.</p>
+                        <p>已存在的列的新名称</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>new_name</varname></pt>
                     <pd>
-                        <p>The new name for the foreign table.</p>
+                        <p>外表的新的名称。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>data_type</varname></pt>
                     <pd>
-                        <p>The data type of the new column, or new data type for an existing column.</p>
+                        <p>新的列的数据类型，或者已存在的列的新数据类型。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>CASCADE</pt>
                     <pd>
-                        <p>Automatically drop objects that depend on the dropped column (for example, views referencing the column).</p>
+                        <p>自动删除依赖于要删除列的对象（比如说，关联到列的视图）。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>RESTRICT</pt>
                     <pd>
-                        <p>Refuse to drop the column if there are any dependent objects. This is the default behavior.</p>
+                        <p>拒绝删除有任何对象依赖的列。这是默认的表现。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>trigger_name</varname></pt>
                     <pd>
-                        <p>Name of a single trigger to disable or enable.</p>
+                        <p>要启用或者禁用的单个触发器名称。</p>
                     </pd>
                 </plentry>
                 
                 <plentry>
                     <pt>ALL</pt>
                     <pd>
-                        <p>Disable or enable all triggers belonging to the foreign table. (This
-                            requires superuser privilege if any of the triggers are internally
-                            generated triggers. The core system does not add such triggers to
-                            foreign tables, but add-on code could do so.) </p>
+                        <p>禁用或启用属于外表的所有触发器。 （如果任何触发器是内部生成的触发器，则需要超级用户权限。核心系统不会将此类触发器添加到外表，但附加代码可以这样做。） </p>
                     </pd>
                 </plentry>
                 
                 <plentry>
                     <pt>USER</pt>
                     <pd>
-                        <p>Disable or enable all triggers belonging to the foreign table except for
-                            internally generated triggers. </p>
+                        <p>除内部生成的触发器外，禁用或启用属于外表的所有触发器。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>new_owner</varname></pt>
                     <pd>
-                        <p>The user name of the new owner of the foreign table.</p>
+                        <p>外表的新所有者的用户名。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>new_schema</varname></pt>
                     <pd>
-                        <p>The name of the schema to which the foreign table will be moved.</p>
+                        <p>外表将移动到的模式的名称</p>
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
             <title>Notes</title>
-              <p>The key word <codeph>COLUMN</codeph> is noise and can be omitted.</p>
-              <p>Consistency with the foreign server is not checked when a column is added or removed with <codeph>ADD COLUMN</codeph> or <codeph>DROP COLUMN</codeph>, a <codeph>NOT NULL</codeph> constraint is added, or a column type is changed with <codeph>SET DATA TYPE</codeph>. It is your responsibility to ensure that the table definition matches the remote side.</p>
-              <p>Refer to <codeph><xref href="CREATE_FOREIGN_TABLE.xml#topic1">CREATE FOREIGN TABLE</xref></codeph> for a further description of valid parameters.</p>
+              <p>关键字<codeph>COLUMN</codeph>是一个噪声词可以被忽略。</p>			  
+              <p>使用Consistency with the foreign server is not checked when a column is added or removed with <codeph>ADD COLUMN</codeph>或<codeph>DROP COLUMN</codeph>添加或删除列，添加 <codeph>NOT NULL</codeph> 约束，或者使用<codeph>SET DATA TYPE</codeph>修改列类型时，不会检查与外部服务器的一致性.您有责任确保表定义与远程端匹配。</p>
+              <p>参考<codeph><xref href="CREATE_FOREIGN_TABLE.xml#topic1">CREATE FOREIGN TABLE</xref></codeph>来获取未来更多的验证参数的描述。</p>
         </section>
         <section id="section6">
-            <title>Examples</title>
-            <p>To mark a column as not-null:</p><codeblock>ALTER FOREIGN TABLE distributors ALTER COLUMN street SET NOT NULL;</codeblock>
-            <p>To change the options of a foreign table:</p><codeblock>ALTER FOREIGN TABLE myschema.distributors 
+            <title>示例</title>
+            <p>标志一个列为not-null:</p><codeblock>ALTER FOREIGN TABLE distributors ALTER COLUMN street SET NOT NULL;</codeblock>
+            <p>修改一个外表的选项：</p><codeblock>ALTER FOREIGN TABLE myschema.distributors 
     OPTIONS (ADD opt1 'value', SET opt2 'value2', DROP opt3 'value3');</codeblock>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p>The forms <codeph>ADD</codeph>, <codeph>DROP</codeph>, and <codeph>SET DATA TYPE</codeph> conform with the SQL standard. The other forms are Greenplum Database extensions of the SQL standard. The ability to specify more than one manipulation in a single <codeph>ALTER FOREIGN TABLE</codeph> command is also a Greenplum Database extension.</p>
-            <p>You can use <codeph>ALTER FOREIGN TABLE ... DROP COLUMN</codeph> to drop the only column of a foreign table, leaving a zero-column table. This is an extension of SQL, which disallows zero-column foreign tables.</p>
+            <title>兼容性</title>
+            <p>这些<codeph>ADD</codeph>, <codeph>DROP</codeph>和 <codeph>SET DATA TYPE</codeph>的形式于SQL标准相符。其他形式为Greenplum数据库在SQL标准的扩展。在单个<codeph>ALTER FOREIGN TABLE</codeph>命令中指定多个操作的功能也是Greenplum数据库的扩展。</p>
+            <p>你可以使用<codeph>ALTER FOREIGN TABLE ... DROP COLUMN</codeph> 来删除外表中唯一的列，留下一个零列的表。这也是SQL的扩展，允许存在零列的外表。</p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="ALTER_TABLE.xml#topic1">ALTER TABLE</xref></codeph>,
                 <codeph><xref href="CREATE_FOREIGN_TABLE.xml#topic1">CREATE FOREIGN TABLE</xref></codeph>,
                         <codeph><xref href="DROP_FOREIGN_TABLE.xml#topic1">DROP

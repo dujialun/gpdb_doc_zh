@@ -4,8 +4,8 @@
 <topic id="topic1">
   <title id="ak20941">ALTER EXTERNAL TABLE</title>
   <body>
-    <p id="sql_command_desc">Changes the definition of an external table.</p>
-    <section id="section2"><title>Synopsis</title>
+    <p id="sql_command_desc">更改一个外部表的定义。</p>
+    <section id="section2"><title>概要</title>
       <sectiondiv id="sql_cmd_synopsis">
         <codeblock id="sql_command_synopsis">ALTER EXTERNAL TABLE <varname>name</varname> <varname>action</varname> [, ... ]</codeblock>
         <p>where <varname>action</varname> is one of:</p>
@@ -15,81 +15,68 @@
   OWNER TO <varname>new_owner</varname></codeblock>
       </sectiondiv></section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>ALTER EXTERNAL TABLE</codeph> changes the definition of an existing external table.
-        These are the supported <codeph>ALTER EXTERNAL TABLE</codeph> actions: </p>
+      <title>描述</title>
+      <p><codeph>ALTER EXTERNAL TABLE</codeph>改变了一个已存在的外部表的定义。
+        下面这些是<codeph>ALTER EXTERNAL TABLE</codeph>支持的动作。</p>
       <ul>
-        <li id="ak136720"><b>ADD COLUMN</b> — Adds a new column to the external table definition. </li>
-        <li id="ak136723"><b>DROP COLUMN</b> — Drops a column from the external table definition. If
-          you drop readable external table columns, it only changes the table definition in
-          Greenplum Database. The <codeph>CASCADE</codeph> keyword is required if anything outside
-          the table depends on the column, such as a view that references the column. </li>
-        <li id="ak142648"><b>ALTER COLUMN TYPE</b> — Changes the data type of a table column. </li>
-        <li id="ak137262"><b>OWNER</b> — Changes the owner of the external table to the specified
-          user. </li>
+        <li id="ak136720"><b>ADD COLUMN</b> — 添加一个新列到外部表的定义。</li>
+        <li id="ak136723"><b>DROP COLUMN</b> — 从一个外部表定义中删除一列。如果你删掉只读外部表的
+		列，这只会在Greenplum的表定义中修改。<codeph>CASCADE</codeph> 关键字是用来当一些其他表依
+		赖于这些列时使用，比如说一个视图依赖于这列。</li>
+        <li id="ak142648"><b>ALTER COLUMN TYPE</b> — 改变一个表列的数据类型。</li>
+        <li id="ak137262"><b>OWNER</b> — 将一个外部表的所有者改为指定用户。</li>
       </ul>
-      <p>Use the <codeph><xref href="./ALTER_TABLE.xml#topic1" type="topic" format="dita"/></codeph>
-        command to perform these actions on an external table.<ul id="ul_gtv_mcm_kbb">
-          <li>Set (change) the table schema.</li>
-          <li>Rename the table.</li>
-          <li>Rename a table column.</li>
+      <p>用<codeph><xref href="./ALTER_TABLE.xml#topic1" type="topic" format="dita"/></codeph>
+        来在一个外部表中实现这些操作。<ul id="ul_gtv_mcm_kbb">
+          <li>设置（修改）表模式</li>
+          <li>重命名表</li>
+          <li>重命名表中的列</li>
         </ul></p>
-      <p>You must own the external table to use <codeph>ALTER EXTERNAL TABLE</codeph> or
-          <codeph>ALTER TABLE</codeph>. To change the schema of an external table, you must also
-        have <codeph>CREATE</codeph> privilege on the new schema. To alter the owner, you must also
-        be a direct or indirect member of the new owning role, and that role must have
-          <codeph>CREATE</codeph> privilege on the external table's schema. A superuser has these
-        privileges automatically.</p>
-      <p>Changes to the external table definition with either <codeph>ALTER EXTERNAL TABLE</codeph>
-        or <codeph>ALTER TABLE</codeph> do not affect the external data. </p>
-      <p>The <codeph>ALTER EXTERNAL TABLE</codeph> and <codeph>ALTER TABLE</codeph> commands cannot
-        modify the type external table (read, write, web), the table <codeph>FORMAT</codeph>
-        information, or the location of the external data. To modify this information, you must drop
-        and recreate the external table definition. </p>
+      <p> 你必须时外部表的所有者才能使用<codeph>ALTER EXTERNAL TABLE</codeph>或者
+          <codeph>ALTER TABLE</codeph>。要改变一个外部表的模式，你还必须在新模式上
+          有<codeph>CREATE</codeph>的权限。要更改所有者，用户还必须是新拥有角色的
+		  直接或间接成员，该角色必须对外部表的模式具有
+		  <codeph>CREATE</codeph>特权。超级用户自动拥有这些权限。</p>
+      <p>用<codeph>ALTER EXTERNAL TABLE</codeph>或者 <codeph>ALTER TABLE</codeph> 
+	  修改外部表的定义不会影响外部的数据。</p>
+      <p><codeph>ALTER EXTERNAL TABLE</codeph> 和 <codeph>ALTER TABLE</codeph>命令
+	   不会修改外部表的类型（读、写、网页），表的<codeph>FORMAT</codeph>信息，或者
+	   外部数据的位置。要修改这些信息，你必须删除然后重建外部表的定义。</p>
     </section>
-    <section id="section4"><title>Parameters</title><parml>
+    <section id="section4"><title>参数</title><parml>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd>The name (possibly schema-qualified) of an existing external table definition to
-            alter.</pd>
+          <pd>要修改的现有外部表定义的名称（可以是方案限定）。</pd>
         </plentry>
         <plentry>
           <pt><varname>column</varname></pt>
-          <pd>Name of an existing column.</pd>
+          <pd>现有列的名称。</pd>
         </plentry>
         <plentry>
           <pt><varname>new_column</varname></pt>
-          <pd>Name of a new column.</pd>
+          <pd>新列的名称</pd>
         </plentry>
         <plentry>
           <pt><varname>type</varname></pt>
-          <pd>Data type of the new column, or new data type for an existing column.</pd>
+          <pd>新列的数据类型，或者现有列的新数据类型。</pd>
         </plentry>
         <plentry>
           <pt><varname>new_owner</varname></pt>
-          <pd>The role name of the new owner of the external table. </pd>
+          <pd>外部表的新所有者角色名。</pd>
         </plentry>
         <plentry>
           <pt>CASCADE</pt>
-          <pd>Automatically drop objects that depend on the dropped column, such as a view that
-            references the column. </pd>
+          <pd>自动删除那些依赖于要删除列的对象，比如说依赖于要删除列的视图。</pd>
         </plentry>
         <plentry>
           <pt>RESTRICT</pt>
-          <pd>Refuse to drop the column or constraint if there are any dependent objects. This is
-            the default behavior. </pd>
+          <pd>拒绝删除那些有依赖对象的列，这是默认的设置。</pd>
         </plentry>
       </parml></section>
-    <section id="section5"><title>Examples</title><p>Add a new column to an external table
-        definition:</p><codeblock>ALTER EXTERNAL TABLE ext_expenses ADD COLUMN manager text;</codeblock><p>Change
-        the owner of an external
-        table:</p><codeblock>ALTER EXTERNAL TABLE ext_data OWNER TO jojo;</codeblock><p>Change the
-        data type of an external table:</p><codeblock>ALTER EXTERNAL TABLE ext_leads ALTER COLUMN acct_code TYPE integer</codeblock>
+    <section id="section5"><title>示例</title><p>往外部表的定义中添加新列：</p><codeblock>ALTER EXTERNAL TABLE ext_expenses ADD COLUMN manager text;</codeblock><p>改变外部表的所有者：</p><codeblock>ALTER EXTERNAL TABLE ext_data OWNER TO jojo;</codeblock><p>改变外部表的数据类型：</p><codeblock>ALTER EXTERNAL TABLE ext_leads ALTER COLUMN acct_code TYPE integer</codeblock>
       </section>
-    <section id="section6"><title>Compatibility</title><p><codeph>ALTER EXTERNAL TABLE</codeph> is a
-        Greenplum Database extension. There is no <codeph>ALTER EXTERNAL TABLE</codeph> statement in
-        the SQL standard or regular PostgreSQL. </p></section>
-    <section id="section7"><title>See Also</title><p><codeph><xref href="./CREATE_EXTERNAL_TABLE.xml#topic1" type="topic" format="dita"/></codeph>,
+    <section id="section6"><title>兼容性</title><p><codeph>ALTER EXTERNAL TABLE</codeph>是Greenplum数据的扩展。标准SQL语句或者PostgreSQL中没有<codeph>ALTER EXTERNAL TABLE</codeph>语句。</p></section>
+    <section id="section7"><title>另见</title><p><codeph><xref href="./CREATE_EXTERNAL_TABLE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_EXTERNAL_TABLE.xml#topic1" type="topic" format="dita"
           /></codeph>,  <codeph><xref href="./ALTER_TABLE.xml#topic1" type="topic" format="dita"
           /></codeph></p></section>

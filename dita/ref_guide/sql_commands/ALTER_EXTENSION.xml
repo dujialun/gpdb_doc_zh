@@ -4,10 +4,9 @@
 <topic id="topic1">
   <title id="cw20941">ALTER EXTENSION</title>
   <body>
-    <p id="sql_command_desc">Change the definition of an extension that is registered in a Greenplum
-      database.</p>
+    <p id="sql_command_desc">更改在Greenplum数据库中注册的扩展的定义。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">ALTER EXTENSION <varname>name</varname> UPDATE [ TO <varname>new_version</varname> ]
 ALTER EXTENSION <varname>name</varname> SET SCHEMA <varname>new_schema</varname>
 ALTER EXTENSION <varname>name</varname> ADD <varname>member_object</varname>
@@ -49,70 +48,58 @@ and <varname>aggregate_signature</varname> is:
     ORDER BY [ <varname>argmode</varname> ] [ <varname>argname</varname> ] <varname>argtype</varname> [ , ... ]</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>ALTER EXTENSION</codeph> changes the definition of an installed extension. These
-        are the subforms:</p>
+      <title>描述</title>
+      <p><codeph>ALTER EXTENSION</codeph> 更改已安装扩展的定义。 有几种子形式:</p>
       <parml>
         <plentry>
           <pt>UPDATE</pt>
           <pd>
-            <p>This form updates the extension to a newer version. The extension must supply a
-              suitable update script (or series of scripts) that can modify the currently-installed
-              version into the requested version.</p>
+            <p>此形式将扩展更新到一个较新版本。该扩展必须提供一个合适的更新脚本（或一系列脚本），可以将当前安装的版本修改为所要求的版本。</p>
           </pd>
         </plentry>
         <plentry>
           <pt>SET SCHEMA</pt>
           <pd>
-            <p>This form moves the extension member objects into another schema. The extension must
-              be <i>relocatable</i>.</p>
+            <p>这种形式将扩展对象移动到另一个模式中。 扩展名必须是<i>可重定位</i>。</p>
           </pd>
         </plentry>
         <plentry>
           <pt>ADD <varname>member_object</varname></pt>
           <pd>
-            <p>This form adds an existing object to the extension. This is useful in extension
-              update scripts. The added object is treated as a member of the extension. The object
-              can only be dropped by dropping the extension.</p>
+            <p>这种形式将一个现有对象添加到该扩展中。这在扩展更新脚本中很有用。 该对象后续将被当作该扩展的一个成员。尤其是该对象只有通过删除扩展 才能删除。</p>
           </pd>
         </plentry>
         <plentry>
           <pt>DROP <varname>member_object</varname></pt>
           <pd>
-            <p>This form removes a member object from the extension. This is mainly useful in
-              extension update scripts. The object is not dropped, only disassociated from the
-              extension.</p>
+            <p>这种形式从扩展中删除一个成员对象。这这主要对扩展更新脚本有用。只有 撤销该对象与其扩展之间的关联后才能删除该对象。</p>
           </pd>
         </plentry>
       </parml>
-      <p>See <xref href="https://www.postgresql.org/docs/9.6/extend-extensions.html"
-          format="html" scope="external">Packaging Related Objects into an Extension</xref> for more
-        information about these operations. </p>
-      <p>You must own the extension to use <codeph>ALTER EXTENSION</codeph>. The
-          <codeph>ADD</codeph> and <codeph>DROP</codeph> forms also require ownership of the object
-        that is being added or dropped.</p>
+      <p>参阅 <xref href="https://www.postgresql.org/docs/9.6/extend-extensions.html"
+          format="html" scope="external">将相关对象打包到扩展中</xref>获取更多关于这些操作的信息。</p>
+      <p>用户必须对扩展有所有权才可以使用<codeph>ALTER EXTENSION</codeph>。
+          <codeph>ADD</codeph> 和 <codeph>DROP</codeph> 形式也要求对需要增加或者删除的对象有所有权。</p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><varname>name</varname></pt>
           <pd>
-            <p>The name of an installed extension.</p>
+            <p>需要安装的扩展名</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>new_version</varname></pt>
           <pd>
-            <p>The new version of the extension. The <varname>new_version</varname> can be either an
-              identifier or a string literal. If not specified, the command attempts to update to
-              the default version in the extension control file.</p>
+            <p>新版本的扩展。<varname>new_version</varname>以是标识符或字符串文字。如果未指定，该命令将尝试更新到扩展控制文件中的默认版本。</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>new_schema</varname></pt>
           <pd>
-            <p>The new schema for the extension.</p>
+            <p>扩展的新模式。</p>
           </pd>
         </plentry>
         <plentry>
@@ -121,94 +108,88 @@ and <varname>aggregate_signature</varname> is:
           <pt><varname>function_name</varname></pt>
           <pt><varname>operator_name</varname></pt>
           <pd>
-            <p>The name of an object to be added to or removed from the extension. Names of tables,
-              aggregates, domains, foreign tables, functions, operators, operator classes, operator
-              families, sequences, text search objects, types, and views can be
-              schema-qualified.</p>
+            <p>要从该扩展增加或者移除的对象的名称。表、聚集、域、外部表、函数、 操作符、操作符类、操作符族、序列、文本搜索对象、类型和视图的名称 可以被方案限定。</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>source_type</varname></pt>
           <pd>
-            <p>The name of the source data type of the cast.</p>
+            <p>需要转换的源数据类型的名称。</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>target_type</varname></pt>
           <pd>
-            <p>The name of the target data type of the cast.</p>
+            <p>需要转换的目标数据类型的名称。</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>argmode</varname></pt>
           <pd>
-            <p>The mode of a function or aggregate argument: <codeph>IN</codeph>,
-                <codeph>OUT</codeph>, <codeph>INOUT</codeph>, or <codeph>VARIADIC</codeph>. The
-              default is <codeph>IN</codeph>. </p>
-            <p>The command ignores the <codeph>OUT</codeph> arguments. Only the input arguments are
-              required to determine the function identity. It is sufficient to list the
-                <codeph>IN</codeph>, <codeph>INOUT</codeph>, and <codeph>VARIADIC</codeph>
-              arguments.</p>
+            <p>函数或聚集参数的模型：<codeph>IN</codeph>,
+                <codeph>OUT</codeph>, <codeph>INOUT</codeph>, 或者 <codeph>VARIADIC</codeph>。默认值是<codeph>IN</codeph>. </p>
+            <p>这个命令会忽略掉<codeph>OUT</codeph> 参数。只需要输入参数才决定标识一个函数。这足够列出
+                <codeph>IN</codeph>, <codeph>INOUT</codeph>和 <codeph>VARIADIC</codeph>
+              参数。</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>argname</varname></pt>
           <pd>
-            <p>The name of a function or aggregate argument. </p>
-            <p>The command ignores argument names, since only the argument data types are required
-              to determine the function identity.</p>
+            <p>函数或聚集参数的名字。</p>
+            <p>这个命令会忽略掉参数的名字，因为参数的数据类型已经决定标识一个函数了。</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>argtype</varname></pt>
           <pd>
-            <p>The data type of a function or aggregate argument.</p>
+            <p>函数或者聚集参数的数据类型。</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>left_type</varname></pt>
           <pt><varname>right_type</varname></pt>
           <pd>
-            <p>The data types of the operator's arguments (optionally schema-qualified) . Specify
-                <codeph>NONE</codeph> for the missing argument of a prefix or postfix operator.</p>
+            <p>操作符参数的数据类型（可以是方案限定）。 指定
+                <codeph>NONE</codeph>对于一个前缀或后缀操作符的缺失的参数。</p>
           </pd>
         </plentry>
         <plentry>
           <pt>PROCEDURAL</pt>
           <pd>
-            <p>This is a noise word.</p>
+            <p>Z这是一个噪声词。</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>type_name</varname></pt>
           <pd>
-            <p>The name of the data type of the transform.</p>
+            <p>该转换的数据类型的名称。</p>
           </pd>
         </plentry>
         <plentry>
           <pt><varname>lang_name</varname></pt>
           <pd>
-            <p>The name of the language of the transform.</p>
+            <p>该转换的语言的名称。</p>
           </pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Examples</title>
-      <p>To update the hstore extension to version 2.0:</p>
+      <title>示例</title>
+      <p>将hstore更新到2.0版本：</p>
       <codeblock>ALTER EXTENSION hstore UPDATE TO '2.0';</codeblock>
-      <p>To change the schema of the <codeph>hstore</codeph> extension to
+      <p>将<codeph>hstore</codeph>扩展的模式更改为
         <codeph>utils</codeph>:</p>
       <codeblock>ALTER EXTENSION hstore SET SCHEMA utils;</codeblock>
-      <p>To add an existing function to the <codeph>hstore</codeph> extension:</p>
+      <p>将一个已存在的函数添加到<codeph>hstore</codeph> 扩展：</p>
       <codeblock>ALTER EXTENSION hstore ADD FUNCTION populate_record(anyelement, hstore);</codeblock>
     </section>
     <section id="section6">
-      <title>Compatibility</title>
-      <p><codeph>ALTER EXTENSION</codeph> is a Greenplum Database extension. </p>
+      <title>兼容性</title>
+      <p><codeph>ALTER EXTENSION</codeph>是一个Greenplum数据库的扩展</p>
     </section>
     <section id="section7">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="CREATE_EXTENSION.xml#topic1">CREATE EXTENSION</xref></codeph>,
             <codeph><xref href="DROP_EXTENSION.xml#topic1">DROP EXTENSION</xref></codeph></p>
     </section>

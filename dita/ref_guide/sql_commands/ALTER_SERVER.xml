@@ -4,9 +4,9 @@
 <topic id="topic1">
     <title id="bv20941">ALTER SERVER</title>
     <body>
-        <p id="sql_command_desc">Changes the definition of a foreign server.</p>
+        <p id="sql_command_desc">修改一个外部服务器的定义。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>g概要</title>
             <codeblock id="sql_command_synopsis">ALTER SERVER <varname>server_name</varname> [ VERSION '<varname>new_version</varname>' ]
     [ OPTIONS ( [ ADD | SET | DROP ] <varname>option</varname> ['<varname>value</varname>'] [, ... ] ) ]
 
@@ -16,63 +16,61 @@ ALTER SERVER <varname>server_name</varname> RENAME TO <varname>new_name</varname
         </section>
         <section id="section3">
             <title>Description</title>
-            <p><codeph>ALTER SERVER</codeph> changes the definition of a foreign server.
-                The first form of the command changes the version string or the generic options of 
-                the server. Greenplum Database requires at least one clause. The second and third forms of the command change the owner or the name of the server.</p>
-            <p>To alter the server, you must be the owner of the server. To alter the owner you must:<ul>
-              <li>Own the server.</li>
-              <li>Be a direct or indirect member of the new owning role.</li>
-              <li>Have <codeph>USAGE</codeph> privilege on the server's foreign-data wrapper.</li></ul></p>
-            <p>Superusers automatically satisfy all of these criteria.</p>
+            <p><codeph>ALTER SERVER</codeph>更改外部服务器的定义。 命令的第一种形式更改服务器的版本字符串或通用选项。 Greenplum数据库需要至少一个子句。 该命令的第二和第三种形式更改服务器的所有者或名称。</p>
+            <p>要更改服务器，您必须是服务器的所有者。 要更改所有者，用户必须：<ul>
+              <li>拥有服务器。</li>
+              <li>成为新拥有角色的直接或间接成员。</li>
+              <li>在服务器的外部数据包装程序上具有<codeph>USAGE</codeph>特权。</li></ul></p>
+            <p>超级用户自动满足所有这些条件。</p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt><varname>server_name</varname></pt>
                     <pd>
-                        <p>The name of an existing server.</p>
+                        <p>现有服务器的名称。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>new_version</varname></pt>
                     <pd>
-                        <p>The new server version.</p>
+                        <p>新的服务器版本。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>OPTIONS ( [ ADD | SET | DROP ] <varname>option</varname>  ['<varname>value</varname>'] [, ... ] )</pt>
                     <pd>
-                        <p>Change the server's options. <codeph>ADD</codeph>, <codeph>SET</codeph>, and <codeph>DROP</codeph> specify the action to perform. If no operation is explicitly specified, the default operation is <codeph>ADD</codeph>. Option names must be unique. Greenplum Database validates names and values using the server's foreign-data wrapper library.</p>
+                        <p>更改服务器的选项。 <codeph>ADD</codeph>, <codeph>SET</codeph>和<codeph>DROP</codeph>指定要执行的操作。 如果未明确指定任何操作，则默认操作为<codeph>ADD</codeph>。 选项名称必须唯一。 Greenplum数据库使用服务器的外部数据包装器库来验证名称和值。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>OWNER TO <varname>new_owner</varname></pt>
                     <pd>
-                        <p>Specifies the new owner of the foreign server.</p>
+                        <p>指定外部服务器的新所有者。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>RENAME TO <varname>new_name</varname></pt>
                     <pd>
-                        <p>Specifies the new name of the foreign server.</p>
+                        <p>指定外部服务器的新名称。</p>
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section6">
             <title>Examples</title>
-            <p>Change the definition of a server named <codeph>foo</codeph> by adding connection options:</p><codeblock>ALTER SERVER foo OPTIONS (host 'foo', dbname 'foodb');</codeblock>
-            <p>Change the option named <codeph>host</codeph> for a server named <codeph>foo</codeph>, and set the server version:</p><codeblock>ALTER SERVER foo VERSION '9.1' OPTIONS (SET host 'baz');</codeblock>
+            <p>通过添加连接选项来更改名为<codeph>foo</codeph>的服务器的定义：</p><codeblock>ALTER SERVER foo OPTIONS (host 'foo', dbname 'foodb');</codeblock>
+            <p>为名为<codeph>foo</codeph>的服务器更改名为<codeph>host</codeph>的选项，并设置服务器版本：</p><codeblock>ALTER SERVER foo VERSION '9.1' OPTIONS (SET host 'baz');</codeblock>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p><codeph>ALTER SERVER</codeph> conforms to ISO/IEC 9075-9 (SQL/MED). The <codeph>OWNER
-                    TO</codeph> and <codeph>RENAME</codeph> forms are Greenplum Database extensions.
+            <title>兼容性</title>
+            <p><codeph>ALTER SERVER</codeph> 符合 ISO/IEC 9075-9 (SQL/MED)。 <codeph>OWNER
+                    TO</codeph> 和 <codeph>RENAME</codeph> 选项是Greenplum数据库的扩展。
             </p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="CREATE_SERVER.xml#topic1">CREATE SERVER</xref></codeph>,
                         <codeph><xref href="DROP_SERVER.xml#topic1">DROP
                     SERVER</xref></codeph></p>
