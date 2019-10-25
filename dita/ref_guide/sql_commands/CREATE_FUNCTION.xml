@@ -1,503 +1,510 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
     <title id="bs20941">CREATE FUNCTION</title>
     <body>
-        <p id="sql_command_desc">Defines a new function.</p>
-        <section id="section2"
-            ><title>Synopsis</title><codeblock id="sql_command_synopsis">CREATE [OR REPLACE] FUNCTION <varname>name</varname>    
+        <p id="sql_command_desc">定义一个新函数。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CREATE [OR REPLACE] FUNCTION <varname>name</varname>    
     ( [ [<varname>argmode</varname>] [<varname>argname</varname>] <varname>argtype</varname> [ { DEFAULT | = } <varname>default_expr</varname> ] [, ...] ] )
-      [ RETURNS <varname>rettype</varname> 
-        | RETURNS TABLE ( <varname>column_name</varname> <varname>column_type</varname> [, ...] ) ]
-    { LANGUAGE <varname>langname</varname>
+      [ RETURNS <varname>rettype</varname>
+        | RETURNS TABLE ( <varname>column_name</varname> <varname>column_type</varname> [, ...] ) ]
+    { LANGUAGE <varname>langname</varname>
     | WINDOW
-    | IMMUTABLE | STABLE | VOLATILE | [NOT] LEAKPROOF
-    | CALLED ON NULL INPUT | RETURNS NULL ON NULL INPUT | STRICT
-    | [EXTERNAL] SECURITY INVOKER | [EXTERNAL] SECURITY DEFINER
-    | EXECUTE ON { ANY | MASTER | ALL SEGMENTS }
-    | COST <varname>execution_cost</varname>
-    | SET <varname>configuration_parameter</varname> { TO <varname>value</varname> | = <varname>value</varname> | FROM CURRENT }
+    | IMMUTABLE | STABLE | VOLATILE | [NOT] LEAKPROOF
+    | CALLED ON NULL INPUT | RETURNS NULL ON NULL INPUT | STRICT
+    | [EXTERNAL] SECURITY INVOKER | [EXTERNAL] SECURITY DEFINER
+    | EXECUTE ON { ANY | MASTER | ALL SEGMENTS }
+    | COST <varname>execution_cost</varname>
+    | SET <varname>configuration_parameter</varname> { TO <varname>value</varname> | = <varname>value</varname> | FROM CURRENT }
     | AS '<varname>definition</varname>'
-    | AS '<varname>obj_file</varname>', '<varname>link_symbol</varname>' } ...
-    [ WITH ({ DESCRIBE = describe_function
-           } [, ...] ) ]</codeblock></section>
-        <section id="section3"><title>Description</title><p><codeph>CREATE FUNCTION</codeph> defines
-                a new function. <codeph>CREATE OR REPLACE FUNCTION</codeph> either creates a new
-                function, or replaces an existing definition.</p><p>The name of the new function
-                must not match any existing function with the same input argument types in the same
-                schema. However, functions of different argument types may share a name
-                (overloading). </p><p>To update the definition of an existing function, use
-                    <codeph>CREATE OR REPLACE FUNCTION</codeph>. It is not possible to change the
-                name or argument types of a function this way (this would actually create a new,
-                distinct function). Also, <codeph>CREATE OR REPLACE FUNCTION</codeph> will not let
-                you change the return type of an existing function. To do that, you must drop and
-                recreate the function. When using <codeph>OUT</codeph> parameters, that means you
-                cannot change the types of any <codeph>OUT</codeph> parameters except by dropping
-                the function. If you drop and then recreate a function, you will have to drop
-                existing objects (rules, views, triggers, and so on) that refer to the old function.
-                Use <codeph>CREATE OR REPLACE FUNCTION</codeph> to change a function definition
-                without breaking objects that refer to the function.</p>
-            <p>The user that creates the function becomes the owner of the function.</p>
-            <p>To be able to create a function, you must have <codeph>USAGE</codeph> privilege on
-                the argument types and the return type.</p>
-            <p>For more information about creating functions, see the <xref
-                    href="https://www.postgresql.org/docs/8.3/xfunc.html" scope="external"
-                    format="html">User Defined Functions</xref> section of the PostgreSQL
-                documentation.</p><sectiondiv id="section4"><b>Limited Use of VOLATILE and STABLE
-                    Functions</b><p>To prevent data from becoming out-of-sync across the segments in
-                    Greenplum Database, any function classified as <codeph>STABLE</codeph> or
-                        <codeph>VOLATILE</codeph> cannot be executed at the segment level if it
-                    contains SQL or modifies the database in any way. For example, functions such as
-                        <codeph>random()</codeph> or <codeph>timeofday()</codeph> are not allowed to
-                    execute on distributed data in Greenplum Database because they could potentially
-                    cause inconsistent data between the segment instances.</p><p>To ensure data
-                    consistency, <codeph>VOLATILE</codeph> and <codeph>STABLE</codeph> functions can
-                    safely be used in statements that are evaluated on and execute from the master.
-                    For example, the following statements are always executed on the master
-                    (statements without a <codeph>FROM</codeph>
-                    clause):</p><codeblock>SELECT setval('myseq', 201);
-SELECT foo();</codeblock><p>In
-                    cases where a statement has a <codeph>FROM</codeph> clause containing a
-                    distributed table and the function used in the <codeph>FROM</codeph> clause
-                    simply returns a set of rows, execution may be allowed on the
-                    segments:</p><codeblock>SELECT * FROM foo();</codeblock><p>One exception to this
-                    rule are functions that return a table reference (<codeph>rangeFuncs</codeph>)
-                    or functions that use the <codeph>refCursor</codeph> data type. Note that you
-                    cannot return a <codeph>refcursor</codeph> from any kind of function in
-                    Greenplum Database.</p></sectiondiv>
-            <sectiondiv><b>Function Volatility and EXECUTE ON Attributes</b><p>Volatility attributes
-                        (<codeph>IMMUTABLE</codeph>, <codeph>STABLE</codeph>,
-                        <codeph>VOLATILE</codeph>) and <codeph>EXECUTE ON</codeph> attributes
-                    specify two different aspects of function execution. In general, volatility
-                    indicates when the function is executed, and <codeph>EXECUTE ON</codeph>
-                    indicates where it is executed. </p><p>For example, a function defined with the
-                        <codeph>IMMUTABLE</codeph> attribute can be executed at query planning time,
-                    while a function with the <codeph>VOLATILE</codeph> attribute must be executed
-                    for every row in the query. A function with the <codeph>EXECUTE ON
-                        MASTER</codeph> attribute is executed only on the master segment and a
-                    function with the <codeph>EXECUTE ON ALL SEGMENTS</codeph> attribute is executed
-                    on all primary segment instances (not the master).</p><p>See <xref
-                        href="../../admin_guide/query/topics/functions-operators.xml#topic26/in151167"
-                        >Using Functions and Operators</xref> in the <cite>Greenplum Database
-                        Administrator Guide</cite>.</p></sectiondiv>
-            <sectiondiv><b>Functions And Replicated Tables</b><p>A user-defined function that
-                    executes only <codeph>SELECT</codeph> commands on replicated tables can run on
-                    segments. Replicated tables, created with the <codeph>DISTRIBUTED
-                        REPLICATED</codeph> clause, store all of their rows on every segment. It is
-                    safe for a function to read them on the segments, but updates to replicated
-                    tables must execute on the master instance. </p></sectiondiv></section>
-        <section id="section5"><title>Parameters</title><parml>
+    | AS '<varname>obj_file</varname>', '<varname>link_symbol</varname>' } ...
+    [ WITH ({ DESCRIBE = describe_function
+           } [, ...] ) ]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CREATE FUNCTION</codeph>定义一个新函数。
+                <codeph>CREATE OR REPLACE FUNCTION</codeph>要么创建新函数，要么替换现有定义。
+            </p>
+            <p>新函数的名称不得与任何在同一模式中具有相同输入参数类型的现有函数匹配。
+                但是，不同参数类型的函数可能共享一个名称（重载）。
+            </p>
+            <p>要更新现有函数的定义，请使用<codeph>CREATE OR REPLACE FUNCTION</codeph>。
+                不能以这种方式更改函数的名称或参数类型（这实际上会创建一个新的，不同的函数）。
+                同样，<codeph>CREATE OR REPLACE FUNCTION</codeph>将不允许您更改现有函数的返回类型。
+                为此，必须删除并重新创建该函数。
+                使用<codeph>OUT</codeph>参数时，这意味着您不能更改任何<codeph>OUT</codeph>参数的类型，除非删除该函数。
+                如果删除然后重新创建函数，则必须删除引用旧函数的现有对象（规则，视图，触发器等）。
+                使用<codeph>CREATE OR REPLACE FUNCTION</codeph>来更改函数定义，而不会破坏引用该函数的对象。
+            </p>
+            <p>创建函数的用户将成为该函数的所有者。</p>
+            <p>为了能够创建函数，您必须对参数类型和返回类型具有<codeph>USAGE</codeph>特权。
+            </p>
+            <p>有关创建函数的更多信息，请参见PostgreSQL文档的<xref href="https://www.postgresql.org/docs/8.3/xfunc.html" scope="external" format="html">用户定义函数</xref>部分。
+            </p>
+            <sectiondiv id="section4">
+                <b>限制使用VOLATILE和STABLE函数
+                </b>
+                <p>为了防止数据在Greenplum数据库的各个segment之间变得不同步，
+                    如果分类为<codeph>STABLE</codeph>或<codeph>VOLATILE</codeph>的任何函数包含SQL或以任何方式修改了数据库，
+                    则不能在segment级别执行该函数。
+                    例如，不允许在Greenplum数据库中的分布式数据上执行诸如<codeph>random()</codeph>或<codeph>timeofday()</codeph>之类的函数，
+                    因为它们可能会导致segment实例之间的数据不一致。
+                </p>
+                <p>为了确保数据的一致性，可以在master数据库上评估并执行的语句中安全地使用<codeph>VOLATILE</codeph>和<codeph>STABLE</codeph>函数。
+                    例如，以下语句始终在master数据库上执行（没有<codeph>FROM</codeph>子句的语句）：
+                </p>
+                <codeblock>SELECT setval('myseq', 201);
+SELECT foo();</codeblock>
+                <p>如果语句的<codeph>FROM</codeph>子句包含一个分布式表，
+                    并且<codeph>FROM</codeph>子句中使用的函数仅返回一组行，则可以在这些segment上执行：
+                </p>
+                <codeblock>SELECT * FROM foo();</codeblock>
+                <p>此规则的一个例外是返回表引用（<codeph>rangeFuncs</codeph>）的函数或使用<codeph>refCursor</codeph>数据类型的函数。
+                    请注意，您无法从Greenplum数据库中的任何类型的函数返回<codeph>refcursor</codeph>。
+                </p>
+            </sectiondiv>
+            <sectiondiv>
+                <b>函数易变性和EXECUTE ON属性</b>
+                <p>易变性属性（<codeph>IMMUTABLE</codeph>，<codeph>STABLE</codeph>，<codeph>VOLATILE</codeph>）和<codeph>EXECUTE ON</codeph>属性指定函数执行的两个不同方面。
+                    通常，易变性表示执行该函数的时间，<codeph>EXECUTE ON</codeph>表示执行该函数的位置。
+                </p>
+                <p>例如，可以在查询计划时执行使用<codeph>IMMUTABLE</codeph>属性定义的函数，
+                    而必须对查询中的每一行执行带有<codeph>VOLATILE</codeph>属性的函数。
+                    具有<codeph>EXECUTE ON MASTER</codeph>属性的函数仅在master上执行，
+                    具有<codeph>EXECUTE ON ALL SEGMENTS</codeph>属性的函数仅在所有primary实例（而不是master）上执行。
+                </p>
+                <p>请参阅<cite>Greenplum数据库管理员指南</cite>中的<xref href="../../admin_guide/query/topics/functions-operators.xml#topic26/in151167">使用函数和运算符</xref>。
+                </p>
+            </sectiondiv>
+            <sectiondiv>
+                <b>函数和复制表</b>
+                <p>在复制表上仅执行<codeph>SELECT</codeph>命令的用户定义函数可以在segment上运行。
+                    使用<codeph>DISTRIBUTED REPLICATED</codeph>子句创建的复制表将其所有行存储在每个segment上。
+                    函数在segment上读取它们是安全的，但是对复制表的更新必须在master实例上执行。
+                </p>
+            </sectiondiv>
+        </section>
+        <section id="section5">
+            <title>参数</title>
+            <parml>
                 <plentry>
-                    <pt><varname>name</varname></pt>
-                    <pd>The name (optionally schema-qualified) of the function to create.</pd>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要创建的函数的名称（可以由模式指定）。</pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>argmode</varname></pt>
-                    <pd>The mode of an argument: either <codeph>IN</codeph>, <codeph>OUT</codeph>,
-                            <codeph>INOUT</codeph>, or <codeph>VARIADIC</codeph>. If omitted, the
-                        default is <codeph>IN</codeph>. Only <codeph>OUT</codeph> arguments can
-                        follow an argument declared as <codeph>VARIADIC</codeph>. Also,
-                            <codeph>OUT</codeph> and <codeph>INOUT</codeph> arguments cannot be used
-                        together with the <codeph>RETURNS TABLE</codeph> notation. </pd>
-                </plentry>
-                <plentry>
-                    <pt><varname>argname</varname></pt>
-                    <pd>The name of an argument. Some languages (currently only SQL and PL/pgSQL)
-                        let you use the name in the function body. For other languages the name of
-                        an input argument is just extra documentation, so far as the function itself
-                        is concerned; but you can use input argument names when calling a function
-                        to improve readability. In any case, the name of an output argument is
-                        significant, since it defines the column name in the result row type. (If
-                        you omit the name for an output argument, the system will choose a default
-                        column name.) </pd>
-                </plentry>
-                <plentry>
-                    <pt><varname>argtype</varname></pt>
-                    <pd>The data type(s) of the function's arguments (optionally schema-qualified),
-                        if any. The argument types may be base, composite, or domain types, or may
-                        reference the type of a table column. </pd>
-                    <pd>Depending on the implementation language it may also be allowed to specify
-                        pseudotypes such as <codeph>cstring</codeph>. Pseudotypes indicate that the
-                        actual argument type is either incompletely specified, or outside the set of
-                        ordinary SQL data types. </pd>
-                    <pd>The type of a column is referenced by writing
-                                <codeph><varname>tablename</varname>.<varname>columnname</varname>%TYPE</codeph>.
-                        Using this feature can sometimes help make a function independent of changes
-                        to the definition of a table. </pd>
-                </plentry>
-                <plentry>
-                    <pt><varname>default_expr</varname></pt>
-                    <pd>An expression to be used as the default value if the parameter is not
-                        specified. The expression must be coercible to the argument type of the
-                        parameter. Only <codeph>IN</codeph> and <codeph>INOUT</codeph> parameters
-                        can have a default value. Each input parameter in the argument list that
-                        follows a parameter with a default value must have a default value as
-                        well.</pd>
-                </plentry>
-                <plentry>
-                    <pt><varname>rettype</varname></pt>
-                    <pd>The return data type (optionally schema-qualified). The return type can be a
-                        base, composite, or domain type, or may reference the type of a table
-                        column. Depending on the implementation language it may also be allowed to
-                        specify pseudotypes such as <codeph>cstring</codeph>. If the function is not
-                        supposed to return a value, specify <codeph>void</codeph> as the return
-                        type. </pd>
-                    <pd>When there are <codeph>OUT</codeph> or <codeph>INOUT</codeph> parameters,
-                        the <codeph>RETURNS</codeph> clause may be omitted. If present, it must
-                        agree with the result type implied by the output parameters:
-                            <codeph>RECORD</codeph> if there are multiple output parameters, or the
-                        same type as the single output parameter. </pd>
-                    <pd>The <codeph>SETOF</codeph> modifier indicates that the function will return
-                        a set of items, rather than a single item. </pd>
-                    <pd>The type of a column is referenced by writing
-                                <codeph><varname>tablename</varname>.<varname>columnname</varname>%TYPE</codeph>.
+                    <pt>
+                        <varname>argmode</varname>
+                    </pt>
+                    <pd>参数的模式：<codeph>IN</codeph>，<codeph>OUT</codeph>，<codeph>INOUT</codeph>或<codeph>VARIADIC</codeph>。
+                        如果省略，则默认值为<codeph>IN</codeph>。
+                        只有<codeph>OUT</codeph>参数可以跟随声明为<codeph>VARIADIC</codeph>的参数。
+                        同样，<codeph>OUT</codeph>和<codeph>INOUT</codeph>参数不能与<codeph>RETURNS TABLE</codeph>表示法一起使用。
                     </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>column_name</varname></pt>
-                    <pd>The name of an output column in the <codeph>RETURNS TABLE</codeph> syntax.
-                        This is effectively another way of declaring a named <codeph>OUT</codeph>
-                        parameter, except that <codeph>RETURNS TABLE</codeph> also implies
-                            <codeph>RETURNS SETOF</codeph>.</pd>
+                    <pt>
+                        <varname>argname</varname>
+                    </pt>
+                    <pd>参数的名称。
+                        某些语言（当前仅SQL和PL/pgSQL）允许您在函数主体中使用名称。
+                        对于其他语言，就函数本身而言，输入参数的名称只是额外的文档。
+                        但是您可以在调用函数时使用输入参数名称来提高可读性。
+                        在任何情况下，输出参数的名称都是有效的，因为它在结果行类型中定义了列名称。
+                        （如果省略输出参数的名称，则系统将选择默认列名称。）
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>column_type</varname></pt>
-                    <pd>The data type of an output column in the <codeph>RETURNS TABLE</codeph>
-                        syntax.</pd>
+                    <pt>
+                        <varname>argtype</varname>
+                    </pt>
+                    <pd>函数参数的数据类型（可以由模式指定）（如果有）。
+                        参数类型可以是基本类型，复合类型或域类型，或者可以引用表列的类型。
+                    </pd>
+                    <pd>根据实现语言的不同，还可以允许指定伪类型，例如<codeph>cstring</codeph>。
+                        伪类型表示实际参数类型未完全指定，或者位于普通SQL数据类型集之外。
+                    </pd>
+                    <pd>通过编写<codeph><varname>tablename</varname>.<varname>columnname</varname>%TYPE</codeph>来引用列的类型。
+                        使用此函数有时可以使函数独立于表定义的更改。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>langname</varname></pt>
-                    <pd>The name of the language that the function is implemented in. May be
-                            <codeph>SQL</codeph>, <codeph>C</codeph>, <codeph>internal</codeph>, or
-                        the name of a user-defined procedural language. See <codeph><xref
-                                href="./CREATE_LANGUAGE.xml#topic1" type="topic" format="dita"
-                            /></codeph> for the procedural languages supported in Greenplum
-                        Database. For backward compatibility, the name may be enclosed by single
-                        quotes. </pd>
+                    <pt>
+                        <varname>default_expr</varname>
+                    </pt>
+                    <pd>如果未指定参数，则用作默认值的表达式。
+                        该表达式必须对参数的参数类型具有强制性。
+                        只有<codeph>IN</codeph>和<codeph>INOUT</codeph>参数可以具有默认值。
+                        参数列表中紧随默认值的参数之后的每个输入参数也必须具有默认值。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>rettype</varname>
+                    </pt>
+                    <pd>返回数据类型（可以由模式指定）。
+                        返回类型可以是基本类型，复合类型或域类型，或者可以引用表列的类型。
+                        根据实现语言的不同，还可以允许指定伪类型，例如<codeph>cstring</codeph>。
+                        如果该函数不应该返回值，则将<codeph>void</codeph>指定为返回类型。
+                    </pd>
+                    <pd>当有<codeph>OUT</codeph>或<codeph>INOUT</codeph>参数时，可以省略<codeph>RETURNS</codeph>子句。
+                        如果存在，则必须与输出参数隐含的结果类型相符：
+                        <codeph>RECORD</codeph>，如果有多个输出参数，或者与单个输出参数具有相同的类型。
+                    </pd>
+                    <pd><codeph>SETOF</codeph>修饰符表示该函数将返回一组项目，而不是单个项目。
+                    </pd>
+                    <pd>通过编写<codeph><varname>tablename</varname>.<varname>columnname</varname>%TYPE</codeph>来引用列的类型。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>column_name</varname>
+                    </pt>
+                    <pd><codeph>RETURNS TABLE</codeph>语法中的输出列的名称。
+                        这实际上是声明命名<codeph>OUT</codeph>参数的另一种方法，
+                        除了<codeph>RETURNS TABLE</codeph>还暗含<codeph>RETURNS SETOF</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>column_type</varname>
+                    </pt>
+                    <pd><codeph>RETURNS TABLE</codeph>语法中输出列的数据类型。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>langname</varname>
+                    </pt>
+                    <pd>函数所使用的语言的名称。
+                        可以是<codeph>SQL</codeph>，<codeph>C</codeph>，<codeph>internal</codeph>或用户定义的过程语言的名称。
+                        有关Greenplum数据库中支持的过程语言，请参见<codeph><xref href="./CREATE_LANGUAGE.xml#topic1" type="topic" format="dita"/></codeph>。
+                        为了向后兼容，名称可以用单引号引起来。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>WINDOW</pt>
-                    <pd><codeph>WINDOW</codeph> indicates that the function is a window function
-                        rather than a plain function. This is currently only useful for functions
-                        written in C. The <codeph>WINDOW</codeph> attribute cannot be changed when
-                        replacing an existing function definition.</pd>
+                    <pd><codeph>WINDOW</codeph>表示该函数是窗口函数，而不是普通函数。
+                        当前这仅对用C编写的函数有用。
+                        替换现有函数定义时，不能更改<codeph>WINDOW</codeph>属性。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>IMMUTABLE</pt>
                     <pt>STABLE</pt>
                     <pt>VOLATILE</pt>
                     <pt>LEAKPROOF</pt>
-                    <pd>These attributes inform the query optimizer about the behavior of the
-                        function. At most one choice may be specified. If none of these appear,
-                            <codeph>VOLATILE</codeph> is the default assumption. Since Greenplum
-                        Database currently has limited use of <codeph>VOLATILE</codeph> functions,
-                        if a function is truly <codeph>IMMUTABLE</codeph>, you must declare it as so
-                        to be able to use it without restrictions.</pd>
-                    <pd><codeph>IMMUTABLE</codeph> indicates that the function cannot modify the
-                        database and always returns the same result when given the same argument
-                        values. It does not do database lookups or otherwise use information not
-                        directly present in its argument list. If this option is given, any call of
-                        the function with all-constant arguments can be immediately replaced with
-                        the function value.</pd>
-                    <pd><codeph>STABLE</codeph> indicates that the function cannot modify the
-                        database, and that within a single table scan it will consistently return
-                        the same result for the same argument values, but that its result could
-                        change across SQL statements. This is the appropriate selection for
-                        functions whose results depend on database lookups, parameter values (such
-                        as the current time zone), and so on. Also note that the
-                            <varname>current_timestamp</varname> family of functions qualify as
-                        stable, since their values do not change within a transaction.</pd>
-                    <pd><codeph>VOLATILE</codeph> indicates that the function value can change even
-                        within a single table scan, so no optimizations can be made. Relatively few
-                        database functions are volatile in this sense; some examples are
-                            <codeph>random()</codeph>, <codeph>timeofday()</codeph>. But note that
-                        any function that has side-effects must be classified volatile, even if its
-                        result is quite predictable, to prevent calls from being optimized away; an
-                        example is <codeph>setval()</codeph>.</pd>
-                    <pd><codeph>LEAKPROOF</codeph> indicates that the function has no side effects.
-                        It reveals no information about its arguments other than by its return
-                        value. For example, a function that throws an error message for some
-                        argument values but not others, or that includes the argument values in any
-                        error message, is not leakproof. The query planner may push leakproof
-                        functions (but not others) into views created with the
-                            <codeph>security_barrier</codeph> option. See <xref
-                            href="CREATE_VIEW.xml#topic1">CREATE VIEW</xref> and <xref
-                            href="CREATE_RULE.xml#topic1"/>. This option can only be set by the
-                        superuser.</pd>
+                    <pd>这些属性将有关函数的行为通知查询优化器。
+                        最多可以指定一种选择。
+                        如果这些都不出现，则默认为<codeph>VOLATILE</codeph>。
+                        由于Greenplum数据库当前对<codeph>VOLATILE</codeph>函数的使用受到限制，
+                        因此，如果一个函数确实是<codeph>IMMUTABLE</codeph>，则必须将其声明为可以不受限制地使用。
+                    </pd>
+                    <pd><codeph>IMMUTABLE</codeph>指示该函数无法修改数据库，并且在给定相同的参数值时始终返回相同的结果。
+                        它不进行数据库查找，或者使用其参数列表中不直接存在的信息。
+                        如果指定了此选项，则可以使用函数值立即替换具有全常数参数的任何函数调用。
+                    </pd>
+                    <pd><codeph>STABLE</codeph>表示该函数无法修改数据库，并且在单个表扫描中它将针对相同的参数值一致地返回相同的结果，
+                        但其结果可能会在SQL语句之间发生变化。
+                        对于结果取决于数据库查找，参数值（例如当前时区）等等的函数，这是适当的选择。
+                        还要注意，<varname>current_timestamp</varname>系列函数符合稳定条件，因为它们的值在事务中不会更改。
+                    </pd>
+                    <pd><codeph>VOLATILE</codeph>表示该函数值即使在一次表扫描中也可以更改，因此无法进行优化。
+                        从这个意义上说，相对来说很少有数据库函数是易变的。
+                        一些示例是<codeph>random()</codeph>，<codeph>timeofday()</codeph>。
+                        但是请注意，任何具有副作用的函数都必须归类为易失性，
+                        即使其结果是可以预测的，也可以防止调用被优化掉。
+                        一个示例是<codeph>setval()</codeph>。
+                    </pd>
+                    <pd><codeph>LEAKPROOF</codeph>表示该函数没有副作用。
+                        除了返回值以外，它不显示有关其参数的任何信息。
+                        例如，对于某些参数值而不是其他参数值抛出错误消息的函数，
+                        或者在任何错误消息中包含参数值的函数，都不是防漏的。
+                        查询优化器可以将防泄漏函数（但不能禁止其他功能）推入使用<codeph>security_barrier</codeph>选项创建的视图中。
+                        请参阅<xref href="CREATE_VIEW.xml#topic1">CREATE VIEW</xref>和<xref href="CREATE_RULE.xml#topic1"/>。
+                        该选项只能由超级用户设置。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>CALLED ON NULL INPUT</pt>
                     <pt>RETURNS NULL ON NULL INPUT</pt>
                     <pt>STRICT</pt>
-                    <pd><codeph>CALLED ON NULL INPUT</codeph> (the default) indicates that the
-                        function will be called normally when some of its arguments are null. It is
-                        then the function author's responsibility to check for null values if
-                        necessary and respond appropriately. <codeph>RETURNS NULL ON NULL
-                            INPUT</codeph> or <codeph>STRICT</codeph> indicates that the function
-                        always returns null whenever any of its arguments are null. If this
-                        parameter is specified, the function is not executed when there are null
-                        arguments; instead a null result is assumed automatically.</pd>
+                    <pd><codeph>CALLED ON NULL INPUT</codeph>（默认值）表示该函数的某些参数为null时将正常调用该函数。
+                        然后，函数作者有责任检查空值（如有必要）并做出适当响应。
+                        <codeph>RETURNS NULL ON NULL INPUT</codeph>或<codeph>STRICT</codeph>表示该函数在任何参数为null时始终返回null。
+                        如果指定了此参数，则在参数为空时不执行该函数；而是自动假定为空结果。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>[EXTERNAL] SECURITY INVOKER</pt>
                     <pt>[EXTERNAL] SECURITY DEFINER</pt>
-                    <pd><codeph>SECURITY INVOKER</codeph> (the default) indicates that the function
-                        is to be executed with the privileges of the user that calls it.
-                            <codeph>SECURITY DEFINER</codeph> specifies that the function is to be
-                        executed with the privileges of the user that created it. The key word
-                            <codeph>EXTERNAL</codeph> is allowed for SQL conformance, but it is
-                        optional since, unlike in SQL, this feature applies to all functions not
-                        just external ones.</pd>
+                    <pd><codeph>SECURITY INVOKER</codeph>（默认值）指示该函数将以调用该函数的用户权限执行。
+                        <codeph>SECURITY DEFINER</codeph>指定要使用创建该函数的用户的特权来执行该函数。
+                        允许使用<codeph>EXTERNAL</codeph>关键字来实现SQL一致性，但它是可选的，
+                        因为与SQL不同，此功能不仅适用于外部函数，还适用于所有函数。
+                    </pd>
                 </plentry>
 
                 <plentry>
                     <pt>EXECUTE ON ANY</pt>
                     <pt>EXECUTE ON MASTER</pt>
                     <pt>EXECUTE ON ALL SEGMENTS</pt>
-                    <pd>The <codeph>EXECUTE ON</codeph> attributes specify where (master or segment
-                        instance) a function executes when it is invoked during the query execution
-                        process.</pd>
-                    <pd><codeph>EXECUTE ON ANY</codeph> (the default) indicates that the function
-                        can be executed on the master, or any segment instance, and it returns the
-                        same result regardless of where it is executed. Greenplum Database
-                        determines where the function executes.</pd>
-                    <pd><codeph>EXECUTE ON MASTER</codeph> indicates that the function must execute
-                        only on the master instance. </pd>
-                    <pd><codeph>EXECUTE ON ALL SEGMENTS</codeph> indicates that the function must
-                        execute on all primary segment instances, but not the master, for each
-                        invocation. The overall result of the function is the <codeph>UNION
-                            ALL</codeph> of the results from all segment instances. </pd>
-                    <pd>For information about using <codeph>EXECUTE ON</codeph> attributes, see
-                            <xref href="#topic1/section6" format="dita">Notes</xref>.</pd>
+                    <pd><codeph>EXECUTE ON</codeph>属性指定在查询执行过程中调用函数时在何处（master或segment实例）执行。
+                    </pd>
+                    <pd><codeph>EXECUTE ON ANY</codeph>（默认值）表示该函数可以在master或任何segment实例上执行，
+                        并且无论在何处执行，它均返回相同的结果。
+                        Greenplum数据库确定函数在哪里执行。
+                    </pd>
+                    <pd><codeph>EXECUTE ON MASTER</codeph>表示该函数只能在master实例上执行。
+                    </pd>
+                    <pd><codeph>EXECUTE ON ALL SEGMENTS</codeph>表明对于每个调用，该函数必须在所有primary实例上执行，但不能在master实例上执行。
+                        该函数的总结果是所有segment实例的结果的<codeph>UNION ALL</codeph>。
+                    </pd>
+                    <pd>有关使用<codeph>EXECUTE ON</codeph>属性的信息，请参阅<xref href="#topic1/section6" format="dita">注释</xref>。
+                    </pd>
                 </plentry>
 
                 <plentry>
-                    <pt>COST <varname>execution_cost</varname></pt>
-                    <pd>A positive number identifying the estimated execution cost for the function,
-                        in <xref
-                            href="https://www.postgresql.org/docs/8.3/runtime-config-query.html#GUC-CPU-OPERATOR-COST"
-                            scope="external" format="html">cpu_operator_cost</xref> units. If the
-                        function returns a set, <varname>execution_cost</varname> identifies the
-                        cost per returned row. If the cost is not specified, C-language and internal
-                        functions default to 1 unit, while functions in other languages default to
-                        100 units. The planner tries to evaluate the function less often when you
-                        specify larger <varname>execution_cost</varname> values.</pd>
+                    <pt>COST
+                        <varname>execution_cost</varname>
+                    </pt>
+                    <pd>一个正数，标识函数的估计执行成本，
+                        以<xref href="https://www.postgresql.org/docs/8.3/runtime-config-query.html#GUC-CPU-OPERATOR-COST" scope="external" format="html">cpu_operator_cost</xref>为单位。
+                        如果函数返回一个集合，则<varname>execution_cost</varname>会标识每个返回行的成本。
+                        如果未指定成本，则C语言和内部函数默认为1个单位，而其他语言的函数默认为100个单位。
+                        当您指定较大的<varname>execution_cost</varname>值时，优化器将尝试较少地评估函数。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>configuration_parameter</varname></pt>
-                    <pt><varname>value</varname></pt>
-                    <pd>The <codeph>SET</codeph> clause applies a value to a session configuration
-                        parameter when the function is entered. The configuration parameter is
-                        restored to its prior value when the function exits. <codeph>SET FROM
-                            CURRENT</codeph> saves the value of the parameter that is current when
-                            <codeph>CREATE FUNCTION</codeph> is executed as the value to be applied
-                        when the function is entered. </pd>
+                    <pt>
+                        <varname>configuration_parameter</varname>
+                    </pt>
+                    <pt>
+                        <varname>value</varname>
+                    </pt>
+                    <pd>进入该函数时，<codeph>SET</codeph>子句将一个值应用于会话配置参数。
+                        函数退出时，配置参数将恢复为其先前的值。
+                        <codeph>SET FROM CURRENT</codeph>会将执行<codeph>CREATE FUNCTION</codeph>时当前的参数值保存为进入该函数时要应用的值。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>definition</varname></pt>
-                    <pd>A string constant defining the function; the meaning depends on the
-                        language. It may be an internal function name, the path to an object file,
-                        an SQL command, or text in a procedural language.</pd>
+                    <pt>
+                        <varname>definition</varname>
+                    </pt>
+                    <pd>定义函数的字符串常量；含义取决于语言。
+                        它可以是内部函数名称，目标文件的路径，SQL命令或过程语言的文本。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>obj_file, link_symbol</varname></pt>
-                    <pd>This form of the <codeph>AS</codeph> clause is used for dynamically loadable
-                        C language functions when the function name in the C language source code is
-                        not the same as the name of the SQL function. The string
-                            <varname>obj_file</varname> is the name of the file containing the
-                        dynamically loadable object, and <varname>link_symbol</varname> is the name
-                        of the function in the C language source code. If the link symbol is
-                        omitted, it is assumed to be the same as the name of the SQL function being
-                        defined. The C names
-                        of all functions must be different, so you must give overloaded SQL
-                        functions different C names (for example, use the argument types as
-                        part of the C names).
-                        It is recommended to locate shared libraries either relative to
-                            <codeph>$libdir</codeph> (which is located at
-                            <codeph>$GPHOME/lib</codeph>) or through the dynamic library path (set
-                        by the <codeph>dynamic_library_path</codeph> server configuration
-                        parameter). This simplifies version upgrades if the new installation is at a
-                        different location.</pd>
+                    <pt>
+                        <varname>obj_file, link_symbol</varname>
+                    </pt>
+                    <pd>当C语言源代码中的函数名称与SQL函数的名称不同时，这种形式的<codeph>AS</codeph>子句用于可动态加载的C语言函数。
+                        字符串<varname>obj_file</varname>是包含动态可加载对象的文件的名称，而<varname>link_symbol</varname>是C语言源代码中的函数的名称。
+                        如果省略链接符号，则假定它与所定义的SQL函数的名称相同。
+                        所有函数的C名称必须不同，因此必须为重载的SQL函数赋予不同的C名称（例如，将参数类型用作C名称的一部分）。
+                        建议相对于<codeph>$libdir</codeph>（位于<codeph>$GPHOME/lib</codeph>）或通过动态库路径（由<codeph>dynamic_library_path</codeph>服务器配置参数设置）定位共享库。
+                        如果新安装位于其他位置，则可以简化版本升级。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>describe_function</varname></pt>
-                    <pd>The name of a callback function to execute when a query that calls this
-                        function is parsed. The callback function returns a tuple descriptor that
-                        indicates the result type.</pd>
+                    <pt>
+                        <varname>describe_function</varname>
+                    </pt>
+                    <pd>解析调用此函数的查询时要执行的回调函数的名称。
+                        回调函数返回一个表示结果类型的元组描述符。
+                    </pd>
                 </plentry>
-            </parml></section>
-        <section id="section6"><title>Notes</title><p>Any compiled code (shared library files) for
-                custom functions must be placed in the same location on every host in your Greenplum
-                Database array (master and all segments). This location must also be in the
-                    <codeph>LD_LIBRARY_PATH</codeph> so that the server can locate the files. It is
-                recommended to locate shared libraries either relative to <codeph>$libdir</codeph>
-                (which is located at <codeph>$GPHOME/lib</codeph>) or through the dynamic library
-                path (set by the <codeph>dynamic_library_path</codeph> server configuration
-                parameter) on all master segment instances in the Greenplum array.</p><p>The full
-                SQL type syntax is allowed for input arguments and return value. However, some
-                details of the type specification (such as the precision field for type
-                    <varname>numeric</varname>) are the responsibility of the underlying function
-                implementation and are not recognized or enforced by the <codeph>CREATE
-                    FUNCTION</codeph> command. </p><p>Greenplum Database allows function overloading. The same name can be used for several different
-                functions so long as they have distinct input argument types. However, the C names
-                of all functions must be different, so you must give overloaded C functions
-                different C names (for example, use the argument types as part of the C names). </p><p>Two functions are considered
-                the same if they have the same names and input argument types, ignoring any
-                    <codeph>OUT</codeph> parameters. Thus for example these declarations
-                conflict:</p><codeblock>CREATE FUNCTION foo(int) ...
-CREATE FUNCTION foo(int, out text) ...</codeblock>
-            <p>Functions that have different argument type lists are not considered to conflict at
-                creation time, but if argument defaults are provided, they might conflict in use.
-                For example, consider:</p><codeblock>CREATE FUNCTION foo(int) ...
-CREATE FUNCTION foo(int, int default 42) ...</codeblock>
-            <p>The call <codeph>foo(10)</codeph>, will fail due to the ambiguity about which
-                function should be called.</p>
-            <p>When repeated <codeph>CREATE FUNCTION</codeph> calls refer to the same object file,
-                the file is only loaded once. To unload and reload the file, use the
-                    <codeph>LOAD</codeph> command. </p><p>You must have the <codeph>USAGE</codeph>
-                privilege on a language to be able to define a function using that language.</p>
-            <p>It is often helpful to use dollar quoting to write the function definition string,
-                rather than the normal single quote syntax. Without dollar quoting, any single
-                quotes or backslashes in the function definition must be escaped by doubling them. A
-                dollar-quoted string constant consists of a dollar sign (<codeph>$</codeph>), an
-                optional tag of zero or more characters, another dollar sign, an arbitrary sequence
-                of characters that makes up the string content, a dollar sign, the same tag that
-                began this dollar quote, and a dollar sign. Inside the dollar-quoted string, single
-                quotes, backslashes, or any character can be used without escaping. The string
-                content is always written literally. For example, here are two different ways to
-                specify the string "Dianne's horse" using dollar quoting:</p><codeblock>$$Dianne's horse$$
-$SomeTag$Dianne's horse$SomeTag$</codeblock>
-            <p>If a <codeph>SET</codeph> clause is attached to a function, the effects of a
-                    <codeph>SET LOCAL</codeph> command executed inside the function for the same
-                variable are restricted to the function; the configuration parameter's prior value
-                is still restored when the function exits. However, an ordinary <codeph>SET</codeph>
-                command (without <codeph>LOCAL</codeph>) overrides the <codeph>CREATE
-                    FUNCTION</codeph>
-                <codeph>SET</codeph> clause, much as it would for a previous <codeph>SET
-                    LOCAL</codeph> command. The effects of such a command will persist after the
-                function exits, unless the current transaction is rolled back.</p>
-            <p>If a function with a <codeph>VARIADIC</codeph> argument is declared as
-                    <codeph>STRICT</codeph>, the strictness check tests that the variadic array as a
-                whole is non-null. PL/pgSQL will still call the function if the array has null
-                elements.</p>
-            <p>When replacing an existing function with <codeph>CREATE OR REPLACE
-                FUNCTION</codeph>, there are restrictions on changing parameter names.
-                You cannot change the name already assigned to any input parameter
-                (although you can add names to parameters that had none before).
-                If there is more than one output parameter, you cannot change the
-                names of the output parameters, because that would change the
-                column names of the anonymous composite type that describes the
-                function's result. These restrictions are made to ensure that
-                existing calls of the function do not stop working when it is replaced.
+            </parml>
+        </section>
+        <section id="section6">
+            <title>注解</title>
+            <p>用于自定义函数的所有已编译代码（共享库文件）必须放在Greenplum数据库阵列（master和所有segment）中每个主机的相同位置。
+                此位置也必须位于<codeph>LD_LIBRARY_PATH</codeph>中，以便服务器可以找到文件。
+                建议在Greenplum阵列中的所有master实例上，
+                相对于<codeph>$libdir</codeph>（位于<codeph>$GPHOME/lib</codeph>）或通过动态库路径（由<codeph>dynamic_library_path</codeph>服务器配置参数设置）定位共享库。
             </p>
-            <sectiondiv id="section7"><b>Using Functions with Queries on Distributed Data</b><p>In
-                    some cases, Greenplum Database does not support using functions in a query where
-                    the data in a table specified in the <codeph>FROM</codeph> clause is distributed
-                    over Greenplum Database segments. As an example, this SQL query contains the
-                    function
-                    <codeph>func()</codeph>:</p><codeblock>SELECT func(a) FROM table1;</codeblock><p>The
-                    function is not supported for use in the query if all of the following
-                    conditions are met:</p><ul>
-                    <li id="bs144942">The data of table <codeph>table1</codeph> is distributed over
-                        Greenplum Database segments.</li>
-                    <li id="bs144694">The function <codeph>func()</codeph> reads or modifies data
-                        from distributed tables. </li>
-                    <li id="bs145327">The function <codeph>func()</codeph> returns more than one row
-                        or takes an argument (<codeph>a</codeph>) that comes from
-                            <codeph>table1</codeph>.</li>
-                </ul><p>If any of the conditions are not met, the function is supported.
-                    Specifically, the function is supported if any of the following conditions
-                    apply:</p><ul>
-                    <li id="bs144699">The function <codeph>func()</codeph> does not access data from
-                        distributed tables, or accesses data that is only on the Greenplum Database
-                        master. </li>
-                    <li id="bs144700">The table <codeph>table1</codeph> is a master only table.</li>
-                    <li id="bs144701">The function <codeph>func()</codeph> returns only one row and
-                        only takes input arguments that are constant values. The function is
-                        supported if it can be changed to require no input arguments.</li>
-                </ul></sectiondiv>
-            <sectiondiv><b>Using EXECUTE ON attributes</b><p>Most functions that execute queries to
-                    access tables can only execute on the master. However, functions that execute
-                    only <codeph>SELECT</codeph> queries on replicated tables can run on segments.
-                    If the function accesses a hash-distributed table or a randomly distributed
-                    table, the function should be defined with the <codeph>EXECUTE ON
-                        MASTER</codeph> attribute. Otherwise, the function might return incorrect
-                    results when the function is used in a complicated query. Without the attribute,
-                    planner optimization might determine it would be beneficial to push the function
-                    invocation to segment instances.</p>These are limitations for functions defined
-                with the <codeph>EXECUTE ON MASTER</codeph> or <codeph>EXECUTE ON ALL
-                    SEGMENTS</codeph> attribute:<ul id="ul_nlg_jky_fcb">
-                    <li>The function must be a set-returning function.</li>
-                    <li>The function cannot be in the <codeph>FROM</codeph> clause of a query.</li>
-                    <li>The function cannot be in the <codeph>SELECT</codeph> list of a query with a
-                            <codeph>FROM</codeph> clause.</li>
-                    <li>A query that includes the function falls back from GPORCA to the Postgres
-                        query planner.</li>
-                </ul></sectiondiv></section>
-        <section id="section8"><title>Examples</title><p>A very simple addition
-                function:</p><codeblock>CREATE FUNCTION add(integer, integer) RETURNS integer
-    AS 'select $1 + $2;'
-    LANGUAGE SQL
-    IMMUTABLE
-    RETURNS NULL ON NULL INPUT;</codeblock><p>Increment
-                an integer, making use of an argument name, in
-                PL/pgSQL:</p><codeblock>CREATE OR REPLACE FUNCTION increment(i integer) RETURNS 
+            <p>输入参数和返回值允许使用完整的SQL类型语法。
+                但是，类型规范的某些详细信息（例如，类型为<varname>numeric</varname>的精度字段）是基础函数实现的职责，
+                而<codeph>CREATE FUNCTION</codeph>命令无法识别或强制执行。
+            </p>
+            <p>Greenplum数据库允许函数重载。
+                相同的名称可以用于多个不同的函数，只要它们具有不同的输入参数类型即可。
+                但是，所有函数的C名称都必须不同，因此必须为重载的C函数赋予不同的C名称（例如，将参数类型用作C名称的一部分）。
+            </p>
+            <p>如果两个函数具有相同的名称和输入参数类型，而忽略任何<codeph>OUT</codeph>参数，则认为它们是相同的。
+                因此，例如，这些声明冲突：
+            </p>
+            <codeblock>CREATE FUNCTION foo(int) ...
+CREATE FUNCTION foo(int, out text) ...</codeblock>
+            <p>具有不同参数类型列表的函数在创建时不会被认为是冲突的，
+                但是如果提供了参数默认值，则它们在使用中可能会发生冲突。
+                例如，考虑：
+            </p>
+            <codeblock>CREATE FUNCTION foo(int) ...
+CREATE FUNCTION foo(int, int default 42) ...</codeblock>
+            <p>由于不清楚应调用哪个函数，因此调用<codeph>foo(10)</codeph>将失败。
+            </p>
+            <p>当重复的<codeph>CREATE FUNCTION</codeph>调用引用相同的目标文件时，该文件仅被加载一次。
+                要卸载并重新加载文件，请使用<codeph>LOAD</codeph>命令。
+            </p>
+            <p>您必须对一种语言具有<codeph>USAGE</codeph>特权，才能使用该语言定义函数。
+            </p>
+            <p>使用美元引号而不是常规的单引号语法编写函数定义字符串通常会很有帮助。
+                如果不使用美元引号，则必须通过将它们加倍来转义函数定义中的任何单引号或反斜杠。
+                用美元引用的字符串常量由一个美元符号（<codeph>$</codeph>），
+                一个零个或多个字符的可选标记，另一个美元符号，构成字符串内容的任意字符序列，
+                一个美元符号以及与开始此美元引用相同的标记和一个美元符号组成。
+                在用美元引用的字符串中，可以使用单引号，反斜杠或任何字符而无需转义。
+                字符串内容始终按原义书写。
+                例如，以下是两种使用美元引号指定字符串"Dianne's horse"的方法：
+            </p>
+            <codeblock>$$Dianne's horse$$
+$SomeTag$Dianne's horse$SomeTag$</codeblock>
+            <p>如果将<codeph>SET</codeph>子句附加到函数，
+                则在函数内部针对相同变量执行的<codeph>SET LOCAL</codeph>命令的作用仅限于该函数；
+                函数退出时，配置参数的先前值仍会恢复。
+                但是，普通的<codeph>SET</codeph>命令（不包含<codeph>LOCAL</codeph>）会覆盖<codeph>CREATE FUNCTION SET</codeph>子句，
+                就像以前的<codeph>SET LOCAL</codeph>命令所使用的一样。
+                除非当前事务回滚，否则该命令的效果将在函数退出后继续存在。
+            </p>
+            <p>如果将带有<codeph>VARIADIC</codeph>参数的函数声明为<codeph>STRICT</codeph>，
+                则严格性检查将测试可变参数数组整体是否为非空。
+                如果数组具有空元素，PL/pgSQL仍将调用该函数。
+            </p>
+            <p>用<codeph>CREATE OR REPLACE FUNCTION</codeph>替换现有函数时，更改参数名称存在限制。
+                您无法更改已分配给任何输入参数的名称（尽管您可以将名称添加到以前没有输入参数的参数中）。
+                如果有多个输出参数，则不能更改输出参数的名称，因为这将更改描述函数结果的匿名复合类型的列名称。
+                进行这些限制是为了确保函数的现有调用在被替换时不会停止工作。
+            </p>
+            <sectiondiv id="section7">
+                <b>将函数与查询一起用于分布式数据</b>
+                <p>在某些情况下，如在<codeph>FROM</codeph>子句中指定的表中的数据分布在Greenplum数据库segment上，
+                    Greenplum数据库不支持在查询中使用函数。
+                    例如，此SQL查询包含函数<codeph>func()</codeph>：
+                </p>
+                <codeblock>SELECT func(a) FROM table1;</codeblock>
+                <p>如果满足以下所有条件，则该函数不支持在查询中使用：
+                </p>
+                <ul>
+                    <li id="bs144942">表<codeph>table1</codeph>的数据分布在Greenplum数据库segment上。
+                    </li>
+                    <li id="bs144694">函数<codeph>func()</codeph>从分布式表中读取或修改数据。
+                    </li>
+                    <li id="bs145327">函数<codeph>func()</codeph>返回多个行或采用来自<codeph>table1</codeph>的参数（<codeph>a</codeph>）。
+                    </li>
+                </ul>
+                <p>如果不满足任何条件，则支持该函数。
+                    具体来说，如果满足以下任一条件，则支持该函数：
+                </p>
+                <ul>
+                    <li id="bs144699">函数<codeph>func()</codeph>不会访问分布式表中的数据，
+                        也不会访问仅在Greenplum数据库master上的数据。
+                    </li>
+                    <li id="bs144700">表<codeph>table1</codeph>是仅在master上。
+                    </li>
+                    <li id="bs144701">函数<codeph>func()</codeph>仅返回一行，并且仅接受常量值的输入参数。
+                        如果可以将其更改为不需要输入参数，则支持该函数。
+                    </li>
+                </ul>
+            </sectiondiv>
+            <sectiondiv>
+                <b>使用EXECUTE ON属性</b>
+                <p>大多数执行查询以访问表的函数只能在master上执行。
+                    但是，仅对复制表执行<codeph>SELECT</codeph>查询的函数可以在segment上运行。
+                    如果函数访问哈希分布表或随机表，则应使用<codeph>EXECUTE ON MASTER</codeph>属性定义该函数。
+                    否则，在复杂的查询中使用该函数时，该函数可能会返回错误的结果。
+                    如果没有该属性，优化器优化可能会确定将函数调用推到segment实例将是有益的。
+                </p>
+                这些是使用<codeph>EXECUTE ON MASTER</codeph>或<codeph>EXECUTE ON ALL SEGMENTS</codeph>属性定义的函数的限制：
+                <ul id="ul_nlg_jky_fcb">
+                    <li>该函数必须是返回集合的函数。</li>
+                    <li>该函数不能在查询的<codeph>FROM</codeph>子句中。
+                    </li>
+                    <li>该函数不能在带有<codeph>FROM</codeph>子句的查询的<codeph>SELECT</codeph>列表中。
+                    </li>
+                    <li>包含该函数的查询从GPORCA退回到Postgres查询计划程序。
+                    </li>
+                </ul>
+            </sectiondiv>
+        </section>
+        <section id="section8">
+            <title>示例</title>
+            <p>一个非常简单的加法函数：
+            </p>
+            <codeblock>CREATE FUNCTION add(integer, integer) RETURNS integer
+   AS 'select $1 + $2;'
+   LANGUAGE SQL
+   IMMUTABLE
+   RETURNS NULL ON NULL INPUT;</codeblock>
+            <p>在PL/pgSQL中使用参数名称递增一个整数：
+            </p>
+            <codeblock>CREATE OR REPLACE FUNCTION increment(i integer) RETURNS
 integer AS $$
         BEGIN
                 RETURN i + 1;
         END;
-$$ LANGUAGE plpgsql;</codeblock><p>Increase
-                the default segment host memory per query for a PL/pgSQL
-                function:</p><codeblock>CREATE OR REPLACE FUNCTION function_with_query() RETURNS 
+$$ LANGUAGE plpgsql;</codeblock>
+            <p>为PL/pgSQL函数增加每个查询的默认segment主机内存：
+            </p>
+            <codeblock>CREATE OR REPLACE FUNCTION function_with_query() RETURNS
 SETOF text AS $$
         BEGIN
                 RETURN QUERY
                 EXPLAIN ANALYZE SELECT * FROM large_table;
         END;
 $$ LANGUAGE plpgsql
-SET statement_mem='256MB';</codeblock><p>Use
-                polymorphic types to return an <codeph>ENUM</codeph>
-                array:</p><codeblock>CREATE TYPE rainbow AS ENUM('red','orange','yellow','green','blue','indigo','violet');
-CREATE FUNCTION return_enum_as_array( anyenum, anyelement, anyelement ) 
+SET statement_mem='256MB';</codeblock>
+            <p>使用多态类型返回<codeph>ENUM</codeph>数组：
+            </p>
+            <codeblock>CREATE TYPE rainbow AS ENUM('red','orange','yellow','green','blue','indigo','violet');
+CREATE FUNCTION return_enum_as_array( anyenum, anyelement, anyelement )
     RETURNS TABLE (ae anyenum, aa anyarray) AS $$
-    SELECT $1, array[$2, $3] 
+    SELECT $1, array[$2, $3]
 $$ LANGUAGE SQL STABLE;
 
-SELECT * FROM return_enum_as_array('red'::rainbow, 'green'::rainbow, 'blue'::rainbow);</codeblock><p>Return
-                a record containing multiple output
-                parameters:</p><codeblock>CREATE FUNCTION dup(in int, out f1 int, out f2 text)
-    AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
-    LANGUAGE SQL;
+SELECT * FROM return_enum_as_array('red'::rainbow, 'green'::rainbow, 'blue'::rainbow);</codeblock>
+            <p>返回包含多个输出参数的记录：
+            </p>
+            <codeblock>CREATE FUNCTION dup(in int, out f1 int, out f2 text)
+   AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
+   LANGUAGE SQL;
 
-SELECT * FROM dup(42);</codeblock><p>You
-                can do the same thing more verbosely with an explicitly named composite
-                type:</p><codeblock>CREATE TYPE dup_result AS (f1 int, f2 text);
+SELECT * FROM dup(42);</codeblock>
+            <p>您可以使用明确命名的复合类型来更详细地执行相同的操作：
+            </p>
+            <codeblock>CREATE TYPE dup_result AS (f1 int, f2 text);
 CREATE FUNCTION dup(int) RETURNS dup_result
     AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
     LANGUAGE SQL;
 
-SELECT * FROM dup(42);</codeblock><p>Another
-                way to return multiple columns is to use a <codeph>TABLE</codeph>
-                function:</p><codeblock>CREATE FUNCTION dup(int) RETURNS TABLE(f1 int, f2 text)
-    AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
-    LANGUAGE SQL;
+SELECT * FROM dup(42);</codeblock>
+            <p>返回多列的另一种方法是使用<codeph>TABLE</codeph>函数：
+            </p>
+            <codeblock>CREATE FUNCTION dup(int) RETURNS TABLE(f1 int, f2 text)
+   AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
+   LANGUAGE SQL;
 
-SELECT * FROM dup(4);
-</codeblock><p>This
-                function is defined with the <codeph>EXECUTE ON ALL SEGMENTS</codeph> to run on all
-                primary segment instances. The <codeph>SELECT</codeph> command executes the function
-                that returns the time it was run on each segment
-                instance.<codeblock>CREATE FUNCTION run_on_segs (text) returns setof text as $$
-  begin 
-    return next ($1 || ' - ' || now()::text ); 
+SELECT * FROM dup(4);</codeblock>
+            <p>该函数在<codeph>EXECUTE ON ALL SEGMENTS</codeph>中定义，以在所有primary实例上运行。
+                <codeph>SELECT</codeph>命令执行返回在每个segment实例上运行时间的函数。
+                <codeblock>CREATE FUNCTION run_on_segs (text) returns setof text as $$
+  begin
+    return next ($1 || ' - ' || now()::text );
   end;
- $$ language plpgsql VOLATILE EXECUTE ON ALL SEGMENTS;
+$$ language plpgsql VOLATILE EXECUTE ON ALL SEGMENTS;
 
-SELECT run_on_segs('my test');</codeblock></p><p>This
-                function looks up a part name in the parts table. The parts table is replicated, so
-                the function can execute on the master or on the primary segments.
-            </p><codeblock>CREATE OR REPLACE FUNCTION get_part_name(partno int) RETURNS text AS
+SELECT run_on_segs('my test');</codeblock>
+            </p>
+            <p>此功能在parts表中查找part名称。
+                parts表是复制表，因此该函数可以在master或primary上执行。
+            </p>
+            <codeblock>CREATE OR REPLACE FUNCTION get_part_name(partno int) RETURNS text AS
 $$
 DECLARE
    result text := ' ';
@@ -505,26 +512,43 @@ BEGIN
     SELECT part_name INTO result FROM parts WHERE part_id = partno;
     RETURN result;
 END;
-$$ LANGUAGE plpgsql;</codeblock>If
-            you execute <codeph>SELECT get_part_name(100);</codeph> at the master the function
-            executes on the master. (The master instance directs the query to a single primary
-            segment.) If orders is a distributed table and you execute the following query, the
-                <codeph>get_part_name()</codeph> function executes on the primary
-            segments.<codeblock><codeph>SELECT order_id, get_part_name(orders.part_no) FROM orders;</codeph></codeblock></section>
-        <section id="section9"><title>Compatibility</title><p><codeph>CREATE FUNCTION</codeph> is
-                defined in SQL:1999 and later. The Greenplum Database version is similar but not
-                fully compatible. The attributes are not portable, neither are the different
-                available languages. </p><p>For compatibility with some other database systems,
-                    <varname>argmode</varname> can be written either before or after
-                    <varname>argname</varname>. But only the first way is standard-compliant. </p>
-            <p>For parameter defaults, the SQL standard specifies only the syntax with
-                the <codeph>DEFAULT</codeph> key word. The syntax
-                with <codeph>=</codeph> is used in T-SQL and Firebird.</p>
+$$ LANGUAGE plpgsql;</codeblock>
+            如果在master上执行<codeph>SELECT get_part_name(100);</codeph>，该函数在master上执行。
+            （master实例将查询定向到单个primary。）
+            如果orders是分布式表，并且您执行以下查询，则<codeph>get_part_name()</codeph>函数将在primary上执行。
+            <codeblock><codeph>SELECT order_id, get_part_name(orders.part_no) FROM orders;</codeph></codeblock>
         </section>
-        <section id="section10"><title>See Also</title><p><codeph><xref
-                        href="ALTER_FUNCTION.xml#topic1" type="topic" format="dita"/></codeph>,
-                        <codeph><xref href="./DROP_FUNCTION.xml#topic1" type="topic" format="dita"
-                    /></codeph>, <codeph><xref href="./LOAD.xml#topic1" type="topic" format="dita"
-                    /></codeph></p></section>
+        <section id="section9">
+            <title>兼容性</title>
+            <p><codeph>CREATE FUNCTION</codeph>在SQL：1999及更高版本中定义。
+                Greenplum数据库版本相似，但不完全兼容。
+                这些属性不是可移植的，不同的可用语言也不是。
+            </p>
+            <p>为了与某些其他数据库系统兼容，可以在<varname>argname</varname>之前或之后写入<varname>argmode</varname>。
+                但是只有第一种方法是符合标准的。
+            </p>
+            <p>对于参数默认值，SQL标准仅使用<codeph>DEFAULT</codeph>关键字指定语法。
+                在T-SQL和Firebird中使用<codeph>=</codeph>语法。
+            </p>
+        </section>
+        <section id="section10">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref
+                            href="ALTER_FUNCTION.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./DROP_FUNCTION.xml#topic1" type="topic" format="dita"
+                    />
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./LOAD.xml#topic1" type="topic" format="dita"
+                    />
+                </codeph>
+            </p>
+        </section>
     </body>
 </topic>

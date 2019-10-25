@@ -4,15 +4,15 @@
 <topic id="topic1">
     <title id="bv20941">DROP FOREIGN TABLE</title>
     <body>
-        <p id="sql_command_desc">删除外键表。</p>
+        <p id="sql_command_desc">删除外部表。</p>
         <section id="section2">
             <title>概要</title>
             <codeblock id="sql_command_synopsis">DROP FOREIGN TABLE [ IF EXISTS ] <varname>name</varname> [, ...] [ CASCADE | RESTRICT ]</codeblock>
         </section>
         <section id="section3">
             <title>描述</title>
-            <p><codeph>DROP FOREIGN TABLE</codeph>删除现有的外键表。
-                只有外键表的所有者才能将其删除。
+            <p><codeph>DROP FOREIGN TABLE</codeph>删除现有的外部表。
+                只有外部表的所有者才能将其删除。
                 </p>
         </section>
         <section id="section4">
@@ -27,30 +27,30 @@
                 <plentry>
                     <pt><varname>name</varname></pt>
                     <pd>
-                        <p>要删除的外键表的名称（可以由模式指定）。</p>
+                        <p>要删除的外部表的名称（可以由模式指定）。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>CASCADE</pt>
                     <pd>
-                        <p>自动删除依赖于外键表的对象（例如视图）。</p>
+                        <p>自动删除依赖于外部表的对象（例如视图）。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>RESTRICT</pt>
                     <pd>
-                        <p>如果有任何对象依赖外键表，则拒绝删除该表。这是默认值。</p>
+                        <p>如果有任何对象依赖外部表，则拒绝删除该表。这是默认值。</p>
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section6">
             <title>示例</title>
-            <p>删除名为<codeph>films</codeph>和<codeph>distributors</codeph>的外键表：</p><codeblock>DROP FOREIGN TABLE films, distributors;</codeblock>
+            <p>删除名为<codeph>films</codeph>和<codeph>distributors</codeph>的外部表：</p><codeblock>DROP FOREIGN TABLE films, distributors;</codeblock>
         </section>
         <section id="section7">
             <title>兼容性</title>
-            <p><codeph>DROP FOREIGN TABLE</codeph>符合ISO/IEC 9075-9（SQL/MED），但标准仅允许每个命令删除一个外键表。
+            <p><codeph>DROP FOREIGN TABLE</codeph>符合ISO/IEC 9075-9（SQL/MED），但标准仅允许每个命令删除一个外部表。
                 <codeph>IF EXISTS</codeph>子句是Greenplum数据库扩展。
                 </p>
         </section>
