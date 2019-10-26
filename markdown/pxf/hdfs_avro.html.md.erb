@@ -232,7 +232,7 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     外部表的简单查询显示了复杂数据类型的组成部分，这些组成部分由`CREATE EXTERNAL TABLE`中指定的分隔符分隔。
 
 
-3. 根据您的应用程序处理文本列中被分隔的部分。例如，一下命令使用Greenplum数据库内部的`string_to_array`函数将`followers`字段中的条目转换为新视图中的文本数组列。
+3. 根据您的应用程序处理文本列中被分隔的部分。例如，以下命令使用Greenplum数据库内部的`string_to_array`函数将`followers`字段中的条目转换为新视图中的文本数组列。
 
     ``` sql
     postgres=# CREATE VIEW followers_view AS 

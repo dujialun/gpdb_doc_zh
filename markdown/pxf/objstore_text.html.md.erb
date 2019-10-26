@@ -167,7 +167,7 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 
 ### <a id="profile_textmulti_query"></a>示例: 从S3中读取多行文本数据
 
-执行一下步骤创建一个样例文本文件、 将文件复制到S3，并使用 PXF `s3:text:multi` 配置文件创建一个Greenplum数据库可读外部表来查询数据。
+执行以下步骤创建一个样例文本文件、 将文件复制到S3，并使用 PXF `s3:text:multi` 配置文件创建一个Greenplum数据库可读外部表来查询数据。
 
 要运行此示例，您必须：
 
@@ -265,13 +265,13 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 | delimiter    | 数据中的分隔符。 数据中的分隔符。对于`FORMAT` `'CSV'`，默认的\<delim_value\> 是逗号`,`。 当分隔符为转义序列时，在\<delim_value\> 前面加上`E`。示例：`(delimiter=E'\t')`, `(delimiter ':')`。 |
 | DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或\<字段名\>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。. |
 
-使用 `<objstore>:text`  配置文件创建可写外部表时，可以选择使用记录或块压缩。 PXF `<objstore>:text` 配置文件支持一下压缩编解码器：
+使用 `<objstore>:text`  配置文件创建可写外部表时，可以选择使用记录或块压缩。 PXF `<objstore>:text` 配置文件支持以下压缩编解码器：
 
 - org.apache.hadoop.io.compress.DefaultCodec
 - org.apache.hadoop.io.compress.GzipCodec
 - org.apache.hadoop.io.compress.BZip2Codec
 
-您可以通过 `CREATE EXTERNAL TABLE` `LOCATION` 子句中的自定义选项指定压缩编码器。 `<objstore>:text` 配置文件支持一下自定义写入选项：
+您可以通过 `CREATE EXTERNAL TABLE` `LOCATION` 子句中的自定义选项指定压缩编码器。 `<objstore>:text` 配置文件支持以下自定义写入选项：
 
 | 选项  | 值描述 |
 |-------|-------------------------------------|
