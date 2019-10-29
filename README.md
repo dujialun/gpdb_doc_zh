@@ -28,18 +28,18 @@
     - 使用外部数据 （完成：杜佳伦）
     - Loading and Unloading Data （完成：武宁）
     - Managing Performance （完成：钱晨）
-- Security Configuration Guide （翻译中：武宁）
+- Security Configuration Guide （翻译中：武宁，进度：2/9）
 - Best Practices Guide （完成：苑泽福）
     - Demo: [http://47.92.231.67:8080/6-0/best_practices/](http://47.92.231.67:8080/6-0/best_practices/)
-- Utility Guide （翻译中：苑泽福）
+- Utility Guide （翻译中：苑泽福，进度：6/53）
 - Reference Guide 进行中（参与者：肖磊、杜佳伦、亓晓帅，何江）
     - Demo: [http://47.92.231.67:8080/6-0/ref_guide/](http://47.92.231.67:8080/6-0/ref_guide/)
-    - SQL Command Reference（翻译中：肖磊，杜佳伦，进度：35/157）
+    - SQL Command Reference（翻译中：肖磊，杜佳伦，进度：132/157）
     - System Catalog Reference（完成：杜佳伦）
     - The gp_toolkit Administrative Schema（翻译中：亓晓帅，进度：1/12）
-    - The gpperfmon Database（翻译中：何江）
+    - The gpperfmon Database（完成：何江）
     - Greenplum Database Data Types（完成：何江）
     - Server Configuration Parameters（完成：杜佳伦）
     - Additional Supplied Modules（待认领）
     - Others（完成：杜佳伦）
-- Platform Extension Framework (PXF) （翻译中：彭占元，许大贵）
+- Platform Extension Framework (PXF) （完成：彭占元，许大贵）
