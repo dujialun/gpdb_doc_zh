@@ -1,5 +1,5 @@
 ---
-title: Accessing an SQL Database with PXF (JDBC)
+title: 使用PXF(JDBC)访问SQL数据库
 ---
 
 <!--
@@ -21,26 +21,26 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Some of your data may already reside in an external SQL database. PXF provides access to this data via the PXF JDBC Connector. The JDBC connector is a JDBC client. It can read data from and write data to SQL databases including MySQL, ORACLE, PostgreSQL, Apache Ignite, and Hive.
+您的某些数据可能已经存储在外部SQL数据库中。 PXF通过PXF JDBC连接器提供对此数据的访问。 JDBC 连接器是一个JDBC客户端。 它可以从SQL数据库(包括MySQL, ORACLE, PostgreSQL, Apache Ignite和Hive)读取或向SQL数据库写入数据。
 
-This section describes how to use the PXF JDBC connector to access data in an external SQL database, including how to create and query or insert data into a PXF external table that references a table in an external database.
+本节描述如何使用PXF JDBC 连接器访问外部SQL数据库中的数据，包括如何创建引用外部数据库表的PXF外部表，向该表查询数据或将数据插入该表中。
 
-<div class="note">The JDBC Connector does not guarantee consistency when writing to an external SQL database. Be aware that if an <code>INSERT</code> operation fails, some data may be written to the external database table. If you require consistency for writes, consider writing to a staging table in the external database, and loading to the target table only after verifying the write operation.</div>
+<div class="note">写入外部SQL数据库时，JDBC 连接器不保证一致性。 请注意，如果 <code>INSERT</code> 操作失败，部分数据可能会写入外部数据库表中。 如果您需要写操作的一致性，请考虑写入到外部数据库的临时表，并仅在验证写操作后才加载到目标表。</div>
 
-## <a id="prereq"></a>Prerequisites
+## <a id="prereq"></a>先决条件
 
-Before you access an external SQL database using the PXF JDBC connector, ensure that:
+在您使用PXF JDBC连接器访问外部数据库前，请确保：
 
-- You have configured and initialized PXF on your Greenplum Database segment hosts, and PXF is running on each host. See [Configuring PXF](instcfg_pxf.html) for additional information.
-- You can identify the PXF user configuration directory (`$PXF_CONF`).
-- Connectivity exists between all Greenplum Database segment hosts and the external SQL database.
-- You have configured your external SQL database for user access from all Greenplum Database segment hosts.
-- You have registered any JDBC driver JAR dependencies.
-- (Recommended) You have created one or more named PXF JDBC Connector server configurations as described in [Configuring the PXF JDBC Connector](jdbc_cfg.html).
+- 您已在Greenplum数据库segment主机上配置并初始化PXF, 并且PXF正在每台segment主机上运行。 更多详情，请参阅[配置 PXF](instcfg_pxf.html)。
+- 您可以确定PXF 用户配置目录(`$PXF_CONF`)。
+- 所有Greenplum数据库segment主机和外部SQL数据库库之间都可以连接。
+- 您已经配置了外部SQL数据库，以便从所有Greenplum数据库segment主机进行访问。
+- 您已经注册了所有JDBC驱动程序的JAR依赖。
+- (推荐)您已经按照 [配置PXF JDBC 连接器](jdbc_cfg.html) 中的描述创建了一个或多个命名的PXF JDBC连接服务配置。
 
-## <a id="datatypes"></a>Data Types Supported
+## <a id="datatypes"></a>数据类型支持
 
-The PXF JDBC connector supports the following data types:
+PXF JDBC 连接器支持以下数据类型:
 
 - INTEGER, BIGINT, SMALLINT
 - REAL, FLOAT8
@@ -51,14 +51,14 @@ The PXF JDBC connector supports the following data types:
 - TIMESTAMP
 - BYTEA
 
-Any data type not listed above is not supported by the PXF JDBC connector.
+PXF JDBC 连接器不支持上面未列出的任何数据类型。
 
-## <a id="queryextdata"></a>Accessing External SQL Data
-The PXF JDBC connector supports a single profile named `Jdbc`. You can both read data from and write data to an external SQL database table with this profile.
+## <a id="queryextdata"></a>访问外部SQL数据
+PXF JDBC连接器支持一个名为 `Jdbc` 的配置文件。 您可以使用此配置文件从外部SQL数据库表读取数据或将数据写入外部SQL数据库表。
 
-To access data in an external SQL database, you create a readable or writable Greenplum Database external table that references the external database table. The Greenplum and external database tables must have the same definition; the column names, types, and order must match.
+要访问外部SQL数据库中的数据，请创建一个可读或可写的Greenplum数据库外部表，该表引用外部数据库表。 Greenplum和外部数据库表必须具有相同的定义： 列名，类型和顺序必须匹配。
 
-Use the following syntax to create a Greenplum Database external table that references an external SQL database table and uses the JDBC connector to read or write data:
+使用以下语法创建引用外部SQL数据库表的Greenplum数据库外部表，并使用JDBC连接器读取或写入数据：
 
 <pre>
 CREATE [READABLE | WRITABLE] EXTERNAL TABLE &lt;table_name>
@@ -67,88 +67,88 @@ LOCATION ('pxf://&lt;external-table-name>?<b>PROFILE=Jdbc[&SERVER=&lt;servername
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 </pre>
 
-The specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command are described in the table below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字  | 值 |
 |-------|-------------------------------------|
-| \<external&#8209;table&#8209;name\>    | The full name of the external table. Depends on the external SQL database, may include a schema name and a table name. |
-| PROFILE    | The `PROFILE` keyword value must specify `Jdbc`. |
-| SERVER=\<servername\>   | The named server configuration that PXF uses to access the external SQL database. |
-| \<custom&#8209;option\>  | \<custom-option\> is profile-specific. `Jdbc` profile-specific options are discussed in the next section.|
-| FORMAT 'CUSTOM' | The JDBC `CUSTOM` `FORMAT` supports the built-in `'pxfwritable_import'` `FORMATTER` function for read operations and the built-in `'pxfwritable_export'` function for write operations. |
+| \<external&#8209;table&#8209;name\>    | 外部表的全名。 取决于外部SQL数据库，可能包括模式名称和表名称。 |
+| PROFILE    | `PROFILE` 关键字必须指定为 `Jdbc`. |
+| SERVER=\<servername\>   |  PXF 访问外部SQL数据库时使用的服务配置 |
+| \<custom&#8209;option\>  | \<custom-option\> 是特定于配置文件的。 `Jdbc` 配置文件的选项将在下一部分讨论。|
+| FORMAT 'CUSTOM' | JDBC `CUSTOM` `FORMAT` 支持用于读取操作的内置 `'pxfwritable_import'` `FORMATTER` 函数和用于写入操作的内置 `'pxfwritable_export'` 函数 |
 
-**Note**: You cannot use the `HEADER` option in your `FORMAT` specification when you create a PXF external table.
+**注意**: 在创建PXF外部表时，不能在 `FORMAT` 规范中使用 `HEADER` 选项。
 
 
-### <a id="jdbcoptions"></a>JDBC Custom Options
+### <a id="jdbcoptions"></a>JDBC自定义选项
 
-You include JDBC connector custom options in the `LOCATION` URI, prefacing each option with an ampersand `&`.
+您在`LOCATION` URI中引入JDBC自定义选项，并在每个选项前加上 `&` 符。
 
-The `Jdbc` profile supports the following connection-related \<custom-option\>s:
+`Jdbc` 配置文件支持以下连接相关的\<custom-option\>：
 
-| Custom Option Name   | jdbc-site.xml Property Name | Description
+| 自定义选项名称   | jdbc-site.xml 属性名称 | 描述
 |----------------------|-----------------------------|--------|
-| JDBC_DRIVER | jdbc.driver | The JDBC driver class name. (Required) |
-| DB_URL | jdbc.url | The external database URL. Depends on the external SQL database, typically includes at least the hostname, port, and database name. (Required) |
-| USER | jdbc.user | The database user name. Required if `PASS` is provided. |
-| PASS | jdbc.password | The database password for `USER`. Required if `USER` is provided. |
+| JDBC_DRIVER | jdbc.driver | JDBC驱动类名 (必须) |
+| DB_URL | jdbc.url | 外部数据库URL。 取决于外部数据库，通常至少包括主机名，端口和数据库名称 (必须) |
+| USER | jdbc.user | 数据库用户名。 如果提供了 `PASS` 则为必须。 |
+| PASS | jdbc.password |  `USER` 的数据库密码。.如果提供了 `USER` 则为必须。 |
 
-<div class="note">If you provide a <code>SERVER=&lt;servername></code> in the <code>CREATE EXTERNAL TABLE</code> <code>LOCATION</code> clause, any connection option that you include in the <code>LOCATION</code> clause overrides the value that you specified in the <code>&lt;servername></code>'s <code>jdbc-site.xml</code> configuration file.</div>
+<div class="note">如果在<code>CREATE EXTERNAL TABLE</code> <code>LOCATION</code> 子句中提供了 <code>SERVER=&lt;servername></code>，则<code>LOCATION</code> 子句中包含的任何连接选项都会覆盖<code>&lt;servername></code>的<code>jdbc-site.xml</code>配置文件中指定的值。</div>
 
-Example JDBC \<custom-option\> connection strings:
+示例 JDBC \<custom-option\> 连接字符串：
 
 ``` pre
 &JDBC_DRIVER=org.postgresql.Driver&DB_URL=jdbc:postgresql://gpmaster:5432/pgtestdb&USER=pguser1&PASS=changeme
 &JDBC_DRIVER=com.mysql.jdbc.Driver&DB_URL=jdbc:mysql://mysqlhost:3306/testdb&USER=user1&PASS=changeme
 ```
 
-Additional `CREATE EXTERNAL TABLE` \<custom-option\>s supported by the `Jdbc` profile include:
+`Jdbc` 配置文件支持的其他 `CREATE EXTERNAL TABLE` \<custom-option\> 包括：
 
-| Option Name   | Operation | Description
+| 选项名称   | 操作 | 描述
 |---------------|------------|--------|
-| BATCH_SIZE | Write | Integer identifying the number of `INSERT` operations to batch to the external SQL database. PXF always validates a `BATCH_SIZE` option, even when provided on a read operation. Batching is enabled by default. |
-| POOL_SIZE | Write | Enable thread pooling on `INSERT` operations and identify the number of threads in the pool. Thread pooling is disabled by default. |
-| PARTITION_BY | Read | The partition column, \<column-name\>:\<column-type\>. You may specify only one partition column. The JDBC connector supports `date`, `int`, and `enum` \<column-type\> values. A null `PARTITION_BY` defaults to a single fragment. |
-| RANGE | Read | Required when `PARTITION_BY` is specified. The query range, \<start-value\>[:\<end-value\>]. When the partition column is an `enum` type, `RANGE` must specify a list of values, each of which forms its own fragment. If the partition column is an `int` or `date` type, `RANGE` must specify a finite left-closed range. That is, the range includes the \<start-value\> but does *not* include the \<end-value\>. If the partition column is a `date` type, use the `yyyy-MM-dd` date format. |
-| INTERVAL | Read | Required when `PARTITION_BY` is specified and of the `int` or `date` type. The interval, \<interval-value\>[:\<interval-unit\>], of one fragment. Specify the size of the fragment in \<interval-value\>. If the partition column is a `date` type, use the \<interval-unit\> to specify `year`, `month`, or `day`. |
-| QUOTE_COLUMNS | Read | Controls whether PXF should quote column names when constructing an SQL query to the external database. Specify `true` to force PXF to quote all column names; PXF does not quote column names if any other value is provided. If `QUOTE_COLUMNS` is not specified (the default), PXF automatically quotes *all* column names in the query when *any* column name:<br>- includes special characters, or <br>- is mixed case and the external database does not support unquoted mixed case identifiers. |
+| BATCH_SIZE | Write | 整数，标识要批处理到外部SQL数据库的 `INSERT` 操作数量。 PXF 始终会验证 `BATCH_SIZE` 选项，即使是在读取操作中提供。 默认开启批处理。 |
+| POOL_SIZE | Write | 在`INSERT`操作上启动线程池，并标识线程池中的线程数。默认情况下，线程池是禁用的。 |
+| PARTITION_BY | Read | 分区列 \<column-name\>:\<column-type\>。 您只能指定一个分区列。JDBC 连接器支持 `date`、 `int` 和 `enum` \<column-type\> 值。 空的 `PARTITION_BY` 默认为单个片段。 |
+| RANGE | Read | 当指定 `PARTITION_BY` 时为必须。 查询范围： \<start-value\>[:\<end-value\>]。 当分区列为 `enum` 类型时， `RANGE` 必须指定一个值列表，每个值形成自己的分区。如果分区列是 `int` 或 `date` 类型，`RANGE` 必须指定一个有限的左闭区间。 即， 范围包括 \<start-value\> 但 *不* 包括 \<end-value\>。 如果分区列是 `date` 类型， 使用 `yyyy-MM-dd` 日期格式。 |
+| INTERVAL | Read | 指定 `PARTITION_BY` 且为 `int` 或 `date` 类型时必须。。 一个分区的间隔：\<interval-value\>[:\<interval-unit\>]。 在 \<interval-value\> 中指定分区的大小。 如果分区列是 `date` 类型, 请使用 \<interval-unit\> 指定 `year`, `month` 或 `day`。 |
+| QUOTE_COLUMNS | Read | 控制在构造外部数据库的SQL查询是 PXF 是否应引用列名。 指定为 `true` 强制PXF引用所有列名称; 如果指定任何其他值，PXF不会引用列名。 如果未指定 `QUOTE_COLUMNS` (默认)， 当查询中 *任一* 字段满足以下条件， PXF自动引用 *所有* 列名： <br>- 包含特殊字符, 或 <br>- 混合大小写，并且外部数据库不支持未引用的混合大小写标识符。 |
 
 
-#### <a id="batching"></a>Batching Insert Operations (Write)
+#### <a id="batching"></a>批量写入操作(写)
 
-When the JDBC driver of the external SQL database supports it, batching of `INSERT` operations may significantly increase performance.
+当外部SQL数据库的JDBC 驱动程序支持它是，批量 `INSERT` 操作可能会大大提升性能。
 
-Batching is enabled by default, and the default batch size is 100. To disable batching or to modify the default batch size value, create the PXF external table with a `BATCH_SIZE` setting:
+默认情况下启用批处理， 默认批处理大小为100。 要禁用批处理或修改批处理大小的值，请使用 `BATCH_SIZE` 设置创建PXF外部表：
 
-- `BATCH_SIZE=0` or `BATCH_SIZE=1` - disables batching
-- `BATCH_SIZE=(n>1)` - sets the `BATCH_SIZE` to `n`
+- `BATCH_SIZE=0` 或 `BATCH_SIZE=1` - 关闭批处理
+- `BATCH_SIZE=(n>1)` - 将 `BATCH_SIZE` 设置为 `n`
 
-When the external database JDBC driver does not support batching, the behaviour of the PXF JDBC connector depends on the `BATCH_SIZE` setting as follows:
+当外部数据库的JDBC驱动程序不支持批处理时，PXF JDBC 连接器的行为取决于 `BATCH_SIZE` 设置，如下所述：
 
-- `BATCH_SIZE` omitted - The JDBC connector inserts without batching.
-- `BATCH_SIZE=(n>1)` - The `INSERT` operation fails and the connector returns an error.
+- `BATCH_SIZE` 省略 - JDBC 连接器插入时不使用批处理。
+- `BATCH_SIZE=(n>1)` - `INSERT` 操作失败并且连接器返回错误。
 
-#### <a id="threadpool"></a>Thread Pooling (Write)
+#### <a id="threadpool"></a>线程池(写)
 
-The PXF JDBC connector can further increase write performance by processing `INSERT` operations in multiple threads when threading is supported by the JDBC driver of the external SQL database.
+当外部数据库的JDBC驱动程序支持线程化时，PXF JDBC连接器可以通过在多个线程中处理 `INSERT` 操作来进一步提升性能。
 
-Consider using batching together with a thread pool. When used together, each thread receives and processes one complete batch of data. If you use a thread pool without batching, each thread in the pool receives exactly one tuple.
+考虑将批处理和线程池一起使用。 当一起使用时，每个线程将接收并处理一批完整的数据。如果您使用线程池而不使用批处理，则线程池中的每个线程都恰好接收一个元组。
 
-The JDBC connector returns an error when any thread in the thread pool fails. Be aware that if an `INSERT` operation fails, some data may be written to the external database table.
+当线程池中的任一线程失败时，JDBC 连接器返回一个错误。请注意 `INSERT` 操作失败，部分数据可能会写入外部数据库表中。
 
-To disable or enable a thread pool and set the pool size, create the PXF external table with a `POOL_SIZE` setting as follows:
+要禁用或启动线程池并设置线程池大小，请使用 `POOL_SIZE` 设置创建PXF外部表，如下所述：
 
-- `POOL_SIZE=(n<1)` - thread pool size is the number of CPUs in the system
-- `POOL_SIZE=1` - disable thread pooling
-- `POOL_SIZE=(n>1)`- set the `POOL_SIZE` to `n`
+- `POOL_SIZE=(n<1)` - 线程池大小是系统中的CPU数量
+- `POOL_SIZE=1` - 关闭线程池
+- `POOL_SIZE=(n>1)`- 将 `POOL_SIZE` 设为 `n`
 
-#### <a id="partitioning"></a>Partitioning (Read)
+#### <a id="partitioning"></a>分区(读)
 
-The PXF JDBC Connector supports simultaneous read access from PXF instances running on multiple segment hosts to an external SQL table. This feature is referred to as partitioning.
+PXF JDBC 连接器支持运行在多个segment主机上的PXF实例同时对外部SQL表的读取访问。 此功能被称为分区
 
-When you specify the `PARTITION_BY` option, tune the `INTERVAL` value and unit based upon the optimal number of JDBC connections to the target database and the optimal distribution of fragments across Greenplum Database segments. The `INTERVAL` low boundary is driven by the number of Greenplum Database segments while the high boundary is driven by the acceptable number of JDBC connections to the target database. The `INTERVAL` setting influences the number of fragments, and should ideally not be set too high nor too low. Testing with multiple values may help you select the optimal settings. 
+当您指定 `PARTITION_BY` 选项时，请根据与目标数据库的最佳连接数以及跨Greenplum数据库segment的最佳片段分布来调整 `INTERVAL` 值和单位。 `INTERVAL` 低边界由Greenplum数据库segment的数据量驱动，而高边界由目标数据库可接受的JDNC连接数驱动。 `INTERVAL` 设置会影响片段的数量， 并且理想情况下不应设置的太高或太低。 使用多个值进行测试可以帮助您选择最佳配置。
 
-Example JDBC \<custom-option\> substrings identifying partitioning parameters:
+标识分区参数的示例JDBC \<custom-option\> 子字符串：
 
 ``` pre
 &PARTITION_BY=year:int&RANGE=2011:2013&INTERVAL=1
@@ -156,44 +156,44 @@ Example JDBC \<custom-option\> substrings identifying partitioning parameters:
 &PARTITION_BY=color:enum&RANGE=red:yellow:blue
 ```
 
-When you enable partitioning, the PXF JDBC Connector splits a `SELECT` query into a set of small queries each of which is called a fragment. All PXF instances process a fragment simultaneously.
+启用分区后，PXF JDBC连接器会将 `SELECT` 查询拆分为一组小查询，每个小查询都称为一个片段。所有PXF实例同时处理一个片段。
 
-The JDBC connector automatically adds extra query constraints (`WHERE` expressions) to each fragment to guarantee that every tuple of data is retrieved from the external database exactly once.
+JDBC 连接器会自动向每个片段添加额外的查询约束 (`WHERE` 表达式)，以确保从外部数据库中检索每个数据元组都只需一次。
 
 
-### <a id="jdbc_example_postgresql"></a>Example: Reading From and Writing to a PostgreSQL Table
+### <a id="jdbc_example_postgresql"></a>示例: 读取和写入PostgreSQL表
 
-In this example, you:
+在本例中，您将：
 
-- Create a PostgreSQL database and table, and insert data into the table
-- Create a PostgreSQL user and assign all privileges on the table to the user
-- Configure the PXF JDBC Connector to access the PostgreSQL database
-- Create a PXF readable external table that references the PostgreSQL table
-- Read the data in the PostgreSQL table
-- Create a PXF writable external table that references the PostgreSQL table
-- Write data to the PostgreSQL table
-- Read the data in the PostgreSQL table again
+- 创建一个PostgreSQL数据库和表，并将数据写入表中
+- 创建一个PostgreSQL用户并将表上的所有权限都赋予该用户
+- 配置PXF JDBC 连接器以访问PostgreSQL数据库
+- 创建一个引用PostgreSQL表的PXF可读外部表
+- 读取PostgreSQL表中的数据
+- 创建一个引用PostgreSQL表的PXF可写外部表
+- 将数据写入PostgreSQL表
+- 再次读取PostgreSQL表中的数据
 
-#### <a id="ex_create_pgtbl"></a>Create a PostgreSQL Table
+#### <a id="ex_create_pgtbl"></a>创建一个PostgreSQL表
 
-Perform the following steps to create a PostgreSQL table named `forpxf_table1` in the `public` schema of a database named `pgtestdb`, and grant a user named `pxfuser1` all privileges on this table:
+执行以下步骤在名为 `pgtestdb` 的数据库的 `public` 模式下创建一个名为 `forpxf_table1` 的PostgreSQL表，并向名为 `pxfuser1` 的用户赋予该表的所有权限：
 
-1. Identify the host name and port of your PostgreSQL server.
+1. 确定PostgreSQL服务器的主机名和端口。
 
-2. Connect to the default PostgreSQL database as the `postgres` user. For example, if your PostgreSQL server is running on the default port on the host named `pserver`:
+2. 以 `postgres` 用户连接默认PostgreSQL数据库。 例如，假设您的PostgreSQL服务以默认端口运行在 `pserver` 主机上：
 
     ``` shell
     $ psql -U postgres -h pserver
     ```
 
-3. Create a PostgreSQL database named `pgtestdb` and connect to this database:
+3. 创建一个名为`pgtestdb`的PostgreSQL数据库并连接到这个数据库：
 
     ``` sql
     =# CREATE DATABASE pgtestdb;
     =# \connect pgtestdb;
     ```
 
-4. Create a table named `forpxf_table1` and insert some data into this table:
+4. 创建一个名为 `forpxf_table1` 的表并并向表中写入一些数据：
 
     ``` sql
     =# CREATE TABLE forpxf_table1(id int);
@@ -202,35 +202,35 @@ Perform the following steps to create a PostgreSQL table named `forpxf_table1` i
     =# INSERT INTO forpxf_table1 VALUES (3);
     ```
 
-5. Create a PostgreSQL user named `pxfuser1`:
+5. 创建一个名为 `pxfuser1` 的PostgreSQL用户：
 
     ``` sql
     =# CREATE USER pxfuser1 WITH PASSWORD 'changeme';
     ```
  
-6. Assign user `pxfuser1` all privileges on table `forpxf_table1`, and exit the `psql` subsystem:
+6. 为用户 `pxfuser1` 分配 `forpxf_table1` 表的所有权限，并退出 `psql` 子系统：
 
     ``` sql
     =# GRANT ALL ON forpxf_table1 TO pxfuser1;
     =# \q
     ```
 
-    With these privileges, `pxfuser1` can read from and write to the `forpxf_table1` table.
+    有了这些权限， `pxfuser1` 可以读取和写入 `forpxf_table1` 表。
 
-7. Update the PostgreSQL configuration to allow user `pxfuser1` to access `pgtestdb` from each Greenplum Database segment host. This configuration is specific to your PostgreSQL environment. You will update the `/var/lib/pgsql/pg_hba.conf` file and then restart the PostgreSQL server.
+7. 更新 PostgreSQL 配置以允许用户 `pxfuser1` 从每个Greenplum数据库segment主机访问 `pgtestdb` 。 此配置特定于您的PostgreSQL环境。 您将更新 `/var/lib/pgsql/pg_hba.conf` 文件，然后重启PostgreSQL服务。
 
 
-#### <a id="ex_jdbconfig"></a>Configure the JDBC Connector 
+#### <a id="ex_jdbconfig"></a>配置JDBC连接器
 
-You must create a JDBC server configuration for PostgreSQL, download the PostgreSQL driver JAR file to your system, copy the JAR file to the PXF user configuration directory, synchronize PXF configuration, and then restart PXF.
+您必须为PostgreSQL创建JDBC服务配置，将PostgreSQL驱动程序JAR文件下载到您的系统，将该JAR文件复制到PXF用户配置目录，同步PXF配置， 然后重启PXF。
 
-1. Log in to the Greenplum Database master node:
+1. 登录到Greenplum数据库master节点：
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. Create a JDBC server configuration for PostgreSQL as described in [Example Configuration Procedure](jdbc_cfg.html#cfg_proc), naming the server/directory `pgsrvcfg`. The `jdbc-site.xml` file contents should look similar to the following (substitute your PostgreSQL host system for `pgserverhost`):
+2. 如[示例配置步骤](jdbc_cfg.html#cfg_proc)中所述为PostgreSQL创建JDBC服务配置，命名服务目录为 `pgsrvcfg`。 `jdbc-site.xml` 文件的内容应类似于以下内容(将PostgreSQL主机系统替换为 `pgserverhost`)：
 
     ``` xml
     <?xml version="1.0" encoding="UTF-8"?>
@@ -254,27 +254,27 @@ You must create a JDBC server configuration for PostgreSQL, download the Postgre
 </configuration>
     ```
 
-2. [Download](https://jdbc.postgresql.org/download.html) a PostgreSQL JDBC driver JAR file and note the location of the downloaded file.
+2. [下载](https://jdbc.postgresql.org/download.html) PostgreSQL JDBC驱动程序JAR文件，并记下文件的下载位置。
 
-3. Copy the JDBC driver JAR file to `$PXF_CONF/lib` on the Greenplum Database master host. For example:
+3. 将JDBC驱动程序JAR文件复制到Greenplum数据库master主机上的 `$PXF_CONF/lib` 。 例如：
 
     ``` shell
     gpadmin@gpmaster$ cp postgresql-42.2.5.jar $PXF_CONF/lib/postgresql-42.2.5.jar
     ``` 
 
-3. Synchronize PXF configuration to all Greenplum Database segment hosts. For example:
+3. 同步PXF 配置到所有Greenplum数据库segment主机。例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
     ``` 
 
-6. Restart PXF on each Greenplum Database segment host as described in [Restarting PXF](cfginitstart_pxf.html#restart_pxf).
+6. 如[重启PXF](cfginitstart_pxf.html#restart_pxf)中所述，在每个Greenplum数据库segment主机上重启PXF。
 
-#### <a id="ex_readjdbc"></a>Read from the PostgreSQL Table
+#### <a id="ex_readjdbc"></a>从PostgreSQL表中读取
 
-Perform the following procedure to create a PXF external table that references the `forpxf_table1` PostgreSQL table that you created in the previous section, and read the data in the table:
+执行以下步骤创建一个PXF外部表，该表引用您在上一节创建的 `forpxf_table1` PostgreSQL表， 并读取该表中的数据：
 
-1. Create the PXF external table specifying the `Jdbc` profile. For example:
+1. 指定 `Jdbc` 配置文件创建PXF外部表。例如：
 
     ``` sql
     gpadmin=# CREATE EXTERNAL TABLE pxf_tblfrompg(id int)
@@ -282,7 +282,7 @@ Perform the following procedure to create a PXF external table that references t
                 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
 
-2. Display all rows of the `pxf_tblfrompg` table:
+2. 显示 `pxf_tblfrompg` 表的所有行：
 
     ``` sql
     gpadmin=# SELECT * FROM pxf_tblfrompg;
@@ -294,11 +294,11 @@ Perform the following procedure to create a PXF external table that references t
     (3 rows)
     ```
 
-#### <a id="ex_writejdbc"></a>Write to the PostgreSQL Table
+#### <a id="ex_writejdbc"></a>写入PostgreSQL表
 
-Perform the following procedure to insert some data into the `forpxf_table1` Postgres table and then read from the table. You must create a new external table for the write operation.
+执行以下步骤，将一些数据写入Postgres `forpxf_table1` 表，然后从该表中读取它们。 您必须为写操作创建一个新的外部表。
 
-1. Create a writable PXF external table specifying the `Jdbc` profile. For example:
+1. 指定 `Jdbc` 配置文件创建一个可写的PXF外部表。 例如：
 
     ``` sql
     gpadmin=# CREATE WRITABLE EXTERNAL TABLE pxf_writeto_postgres(id int)
@@ -306,7 +306,7 @@ Perform the following procedure to insert some data into the `forpxf_table1` Pos
               FORMAT 'CUSTOM' (FORMATTER='pxfwritable_export');
     ```
 
-4. Insert some data into the `pxf_writeto_postgres` table. For example:
+4. 将一些数据写入 `pxf_writeto_postgres` 表。 例如：
 
     ``` sql
     =# INSERT INTO pxf_writeto_postgres VALUES (111);
@@ -314,7 +314,7 @@ Perform the following procedure to insert some data into the `forpxf_table1` Pos
     =# INSERT INTO pxf_writeto_postgres VALUES (333);
     ```
 
-5. Use the `pxf_tblfrompg` readable external table that you created in the previous section to view the new data in the `forpxf_table1` PostgreSQL table:
+5. 使用您在上一节创建的可读外部表 `pxf_tblfrompg` 来查看PostgreSQL `forpxf_table1` 表中的数据：
 
     ``` sql
     gpadmin=# SELECT * FROM pxf_tblfrompg ORDER BY id DESC;

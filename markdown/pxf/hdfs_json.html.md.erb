@@ -1,5 +1,5 @@
 ---
-title: Reading JSON Data from HDFS
+title: 从HDFS从读取JSON数据
 ---
 
 <!--
@@ -21,19 +21,19 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Use the PXF HDFS Connector to read JSON-format data. This section describes how to use PXF to access JSON data in HDFS, including how to create and query an external table that references a JSON file in the HDFS data store.
+使用PXF HDFS连接器读取JSON格式数据的数据。本节描述了如何使用PXF访问HDFS中的JSON数据，包括如何创建和查询引用HDFS中JSON文件的外部表。
 
-## <a id="prereq"></a>Prerequisites
+## <a id="prereq"></a>先决条件
 
-Ensure that you have met the PXF Hadoop [Prerequisites](access_hdfs.html#hadoop_prereq) before you attempt to read data from HDFS.
+在尝试从HDFS读取或向HDFS写入数据之前，请确保已满足PXF Hadoop[先决条件](access_hdfs.html#hadoop_prereq)。
 
-## <a id="hdfsjson_work"></a>Working with JSON Data
+## <a id="hdfsjson_work"></a>使用JSON数据
 
-JSON is a text-based data-interchange format. JSON data is typically stored in a file with a `.json` suffix. 
+JSON是基于文本的数据交换格式。JSON数据通常存储在带有 `.json`后缀的文件中。
 
-A `.json` file will contain a collection of objects. A JSON object is a collection of unordered name/value pairs. A value can be a string, a number, true, false, null, or an object or an array. You can define nested JSON objects and arrays.
+`.json`文件将包含对象的集合。JSON对象是无序键/值对的集合。值可以是字符串(string)、数字(number)、true、false、null或对象(object)或数组(array)。您可以定义嵌套的JSON对象和数组。
 
-Sample JSON data file content:
+样本JSON数据文件内容：
 
 ``` json
   {
@@ -53,57 +53,57 @@ Sample JSON data file content:
   }
 ```
 
-In the sample above, `user` is an object composed of fields named `id` and `location`. To specify the nested fields in the `user` object as Greenplum Database external table columns, use `.` projection:
+在上述的示例中，`user`是一个由名为`id`和`location`的字段组成的对象。要将`user`对象中的嵌套字段指定为Greenplum数据库外部表列，请使用`.`映射：
 
 ``` pre
 user.id
 user.location
 ```
 
-`coordinates` is an object composed of a text field named `type` and an array of integers named `values`. Use `[]` to identify specific elements of the `values` array as Greenplum Database external table columns:
+`coordinates`是一个由名为`type`字段和名为`values`的整数数组组成的对象。使用`[]`来指定特定`values`数组中特定的元素作为Greenplum数据库外部表的列：
 
 ``` pre
 coordinates.values[0]
 coordinates.values[1]
 ```
 
-Refer to [Introducing JSON](http://www.json.org/) for detailed information on JSON syntax.
+有关JSON语法的详细信息，请参阅[JSON 简介](http://www.json.org/)。
 
-### <a id="datatypemap_json"></a>JSON to Greenplum Database Data Type Mapping</a>
+### <a id="datatypemap_json"></a>JSON到Greenplum数据库数据类型映射</a>
 
-To represent JSON data in Greenplum Database, map data values that use a primitive data type to Greenplum Database columns of the same type. JSON supports complex data types including projections and arrays. Use N-level projection to map members of nested objects and arrays to primitive data types.
+要在Greenplum数据库中表示JSON数据，请将使用基本数据类型的值映射到相同类型的Greenplum数据库列。JSON支持复杂的数据类型包括投影和数组。 使用N级投影将嵌套对象和数组的成员映射到基本数据类型。
 
-The following table summarizes external mapping rules for JSON data.
+下表总结了JSON数据的外部映射规则。
 
-<caption><span class="tablecap">Table 1. JSON Mapping</span></caption>
+<caption><span class="tablecap">表1. JSON映射</span></caption>
 
 <a id="topic_table_jsondatamap"></a>
 
-| JSON Data Type                                                    | PXF/Greenplum Data Type                                                                                                                                                                                            |
+| JSON 数据类型                                                    | PXF/Greenplum Data Type                                                                                                                                                                                            |
 |-------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Primitive type (integer, float, string, boolean, null) | Use the corresponding Greenplum Database built-in data type; see [Greenplum Database Data Types](../ref_guide/data_types.html). |
-| Array                         | Use `[]` brackets to identify a specific array index to a member of primitive type.                                                                                            |
-| Object                | Use dot `.` notation to specify each level of projection (nesting) to a member of a primitive type.                                                                                         |
+| 基本类型(integer, float, string, boolean, null) | 使用相应的Greenplum数据库内置数据类型；请参阅[Greenplum数据库数据类型](../ref_guide/data_types.html). |
+| 数组(Array)                         | 使用`[]`括号标识基本数据类型数组特定成员的索引。|
+| 对象(Object)                | 使用`.`点号指定基本类型的每一层投影(嵌套)。|
 
-### <a id="topic_jsonreadmodes"></a>JSON Data Read Modes
+### <a id="topic_jsonreadmodes"></a>JSON数据读取模式
 
-PXF supports two data read modes. The default mode expects one full JSON record per line.  PXF also supports a read mode operating on JSON records that span multiple lines.
+PXF支持两种数据读取模式。默认模式是每行一条完成的JSON记录。PXF还支持对跨多行的JSON记录进行操作的读取模式。
 
-In upcoming examples, you will use both read modes to operate on a sample data set. The schema of the sample data set defines objects with the following member names and value data types:
+在接下来的示例中，您将使用两种模式对样本数据集进行操作。样本数据集的模式定义具有以下成员名称和数据类型的对象：
 
    - "created_at" - text
    - "id_str" - text
    - "user" - object
       - "id" - integer
       - "location" - text
-   - "coordinates" - object (optional)
+   - "coordinates" - object (可选)
       - "type" - text
       - "values" - array
          - [0] - integer
          - [1] - integer
 
 
-The single-JSON-record-per-line data set follows:
+每行单条JSON记录数据如下：
 
 ``` pre
 {"created_at":"FriJun0722:45:03+00002013","id_str":"343136551322136576","user":{
@@ -115,7 +115,7 @@ The single-JSON-record-per-line data set follows:
 "id":287819058,"location":""}, "coordinates": null}
 ```  
 
-This is the data set for for the multi-line JSON record data set:
+这是用于多行JSON数据的数据集:
 
 ``` json
 {
@@ -150,17 +150,17 @@ This is the data set for for the multi-line JSON record data set:
 }
 ```
 
-You will create JSON files for the sample data sets and add them to HDFS in the next section.
+在下一节中您将为示例数据集创建JSON文件，并将其添加到HDFS中。
 
-## <a id="jsontohdfs"></a>Loading the Sample JSON Data to HDFS
+## <a id="jsontohdfs"></a>将样本JSON数据加载到HDFS
 
-The PXF HDFS connector reads native JSON stored in HDFS. Before you can use Greenplum Database to query JSON format data, the data must reside in your HDFS data store.
+PXF HDFS连接器读取存储在HDFS本地的JSON文件。在使用Greenplum数据库查询JSON格式数据之前，该数据必须存在于HDFS中。
 
-Copy and paste the single line JSON record sample data set above to a file named `singleline.json`. Similarly, copy and paste the multi-line JSON record data set to a file named `multiline.json`.
+将上面的单行JSON记录样本数据集复制并黏贴到名为`singleline.json`的文件中。同样的，将多行JSON记录数据集复制并黏贴到名为`multiline.json`的文件中。
 
-**Note**: Ensure that there are **no** blank lines in your JSON files.
+**注意**: 确保JSON文件中**没有**空白行。
 
-Copy the JSON data files that you just created to your HDFS data store. Create the `/data/pxf_examples` directory if you did not do so in a previous exercise. For example:
+将您刚创建的文件复制到HDFS中。如果您在上一个练习中没有创建`/data/pxf_examples`目录，请创建它。例如：
 
 ``` shell
 $ hdfs dfs -mkdir /data/pxf_examples
@@ -168,12 +168,12 @@ $ hdfs dfs -put singleline.json /data/pxf_examples
 $ hdfs dfs -put multiline.json /data/pxf_examples
 ```
 
-Once the data is loaded to HDFS, you can use Greenplum Database and PXF to query and analyze the JSON data.
+数据加载到HDFS后，您可以使用Greenplum数据库和PXF查询和分析JSON数据。
 
 
-## <a id="json_cet"></a>Creating the External Table
+## <a id="json_cet"></a>创建外部表
 
-Use the `hdfs:json` profile to read JSON-format files from HDFS. The following syntax creates a Greenplum Database readable external table that references such a file:
+使用`hdfs:json`配置文件从HDFS中读取JSON格式的文件。以下语法创建一个引用此类文件的Greenplum数据库可读外部表：
 
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
@@ -182,26 +182,26 @@ LOCATION ('pxf://<path-to-hdfs-file>?PROFILE=hdfs:json[&<custom-option>=<value>[
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
-The specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command are described in the table below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字| 值|
 |-------|-------------------------------------|
-| \<path&#8209;to&#8209;hdfs&#8209;file\>    | The absolute path to the directory or file in the HDFS data store. |
-| PROFILE    | The `PROFILE` keyword must specify `hdfs:json`. |
-| \<custom&#8209;option\>  | \<custom-option\>s are discussed below.|
-| FORMAT 'CUSTOM' | Use `FORMAT` `'CUSTOM'` with  the `hdfs:json` profile. The `CUSTOM` `FORMAT` requires that you specify `(FORMATTER='pxfwritable_import')`. |
+| \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径 |
+| PROFILE    | `PROFILE`关键字必须指定为`hdfs:json` |
+| \<custom&#8209;option\>  | \<custom-option\>描述见下方|
+| FORMAT 'CUSTOM' | 在 `hdfs:json`配置文件中使用 `FORMAT` `'CUSTOM'` 。 `CUSTOM` `FORMAT` 要求您指定为 `(FORMATTER='pxfwritable_import')`。 |
 
 <a id="customopts"></a>
-PXF supports single- and multi- line JSON records. When you want to read multi-line JSON records, you must provide an `IDENTIFIER` \<custom-option\> and value. Use this \<custom-option\> to identify the member name of the first field in the JSON record object:
+PXF支持单行和多行JSON记录。当您想读取多行JSON记录时，必须提供`IDENTIFIER` \<custom-option\> 和值。 使用这个\<custom-option\>标识JSON记录对象中第一个字段的成员名称：
 
-| Option Keyword  | &nbsp;&nbsp;Syntax,&nbsp;&nbsp;Example(s)&nbsp;&nbsp; | Description |
+| 选项关键字  | &nbsp;&nbsp;语法、&nbsp;&nbsp;示例&nbsp;&nbsp; | 描述 |
 |-------|--------------|-----------------------|
-| IDENTIFIER  | `&IDENTIFIER=<value>`<br>`&IDENTIFIER=created_at`| You must include the `IDENTIFIER` keyword and \<value\> in the `LOCATION` string only when you are accessing JSON data comprised of multi-line records. Use the \<value\> to identify the member name of the first field in the JSON record object. | 
+| IDENTIFIER  | `&IDENTIFIER=<value>`<br>`&IDENTIFIER=created_at`| 仅在访问多行JSON记录时，才必须在`LOCATION`字符串中指定`IDENTIFIER`关键字和值。 使用这个值标识JSON记录对象中第一个字段的成员名称。 |
 
 
-## <a id="jsonexample1"></a>Example: Reading a JSON File with Single Line Records
+## <a id="jsonexample1"></a>示例：读取单行记录的JSON文件
 
-Use the following [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) SQL command to create a readable external table that references the single-line-per-record JSON data file.
+使用以下[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) SQL命令创建一个引用每条记录单行的JSON数据文件的可读外部表。
 
 ``` sql 
 CREATE EXTERNAL TABLE singleline_json_tbl(
@@ -216,17 +216,17 @@ LOCATION('pxf://data/pxf_examples/singleline.json?PROFILE=hdfs:json')
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
-Notice the use of `.` projection to access the nested fields in the `user` and `coordinates` objects.  Also notice the use of `[]` to access specific elements of the `coordinates.values[]` array.
+注意使用`.`投影访问`user`和`coordinates`对象中的嵌套字段。还要注意使用`[]`来访问`coordinates.values[]`数组中的特定元素。
 
-To query the JSON data in the external table:
+查询外部表中的JSON数据:
 
 ``` sql
 SELECT * FROM singleline_json_tbl;
 ```
 
-## <a id="jsonexample2" class="no-quick-link"></a>Example: Reading a JSON file with Multi-Line Records
+## <a id="jsonexample2" class="no-quick-link"></a>示例：读取多行记录的JSON文件
 
-The SQL command to create a readable external table from the multi-line-per-record JSON file is very similar to that of the single line data set above. You must additionally specify the `LOCATION` clause `IDENTIFIER` keyword and an associated value when you want to read multi-line JSON records. For example:
+从多行JSON记录文件中创建可读外部表的SQL命令和上面单行JSON记录的非常类似。当您要读取多行JSON记录时，您必须额外指定`LOCATION`子句的`IDENTIFIER`关键字和值。例如：
 
 ``` sql
 CREATE EXTERNAL TABLE multiline_json_tbl(
@@ -241,9 +241,9 @@ LOCATION('pxf://data/pxf_examples/multiline.json?PROFILE=hdfs:json&IDENTIFIER=cr
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
-`created_at` identifies the member name of the first field in the JSON record `record_obj` in the sample data schema.
+`created_at`标识示例数据模式中JSON记录`record_obj`中第一个字段的成员名称。
 
-To query the JSON data in this external table:
+查询外部表中的JSON数据：
 
 ``` sql
 SELECT * FROM multiline_json_tbl;

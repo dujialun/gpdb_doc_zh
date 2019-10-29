@@ -1,5 +1,5 @@
 ---
-title: Reading and Writing HDFS SequenceFile Data
+title: 读写HDFS SequenceFile数据
 ---
 
 <!--
@@ -21,22 +21,22 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The PXF HDFS connector supports SequenceFile format binary data. This section describes how to use PXF to read and write HDFS SequenceFile data, including how to create, insert, and query data in external tables that reference files in the HDFS data store.
+PXF HDFS连接器支持SequenceFile格式的二进制数据。本节描述如何使用PXF读写HDFS SequenceFile数据，包括如何创建引用HDFS文件的外部表，查询和向外部表写入数据。
 
-## <a id="prereq"></a>Prerequisites
+## <a id="prereq"></a>先决条件
 
-Ensure that you have met the PXF Hadoop [Prerequisites](access_hdfs.html#hadoop_prereq) before you attempt to read data from or write data to HDFS.
+在尝试从HDFS读取或向HDFS写入数据之前，请确保已满足PXF Hadoop[先决条件](access_hdfs.html#hadoop_prereq)。
 
-## <a id="hdfswrite_writeextdata"></a>Creating the External Table
+## <a id="hdfswrite_writeextdata"></a>创建外部表
 
-The PXF HDFS connector `hdfs:SequenceFile` profile supports reading and writing HDFS data in SequenceFile binary format. When you insert records into a writable external table, the block(s) of data that you insert are written to one or more files in the directory that you specified.
+PXF HDFS连接器 `hdfs:SequenceFile` 配置文件支持读写HDFS中SequenceFile格式的二进制数据。 当您将记录插入可写外部表中时，您插入的数据块将写入指定目录中的一个或多个文件。
 
-**Note**: External tables that you create with a writable profile can only be used for INSERT operations. If you want to query the data that you inserted, you must create a separate readable external table that references the HDFS directory.
+**注意**: 使用可写配置创建的外部表仅INSERT操作。 如果要查询插入的数据，则必须单独创建一个引用相关HDFS目录的可读外部表。
 
-Use the following syntax to create a Greenplum Database external table that references an HDFS directory: 
+使用以下语法创建一个引用HDFS目录的Greenplum数据库外部表：
 
 ``` sql
-CREATE [WRITABLE] EXTERNAL TABLE <table_name> 
+CREATE [WRITABLE] EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
 LOCATION ('pxf://<path-to-hdfs-dir>
     ?PROFILE=hdfs:SequenceFile[&<custom-option>=<value>[...]]')
@@ -44,46 +44,46 @@ FORMAT 'CUSTOM' (<formatting-properties>)
 [DISTRIBUTED BY (<column_name> [, ... ] ) | DISTRIBUTED RANDOMLY];
 ```
 
-The specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command are described in the table below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字| 值|
 |-------|-------------------------------------|
-| \<path&#8209;to&#8209;hdfs&#8209;dir\>    | The absolute path to the directory in the HDFS data store. |
-| PROFILE    | The `PROFILE` keyword must specify `hdfs:SequenceFile`. |
-| \<custom&#8209;option\>  | \<custom-option\>s are described below.|
-| FORMAT | Use `FORMAT` '`CUSTOM`' with `(FORMATTER='pxfwritable_export')` (write) or `(FORMATTER='pxfwritable_import')` (read). |
-| DISTRIBUTED BY    | If you plan to load the writable external table with data from an existing Greenplum Database table, consider specifying the same distribution policy or \<column_name\> on the writable external table as that defined for the table from which you plan to load the data. Doing so will avoid extra motion of data between segments on the load operation. |
+| \<path&#8209;to&#8209;hdfs&#8209;dir\>    | HDFS数据存储中目录或文件的绝对路径 |
+| PROFILE    | `PROFILE` 关键字必须指定为 `hdfs:SequenceFile`. |
+| \<custom&#8209;option\>  | \<custom-option\> 描述见下方.|
+| FORMAT | 使用 `FORMAT` '`CUSTOM`' 时指定 `(FORMATTER='pxfwritable_export')` (写入) 或 `(FORMATTER='pxfwritable_import')` (读取). |
+| DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或\<字段名\>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。 |
 
 <a id="customopts"></a>
-SequenceFile format data can optionally employ record or block compression. The PXF `hdfs:SequenceFile` profile supports the following compression codecs:
+SequenceFile 格式数据可以选择采用record或block压缩。 PXF `hdfs:SequenceFile` 配置支持以下压缩编解码器：
 
 - org.apache.hadoop.io.compress.DefaultCodec
 - org.apache.hadoop.io.compress.BZip2Codec
 
-When you use the `hdfs:SequenceFile` profile to write SequenceFile format data, you must provide the name of the Java class to use for serializing/deserializing the binary data. This class must provide read and write methods for each data type referenced in the data schema.
+使用 `hdfs:SequenceFile` 配置文件写入SequenceFile格式数据时，则必须提供Java类的名称，以用于序列化/反序列化二进制数据。 这个类必须为数据模式中引用的每种数据类型提供读写方法。
 
-You specify the compression codec and Java serialization class via custom options in the `CREATE EXTERNAL TABLE` `LOCATION` clause. The `hdfs:SequenceFile` profile supports the following custom options:
+您可以通过 `CREATE EXTERNAL TABLE` `LOCATION` 子句的自定义选项指定压缩编解码器和Java 序列化类。 `hdfs:SequenceFile` 配置文件支持以下自定义选项：
 
-| Option  | Value Description |
+| 选项  | 值描述|
 |-------|-------------------------------------|
-| COMPRESSION_CODEC    | The compression codec Java class name. If this option is not provided, Greenplum Database performs no data compression. Supported compression codecs include:<br>`org.apache.hadoop.io.compress.DefaultCodec`<br>`org.apache.hadoop.io.compress.BZip2Codec`<br>`org.apache.hadoop.io.compress.GzipCodec` |
-| COMPRESSION_TYPE    | The compression type to employ; supported values are `RECORD` (the default) or `BLOCK`. |
-| DATA-SCHEMA    | The name of the writer serialization/deserialization class. The jar file in which this class resides must be in the PXF classpath. This option is required for the `hdfs:SequenceFile` profile and has no default value. |
-| THREAD-SAFE | Boolean value determining if a table query can run in multi-threaded mode. The default value is `TRUE`. Set this option to `FALSE` to handle all requests in a single thread for operations that are not thread-safe (for example, compression). |
+| COMPRESSION_CODEC    | 压缩编码器类名称。 如果此选项未提供，Greenplum 数据库不执行数据压缩。 支持的压缩编解码器包括：<br>`org.apache.hadoop.io.compress.DefaultCodec`<br>`org.apache.hadoop.io.compress.BZip2Codec`<br>`org.apache.hadoop.io.compress.GzipCodec` |
+| COMPRESSION_TYPE    | 采用的压缩类型; 支持的值有 `RECORD` (默认) 或 `BLOCK`. |
+| DATA-SCHEMA    | 编写器序列化/反序列化类的名称。 此类所在的jar文件必须位于PXF类路径中。 `hdfs:SequenceFile` 配置文件需要此选项，并且没有默认值。 |
+| THREAD-SAFE | 确定表查询是否可以在多线程模式下运行的布尔值。 默认为 `TRUE`。 将此选项设置为 `FALSE` 以处理单个线程中所有非线程安全操作 (例如，压缩)的请求。 |
 
 
-## <a id="write_binary"></a>Reading and Writing Binary Data
+## <a id="write_binary"></a>读写二进制数据
 
-Use the HDFS connector `hdfs:SequenceFile` profile when you want to read or write SequenceFile format data to HDFS. Files of this type consist of binary key/value pairs. SequenceFile format is a common data transfer format between MapReduce jobs. 
+当您要读写HDFS中 SequenceFile 格式的数据，请使用HDFS 连接器 `hdfs:SequenceFile` 配置文件。 这种类型的文件由二进制键/值对组成。 SequenceFile 格式是MapReduce作业之间常见的数据传输格式。
 
 
-### <a id="write_seqfile_example" class="no-quick-link"></a>Example: Writing Binary Data to HDFS
+### <a id="write_seqfile_example" class="no-quick-link"></a>示例： 将二进制数据写入HDFS
 
-In this example, you create a Java class named `PxfExample_CustomWritable` that will serialize/deserialize the fields in the sample schema used in previous examples. You will then use this class to access a writable external table that you create with the `hdfs:SequenceFile` profile. 
+在此示例中，您将创建一个名为 `PxfExample_CustomWritable` 的Java类，该类将对先前示例中使用的示例模式中的字段进行序列化/反序列化。 然后，您将使用此类访问通过 `hdfs:SequenceFile` 配置文件创建的可写外部表。
 
-Perform the following procedure to create the Java class and writable table.
+执行以下步骤来创建Java类和可写外部表。
 
-1. Prepare to create the sample Java class:
+1. 准备创建示例Java类:
 
     ``` shell
     $ mkdir -p pxfex/com/example/pxf/hdfs/writable/dataschema
@@ -91,7 +91,7 @@ Perform the following procedure to create the Java class and writable table.
     $ vi PxfExample_CustomWritable.java
     ```
 
-2. Copy and paste the following text into the `PxfExample_CustomWritable.java` file:
+2. 将以下文本复制并黏贴到 `PxfExample_CustomWritable.java` 文件中：
 
     ``` java
     package com.example.pxf.hdfs.writable.dataschema;
@@ -191,7 +191,7 @@ public class PxfExample_CustomWritable implements Writable {
 }
     ```
 
-3. Compile and create a Java class JAR file for `PxfExample_CustomWritable`. Provide a classpath that includes the `hadoop-common.jar` file for your Hadoop distribution. For example, if you installed the Hortonworks Data Platform Hadoop client:
+3. 编译并为 `PxfExample_CustomWritable` 创建Java类JAR文件。 为您的Hadoop发行版提供一个包含 `hadoop-common.jar` 文件的类路径。 例如， 如果您安装了Hortonworks Data Platform Hadoop客户端：
 
     ``` shell
     $ javac -classpath /usr/hdp/current/hadoop-client/hadoop-common.jar  PxfExample_CustomWritable.java
@@ -200,35 +200,35 @@ public class PxfExample_CustomWritable implements Writable {
     $ cp pxfex-customwritable.jar /tmp/
     ```
 
-    (Your Hadoop library classpath may differ.)
+    (您的Hadoop库类路径可能不同)
 
-3. Copy the `pxfex-customwritable.jar` file to the Greenplum Database master node. For example:
+3. 将 `pxfex-customwritable.jar` 文件复制到Greenplum 数据库master节点。 例如：
 
     ``` shell
     $ scp pxfex-customwritable.jar gpadmin@gpmaster:/home/gpadmin
     ```
 
-4. Log in to your Greenplum Database master node:
+4. 登录到您的Greenplum数据库master节点：
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ````
 
-5. Copy the `pxfex-customwritable.jar` JAR file to the user runtime library directory, and note the location. For example, if `PXF_CONF=/usr/local/greenplum-pxf`:
+5. 将 `pxfex-customwritable.jar` JAR文件复制到用户运行时类库目录中，并记下位置。 例如， 如果 `PXF_CONF=/usr/local/greenplum-pxf`：
 
     ``` shell
     gpadmin@gpmaster$ cp /home/gpadmin/pxfex-customwritable.jar /usr/local/greenplum-pxf/lib/pxfex-customwritable.jar
     ```
 
-5. Synchronize the PXF configuration to each Greenplum Database segment host. For example:
+5. 将PXF配置同步到每个Greenplum数据库segment主机。 例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
     ```
 
-3. Restart PXF on each Greenplum Database segment host as described in [Restarting PXF](cfginitstart_pxf.html#restart_pxf).
+3. 如[重启PXF](cfginitstart_pxf.html#restart_pxf)中所述，在每个Greenplum数据库segment主机上重启PXF。
 
-5. Use the PXF `hdfs:SequenceFile` profile to create a Greenplum Database writable external table. Identify the serialization/deserialization Java class you created above in the `DATA-SCHEMA` \<custom-option\>. Use `BLOCK` mode compression with `BZip2` when you create the writable table.
+5. 使用PXF `hdfs:SequenceFile` 配置文件创建Greenplum数据库可写外部表。 在 `DATA-SCHEMA` 自定义选项 \<custom-option\> 中标识您在上面创建的序列化/反序列化Java类。 创建可写外部表时，使用 `BZip2` 压缩并指定 `BLOCK` 压缩模式。
 
     ``` sql
     postgres=# CREATE WRITABLE EXTERNAL TABLE pxf_tbl_seqfile (location text, month text, number_of_orders integer, total_sales real)
@@ -236,25 +236,25 @@ public class PxfExample_CustomWritable implements Writable {
               FORMAT 'CUSTOM' (FORMATTER='pxfwritable_export');
     ```
 
-    Notice that the `'CUSTOM'` `FORMAT` \<formatting-properties\> specifies the built-in `pxfwritable_export` formatter.
+    注意 `'CUSTOM'` `FORMAT` 格式化属性 \<formatting-properties\> 指定为内置的 `pxfwritable_export` 格式化程序。
 
-6. Write a few records to the `pxf_seqfile` HDFS directory by inserting directly into the `pxf_tbl_seqfile` table. For example:
+6. 通过直接插入 `pxf_tbl_seqfile` 表将一些数据写入 `pxf_seqfile` HDFS目录中。 例如：
 
     ``` sql
     postgres=# INSERT INTO pxf_tbl_seqfile VALUES ( 'Frankfurt', 'Mar', 777, 3956.98 );
     postgres=# INSERT INTO pxf_tbl_seqfile VALUES ( 'Cleveland', 'Oct', 3812, 96645.37 );
     ```
 
-6. Recall that Greenplum Database does not support directly querying a writable external table. To read the data in `pxf_seqfile`, create a readable external Greenplum Database referencing this HDFS directory:
+6. 回想一下，Greenplum 数据库不支持直接查询一个可写外部表。要读取`pxf_seqfile`中的数据，请创建一个引用此HDFS目录的可读外部表：
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE read_pxf_tbl_seqfile (location text, month text, number_of_orders integer, total_sales real)
                 LOCATION ('pxf://data/pxf_examples/pxf_seqfile?PROFILE=hdfs:SequenceFile&DATA-SCHEMA=com.example.pxf.hdfs.writable.dataschema.PxfExample_CustomWritable')
               FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
-    You must specify the `DATA-SCHEMA` \<custom-option\> when you read HDFS data via the `hdfs:SequenceFile` profile. You need not provide compression-related options.
+    当您通过 `hdfs:SequenceFile` 配置文件读取HDFS数据是必须指定 `DATA-SCHEMA` 自定义选项 \<custom-option\>。 您无需提供压缩相关的选项。
     
-6. Query the readable external table `read_pxf_tbl_seqfile`:
+6. 查询可读外部表 `read_pxf_tbl_seqfile`：
 
     ``` sql
     gpadmin=# SELECT * FROM read_pxf_tbl_seqfile ORDER BY total_sales;
@@ -268,13 +268,13 @@ public class PxfExample_CustomWritable implements Writable {
     (2 rows)
     ```
 
-## <a id="read_recordkey"></a>Reading the Record Key
+## <a id="read_recordkey"></a>读取记录键
 
-When a Greenplum Database external table references SequenceFile or another data format that stores rows in a key-value format, you can access the key values in Greenplum queries by using the `recordkey` keyword as a field name.
+当Greenplum数据库外部表引用SequenceFile或其他以键-值对存储行的数据格式时， 您可以通过使用 `recordkey` 关键字作为字段名称，在Greenplum查询中访问记录键的值。
 
-The field type of `recordkey` must correspond to the key type, much as the other fields must match the HDFS data. 
+`recordkey` 字段类型必须与记录键类型相对应，就像其他字段必须与HDFS数据匹配一样。. 
 
-You can define `recordkey` to be any of the following Hadoop types:
+您可以将 `recordkey` 定义为以下任何Hadoop类型：
 
 -   BooleanWritable
 -   ByteWritable
@@ -284,12 +284,12 @@ You can define `recordkey` to be any of the following Hadoop types:
 -   LongWritable
 -   Text
 
-If no record key is defined for a row, Greenplum Database returns the id of the segment that processed the row.
+如果没有为行定义记录键， Greenplum数据库将返回处理该行的segment的id。
 
 
-### <a id="read_recordkey_example"></a>Example: Using Record Keys
+### <a id="read_recordkey_example"></a>示例： 使用记录键
 
-Create an external readable table to access the record keys from the writable table `pxf_tbl_seqfile` that you created in [Example: Writing Binary Data to HDFS](#write_seqfile_example). Define the `recordkey` in this example to be of type `int8`.
+创建一个可读外部表，以访问您在 [示例： 将二进制数据写入HDFS](#write_seqfile_example) 创建的可写外部表 `pxf_tbl_seqfile` 的记录键。 本例中将 `recordkey` 定义为 `int8` 类型。
 
 ``` sql
 postgres=# CREATE EXTERNAL TABLE read_pxf_tbl_seqfile_recordkey(recordkey int8, location text, month text, number_of_orders integer, total_sales real)
@@ -306,5 +306,5 @@ gpadmin=# SELECT * FROM read_pxf_tbl_seqfile_recordkey;
 (2 rows)
 ```
 
-You did not define a record key when you inserted the rows into the writable table, so the `recordkey` identifies the segment on which the row data was processed.
+当您将行插入到可写外部表时，您没有定义记录键， 因此 `recordkey` 标识为处理该行的segment。
 

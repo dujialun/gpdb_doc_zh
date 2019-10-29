@@ -1,5 +1,5 @@
 ---
-title: Reading and Writing HDFS Text Data
+title: 读写HDFS文本数据
 ---
 
 <!--
@@ -21,43 +21,43 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The PXF HDFS Connector supports plain delimited and comma-separated value form text data. This section describes how to use PXF to access HDFS text data, including how to create, query, and insert data into an external table that references files in the HDFS data store.
+PXF HDFS连接器支持纯分隔和逗号分隔的值表单文本数据。 本节介绍如何使用PXF访问HDFS文本数据，包括如何创建引用了HDFS文件的外部表，查询外部表和向外部表写入数据。
 
-## <a id="prereq"></a>Prerequisites
+## <a id="prereq"></a>先决条件
 
-Ensure that you have met the PXF Hadoop [Prerequisites](access_hdfs.html#hadoop_prereq) before you attempt to read data from or write data to HDFS.
+在尝试从HDFS读取或向HDFS写入数据之前，请确保已满足PXF Hadoop[先决条件](access_hdfs.html#hadoop_prereq)。
 
-## <a id="profile_text"></a>Reading Text Data
+## <a id="profile_text"></a>读取文本数据
 
-Use the `hdfs:text` profile when you read plain text delimited or .csv data where each row is a single record. The following syntax creates a Greenplum Database readable external table that references such a text file on HDFS: 
+当您在读取每行都是单条记录的纯文本分隔或csv数据时，请使用`hdfs:text`配置文件。以下语法创建了一个Greenplum数据库可读外部表，该表引用了HDFS上的此类文本文件：
 
 ``` sql
-CREATE EXTERNAL TABLE <table_name> 
+CREATE EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
 LOCATION ('pxf://<path-to-hdfs-file>?PROFILE=hdfs:text')
 FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 ```
 
-The specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command are described in the table below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字  | 值 |
 |-------|-------------------------------------|
-| \<path&#8209;to&#8209;hdfs&#8209;file\>    | The absolute path to the directory or file in the HDFS data store. |
-| PROFILE    | The `PROFILE` keyword must specify `hdfs:text`. |
-| FORMAT | Use `FORMAT` `'TEXT'` when \<path-to-hdfs-file\> references plain text delimited data.<br> Use `FORMAT` `'CSV'`  when \<path-to-hdfs-file\> references comma-separated value data.  |
-| delimiter    | The delimiter character in the data. For `FORMAT` `'CSV'`, the default \<delim_value\> is a comma `,`. Preface the \<delim_value\> with an `E` when the value is an escape sequence. Examples: `(delimiter=E'\t')`, `(delimiter ':')`. |
+| \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径 |
+| PROFILE    | `PROFILE`关键字必须指定为`hdfs:text` |
+| FORMAT | 当\<path-to-hdfs-file\>引用纯文本分隔数据时，请使用`FORMAT` `'TEXT'`。<br> 当\<path-to-hdfs-file\>引用逗号分隔值数据时，请使用`FORMAT` `'CSV'`。|
+| delimiter    | 数据中的分隔符。对于`FORMAT` `'CSV'`，默认的\<delim_value\> 是逗号`,`。 当分隔符为转义序列时，在\<delim_value\> 前面加上`E`。示例：`(delimiter=E'\t')`, `(delimiter ':')`。 |
 
-### <a id="profile_text_query"></a>Example: Reading Text Data on HDFS
+### <a id="profile_text_query"></a>示例：读取HDFS中的文本数据
 
-Perform the following procedure to create a sample text file, copy the file to HDFS, and use the `hdfs:text` profile to create two PXF external tables to query the data:
+执行以下步骤以创建示例文本文件、将文件复制到HDFS，并使用PXF `hdfs:text`配置文件创建两个PXF外部表来查询数据：
 
-1. Create an HDFS directory for PXF example data files. For example:
+1. 为PXF示例数据文件创建HDFS目录。例如：
 
     ``` shell
     $ hdfs dfs -mkdir -p /data/pxf_examples
     ```
 
-2. Create a delimited plain text data file named `pxf_hdfs_simple.txt`:
+2. 创建名为`pxf_hdfs_simple.txt`的纯文本分割数据文件：
 
     ``` shell
     $ echo 'Prague,Jan,101,4875.33
@@ -66,42 +66,42 @@ Bangalore,May,317,8936.99
 Beijing,Jul,411,11600.67' > /tmp/pxf_hdfs_simple.txt
     ```
 
-    Note the use of the comma `,` to separate the four data fields.
+    注意使用逗号`,`来分隔四个数据字段。.
 
-4. Add the data file to HDFS:
+3. 将数据文件添加到HDFS:
 
     ``` shell
     $ hdfs dfs -put /tmp/pxf_hdfs_simple.txt /data/pxf_examples/
     ```
 
-5. Display the contents of the `pxf_hdfs_simple.txt` file stored in HDFS:
+4. 显示存储在HDFS中的`pxf_hdfs_simple.txt`文件的内容:
 
     ``` shell
     $ hdfs dfs -cat /data/pxf_examples/pxf_hdfs_simple.txt
     ```
 
-4. Start the `psql` subsystem:
+5. 启动`psql`子系统:
 
     ``` shell
     $ psql -d postgres
     ```
 
-1. Use the PXF `hdfs:text` profile to create a Greenplum Database external table that references the `pxf_hdfs_simple.txt` file that you just created and added to HDFS:
+6. 使用PXF `hdfs:text` 配置文件创建一个引用刚刚创建并添加到HDFS的`pxf_hdfs_simple.txt`文件的Greenplum数据库外部表:
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE pxf_hdfs_textsimple(location text, month text, num_orders int, total_sales float8)
                 LOCATION ('pxf://data/pxf_examples/pxf_hdfs_simple.txt?PROFILE=hdfs:text')
               FORMAT 'TEXT' (delimiter=E',');
     ```
-              
-2. Query the external table:
+
+7. 查询外部表:
 
     ``` sql
-    postgres=# SELECT * FROM pxf_hdfs_textsimple;          
+    postgres=# SELECT * FROM pxf_hdfs_textsimple;
     ```
 
     ``` pre
-       location    | month | num_orders | total_sales 
+       location    | month | num_orders | total_sales
     ---------------+-------+------------+-------------
      Prague        | Jan   |        101 |     4875.33
      Rome          | Mar   |         87 |     1557.39
@@ -110,20 +110,20 @@ Beijing,Jul,411,11600.67' > /tmp/pxf_hdfs_simple.txt
     (4 rows)
     ```
 
-2. Create a second external table that references `pxf_hdfs_simple.txt`, this time specifying the `CSV` `FORMAT`:
+8. 创建第二个引用`pxf_hdfs_simple.txt`的外部表，这一次指定`FORMAT`为`CSV` :
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE pxf_hdfs_textsimple_csv(location text, month text, num_orders int, total_sales float8)
                 LOCATION ('pxf://data/pxf_examples/pxf_hdfs_simple.txt?PROFILE=hdfs:text')
               FORMAT 'CSV';
-    postgres=# SELECT * FROM pxf_hdfs_textsimple_csv;          
+    postgres=# SELECT * FROM pxf_hdfs_textsimple_csv;
     ```
 
-    When you specify `FORMAT 'CSV'` for comma-separated value data, no `delimiter` formatter option is required because comma is the default delimiter value.
+    当您为逗号分隔值数据指定`FORMAT 'CSV'`时，不需要提供`delimiter`分隔符选项，因为默认的分隔符是逗号。
 
-## <a id="profile_textmulti"></a>Reading Text Data with Quoted Linefeeds
+## <a id="profile_textmulti"></a>读取含有双引号引起来的换行符的文本数据
 
-Use the `hdfs:text:multi` profile to read plain text data with delimited single- or multi- line records that include embedded (quoted) linefeed characters. The following syntax creates a Greenplum Database readable external table that references such a text file on HDFS:
+使用`hdfs:text:multi`配置文件读取数据中含有引号引起来的换行符，单行或多行的分隔文本数据。以下语法创建一个引用此类文件的Greenplum外部表：
 
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
@@ -132,26 +132,26 @@ LOCATION ('pxf://<path-to-hdfs-file>?PROFILE=hdfs:text:multi')
 FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 ```
 
-The specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command are described in the table below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字  | 值 |
 |-------|-------------------------------------|
-| \<path&#8209;to&#8209;hdfs&#8209;file\>    | The absolute path to the directory or file in the HDFS data store. |
-| PROFILE    | The `PROFILE` keyword must specify `hdfs:text:multi`. |
-| FORMAT | Use `FORMAT` `'TEXT'` when \<path-to-hdfs-file\> references plain text delimited data.<br> Use `FORMAT` `'CSV'` when \<path-to-hdfs-file\> references comma-separated value data.  |
-| delimiter    | The delimiter character in the data. For `FORMAT` `'CSV'`, the default \<delim_value\> is a comma `,`. Preface the \<delim_value\> with an `E` when the value is an escape sequence. Examples: `(delimiter=E'\t')`, `(delimiter ':')`. |
+| \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径|
+| PROFILE    | `PROFILE`关键字必须指定为`hdfs:text:multi` |
+| FORMAT | 当\<path-to-hdfs-file\>引用纯文本分隔数据时，请使用`FORMAT` `'TEXT'`。<br> 当\<path-to-hdfs-file\>引用逗号分隔值数据时，请使用`FORMAT` `'CSV'`。  |
+| delimiter    | 数据中的分隔符。对于`FORMAT` `'CSV'`，默认的\<delim_value\> 是逗号`,`。 当分隔符为转义序列时，在\<delim_value\> 前面加上`E`。示例：`(delimiter=E'\t')`, `(delimiter ':')`。 |
 
-### <a id="profile_textmulti_query"></a>Example: Reading Multi-Line Text Data on HDFS
+### <a id="profile_textmulti_query"></a>示例：在HDFS上读取多行文本数据
 
-Perform the following steps to create a sample text file, copy the file to HDFS, and use the PXF `hdfs:text:multi` profile to create a Greenplum Database readable external table to query the data:
+执行以下步骤以创建示例文本文件、将文件复制到HDFS, ，并使用PXF `hdfs:text:multi` 配置文件创建一个可读外部表用来查询数据：
 
-1. Create a second delimited plain text file:
+1. 创建第二个分隔的纯文本文件：
 
     ``` shell
     $ vi /tmp/pxf_hdfs_multi.txt
     ```
 
-2. Copy/paste the following data into `pxf_hdfs_multi.txt`:
+2. 将以下数据复制/黏贴到`pxf_hdfs_multi.txt`中：
 
     ``` pre
     "4627 Star Rd.
@@ -166,56 +166,56 @@ Perform the following steps to create a sample text file, copy the file to HDFS,
     Columbus, OH  43213":Dec:2018
     ```
 
-    Notice the use of the colon `:` to separate the three fields. Also notice the quotes around the first (address) field. This field includes an embedded line feed separating the street address from the city and state.
+    注意使用冒号 `:` 分隔三个字段。 另外请注意第一个（地址）字段周围的引号。这个字段包含了一个嵌入的换行符，用于将街道地址与城市和州分开。
 
-3. Copy the text file to HDFS:
+3. 将文本文件复制到HDFS：
 
     ``` shell
     $ hdfs dfs -put /tmp/pxf_hdfs_multi.txt /data/pxf_examples/
     ```
 
-4. Use the `hdfs:text:multi` profile to create an external table that references the `pxf_hdfs_multi.txt` HDFS file, making sure to identify the `:` (colon) as the field separator:
+4. 使用 `hdfs:text:multi` 配置文件创建一个引用HDFS文件 `pxf_hdfs_multi.txt` 的外部表， 确保将`:` (冒号) 标识为字段分隔符：
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE pxf_hdfs_textmulti(address text, month text, year int)
                 LOCATION ('pxf://data/pxf_examples/pxf_hdfs_multi.txt?PROFILE=hdfs:text:multi')
               FORMAT 'CSV' (delimiter ':');
     ```
-    
+
     Notice the alternate syntax for specifying the `delimiter`.
-    
-2. Query the `pxf_hdfs_textmulti` table:
+
+5. 查询 `pxf_hdfs_textmulti` 表：
 
     ``` sql
     postgres=# SELECT * FROM pxf_hdfs_textmulti;
     ```
 
     ``` pre
-             address          | month | year 
+             address          | month | year
     --------------------------+-------+------
      4627 Star Rd.            | Sept  | 2017
-     San Francisco, CA  94107           
+     San Francisco, CA  94107
      113 Moon St.             | Jan   | 2018
-     San Diego, CA  92093               
+     San Diego, CA  92093
      51 Belt Ct.              | Dec   | 2016
-     Denver, CO  90123                  
+     Denver, CO  90123
      93114 Radial Rd.         | Jul   | 2017
-     Chicago, IL  60605                 
+     Chicago, IL  60605
      7301 Brookview Ave.      | Dec   | 2018
-     Columbus, OH  43213                
+     Columbus, OH  43213
     (5 rows)
     ```
 
-## <a id="hdfswrite_text"></a>Writing Text Data to HDFS
+## <a id="hdfswrite_text"></a>将文本文件写入HDFS
 
-The PXF HDFS connector "hdfs:text" profile supports writing single line plain text data to HDFS. When you create a writable external table with the PXF HDFS connector, you specify the name of a directory on HDFS. When you insert records into a writable external table, the block(s) of data that you insert are written to one or more files in the directory that you specified.
+PXF HDFS连接器 "hdfs:text" 配置文件支持将单行纯文本数据写入HDFS。 当您使用PXF HDFS连接器创建可写外部表时，可以指定在HDFS上的目录名称。 当您向可写外部表写入数据时，您写入的数据块将写入到指定目录中的一个或多个文件。
 
-**Note**: External tables that you create with a writable profile can only be used for `INSERT` operations. If you want to query the data that you inserted, you must create a separate readable external table that references the HDFS directory.
+**注意**: 使用可写配置文件创建的外部表只能用于 `INSERT` 操作。如果要查询写入的数据，则必须另外创建一个引用HDFS目录的可读外部表。
 
-Use the following syntax to create a Greenplum Database writable external table that references an HDFS directory: 
+使用以下语法创建一个引用HDFS目录的Greenplum可写外部表： 
 
 ``` sql
-CREATE WRITABLE EXTERNAL TABLE <table_name> 
+CREATE WRITABLE EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
 LOCATION ('pxf://<path-to-hdfs-dir>
     ?PROFILE=hdfs:text[&<custom-option>=<value>[...]]')
@@ -223,49 +223,49 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 [DISTRIBUTED BY (<column_name> [, ... ] ) | DISTRIBUTED RANDOMLY];
 ```
 
-The specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command are described in the table below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字  | 值|
 |-------|-------------------------------------|
-| \<path&#8209;to&#8209;hdfs&#8209;dir\>    | The absolute path to the directory in the HDFS data store. |
-| PROFILE    | The `PROFILE` keyword must specify `hdfs:text` |
-| \<custom&#8209;option\>  | \<custom-option\>s are described below.|
-| FORMAT | Use `FORMAT` `'TEXT'` to write plain, delimited text to \<path-to-hdfs-dir\>.<br> Use `FORMAT` `'CSV'` to write comma-separated value text to \<path-to-hdfs-dir\>. |
-| delimiter    | The delimiter character in the data. For `FORMAT` `'CSV'`, the default \<delim_value\> is a comma `,`. Preface the \<delim_value\> with an `E` when the value is an escape sequence. Examples: `(delimiter=E'\t')`, `(delimiter ':')`. |
-| DISTRIBUTED BY    | If you plan to load the writable external table with data from an existing Greenplum Database table, consider specifying the same distribution policy or \<column_name\> on the writable external table as that defined for the table from which you plan to load the data. Doing so will avoid extra motion of data between segments on the load operation. |
+| \<path&#8209;to&#8209;hdfs&#8209;dir\>    | HDFS数据存储中目录的绝对路径 |
+| PROFILE    | `PROFILE`关键字必须指定为`hdfs:text` |
+| \<custom&#8209;option\>  | \<custom-option\>描述见下方|
+| FORMAT | 当\<path-to-hdfs-file\>引用纯文本分隔数据时，请使用`FORMAT` `'TEXT'`。<br> 当\<path-to-hdfs-file\>引用逗号分隔值数据时，请使用`FORMAT` `'CSV'`。 |
+| delimiter    | 数据中的分隔符。对于`FORMAT` `'CSV'`，默认的\<delim_value\> 是逗号`,`。 当分隔符为转义序列时，在\<delim_value\> 前面加上`E`。示例：`(delimiter=E'\t')`, `(delimiter ':')`。 |
+| DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用Greenplum表相同的分布策略或<字段名>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。|
 
-Writable external tables that you create using the `hdfs:text` profile can optionally use record or block compression. The PXF `hdfs:text` profile supports the following compression codecs:
+使用 `hdfs:text` 配置文件创建的可写外部表可以选择使用记录或块压缩。 PXF `hdfs:text` 配置文件支持以下压缩编解码器：
 
 - org.apache.hadoop.io.compress.DefaultCodec
 - org.apache.hadoop.io.compress.GzipCodec
 - org.apache.hadoop.io.compress.BZip2Codec
 
-You specify the compression codec via custom options in the `CREATE EXTERNAL TABLE` `LOCATION` clause. The `hdfs:text` profile support the following custom write options:
+您可以通过 `CREATE EXTERNAL TABLE` `LOCATION` 子句中自定义选择指定压缩编解码器。 `hdfs:text` 配置文件支持以下自定义写入选项：
 
-| Option  | Value Description |
+| 选项  | 值描述 |
 |-------|-------------------------------------|
-| COMPRESSION_CODEC    | The compression codec Java class name. If this option is not provided, Greenplum Database performs no data compression. Supported compression codecs include:<br>`org.apache.hadoop.io.compress.DefaultCodec`<br>`org.apache.hadoop.io.compress.BZip2Codec`<br>`org.apache.hadoop.io.compress.GzipCodec` |
-| COMPRESSION_TYPE    | The compression type to employ; supported values are `RECORD` (the default) or `BLOCK`. |
-| THREAD-SAFE | Boolean value determining if a table query can run in multi-threaded mode. The default value is `TRUE`. Set this option to `FALSE` to handle all requests in a single thread for operations that are not thread-safe (for example, compression). |
+| COMPRESSION_CODEC    | 压缩编解码器Java类名。 如果未提供此选项，Greenplum数据库不会执行压缩编码。支持的压缩编解码器包括：<br>`org.apache.hadoop.io.compress.DefaultCodec`<br>`org.apache.hadoop.io.compress.BZip2Codec`<br>`org.apache.hadoop.io.compress.GzipCodec` |
+| COMPRESSION_TYPE    | 采用的压缩类型; 支持的值为 `RECORD` (默认) 或 `BLOCK` |
+| THREAD-SAFE | 确定表查询是否可以在多线程模式下运行的布尔值。 默认为 `TRUE`。 将此选项设置为 `FALSE` 以处理单个线程中所有非线程安全操作 (例如，压缩)的请求。|
 
-### <a id="write_hdfstextsimple_example"></a>Example: Writing Text Data to HDFS
+### <a id="write_hdfstextsimple_example"></a>示例：将文本数据写入HDFS
 
-This example utilizes the data schema introduced in [Example: Reading Text Data on HDFS](#profile_text_query). 
+此示例使用了[示例：读取HDFS中的文本数据](#profile_text_query)中的数据格式。
 
-| Column Name  | Data Type |
+| 列名  | 数据类型 |
 |-------|-------------------------------------|
 | location | text |
 | month | text |
 | number\_of\_orders | int |
 | total\_sales | float8 |
 
-This example also optionally uses the Greenplum Database external table named `pxf_hdfs_textsimple` that you created in that exercise.
+在此示例中您还可以选择在该练习创建的 `pxf_hdfs_textsimple` Greenplum数据库外部表。.
 
-#### <a id="write_hdfstextsimple_proc" class="no-quick-link"></a>Procedure
+#### <a id="write_hdfstextsimple_proc" class="no-quick-link"></a>步骤
 
-Perform the following procedure to create Greenplum Database writable external tables utilizing the same data schema as described above, one of which will employ compression. You will use the PXF `hdfs:text` profile to write data to the underlying HDFS directory. You will also create a separate, readable external table to read the data that you wrote to the HDFS directory.
+执行以下步骤以使用与上述相同的数据格式创建Greenplum数据库可写外部表，其中一个表将采用压缩。 您将使用PXF `hdfs:text` 配置文件将数据写入HDFS底层目录。您还将创建另外一个可读外部表来读取您写入HDFS目录中的数据。
 
-1. Create a Greenplum Database writable external table utilizing the data schema described above. Write to the HDFS directory `/data/pxf_examples/pxfwritable_hdfs_textsimple1`. Create the table specifying a comma `,` as the delimiter:
+1. 使用上述数据格式创建Greenplum数据库可写外部表。 写入HDFS目录`/data/pxf_examples/pxfwritable_hdfs_textsimple1`。 使用逗号`,`作为分隔符创建表:
 
     ``` sql
     postgres=# CREATE WRITABLE EXTERNAL TABLE pxf_hdfs_writabletbl_1(location text, month text, num_orders int, total_sales float8)
@@ -273,22 +273,22 @@ Perform the following procedure to create Greenplum Database writable external t
               FORMAT 'TEXT' (delimiter=',');
     ```
     
-    You specify the `FORMAT` subclause `delimiter` value as the single ascii comma character `,`.
+    您将`FORMAT` 子句 `delimiter` 的值指定为单个ascii逗号字符`,`。
 
-2. Write a few individual records to the `pxfwritable_hdfs_textsimple1` HDFS directory by invoking the SQL `INSERT` command on `pxf_hdfs_writabletbl_1`:
+2. 通过在`pxf_hdfs_writabletbl_1`上调用SQL `INSERT` 命令，将一些单独的记录写入`pxfwritable_hdfs_textsimple1` HDFS目录:
 
     ``` sql
     postgres=# INSERT INTO pxf_hdfs_writabletbl_1 VALUES ( 'Frankfurt', 'Mar', 777, 3956.98 );
     postgres=# INSERT INTO pxf_hdfs_writabletbl_1 VALUES ( 'Cleveland', 'Oct', 3812, 96645.37 );
     ```
 
-3. (Optional) Insert the data from the `pxf_hdfs_textsimple` table that you created in [Example: Reading Text Data on HDFS] (#profile_text_query) into `pxf_hdfs_writabletbl_1`:
+3. (可选) 写入您在[示例：读取HDFS中的文本数据] (#profile_text_query)创建的 `pxf_hdfs_textsimple` 表中的数据到 `pxf_hdfs_writabletbl_1`:
 
     ``` sql
     postgres=# INSERT INTO pxf_hdfs_writabletbl_1 SELECT * FROM pxf_hdfs_textsimple;
     ```
 
-4. In another terminal window, display the data that you just added to HDFS:
+4. 在另一个终端窗口，显示刚添加到HDFS的数据:
 
     ``` shell
     $ hdfs dfs -cat /data/pxf_examples/pxfwritable_hdfs_textsimple1/*
@@ -300,9 +300,9 @@ Perform the following procedure to create Greenplum Database writable external t
     Beijing,Jul,411,11600.67
     ```
 
-    Because you specified comma `,` as the delimiter when you created the writable external table, this character is the field separator used in each record of the HDFS data.
+    因为您在创建可写外部表时使用了逗号 `,` 作为分隔符, 这个字符是HDFS数据中每条记录的字段分隔符.
 
-5. Greenplum Database does not support directly querying a writable external table. To query the data that you just added to HDFS, you must create a readable external Greenplum Database table that references the HDFS directory:
+5. Greenplum数据库不支持直接查询可写外部表。要查询刚刚添加到HDFS的数据， 你必须创建一个引用这个HDFS目录的Greenplum可读外部表：
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE pxf_hdfs_textsimple_r1(location text, month text, num_orders int, total_sales float8)
@@ -310,9 +310,9 @@ Perform the following procedure to create Greenplum Database writable external t
 			    FORMAT 'CSV';
     ```
 
-    You specify the `'CSV'` `FORMAT` when you create the readable external table because you created the writable table with a comma `,` as the delimiter character, the default delimiter for `'CSV'` `FORMAT`.
+    在创建可读外部表时使用 `'CSV'` `FORMAT`，因为您在创建可写外部表时使用逗号 `,` 作为分隔符，即 `'CSV'` `FORMAT` 的默认分隔符。
 
-6. Query the readable external table:
+6. 查询可读外部表:
 
     ``` sql
     postgres=# SELECT * FROM pxf_hdfs_textsimple_r1 ORDER BY total_sales;
@@ -330,9 +330,9 @@ Perform the following procedure to create Greenplum Database writable external t
     (6 rows)
     ```
 
-    The `pxf_hdfs_textsimple_r1` table includes the records you individually inserted, as well as the full contents of the `pxf_hdfs_textsimple` table if you performed the optional step.
+    `pxf_hdfs_textsimple_r1` 表包含您单独插入的记录， 以及执行可选步骤时 `pxf_hdfs_textsimple` 表的完整内容。
 
-7. Create a second Greenplum Database writable external table, this time using Gzip compression and employing a colon `:` as the delimiter:
+7. 创建第二个Greenplum数据库可写外部表， 这次使用Gzip压缩并使用冒号 `:` 作为分隔符：
 
     ``` sql
     postgres=# CREATE WRITABLE EXTERNAL TABLE pxf_hdfs_writabletbl_2 (location text, month text, num_orders int, total_sales float8)
@@ -340,14 +340,14 @@ Perform the following procedure to create Greenplum Database writable external t
               FORMAT 'TEXT' (delimiter=':');
     ```
 
-8. Write a few records to the `pxfwritable_hdfs_textsimple2` HDFS directory by inserting directly into the `pxf_hdfs_writabletbl_2` table:
+8. 通过直接写入 `pxf_hdfs_writabletbl_2` 表，将一些记录写入`pxfwritable_hdfs_textsimple2` HDFS目录：
 
     ``` sql
     gpadmin=# INSERT INTO pxf_hdfs_writabletbl_2 VALUES ( 'Frankfurt', 'Mar', 777, 3956.98 );
     gpadmin=# INSERT INTO pxf_hdfs_writabletbl_2 VALUES ( 'Cleveland', 'Oct', 3812, 96645.37 );
     ```
 
-9. In another terminal window, display the contents of the data that you added to HDFS; use the `-text` option to `hdfs dfs` to view the compressed data as text:
+9. 在另一个终端窗口中，显示您刚添加到HDFS的数据；使用 `hdfs dfs` `-text` 选项以文本的形式查看压缩数据：
 
     ``` shell
     $ hdfs dfs -text /data/pxf_examples/pxfwritable_hdfs_textsimple2/*
@@ -355,7 +355,7 @@ Perform the following procedure to create Greenplum Database writable external t
     Cleveland:Oct:3812:96645.3
     ```
 
-    Notice that the colon `:` is the field separator in this HDFS data.
+    请注意冒号 `:` 是此HDFS数据的字段分隔符。
 
-    To query data from the newly-created HDFS directory named `pxfwritable_hdfs_textsimple2`, you can create a readable external Greenplum Database table as described above that references this HDFS directory and specifies `FORMAT 'CSV' (delimiter=':')`.
+    要从名为`pxfwritable_hdfs_textsimple2`的新创建的HDFS目录中查询数据，您可以创建一个Greenplum可读外部表并指定 `FORMAT 'CSV' (delimiter=':')`。
 
