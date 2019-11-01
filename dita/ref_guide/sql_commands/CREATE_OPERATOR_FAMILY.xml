@@ -1,29 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="bx20941">CREATE OPERATOR FAMILY</title><body><p id="sql_command_desc">Defines a new operator family.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">CREATE OPERATOR FAMILY <varname>name</varname>  USING <varname>index_method</varname>  </codeblock></section><section id="section3"><title>Description</title><p><codeph>CREATE OPERATOR FAMILY</codeph> creates a new operator family. An operator family defines
-                a collection of related operator classes, and perhaps some additional operators and
-                support functions that are compatible with these operator classes but not essential
-                for the functioning of any individual index. (Operators and functions that are
-                essential to indexes should be grouped within the relevant operator class, rather
-                than being "loose" in the operator family. Typically, single-data-type operators are
-                bound to operator classes, while cross-data-type operators can be loose in an
-                operator family containing operator classes for both data types.)</p><p>The new operator family is initially empty. It should be populated by issuing subsequent
-                    <codeph>CREATE OPERATOR CLASS</codeph> commands to add contained operator
-                classes, and optionally <codeph>ALTER OPERATOR FAMILY</codeph>commands to add
-                "loose" operators and their corresponding support functions.</p>
-            <p>If a schema name is given then the operator family is created in the specified
-                schema. Otherwise it is created in the current schema. Two operator families in the
-                same schema can have the same name only if they are for different index methods.</p><p>The user who defines an operator family becomes its owner. Presently, the creating user must be a
-                superuser. (This restriction is made because an erroneous operator family definition
-                could confuse or even crash the server.)</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The (optionally schema-qualified) name of the operator family to be defined. The name can be
-                        schema-qualified. </pd></plentry><plentry><pt><varname>index_method</varname></pt><pd>The name of the index method this operator family is for. </pd></plentry></parml></section><section id="section7"><title>Compatibility</title><p><codeph>CREATE OPERATOR FAMILY</codeph> is a Greenplum Database extension. There is no
-    <codeph>CREATE OPERATOR FAMILY</codeph> statement in the SQL standard.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="ALTER_OPERATOR_FAMILY.xml#topic1" type="topic" format="dita"/></codeph>,
-                        <codeph><xref href="./DROP_OPERATOR_FAMILY.xml#topic1" type="topic"
-                        format="dita"/></codeph>, <codeph><xref href="CREATE_FUNCTION.xml#topic1"
-                        type="topic" format="dita"/></codeph>, <codeph><xref
-                        href="ALTER_OPERATOR_CLASS.xml#topic1" type="topic" format="dita"
-                /></codeph>, <codeph><xref href="CREATE_OPERATOR_CLASS.xml#topic1" type="topic"
-                        format="dita"/></codeph>, <codeph><xref
-                        href="./DROP_OPERATOR_CLASS.xml#topic1" type="topic" format="dita"
-                    /></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="bx20941">CREATE OPERATOR FAMILY</title>
+    <body>
+        <p id="sql_command_desc">定义一个新的运算符族。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CREATE OPERATOR FAMILY <varname>name</varname>  USING <varname>index_method</varname></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CREATE OPERATOR FAMILY</codeph>创建一个新的运算符族。
+                运算符族定义了一组相关的运算符类，
+                以及可能与这些运算符类兼容但对于任何单个索引的函数而言并非必不可少的一些其他运算符和支持函数。
+                （对于索引必不可少的运算符和函数应该在相关的运算符类中分组，而不是"松散地"在运算符族中。
+                通常，单数据类型的运算符绑定到运算符类，
+                而跨数据类型的运算符在包含两种数据类型的运算符类的运算符族中可能会比较松散。）
+            </p>
+            <p>新的运算符族最初是空的。
+                应该通过发出后续的<codeph>CREATE OPERATOR CLASS</codeph>命令来添加所包含的运算符类，
+                并可选地通过<codeph>ALTER OPERATOR FAMILY</codeph>命令来添加“松散”运算符及其相应的支持函数来填充该表。
+            </p>
+            <p>如果指定了模式名称，则会在指定的模式中创建运算符族。
+                否则，它将在当前模式中创建。
+                同一模式中的两个运算符族只有用于不同索引方法的名称才能相同。
+            </p>
+            <p>定义运算符族的用户将成为其所有者。
+                当前，创建用户必须是超级用户。
+                （之所以做出此限制，是因为错误的运算符族定义可能会使服务器混乱甚至崩溃。）
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要定义的运算符族的名称（可以由模式指定）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>index_method</varname>
+                    </pt>
+                    <pd>该运算符族所针对的索引方法的名称。</pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p><codeph>CREATE OPERATOR FAMILY</codeph>是Greenplum数据库扩展。
+                SQL标准中没有<codeph>CREATE OPERATOR FAMILY</codeph>语句。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_OPERATOR_FAMILY.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./DROP_OPERATOR_FAMILY.xml#topic1" type="topic"
+                          format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="CREATE_FUNCTION.xml#topic1"
+                          type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="ALTER_OPERATOR_CLASS.xml#topic1" type="topic" format="dita"
+                    />
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="CREATE_OPERATOR_CLASS.xml#topic1" type="topic"
+                          format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="./DROP_OPERATOR_CLASS.xml#topic1" type="topic" format="dita"
+                    />
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>
