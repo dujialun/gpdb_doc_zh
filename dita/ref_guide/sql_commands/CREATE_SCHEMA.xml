@@ -1,62 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="cb20941">CREATE SCHEMA</title><body><p id="sql_command_desc">Defines a new schema.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">CREATE SCHEMA <varname>schema_name</varname> [AUTHORIZATION <varname>username</varname>] 
-   [<varname>schema_element</varname> [ ... ]]
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="cb20941">CREATE SCHEMA</title>
+    <body>
+        <p id="sql_command_desc">定义一个新的模式。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CREATE SCHEMA <varname>schema_name</varname> [AUTHORIZATION <varname>username</varname>]
+    [<varname>schema_element</varname> [ ... ]]
 
 CREATE SCHEMA AUTHORIZATION <varname>rolename</varname> [<varname>schema_element</varname> [ ... ]]
 
 CREATE SCHEMA IF NOT EXISTS <varname>schema_name</varname> [ AUTHORIZATION <varname>user_name</varname> ]
 
-CREATE SCHEMA IF NOT EXISTS AUTHORIZATION <varname>user_name</varname>
-</codeblock></section><section id="section3"><title>Description</title><p><codeph>CREATE SCHEMA</codeph> enters a new schema into the current
-database. The schema name must be distinct from the name of any existing
-schema in the current database. </p><p>A schema is essentially a namespace: it contains named objects (tables,
-data types, functions, and operators) whose names may duplicate those
-of other objects existing in other schemas. Named objects are accessed
-either by qualifying their names with the schema name as a prefix, or
-by setting a search path that includes the desired schema(s). A <codeph>CREATE</codeph>
-command specifying an unqualified object name creates the object in the
-current schema (the one at the front of the search path, which can be
-determined with the function <codeph>current_schema</codeph>). </p><p>Optionally, <codeph>CREATE SCHEMA</codeph> can include subcommands
-to create objects within the new schema. The subcommands are treated
-essentially the same as separate commands issued after creating the schema,
-except that if the <codeph>AUTHORIZATION</codeph> clause is used, all
-the created objects will be owned by that role.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>schema_name</varname></pt><pd>The name of a schema to be created. If this is omitted, the user name is used as the schema
-            name. The name cannot begin with <codeph>pg_</codeph>, as such names are reserved for
-            system catalog schemas. </pd></plentry><plentry><pt><varname>user_name</varname></pt><pd>The name of the role who will own the schema. If omitted, defaults
-to the role executing the command. Only superusers may create schemas
-owned by roles other than themselves.</pd></plentry><plentry><pt><varname>schema_element</varname></pt><pd>An SQL statement defining an object to be created within the schema. Currently, only
-              <codeph>CREATE TABLE</codeph>, <codeph>CREATE VIEW</codeph>, <codeph>CREATE
-              INDEX</codeph>, <codeph>CREATE SEQUENCE</codeph>, <codeph>CREATE TRIGGER</codeph> and
-              <codeph>GRANT</codeph> are accepted as clauses within <codeph>CREATE SCHEMA</codeph>.
-            Other kinds of objects may be created in separate commands after the schema is
-            created.<note>Greenplum Database does not support triggers.</note></pd></plentry>      
-        <plentry>
-          <pt><codeph>IF NOT EXISTS</codeph></pt>
-          <pd>Do nothing (except issuing a notice) if a schema with the same name already exists.
-              <varname>schema_element</varname> subcommands cannot be included when this option is
-            used. </pd>
-        </plentry>
-</parml></section><section id="section5"><title>Notes</title><p>To create a schema, the invoking user must have the <codeph>CREATE</codeph>
-privilege for the current database or be a superuser.</p></section><section id="section6"><title>Examples</title><p>Create a schema:</p><codeblock>CREATE SCHEMA myschema;</codeblock><p>Create a schema for role <codeph>joe</codeph> (the schema will also be named
-  <codeph>joe</codeph>):</p><codeblock>CREATE SCHEMA AUTHORIZATION joe;</codeblock>  
-      <p> Create a schema named <codeph>test</codeph> that will be owned by user
-          <codeph>joe</codeph>, unless there already is a schema named <codeph>test</codeph>. (It
-        does not matter whether <codeph>joe</codeph> owns the pre-existing schema.)
-        <codeblock>CREATE SCHEMA IF NOT EXISTS test AUTHORIZATION joe;
-</codeblock>
-      </p>
-</section><section id="section7"><title>Compatibility</title><p>The SQL standard allows a <codeph>DEFAULT CHARACTER SET</codeph> clause
-in <codeph>CREATE SCHEMA</codeph>, as well as more subcommand types than
-are presently accepted by Greenplum Database. </p><p>The SQL standard specifies that the subcommands in <codeph>CREATE
-SCHEMA</codeph> may appear in any order. The present Greenplum Database
-implementation does not handle all cases of forward references in subcommands;
-it may sometimes be necessary to reorder the subcommands in order to
-avoid forward references. </p><p>According to the SQL standard, the owner of a schema always owns all
-objects within it. Greenplum Database allows schemas to contain objects
-owned by users other than the schema owner. This can happen only if the
-schema owner grants the <codeph>CREATE</codeph> privilege on the schema
-to someone else, or a superuser chooses to create objects in it.</p>
-      <p>The <codeph>IF NOT EXISTS</codeph> option is a Greenplum Database extension.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="ALTER_SCHEMA.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="./DROP_SCHEMA.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+CREATE SCHEMA IF NOT EXISTS AUTHORIZATION <varname>user_name</varname></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CREATE SCHEMA</codeph>将新模式加入当前数据库。
+                模式名称必须不同于当前数据库中任何现有模式的名称。
+            </p>
+            <p>模式本质上是一个名称空间：它包含命名对象（表，数据类型，函数和运算符），其名称可能与其他模式中存在的其他对象的名称重复。
+                通过使用模式名称作为前缀来限定其名称，或设置包含所需模式的搜索路径，可以访问命名对象。
+                使用<codeph>CREATE</codeph>命令指定了不合格的对象名称，将在当前模式（搜索路径前面的对象，可以使用<codeph>current_schema</codeph>函数确定）中创建该对象。
+            </p>
+            <p>（可选）<codeph>CREATE SCHEMA</codeph>可以包含子命令以在新模式中创建对象。
+                子命令与创建模式后发出的单独命令基本相同，不同之处在于，
+                如果使用<codeph>AUTHORIZATION</codeph>子句，则所有创建的对象将归该角色所有。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>schema_name</varname>
+                    </pt>
+                    <pd>要创建的模式的名称。如果省略，则将用户名用作模式名称。
+                        该名称不能以<codeph>pg_</codeph>开头，因为此类名称是为系统catalog模式保留的。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>user_name</varname>
+                    </pt>
+                    <pd>拥有模式的角色的名称。如果省略，则默认为执行命令的角色。只有超级用户可以创建除自己以外的角色所有的模式。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>schema_element</varname>
+                    </pt>
+                    <pd>定义要在模式内创建的对象的SQL语句。
+                        当前，在<codeph>CREATE SCHEMA</codeph>中，只有<codeph>CREATE TABLE</codeph>，<codeph>CREATE VIEW</codeph>，
+                        <codeph>CREATE INDEX</codeph>，<codeph>CREATE SEQUENCE</codeph>，<codeph>CREATE TRIGGER</codeph>和<codeph>GRANT</codeph>被接受为子句。
+                        创建模式后，可以在单独的命令中创建其他类型的对象。
+                        <note>Greenplum数据库不支持触发器。</note>
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <codeph>IF NOT EXISTS</codeph>
+                    </pt>
+                    <pd>如果已经存在相同名称的模式，则不执行任何操作（发出通知除外）。
+                        使用此选项时，不能包含<varname>schema_element</varname>子命令。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p>要创建模式，调用用户必须对当前数据库具有<codeph>CREATE</codeph>特权，或者必须是超级用户。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>创建一个模式：</p>
+            <codeblock>CREATE SCHEMA myschema;</codeblock>
+            <p>为角色<codeph>joe</codeph>创建一个模式（该模式也将命名为<codeph>joe</codeph>）：
+            </p>
+            <codeblock>CREATE SCHEMA AUTHORIZATION joe;</codeblock>
+            <p>创建一个名为<codeph>test</codeph>的模式，该模式将由用户<codeph>joe</codeph>拥有，除非已经有一个名为<codeph>test</codeph>的模式。
+                （<codeph>joe</codeph>是否拥有预先存在的模式是没有影响的。）
+                <codeblock>CREATE SCHEMA IF NOT EXISTS test AUTHORIZATION joe;</codeblock>
+            </p>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p>SQL标准允许在<codeph>CREATE SCHEMA</codeph>中使用<codeph>DEFAULT CHARACTER SET</codeph>子句，
+                以及比Greenplum数据库目前接受的子命令类型更多的子命令类型。
+            </p>
+            <p>SQL标准指定<codeph>CREATE SCHEMA</codeph>中的子命令可以按任何顺序出现。
+                当前的Greenplum数据库实现并未处理子命令中所有前向引用的情况；
+                有时可能需要对子命令重新排序，以避免前向引用。
+            </p>
+            <p>根据SQL标准，模式的所有者始终拥有其中的所有对象。
+                Greenplum数据库允许模式包含模式所有者以外的用户拥有的对象。
+                仅当模式所有者将模式的<codeph>CREATE</codeph>特权授予其他人，或者超级用户选择在其中创建对象时，才会发生这种情况。
+            </p>
+            <p><codeph>IF NOT EXISTS</codeph>选项是Greenplum数据库扩展。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_SCHEMA.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="./DROP_SCHEMA.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>
