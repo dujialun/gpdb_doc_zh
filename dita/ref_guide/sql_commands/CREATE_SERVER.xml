@@ -4,93 +4,97 @@
 <topic id="topic1">
     <title id="bv20941">CREATE SERVER</title>
     <body>
-        <p id="sql_command_desc">Defines a new foreign server.</p>
+        <p id="sql_command_desc">定义一个新的外部服务器。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">CREATE SERVER <varname>server_name</varname> [ TYPE '<varname>server_type</varname>' ] [ VERSION '<varname>server_version</varname>' ]
     FOREIGN DATA WRAPPER <varname>fdw_name</varname>
     [ OPTIONS ( [ mpp_execute { 'master' | 'any' | 'all segments' } [, ] ] <varname>option</varname> '<varname>value</varname>' [, ... ] ) ]</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>CREATE SERVER</codeph> defines a new foreign server. The user who defines
-               the server becomes its owner.</p>
-            <p>A foreign server typically encapsulates connection information that a foreign-data
-              wrapper uses to access an external data source. Additional user-specific connection
-              information may be specified by means of user mappings.</p>
-            <p>Creating a server requires the <codeph>USAGE</codeph> privilege on the foreign-data
-              wrapper specified.</p>
+            <title>描述</title>
+            <p><codeph>CREATE SERVER</codeph>定义一个新的外部服务器。定义服务器的用户将成为其所有者。
+                </p>
+            <p>外部服务器通常封装外部数据包装器用来访问外部数据源的连接信息。
+                可以通过用户映射指定其他特定于用户的连接信息。
+                </p>
+            <p>创建服务器需要对指定的外部数据包装器具有<codeph>USAGE</codeph>特权。
+                </p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt><varname>server_name</varname></pt>
                     <pd>
-                        <p>The name of the foreign server to create. The server name must be unique within the database.</p>
+                        <p>要创建的外部服务器的名称。服务器名称在数据库中必须唯一。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>server_type</varname></pt>
                     <pd>
-                        <p>Optional server type, potentially useful to foreign-data wrappers.</p>
+                        <p>可选服务器类型，可能对外部数据包装器有用。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>server_version</varname></pt>
                     <pd>
-                        <p>Optional server version, potentially useful to foreign-data wrappers.</p>
+                        <p>可选服务器版本，可能对外部数据包装器有用。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>fdw_name</varname></pt>
                     <pd>
-                        <p>Name of the foreign-data wrapper that manages the server.</p>
+                        <p>管理服务器的外部数据包装器的名称。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>OPTIONS ( <varname>option</varname> '<varname>value</varname>' [, ... ] )</pt>
                     <pd>
-                        <p>The options for the new foreign server. The options typically define the connection details of the server, but the actual names and values are dependent upon the server's foreign-data wrapper.</p>
+                        <p>新的外部服务器的选项。
+                            这些选项通常定义服务器的连接详细信息，但是实际的名称和值取决于服务器的外部数据包装器。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>mpp_execute { 'master' | 'any' | 'all segments' }</pt>
                     <pd>
-                        <p>An option that identifies the host from which the foreign data-wrapper
-                            requests data: <ul id="ul_zcg_2vd_mgb">
-                                <li><codeph>master</codeph> (the default)—Request data from the
-                                    master host.</li>
-                                <li><codeph>any</codeph>—Request data from either the master host or
-                                    any one segment, depending on which path costs less.</li>
-                                <li><codeph>all segments</codeph>—Request data from all segments. To
-                                    support this option value, the foreign data-wrapper must have a
-                                    policy that matches the segments to data.</li>
+                        <p>一个选项，用于标识外部数据包装器从其请求数据的主机：
+                            <ul id="ul_zcg_2vd_mgb">
+                                <li><codeph>master</codeph>（默认设置）- 从master主机请求数据。</li>
+                                <li><codeph>any</codeph> — 向master主机或任一segment请求数据，具体取决于哪条路径的成本更低。
+                                    </li>
+                                <li><codeph>all segments</codeph> — 从所有segment中请求数据。
+                                    要支持此选项值，外部数据包装器必须具有将segment与数据匹配的策略。
+                                    </li>
                             </ul></p>
-                        <p>The <codeph>mpp_execute</codeph> option can be specified in multiple
-                            commands: <codeph>CREATE FOREIGN TABLE</codeph>, <codeph>CREATE
-                                SERVER</codeph>, and <codeph>CREATE FOREIGN DATA WRAPPER</codeph>.
-                            The foreign table setting takes precedence over the foreign server
-                            setting, followed by the foreign data wrapper setting.</p>
+                        <p>可以在多个命令中指定<codeph>mpp_execute</codeph>选项：
+                            <codeph>CREATE FOREIGN TABLE</codeph>，
+                            <codeph>CREATE SERVER</codeph>和<codeph>CREATE FOREIGN DATA WRAPPER</codeph>。
+                            外部表设置优先于外部服务器设置，然后是外部数据包装器设置。
+                            </p>
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Notes</title>
-            <p>When using the dblink module (see <codeph><xref href="../modules/dblink.xml#topic1">dblink</xref></codeph>), you can use the foreign server name as an argument of the <codeph>dblink_connect()</codeph> function to provide the connection parameters. You must have the <codeph>USAGE</codeph> privilege on the foreign server to use it in this manner.</p>
+            <title>注解</title>
+            <p>使用dblink模块（请参阅<codeph><xref href="../modules/dblink.xml#topic1">dblink</xref></codeph>）时，
+                可以将外部服务器名称用作<codeph>dblink_connect()</codeph>函数的参数来提供连接参数。
+                您必须在外部服务器上具有<codeph>USAGE</codeph>特权才能以这种方式使用它。
+                </p>
         </section>
         <section id="section6">
-            <title>Examples</title>
-            <p>Create a foreign server named <codeph>myserver</codeph> that uses the foreign-data wrapper named <codeph>pgsql</codeph> and includes connection options:</p><codeblock>CREATE SERVER myserver FOREIGN DATA WRAPPER pgsql 
+            <title>示例</title>
+            <p>创建一个名为<codeph>myserver</codeph>的外部服务器，该服务器使用名为<codeph>pgsql</codeph>的外部数据包装器并包含连接选项：</p>
+            <codeblock>CREATE SERVER myserver FOREIGN DATA WRAPPER pgsql
     OPTIONS (host 'foo', dbname 'foodb', port '5432');</codeblock>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p><codeph>CREATE SERVER</codeph> conforms to ISO/IEC 9075-9 (SQL/MED).</p>
+            <title>兼容性</title>
+            <p><codeph>CREATE SERVER</codeph>符合ISO/IEC 9075-9（SQL/MED）。</p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="ALTER_SERVER.xml#topic1">ALTER SERVER</xref></codeph>,
                         <codeph><xref href="DROP_SERVER.xml#topic1">DROP
                     SERVER</xref></codeph>,
