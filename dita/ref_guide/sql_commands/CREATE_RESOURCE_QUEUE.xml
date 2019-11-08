@@ -4,11 +4,11 @@
 <topic id="topic1">
   <title id="by20941">CREATE RESOURCE QUEUE</title>
   <body>
-    <p id="sql_command_desc">Defines a new resource queue.</p>
+    <p id="sql_command_desc">定义一个新的资源队列。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">CREATE RESOURCE QUEUE <varname>name</varname> WITH (<varname>queue_attribute</varname>=<varname>value</varname> [, ... ])</codeblock>
-      <p>where <varname>queue_attribute</varname> is:</p>
+      <p>其中<varname>queue_attribute</varname>为：</p>
       <codeblock>    ACTIVE_STATEMENTS=<varname>integer</varname>
         [ MAX_COST=<varname>float </varname>[COST_OVERCOMMIT={TRUE|FALSE}] ]
         [ MIN_COST=<varname>float </varname>]
@@ -22,179 +22,163 @@
         [ MEMORY_LIMIT='<varname>memory_units</varname>' ]</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>Creates a new resource queue for Greenplum Database resource management. A resource queue
-        must have either an <codeph>ACTIVE_STATEMENTS</codeph> or a <codeph>MAX_COST</codeph> value
-        (or it can have both). Only a superuser can create a resource queue.</p>
-      <p>Resource queues with an <codeph>ACTIVE_STATEMENTS</codeph> threshold set a maximum limit on
-        the number of queries that can be executed by roles assigned to that queue. It controls the
-        number of active queries that are allowed to run at the same time. The value for
-          <codeph>ACTIVE_STATEMENTS</codeph> should be an integer greater than 0. </p>
-      <p>Resource queues with a <codeph>MAX_COST</codeph> threshold set a maximum limit on the total
-        cost of queries that can be executed by roles assigned to that queue. Cost is measured in
-        the <i>estimated total cost</i> for the query as determined by the Greenplum Database query
-        planner (as shown in the <codeph>EXPLAIN</codeph> output for a query). Therefore, an
-        administrator must be familiar with the queries typically executed on the system in order to
-        set an appropriate cost threshold for a queue. Cost is measured in units of disk page
-        fetches; 1.0 equals one sequential disk page read. The value for <codeph>MAX_COST</codeph>
-        is specified as a floating point number (for example 100.0) or can also be specified as an
-        exponent (for example 1e+2). If a resource queue is limited based on a cost threshold, then
-        the administrator can allow <codeph>COST_OVERCOMMIT=TRUE</codeph> (the default). This means
-        that a query that exceeds the allowed cost threshold will be allowed to run but only when
-        the system is idle. If <codeph>COST_OVERCOMMIT=FALSE</codeph> is specified, queries that
-        exceed the cost limit will always be rejected and never allowed to run. Specifying a value
-        for <codeph>MIN_COST</codeph> allows the administrator to define a cost for small queries
-        that will be exempt from resource queueing.</p>
-      <note>GPORCA and the Postgres query optimizer utilize different
-              query costing models and may compute different costs for the same query.
-              The Greenplum Database resource queue resource management scheme neither
-              differentiates nor aligns costs between GPORCA and the Postgres optimizer; it
-              uses the literal cost value returned from the optimizer to throttle
-              queries.<p> When resource queue-based resource management is active, use the
-              <codeph>MEMORY_LIMIT</codeph> and <codeph>ACTIVE_STATEMENTS</codeph> limits for
-              resource queues rather than configuring cost-based limits. Even when using GPORCA,
-              Greenplum Database may fall back to using the Postgres query optimizer for certain
-              queries, so using cost-based limits can lead to unexpected results.</p></note>
-      <p>If a value is not defined for <codeph>ACTIVE_STATEMENTS</codeph> or
-          <codeph>MAX_COST</codeph>, it is set to <codeph>-1</codeph> by default (meaning no limit).
-        After defining a resource queue, you must assign roles to the queue using the <codeph><xref
-            href="ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph> or <codeph><xref
-            href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph> command.</p>
-      <p>You can optionally assign a <codeph>PRIORITY</codeph> to a resource queue to control the
-        relative share of available CPU resources used by queries associated with the queue in
-        relation to other resource queues. If a value is not defined for <codeph>PRIORITY</codeph>,
-        queries associated with the queue have a default priority of <codeph>MEDIUM</codeph>.</p>
-      <p>Resource queues with an optional <codeph>MEMORY_LIMIT</codeph> threshold set a maximum
-        limit on the amount of memory that all queries submitted through a resource queue can
-        consume on a segment host. This determines the total amount of memory that all worker
-        processes of a query can consume on a segment host during query execution. Greenplum
-        recommends that <codeph>MEMORY_LIMIT</codeph> be used in conjunction with
-          <codeph>ACTIVE_STATEMENTS</codeph> rather than with <codeph>MAX_COST</codeph>. The default
-        amount of memory allotted per query on statement-based queues is: <codeph>MEMORY_LIMIT /
-          ACTIVE_STATEMENTS</codeph>. The default amount of memory allotted per query on cost-based
-        queues is: <codeph>MEMORY_LIMIT * (query_cost / MAX_COST)</codeph>.</p>
-      <p>The default memory allotment can be overridden on a per-query basis using the
-          <codeph>statement_mem</codeph> server configuration parameter, provided that
-          <codeph>MEMORY_LIMIT</codeph> or <codeph>max_statement_mem</codeph> is not exceeded. For
-        example, to allocate more memory to a particular query:</p>
+      <title>描述</title>
+      <p>为Greenplum数据库资源管理创建一个新的资源队列。
+          资源队列必须具有<codeph>ACTIVE_STATEMENTS</codeph>或<codeph>MAX_COST</codeph>值（或者可以同时具有两者）。
+          只有超级用户才能创建资源队列。</p>
+      <p>具有<codeph>ACTIVE_STATEMENTS</codeph>阈值的资源队列为分配给该队列的角色可以执行的查询数量设置了最大限制。
+          它控制允许同时运行的活动查询的数量。
+          <codeph>ACTIVE_STATEMENTS</codeph>的值应为大于0的整数。
+          </p>
+      <p>具有<codeph>MAX_COST</codeph>阈值的资源队列对可以由分配给该队列的角色执行的查询的总成本设置最大限制。
+          成本以Greenplum数据库查询优化器确定的查询的估计总成本来衡量（如查询的<codeph>EXPLAIN</codeph>输出中所示）。
+          因此，管理员必须熟悉通常在系统上执行的查询，以便为队列设置适当的成本阈值。
+          成本以获取磁盘页面为单位进行衡量；1.0等于读取一个连续的磁盘页面。
+          <codeph>MAX_COST</codeph>的值指定为浮点数（例如100.0），也可以指定为指数（例如1e + 2）。
+          如果基于成本阈值限制资源队列，则管理员可以允许<codeph>COST_OVERCOMMIT=TRUE</codeph>（默认值）。
+          这意味着将允许运行超过允许的成本阈值的查询，但仅在系统空闲时才允许运行。
+          如果指定<codeph>COST_OVERCOMMIT=FALSE</codeph>，则超出成本限制的查询将始终被拒绝，并且永远不允许运行。
+          通过为<codeph>MIN_COST</codeph>指定一个值，管理员可以为小型查询定义费用，这些费用将免于资源排队。
+          </p>
+      <note>GPORCA和Postgres查询优化器利用不同的查询成本模型，并且可以为同一查询计算不同的成本。
+          Greenplum数据库资源队列资源管理方案既不区分GPORCA和Postgres优化器之间的成本，也没有对其进行调整。
+          它使用从优化程序返回的文字成本值来限制查询。
+              <p>当基于资源队列的资源管理处于活动状态时，
+                  请对资源队列使用<codeph>MEMORY_LIMIT</codeph>和<codeph>ACTIVE_STATEMENTS</codeph>限制，而不是配置基于成本的限制。
+                  即使使用GPORCA，Greenplum数据库也可能会退回到对某些查询使用Postgres查询优化器，
+                  因此使用基于成本的限制可能会导致意外结果。
+                  </p></note>
+      <p>如果未为<codeph>ACTIVE_STATEMENTS</codeph>或<codeph>MAX_COST</codeph>定义值，则默认情况下将其设置为<codeph>-1</codeph>（表示无限制）。
+          定义资源队列后，必须使用<codeph><xref
+                  href="ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph>或<codeph><xref
+                  href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>命令将角色分配给队列。
+        </p>
+      <p>您可以选择将<codeph>PRIORITY</codeph>分配给资源队列，
+          以控制与该队列相关联的查询相对于其他资源队列使用的可用CPU资源的相对份额。
+          如果未为<codeph>PRIORITY</codeph>定义值，则与队列关联的查询的默认优先级为<codeph>MEDIUM</codeph>。
+          </p>
+      <p>具有可选<codeph>MEMORY_LIMIT</codeph>阈值的资源队列设置了对通过资源队列提交的所有查询可以在segment主机上使用的最大内存量的限制。
+          这就决定了一个查询的所有工作进程可以在查询执行期间的segment主机上消耗的存储器的总量。
+          Greenplum建议将<codeph>MEMORY_LIMIT</codeph>与<codeph>ACTIVE_STATEMENTS</codeph>结合使用，而不要与<codeph>MAX_COST</codeph>结合使用。
+          在基于语句的队列上，每个查询分配的默认内存量为：<codeph>MEMORY_LIMIT / ACTIVE_STATEMENTS</codeph>。
+          在基于成本的队列上，每个查询分配的默认内存量为：<codeph>MEMORY_LIMIT *（query_cost / MAX_COST）</codeph>。
+          </p>
+      <p>如果不超过<codeph>MEMORY_LIMIT</codeph>或<codeph>statement_mem</codeph>，
+          则可以使用<codeph>statement_mem</codeph>服务器配置参数在每个查询的基础上覆盖默认内存分配。
+          例如，为一个特定的查询分配更多的内存：
+          </p>
       <codeblock>=&gt; SET statement_mem='2GB';
 =&gt; SELECT * FROM my_big_table WHERE column='value' ORDER BY id;
 =&gt; RESET statement_mem;</codeblock>
-      <p>The <codeph>MEMORY_LIMIT</codeph> value for all of your resource queues should not exceed
-        the amount of physical memory of a segment host. If workloads are staggered over multiple
-        queues, memory allocations can be oversubscribed. However, queries can be cancelled during
-        execution if the segment host memory limit specified in
-          <codeph>gp_vmem_protect_limit</codeph> is exceeded.</p>
-      <p>For information about <codeph>statement_mem</codeph>, <codeph>max_statement</codeph>, and
-          <codeph>gp_vmem_protect_limit</codeph>, see <xref href="../config_params/guc_config.xml"
-          type="topic" format="dita"/>.</p>
+      <p>您所有资源队列的<codeph>MEMORY_LIMIT</codeph>值不应超过segment主机的物理内存量。
+          如果工作负载分散在多个队列中，则内存分配可能会超额预定。
+          但是，如果超出了<codeph>gp_vmem_protect_limit</codeph>中指定的segment主机内存限制，则可以在执行期间取消查询。
+          </p>
+      <p>有关<codeph>statement_mem</codeph>，<codeph>max_statement</codeph>和<codeph>gp_vmem_protect_limit</codeph>的信息，
+          请参阅<xref href="../config_params/guc_config.xml" type="topic" format="dita"/>。
+          </p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>
             <varname>name</varname>
           </pt>
-          <pd>The name of the resource queue.</pd>
+          <pd>资源队列的名称。</pd>
         </plentry>
         <plentry>
           <pt>ACTIVE_STATEMENTS <varname>integer</varname></pt>
-          <pd>Resource queues with an <codeph>ACTIVE_STATEMENTS</codeph> threshold limit the number
-            of queries that can be executed by roles assigned to that queue. It controls the number
-            of active queries that are allowed to run at the same time. The value for
-              <codeph>ACTIVE_STATEMENTS</codeph> should be an integer greater than 0.</pd>
+          <pd>具有<codeph>ACTIVE_STATEMENTS</codeph>阈值的资源队列限制了分配给该队列的角色可以执行的查询数量。
+              它控制允许同时运行的活动查询的数量。
+              <codeph>ACTIVE_STATEMENTS</codeph>的值应为大于0的整数。</pd>
         </plentry>
         <plentry>
           <pt>MEMORY_LIMIT <varname>'memory_units'</varname></pt>
-          <pd>Sets the total memory quota for all statements submitted from users in this resource
-            queue. Memory units can be specified in kB, MB or GB. The minimum memory quota for a
-            resource queue is 10MB. There is no maximum, however the upper boundary at query
-            execution time is limited by the physical memory of a segment host. The default is no
-            limit (<codeph>-1</codeph>).</pd>
+          <pd>设置此资源队列中用户提交的所有语句的总内存配额。
+              可以用kB，MB或GB指定存储单元。
+              资源队列的最小内存配额为10MB。
+              没有最大值，但是查询执行时的上限受segment主机的物理内存限制。
+              默认值为无限制（<codeph>-1</codeph>）。
+              </pd>
         </plentry>
         <plentry>
           <pt>MAX_COST <varname>float</varname></pt>
-          <pd>Resource queues with a <codeph>MAX_COST</codeph> threshold set a maximum limit on the
-            total cost of queries that can be executed by roles assigned to that queue. Cost is
-            measured in the <i>estimated total cost</i> for the query as determined by the Greenplum
-            Database query optimizer (as shown in the <codeph>EXPLAIN</codeph> output for a query).
-            Therefore, an administrator must be familiar with the queries typically executed on the
-            system in order to set an appropriate cost threshold for a queue. Cost is measured in
-            units of disk page fetches; 1.0 equals one sequential disk page read. The value for
-              <codeph>MAX_COST</codeph> is specified as a floating point number (for example 100.0)
-            or can also be specified as an exponent (for example 1e+2).</pd>
+          <pd>具有<codeph>MAX_COST</codeph>阈值的资源队列对可以由分配给该队列的角色执行的查询的总成本设置了最大限制。
+              成本以Greenplum数据库查询优化器确定的查询的估算总成本来衡量（如查询的<codeph>EXPLAIN</codeph>输出中所示）。
+              因此，管理员必须熟悉通常在系统上执行的查询，以便为队列设置适当的成本阈值。
+              成本以获取磁盘页面为单位进行衡量；1.0等于读取一个连续的磁盘页面。
+              <codeph>MAX_COST</codeph>的值指定为浮点数（例如100.0），也可以指定为指数（例如1e+2）。
+              </pd>
         </plentry>
         <plentry>
           <pt>COST_OVERCOMMIT <varname>boolean</varname></pt>
-          <pd>If a resource queue is limited based on <codeph>MAX_COST</codeph>, then the
-            administrator can allow <codeph>COST_OVERCOMMIT</codeph> (the default). This means that
-            a query that exceeds the allowed cost threshold will be allowed to run but only when the
-            system is idle. If <codeph>COST_OVERCOMMIT=FALSE </codeph>is specified, queries that
-            exceed the cost limit will always be rejected and never allowed to run.</pd>
+          <pd>如果基于<codeph>MAX_COST</codeph>限制资源队列，则管理员可以允许<codeph>COST_OVERCOMMIT</codeph>（默认值）。
+              这意味着将允许运行超过允许的成本阈值的查询，但仅在系统空闲时才允许运行。
+              如果指定<codeph>COST_OVERCOMMIT=FALSE</codeph>，则超出成本限制的查询将始终被拒绝，并且永远不允许运行。
+              </pd>
         </plentry>
         <plentry>
           <pt>MIN_COST <varname>float</varname></pt>
-          <pd>The minimum query cost limit of what is considered a small query. Queries with a cost
-            under this limit will not be queued and run immediately. Cost is measured in the
-              <i>estimated total cost</i> for the query as determined by the Greenplum Database
-            query planner (as shown in the <codeph>EXPLAIN</codeph> output for a query). Therefore,
-            an administrator must be familiar with the queries typically executed on the system in
-            order to set an appropriate cost for what is considered a small query. Cost is measured
-            in units of disk page fetches; 1.0 equals one sequential disk page read. The value for
-              <codeph>MIN_COST </codeph>is specified as a floating point number (for example 100.0)
-            or can also be specified as an exponent (for example 1e+2).</pd>
+          <pd>小型查询的最低查询成本限制。
+              费用低于此限制的查询将不会排队并立即运行。
+              成本以Greenplum数据库查询优化器确定的查询的估计总成本来衡量（如查询的<codeph>EXPLAIN</codeph>输出中所示）。
+              因此，管理员必须熟悉通常在系统上执行的查询，以便为被认为是小的查询设置适当的成本。
+              成本以获取磁盘页面为单位进行衡量；1.0等于读取一个连续的磁盘页面。
+              <codeph>MIN_COST </codeph>的值指定为浮点数（例如100.0），也可以指定为指数（例如1e+2）。
+              </pd>
         </plentry>
         <plentry>
           <pt>PRIORITY={MIN|LOW|MEDIUM|HIGH|MAX}</pt>
-          <pd>Sets the priority of queries associated with a resource queue. Queries or statements
-            in queues with higher priority levels will receive a larger share of available CPU
-            resources in case of contention. Queries in low-priority queues may be delayed while
-            higher priority queries are executed. If no priority is specified, queries associated
-            with the queue have a priority of <codeph>MEDIUM</codeph>.</pd>
+          <pd>设置与资源队列关联的查询的优先级。
+              发生竞争时，具有较高优先级的队列中的查询或语句将获得更多的可用CPU资源份额。
+              在执行较高优先级的查询时，低优先级队列中的查询可能会延迟。
+              如果未指定优先级，则与队列关联的查询的优先级为<codeph>MEDIUM</codeph>。
+              </pd>
         </plentry>
       </parml>
     </section>
-    <section id="section5"><title>Notes</title><p>Use the
-          <codeph>gp_toolkit.gp_resqueue_status</codeph> system view to see the limit settings and
-        current status of a resource
-        queue:</p><codeblock>SELECT * from gp_toolkit.gp_resqueue_status WHERE 
-  rsqname='queue_name';</codeblock><p>There
-        is also another system view named <codeph>pg_stat_resqueues</codeph> which shows statistical
-        metrics for a resource queue over time. To use this view, however, you must enable the
-          <codeph>stats_queue_level</codeph> server configuration parameter. See "Managing Workload
-        and Resources" in the <i>Greenplum Database Administrator Guide</i> for more information
-        about using resource queues.</p><p><codeph>CREATE RESOURCE QUEUE</codeph> cannot be run
-        within a transaction.</p>Also, an SQL statement that is run during the execution of an
-        <codeph>EXPLAIN ANALYZE</codeph> command is excluded from resource queues.</section>
+    <section id="section5"><title>注解</title>
+        <p>使用<codeph>gp_toolkit.gp_resqueue_status</codeph>系统视图查看资源队列的限制设置和当前状态：
+            </p><codeblock>SELECT * from gp_toolkit.gp_resqueue_status WHERE
+  rsqname='queue_name';</codeblock>
+        <p>还有另一个名为<codeph>pg_stat_resqueues</codeph>的系统视图，该视图显示了一段时间内资源队列的统计指标。
+            但是，要使用此视图，必须启用<codeph>stats_queue_level</codeph>服务器配置参数。
+            有关使用资源队列的更多信息，请参见<i>Greenplum数据库管理员指南</i>中的“管理工作负载和资源”。
+            </p>
+        <p><codeph>CREATE RESOURCE QUEUE</codeph>不能在事务中运行。
+            </p>
+        此外，在执行<codeph>EXPLAIN ANALYZE</codeph>命令的过程中运行的SQL语句将从资源队列中排除。
+        </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>Create a resource queue with an active query limit of 20: </p>
+      <title>示例</title>
+      <p>创建一个活动查询限制为20的资源队列：</p>
       <codeblock>CREATE RESOURCE QUEUE myqueue WITH (ACTIVE_STATEMENTS=20);</codeblock>
-      <p>Create a resource queue with an active query limit of 20 and a total memory limit of 2000MB
-        (each query will be allocated 100MB of segment host memory at execution time): </p>
+      <p>创建一个资源队列，其活动查询限制为20，总内存限制为2000MB（每个查询在执行时将分配100MB的segment主机内存）：
+          </p>
       <codeblock>CREATE RESOURCE QUEUE myqueue WITH (ACTIVE_STATEMENTS=20, 
   MEMORY_LIMIT='2000MB');</codeblock>
-      <p>Create a resource queue with a query cost limit of 3000.0: </p>
+      <p>创建一个查询费用限制为3000.0的资源队列：</p>
       <codeblock>CREATE RESOURCE QUEUE myqueue WITH (MAX_COST=3000.0);</codeblock>
-      <p>Create a resource queue with a query cost limit of 3<sup>10</sup> (or 30000000000.0) and do
-        not allow overcommit. Allow small queries with a cost under 500 to run immediately:</p>
+      <p>创建一个查询成本限制为3<sup>10</sup>（或30000000000.0）的资源队列，并且不允许过量使用。
+          允许成本低于500的小型查询立即运行：</p>
       <codeblock>CREATE RESOURCE QUEUE myqueue WITH (MAX_COST=3e+10, 
   COST_OVERCOMMIT=FALSE, MIN_COST=500.0);</codeblock>
-      <p>Create a resource queue with both an active query limit and a query cost limit:</p>
+      <p>创建同时具有活动查询限制和查询成本限制的资源队列：</p>
       <codeblock>CREATE RESOURCE QUEUE myqueue WITH (ACTIVE_STATEMENTS=30, 
   MAX_COST=5000.00);</codeblock>
-      <p>Create a resource queue with an active query limit of 5 and a maximum priority setting: </p>
+      <p>创建一个活动查询限制为5且最大优先级设置的资源队列：</p>
       <codeblock>CREATE RESOURCE QUEUE myqueue WITH (ACTIVE_STATEMENTS=5, 
   PRIORITY=MAX);</codeblock>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p><codeph>CREATE RESOURCE QUEUE</codeph> is a Greenplum Database extension. There is no
-        provision for resource queues or resource management in the SQL standard.</p>
+      <title>兼容性</title>
+      <p><codeph>CREATE RESOURCE QUEUE</codeph>是Greenplum数据库扩展。
+          SQL标准中没有提供资源队列或资源管理的规定。
+          </p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="ALTER_RESOURCE_QUEUE.xml#topic1" type="topic" format="dita"

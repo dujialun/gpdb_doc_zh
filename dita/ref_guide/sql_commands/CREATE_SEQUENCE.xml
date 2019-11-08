@@ -1,85 +1,204 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="cc20941">CREATE SEQUENCE</title><body><p id="sql_command_desc">Defines a new sequence generator.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">CREATE [TEMPORARY | TEMP] SEQUENCE <varname>name</varname>
-       [INCREMENT [BY] <varname>value</varname>] 
-       [MINVALUE <varname>minvalue</varname> | NO MINVALUE] 
-       [MAXVALUE <varname>maxvalue</varname> | NO MAXVALUE] 
-       [START [ WITH ] <varname>start</varname>] 
-       [CACHE <varname>cache</varname>] 
-       [[NO] CYCLE] 
-       [OWNED BY { <varname>table</varname>.<varname>column</varname> | NONE }]</codeblock></section><section id="section3"><title>Description</title><p><codeph>CREATE SEQUENCE</codeph> creates a new sequence number generator.
-This involves creating and initializing a new special single-row table.
-The generator will be owned by the user issuing the command. </p><p>If a schema name is given, then the sequence is created in the specified
-schema. Otherwise it is created in the current schema. Temporary sequences
-exist in a special schema, so a schema name may not be given when creating
-a temporary sequence. The sequence name must be distinct from the name
-of any other sequence, table, index, view, or foreign table in the same schema. </p><p>After a sequence is created, you use the <codeph>nextval()</codeph>
-function to operate on the sequence. For example, to insert a row into
-a table that gets the next value of a sequence:</p><codeblock>INSERT INTO distributors VALUES (nextval('myserial'), 'acme');</codeblock><p>You can also use the function <codeph>setval()</codeph> to operate on a
-sequence, but only for queries that do not operate on distributed data.
-For example, the following query is allowed because it resets the sequence
-counter value for the sequence generator process on the master:</p><codeblock>SELECT setval('myserial', 201);</codeblock><p>But the following query will be rejected in Greenplum Database because
-it operates on distributed data:</p><codeblock>INSERT INTO product VALUES (setval('myserial', 201), 'gizmo');</codeblock><p>In a regular (non-distributed) database, functions that operate on the
-sequence go to the local sequence table to get values as they are needed.
- In Greenplum Database, however, keep in mind that each segment is its
-own distinct database process. Therefore the segments need a single point
-of truth to go for sequence values so that all segments get incremented
-correctly and the sequence moves forward in the right order. A sequence
-server process runs on the master and is the point-of-truth for a sequence
-in a Greenplum distributed database. Segments get sequence values at
-runtime from the master.</p><p>Because of this distributed sequence design, there are some limitations
-on the functions that operate on a sequence in Greenplum Database:</p><ul><li id="cc148439"><codeph>lastval()</codeph> and <codeph>currval()</codeph> functions are
-not supported. </li><li id="cc149500"><codeph>setval()</codeph> can only be used to set the value of the sequence
-generator on the master, it cannot be used in subqueries to update records
-on distributed table data.</li><li id="cc149515"><codeph>nextval()</codeph> sometimes grabs a block of values from the
-master for a segment to use, depending on the query. So values may sometimes
-be skipped in the sequence if all of the block turns out not to be needed
-at the segment level. Note that a regular PostgreSQL database does this
-too, so this is not something unique to Greenplum Database.</li></ul><p>Although you cannot update a sequence directly, you can use a query like:</p><codeblock>SELECT * FROM <varname>sequence_name</varname>;</codeblock><p>to examine the parameters and current state of a sequence. In particular,
-the <varname>last_value</varname> field of the sequence shows the last value allocated
-by any session.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt>TEMPORARY | TEMP</pt><pd>If specified, the sequence object is created only for this session,
-and is automatically dropped on session exit. Existing permanent sequences
-with the same name are not visible (in this session) while the temporary
-sequence exists, unless they are referenced with schema-qualified names.
-</pd></plentry><plentry><pt><varname>name</varname></pt><pd>The name (optionally schema-qualified) of the sequence to be created.
-</pd></plentry><plentry><pt><varname>increment</varname></pt><pd>Specifies which value is added to the current sequence value to create
-a new value. A positive value will make an ascending sequence, a negative
-one a descending sequence. The default value is 1. </pd></plentry><plentry><pt><varname>minvalue</varname></pt><pt>NO MINVALUE</pt><pd>Determines the minimum value a sequence can generate. If this clause
-is not supplied or <codeph>NO MINVALUE</codeph> is specified, then defaults
-will be used. The defaults are 1 and -263-1 for ascending and descending
-sequences, respectively. </pd></plentry><plentry><pt><varname>maxvalue</varname></pt><pt>NO MAXVALUE</pt><pd>Determines the maximum value for the sequence. If this clause is
-not supplied or <codeph>NO MAXVALUE</codeph> is specified, then default
-values will be used. The defaults are 263-1 and -1 for ascending and
-descending sequences, respectively. </pd></plentry><plentry><pt><varname>start</varname></pt><pd>Allows the sequence to begin anywhere. The default starting value
-is <varname>minvalue</varname> for ascending sequences and <varname>maxvalue</varname> for descending
-ones. </pd></plentry><plentry><pt><varname>cache</varname></pt><pd>Specifies how many sequence numbers are to be preallocated and stored
-in memory for faster access. The minimum (and default) value is 1 (no
-cache). </pd></plentry><plentry><pt>CYCLE</pt><pt>NO CYCLE</pt><pd>Allows the sequence to wrap around when the <varname>maxvalue</varname> (for
-ascending) or <varname>minvalue</varname> (for descending) has been reached. If the
-limit is reached, the next number generated will be the <varname>minvalue</varname>
-(for ascending) or <varname>maxvalue</varname> (for descending). If <codeph>NO CYCLE</codeph>
-is specified, any calls to <codeph>nextval()</codeph> after the sequence
-has reached its maximum value will return an error. If not specified,
-<codeph>NO CYCLE</codeph> is the default.</pd></plentry><plentry><pt>OWNED BY <varname>table.column</varname></pt><pt>OWNED BY NONE</pt><pd>Causes the sequence to be associated with a specific table column,
-such that if that column (or its whole table) is dropped, the sequence
-will be automatically dropped as well. The specified table must have
-the same owner and be in the same schema as the sequence. <codeph>OWNED
-BY NONE</codeph>, the default, specifies that there is no such association.</pd></plentry></parml></section><section id="section5"><title>Notes</title><p>Sequences are based on bigint arithmetic, so the range cannot exceed
-the range of an eight-byte integer (-9223372036854775808 to 9223372036854775807).</p><p>Although multiple sessions are guaranteed to allocate distinct sequence
-values, the values may be generated out of sequence when all the sessions
-are considered. For example, session A might reserve values 1..10 and
-return <codeph>nextval=1</codeph>, then session B might reserve values
-11..20 and return <codeph>nextval=11</codeph> before session A has generated
-nextval=2. Thus, you should only assume that the <codeph>nextval()</codeph>
-values are all distinct, not that they are generated purely sequentially.
-Also, <varname>last_value</varname> will reflect the latest value reserved by any
-session, whether or not it has yet been returned by <codeph>nextval()</codeph>.</p></section><section id="section6"><title>Examples</title><p>Create a sequence named <varname>myseq</varname>:</p><codeblock>CREATE SEQUENCE myseq START 101;</codeblock><p>Insert a row into a table that gets the next value of the sequence named <varname>idseq</varname>:</p><codeblock>INSERT INTO distributors VALUES (nextval('idseq'), 'acme'); </codeblock><p>Reset the sequence counter value on the master:</p><codeblock>SELECT setval('myseq', 201);</codeblock><p>Illegal use of <codeph>setval()</codeph> in Greenplum Database (setting
-sequence values on distributed data):</p><codeblock>INSERT INTO product VALUES (setval('myseq', 201), 'gizmo'); </codeblock></section><section id="section7"><title>Compatibility</title><p><codeph>CREATE SEQUENCE</codeph> conforms to the SQL standard, with
-the following exceptions: </p><ul><li id="cc148458">The <codeph>AS <varname>data_type</varname></codeph> expression specified in the SQL standard
-          is not supported. </li><li id="cc148460">Obtaining the next value is done using the <codeph>nextval()</codeph>
-function instead of the <codeph>NEXT VALUE FOR</codeph> expression specified
-in the SQL standard. </li><li id="cc148462">The <codeph>OWNED BY</codeph> clause is a Greenplum Database extension.
-</li></ul></section><section id="section8"><title>See Also</title><p><codeph><xref href="ALTER_SEQUENCE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="./DROP_SEQUENCE.xml#topic1" type="topic" format="dita"
-        /></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="cc20941">CREATE SEQUENCE</title>
+    <body>
+        <p id="sql_command_desc">定义一个新的序列生成器。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CREATE [TEMPORARY | TEMP] SEQUENCE <varname>name</varname>
+        [INCREMENT [BY] <varname>value</varname>]
+        [MINVALUE <varname>minvalue</varname> | NO MINVALUE]
+        [MAXVALUE <varname>maxvalue</varname> | NO MAXVALUE]
+        [START [ WITH ] <varname>start</varname>]
+        [CACHE <varname>cache</varname>]
+        [[NO] CYCLE]
+        [OWNED BY { <varname>table</varname>.<varname>column</varname> | NONE }]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CREATE SEQUENCE</codeph>创建一个新的序列生成器。
+                这涉及创建和初始化新的特殊单行表。
+                生成器将由发出命令的用户所有。
+            </p>
+            <p>如果指定了模式名称，则会在指定的模式中创建序列。
+                否则，它将在当前模式中创建。
+                临时序列存在于特殊模式中，因此在创建临时序列时可能不会给出模式名称。
+                序列名称必须与同一模式中任何其他序列，表，索引，视图或外部表的名称不同。
+            </p>
+            <p>创建序列后，可以使用<codeph>nextval()</codeph>函数对序列进行操作。
+                例如，要将行插入到获取序列的下一个值的表中：
+            </p>
+            <codeblock>INSERT INTO distributors VALUES (nextval('myserial'), 'acme');</codeblock>
+            <p>您还可以使用函数<codeph>setval()</codeph>对序列进行操作，但仅用于不对分布式数据进行操作的查询。
+                例如，允许以下查询，因为它会重置master上序列生成器进程的序列计数器值：
+            </p>
+            <codeblock>SELECT setval('myserial', 201);</codeblock>
+            <p>但是以下查询在Greenplum数据库中将被拒绝，因为它对分布式数据进行操作：
+            </p>
+            <codeblock>INSERT INTO product VALUES (setval('myserial', 201), 'gizmo');</codeblock>
+            <p>在常规（非分布式）数据库中，对序列进行操作的函数会转到本地序列表以根据需要获取值。
+                但是，请记住，在Greenplum数据库中，每个segment都是其自己不同的数据库进程。
+                因此，segment需要一个真实单点来获取序列值，以便所有segment正确递增，并且序列以正确的顺序前进。
+                序列服务器进程在master上运行，并且是Greenplum分布式数据库中序列的真实点。
+                segment在运行时从master获取序列值。
+            </p>
+            <p>由于这种分布式序列设计，因此在Greenplum数据库中对序列操作的函数存在一些限制：
+            </p>
+            <ul>
+                <li id="cc148439">
+                    <codeph>lastval()</codeph>和<codeph>currval()</codeph>函数不被支持。
+                </li>
+                <li id="cc149500">
+                    <codeph>setval()</codeph>仅可用于在master上设置序列生成器的值，而不能在子查询中用于更新分布式表数据上的记录。
+                </li>
+                <li id="cc149515">
+                    根据查询的不同，<codeph>nextval()</codeph>有时会从master获取一个值块以供segment使用。
+                    因此，如果在segment级别不需要所有块，有时可能会跳过序列中的值。
+                    请注意，常规PostgreSQL数据库也可以执行此操作，因此这并不是Greenplum数据库所独有的。
+                </li>
+            </ul>
+            <p>尽管您无法直接更新序列，但可以使用类似以下的查询：</p>
+            <codeblock>SELECT * FROM <varname>sequence_name</varname>;
+            </codeblock>
+            <p>检查序列的参数和当前状态。
+                特别是，序列的<varname>last_value</varname>字段显示了任何会话分配的最后一个值。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>TEMPORARY | TEMP</pt>
+                    <pd>如果指定，则仅为此会话创建序列对象，并在会话退出时自动将其删除。
+                        具有相同名称的现有永久序列在临时序列存在时不可见（在此会话中），除非使用模式限定名称引用它们。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要创建的序列的名称（可以由模式指定）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>increment</varname>
+                    </pt>
+                    <pd>指定将哪个值添加到当前序列值以创建新值。
+                        正值将形成一个升序，负值将形成一个降序。默认值为1。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>minvalue</varname>
+                    </pt>
+                    <pt>NO MINVALUE</pt>
+                    <pd>确定序列可以生成的最小值。
+                        如果未提供此子句或指定了<codeph>NO MINVALUE</codeph>，则将使用默认值。
+                        升序和降序的默认值分别为1和-263-1。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>maxvalue</varname>
+                    </pt>
+                    <pt>NO MAXVALUE</pt>
+                    <pd>确定序列的最大值。
+                        如果未提供此子句或指定了<codeph>NO MAXVALUE</codeph>，则将使用默认值。
+                        升序和降序的默认值分别为263-1和-1。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>start</varname>
+                    </pt>
+                    <pd>允许序列从任何地方开始。
+                        默认的起始值为升序的最小值和降序的最大值。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>cache</varname>
+                    </pt>
+                    <pd>指定要预分配多少序号并将其存储在内存中，以加快访问速度。
+                        最小（默认）值为1（无高速缓存）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>CYCLE</pt>
+                    <pt>NO CYCLE</pt>
+                    <pd>当达到最大值（递增）或最小值（递减）时，允许序列回绕。
+                        如果达到限制，则生成的下一个数字将是最小值（升序）或最大值（降序）。
+                        如果指定了<codeph>NO CYCLE</codeph>，则在序列达到最大值之后，对<codeph>nextval()</codeph>的任何调用都将返回错误。
+                        如果未指定，则默认为<codeph>NO CYCLE</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>OWNED BY
+                        <varname>table.column</varname>
+                    </pt>
+                    <pt>OWNED BY NONE</pt>
+                    <pd>使序列与特定的表列相关联，这样，如果该列（或其整个表）被删除，该序列也将被自动删除。
+                        指定的表必须具有相同的所有者，并且与序列具有相同的模式。
+                        <codeph>OWNED BY NONE</codeph>（默认值）指定不存在这种关联。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p>序列基于bigint算术，因此范围不能超过八字节整数的范围（-9223372036854775808至9223372036854775807）。
+            </p>
+            <p>尽管保证多个会话分配不同的序列值，但是当考虑所有会话时，这些值可能会不按顺序生成。
+                例如，会话A可能保留值1..10并返回<codeph>nextval=1</codeph>，
+                然后会话B可能保留值11..20并在会话A生成nextval=2之前返回<codeph>nextval=11</codeph>。
+                因此，您仅应假设<codeph>nextval()</codeph>值都是不同的，而不是纯粹按顺序生成它们。
+                同样，<varname>last_value</varname>将反映任何会话保留的最新值，无论<codeph>nextval()</codeph>是否已返回该值。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>创建一个名为<varname>myseq</varname>的序列：
+            </p>
+            <codeblock>CREATE SEQUENCE myseq START 101;</codeblock>
+            <p>在表中插入一行，以获取名为<varname>idseq</varname>的序列的下一个值：
+            </p>
+            <codeblock>INSERT INTO distributors VALUES (nextval('idseq'), 'acme');</codeblock>
+            <p>在master上重置序列计数器值：</p>
+            <codeblock>SELECT setval('myseq', 201);</codeblock>
+            <p>在Greenplum数据库中非法使用<codeph>setval()</codeph>（在分布式数据上设置序列值）：
+            </p>
+            <codeblock>INSERT INTO product VALUES (setval('myseq', 201), 'gizmo');</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p><codeph>CREATE SEQUENCE</codeph>符合SQL标准，但以下情况除外：
+            </p>
+            <ul>
+                <li id="cc148458">
+                    不支持SQL标准中指定的<codeph>AS<varname>data_type</varname></codeph>表达式。
+                </li>
+                <li id="cc148460">
+                    使用<codeph>nextval()</codeph>函数代替SQL标准中指定的<codeph>NEXT VALUE FOR</codeph>表达式来获取下一个值。
+                </li>
+                <li id="cc148462"><codeph>OWNED BY</codeph>子句是Greenplum数据库扩展。
+                </li>
+            </ul>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_SEQUENCE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./DROP_SEQUENCE.xml#topic1" type="topic" format="dita"
+                    />
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

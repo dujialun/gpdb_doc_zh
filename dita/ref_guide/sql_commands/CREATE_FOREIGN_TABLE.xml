@@ -4,124 +4,136 @@
 <topic id="topic1">
     <title id="bv20941">CREATE FOREIGN TABLE</title>
     <body>
-        <p id="sql_command_desc">Defines a new foreign table.</p>
+        <p id="sql_command_desc">定义一个新的外部表。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">CREATE FOREIGN TABLE [ IF NOT EXISTS ] <varname>table_name</varname> ( [
     <varname>column_name</varname> <varname>data_type</varname> [ OPTIONS ( <varname>option</varname> '<varname>value</varname>' [, ... ] ) ] [ COLLATE <varname>collation</varname> ] [ <varname>column_constraint</varname> [ ... ] ]
       [, ... ]
 ] )
     SERVER <varname>server_name</varname>
   [ OPTIONS ( [ mpp_execute { 'master' | 'any' | 'all segments' } [, ] ] <varname>option</varname> '<varname>value</varname>' [, ... ] ) ]</codeblock>
-        <p>where <varname>column_constraint</varname> is:</p><codeblock>
-[ CONSTRAINT <varname>constraint_name</varname> ]
+        <p>其中<varname>column_constraint</varname>为：</p>
+            <codeblock>[ CONSTRAINT <varname>constraint_name</varname> ]
 { NOT NULL |
   NULL |
   DEFAULT <varname>default_expr</varname> }</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>CREATE FOREIGN TABLE</codeph> creates a new foreign table
-                in the current database.  The user who creates the foreign table becomes
-                 its owner.</p>
-            <p>If you schema-qualify the table name (for example, <codeph>CREATE FOREIGN TABLE myschema.mytable ...</codeph>), Greenplum Database creates the table in the specified schema. Otherwise, the foreign table is created in the current schema. The name of the foreign table must be distinct from the name of any other foreign table, table, sequence, index, or view in the same schema.</p>
-            <p>Because <codeph>CREATE FOREIGN TABLE</codeph> automatically creates a data type that represents the composite type corresponding to one row of the foreign table, foreign tables cannot have the same name as any existing data type in the same schema.</p>
-            <p>To create a foreign table, you must have <codeph>USAGE</codeph> privilege on the foreign server, as well as <codeph>USAGE</codeph> privilege on all column types used in the table.</p>
+            <title>描述</title>
+            <p><codeph>CREATE FOREIGN TABLE</codeph>在当前数据库中创建一个新的外部表。
+                创建外部表的用户将成为其所有者。
+                </p>
+            <p>如果您对表名称进行模式限定（例如，<codeph>CREATE FOREIGN TABLE myschema.mytable ...</codeph>），
+                则Greenplum数据库将在指定模式中创建表。
+                否则，将在当前模式中创建外部表。
+                外部表的名称必须与同一模式中任何其他外部表，表，序列，索引或视图的名称不同。
+                </p>
+            <p>因为<codeph>CREATE FOREIGN TABLE</codeph>自动创建一种数据类型，
+                该数据类型表示与外部表的一行相对应的复合类型，所以外部表不能与同一模式中的任何现有数据类型具有相同的名称。
+                </p>
+            <p>要创建外部表，您必须在外部服务器上具有<codeph>USAGE</codeph>特权，
+                并且对表中使用的所有列类型都具有<codeph>USAGE</codeph>特权。
+                </p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt>IF NOT EXISTS</pt>
                     <pd>
-                        <p>Do not throw an error if a relation with the same name already exists. Greenplum Database issues a notice in this case. Note that there is no guarantee that the existing relation is anything like the one that would have been created.</p>
+                        <p>如果已经存在同名关系，则不要抛出错误。
+                            在这种情况下，Greenplum数据库会发出通知。
+                            请注意，不能保证现有关系类似于将要创建的关系。
+                            </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>table_name</varname></pt>
                     <pd>
-                        <p>The name (optionally schema-qualified) of the foreign table to create.</p>
+                        <p>要创建的外部表的名称（可以由模式指定）。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>column_name</varname></pt>
                     <pd>
-                        <p>The name of a column to create in the new foreign table.</p>
+                        <p>在新的外部表中创建的列的名称。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>data_type</varname></pt>
                     <pd>
-                        <p>The data type of the column, including array specifiers.</p>
+                        <p>列的数据类型，包括数组说明符。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>NOT NULL</pt>
                     <pd>
-                        <p>The column is not allowed to contain null values.</p>
+                        <p>该列不允许包含空值。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>NULL</pt>
                     <pd>
-                        <p>The column is allowed to contain null values. This is the default.</p>
-                        <p>This clause is provided only for compatibility with non-standard SQL databases. Its use is discouraged in new applications.</p>
+                        <p>该列允许包含空值。这是默认值。</p>
+                        <p>提供此子句仅是为了与非标准SQL数据库兼容。不建议在新应用中使用它。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>DEFAULT <varname>default_expr</varname></pt>
                     <pd>
-                        <p>The <codeph>DEFAULT</codeph> clause assigns a default value for the
-                          column whose definition it appears within. The value is any
-                          variable-free expression; Greenplum Database does not allow subqueries
-                          and cross-references to other columns in the current table. The data
-                          type of the default expression must match the data type of the column.</p>
-                        <p>Greenplum Database uses the default expression in any insert operation
-                          that does not specify a value for the column. If there is no default
-                          for a column, then the default is null.</p>
+                        <p><codeph>DEFAULT</codeph>子句为其定义所在的列分配默认值。
+                            该值是任何无变量表达式；Greenplum数据库不允许子查询和对当前表中其他列的交叉引用。
+                            默认表达式的数据类型必须与列的数据类型匹配。
+                            </p>
+                        <p>Greenplum数据库在未为列指定值的任何插入操作中使用默认表达式。
+                            如果列没有默认值，则默认值为null。
+                            </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>server_name</varname></pt>
                     <pd>
-                        <p>The name of an existing server to use for the foreign table.
-                          For details on defining a server, see <codeph><xref href="CREATE_SERVER.xml#topic1">CREATE
-                    SERVER</xref></codeph>.</p>
+                        <p>用于外部表的现有服务器的名称。
+                            有关定义服务器的详细信息，请参见<codeph><xref href="CREATE_SERVER.xml#topic1">CREATE SERVER</xref></codeph>。
+                            </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>OPTIONS ( <varname>option</varname> '<varname>value</varname>' [, ... ] )</pt>
                     <pd>
-                        <p>The options for the new foreign table or one of its columns. While option names must be unique, a table option and a column option may have the same name. The option names and values are foreign-data wrapper-specific. Greenplum Database validates the options and values using the foreign-data wrapper's <varname>validator_function</varname>.</p>
+                        <p>新外部表或其列之一的选项。
+                            虽然选项名称必须唯一，但表选项和列选项可能具有相同的名称。
+                            选项名称和值是特定于外部数据包装程序的。
+                            Greenplum数据库使用外部数据包装程序的<varname>validator_function</varname>验证选项和值。
+                            </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>mpp_execute { 'master' | 'any' | 'all segments' }</pt>
                     <pd>
-                        <p>An option that identifies the host from which the foreign data-wrapper
-                            requests data: <ul id="ul_zcg_2vd_mgb">
-                                <li><codeph>master</codeph> (the default)—Request data from the
-                                    master host.</li>
-                                <li><codeph>any</codeph>—Request data from either the master host or
-                                    any one segment, depending on which path costs less.</li>
-                                <li><codeph>all segments</codeph>—Request data from all segments. To
-                                    support this option value, the foreign data-wrapper must have a
-                                    policy that matches the segments to data.</li>
+                        <p>一个选项，用于标识外部数据包装器从其请求数据的主机：
+                            <ul id="ul_zcg_2vd_mgb">
+                                <li><codeph>master</codeph> （默认设置）- 从master主机请求数据。</li>
+                                <li><codeph>any</codeph> — 向master主机或任一segment请求数据，具体取决于哪条路径的成本更低。</li>
+                                <li><codeph>all segments</codeph> — 从所有segment中请求数据。
+                                    要支持此选项值，外部数据包装器必须具有将segment与数据匹配的策略。
+                                </li>
                             </ul></p>
-                        <p>Use of the foreign table <codeph>mpp_execute</codeph> option, and the
-                            specific modes supported, is foreign data-wrapper-specific.</p>
-                        <p>The <codeph>mpp_execute</codeph> option can be specified in multiple
-                            commands: <codeph>CREATE FOREIGN TABLE</codeph>, <codeph>CREATE
-                                SERVER</codeph>, and <codeph>CREATE FOREIGN DATA WRAPPER</codeph>.
-                            The foreign table setting takes precedence over the foreign server
-                            setting, followed by the foreign data wrapper setting.</p>
+                        <p>外部表<codeph>mpp_execute</codeph>选项和受支持的特定模式的使用是特定于外部数据包装器的。
+                            </p>
+                        <p>可以在多个命令中指定<codeph>mpp_execute</codeph>选项：
+                            <codeph>CREATE FOREIGN TABLE</codeph>，<codeph>CREATE SERVER</codeph>和<codeph>CREATE FOREIGN DATA WRAPPER</codeph>。
+                            外部表设置优先于外部服务器设置，然后是外部数据包装器设置。
+                            </p>
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section6">
-            <title>Examples</title>
-            <p>Create a foreign table named <codeph>films</codeph> with the server named <codeph>film_server</codeph>:</p><codeblock>CREATE FOREIGN TABLE films (
+            <title>示例</title>
+            <p>使用名为<codeph>film_server</codeph>的服务器创建一个名为<codeph>films</codeph>的外部表：</p>
+            <codeblock>CREATE FOREIGN TABLE films (
     code        char(5) NOT NULL,
     title       varchar(40) NOT NULL,
     did         integer NOT NULL,
@@ -132,14 +144,14 @@
 SERVER film_server;</codeblock>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p><codeph>CREATE FOREIGN TABLE</codeph> largely conforms to the SQL standard; however, much as with <codeph><xref href="CREATE_TABLE.xml#topic1">CREATE
-                    TABLE</xref></codeph>, Greenplum Database permits <codeph>NULL</codeph> constraints and zero-column foreign tables.
-               The ability to specify a default value is a Greenplum Database extension,
-               as is the <codeph>mpp_execute</codeph> option.</p>
+            <title>兼容性</title>
+            <p><codeph>CREATE FOREIGN TABLE</codeph>基本上符合SQL标准；
+                但是，与<codeph><xref href="CREATE_TABLE.xml#topic1">CREATE TABLE</xref></codeph>一样，Greenplum数据库允许<codeph>NULL</codeph>约束和零列外部表。
+                指定默认值的功能是Greenplum数据库扩展，以及<codeph>mpp_execute</codeph>选项。
+                </p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="ALTER_FOREIGN_TABLE.xml#topic1">ALTER FOREIGN TABLE</xref></codeph>,
                         <codeph><xref href="DROP_FOREIGN_TABLE.xml#topic1">DROP
                     FOREIGN TABLE</xref></codeph>,

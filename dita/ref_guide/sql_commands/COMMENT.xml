@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title id="bi20941">COMMENT</title>
-  <body>
-    <p id="sql_command_desc">Defines or changes the comment of an object.</p>
-    <section id="section2">
-      <title>Synopsis</title>
-      <codeblock id="sql_command_synopsis">COMMENT ON
+    <title id="bi20941">COMMENT</title>
+    <body>
+        <p id="sql_command_desc">定义或更改对象的注释。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">COMMENT ON
 { TABLE <varname>object_name</varname> |
   COLUMN <varname>relation_name.column_name</varname> |
   AGGREGATE <varname>agg_name</varname> (<varname>agg_type</varname> [, ...]) |
@@ -27,7 +27,7 @@
   OPERATOR CLASS <varname>object_name</varname> USING <varname>index_method</varname> |
   [PROCEDURAL] LANGUAGE <varname>object_name</varname> |
   RESOURCE GROUP <varname>object_name</varname> |
-  RESOURCE QUEUE <varname>object_name</varname> |
+  RESOURCE QUEUE <varname>object_name</varname> |
   ROLE <varname>object_name</varname> |
   RULE <varname>rule_name</varname> ON <varname>table_name</varname> |
   SCHEMA <varname>object_name</varname> |
@@ -36,121 +36,155 @@
   TABLESPACE <varname>object_name</varname> |
   TRIGGER <varname>trigger_name</varname> ON <varname>table_name</varname> |
   TYPE <varname>object_name</varname> |
-  VIEW <varname>object_name</varname> } 
+  VIEW <varname>object_name</varname> }
 IS '<varname>text</varname>'</codeblock>
-    </section>
-    <section id="section3">
-      <title>Description</title>
-      <p><codeph>COMMENT</codeph> stores a comment about a database object. Only one comment string
-        is stored for each object. To remove a comment, write <codeph>NULL</codeph> in place of the
-        text string. Comments are automatically dropped when the object is dropped.</p>
-      <p>For most kinds of object, only the object's owner can set the comment. Roles don't have
-        owners, so the rule for <codeph>COMMENT ON ROLE</codeph> is that you must be superuser to
-        comment on a superuser role, or have the <codeph>CREATEROLE</codeph> privilege to comment on
-        non-superuser roles. Of course, a superuser can comment on anything. </p>
-      <p>Comments can be easily retrieved with the psql meta-commands <codeph>\dd</codeph>,
-          <codeph>\d+</codeph>, and <codeph>\l+</codeph>. Other user interfaces to retrieve comments
-        can be built atop the same built-in functions that psql uses, namely
-          <codeph>obj_description</codeph>, <codeph>col_description</codeph>, and
-          <codeph>shobj_description</codeph>.</p>
-    </section>
-    <section id="section4">
-      <title>Parameters</title>
-      <parml>
-        <plentry>
-          <pt><varname>object_name</varname></pt>
-          <pt><varname>relation_name.column_name</varname></pt>
-          <pt><varname>agg_name</varname></pt>
-          <pt><varname>constraint_name</varname></pt>
-          <pt><varname>func_name</varname></pt>
-          <pt><varname>operator_name</varname></pt>
-          <pt><varname>rule_name</varname></pt>
-          <pt><varname>trigger_name</varname></pt>
-          <pd>The name of the object to be commented. Names of tables, aggregates, collations,
-            conversions, domains, foreign tables, functions, indexes, operators, operator classes,
-            operator families, sequences, text search objects, types, and views can be
-            schema-qualified.  When commenting on a column, <varname>relation_name</varname> must
-            refer to a table, view, composite type, or foreign table.<note>Greenplum Database does
-              not support triggers.</note></pd>
-        </plentry>
-        <plentry>
-          <pt><varname>aggregate_type</varname></pt>
-          <pd>An input data type on which the aggregate function operates. To reference a
-            zero-argument aggregate function, write <codeph>*</codeph> in place of the list of input
-            data types. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>source_type</varname></pt>
-          <pd>The name of the source data type of the cast. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>target_type</varname></pt>
-          <pd>The name of the target data type of the cast. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>argmode</varname></pt>
-          <pd>The mode of a function argument: either <codeph>IN</codeph>, <codeph>OUT</codeph>,
-              <codeph>INOUT</codeph>, or <codeph>VARIADIC</codeph>. If omitted, the default is
-              <codeph>IN</codeph>. Note that <codeph>COMMENT ON FUNCTION</codeph> does not actually
-            pay any attention to <codeph>OUT</codeph> arguments, since only the input arguments are
-            needed to determine the function's identity. So it is sufficient to list the
-              <codeph>IN</codeph>, <codeph>INOUT</codeph>, and <codeph>VARIADIC</codeph> arguments.
-          </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>argname</varname></pt>
-          <pd>The name of a function argument. Note that <codeph>COMMENT ON FUNCTION</codeph> does
-            not actually pay any attention to argument names, since only the argument data types are
-            needed to determine the function's identity. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>argtype</varname></pt>
-          <pd>The data type(s) of the function's arguments (optionally schema-qualified), if any.
-          </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>large_object_oid</varname></pt>
-          <pd>The OID of the large object. </pd>
-          <pd>
-            <note>Greenplum Database does not support the PostgreSQL <xref
-                href="https://www.postgresql.org/docs/9.4/largeobjects.html" format="html"
-                scope="external">large object facility</xref> for streaming user data that is stored
-              in large-object structures.</note>
-          </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>left_type</varname></pt>
-          <pt><varname>right_type</varname></pt>
-          <pd>The data type(s) of the operator's arguments (optionally schema-qualified). Write
-              <codeph>NONE</codeph> for the missing argument of a prefix or postfix operator. </pd>
-        </plentry>
-        <plentry>
-          <pt>PROCEDURAL</pt>
-          <pd>This is a noise word. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>text</varname></pt>
-          <pd>The new comment, written as a string literal; or <codeph>NULL</codeph> to drop the
-            comment.</pd>
-        </plentry>
-      </parml>
-    </section>
-    <section id="section5">
-      <title>Notes</title>
-      <p>There is presently no security mechanism for viewing comments: any user connected to a
-        database can see all the comments for objects in that database. For shared objects such as
-        databases, roles, and tablespaces, comments are stored globally so any user connected to any
-        database in the cluster can see all the comments for shared objects. Therefore, do not put
-        security-critical information in comments.</p>
-    </section>
-    <section id="section6">
-      <title>Examples</title>
-      <p>Attach a comment to the table <codeph>mytable</codeph>: </p>
-      <codeblock>COMMENT ON TABLE mytable IS 'This is my table.';</codeblock>
-      <p>Remove it again: </p>
-      <codeblock>COMMENT ON TABLE mytable IS NULL;</codeblock>
-      <p>Some more examples:</p>
-      <codeblock>COMMENT ON AGGREGATE my_aggregate (double precision) IS 'Computes sample variance';
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>COMMENT</codeph>存储有关数据库对象的注释。
+                每个对象仅存储一个注释字符串。
+                要删除注释，请在文本字符串的位置写入<codeph>NULL</codeph>。
+                删除对象时，注释将自动删除。
+            </p>
+            <p>对于大多数对象，只有对象的所有者才能设置注释。
+                角色没有所有者，因此<codeph>COMMENT ON ROLE</codeph>的规则是您必须是超级用户才能对超级用户角色进行评论，
+                或者具有<codeph>CREATEROLE</codeph>特权才能对非超级用户角色添加注释。
+                当然，超级用户可以对任何对象添加注释。
+            </p>
+            <p>使用psql元命令<codeph>\dd</codeph>，<codeph>\d+</codeph>和<codeph>\l+</codeph>可以轻松提取注释。
+                可以在psql使用的相同内置函数（即<codeph>obj_description</codeph>，<codeph>col_description</codeph>和<codeph>shobj_description</codeph>）之上构建其他用于提取注释的用户界面。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>object_name</varname>
+                    </pt>
+                    <pt>
+                        <varname>relation_name.column_name</varname>
+                    </pt>
+                    <pt>
+                        <varname>agg_name</varname>
+                    </pt>
+                    <pt>
+                        <varname>constraint_name</varname>
+                    </pt>
+                    <pt>
+                        <varname>func_name</varname>
+                    </pt>
+                    <pt>
+                        <varname>operator_name</varname>
+                    </pt>
+                    <pt>
+                        <varname>rule_name</varname>
+                    </pt>
+                    <pt>
+                        <varname>trigger_name</varname>
+                    </pt>
+                    <pd>要注释的对象的名称。
+                        表，聚合，排序规则，转换，域，外部表，函数，索引，运算符，运算符类，运算符族，序列，文本搜索对象，类型和视图的名称可以通过模式指定。
+                        在对列进行注释时，<varname>relation_name</varname>必须引用表，视图，组合类型或外部表。
+                        <note>Greenplum数据库不支持触发器。
+                        </note>
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>aggregate_type</varname>
+                    </pt>
+                    <pd>聚合函数所基于的输入数据类型。
+                        要引用零参数聚合函数，请写<codeph>*</codeph>代替输入数据类型列表。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>source_type</varname>
+                    </pt>
+                    <pd>强制转换的源数据类型的名称。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>target_type</varname>
+                    </pt>
+                    <pd>强制转换的目标数据类型的名称。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>argmode</varname>
+                    </pt>
+                    <pd>函数参数的模式：<codeph>IN</codeph>，<codeph>OUT</codeph>，<codeph>INOUT</codeph>或<codeph>VARIADIC</codeph>。
+                        如果省略，则默认值为<codeph>IN</codeph>。
+                        注意，由于仅需要输入参数来确定函数的标识，因此<codeph>COMMENT ON FUNCTION</codeph>实际上并不对<codeph>OUT</codeph>参数给予任何关注。
+                        因此，列出<codeph>IN</codeph>，<codeph>INOUT</codeph>和<codeph>VARIADIC</codeph>参数就足够了。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>argname</varname>
+                    </pt>
+                    <pd>函数参数的名称。
+                        请注意，<codeph>COMMENT ON FUNCTION</codeph>实际上并不关注参数名称，因为仅需要参数数据类型来确定函数的身份。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>argtype</varname>
+                    </pt>
+                    <pd>函数参数的数据类型（可以由模式指定）（如果有）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>large_object_oid</varname>
+                    </pt>
+                    <pd>大对象的OID。</pd>
+                    <pd>
+                        <note>Greenplum数据库不支持PostgreSQL<xref href="https://www.postgresql.org/docs/9.4/largeobjects.html" format="html" scope="external">大对象工具</xref>来流存储在大对象结构中的用户数据。
+                        </note>
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>left_type</varname>
+                    </pt>
+                    <pt>
+                        <varname>right_type</varname>
+                    </pt>
+                    <pd>运算符参数的数据类型（可以由模式指定）。
+                        为前缀或后缀运算符的缺少参数写<codeph>NONE</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>PROCEDURAL</pt>
+                    <pd>这是一个干扰词。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>text</varname>
+                    </pt>
+                    <pd>新注释，以字符串文字形式表示；或<codeph>NULL</codeph>以删除注释。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p>当前没有用于查看注释的安全机制：连接到数据库的任何用户都可以查看该数据库中对象的所有注释。
+                对于共享对象，例如数据库，角色和表空间，注释是全局存储的，因此连接到集群中任何数据库的任何用户都可以查看共享对象的所有注释。
+                因此，请勿在评论中添加对安全性至关重要的信息。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>在表<codeph>mytable</codeph>上添加注释：
+            </p>
+            <codeblock>COMMENT ON TABLE mytable IS 'This is my table.';</codeblock>
+            <p>再次删除：</p>
+            <codeblock>COMMENT ON TABLE mytable IS NULL;</codeblock>
+            <p>其他示例：</p>
+            <codeblock>COMMENT ON AGGREGATE my_aggregate (double precision) IS 'Computes sample variance';
 COMMENT ON CAST (text AS int4) IS 'Allow casts from text to int4';
 COMMENT ON COLLATION "fr_CA" IS 'Canadian French';
 COMMENT ON COLUMN my_table.my_column IS 'Employee ID number';
@@ -183,10 +217,11 @@ COMMENT ON TEXT SEARCH TEMPLATE snowball IS 'Snowball stemmer';
 COMMENT ON TRIGGER my_trigger ON my_table IS 'Used for RI';
 COMMENT ON TYPE complex IS 'Complex number data type';
 COMMENT ON VIEW my_view IS 'View of departmental costs';</codeblock>
-    </section>
-    <section id="section7">
-      <title>Compatibility</title>
-      <p>There is no <codeph>COMMENT</codeph> statement in the SQL standard.</p>
-    </section>
-  </body>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p>SQL标准中没有<codeph>COMMENT</codeph>语句。
+            </p>
+        </section>
+    </body>
 </topic>

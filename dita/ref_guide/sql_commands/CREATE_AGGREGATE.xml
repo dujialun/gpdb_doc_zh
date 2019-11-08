@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="bm20941">CREATE AGGREGATE</title><body><p id="sql_command_desc">Defines a new aggregate function.</p><section id="section2"
-      ><title>Synopsis</title><varname>argname</varname><codeblock id="sql_command_synopsis">CREATE AGGREGATE <varname>name</varname> ( [ <varname>argmode</varname> ] [  ] <varname>arg_data_type</varname> [ , ... ] ) (
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="bm20941">CREATE AGGREGATE</title>
+    <body>
+        <p id="sql_command_desc">定义一个新的聚集函数</p>
+        <section id="section2">
+            <title>概要</title>
+            <varname>argname</varname>
+            <codeblock id="sql_command_synopsis">CREATE AGGREGATE <varname>name</varname> ( [ <varname>argmode</varname> ] [ ] <varname>arg_data_type</varname> [ , ... ] ) (
     SFUNC = <varname>sfunc</varname>,
     STYPE = <varname>state_data_type</varname>
     [ , SSPACE = <varname>state_data_size</varname> ]
@@ -21,7 +27,7 @@
     [ , MINITCOND = <varname>minitial_condition</varname> ]
     [ , SORTOP = <varname>sort_operator</varname> ]
   )
-  
+
   CREATE AGGREGATE <varname>name</varname> ( [ [ <varname>argmode</varname> ] [ <varname>argname</varname> ] <varname>arg_data_type</varname> [ , ... ] ]
       ORDER BY [ <varname>argmode</varname> ] [ <varname>argname</varname> ] <varname>arg_data_type</varname> [ , ... ] ) (
     SFUNC = <varname>sfunc</varname>,
@@ -35,9 +41,9 @@
     [ , INITCOND = <varname>initial_condition</varname> ]
     [ , HYPOTHETICAL ]
   )
-  
+
   or the old syntax
-  
+
   CREATE AGGREGATE <varname>name</varname> (
     BASETYPE = <varname>base_type</varname>,
     SFUNC = <varname>sfunc</varname>,
@@ -57,367 +63,415 @@
     [ , MFINALFUNC_EXTRA ]
     [ , MINITCOND = <varname>minitial_condition</varname> ]
     [ , SORTOP = <varname>sort_operator</varname> ]
-  )</codeblock></section><section id="section3"><title>Description</title><p><codeph>CREATE AGGREGATE</codeph> defines a new
-        aggregate function. Some basic and commonly-used aggregate functions such as
-          <codeph>count</codeph>, <codeph>min</codeph>, <codeph>max</codeph>, <codeph>sum</codeph>,
-          <codeph>avg</codeph> and so on are already provided in Greenplum Database. If one defines
-        new types or needs an aggregate function not already provided, then <codeph>CREATE
-          AGGREGATE</codeph> can be used to provide the desired features.</p>
-      <p>If a schema name is given (for example, <codeph>CREATE AGGREGATE myschema.myagg
-          ...</codeph>) then the aggregate function is created in the specified schema. Otherwise it
-        is created in the current schema. </p>
-      <p>An aggregate function is identified by its name and input data types. Two aggregate
-        functions in the same schema can have the same name if they operate on different input
-        types. The name and input data types of an aggregate function must also be distinct from the
-        name and input data types of every ordinary function in the same schema. This behavior is
-        identical to overloading of ordinary function names. See <codeph><xref
-            href="CREATE_FUNCTION.xml#topic1"/></codeph>.</p>
+  )</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CREATE AGGREGATE</codeph>定义一个新的聚合函数。
+                Greenplum数据库中已经提供了一些基本且常用的聚合函数，
+                例如<codeph>count</codeph>，<codeph>min</codeph>，<codeph>max</codeph>，<codeph>sum</codeph>，<codeph>avg</codeph>等。
+                如果定义了新类型或需要尚未提供的聚合函数，则可以使用<codeph>CREATE AGGREGATE</codeph>提供所需的功能。
+            </p>
+            <p>如果指定了模式名称（例如<codeph>CREATE AGGREGATE myschema.myagg ...</codeph>），则将在指定的模式中创建聚合函数。
+                否则，它将在当前模式中创建。
+            </p>
+            <p>聚合函数由其名称和输入数据类型标识。
+                如果同一模式中的两个聚合函数对不同的输入类型进行操作，则它们可以具有相同的名称。
+                聚合函数的名称和输入数据类型也必须与同一模式中每个普通函数的名称和输入数据类型不同。
+                此行为与普通函数名称的重载相同。
+                请参阅<codeph><xref href="CREATE_FUNCTION.xml#topic1"/></codeph>。
+            </p>
 
-      <p>A simple aggregate function is made from one, two, or three ordinary functions (which must
-        be <codeph>IMMUTABLE</codeph> functions): </p>
-      <ul id="ul_d5c_5yl_dhb">
-        <li>a state transition function <varname>sfunc</varname></li>
-        <li>an optional final calculation function <varname>ffunc</varname></li>
-        <li>an optional combine function <varname>combinefunc</varname></li>
-      </ul>
-   
-	<p>These functions are used as
-        follows:</p><codeblock><varname>sfunc</varname>( internal-state, next-data-values ) ---&gt; next-internal-state
+            <p>一个简单的聚合函数由一个，两个或三个普通函数（必须是<codeph>IMMUTABLE</codeph>函数）组成：
+            </p>
+            <ul id="ul_d5c_5yl_dhb">
+                <li>状态转换函数
+                    <varname>sfunc</varname>
+                </li>
+                <li>可选的最终计算函数
+                    <varname>ffunc</varname>
+                </li>
+                <li>可选的合并函数
+                    <varname>combinefunc</varname>
+                </li>
+            </ul>
+
+            <p>这些函数的用法如下：
+            </p>
+            <codeblock><varname>sfunc</varname>( internal-state, next-data-values ) ---&gt; next-internal-state
 <varname>ffunc</varname>( internal-state ) ---&gt; aggregate-value
 <varname>combinefunc</varname>( internal-state, internal-state ) ---&gt; next-internal-state</codeblock>
-      <p>Greenplum Database creates a temporary variable of data type <varname>stype</varname> to
-        hold the current internal state of the aggregate function. At each input row, the aggregate
-        argument values are calculated and the state transition function is invoked with the current
-        state value and the new argument values to calculate a new internal state value. After all
-        the rows have been processed, the final function is invoked once to calculate the aggregate
-        return value. If there is no final function then the ending state value is returned
-        as-is.</p><p>You can specify <codeph><varname>combinefunc</varname></codeph> as a method for optimizing
-        aggregate execution. By specifying <codeph><varname>combinefunc</varname></codeph>, the
-        aggregate can be executed in parallel on segments first and then on the master. When a
-        two-level execution is performed, <codeph><varname>sfunc</varname></codeph> is executed on
-        the segments to generate partial aggregate results, and
-            <codeph><varname>combinefunc</varname></codeph> is executed on the master to aggregate
-        the partial results from segments. If single-level aggregation is performed, all the rows
-        are sent to the master and <codeph><varname>sfunc</varname></codeph> is applied to the
-        rows.</p><p>Single-level aggregation and two-level aggregation are equivalent execution strategies. Either
-        type of aggregation can be implemented in a query plan. When you implement the functions
-          <codeph>combinefunc</codeph> and <codeph>sfunc</codeph>, you must ensure that the
-        invocation of <codeph>sfunc</codeph> on the segment instances followed by
-          <codeph>combinefunc</codeph> on the master produce the same result as single-level
-        aggregation that sends all the rows to the master and then applies only the
-          <codeph>sfunc</codeph> to the rows.</p><p>An aggregate function can
-        provide an optional initial condition, an initial value for the internal state value. This
-        is specified and stored in the database as a value of type text, but it must be a valid
-        external representation of a constant of the state value data type. If it is not supplied
-        then the state value starts out <codeph>NULL</codeph>. </p><p>If the state transition
-        function is declared <codeph>STRICT</codeph>, then it cannot be called with
-          <codeph>NULL</codeph> inputs. With such a transition function, aggregate execution behaves
-        as follows. Rows with any null input values are ignored (the function is not called and the
-        previous state value is retained). If the initial state value is <codeph>NULL</codeph>, then
-        at the first row with all non-null input values, the first argument value replaces the state
-        value, and the transition function is invoked at subsequent rows with all non-null input
-        values. This is useful for implementing aggregates like <codeph>max</codeph>. Note that this
-        behavior is only available when <varname>state_data_type</varname> is the same as the first
-          <varname>input_data_type</varname>. When these types are different, you must supply a non-null initial
-        condition or use a nonstrict transition function.</p><p>If the state transition function is not declared <codeph>STRICT</codeph>, then it will be called
-        unconditionally at each input row, and must deal with <codeph>NULL</codeph> inputs and
-          <codeph>NULL</codeph> transition values for itself. This allows the aggregate author to
-        have full control over the aggregate's handling of <codeph>NULL</codeph> values.</p><p>If the final function is declared
-          <codeph>STRICT</codeph>, then it will not be called when the ending state value is
-          <codeph>NULL</codeph>; instead a <codeph>NULL</codeph> result will be returned
-        automatically. (This is the normal behavior of <codeph>STRICT</codeph> functions.) In any
-        case the final function has the option of returning a <codeph>NULL</codeph> value. For
-        example, the final function for <codeph>avg</codeph> returns <codeph>NULL</codeph> when it
-        sees there were zero input rows.</p>
-    <p>
-      Sometimes it is useful to declare the final function as taking not just
-      the state value, but extra parameters corresponding to the aggregate's
-      input values.  The main reason for doing this is if the final function
-      is polymorphic and the state value's data type would be inadequate to
-      pin down the result type.  These extra parameters are always passed as
-      <codeph>NULL</codeph> (and so the final function must not be strict when
-      the <codeph>FINALFUNC_EXTRA</codeph> option is used), but nonetheless they
-        are valid parameters.  The final function could for example make use
-        of <codeph>get_fn_expr_argtype</codeph> to identify the actual argument type
-          in the current call.
-    </p>
-      <p> An aggregate can optionally support <i>moving-aggregate mode</i>, as described in <xref
-          href="https://www.postgresql.org/docs/9.4/xaggr.html#XAGGR-MOVING-AGGREGATES"
-          scope="external" format="html">Moving-Aggregate Mode</xref> in the PostgreSQL
-        documentation. This requires specifying the <codeph><varname>msfunc</varname></codeph>,
-            <codeph><varname>minfunc</varname></codeph>, and
-          <codeph><varname>mstype</varname></codeph> functions, and optionally the
-            <codeph><varname>mspace</varname></codeph>,
-          <codeph><varname>mfinalfunc</varname></codeph>,
-            <codeph><varname>mfinalfunc_extra</varname></codeph>, and
-            <codeph><varname>minitcond</varname></codeph> functions. Except for
-            <codeph><varname>minvfunc</varname></codeph>, these functions work like the
-        corresponding simple-aggregate functions without <codeph><varname>m</varname></codeph>; they
-        define a separate implementation of the aggregate that includes an inverse transition
-        function. </p>   
-      <p>The syntax with <codeph>ORDER BY</codeph> in the parameter list creates a special type of
-        aggregate called an <i>ordered-set aggregate</i>; or if <codeph>HYPOTHETICAL</codeph> is
-        specified, then a <i>hypothetical-set aggregate</i> is created. These aggregates operate
-        over groups of sorted values in order-dependent ways, so that specification of an input sort
-        order is an essential part of a call. Also, they can have <i>direct</i> arguments, which are
-        arguments that are evaluated only once per aggregation rather than once per input row.
-        Hypothetical-set aggregates are a subclass of ordered-set aggregates in which some of the
-        direct arguments are required to match, in number and data types, the aggregated argument
-        columns. This allows the values of those direct arguments to be added to the collection of
-        aggregate-input rows as an additional "hypothetical" row. </p>
-    <p>Single argument aggregate functions, such as min or
-        max, can sometimes be optimized by looking into an index instead of scanning every input
-        row. If this aggregate can be so optimized, indicate it by specifying a sort operator. The
-        basic requirement is that the aggregate must yield the first element in the sort ordering
-        induced by the operator; in other
-        words:</p><codeblock>SELECT <varname>agg</varname>(<varname>col</varname>) FROM <varname>tab</varname>; </codeblock>
-      <p>must be equivalent to:</p>
-    <codeblock>SELECT <varname>col</varname> FROM <varname>tab</varname> ORDER BY <varname>col</varname> USING <varname>sortop</varname> LIMIT 1;</codeblock><p>Further
-        assumptions are that the aggregate function ignores <codeph>NULL</codeph> inputs, and that
-        it delivers a <codeph>NULL</codeph> result if and only if there were no non-null inputs.
-        Ordinarily, a data type's <codeph>&lt;</codeph> operator is the proper sort operator for
-          <codeph>MIN</codeph>, and <codeph>&gt;</codeph> is the proper sort operator for
-          <codeph>MAX</codeph>. Note that the optimization will never actually take effect unless
-        the specified operator is the "less than" or "greater than" strategy member of a B-tree
-        index operator class.</p>
-      <p> To be able to create an aggregate function, you must have <codeph>USAGE</codeph> privilege
-        on the argument types, the state type, and the return type, as well as
-          <codeph>EXECUTE</codeph> privilege on the transition and final functions. </p>
-</section><section id="section5"><title>Parameters</title>
-      <parml>
-        <plentry>
-          <pt><varname>name</varname></pt>
-          <pd>The name (optionally schema-qualified) of the aggregate function to create.</pd>
-        </plentry>
-        <plentry>
-          <pt><varname>argmode</varname></pt>
-          <pd>The mode of an argument: <codeph>IN</codeph> or <codeph>VARIADIC</codeph>. (Aggregate
-            functions do not support <codeph>OUT</codeph> arguments.) If omitted, the default is
-              <codeph>IN</codeph>. Only the last argument can be marked
-            <codeph>VARIADIC</codeph>.</pd>
-        </plentry>
-        <plentry>
-          <pt><varname>argname</varname></pt>
-          <pd>The name of an argument. This is currently only useful for documentation purposes. If
-            omitted, the argument has no name.</pd>
-        </plentry>
-        <plentry>
-          <pt><varname>arg_data_type</varname></pt>
-          <pd>An input data type on which this aggregate function operates. To create a
-            zero-argument aggregate function, write <codeph>*</codeph> in place of the list of
-            argument specifications. (An example of such an aggregate is <codeph>count(*)</codeph>.)
-          </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>base_type</varname></pt>
-          <pd>In the old syntax for <codeph>CREATE AGGREGATE</codeph>, the input data type is
-            specified by a <codeph>basetype</codeph> parameter rather than being written next to the
-            aggregate name. Note that this syntax allows only one input parameter. To define a
-            zero-argument aggregate function with this syntax, specify the <codeph>basetype</codeph>
-            as <codeph>"ANY"</codeph> (not <codeph>*</codeph>). Ordered-set aggregates cannot be
-            defined with the old syntax. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>sfunc</varname></pt>
-          <pd>The name of the state transition function to be called for each input row. For a
-            normal N-argument aggregate function, the <varname>sfunc</varname> must take N+1
-            arguments, the first being of type <varname>state_data_type</varname> and the rest
-            matching the declared input data types of the aggregate. The function must return a
-            value of type <varname>state_data_type</varname>. This function takes the current state
-            value and the current input data values, and returns the next state value.</pd>
-          <pd>For ordered-set (including hypothetical-set) aggregates, the state transition function
-            receives only the current state value and the aggregated arguments, not the direct
-            arguments. Otherwise it is the same. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>state_data_type</varname></pt>
-          <pd>The data type for the aggregate state value.</pd>
-        </plentry>
-        <plentry>
-          <pt><varname>state_data_size</varname></pt>
-          <pd>The approximate average size (in bytes) of the aggregate's state value. If this
-            parameter is omitted or is zero, a default estimate is used based on the
-              <varname>state_data_type</varname>. The planner uses this value to estimate the memory
-            required for a grouped aggregate query. Large values of this parameter discourage use of
-            hash aggregation.</pd>
-        </plentry>
-        <plentry>
-          <pt><varname>ffunc</varname></pt>
-          <pd>The name of the final function called to compute the aggregate result after all input
-            rows have been traversed. The function must take a single argument of type
-              <codeph>state_data_type</codeph>. The return data type of the aggregate is defined as
-            the return type of this function. If <codeph><varname>ffunc</varname></codeph> is not specified, then the
-            ending state value is used as the aggregate result, and the return type is
-              <codeph>state_data_type</codeph>. </pd>
-          <pd>For ordered-set (including hypothetical-set) aggregates, the final function receives
-            not only the final state value, but also the values of all the direct arguments.</pd>
-          <pd>If <codeph>FINALFUNC_EXTRA</codeph> is specified, then in addition to the final state
-            value and any direct arguments, the final function receives extra NULL values
-            corresponding to the aggregate's regular (aggregated) arguments. This is mainly useful
-            to allow correct resolution of the aggregate result type when a polymorphic aggregate is
-            being defined. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>serialfunc</varname></pt>
-          <pd> An aggregate function whose <varname>state_data_type</varname> is
-              <codeph>internal</codeph> can participate in parallel aggregation only if it has a
-              <varname>serialfunc</varname> function, which must serialize the aggregate state into
-            a <codeph>bytea</codeph> value for transmission to another process. This function must
-            take a single argument of type <codeph>internal</codeph> and return type
-              <codeph>bytea</codeph>. A corresponding <varname>deserialfunc</varname> is also
-            required. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>deserialfunc</varname></pt>
-          <pd> Deserialize a previously serialized aggregate state back into
-              <varname>state_data_type</varname>. This function must take two arguments of types
-              <codeph>bytea</codeph> and <codeph>internal</codeph>, and produce a result of type
-              <codeph>internal</codeph>. (Note: the second, <codeph>internal</codeph> argument is
-            unused, but is required for type safety reasons.) </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>initial_condition</varname></pt>
-          <pd> The initial setting for the state value. This must be a string constant in the form
-            accepted for the data type <varname>state_data_type</varname>. If not specified, the
-            state value starts out null. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>msfunc</varname></pt>
-          <pd> The name of the forward state transition function to be called for each input row in
-            moving-aggregate mode. This is exactly like the regular transition function, except that
-            its first argument and result are of type <varname>mstate_data_type</varname>, which
-            might be different from <varname>state_data_type</varname>. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>minvfunc</varname></pt>
-          <pd> The name of the inverse state transition function to be used in moving-aggregate
-            mode. This function has the same argument and result types as <varname>msfunc</varname>,
-            but it is used to remove a value from the current aggregate state, rather than add a
-            value to it. The inverse transition function must have the same strictness attribute as
-            the forward state transition function. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>mstate_data_type</varname></pt>
-          <pd> The data type for the aggregate's state value, when using moving-aggregate mode.
-          </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>mstate_data_size</varname></pt>
-          <pd> The approximate average size (in bytes) of the aggregate's state value, when using
-            moving-aggregate mode. This works the same as <varname>state_data_size</varname>. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>mffunc</varname></pt>
-          <pd> The name of the final function called to compute the aggregate's result after all
-            input rows have been traversed, when using moving-aggregate mode. This works the same as
-              <varname>ffunc</varname>, except that its first argument's type is
-              <varname>mstate_data_type</varname> and extra dummy arguments are specified by writing
-              <codeph>MFINALFUNC_EXTRA</codeph>. The aggregate result type determined by
-              <varname>mffunc</varname> or <varname>mstate_data_type</varname> must match that
-            determined by the aggregate's regular implementation. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>minitial_condition</varname></pt>
-          <pd> The initial setting for the state value, when using moving-aggregate mode. This works
-            the same as <varname>initial_condition</varname>. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>sort_operator</varname></pt>
-          <pd> The associated sort operator for a <codeph>MIN</codeph>- or <codeph>MAX</codeph>-like
-            aggregate. This is just an operator name (possibly schema-qualified). The operator is
-            assumed to have the same input data types as the aggregate (which must be a
-            single-argument normal aggregate). </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>HYPOTHETICAL</varname></pt>
-          <pd> For ordered-set aggregates only, this flag specifies that the aggregate arguments are
-            to be processed according to the requirements for hypothetical-set aggregates: that is,
-            the last few direct arguments must match the data types of the aggregated
-              (<codeph>WITHIN GROUP</codeph>) arguments. The <codeph>HYPOTHETICAL</codeph> flag has
-            no effect on run-time behavior, only on parse-time resolution of the data types and
-            collations of the aggregate's arguments. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>combinefunc</varname></pt>
-          <pd>The name of a combine function. This is a function of two arguments, both of type
-              <varname>state_data_type</varname>. It must return a value of
-              <varname>state_data_type</varname>. A combine function takes two transition state
-            values and returns a new transition state value representing the combined aggregation.
-            In Greenplum Database, if the result of the aggregate function is computed in a
-            segmented fashion, the combine function is invoked on the individual internal states in
-            order to combine them into an ending internal state.</pd>
-          <pd>Note that this function is also called in hash aggregate mode within a segment.
-            Therefore, if you call this aggregate function without a combine function, hash
-            aggregate is never chosen. Since hash aggregate is efficient, consider defining a combine
-            function whenever possible.</pd>
-        </plentry>
-      </parml></section>
-<section id="section6"><title>Notes</title>
+            <p>Greenplum数据库创建一个数据类型为<varname>stype</varname>的临时变量，以保存聚合函数的当前内部状态。
+                在每个输入行，将计算聚合参数值，并使用当前状态值和新参数值调用状态转换函数以计算新的内部状态值。
+                处理完所有行后，将一次调用最终函数以计算合计返回值。
+                如果没有最终函数，则按原样返回最终状态值。
+            </p>
+            <p>您可以将<codeph><varname>combinefunc</varname></codeph>指定为优化聚合执行的方法。
+                通过指定<codeph><varname>combinefunc</varname></codeph>，可以首先在segment上并行执行聚合，然后在master上并行执行。
+                当执行两级执行时，在segment上执行<codeph><varname>sfunc</varname></codeph>以生成部分聚合结果，
+                而在master上执行<codeph><varname>combinefunc</varname></codeph>来聚合segment中的部分结果。
+                如果执行单级聚合，则将所有行发送到master，并将<codeph><varname>sfunc</varname></codeph>应用于行。
+            </p>
+            <p>单级聚合和二级聚合是等效的执行策略。
+                两种类型的聚合都可以在查询计划中实现。
+                在实现函数<codeph>combinefunc</codeph>和<codeph>sfunc</codeph>时，必须确保在segment实例上调用<codeph>sfunc</codeph>，
+                然后在master上调用<codeph>combinefunc</codeph>产生与将所有行发送到master然后仅应用<codeph>sfunc</codeph>到行的单级聚合相同的结果。
+            </p>
+            <p>聚合函数可以提供可选的初始条件，即内部状态值的初始值。
+                它是作为text类型的值指定并存储在数据库中的，但是它必须是状态值数据类型的常量的有效外部表示形式。
+                如果未提供，则状态值开始为<codeph>NULL</codeph>。
+            </p>
+            <p>如果状态转换函数声明为<codeph>STRICT</codeph>，则不能使用<codeph>NULL</codeph>输入调用它。
+                使用这种转换函数，聚合执行的行为如下。
+                输入值为空的行将被忽略（不调用该函数，并且保留先前的状态值）。
+                如果初始状态值为<codeph>NULL</codeph>，则在具有所有非空输入值的第一行，第一个参数值将替换状态值，并且在具有所有非空输入值的后续行中调用转换函数。
+                这对于实现像<codeph>max</codeph>这样的聚合很有用。
+                请注意，只有当<varname>state_data_type</varname>与第一个<varname>input_data_type</varname>相同时，此行为才可用。
+                当这些类型不同时，必须提供一个非空的初始条件或使用一个非严格的转换函数。
+            </p>
+            <p>如果未将状态转换函数声明为<codeph>STRICT</codeph>，则将在每个输入行无条件调用该状态转换函数，
+                并且必须自己处理<codeph>NULL</codeph>输入和<codeph>NULL</codeph>转换值。
+                这使聚合作者可以完全控制聚合对<codeph>NULL</codeph>值的处理。
+            </p>
+            <p>如果将最终函数声明为<codeph>STRICT</codeph>，则当结束状态值为<codeph>NULL</codeph>时将不调用该函数；而是将自动返回<codeph>NULL</codeph>结果。
+                （这是<codeph>STRICT</codeph>函数的正常行为。）在任何情况下，最终函数都可以选择返回<codeph>NULL</codeph>值。
+                例如，当<codeph>avg</codeph>的最终函数看到输入行为零时，将返回<codeph>NULL</codeph>。
+            </p>
+            <p>有时，将最终函数声明为不仅接受状态值，而且接受与聚合的输入值相对应的额外参数是有用的。
+                这样做的主要原因是，如果最终函数是多态的，并且状态值的数据类型不足以固定结果类型。
+                这些额外的参数始终以<codeph>NULL</codeph>的形式传递（因此，在使用<codeph>FINALFUNC_EXTRA</codeph>选项时，最后的函数一定不能严格），但是它们仍然是有效的参数。
+                最终函数可以例如使用<codeph>get_fn_expr_argtype</codeph>来标识当前调用中的实际参数类型。
+            </p>
+            <p>聚合可以选择支持移动聚合模式，如PostgreSQL文档中的<xref href="https://www.postgresql.org/docs/9.4/xaggr.html#XAGGR-MOVING-AGGREGATES" scope="external" format="html">移动聚合模式</xref>中所述。
+                这需要指定<codeph><varname>msfunc</varname></codeph>，<codeph><varname>minfunc</varname></codeph>和<codeph><varname>mstype</varname></codeph>函数，
+                以及可选的<codeph><varname>mspace</varname></codeph>，<codeph><varname>mfinalfunc</varname></codeph>，
+                <codeph><varname>mfinalfunc_extra</varname></codeph>和<codeph><varname>minitcond</varname></codeph>函数。
+                除了<codeph><varname>minvfunc</varname></codeph>以外，这些函数的工作方式与不带<codeph><varname>m</varname></codeph>的相应简单聚合函数相同；
+                它们定义了包含逆转换函数的聚合的单独实现。
+            </p>
+            <p>参数列表中带有<codeph>ORDER BY</codeph>的语法会创建一种特殊的聚合类型，称为有序集聚合。
+                或者，如果指定了<codeph>HYPOTHETICAL</codeph>，则创建一个假设集合。
+                这些聚合以顺序相关的方式对排序值的组进行操作，因此指定输入排序顺序是调用的重要组成部分。
+                而且，它们可以具有直接参数，这些参数是每个聚合仅评估一次的参数，而不是每个输入行评估一次的参数。
+                假设集合聚合是有序集合聚合的子类，其中一些直接参数需要在数量和数据类型上与聚合参数列匹配。
+                这允许将那些直接自变量的值作为附加的“假设”行添加到集合输入行的集合中。
+            </p>
+            <p>有时可以通过查看索引而不是扫描每个输入行来优化单参数聚合函数（例如min或max）。
+                如果可以如此优化此聚合，请通过指定排序运算符进行指示。
+                基本要求是，集合必须在运算符引起的排序顺序中产生第一个元素；换一种说法：
+            </p>
+            <codeblock>SELECT <varname>agg</varname>(<varname>col</varname>) FROM <varname>tab</varname>;</codeblock>
+            <p>必须等于：</p>
+            <codeblock>SELECT <varname>col</varname> FROM <varname>tab</varname> ORDER BY <varname>col</varname> USING <varname>sortop</varname> LIMIT 1;</codeblock>
+            <p>进一步假设聚合函数将忽略<codeph>NULL</codeph>输入，并且当且仅当不存在非null输入时，它才会传递<codeph>NULL</codeph>结果。
+                通常，数据类型的<codeph>&lt;</codeph>运算符是<codeph>MIN</codeph>的适当排序运算符，<codeph>&gt;</codeph>是<codeph>MAX</codeph>的适当的排序运算符。
+                请注意，除非指定的运算符是B树索引运算符类的“小于”或“大于”策略成员，否则优化实际上不会生效。
+            </p>
+            <p>为了能够创建聚合函数，您必须对参数类型，状态类型和返回类型具有<codeph>USAGE</codeph>特权，并且对过渡和最终函数具有<codeph>EXECUTE</codeph>特权。
+            </p>
+        </section>
+        <section id="section5">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要创建的聚合函数的名称（可以由模式指定）。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>argmode</varname>
+                    </pt>
+                    <pd>参数的模式：<codeph>IN</codeph>或<codeph>VARIADIC</codeph>。
+                        （聚合函数不支持<codeph>OUT</codeph>参数。）如果省略，则默认值为<codeph>IN</codeph>。
+                        只有最后一个参数可以标记为<codeph>VARIADIC</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>argname</varname>
+                    </pt>
+                    <pd>参数的名称。当前这仅用于文档目的。如果省略，则参数没有名称。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>arg_data_type</varname>
+                    </pt>
+                    <pd>此聚合函数在其上操作的输入数据类型。
+                        要创建零参数聚合函数，请写<codeph>*</codeph>代替参数说明列表。
+                        （此类汇总的一个示例是<codeph>count(*)</codeph>。）
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>base_type</varname>
+                    </pt>
+                    <pd>在<codeph>CREATE AGGREGATE</codeph>的旧语法中，输入数据类型由<codeph>basetype</codeph>参数指定，而不是写在聚合名称旁边。
+                        请注意，此语法仅允许一个输入参数。
+                        要使用此语法定义零参数聚合函数，请将<codeph>basetype</codeph>指定为<codeph>"ANY"</codeph>（不是<codeph>*</codeph>）。
+                        不能使用旧语法定义有序集的聚合。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>sfunc</varname>
+                    </pt>
+                    <pd>每个输入行要调用的状态转换函数的名称。
+                        对于普通的N参数聚合函数，<varname>sfunc</varname>必须采用N + 1个参数，第一个参数为<varname>state_data_type</varname>类型，其余参数与聚合的声明输入数据类型匹配。
+                        该函数必须返回<varname>state_data_type</varname>类型的值。
+                        该函数获取当前状态值和当前输入数据值，并返回下一个状态值。
+                    </pd>
+                    <pd>对于有序集（包括假设集）聚合，状态转换函数仅接收当前状态值和聚合参数，而不接收直接参数。
+                        否则它是相同的。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>state_data_type</varname>
+                    </pt>
+                    <pd>聚合状态值的数据类型。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>state_data_size</varname>
+                    </pt>
+                    <pd>聚合状态值的近似平均大小（以字节为单位）。
+                        如果省略此参数或将其设置为零，则基于<varname>state_data_type</varname>使用默认估计。
+                        优化器使用此值来估计分组聚合查询所需的内存。
+                        此参数的较大值不鼓励使用哈希聚合。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>ffunc</varname>
+                    </pt>
+                    <pd>遍历所有输入行后，用于计算合计结果的最终函数的名称。
+                        该函数必须采用<codeph>state_data_type</codeph>类型的单个参数。
+                        聚集的返回数据类型定义为该函数的返回类型。
+                        如果未指定<codeph><varname>ffunc</varname></codeph>，则将结束状态值用作汇总结果，返回类型为<codeph>state_data_type</codeph>。
+                    </pd>
+                    <pd>对于有序聚集（包括假设集合），最终函数不仅接收最终状态值，而且还接收所有直接参数的值。
+                    </pd>
+                    <pd>如果指定了<codeph>FINALFUNC_EXTRA</codeph>，则除了最终状态值和任何直接参数之外，
+                        最终函数还将接收与聚合的常规（聚合）参数相对应的额外NULL值。
+                        当定义多态聚合时，这主要用于允许正确解析聚合结果类型。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>serialfunc</varname>
+                    </pt>
+                    <pd>仅当<varname>state_data_type</varname>为<codeph>internal</codeph>的聚合函数具有<varname>serialfunc</varname>函数时，
+                        该函数才能参与并行聚合，该函数必须将聚合状态序列化为<codeph>bytea</codeph>值以传输到另一个进程。
+                        该函数必须接受一个类型为<codeph>internal</codeph>的单个参数，并返回<codeph>bytea</codeph>类型。
+                        还需要相应的<varname>deserialfunc</varname>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>deserialfunc</varname>
+                    </pt>
+                    <pd>将先前序列化的聚合状态反序列化回<varname>state_data_type</varname>。
+                        此函数必须接受<codeph>bytea</codeph>和<codeph>internal</codeph>类型的两个参数，并产生一个<codeph>internal</codeph>类型的结果。
+                        （注意：第二个<codeph>internal</codeph>参数未使用，但出于类型安全的原因是必需的。）
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>initial_condition</varname>
+                    </pt>
+                    <pd>状态值的初始设置。
+                        这必须是数据类型<varname>state_data_type</varname>接受的字符串常量。
+                        如果未指定，则状态值开始为null。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>msfunc</varname>
+                    </pt>
+                    <pd>在移动聚合模式下要为每个输入行调用的前向状态转换函数的名称。
+                        这与常规转换函数完全相同，除了它的第一个参数和结果的类型为<varname>mstate_data_type</varname>，
+                        这可能与<varname>state_data_type</varname>不同。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>minvfunc</varname>
+                    </pt>
+                    <pd>在移动聚集模式下使用的逆状态转换函数的名称。
+                        该函数的参数和结果类型与<varname>msfunc</varname>相同，但是用于从当前聚合状态中删除一个值，而不是向其添加值。
+                        逆转换函数必须具有与前向状态转换函数相同的严格性属性。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>mstate_data_type</varname>
+                    </pt>
+                    <pd>使用移动聚合模式时，聚合状态值的数据类型。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>mstate_data_size</varname>
+                    </pt>
+                    <pd>使用移动聚合模式时，聚合状态值的近似平均大小（以字节为单位）。
+                        这与<varname>state_data_size</varname>相同。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>mffunc</varname>
+                    </pt>
+                    <pd>使用移动聚合模式时，在遍历所有输入行之后将用来计算聚合结果的最终函数的名称。
+                        它与<varname>ffunc</varname>相同，不同之处在于其第一个参数的类型为<varname>mstate_data_type</varname>，
+                        并且通过编写<codeph>MFINALFUNC_EXTRA</codeph>指定了额外的伪参数。
+                        由<varname>mffunc</varname>或<varname>mstate_data_type</varname>确定的聚合结果类型必须与由聚合的常规实现确定的结果类型匹配。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>minitial_condition</varname>
+                    </pt>
+                    <pd>使用移动聚合模式时，状态值的初始设置。这与<varname>initial_condition</varname>相同。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>sort_operator</varname>
+                    </pt>
+                    <pd>类似于<codeph>MIN</codeph>或<codeph>MAX</codeph>的聚合的关联排序运算符。
+                        这只是一个运算符名称（可以由模式指定）。
+                        假定运算符具有与聚合相同的输入数据类型（必须是单参数常规聚合）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>HYPOTHETICAL</varname>
+                    </pt>
+                    <pd>仅对于有序集合聚合，此标志指定将根据假设集合聚合的要求处理聚合参数：
+                        也就是说，最后几个直接参数必须与聚合（<codeph>WITHIN GROUP</codeph>）参数的数据类型匹配。
+                        <codeph>HYPOTHETICAL</codeph>标志对运行时行为没有影响，仅对数据类型的解析时解析和聚合参数的排序规则有影响。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>combinefunc</varname>
+                    </pt>
+                    <pd>组合函数的名称。
+                        这是两个参数的函数，两个参数的类型均为<varname>state_data_type</varname>。
+                        它必须返回<varname>state_data_type</varname>类型的值。
+                        组合函数采用两个过渡状态值，并返回代表组合聚合的新过渡状态值。
+                        在Greenplum数据库中，如果以分段方式计算聚合函数的结果，则对各个内部状态调用合并函数，以将它们组合为结束内部状态。
+                    </pd>
+                    <pd>请注意，该函数在segment内的哈希聚合模式下也被调用。
+                        因此，如果您在没有合并函数的情况下调用此聚合函数，则永远不会选择哈希聚合。
+                        由于哈希聚合非常有效，因此请考虑尽可能定义一个合并函数。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section6">
+            <title>注解</title>
 
-<p>The ordinary functions used to define a new aggregate function must
-be defined first. Note that in this release of Greenplum Database, it
-is required that the <varname>sfunc</varname>, <varname>ffunc</varname>, and <varname>combinefunc</varname> functions
-used to create the aggregate are defined as <codeph>IMMUTABLE</codeph>.</p>
+            <p>必须先定义用于定义新聚合函数的普通函数。
+                请注意，在此版本的Greenplum数据库中，
+                要求将用于创建聚合的<varname>sfunc</varname>，<varname>ffunc</varname>和<varname>Combinefunc</varname>函数定义为<codeph>IMMUTABLE</codeph>。
+            </p>
 
-<p>If the value of the Greenplum Database server configuration parameter
-<codeph>gp_enable_multiphase_agg</codeph> is <codeph>off</codeph>, only
-single-level aggregation is performed. </p>
+            <p>如果Greenplum数据库服务器配置参数<codeph>gp_enable_multiphase_agg</codeph>的值关闭，则仅执行单级聚合。
+            </p>
 
-<p>Any compiled code (shared library files) for custom functions must
-be placed in the same location on every host in your Greenplum Database
-array (master and all segments). This location must also be in the <codeph>LD_LIBRARY_PATH</codeph>
-so that the server can locate the files.</p>
+            <p>用于自定义函数的所有已编译代码（共享库文件）必须放在Greenplum数据库阵列（master和所有segment）中每个主机的相同位置。
+                此位置也必须位于<codeph>LD_LIBRARY_PATH</codeph>中，以便服务器可以找到文件。
+            </p>
 
-<p>In previous versions of Greenplum Database, there was a concept of
-ordered aggregates. Since version 6, any aggregate can be called as an
-ordered aggregate, using the syntax:
+            <p>在以前的Greenplum数据库版本中，有一个有序聚合的概念。
+                从版本6开始，可以使用以下语法将任何聚合称为有序聚合：
+                <codeblock>name ( arg [ , ... ] [ORDER BY sortspec [ , ...]] )</codeblock>
+            </p>
 
-<codeblock>name ( arg [ , ... ] [ORDER BY sortspec [ , ...]] )</codeblock></p>
+            <p>接受<codeph>ORDERED</codeph>关键字是为了实现向后兼容，但会被忽略。
+            </p>
 
-<p>The <codeph>ORDERED</codeph> keyword is accepted for backwards compatibility, but
-  is ignored.</p>
+            <p>在以前的Greenplum数据库版本中，<codeph>COMBINEFUNC</codeph>选项称为<codeph>PREFUNC</codeph>。
+                为了向后兼容，它仍然被接受，作为<codeph>COMBINEFUNC</codeph>的同义词。
+            </p>
 
-<p>In previous versions of Greenplum Database, the <codeph>COMBINEFUNC</codeph> option was called
-<codeph>PREFUNC</codeph>. It is still accepted for backwards compatibility, as a synonym for
-<codeph>COMBINEFUNC</codeph>.</p>
-
-</section><section id="section7"><title>Example</title><p>The following simple example creates an aggregate function that computes
-the sum of two columns. </p><p>Before creating the aggregate function, create two functions that are used as the
-            <codeph><varname>sfunc</varname></codeph> and
-          <codeph><varname>combinefunc</varname></codeph> functions of the aggregate function. </p><p>This function is specified as the <codeph><varname>sfunc</varname></codeph> function in the
-        aggregate function.</p><codeblock>CREATE FUNCTION mysfunc_accum(numeric, numeric, numeric) 
-  RETURNS numeric
-   AS 'select $1 + $2 + $3'
-   LANGUAGE SQL
-   IMMUTABLE
-   RETURNS NULL ON NULL INPUT;</codeblock><p>This function is specified as the <codeph><codeph>combinefunc</codeph></codeph> function in the
-        aggregate function.</p><codeblock>CREATE FUNCTION mycombine_accum(numeric, numeric )
-  RETURNS numeric
-   AS 'select $1 + $2'
-   LANGUAGE SQL
-   IMMUTABLE
-   RETURNS NULL ON NULL INPUT;</codeblock><p>This <codeph>CREATE AGGREGATE</codeph> command creates the aggregate function
-that adds two columns. </p><codeblock>CREATE AGGREGATE agg_prefunc(numeric, numeric) (
-   SFUNC = mysfunc_accum,
-   STYPE = numeric,
-   COMBINEFUNC = mycombine_accum,
-   INITCOND = 0 );</codeblock><p>The following commands create a table, adds some rows, and runs the aggregate
-function.</p><codeblock>create table t1 (a int, b int) DISTRIBUTED BY (a);
+        </section>
+        <section id="section7">
+            <title>Example</title>
+            <p>以下简单示例创建一个聚合函数，该函数计算两列的总和。
+            </p>
+            <p>在创建聚合函数之前，创建两个用作聚合函数的<codeph><varname>sfunc</varname></codeph>和<codeph><varname>combinefunc</varname></codeph>函数的函数。
+            </p>
+            <p>该函数在聚合函数中指定为<codeph><varname>sfunc</varname></codeph>函数。
+            </p>
+            <codeblock>CREATE FUNCTION mysfunc_accum(numeric, numeric, numeric)
+  RETURNS numeric
+    AS 'select $1 + $2 + $3'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;</codeblock>
+            <p>该函数在聚合函数中被指定为<codeph><codeph>combinefunc</codeph></codeph>函数。
+            </p>
+            <codeblock>CREATE FUNCTION mycombine_accum(numeric, numeric )
+  RETURNS numeric
+    AS 'select $1 + $2'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;</codeblock>
+            <p>此<codeph>CREATE AGGREGATE</codeph>命令创建添加两列的聚合函数。
+            </p>
+            <codeblock>CREATE AGGREGATE agg_prefunc(numeric, numeric) (
+  SFUNC = mysfunc_accum,
+  STYPE = numeric,
+  COMBINEFUNC = mycombine_accum,
+  INITCOND = 0 );</codeblock>
+            <p>以下命令创建一个表，添加一些行，并运行聚合函数。
+            </p>
+            <codeblock>create table t1 (a int, b int) DISTRIBUTED BY (a);
 insert into t1 values
-   (10, 1),
-   (20, 2),
-   (30, 3);
-select agg_prefunc(a, b) from t1;</codeblock><p>This <codeph>EXPLAIN</codeph> command shows two phase aggregation. </p><codeblock>explain select agg_prefunc(a, b) from t1;
+    (10, 1),
+    (20, 2),
+    (30, 3);
+select agg_prefunc(a, b) from t1;</codeblock>
+            <p>此<codeph>EXPLAIN</codeph>命令显示两阶段聚合。
+            </p>
+            <codeblock>explain select agg_prefunc(a, b) from t1;
 
 QUERY PLAN
--------------------------------------------------------------------------- 
+--------------------------------------------------------------------------
 Aggregate (cost=1.10..1.11 rows=1 width=32)  
- -&gt; Gather Motion 2:1 (slice1; segments: 2) (cost=1.04..1.08 rows=1
-      width=32)
-     -&gt; Aggregate (cost=1.04..1.05 rows=1 width=32)
-       -&gt; Seq Scan on t1 (cost=0.00..1.03 rows=2 width=8)
- (4 rows)</codeblock></section><section id="section8"><title>Compatibility</title><p><codeph>CREATE AGGREGATE</codeph> is a Greenplum Database language extension. The SQL standard
-        does not provide for user-defined aggregate functions.</p></section><section id="section9"><title>See Also</title><p><codeph><xref href="ALTER_AGGREGATE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="./DROP_AGGREGATE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="./CREATE_FUNCTION.xml#topic1" type="topic" format="dita"
-        /></codeph></p></section></body></topic>
+ -&gt; Gather Motion 2:1 (slice1; segments: 2) (cost=1.04..1.08 rows=1
+      width=32)
+     -&gt; Aggregate (cost=1.04..1.05 rows=1 width=32)
+       -&gt; Seq Scan on t1 (cost=0.00..1.03 rows=2 width=8)
+(4 rows)</codeblock>
+        </section>
+        <section id="section8">
+            <title>兼容性</title>
+            <p><codeph>CREATE AGGREGATE</codeph>是Greenplum数据库语言的扩展。
+                SQL标准不提供用户定义的聚合函数。
+            </p>
+        </section>
+        <section id="section9">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_AGGREGATE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./DROP_AGGREGATE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./CREATE_FUNCTION.xml#topic1" type="topic" format="dita"
+                    />
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

@@ -5,60 +5,59 @@
   <body>
     <section>
       <title>Description</title>
-      <p id="sql_command_desc">Defines a new text search template.</p>
+      <p id="sql_command_desc">定义一个新的文本搜索模板。</p>
     </section>
     <section>
-      <title>Synopsis</title>
+      <title>概要</title>
     </section>
     <codeblock id="sql_command_synopsis">CREATE TEXT SEARCH TEMPLATE <varname>name</varname> (
     [ INIT = <varname>init_function</varname> , ]
     LEXIZE = <varname>lexize_function</varname>
 )</codeblock>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>CREATE TEXT SEARCH TEMPLATE</codeph> creates a new text search template. Text
-        search templates define the functions that implement text search dictionaries. A template is
-        not useful by itself, but must be instantiated as a dictionary to be used. The dictionary
-        typically specifies parameters to be given to the template functions.</p>
-      <p>If a schema name is given then the text search template is created in the specified schema.
-        Otherwise it is created in the current schema.</p>
-      <p>You must be a superuser to use <codeph>CREATE TEXT SEARCH TEMPLATE</codeph>. This
-        restriction is made because an erroneous text search template definition could confuse or
-        even crash the server. The reason for separating templates from dictionaries is that a
-        template encapsulates the "unsafe" aspects of defining a dictionary. The parameters that can
-        be set when defining a dictionary are safe for unprivileged users to set, and so creating a
-        dictionary need not be a privileged operation.</p>
-      <p>Refer to <xref href="../../admin_guide/textsearch/full-text-search.xml#full-text-search"/>
-        for further information.</p>
+      <title>描述</title>
+      <p><codeph>CREATE TEXT SEARCH TEMPLATE</codeph>创建一个新的文本搜索模板。
+        文本搜索模板定义了实现文本搜索词典的函数。
+        模板本身不是有用的，但必须实例化为要使用的字典。
+        字典通常指定要提供给模板函数的参数。
+        </p>
+      <p>如果指定了模式名称，则会在指定的模式中创建文本搜索模板。
+        否则，它将在当前模式中创建。</p>
+      <p>您必须是超级用户才能使用<codeph>CREATE TEXT SEARCH TEMPLATE</codeph>。
+        之所以做出此限制，是因为错误的文本搜索模板定义可能会使服务器混乱甚至崩溃。
+        将模板与词典分开的原因是模板封装了定义词典的“不安全”方面。
+        定义字典时可以设置的参数对于没有特权的用户是安全的，因此创建字典不必是特权操作。
+        </p>
+      <p>更多信息请参考<xref href="../../admin_guide/textsearch/full-text-search.xml#full-text-search"/>。</p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><codeph><varname>name</varname></codeph></pt>
-          <pd>The name of the text search template to be created. The name can be
-            schema-qualified.</pd>
+          <pd>要创建的文本搜索模板的名称。该名称可以由模式指定。</pd>
         </plentry>
         <plentry>
           <pt><codeph><varname>init_function</varname></codeph></pt>
-          <pd>The name of the init function for the template.</pd>
+          <pd>模板的初始化函数的名称。</pd>
         </plentry>
         <plentry>
           <pt><codeph><varname>lexize_function</varname></codeph></pt>
-          <pd>The name of the lexize function for the template.</pd>
+          <pd>模板的lexize函数的名称。</pd>
         </plentry>
       </parml>
-      <p>The function names can be schema-qualified if necessary. Argument types are not given,
-        since the argument list for each type of function is predetermined. The lexize function is
-        required, but the init function is optional.</p>
-      <p>The arguments can appear in any order, not only the order shown above.</p>
+      <p>如有必要，可以对函数名称进行模式限定。
+        由于每种函数类型的参数列表都是预先确定的，因此未提供参数类型。
+        lexize函数是必需的，但init函数是可选的。
+        </p>
+      <p>参数可以以任何顺序出现，而不仅是上面显示的顺序。</p>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p>There is no <codeph>CREATE TEXT SEARCH TEMPLATE</codeph> statement in the SQL standard.</p>
+      <title>兼容性</title>
+      <p>SQL标准中没有<codeph>CREATE TEXT SEARCH TEMPLATE</codeph>语句。</p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="CREATE_TEXT_SEARCH_TEMPLATE.xml#topic1" type="topic" format="dita"
           /></codeph>, <codeph><xref href="DROP_TEXT_SEARCH_TEMPLATE.xml#topic1"/></codeph></p>
     </section>

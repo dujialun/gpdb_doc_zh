@@ -1,81 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="bq20941">CREATE DOMAIN</title><body><p id="sql_command_desc">Defines a new domain.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">CREATE DOMAIN <varname>name</varname> [AS] <varname>data_type</varname> [DEFAULT <varname>expression</varname>]
-       [ COLLATE <varname>collation</varname> ] 
-       [ CONSTRAINT <varname>constraint_name</varname>
-       | NOT NULL | NULL 
-       | CHECK (<varname>expression</varname>) [...]]</codeblock></section><section id="section3"><title>Description</title>
-      <p><codeph>CREATE DOMAIN</codeph> creates a new domain. A domain is essentially a data type
-        with optional constraints (restrictions on the allowed set of values). The user who defines
-        a domain becomes its owner. The domain name must be unique among the data types and domains
-        existing in its schema. </p>
-      <p>If a schema name is given (for example, <codeph>CREATE DOMAIN myschema.mydomain
-          ...</codeph>) then the domain is created in the specified schema. Otherwise it is created
-        in the current schema. </p>
-  
-  <p>Domains are useful for abstracting common constraints on fields into
-a single location for maintenance. For example, several tables might
-contain email address columns, all requiring the same <codeph>CHECK</codeph>
-constraint to verify the address syntax. It is easier to define a domain
-rather than setting up a column constraint for each table that has an
-email column.</p>
-      <p> To be able to create a domain, you must have <codeph>USAGE</codeph> privilege on the
-        underlying type.</p></section><section id="section4"><title>Parameters</title>
-      <parml>
-        <plentry>
-          <pt><varname>name</varname></pt>
-          <pd>The name (optionally schema-qualified) of a domain to be created. </pd>
-        </plentry>
-        <plentry>
-          <pt><varname>data_type</varname></pt>
-          <pd>The underlying data type of the domain. This may include array specifiers. </pd>
-        </plentry>
-        <plentry>
-          <pt>DEFAULT <varname>expression</varname></pt>
-          <pd>Specifies a default value for columns of the domain data type. The value is any
-            variable-free expression (but subqueries are not allowed). The data type of the default
-            expression must match the data type of the domain. If no default value is specified,
-            then the default value is the null value. The default expression will be used in any
-            insert operation that does not specify a value for the column. If a default value is
-            defined for a particular column, it overrides any default associated with the domain. In
-            turn, the domain default overrides any default value associated with the underlying data
-            type.</pd>
-        </plentry>
-        <plentry>
-          <pt>COLLATE <varname>collation</varname></pt>
-          <pd>An optional collation for the domain. If no collation is specified, the underlying
-            data type's default collation is used. The underlying type must be collatable if
-              <codeph>COLLATE</codeph> is specified. </pd>
-        </plentry>
-        <plentry>
-          <pt>CONSTRAINT <varname>constraint_name</varname></pt>
-          <pd>An optional name for a constraint. If not specified, the system generates a name.
-          </pd>
-        </plentry>
-        <plentry>
-          <pt>NOT NULL</pt>
-          <pd>Values of this domain are normally prevented from being null. However, it is still
-            possible for a domain with this constraint to take a null value if it is assigned a
-            matching domain type that has become null, e.g. via a left outer join, or a command such
-            as <codeph>INSERT INTO tab (domcol) VALUES ((SELECT domcol FROM tab WHERE
-              false))</codeph>. </pd>
-        </plentry>
-        <plentry>
-          <pt>NULL</pt>
-          <pd>Values of this domain are allowed to be null. This is the default. This clause is only
-            intended for compatibility with nonstandard SQL databases. Its use is discouraged in new
-            applications.</pd>
-        </plentry>
-        <plentry>
-          <pt>CHECK <varname>(expression)</varname></pt>
-          <pd><codeph>CHECK</codeph> clauses specify integrity constraints or tests which values of
-            the domain must satisfy. Each constraint must be an expression producing a Boolean
-            result. It should use the key word <codeph>VALUE</codeph> to refer to the value being
-            tested. Currently, <codeph>CHECK</codeph> expressions cannot contain subqueries nor
-            refer to variables other than <codeph>VALUE</codeph>. </pd>
-        </plentry>
-      </parml></section><section id="section5"><title>Examples</title><p>Create the <codeph>us_zip_code</codeph> data type. A regular expression test is used to verify
-        that the value looks like a valid US zip code. </p><codeblock>CREATE DOMAIN us_zip_code AS TEXT CHECK 
-       ( VALUE ~ '^\d{5}$' OR VALUE ~ '^\d{5}-\d{4}$' );</codeblock></section><section id="section6"><title>Compatibility</title><p><codeph>CREATE DOMAIN</codeph> conforms to the SQL standard. </p></section><section id="section7"><title>See Also</title><p><codeph><xref href="ALTER_DOMAIN.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="./DROP_DOMAIN.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="bq20941">CREATE DOMAIN</title>
+    <body>
+        <p id="sql_command_desc">定义一个新域。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CREATE DOMAIN <varname>name</varname> [AS] <varname>data_type</varname> [DEFAULT <varname>expression</varname>]
+        [ COLLATE <varname>collation</varname> ]
+        [ CONSTRAINT <varname>constraint_name</varname>
+        | NOT NULL | NULL
+        | CHECK (<varname>expression</varname>) [...]]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CREATE DOMAIN</codeph>创建一个新域。
+                域本质上是具有可选约束（对允许的值集的约束）的数据类型。
+                定义域的用户将成为其所有者。
+                域名在其模式中存在的数据类型和域之间必须唯一。
+            </p>
+            <p>如果提供了模式名称（例如<codeph>CREATE DOMAIN myschema.mydomain ...</codeph>），则将在指定的模式中创建域。
+                否则，它将在当前模式中创建。
+            </p>
+
+            <p>域对于将字段上的公共约束抽象到单个位置进行维护很有用。
+                例如，几个表可能包含电子邮件地址列，所有这些列都需要相同的<codeph>CHECK</codeph>约束来验证地址语法。
+                定义域比为每个具有电子邮件列的表设置列约束要容易得多。
+            </p>
+            <p>为了能够创建域，您必须对基础类型具有<codeph>USAGE</codeph>特权。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要创建的域的名称（可以由模式指定）。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>data_type</varname>
+                    </pt>
+                    <pd>域的基础数据类型。这可能包括数组说明符。</pd>
+                </plentry>
+                <plentry>
+                    <pt>DEFAULT <varname>expression</varname>
+                    </pt>
+                    <pd>为域数据类型的列指定默认值。
+                        该值是任何无变量的表达式（但不允许子查询）。
+                        默认表达式的数据类型必须与域的数据类型匹配。
+                        如果未指定默认值，则默认值为空值。
+                        默认表达式将在未为列指定值的任何插入操作中使用。
+                        如果为特定列定义了默认值，它将覆盖与该域关联的任何默认值。
+                        反过来，域默认值将覆盖与基础数据类型关联的任何默认值。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>COLLATE <varname>collation</varname>
+                    </pt>
+                    <pd>域的可选归类。
+                        如果未指定排序规则，则使用基础数据类型的默认排序规则。
+                        如果指定了<codeph>COLLATE</codeph>，则基础类型必须可整理。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>CONSTRAINT <varname>constraint_name</varname>
+                    </pt>
+                    <pd>约束的可选名称。如果未指定，系统将生成一个名称。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>NOT NULL</pt>
+                    <pd>通常可以防止该域的值为null。
+                        但是，如果为该域分配了已变为空的匹配域类型仍然是可行的，
+                        例如，通过左连接或诸如<codeph>INSERT INTO tab (domcol) VALUES ((SELECT domcol FROM tab WHERE false))</codeph>之类的命令。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>NULL</pt>
+                    <pd>该域的值允许为空。
+                        这是默认值。
+                        此子句仅用于与非标准SQL数据库兼容。
+                        不建议在新应用中使用它。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>CHECK<varname>(expression)</varname>
+                    </pt>
+                    <pd><codeph>CHECK</codeph>子句指定完整性约束或测试域必须满足的值。
+                        每个约束必须是一个产生布尔结果的表达式。
+                        它应该使用关键字<codeph>VALUE</codeph>来引用要测试的值。
+                        当前，<codeph>CHECK</codeph>表达式不能包含子查询，也不能引用<codeph>VALUE</codeph>以外的变量。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>创建<codeph>us_zip_code</codeph>数据类型。
+                使用正则表达式测试来验证该值看起来像是有效的美国邮政编码。
+            </p>
+            <codeblock>CREATE DOMAIN us_zip_code AS TEXT CHECK
+    ( VALUE ~ '^\d{5}$' OR VALUE ~ '^\d{5}-\d{4}$' );</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p><codeph>CREATE DOMAIN</codeph>符合SQL标准。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_DOMAIN.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="./DROP_DOMAIN.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

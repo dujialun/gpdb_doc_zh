@@ -1,17 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="bg20941">CLOSE</title><body><p id="sql_command_desc">Closes a cursor.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">CLOSE <varname>cursor_name</varname></codeblock></section><section id="section3"><title>Description</title><p><codeph>CLOSE</codeph> frees the resources associated with an open cursor.
-After the cursor is closed, no subsequent operations are allowed on it.
-A cursor should be closed when it is no longer needed. </p><p>Every non-holdable open cursor is implicitly closed when a transaction
-is terminated by <codeph>COMMIT</codeph> or <codeph>ROLLBACK</codeph>.
-A holdable cursor is implicitly closed if the transaction that created
-it aborts via <codeph>ROLLBACK</codeph>. If the creating transaction
-successfully commits, the holdable cursor remains open until an explicit
-<codeph>CLOSE</codeph> is executed, or the client disconnects. </p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>cursor_name</varname></pt><pd>The name of an open cursor to close.</pd></plentry></parml></section><section id="section5"><title>Notes</title><p>Greenplum Database does not have an explicit <codeph>OPEN</codeph> cursor
-statement. A cursor is considered open when it is declared. Use the <codeph>DECLARE</codeph>
-statement to declare (and open) a cursor. </p><p>You can see all available cursors by querying the <codeph>pg_cursors</codeph> system view.</p>
-      <p>If a cursor is closed after a savepoint which is later rolled back, the
-          <codeph>CLOSE</codeph> is not rolled back; that is the cursor remains closed.</p></section><section id="section6"><title>Examples</title><p>Close the cursor <codeph>portala</codeph>:</p><codeblock>CLOSE portala;</codeblock></section><section id="section7"><title>Compatibility</title><p><codeph>CLOSE</codeph> is fully conforming with the SQL standard.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="./DECLARE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="./FETCH.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="./MOVE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="bg20941">CLOSE</title>
+    <body>
+        <p id="sql_command_desc">关闭游标。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CLOSE <varname>cursor_name</varname></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CLOSE</codeph>释放与打开的游标关联的资源。
+                关闭游标后，不允许对其进行后续操作。
+                不再需要游标时，应将其关闭。
+            </p>
+            <p>当事务通过<codeph>COMMIT</codeph>或<codeph>ROLLBACK</codeph>终止时，每个非持有的打开游标都会隐式关闭。
+                如果创建游标的事务通过<codeph>ROLLBACK</codeph>中止，则该游标将隐式关闭。
+                如果创建事务成功提交，则持有的游标将保持打开状态，直到执行了显式<codeph>CLOSE</codeph>或客户端断开连接为止。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>cursor_name</varname>
+                    </pt>
+                    <pd>要关闭的打开的游标的名称。</pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p>Greenplum数据库没有显式的<codeph>OPEN</codeph>游标语句。
+                当游标被声明时，它被认为是打开的。
+                使用<codeph>DECLARE</codeph>语句声明（并打开）游标。
+            </p>
+            <p>您可以通过查询<codeph>pg_cursors</codeph>系统视图来查看所有可用的游标。
+            </p>
+            <p>如果在保存点之后关闭游标，该保存点随后会回滚，则<codeph>CLOSE</codeph>不会回滚；即光标保持关闭状态。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>关闭游标<codeph>portala</codeph>：
+            </p>
+            <codeblock>CLOSE portala;</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p><codeph>CLOSE</codeph>完全符合SQL标准。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="./DECLARE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="./FETCH.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="./MOVE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

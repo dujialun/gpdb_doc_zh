@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title id="cd20941">CREATE TABLE</title>
-  <body>
-    <p id="sql_command_desc">Defines a new table.</p>
-    <note type="note">Referential integrity syntax (foreign key constraints) is accepted but not
-      enforced.</note>
-    <section id="section2">
-      <title>Synopsis</title>
-      <codeblock id="sql_command_synopsis">
-CREATE [ [GLOBAL | LOCAL] {TEMPORARY | TEMP } | UNLOGGED] TABLE [IF NOT EXISTS] 
-  <varname>table_name</varname> ( 
-  [ { <varname>column_name</varname> <varname>data_type</varname> [ COLLATE <varname>collation</varname> ] [<varname>column_constraint</varname> [ ... ] ]
+    <title id="cd20941">CREATE TABLE</title>
+    <body>
+        <p id="sql_command_desc">定义一个新表。</p>
+        <note type="note">引用完整性语法（外键约束）被接受但未强制执行。
+        </note>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CREATE [ [GLOBAL | LOCAL] {TEMPORARY | TEMP } | UNLOGGED] TABLE [IF NOT EXISTS]
+    <varname>table_name</varname> (
+    [ { <varname>column_name</varname> <varname>data_type</varname> [ COLLATE <varname>collation</varname> ] [<varname>column_constraint</varname> [ ... ] ]
 [ ENCODING ( <varname>storage_directive</varname> [, ...] ) ]
     | <varname>table_constraint</varname>
     | LIKE <varname>source_table</varname> [ <varname>like_option</varname> ... ] }
@@ -50,11 +49,12 @@ CREATE [ [GLOBAL | LOCAL] {TEMPORARY | TEMP} | UNLOGGED ] TABLE [IF NOT EXISTS]
 [ ON COMMIT { PRESERVE ROWS | DELETE ROWS | DROP } ]
 [ TABLESPACE <varname>tablespace_name</varname> ]
 </codeblock>
-      <p>where <varname>column_constraint</varname> is:</p>
-      <codeblock>[ CONSTRAINT <varname>constraint_name</varname>]
-{ NOT NULL 
-  | NULL 
-  | CHECK  ( <varname>expression</varname> ) [ NO INHERIT ]
+            <p>其中<varname>column_constraint</varname>是：
+            </p>
+            <codeblock>[ CONSTRAINT <varname>constraint_name</varname>]
+{ NOT NULL
+  | NULL
+  | CHECK ( <varname>expression</varname> ) [ NO INHERIT ]
   | DEFAULT <varname>default_expr</varname>
   | UNIQUE <varname>index_parameters</varname>
   | PRIMARY KEY <varname>index_parameters</varname>
@@ -62,7 +62,7 @@ CREATE [ [GLOBAL | LOCAL] {TEMPORARY | TEMP} | UNLOGGED ] TABLE [IF NOT EXISTS]
       [ MATCH FULL | MATCH PARTIAL | MATCH SIMPLE ]  
       [ ON DELETE <varname>key_action</varname> ] [ ON UPDATE <varname>key_action</varname> ] }
 [ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]</codeblock>
-      <p>and <varname>table_constraint</varname> is:</p>
+      <p><varname>table_constraint</varname>是：</p>
       <codeblock>[ CONSTRAINT <varname>constraint_name</varname> ]
 { CHECK ( <varname>expression</varname> ) [ NO INHERIT ]
   | UNIQUE ( <varname>column_name</varname> [, ... ] ) <varname>index_parameters</varname>
@@ -72,732 +72,766 @@ CREATE [ [GLOBAL | LOCAL] {TEMPORARY | TEMP} | UNLOGGED ] TABLE [IF NOT EXISTS]
       [ MATCH FULL | MATCH PARTIAL | MATCH SIMPLE ] 
       [ ON DELETE <varname>key_action</varname> ] [ ON UPDATE <varname>key_action</varname> ] }
 [ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]</codeblock>
-      <p>and <i>like_option</i>
-        is:<codeblock>{INCLUDING|EXCLUDING} {DEFAULTS|CONSTRAINTS|INDEXES|STORAGE|COMMENTS|ALL}</codeblock></p>
-      <p>and <varname>index_parameters</varname> in <codeph>UNIQUE</codeph> and <codeph>PRIMARY
-          KEY</codeph> constraints are:</p>
-      <codeblock>[ WITH ( <varname>storage_parameter</varname> [=<varname>value</varname>] [, ... ] ) ]
-[ USING INDEX TABLESPACE <varname>tablespace_name</varname> ] </codeblock>
-      <p>and <varname>storage_directive</varname> for a column is:</p>
-      <codeblock>   compresstype={ZLIB|ZSTD|QUICKLZ|RLE_TYPE|NONE}
+            <p><i>like_option</i>是：
+                <codeblock>{INCLUDING|EXCLUDING} {DEFAULTS|CONSTRAINTS|INDEXES|STORAGE|COMMENTS|ALL}</codeblock>
+            </p>
+            <p><codeph>UNIQUE</codeph>和<codeph>PRIMARY KEY</codeph>中的<varname>index_parameters</varname>约束为：
+            </p>
+            <codeblock>[ WITH ( <varname>storage_parameter</varname> [=<varname>value</varname>] [, ... ] ) ]
+[ USING INDEX TABLESPACE <varname>tablespace_name</varname> ]</codeblock>
+            <p>列的<varname>storage_directive</varname>是：
+            </p>
+            <codeblock>compresstype={ZLIB|ZSTD|QUICKLZ|RLE_TYPE|NONE}
     [compresslevel={0-9}]
     [blocksize={8192-2097152} ]</codeblock>
-      <p>and <varname>storage_parameter</varname> for the table is:</p>
+      <p>表的<varname>storage_parameter</varname>是：</p>
       <codeblock>   appendoptimized={TRUE|FALSE}
    blocksize={8192-2097152}
    orientation={COLUMN|ROW}
    checksum={TRUE|FALSE}
-   compresstype={ZLIB|ZSTD|QUICKLZ|RLE_TYPE|NONE}
-   compresslevel={0-9}
-   fillfactor={10-100}
-   oids[=TRUE|FALSE]</codeblock>
-      <p>and <varname>key_action</varname> is:</p>
-      <codeblock>    ON DELETE 
-  | ON UPDATE
-  | NO ACTION
-  | RESTRICT
-  | CASCADE
-  | SET NULL
-  | SET DEFAULT</codeblock>
-      <p>and <varname>partition_type</varname> is:</p>
-      <codeblock>    LIST | RANGE</codeblock>
-      <p>and <varname>partition_specification</varname> is:</p>
-      <codeblock><varname>partition_element</varname> [, ...]</codeblock>
-      <p>and <varname>partition_element</varname> is:</p>
-      <codeblock>   DEFAULT PARTITION <varname>name</varname>
-  | [PARTITION <varname>name</varname>] VALUES (<varname>list_value</varname> [,...] )
-  | [PARTITION <varname>name</varname>] 
-     START ([<varname>datatype</varname>] '<varname>start_value</varname>') [INCLUSIVE | EXCLUSIVE]
-     [ END ([<varname>datatype</varname>] '<varname>end_value</varname>') [INCLUSIVE | EXCLUSIVE] ]
-     [ EVERY ([<varname>datatype</varname>] [<varname>number | </varname>INTERVAL] '<varname>interval_value</varname>') ]
-  | [PARTITION <varname>name</varname>] 
-     END ([<varname>datatype</varname>] '<varname>end_value</varname>') [INCLUSIVE | EXCLUSIVE]
-     [ EVERY ([<varname>datatype</varname>] [<varname>number | </varname>INTERVAL] '<varname>interval_value</varname>') ]
+   compresstype={ZLIB|ZSTD|QUICKLZ|RLE_TYPE|NONE}
+   compresslevel={0-9}
+   fillfactor={10-100}
+   oids[=TRUE|FALSE]</codeblock>
+            <p><varname>key_action</varname>是：</p>
+            <codeblock>    ON DELETE
+   | ON UPDATE
+   | NO ACTION
+   | RESTRICT
+   | CASCADE
+   | SET NULL
+   | SET DEFAULT</codeblock>
+            <p><varname>partition_type</varname>是：
+            </p>
+            <codeblock>    LIST | RANGE</codeblock>
+            <p><varname>partition_specification</varname>是：
+            </p>
+            <codeblock><varname>partition_element</varname> [, ...]</codeblock>
+            <p><varname>partition_element</varname>是：
+            </p>
+            <codeblock>   DEFAULT PARTITION
+                <varname>name</varname>
+   | [PARTITION <varname>name</varname>] VALUES (<varname>list_value</varname> [,...] )
+   | [PARTITION <varname>name</varname>]
+      START ([<varname>datatype</varname>] '<varname>start_value</varname>') [INCLUSIVE | EXCLUSIVE]
+      [ END ([<varname>datatype</varname>] '<varname>end_value</varname>') [INCLUSIVE | EXCLUSIVE] ]
+      [ EVERY ([<varname>datatype</varname>] [<varname>number |</varname>INTERVAL] '<varname>interval_value</varname>') ]
+   | [PARTITION <varname>name</varname>]
+      END ([<varname>datatype</varname>] '<varname>end_value</varname>') [INCLUSIVE | EXCLUSIVE]
+      [ EVERY ([<varname>datatype</varname>] [<varname>number |</varname>INTERVAL] '<varname>interval_value</varname>') ]
 [ WITH ( <varname>partition_storage_parameter</varname>=<varname>value</varname> [, ... ] ) ]
 [ <varname>column_reference_storage_directive</varname> [, ...] ]
 [ TABLESPACE <varname>tablespace</varname> ]</codeblock>
-      <p>where <varname>subpartition_spec</varname> or <varname>template_spec</varname> is:</p>
-      <codeblock><varname>subpartition_element</varname> [, ...]</codeblock>
-      <p>and <varname>subpartition_element</varname> is:</p>
-      <codeblock>   DEFAULT SUBPARTITION <varname>name</varname>
-  | [SUBPARTITION <varname>name</varname>] VALUES (<varname>list_value</varname> [,...] )
-  | [SUBPARTITION <varname>name</varname>] 
-     START ([<varname>datatype</varname>] '<varname>start_value</varname>') [INCLUSIVE | EXCLUSIVE]
-     [ END ([<varname>datatype</varname>] '<varname>end_value</varname>') [INCLUSIVE | EXCLUSIVE] ]
-     [ EVERY ([<varname>datatype</varname>] [<varname>number | </varname>INTERVAL] '<varname>interval_value</varname>') ]
-  | [SUBPARTITION <varname>name</varname>] 
-     END ([<varname>datatype</varname>] '<varname>end_value</varname>') [INCLUSIVE | EXCLUSIVE]
-     [ EVERY ([<varname>datatype</varname>] [<varname>number | </varname>INTERVAL] '<varname>interval_value</varname>') ]
+            <p>其中<varname>subpartition_spec</varname>或<varname>template_spec</varname>是：
+            </p>
+            <codeblock><varname>subpartition_element</varname> [, ...]</codeblock>
+            <p><varname>subpartition_element</varname>是：
+            </p>
+            <codeblock>   DEFAULT SUBPARTITION <varname>name</varname>
+    | [SUBPARTITION <varname>name</varname>] VALUES (<varname>list_value</varname> [,...] )
+    | [SUBPARTITION <varname>name</varname>]
+       START ([<varname>datatype</varname>] '<varname>start_value</varname>') [INCLUSIVE | EXCLUSIVE]
+       [ END ([<varname>datatype</varname>] '<varname>end_value</varname>') [INCLUSIVE | EXCLUSIVE] ]
+       [ EVERY ([<varname>datatype</varname>] [<varname>number |</varname>INTERVAL] '<varname>interval_value</varname>') ]
+    | [SUBPARTITION <varname>name</varname>]
+       END ([<varname>datatype</varname>] '<varname>end_value</varname>') [INCLUSIVE | EXCLUSIVE]
+       [ EVERY ([<varname>datatype</varname>] [<varname>number |</varname>INTERVAL] '<varname>interval_value</varname>') ]
 [ WITH ( <varname>partition_storage_parameter</varname>=<varname>value</varname> [, ... ] ) ]
 [ <varname>column_reference_storage_directive</varname> [, ...] ]
 [ TABLESPACE <varname>tablespace</varname> ]</codeblock>
-      <p>where <varname>storage_parameter</varname> for a partition is:</p>
+      <p>其中分区的<varname>storage_parameter</varname>是：</p>
       <codeblock>   appendoptimized={TRUE|FALSE}
    blocksize={8192-2097152}
    orientation={COLUMN|ROW}
    checksum={TRUE|FALSE}
-   compresstype={ZLIB|ZSTD|QUICKLZ|RLE_TYPE|NONE}
-   compresslevel={1-19}
-   fillfactor={10-100}
-   oids[=TRUE|FALSE]</codeblock>
-    </section>
-    <section id="section3">
-      <title>Description</title>
-      <p><codeph>CREATE TABLE</codeph> creates an initially empty table in the current database. The
-        user who issues the command owns the table.</p>
-      <p>To be able to create a table, you must have <codeph>USAGE</codeph> privilege on all column
-        types or the type in the <codeph>OF</codeph> clause, respectively. </p>
-      <p>If you specify a schema name, Greenplum creates the table in the specified schema.
-        Otherwise Greenplum creates the table in the current schema. Temporary tables exist in a
-        special schema, so you cannot specify a schema name when creating a temporary table. Table
-        names must be distinct from the name of any other table, external table, sequence, index,
-        view, or foreign table in the same schema.</p>
-      <p><codeph>CREATE TABLE</codeph> also automatically creates a data type that represents the
-        composite type corresponding to one row of the table. Therefore, tables cannot have the same
-        name as any existing data type in the same schema.</p>
-      <p>The optional constraint clauses specify conditions that new or updated rows must satisfy
-        for an insert or update operation to succeed. A constraint is an SQL object that helps
-        define the set of valid values in the table in various ways. Constraints apply to tables,
-        not to partitions. You cannot add a constraint to a partition or subpartition.</p>
-      <p>Referential integrity constraints (foreign keys) are accepted but not enforced. The
-        information is kept in the system catalogs but is otherwise ignored.</p>
-      <p>There are two ways to define constraints: table constraints and column constraints. A
-        column constraint is defined as part of a column definition. A table constraint definition
-        is not tied to a particular column, and it can encompass more than one column. Every column
-        constraint can also be written as a table constraint; a column constraint is only a
-        notational convenience for use when the constraint only affects one column. </p>
-      <p>When creating a table, there is an additional clause to declare the Greenplum Database
-        distribution policy. If a <codeph>DISTRIBUTED BY</codeph>, <codeph>DISTRIBUTED
-          RANDOMLY</codeph>, or <codeph>DISTRIBUTED REPLICATED</codeph> clause is not supplied, then
-        Greenplum Database assigns a hash distribution policy to the table using either the
-          <codeph>PRIMARY KEY</codeph> (if the table has one) or the first column of the table as
-        the distribution key. Columns of geometric or user-defined data types are not eligible as
-        Greenplum distribution key columns. If a table does not have a column of an eligible data
-        type, the rows are distributed based on a round-robin or random distribution. To ensure an
-        even distribution of data in your Greenplum Database system, you want to choose a
-        distribution key that is unique for each record, or if that is not possible, then choose
-          <codeph>DISTRIBUTED RANDOMLY</codeph>. </p>
-      <p>If the <codeph>DISTRIBUTED REPLICATED</codeph> clause is supplied, Greenplum Database
-        distributes all rows of the table to all segments in the Greenplum Database system. This
-        option can be used in cases where user-defined functions must execute on the segments, and
-        the functions require access to all rows of the table. Replicated functions can also be used
-        to improve query performance by preventing broadcast motions for the table. The
-          <codeph>DISTRIBUTED REPLICATED</codeph> clause cannot be used with the <codeph>PARTITION
-          BY</codeph> clause or the <codeph>INHERITS</codeph> clause. A replicated table also cannot
-        be inherited by another table. The hidden system columns (<codeph>ctid</codeph>,
-          <codeph>cmin</codeph>, <codeph>cmax</codeph>, <codeph>xmin</codeph>,
-        <codeph>xmax</codeph>, and <codeph>gp_segment_id</codeph>) cannot be referenced in user
-        queries on replicated tables because they have no single, unambiguous value.</p>
-      <p>The <codeph>PARTITION BY</codeph> clause allows you to divide the table into multiple
-        sub-tables (or parts) that, taken together, make up the parent table and share its schema.
-        Though the sub-tables exist as independent tables, the Greenplum Database restricts their
-        use in important ways. Internally, partitioning is implemented as a special form of
-        inheritance. Each child table partition is created with a distinct <codeph>CHECK</codeph>
-        constraint which limits the data the table can contain, based on some defining criteria. The
-          <codeph>CHECK</codeph> constraints are also used by the query optimizer to determine which
-        table partitions to scan in order to satisfy a given query predicate. These partition
-        constraints are managed automatically by the Greenplum Database.</p>
-    </section>
-    <section id="section4">
-      <title>Parameters</title>
-      <parml>
-        <plentry>
-          <pt>GLOBAL | LOCAL</pt>
-          <pd>These keywords are present for SQL standard compatibility, but have no effect in
-            Greenplum Database and are deprecated.</pd>
-        </plentry>
-        <plentry>
-          <pt>TEMPORARY | TEMP</pt>
-          <pd>If specified, the table is created as a temporary table. Temporary tables are
-            automatically dropped at the end of a session, or optionally at the end of the current
-            transaction (see <codeph>ON COMMIT</codeph>). Existing permanent tables with the same
-            name are not visible to the current session while the temporary table exists, unless
-            they are referenced with schema-qualified names. Any indexes created on a temporary
-            table are automatically temporary as well.</pd>
-        </plentry>
-        <plentry>
-          <pt>UNLOGGED</pt>
-          <pd>If specified, the table is created as an unlogged table. Data written to unlogged
-            tables is not written to the write-ahead (WAL) log, which makes them considerably faster
-            than ordinary tables. However, the contents of an unlogged table are not replicated to
-            mirror segment instances. Also an unlogged table is not crash-safe. After a segment
-            instance crash or unclean shutdown, the data for the unlogged table on that segment is
-            truncated. Any indexes created on an unlogged table are automatically unlogged as
-            well.</pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>table_name</varname>
-          </pt>
-          <pd>The name (optionally schema-qualified) of the table to be created. </pd>
-        </plentry>
-        <plentry>
-          <pt>OF <varname>type_name</varname></pt>
-          <pd>Creates a typed table, which takes its structure from the specified composite type
-            (name optionally schema-qualified). A typed table is tied to its type; for example the
-            table will be dropped if the type is dropped (with <codeph>DROP TYPE ...
-              CASCADE</codeph>).</pd>
-          <pd> When a typed table is created, the data types of the columns are determined by the
-            underlying composite type and are not specified by the <codeph>CREATE TABLE</codeph>
-            command. But the <codeph>CREATE TABLE</codeph> command can add defaults and constraints
-            to the table and can specify storage parameters. </pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>column_name</varname>
-          </pt>
-          <pd>The name of a column to be created in the new table. </pd>
-        </plentry>
-        <plentry>
-          <pt>
-            <varname>data_type</varname>
-          </pt>
-          <pd>The data type of the column. This may include array specifiers.</pd>
-          <pd>For table columns that contain textual data, Specify the data type
-              <codeph>VARCHAR</codeph> or <codeph>TEXT</codeph>. Specifying the data type
-              <codeph>CHAR</codeph> is not recommended. In Greenplum Database, the data types
-              <codeph>VARCHAR</codeph> or <codeph>TEXT</codeph> handles padding added to the data
-            (space characters added after the last non-space character) as significant characters,
-            the data type <codeph>CHAR</codeph> does not. See <xref href="#topic1/section5"
-              format="dita"/>.</pd>
-        </plentry>
-        <plentry>
-          <pt>COLLATE <varname>collation</varname></pt>
-          <pd>The <codeph>COLLATE</codeph> clause assigns a collation to the column (which must be
-            of a collatable data type). If not specified, the column data type's default collation
-            is used.<note>GPORCA supports collation only when all columns in the query use the same
-              collation. If columns in the query use different collations, then Greenplum uses the
-              Postgres query planner.</note></pd>
-        </plentry>
-        <plentry>
-          <pt>DEFAULT <varname>default_expr</varname></pt>
-          <pd>The <codeph>DEFAULT</codeph> clause assigns a default data value for the column whose
-            column definition it appears within. The value is any variable-free expression
-            (subqueries and cross-references to other columns in the current table are not allowed).
-            The data type of the default expression must match the data type of the column. The
-            default expression will be used in any insert operation that does not specify a value
-            for the column. If there is no default for a column, then the default is null. </pd>
-        </plentry>
-        <plentry>
-          <pt> ENCODING ( <varname>storage_directive</varname> [, ...] ) </pt>
-          <pd>For a column, the optional <codeph>ENCODING</codeph> clause specifies the type of
-            compression and block size for the column data. See <xref href="#topic1/with_storage"
-              format="dita">storage_options</xref> for <codeph>compresstype</codeph>,
-              <codeph>compresslevel</codeph>, and <codeph>blocksize</codeph> values.</pd>
-          <pd>The clause is valid only for append-optimized, column-oriented tables.</pd>
-          <pd>Column compression settings are inherited from the table level to the partition level
-            to the subpartition level. The lowest-level settings have priority.</pd>
-        </plentry>
-        <plentry>
-          <pt>INHERITS ( parent_table [, …])</pt>
-          <pd>The optional <codeph>INHERITS</codeph> clause specifies a list of tables from which
-            the new table automatically inherits all columns. Use of <codeph>INHERITS</codeph>
-            creates a persistent relationship between the new child table and its parent table(s).
-            Schema modifications to the parent(s) normally propagate to children as well, and by
-            default the data of the child table is included in scans of the parent(s). </pd>
-          <pd>In Greenplum Database, the <codeph>INHERITS</codeph> clause is not used when creating
-            partitioned tables. Although the concept of inheritance is used in partition
-            hierarchies, the inheritance structure of a partitioned table is created using the
-                <codeph><xref href="#topic1/part_by" format="dita">PARTITION BY</xref></codeph>
-            clause. </pd>
-          <pd>If the same column name exists in more than one parent table, an error is reported
-            unless the data types of the columns match in each of the parent tables. If there is no
-            conflict, then the duplicate columns are merged to form a single column in the new
-            table. If the column name list of the new table contains a column name that is also
-            inherited, the data type must likewise match the inherited column(s), and the column
-            definitions are merged into one. If the new table explicitly specifies a default value
-            for the column, this default overrides any defaults from inherited declarations of the
-            column. Otherwise, any parents that specify default values for the column must all
-            specify the same default, or an error will be reported. </pd>
-          <pd><codeph>CHECK</codeph> constraints are merged in essentially the same way as columns:
-            if multiple parent tables or the new table definition contain identically-named
-              <codeph>constraints</codeph>, these constraints must all have the same check
-            expression, or an error will be reported. Constraints having the same name and
-            expression will be merged into one copy. A constraint marked <codeph>NO INHERIT</codeph>
-            in a parent will not be considered. Notice that an unnamed <codeph>CHECK</codeph>
-            constraint in the new table will never be merged, since a unique name will always be
-            chosen for it.</pd>
-          <pd>Column <codeph>STORAGE</codeph> settings are also copied from parent tables.</pd>
-        </plentry>
-        <plentry>
-          <pt>LIKE <varname>source_table</varname>
-            <varname>like_option</varname>
-            <codeph>...</codeph>]</pt>
-          <pd>The <codeph>LIKE</codeph> clause specifies a table from which the new table
-            automatically copies all column names, their data types, not-null constraints, and
-            distribution policy. Storage properties like append-optimized or partition structure are
-            not copied. Unlike <codeph>INHERITS</codeph>, the new table and original table are
-            completely decoupled after creation is complete.</pd>
-          <pd>Default expressions for the copied column definitions will only be copied if
-              <codeph>INCLUDING DEFAULTS</codeph> is specified. The default behavior is to exclude
-            default expressions, resulting in the copied columns in the new table having null
-            defaults. </pd>
-          <pd>Not-null constraints are always copied to the new table. <codeph>CHECK</codeph>
-            constraints will be copied only if <codeph>INCLUDING CONSTRAINTS</codeph> is specified.
-            No distinction is made between column constraints and table constraints. </pd>
-          <pd>Indexes, <codeph>PRIMARY KEY</codeph>, and <codeph>UNIQUE</codeph> constraints on the
-            original table will be created on the new table only if the <codeph>INCLUDING
-              INDEXES</codeph> clause is specified. Names for the new indexes and constraints are
-            chosen according to the default rules, regardless of how the originals were named. (This
-            behavior avoids possible duplicate-name failures for the new indexes.)</pd>
-          <pd>Any indexes on the original table will not be created on the new table, unless the
-              <codeph>INCLUDING INDEXES</codeph> clause is specified.</pd>
-          <pd><codeph>STORAGE</codeph> settings for the copied column definitions will be copied
-            only if <codeph>INCLUDING STORAGE</codeph> is specified. The default behavior is to
-            exclude <codeph>STORAGE</codeph> settings, resulting in the copied columns in the new
-            table having type-specific default settings. </pd>
-          <pd> Comments for the copied columns, constraints, and indexes will be copied only if
-              <codeph>INCLUDING COMMENTS</codeph> is specified. The default behavior is to exclude
-            comments, resulting in the copied columns and constraints in the new table having no
-            comments. </pd>
-          <pd>
-            <codeph>INCLUDING ALL</codeph> is an abbreviated form of
-            <codeph>INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES 
-     INCLUDING STORAGE INCLUDING COMMENTS</codeph>.
-          </pd>
-          <pd> Note that unlike <codeph>INHERITS</codeph>, columns and constraints copied by
-              <codeph>LIKE</codeph> are not merged with similarly named columns and constraints. If
-            the same name is specified explicitly or in another <codeph>LIKE</codeph> clause, an
-            error is signaled. </pd>
-          <pd>The <codeph>LIKE</codeph> clause can also be used to copy columns from views, foreign
-            tables, or composite types. Inapplicable options (e.g., <codeph>INCLUDING
-              INDEXES</codeph> from a view) are ignored. </pd>
-        </plentry>
-        <plentry>
-          <pt>CONSTRAINT <varname>constraint_name</varname></pt>
-          <pd>An optional name for a column or table constraint. If the constraint is violated, the
-            constraint name is present in error messages, so constraint names like <varname>column
-              must be positive</varname> can be used to communicate helpful constraint information
-            to client applications. (Double-quotes are needed to specify constraint names that
-            contain spaces.) If a constraint name is not specified, the system generates a
-              name.<note type="note">The specified <varname>constraint_name</varname> is used for
-              the constraint, but a system-generated unique name is used for the index name. In some
-              prior releases, the provided name was used for both the constraint name and the index
-              name. </note></pd>
-        </plentry>
-        <plentry>
-          <pt>NULL | NOT NULL </pt>
-          <pd>Specifies if the column is or is not allowed to contain null values.
-              <codeph>NULL</codeph> is the default.</pd>
-        </plentry>
-        <plentry>
-          <pt>CHECK (<varname>expression</varname>) [ NO INHERIT ]</pt>
-          <pd>The <codeph>CHECK</codeph> clause specifies an expression producing a Boolean result
-            which new or updated rows must satisfy for an insert or update operation to succeed.
-            Expressions evaluating to <codeph>TRUE</codeph> or <codeph>UNKNOWN</codeph> succeed.
-            Should any row of an insert or update operation produce a <codeph>FALSE</codeph> result
-            an error exception is raised and the insert or update does not alter the database. A
-            check constraint specified as a column constraint should reference that column's value
-            only, while an expression appearing in a table constraint can reference multiple
-            columns. </pd>
-          <pd>A constraint marked with <codeph>NO INHERIT</codeph> will not propagate to child
-            tables. </pd>
-          <pd> Currently, <codeph>CHECK</codeph> expressions cannot contain subqueries nor refer to
-            variables other than columns of the current row. </pd>
-        </plentry>
-        <plentry>
-          <pt>UNIQUE ( <varname>column_constraint</varname> )</pt>
-          <pt>UNIQUE ( <varname>column_name</varname> [, ... ] ) (
-              <varname>table_constraint</varname> )</pt>
-          <pd>The <codeph>UNIQUE</codeph> constraint specifies that a group of one or more columns
-            of a table may contain only unique values. The behavior of the unique table constraint
-            is the same as that for column constraints, with the additional capability to span
-            multiple columns. For the purpose of a unique constraint, null values are not considered
-            equal. The column(s) that are unique must contain all the columns of the Greenplum
-            distribution key. In addition, the <codeph>&lt;key&gt;</codeph> must contain all the
-            columns in the partition key if the table is partitioned. Note that a
-              <codeph>&lt;key&gt;</codeph> constraint in a partitioned table is not the same as a
-            simple <codeph>UNIQUE INDEX</codeph>.</pd>
-          <pd>For information about unique constraint management and limitations, see <xref
-              href="#topic1/section5" format="dita"/>.</pd>
-        </plentry>
-        <plentry>
-          <pt>PRIMARY KEY ( <varname>column constraint</varname> )</pt>
-          <pt>PRIMARY KEY ( <varname>column_name</varname> [, ... ] ) ( <varname>table
-              constraint</varname> )</pt>
-          <pd>The <codeph>PRIMARY KEY</codeph> constraint specifies that a column or columns of a
-            table may contain only unique (non-duplicate), non-null values. Only one primary key can
-            be specified for a table, whether as a column constraint or a table constraint. </pd>
-          <pd>For a table to have a primary key, it must be hash distributed (not randomly
-            distributed), and the primary key, the column(s) that are unique, must contain all the
-            columns of the Greenplum distribution key. In addition, the <codeph>&lt;key&gt;</codeph>
-            must contain all the columns in the partition key if the table is partitioned. Note that
-            a <codeph>&lt;key&gt;</codeph> constraint in a partitioned table is not the same as a
-            simple <codeph>UNIQUE INDEX</codeph>. </pd>
-          <pd><codeph>PRIMARY KEY</codeph> enforces the same data constraints as a combination of
-              <codeph>UNIQUE</codeph> and <codeph>NOT NULL</codeph>, but identifying a set of
-            columns as the primary key also provides metadata about the design of the schema, since
-            a primary key implies that other tables can rely on this set of columns as a unique
-            identifier for rows. </pd>
-          <pd>For information about primary key management and limitations, see <xref
-              href="#topic1/section5" format="dita"/>. </pd>
-        </plentry>
-        <plentry>
-          <pt>REFERENCES <varname>reftable</varname> [ ( <varname>refcolumn</varname> ) ] </pt>
-          <pt>     [ MATCH FULL | MATCH PARTIAL | MATCH SIMPLE ]</pt>
-          <pt>     [ON DELETE | ON UPDATE]  [<varname>key_action</varname>]</pt>
-          <pt>FOREIGN KEY (<varname>column_name</varname> [, ...])</pt>
-          <pd>The <codeph>REFERENCES</codeph> and <codeph>FOREIGN KEY</codeph> clauses specify
-            referential integrity constraints (foreign key constraints). Greenplum accepts
-            referential integrity constraints as specified in PostgreSQL syntax but does not enforce
-            them. See the PostgreSQL documentation for information about referential integrity
-            constraints.</pd>
-        </plentry>
-        <plentry>
-          <pt>DEFERRABLE</pt>
-          <pt>NOT DEFERRABLE</pt>
-          <pd>The <codeph>[NOT] DEFERRABLE</codeph> clause controls whether the constraint can be
-            deferred. A constraint that is not deferrable will be checked immediately after every
-            command. Checking of constraints that are deferrable can be postponed until the end of
-            the transaction (using the <xref href="SET_CONSTRAINTS.xml#topic1"><codeph>SET
-                CONSTRAINTS</codeph></xref> command). <codeph>NOT DEFERRABLE</codeph> is the
-            default. Currently, only <codeph>UNIQUE</codeph> and <codeph>PRIMARY KEY</codeph>
-            constraints are deferrable.  <codeph>NOT NULL</codeph> and <codeph>CHECK</codeph>
-            constraints are not deferrable. <codeph>REFERENCES</codeph> (foreign key) constraints
-            accept this clause but are not enforced. </pd>
-        </plentry>
-        <plentry><pt>INITIALLY IMMEDIATE</pt>
-        <pt>INITIALLY DEFERRED</pt>
-          <pd>If a constraint is deferrable, this clause specifies the default time to check the
-            constraint. If the constraint is <codeph>INITIALLY IMMEDIATE</codeph>, it is checked
-            after each statement. This is the default. If the constraint is <codeph>INITIALLY
-              DEFERRED</codeph>, it is checked only at the end of the transaction. The constraint
-            check time can be altered with the <codeph>SET CONSTRAINTS</codeph> command. </pd></plentry>
-        <plentry id="with_storage">
-          <pt>WITH ( <varname>storage_parameter=value</varname> ) </pt>
-          <pd>The <codeph>WITH</codeph> clause can specify storage parameters for tables, and for
-            indexes associated with a <codeph>UNIQUE</codeph> or <codeph>PRIMARY</codeph>
-            constraint. Note that you can also set storage parameters on a particular partition or
-            subpartition by declaring the <codeph>WITH</codeph> clause in the partition
-            specification. The lowest-level settings have priority.</pd>
-          <pd>The defaults for some of the table storage options can be specified with the server
-            configuration parameter <codeph>gp_default_storage_options</codeph>. For information
-            about setting default storage options, see <xref href="#topic1/section5" format="dita"
-            />. </pd>
-          <pd>The following storage options are available:</pd>
-          <pd><b>appendoptimized</b> — Set to <codeph>TRUE</codeph> to create the table as an
-            append-optimized table. If <codeph>FALSE</codeph> or not declared, the table will be
-            created as a regular heap-storage table.</pd>
-          <pd><b>blocksize</b> — Set to the size, in bytes, for each block in a table. The
-              <codeph>blocksize</codeph> must be between 8192 and 2097152 bytes, and be a multiple
-            of 8192. The default is 32768.</pd>
-          <pd><b>orientation</b> — Set to <codeph>column</codeph> for column-oriented storage, or
-              <codeph>row</codeph> (the default) for row-oriented storage. This option is only valid
-            if <codeph>appendoptimized=TRUE</codeph>. Heap-storage tables can only be row-oriented.</pd>
-          <pd><b>checksum</b> — This option is valid only for append-optimized tables
-              (<codeph>appendoptimized=TRUE</codeph>). The value <codeph>TRUE</codeph> is the default and
-            enables CRC checksum validation for append-optimized tables. The checksum is calculated
-            during block creation and is stored on disk. Checksum validation is performed during
-            block reads. If the checksum calculated during the read does not match the stored
-            checksum, the transaction is aborted. If you set the value to <codeph>FALSE</codeph> to
-            disable checksum validation, checking the table data for on-disk corruption will not be
-            performed.</pd>
-          <pd><b>compresstype</b> — Set to <codeph>ZLIB</codeph> (the default),
-              <codeph>ZSTD</codeph>, <codeph>RLE_TYPE</codeph>, or
-              <codeph>QUICKLZ</codeph><sup>1</sup> to specify the type of compression used. The
-            value <codeph>NONE</codeph> disables compression. Zstd provides for both speed or a good
-            compression ratio, tunable with the <codeph>compresslevel</codeph> option. QuickLZ and
-            zlib are provided for backwards-compatibility. Zstd outperforms these compression types
-            on usual workloads. The <codeph>compresstype</codeph> option is only valid if
-              <codeph>appendoptimized=TRUE</codeph>.<p>
-              <note type="note"><sup>1</sup>QuickLZ compression is available only in the commercial
-                release of Pivotal Greenplum Database.</note>
-            </p><p>The value <codeph>RLE_TYPE</codeph>, which is supported only if
-                <codeph>orientation</codeph>=<codeph>column</codeph> is specified, enables the
-              run-length encoding (RLE) compression algorithm. RLE compresses data better than the
-              Zstd, zlib, or QuickLZ compression algorithms when the same data value occurs in many
-              consecutive rows.</p><p>For columns of type <codeph>BIGINT</codeph>,
-                <codeph>INTEGER</codeph>, <codeph>DATE</codeph>, <codeph>TIME</codeph>, or
-                <codeph>TIMESTAMP</codeph>, delta compression is also applied if the
-                <codeph>compresstype</codeph> option is set to <codeph>RLE_TYPE</codeph>
-              compression. The delta compression algorithm is based on the delta between column
-              values in consecutive rows and is designed to improve compression when data is loaded
-              in sorted order or the compression is applied to column data that is in sorted
-              order.</p><p>For information about using table compression, see "Choosing the Table
-              Storage Model" in the <cite>Greenplum Database Administrator Guide</cite>.</p></pd>
-              <pd><b>compresslevel</b> — For Zstd compression of append-optimized tables, set to an
-            integer value from 1 (fastest compression) to 19 (highest compression ratio). For zlib
-            compression, the valid range is from 1 to 9. QuickLZ compression level can only be set
-            to 1. If not declared, the default is 1. For <codeph>RLE_TYPE</codeph>, the compression
-            level can be an integer value from 1 (fastest compression) to 4 (highest compression
-            ratio). </pd>
-          <pd>The <codeph>compresslevel</codeph> option is valid only if <codeph>appendoptimized=TRUE</codeph>.</pd>
-          <pd><b>fillfactor</b> — See <codeph><xref href="CREATE_INDEX.xml#topic1" type="topic"
-                format="dita"/></codeph> for more information about this index storage parameter. </pd>
-          <pd><b>oids</b> — Set to <codeph>oids=FALSE</codeph> (the default) so that rows do not
-            have object identifiers assigned to them. Greenplum strongly recommends that you do not
-            enable OIDS when creating a table. On large tables, such as those in a typical Greenplum
-            Database system, using OIDs for table rows can cause wrap-around of the 32-bit OID
-            counter. Once the counter wraps around, OIDs can no longer be assumed to be unique,
-            which not only makes them useless to user applications, but can also cause problems in
-            the Greenplum Database system catalog tables. In addition, excluding OIDs from a table
-            reduces the space required to store the table on disk by 4 bytes per row, slightly
-            improving performance. OIDS are not allowed on partitioned tables or append-optimized
-            column-oriented tables.</pd>
-        </plentry>
-        <plentry>
-          <pt>WITH OIDS</pt>
-          <pt>WITHOUT OIDS</pt>
-          <pd>These are obsolescent syntaxes equivalent to <codeph>WITH (OIDS)</codeph> and
-              <codeph>WITH (OIDS=FALSE)</codeph>, respectively. If you wish to give both an OIDS
-            setting and storage parameters, you must use the <codeph>WITH ( ... )</codeph> syntax;
-            see above. Greenplum strongly recommends that you do not enable OIDS when creating
-            tables. See the <b>oids</b> parameter description for more information about using
-            oids.</pd>
-        </plentry>
-        <plentry>
-          <pt>ON COMMIT</pt>
-          <pd>The behavior of temporary tables at the end of a transaction block can be controlled
-            using <codeph>ON COMMIT</codeph>. The three options are: </pd>
-          <pd><b>PRESERVE ROWS</b> - No special action is taken at the ends of transactions for
-            temporary tables. This is the default behavior. </pd>
-          <pd><b>DELETE ROWS</b> - All rows in the temporary table will be deleted at the end of
-            each transaction block. Essentially, an automatic <codeph>TRUNCATE</codeph> is done at
-            each commit. </pd>
-          <pd><b>DROP</b> - The temporary table will be dropped at the end of the current
-            transaction block. </pd>
-        </plentry>
-        <plentry>
-          <pt>TABLESPACE <varname>tablespace</varname></pt>
-          <pd>The name of the tablespace in which the new table is to be created. If not specified,
-            the database's default tablespace is used.</pd>
-        </plentry>
-        <plentry>
-          <pt>USING INDEX TABLESPACE <varname>tablespace</varname></pt>
-          <pd>This clause allows selection of the tablespace in which the index associated with a
-              <codeph>UNIQUE</codeph> or <codeph>PRIMARY KEY</codeph> constraint will be created. If
-            not specified, the database's default tablespace is used. </pd>
-        </plentry>
-        <plentry>
-          <pt>DISTRIBUTED BY (<varname>column</varname> [<varname>opclass</varname>], [ ... ] )</pt>
-          <pt>DISTRIBUTED RANDOMLY</pt>
-          <pt>DISTRIBUTED REPLICATED</pt>
-          <pd>Used to declare the Greenplum Database distribution policy for the table.
-              <codeph>DISTRIBUTED BY</codeph> uses hash distribution with one or more columns
-            declared as the distribution key. For the most even data distribution, the distribution
-            key should be the primary key of the table or a unique column (or set of columns). If
-            that is not possible, then you may choose <codeph>DISTRIBUTED RANDOMLY</codeph>, which
-            will send the data round-robin to the segment instances. Additionally, an operator
-            class, <codeph>opclass</codeph>, can be specified, to use a non-default hash function. </pd>
-          <pd>The Greenplum Database server configuration parameter
-              <codeph>gp_create_table_random_default_distribution</codeph> controls the default
-            table distribution policy if the <cmdname>DISTRIBUTED BY</cmdname> clause is not
-            specified when you create a table. Greenplum Database follows these rules to create a
-            table if a distribution policy is not specified. <p>If the value of the parameter is
-                <codeph>off</codeph> (the default), Greenplum Database chooses the table
-              distribution key based on the command:<ul id="ul_rjb_gty_qfb">
-                <li>If a <codeph>LIKE</codeph> or <codeph>INHERITS</codeph> clause is specified,
-                  then Greenplum copies the distribution key from the source or parent table.</li>
-                <li>If a <codeph>PRIMARY KEY</codeph> or <codeph>UNIQUE</codeph> constraints are
-                  specified, then Greenplum chooses the largest subset of all the key columns as the
-                  distribution key.</li>
-                <li>If neither constraints nor a <codeph>LIKE</codeph> or <codeph>INHERITS</codeph>
-                  clause is specified, then Greenplum chooses the first suitable column as the
-                  distribution key. (Columns with geometric or user-defined data types are not
-                  eligible as Greenplum distribution key columns.)</li>
-              </ul></p><p>If the value of the parameter is set to <codeph>on</codeph>, Greenplum
-              Database follows these rules:<ul id="ul_tbr_5kq_kq">
-                <li>If <cmdname>PRIMARY KEY</cmdname> or <cmdname>UNIQUE</cmdname> columns are not
-                  specified, the distribution of the table is random (<cmdname>DISTRIBUTED
-                    RANDOMLY</cmdname>). Table distribution is random even if the table creation
-                  command contains the <cmdname>LIKE</cmdname> or <cmdname>INHERITS</cmdname>
-                  clause. </li>
-                <li>If <cmdname>PRIMARY KEY</cmdname> or <cmdname>UNIQUE</cmdname> columns are
-                  specified, a <cmdname>DISTRIBUTED BY</cmdname> clause must also be specified. If a
-                    <cmdname>DISTRIBUTED BY</cmdname> clause is not specified as part of the table
-                  creation command, the command fails.</li>
-              </ul></p></pd>
-          <pd>For more information about setting the default table distribution policy, see <xref
-              href="../config_params/guc-list.xml#gp_create_table_random_default_distribution"
-              type="section" format="dita"
-                ><codeph>gp_create_table_random_default_distribution</codeph></xref>. </pd>
-          <pd>The <codeph>DISTRIBUTED REPLICATED</codeph> clause replicates the entire table to all
-            Greenplum Database segment instances. It can be used when it is necessary to execute
-            user-defined functions on segments when the functions require access to all rows in the
-            table, or to improve query performance by preventing broadcast motions. </pd>
-        </plentry>
-        <plentry id="part_by">
-          <pt>PARTITION BY</pt>
-          <pd>Declares one or more columns by which to partition the table.</pd>
-          <pd>When creating a partitioned table, Greenplum Database creates the root partitioned
-            table (the root partition) with the specified table name. Greenplum Database also
-            creates a hierarchy of tables, child tables, that are the subpartitions based on the
-            partitioning options that you specify. The Greenplum Database <i>pg_partition</i>*
-            system views contain information about the subpartition tables.</pd>
-          <pd>For each partition level (each hierarchy level of tables), a partitioned table can
-            have a maximum of 32,767 partitions. </pd>
-          <pd>
-            <note> Greenplum Database stores partitioned table data in the leaf child tables, the
-              lowest-level tables in the hierarchy of child tables for use by the partitioned
-              table.</note>
-          </pd>
-          <pd>
+   compresstype={ZLIB|ZSTD|QUICKLZ|RLE_TYPE|NONE}
+   compresslevel={1-19}
+   fillfactor={10-100}
+   oids[=TRUE|FALSE]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CREATE TABLE</codeph>在当前数据库中创建一个最初为空的表。
+                执行命令的用户拥有该表。
+            </p>
+            <p>为了能够创建表，您必须分别对所有列类型或<codeph>OF</codeph>子句中的类型具有<codeph>USAGE</codeph>特权。
+            </p>
+            <p>如果指定模式名称，Greenplum将在指定的模式中创建表。
+                否则，Greenplum将在当前模式中创建表。
+                临时表存在于特殊的模式中，因此在创建临时表时不能指定模式名称。
+                表名称必须与同一模式中的任何其他表，外部表，序列，索引，视图或外部表的名称不同。
+            </p>
+            <p><codeph>CREATE TABLE</codeph>还会自动创建一个数据类型，该数据类型表示与表的一行相对应的复合类型。
+                因此，表不能与同一模式中的任何现有数据类型具有相同的名称。
+            </p>
+            <p>可选的约束子句指定新行或更新行必须满足的条件才能成功执行插入或更新操作。
+                约束是一个SQL对象，可以通过多种方式帮助定义表中的有效值集。
+                约束适用于表，而不适用于分区。
+                您不能将约束添加到分区或子分区。
+            </p>
+            <p>引用完整性约束（外键）被接受但不强制执行。
+                该信息保留在系统catalog中，否则将被忽略。
+            </p>
+            <p>有两种定义约束的方法：表约束和列约束。
+                列约束被定义为列定义的一部分。
+                表约束定义不与特定列绑定，并且可以包含多个列。
+                每个列约束也可以写为表约束。
+                当约束仅影响一列时，使用列约束只是一种符号上的方便。
+            </p>
+            <p>创建表时，还有一个附加子句来声明Greenplum数据库分发策略。
+                如果未提供<codeph>DISTRIBUTED BY</codeph>，<codeph>DISTRIBUTED RANDOMLY</codeph>或<codeph>DISTRIBUTED REPLICATED</codeph>子句，
+                则Greenplum数据库将通过使用<codeph>PRIMARY KEY</codeph>（如果表具有一个）或表的第一列作为分发键，向该表分配哈希分发策略。
+                几何或用户定义数据类型的列不符合Greenplum分布键列的要求。
+                如果表中没有符合条件的数据类型的列，则将根据轮询或随机分布来分配行。
+                为了确保数据在Greenplum数据库系统中的均匀分配，
+                您希望选择一个对于每个记录都是唯一的分配键，或者如果不可能，则选择<codeph>DISTRIBUTED RANDOMLY</codeph>。
+            </p>
+            <p>如果提供了<codeph>DISTRIBUTED REPLICATED</codeph>子句，则Greenplum数据库会将表的所有行分配给Greenplum数据库系统中的所有segment。
+                如果用户定义的函数必须在segment上执行，并且这些函数需要访问表的所有行，则可以使用此选项。
+                复制函数还可以用于防止表的broadcast motions，从而提高查询性能。
+                <codeph>DISTRIBUTED REPLICATED</codeph>子句不能与<codeph>PARTITION BY</codeph>子句或<codeph>INHERITS</codeph>子句一起使用。
+                复制的表也不能被另一个表继承。
+                隐藏的系统列（<codeph>ctid</codeph>，<codeph>cmin</codeph>，<codeph>cmax</codeph>，<codeph>xmin</codeph>，
+                <codeph>xmax</codeph>和<codeph>gp_segment_id</codeph>）无法在复制表的用户查询中引用，因为它们没有单一的，无歧义的值。
+            </p>
+            <p>通过<codeph>PARTITION BY</codeph>子句，您可以将表分为多个子表（或部分），这些子表一起构成父表并共享其模式。
+                尽管子表作为独立表存在，但是Greenplum数据库以重要方式限制了它们的使用。
+                在内部，分区被实现为继承的一种特殊形式。
+                每个子表分区都是根据不同的<codeph>CHECK</codeph>约束创建的，该约束根据一些定义条件限制表可以包含的数据。
+                查询优化器还使用<codeph>CHECK</codeph>约束来确定要扫描哪些表分区以满足给定的查询谓词。
+                这些分区约束由Greenplum数据库自动管理。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
             <parml>
-              <plentry>
-                <pt>
-                  <varname>partition_type</varname>
-                </pt>
-                <pd>Declares partition type: <codeph>LIST</codeph> (list of values) or
-                    <codeph>RANGE</codeph> (a numeric or date range). </pd>
-              </plentry>
-              <plentry>
-                <pt>
-                  <varname>partition_specification</varname>
-                </pt>
-                <pd>Declares the individual partitions to create. Each partition can be defined
-                  individually or, for range partitions, you can use the <codeph>EVERY</codeph>
-                  clause (with a <codeph>START</codeph> and optional <codeph>END</codeph> clause) to
-                  define an increment pattern to use to create the individual partitions.</pd>
-                <pd><b><codeph>DEFAULT PARTITION <varname>name</varname></codeph></b> — Declares a
-                  default partition. When data does not match to an existing partition, it is
-                  inserted into the default partition. Partition designs that do not have a default
-                  partition will reject incoming rows that do not match to an existing
-                  partition.</pd>
-                <pd><b><codeph>PARTITION <varname>name</varname></codeph></b> — Declares a name to
-                  use for the partition. Partitions are created using the following naming
-                  convention:
-                      <codeph><varname>parentname</varname>_<varname>level#</varname>_prt_<varname>givenname</varname></codeph>.</pd>
-                <pd><b><codeph>VALUES</codeph></b> — For list partitions, defines the value(s) that
-                  the partition will contain.</pd>
-                <pd><b><codeph>START</codeph></b> — For range partitions, defines the starting range
-                  value for the partition. By default, start values are <codeph>INCLUSIVE</codeph>.
-                  For example, if you declared a start date of '<codeph>2016-01-01</codeph>', then
-                  the partition would contain all dates greater than or equal to
-                    '<codeph>2016-01-01</codeph>'. Typically the data type of the
-                    <codeph>START</codeph> expression is the same type as the partition key column.
-                  If that is not the case, then you must explicitly cast to the intended data type. </pd>
-                <pd><b><codeph>END</codeph></b> — For range partitions, defines the ending range
-                  value for the partition. By default, end values are <codeph>EXCLUSIVE</codeph>.
-                  For example, if you declared an end date of '<codeph>2016-02-01</codeph>', then
-                  the partition would contain all dates less than but not equal to
-                    '<codeph>2016-02-01</codeph>'. Typically the data type of the
-                    <codeph>END</codeph> expression is the same type as the partition key column. If
-                  that is not the case, then you must explicitly cast to the intended data
-                  type.</pd>
-                <pd><b><codeph>EVERY</codeph></b> — For range partitions, defines how to increment
-                  the values from <codeph>START</codeph> to <codeph>END</codeph> to create
-                  individual partitions. Typically the data type of the <codeph>EVERY</codeph>
-                  expression is the same type as the partition key column. If that is not the case,
-                  then you must explicitly cast to the intended data type.</pd>
-                <pd><b><codeph>WITH</codeph>
-                  </b>— Sets the table storage options for a partition. For example, you may want
-                  older partitions to be append-optimized tables and newer partitions to be regular
-                  heap tables. </pd>
-                <pd><b><codeph>TABLESPACE</codeph></b> — The name of the tablespace in which the
-                  partition is to be created. </pd>
-              </plentry>
+                <plentry>
+                    <pt>GLOBAL | LOCAL</pt>
+                    <pd>提供这些关键字是为了实现SQL标准兼容性，但在Greenplum数据库中无效，并且已弃用。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>TEMPORARY | TEMP</pt>
+                    <pd>如果指定，该表将被创建为临时表。
+                        临时表在会话结束时或在当前事务结束时自动删除（请参见<codeph>ON COMMIT</codeph>）。
+                        临时表存在时，具有相同名称的现有永久表在当前会话中不可见，除非使用模式限定名称引用它们。
+                        在临时表上创建的所有索引也会自动成为临时索引。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>UNLOGGED</pt>
+                    <pd>如果指定，该表将创建为未记录表。
+                        写入未记录表的数据不会写入预写（WAL）日志，这使它们比普通表快得多。
+                        但是，未记录表的内容不会复制到mirror实例。
+                        同样，未记录的表也不是崩溃安全的。
+                        segment实例崩溃或异常关闭后，该segment上未记录表的数据将被截断。
+                        在未记录表上创建的所有索引也会自动成为未记录索引。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>table_name</varname>
+                    </pt>
+                    <pd>要创建的新表的名称（可以由模式指定）。</pd>
+                </plentry>
+                <plentry>
+                    <pt>OF <varname>type_name</varname>
+                    </pt>
+                    <pd>创建一个类型化的表，该表从指定的组合类型（名称可以由模式指定）获取其结构。
+                        类型化的表与其类型相关联。
+                        例如，如果删除了类型（使用<codeph>DROP TYPE ... CASCADE</codeph>），则将删除该表。
+                    </pd>
+                    <pd>当一个类型化的表被创建时，列的数据类型由底层的组合类型决定而没有在<codeph>CREATE TABLE</codeph>命令中直接指定。
+                        但是<codeph>CREATE TABLE</codeph>命令可以对表增加默认值和约束，并且可以指定存储参数。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>column_name</varname>
+                    </pt>
+                    <pd>要在新表中创建的列的名称。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>data_type</varname>
+                    </pt>
+                    <pd>列的数据类型。这可能包括数组说明符。</pd>
+                    <pd>对于包含文本数据的表列，请指定数据类型<codeph>VARCHAR</codeph>或<codeph>TEXT</codeph>。
+                        不建议指定数据类型<codeph>CHAR</codeph>。
+                        在Greenplum数据库中，数据类型<codeph>VARCHAR</codeph>或<codeph>TEXT</codeph>处理作为有效字符添加到数据
+                        （在最后一个非空格字符之后添加的空格字符）的填充，而数据类型<codeph>CHAR</codeph>不处理。
+                        请参阅<xref href="#topic1/section5" format="dita"/>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>COLLATE
+                        <varname>collation</varname>
+                    </pt>
+                    <pd><codeph>COLLATE</codeph>子句为该列分配排序规则（该排序规则必须是可排序的数据类型）。
+                        如果未指定，则使用列数据类型的默认排序规则。
+                        <note>仅当查询中的所有列使用相同的排序规则时，GPORCA才支持排序规则。
+                        如果查询中的列使用不同的排序规则，则Greenplum使用Postgres查询优化器。</note>
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>DEFAULT
+                        <varname>default_expr</varname>
+                    </pt>
+                    <pd><codeph>DEFAULT</codeph>子句为出现在其列定义中的列分配默认数据值。
+                        该值是任何不带变量的表达式（不允许对当前表中的其他列进行子查询和交叉引用）。
+                        默认表达式的数据类型必须与列的数据类型匹配。
+                        默认表达式将在未为列指定值的任何插入操作中使用。
+                        如果列没有默认值，则默认值为null。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>ENCODING ( <varname>storage_directive</varname> [, ...] )
+                    </pt>
+                    <pd>对于列，可选的<codeph>ENCODING</codeph>子句指定列数据的压缩类型和块大小。
+                        有关<codeph>compresstype</codeph>，<codeph>compresslevel</codeph>和<codeph>blocksize</codeph>值，请参见<xref href="#topic1/with_storage" format="dita">storage_options</xref>。
+                    </pd>
+                    <pd>该子句仅对追加优化的，面向列的表有效。</pd>
+                    <pd>列压缩设置从表级别继承到分区级别再到子分区级别。
+                        最低级别的设置具有优先权。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>INHERITS ( parent_table [, …])</pt>
+                    <pd>可选的<codeph>INHERITS</codeph>子句指定一个表列表，新表将从中自动继承所有列。
+                        使用<codeph>INHERITS</codeph>将在新的子表及其父表之间创建持久关系。
+                        对父级的模式修改通常也会传播到子级，默认情况下，子级表的数据包含在父级扫描中。
+                    </pd>
+                    <pd>在Greenplum数据库中，创建分区表时不使用<codeph>INHERITS</codeph>子句。
+                        尽管在分区层次结构中使用了继承的概念，但是使用<codeph><xref href="#topic1/part_by" format="dita">PARTITION BY</xref></codeph>子句创建了分区表的继承结构。
+                    </pd>
+                    <pd>如果一个以上的父表中存在相同的列名，则将报告错误，除非每个父表中的列的数据类型都匹配。
+                        如果没有冲突，则将重复的列合并以在新表中形成一个列。
+                        如果新表的列名列表包含一个也被继承的列名，则数据类型必须同样与继承的列匹配，并且列定义将合并为一个。
+                        如果新表显式指定了该列的默认值，则该默认值将覆盖该列的继承声明中的所有默认值。
+                        否则，为该列指定默认值的所有父项都必须指定相同的默认值，否则将报告错误。
+                    </pd>
+                    <pd><codeph>CHECK</codeph>约束基本上以与列相同的方式合并：
+                        如果多个父表或新表定义包含名称相同的约束，则这些约束必须全部具有相同的校验表达式，否则将报告错误。
+                        具有相同名称和表达式的约束将合并为一个副本。
+                        不会考虑在父级中标记为<codeph>NO INHERIT</codeph>的约束。
+                        请注意，新表中未命名的<codeph>CHECK</codeph>约束将永远不会被合并，因为将始终为其选择唯一的名称。
+                    </pd>
+                    <pd>列<codeph>STORAGE</codeph>设置也会从父表中复制。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>LIKE
+                        <varname>source_table</varname>
+                        <varname>like_option</varname>
+                        <codeph>...</codeph>]
+                    </pt>
+                    <pd><codeph>LIKE</codeph>子句指定一个表，新表将从该表中自动复制所有列名，其数据类型，非空约束和分发策略。
+                        不会复制诸如追加优化或分区结构之类的存储属性。
+                        与<codeph>INHERITS</codeph>不同，新表和原始表在创建完成后完全解耦。
+                    </pd>
+                    <pd>仅当指定<codeph>INCLUDING DEFAULTS</codeph>时，才会复制复制的列定义的默认表达式。
+                        默认行为是排除默认表达式，导致新表中复制的列具有空默认值。
+                    </pd>
+                    <pd>非空约束始终会复制到新表中。
+                        仅当指定<codeph>INCLUDING CONSTRAINTS</codeph>时，才会复制<codeph>CHECK</codeph>约束。
+                        列约束和表约束之间没有区别。
+                    </pd>
+                    <pd>仅在指定<codeph>INCLUDING INDEXES</codeph>子句的情况下，才会在新表上创建原始表的索引，
+                        <codeph>PRIMARY KEY</codeph>和<codeph>UNIQUE</codeph>约束。
+                        不论原始名称如何命名，都会根据默认规则选择新索引和约束的名称。
+                        （此行为避免了新索引可能出现的重复名称错误。）
+                    </pd>
+                    <pd>除非指定了<codeph>INCLUDING INDEXES</codeph>子句，否则不会在新表上创建原始表上的任何索引。
+                    </pd>
+                    <pd>仅当指定了<codeph>INCLUDING STORAGE</codeph>时，才会复制复制的列定义的<codeph>STORAGE</codeph>设置。
+                        默认行为是排除<codeph>STORAGE</codeph>设置，导致新表中复制的列具有特定于类型的默认设置。
+                    </pd>
+                    <pd>仅当指定<codeph>INCLUDING COMMENTS</codeph>时，才会复制复制的列，约束和索引的注释。
+                        默认行为是排除注释，导致新表中复制的列和约束没有注释。
+                    </pd>
+                    <pd>
+                        <codeph>INCLUDING ALL</codeph>
+                        是
+                        <codeph>INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES
+                            INCLUDING STORAGE INCLUDING COMMENTS</codeph>的缩写形式.
+                    </pd>
+                    <pd>请注意，与<codeph>INHERITS</codeph>不同，<codeph>LIKE</codeph>复制的列和约束不会与名称相似的列和约束合并。
+                        如果显式指定了相同的名称，或者在另一个<codeph>LIKE</codeph>子句中指定了相同的名称，则将指示错误。
+                    </pd>
+                    <pd><codeph>LIKE</codeph>子句还可用于从视图，外部表或复合类型中复制列。
+                        不适用的选项（例如，从视图<codeph>INCLUDING INDEXES</codeph>）将被忽略。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>CONSTRAINT
+                        <varname>constraint_name</varname>
+                    </pt>
+                    <pd>列或表约束的可选名称。
+                        如果违反了约束，那么约束名称将出现在错误消息中，因此可以使用约束名称（例如列必须为正）来将有用的约束信息传达给客户端应用程序。
+                        （需要双引号指定包含空格的约束名称。）如果未指定约束名称，则系统将生成一个名称。
+                        <note type="note">指定的<varname>constraint_name</varname>用于约束，但系统生成的唯一名称用于索引名。
+                            在某些以前的版本中，提供的名称同时用于约束名称和索引名称。
+                        </note>
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>NULL | NOT NULL</pt>
+                    <pd>指定是否允许该列包含空值。默认值为<codeph>NULL</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>CHECK (<varname>expression</varname>) [ NO INHERIT ]
+                    </pt>
+                    <pd><codeph>CHECK</codeph>子句指定一个生成布尔结果的表达式，新的或更新的行必须满足才能使插入或更新操作成功。
+                        计算为<codeph>TRUE</codeph>或<codeph>UNKNOWN</codeph>的表达式会成功。
+                        如果插入或更新操作的任何行都产生<codeph>FALSE</codeph>结果，则会引发错误异常，并且插入或更新不会更改数据库。
+                        指定为列约束的检查约束应仅引用该列的值，而出现在表约束中的表达式可以引用多个列。
+                    </pd>
+                    <pd>标有<codeph>NO INHERIT</codeph>的约束不会传播到子表。
+                    </pd>
+                    <pd>当前，<codeph>CHECK</codeph>表达式不能包含子查询，也不能引用当前行的列以外的变量。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>UNIQUE ( <varname>column_constraint</varname> )
+                    </pt>
+                    <pt>UNIQUE ( <varname>column_name</varname> [, ... ] ) (
+                        <varname>table_constraint</varname>
+                        )
+                    </pt>
+                    <pd><codeph>UNIQUE</codeph>约束指定表的一组一个或多个列只能包含唯一值。
+                        唯一表约束的行为与列约束的行为相同，但具有跨多个列的附加功能。
+                        出于唯一约束的目的，空值不视为相等。
+                        唯一的列必须包含Greenplum分布键的所有列。
+                        此外，如果表已分区，则<codeph>&lt;key&gt;</codeph>必须包含分区键中的所有列。
+                        请注意，分区表中的<codeph>&lt;key&gt;</codeph>约束与简单的<codeph>UNIQUE INDEX</codeph>不同。
+                    </pd>
+                    <pd>有关唯一约束管理和限制的信息，请参见<xref href="#topic1/section5" format="dita"/>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>PRIMARY KEY ( <varname>column constraint</varname> )
+                    </pt>
+                    <pt>PRIMARY KEY ( <varname>column_name</varname> [, ... ] ) ( <varname>table
+                        constraint
+                    </varname> )
+                    </pt>
+                    <pd><codeph>PRIMARY KEY</codeph>约束指定表的一列或多列只能包含唯一（非重复），非null值。
+                        只能为一个表指定一个主键，无论是作为列约束还是表约束。
+                    </pd>
+                    <pd>要使一个表具有主键，它必须是哈希分布的（不是随机分布的），并且主键（唯一的列）必须包含Greenplum分布键的所有列。
+                        此外，如果表已分区，则<codeph>&lt;key&gt;</codeph>必须包含分区键中的所有列。
+                        请注意，分区表中的<codeph>&lt;key&gt;</codeph>约束与简单的<codeph>UNIQUE INDEX</codeph>不同。
+                    </pd>
+                    <pd><codeph>PRIMARY KEY</codeph>强制执行与<codeph>UNIQUE</codeph>和<codeph>NOT NULL</codeph>相同的组合数据约束，
+                        但是将一组列标识为主键也可以提供有关模式设计的元数据，因为主键标识其他表可以依赖这一个列集合作为行的唯一标识符。
+                    </pd>
+                    <pd>有关主键管理和限制的信息，请参阅<xref href="#topic1/section5" format="dita"/>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>REFERENCES <varname>reftable</varname> [ ( <varname>refcolumn</varname> ) ]
+                    </pt>
+                    <pt>[ MATCH FULL | MATCH PARTIAL | MATCH SIMPLE ]</pt>
+                    <pt>[ON DELETE | ON UPDATE] [<varname>key_action</varname>]
+                    </pt>
+                    <pt>FOREIGN KEY (<varname>column_name</varname> [, ...])
+                    </pt>
+                    <pd><codeph>REFERENCES</codeph>和<codeph>FOREIGN KEY</codeph>子句指定引用完整性约束（外键约束）。
+                        Greenplum接受PostgreSQL语法中指定的参照完整性约束，但不强制执行。
+                        有关引用完整性约束的信息，请参见PostgreSQL文档。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>DEFERRABLE</pt>
+                    <pt>NOT DEFERRABLE</pt>
+                    <pd><codeph>[NOT] DEFERRABLE</codeph>子句控制约束是否可以被推迟。
+                        一个不可推迟的约束将在每个命令后立即进行检查。
+                        可以推迟检查约束，直到事务结束（使用<xref href="SET_CONSTRAINTS.xml#topic1"><codeph>SET CONSTRAINTS</codeph></xref>命令）。
+                        默认值是<codeph>NOT DEFERRABLE</codeph>。
+                        当前，只有<codeph>UNIQUE</codeph>和<codeph>PRIMARY KEY</codeph>约束是可推迟的。
+                        <codeph>NOT NULL</codeph>和<codeph>CHECK</codeph>约束不可延迟。
+                        <codeph>REFERENCES</codeph>（外键）约束接受此子句，但不强制执行。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>INITIALLY IMMEDIATE</pt>
+                    <pt>INITIALLY DEFERRED</pt>
+                    <pd>如果约束是可延迟的，则此子句指定检查约束的默认时间。
+                        如果该约束是<codeph>INITIALLY IMMEDIATE</codeph>，则在每个语句之后对其进行检查。
+                        这是默认值。
+                        如果约束是<codeph>INITIALLY DEFERRED</codeph>，则仅在事务结束时进行检查。
+                        可以使用<codeph>SET CONSTRAINTS</codeph>命令更改约束检查时间。
+                    </pd>
+                </plentry>
+                <plentry id="with_storage">
+                    <pt>WITH ( <varname>storage_parameter=value</varname> )
+                    </pt>
+                    <pd><codeph>WITH</codeph>子句可以为表以及与<codeph>UNIQUE</codeph>或<codeph>PRIMARY</codeph>约束关联的索引指定存储参数。
+                        请注意，您还可以通过在分区规范中声明<codeph>WITH</codeph>子句来在特定分区或子分区上设置存储参数。
+                        最低级别的设置具有优先权。
+                    </pd>
+                    <pd>某些表存储选项的默认值可以使用服务器配置参数<codeph>gp_default_storage_options</codeph>指定。
+                        有关设置默认存储选项的信息，请参阅<xref href="#topic1/section5" format="dita"/>。
+                    </pd>
+                    <pd>可以使用以下存储选项：</pd>
+                    <pd>
+                        <b>appendoptimized</b>
+                        — 设置为<codeph>TRUE</codeph>可将表创建为追加优化的表。
+                        如果为<codeph>FALSE</codeph>或未声明，则将表创建为常规堆存储表。
+                    </pd>
+                    <pd>
+                        <b>blocksize</b>
+                        — 设置为表中每个块的大小（以字节为单位）。
+                        <codeph>blocksize</codeph>必须介于8192和2097152字节之间，并且是8192的倍数。默认值为32768。
+                    </pd>
+                    <pd>
+                        <b>orientation</b>
+                        — 设置为<codeph>column</codeph>以用于列式存储，或设置为<codeph>row</codeph>（默认）以用于行式存储。
+                        仅当<codeph>appendoptimized=TRUE</codeph>时，此选项才有效。堆存储表只能是面向行的。
+                    </pd>
+                    <pd>
+                        <b>checksum</b>
+                        — 此选项仅对追加优化的表（<codeph>appendoptimized=TRUE</codeph>）有效。
+                        值<codeph>TRUE</codeph>是默认值，并为追加优化表启用CRC校验和验证。
+                        校验和是在块创建期间计算的，并存储在磁盘上。
+                        在块读取期间执行校验和验证。
+                        如果在读取期间计算出的校验和与存储的校验和不匹配，则事务中止。
+                        如果将值设置为<codeph>FALSE</codeph>以禁用校验和验证，将不会执行检查表数据是否存在磁盘损坏的操作。
+                    </pd>
+                    <pd>
+                        <b>compresstype</b>
+                        — 设置为<codeph>ZLIB</codeph>（默认值），<codeph>ZSTD</codeph>，<codeph>RLE_TYPE</codeph>或<codeph>QUICKLZ</codeph><sup>1</sup>以指定使用的压缩类型。
+                        值<codeph>NONE</codeph>禁用压缩。
+                        Zstd提供速度或良好的压缩率，可通过<codeph>compresslevel</codeph>选项进行调整。
+                        提供QuickLZ和zlib是为了向后兼容。
+                        在通常的工作负载上，Zstd的性能优于这些压缩类型。
+                        仅当<codeph>appendoptimized=TRUE</codeph>时，<codeph>compresstype</codeph>选项才有效。
+                        <p>
+                            <note type="note">注意：<sup>1</sup>QuickLZ压缩仅在商业版本的Pivotal Greenplum数据库中可用。
+                            </note>
+                        </p>
+                        <p>仅当指定了<codeph>orientation</codeph>=<codeph>column</codeph>时才支持值<codeph>RLE_TYPE</codeph>，它启用游程编码（RLE）压缩算法。
+                            当相同的数据值出现在许多连续的行中时，RLE的压缩数据比Zstd，zlib或QuickLZ压缩算法更好。
+                        </p>
+                        <p>对于<codeph>BIGINT</codeph>，<codeph>INTEGER</codeph>，<codeph>DATE</codeph>，
+                            <codeph>TIME</codeph>或<codeph>TIMESTAMP</codeph>类型的列，如果将<codeph>compresstype</codeph>选项设置为<codeph>RLE_TYPE</codeph>压缩，则还将应用增量压缩。
+                            增量压缩算法基于连续行中列值之间的增量，旨在改善按排序顺序加载数据或将压缩应用于按排序顺序的列数据时的压缩。
+                        </p>
+                        <p>有关使用表压缩的信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的“选择表存储模型”。
+                        </p>
+                    </pd>
+                    <pd>
+                        <b>compresslevel</b>
+                        — 对于追加优化表的Zstd压缩，请将其设置为1（最快压缩）到19（最高压缩率）之间的整数值。
+                        对于zlib压缩，有效范围是1到9。QuickLZ压缩级别只能设置为1。
+                        如果未声明，则默认值为1。
+                        对于<codeph>RLE_TYPE</codeph>，压缩级别可以是1（最快压缩）到4（最高压缩率）之间的整数值。
+                    </pd>
+                    <pd>仅当<codeph>appendoptimized=TRUE</codeph>时，<codeph>compresslevel</codeph>选项才有效。
+                    </pd>
+                    <pd>
+                        <b>fillfactor</b>
+                        — 有关此索引存储参数的更多信息，请参见<codeph><xref href="CREATE_INDEX.xml#topic1" type="topic" format="dita"/></codeph>。
+                    </pd>
+                    <pd>
+                        <b>oids</b>
+                        — 设置为<codeph>oids=FALSE</codeph>（默认值），以便不为行分配对象标识符。
+                        Greenplum强烈建议您在创建表时不要启用OIDS。
+                        在大型表上（例如典型的Greenplum数据库系统中的表），对表行使用OID可能会导致32位OID计数器的折回。
+                        一旦计数器回绕，就不能再认为OID是唯一的，这不仅使它们对用户应用程序无用，
+                        而且还会在Greenplum数据库系统catalog表中引起问题。
+                        此外，从表中排除OID会使表每行存储在磁盘上所需的空间减少了每行4个字节，从而略微提高了性能。
+                        分区表或追加优化的面向列的表上不允许使用OIDS。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>WITH OIDS</pt>
+                    <pt>WITHOUT OIDS</pt>
+                    <pd>它们是分别等同于<codeph>WITH (OIDS)</codeph>和<codeph>WITH (OIDS=FALSE)</codeph>的过时语法。
+                        如果希望同时提供OIDS设置和存储参数，则必须使用<codeph>WITH ( ... )</codeph>语法；往上看。
+                        Greenplum强烈建议您在创建表时不要启用OIDS。
+                        有关使用<b>oids</b>的更多信息，请参见<b>oids</b>参数说明。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>ON COMMIT</pt>
+                    <pd>可以使用<codeph>ON COMMIT</codeph>控制事务块末尾的临时表的行为。
+                        这三个选项是：</pd>
+                    <pd>
+                        <b>PRESERVE ROWS</b>
+                        - 临时表的事务结束时不会采取任何特殊操作。这是默认行为。
+                    </pd>
+                    <pd>
+                        <b>DELETE ROWS</b>
+                        - 临时表中的所有行将在每个事务块的末尾删除。
+                        本质上，每次提交都会自动执行一次<codeph>TRUNCATE</codeph>。
+                    </pd>
+                    <pd>
+                        <b>DROP</b>
+                        - 临时表将在当前事务块的末尾删除。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>TABLESPACE
+                        <varname>tablespace</varname>
+                    </pt>
+                    <pd>要在其中创建新表的表空间的名称。如果未指定，则使用数据库的默认表空间。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>USING INDEX TABLESPACE
+                        <varname>tablespace</varname>
+                    </pt>
+                    <pd>该子句允许选择将在其中创建与<codeph>UNIQUE</codeph>或<codeph>PRIMARY KEY</codeph>约束关联的索引的表空间。
+                        如果未指定，则使用数据库的默认表空间。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>DISTRIBUTED BY (<varname>column</varname> [<varname>opclass</varname>], [ ... ] )
+                    </pt>
+                    <pt>DISTRIBUTED RANDOMLY</pt>
+                    <pt>DISTRIBUTED REPLICATED</pt>
+                    <pd>用于声明表的Greenplum数据库分布策略。
+                        <codeph>DISTRIBUTED BY</codeph>使用具有一个或多个声明为分布键的列的哈希分布。
+                        为了获得最均匀的数据分配，分布键应为表的主键或唯一列（或一组列）。
+                        如果无法做到这一点，则可以选择<codeph>DISTRIBUTED RANDOMLY</codeph>，它将数据轮询发送到segment实例。
+                        此外，可以指定运算符类<codeph>opclass</codeph>，以使用非默认哈希函数。
+                    </pd>
+                    <pd>如果在创建表时未指定<cmdname>DISTRIBUTED BY</cmdname>子句，
+                        则Greenplum数据库服务器配置参数<codeph>gp_create_table_random_default_distribution</codeph>将控制表默认分布策略。
+                        如果未指定分布策略，Greenplum数据库将遵循以下规则来创建表。
+                        <p>如果参数的值是<codeph>off</codeph>（默认值），则Greenplum数据库根据以下命令选择表分布键：
+                            <ul id="ul_rjb_gty_qfb">
+                                <li>如果指定了<codeph>LIKE</codeph>或<codeph>INHERITS</codeph>子句，则Greenplum从源表或父表复制分布键。
+                                </li>
+                                <li>如果指定了<codeph>PRIMARY KEY</codeph>或<codeph>UNIQUE</codeph>约束，则Greenplum选择所有键列中最大的子集作为分布键。
+                                </li>
+                                <li>如果既未指定约束，也未指定<codeph>LIKE</codeph>或<codeph>INHERITS</codeph>子句，则Greenplum选择第一个合适的列作为分布键。
+                                    （具有几何或用户定义数据类型的列不符合作为Greenplum分布键列的条件。）
+                                </li>
+                            </ul>
+                        </p>
+                        <p>如果参数的值设置为<codeph>on</codeph>，则Greenplum数据库遵循以下规则：
+                            <ul id="ul_tbr_5kq_kq">
+                                <li>如果未指定<cmdname>PRIMARY KEY</cmdname>或<cmdname>UNIQUE</cmdname>列，
+                                    则表的分布是随机的（<cmdname>DISTRIBUTED RANDOMLY</cmdname>）。
+                                    即使表创建命令包含<cmdname>LIKE</cmdname>或<cmdname>INHERITS</cmdname>子句，表分布也是随机的。
+                                </li>
+                                <li>如果指定了<cmdname>PRIMARY KEY</cmdname>或<cmdname>UNIQUE</cmdname>列，则还必须指定<cmdname>DISTRIBUTED BY</cmdname>子句。
+                                    如果在表创建命令中未指定<cmdname>DISTRIBUTED BY</cmdname>子句，则该命令将失败。
+                                </li>
+                            </ul>
+                        </p>
+                    </pd>
+                    <pd>有关设置默认表分布策略的更多信息，
+                        请参见<xref href="../config_params/guc-list.xml#gp_create_table_random_default_distribution" type="section" format="dita"><codeph>gp_create_table_random_default_distribution</codeph></xref>。
+                    </pd>
+                    <pd><codeph>DISTRIBUTED REPLICATED</codeph>子句将整个表复制到所有Greenplum数据库segment实例。
+                        当函数需要访问表中的所有行或需要通过阻止broadcast motion来提高查询性能时，必须在segment上执行用户定义的函数时可以使用它。
+                    </pd>
+                </plentry>
+                <plentry id="part_by">
+                    <pt>PARTITION BY</pt>
+                    <pd>声明用于对表进行分区的一列或多列。</pd>
+                    <pd>创建分区表时，Greenplum数据库使用指定的表名创建根分区表（根分区）。
+                        Greenplum数据库还会根据您指定的分区选项创建表，子表的层次结构，这些表是子分区。
+                        Greenplum数据库<i>pg_partition</i>*系统视图包含有关子分区表的信息。
+                    </pd>
+                    <pd>对于每个分区级别（表的每个层次结构级别），一个分区表最多可以有32,767个分区。
+                    </pd>
+                    <pd>
+                        <note>Greenplum数据库将分区表数据存储在叶子表中，叶子表是子表层次结构中的最低级表，供分区表使用。
+                        </note>
+                    </pd>
+                    <pd>
+                        <parml>
+                            <plentry>
+                                <pt>
+                                    <varname>partition_type</varname>
+                                </pt>
+                                <pd>声明分区类型：<codeph>LIST</codeph>（值列表）或<codeph>RANGE</codeph>（数字或日期范围）。
+                                </pd>
+                            </plentry>
+                            <plentry>
+                                <pt>
+                                    <varname>partition_specification</varname>
+                                </pt>
+                                <pd>声明要创建的各个分区。
+                                    可以单独定义每个分区，或者对于范围分区，可以使用<codeph>EVERY</codeph>子句（带有<codeph>START</codeph>和可选<codeph>END</codeph>子句）来定义用于创建单个分区的增量模式。
+                                </pd>
+                                <pd>
+                                    <b>
+                                        <codeph>DEFAULT PARTITION
+                                            <varname>name</varname>
+                                        </codeph>
+                                    </b>
+                                    — 声明默认分区。
+                                    当数据与现有分区不匹配时，会将其插入默认分区。
+                                    没有默认分区的分区设计将拒绝与现有分区不匹配的传入行。
+                                </pd>
+                                <pd>
+                                    <b>
+                                        <codeph>PARTITION
+                                            <varname>name</varname>
+                                        </codeph>
+                                    </b>
+                                    — 声明要用于分区的名称。
+                                    使用以下命名约定创建分区：<codeph><varname>parentname</varname>_<varname>level#</varname>_prt_<varname>givenname</varname></codeph>。
+                                </pd>
+                                <pd>
+                                    <b>
+                                        <codeph>VALUES</codeph>
+                                    </b>
+                                    — 对于列表分区，定义分区将包含的值。
+                                </pd>
+                                <pd>
+                                    <b>
+                                        <codeph>START</codeph>
+                                    </b>
+                                    — 对于范围分区，定义分区的起始范围值。
+                                    默认情况下，起始值为<codeph>INCLUSIVE</codeph>。
+                                    例如，如果您声明开始日期为'<codeph>2016-01-01</codeph>'，
+                                    则分区将包含所有大于或等于'<codeph>2016-01-01</codeph>'的日期。
+                                    通常，<codeph>START</codeph>表达式的数据类型与分区键列的类型相同。
+                                    如果不是这种情况，则必须显式转换为预期的数据类型。
+                                </pd>
+                                <pd>
+                                    <b>
+                                        <codeph>END</codeph>
+                                    </b>
+                                    — 对于范围分区，定义分区的结束范围值。
+                                    默认情况下，结束值为<codeph>EXCLUSIVE</codeph>。
+                                    例如，如果您声明结束日期为'<codeph>2016-02-01</codeph>'，
+                                    则分区将包含所有小于但不等于'<codeph>2016-02-01</codeph>'的日期。
+                                    通常，<codeph>END</codeph>表达式的数据类型与分区键列的类型相同。
+                                    如果不是这种情况，则必须显式转换为预期的数据类型。
+                                </pd>
+                                <pd>
+                                    <b>
+                                        <codeph>EVERY</codeph>
+                                    </b>
+                                    — 对于范围分区，定义如何将值从<codeph>START</codeph>递增到<codeph>END</codeph>以创建单个分区。
+                                    通常，<codeph>EVERY</codeph>表达式的数据类型与分区键列的类型相同。
+                                    如果不是这种情况，则必须显式转换为预期的数据类型。
+                                </pd>
+                                <pd>
+                                    <b>
+                                        <codeph>WITH</codeph>
+                                    </b>
+                                    — 设置分区的表存储选项。
+                                    例如，您可能希望将较旧的分区作为追加优化表，而将较新的分区作为常规堆表。
+                                </pd>
+                                <pd>
+                                    <b>
+                                        <codeph>TABLESPACE</codeph>
+                                    </b>
+                                    — 要在其中创建分区的表空间的名称。
+                                </pd>
+                            </plentry>
+                        </parml>
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>SUBPARTITION BY</pt>
+                    <pd>声明用于对表的第一级分区进行子分区的一个或多个列。
+                        子分区的规范格式类似于上述分区的规范格式。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>SUBPARTITION TEMPLATE</pt>
+                    <pd>您可以选择声明一个用于创建子分区的子分区模板（低级别子表），而不是为每个分区分别声明每个子分区定义。
+                        然后，此子分区规范将应用于所有父分区。
+                    </pd>
+                </plentry>
             </parml>
-          </pd>
-        </plentry>
-        <plentry>
-          <pt>SUBPARTITION BY</pt>
-          <pd>Declares one or more columns by which to subpartition the first-level partitions of
-            the table. The format of the subpartition specification is similar to that of a
-            partition specification described above. </pd>
-        </plentry>
-        <plentry>
-          <pt>SUBPARTITION TEMPLATE</pt>
-          <pd>Instead of declaring each subpartition definition individually for each partition, you
-            can optionally declare a subpartition template to be used to create the subpartitions
-            (lower level child tables). This subpartition specification would then apply to all
-            parent partitions.</pd>
-        </plentry>
-      </parml>
-    </section>
-    <section id="section5">
-      <title>Notes</title>
-      <ul id="ul_stf_sl1_tt">
-        <li>In Greenplum Database (a Postgres-based system) the data types <codeph>VARCHAR</codeph>
-          or <codeph>TEXT</codeph> handle padding added to the textual data (space characters added
-          after the last non-space character) as significant characters; the data type
-            <codeph>CHAR</codeph> does not.<p>In Greenplum Database, values of type
-                <codeph>CHAR(<varname>n</varname>)</codeph> are padded with trailing spaces to the
-            specified width <varname>n</varname>. The values are stored and displayed with the
-            spaces. However, the padding spaces are treated as semantically insignificant. When the
-            values are distributed, the trailing spaces are disregarded. The trailing spaces are
-            also treated as semantically insignificant when comparing two values of data type
-              <codeph>CHAR</codeph>, and the trailing spaces are removed when converting a character
-            value to one of the other string types. </p></li>
-        <li>Using OIDs in new applications is not recommended: where possible, using a
-            <codeph>SERIAL</codeph> or other sequence generator as the table's primary key is
-          preferred. However, if your application does make use of OIDs to identify specific rows of
-          a table, it is recommended to create a unique constraint on the OID column of that table,
-          to ensure that OIDs in the table will indeed uniquely identify rows even after counter
-          wrap-around. Avoid assuming that OIDs are unique across tables; if you need a
-          database-wide unique identifier, use the combination of table OID and row OID for the
-          purpose.</li>
-        <li>Greenplum Database has some special conditions for primary key and unique constraints
-          with regards to columns that are the <i>distribution key</i> in a Greenplum table. For a
-          unique constraint to be enforced in Greenplum Database, the table must be hash-distributed
-          (not <codeph>DISTRIBUTED RANDOMLY</codeph>), and the constraint columns must be the same
-          as (or a superset of) the table's distribution key columns. Also, the distribution key
-          must be a left-subset of the constraint columns with the columns in the correct order. For
-          example, if the primary key is (a,b,c), the distribution key can be only one of the
-          following: (a), (a,b), or (a,b,c).<p>Replicated tables (<codeph>DISTRIBUTED
-              REPLICATED</codeph>) can have both <codeph>PRIMARY KEY</codeph> and
-              <codeph>UNIQUE</codeph>column constraints.</p><p>A primary key constraint is simply a
-            combination of a unique constraint and a not-null constraint.</p><p>Greenplum Database
-            automatically creates a <codeph>UNIQUE</codeph> index for each <codeph>UNIQUE</codeph>
-            or <codeph>PRIMARY KEY</codeph> constraint to enforce uniqueness. Thus, it is not
-            necessary to create an index explicitly for primary key columns. <codeph>UNIQUE</codeph>
-            and <codeph>PRIMARY KEY</codeph> constraints are not allowed on append-optimized tables
-            because the <codeph>UNIQUE</codeph> indexes that are created by the constraints are not
-            allowed on append-optimized tables.</p><p>Foreign key constraints are not supported in
-            Greenplum Database. </p><p>For inherited tables, unique constraints, primary key
-            constraints, indexes and table privileges are <i>not</i> inherited in the current
-            implementation.</p></li>
-        <li>For append-optimized tables, <codeph>UPDATE</codeph> and <codeph>DELETE</codeph> are not
-          allowed in a repeatable read or serializable transaction and will cause the transaction to
-          abort. <codeph>CLUSTER</codeph>, <codeph>DECLARE...FOR UPDATE</codeph>, and triggers are
-          not supported with append-optimized tables.</li>
-        <li>To insert data into a partitioned table, you specify the root partitioned table, the
-          table created with the <codeph>CREATE TABLE</codeph> command. You also can specify a leaf
-          child table of the partitioned table in an <codeph>INSERT</codeph> command. An error is
-          returned if the data is not valid for the specified leaf child table. Specifying a child
-          table that is not a leaf child table in the <codeph>INSERT</codeph> command is not
-          supported. Execution of other DML commands such as <codeph>UPDATE</codeph> and
-            <codeph>DELETE</codeph> on any child table of a partitioned table is not supported.
-          These commands must be executed on the root partitioned table, the table created with the
-            <codeph>CREATE TABLE</codeph> command.</li>
-        <li>The default values for these table storage options can be specified with the server
-          configuration parameter <codeph>gp_default_storage_option</codeph>.<ul id="ul_hr1_3m1_tt">
-            <li>
-              <cmdname>appendoptimized</cmdname>
-            </li>
-            <li>
-              <cmdname>blocksize</cmdname>
-            </li>
-            <li>
-              <cmdname>checksum</cmdname>
-            </li>
-            <li>
-              <cmdname>compresstype</cmdname>
-            </li>
-            <li>
-              <cmdname>compresslevel</cmdname>
-            </li>
-            <li>
-              <cmdname>orientation</cmdname>
-            </li>
-          </ul><p>The defaults can be set for the system, a database, or a user. For information
-            about setting storage options, see the server configuration parameter <codeph><xref
-                href="../../ref_guide/config_params/guc-list.xml#gp_default_storage_options"
-                >gp_default_storage_options</xref></codeph>.</p></li>
-      </ul>
-      <note type="important">The current Greenplum Database Postgres optimizer allows list partitions
-        with multi-column (composite) partition keys. GPORCA does not support composite keys, so
-        using composite partition keys is not recommended.</note>
-    </section>
-    <section id="section6">
-      <title>Examples</title>
-      <p>Create a table named <codeph>rank</codeph> in the schema named <codeph>baby</codeph> and
-        distribute the data using the columns <codeph>rank</codeph>, <codeph>gender</codeph>, and
-          <codeph>year</codeph>:</p>
-      <codeblock>CREATE TABLE baby.rank (id int, rank int, year smallint, 
-gender char(1), count int ) DISTRIBUTED BY (rank, gender, 
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <ul id="ul_stf_sl1_tt">
+                <li>在Greenplum数据库（基于Postgres的系统）中，
+                    数据类型<codeph>VARCHAR</codeph>或<codeph>TEXT</codeph>处理填充作为有效字符添加到文本的数据（最后一个非空格字符之后添加空格字符）；
+                    数据类型<codeph>CHAR</codeph>则没有。
+                    <p>在Greenplum数据库中，<codeph>CHAR(<varname>n</varname>)</codeph>类型的值用尾随空格填充到指定的宽度<varname>n</varname>。
+                        值将存储并显示为空格。
+                        但是，填充空格在语义上无关紧要。
+                        分配值时，将忽略尾随空格。
+                        比较数据类型<codeph>CHAR</codeph>的两个值时，尾随空格在语义上也无关紧要，
+                        而将字符值转换为其他字符串类型之一时，尾随空格也将被删除。
+                    </p>
+                </li>
+                <li>不建议在新应用程序中使用OID：在可能的情况下，最好使用<codeph>SERIAL</codeph>或其他序列生成器作为表的主键。
+                    但是，如果您的应用程序确实使用OID来标识表的特定行，
+                    则建议在该表的OID列上创建唯一约束，以确保即使在计数器回绕后，表中的OID的确可以唯一地标识行。
+                    避免假设OID在表之间是唯一的；如果需要数据库范围的唯一标识符，则可以使用表OID和行OID的组合。
+                </li>
+                <li>Greenplum数据库对于主键和作为Greenplum表中的分布键的列的唯一约束具有一些特殊条件。
+                    为了在Greenplum数据库中实施唯一约束，表必须是哈希分布的（不是<codeph>DISTRIBUTED RANDOMLY</codeph>），
+                    并且约束列必须与表的分布键列相同（或作为其的超集）。
+                    另外，分布键必须是约束列的左子集，并且列的顺序正确。
+                    例如，如果主键是（a，b，c），则分布键只能是以下之一：（a），（a，b）或（a，b，c）。
+                    <p>复制表（<codeph>DISTRIBUTED REPLICATED</codeph>）可以同时具有<codeph>PRIMARY KEY</codeph>和<codeph>UNIQUE</codeph>列约束。
+                    </p>
+                    <p>主键约束只是唯一约束和非空约束的组合。
+                    </p>
+                    <p>Greenplum数据库自动为每个<codeph>UNIQUE</codeph>或<codeph>PRIMARY KEY</codeph>约束创建一个<codeph>UNIQUE</codeph>索引，以强制执行唯一性。
+                        因此，没有必要为主键列显式创建索引。
+                        在追加优化表上不允许使用<codeph>UNIQUE</codeph>和<codeph>PRIMARY KEY</codeph>约束，因为在追加优化表上不允许通过约束创建的<codeph>UNIQUE</codeph>索引。
+                    </p>
+                    <p>Greenplum数据库中不支持外键约束。
+                    </p>
+                    <p>对于继承的表，当前实现中不会继承唯一约束，主键约束，索引和表特权。
+                    </p>
+                </li>
+                <li>对于追加优化的表，可重复读或可序列化事务中不允许<codeph>UPDATE</codeph>和<codeph>DELETE</codeph>，这将导致事务中止。
+                    <codeph>CLUSTER</codeph>，<codeph>DECLARE...FOR UPDATE</codeph>和触发器不支持追加优化的表。
+                </li>
+                <li>要将数据插入分区表中，请指定根分区表，即使用<codeph>CREATE TABLE</codeph>命令创建的表。
+                    您还可以在<codeph>INSERT</codeph>命令中指定分区表的叶子表。
+                    如果数据对于指定的叶子表无效，则返回错误。
+                    不支持在<codeph>INSERT</codeph>命令中指定不是叶子表的子表。
+                    不支持在分区表的任何子表上执行其他DML命令，例如<codeph>UPDATE</codeph>和<codeph>DELETE</codeph>。
+                    这些命令必须在根分区表（使用<codeph>CREATE TABLE</codeph>命令创建的表）上执行。
+                </li>
+                <li>可以使用服务器配置参数<codeph>gp_default_storage_option</codeph>指定这些表存储选项的默认值。
+                    <ul id="ul_hr1_3m1_tt">
+                        <li>
+                            <cmdname>appendoptimized</cmdname>
+                        </li>
+                        <li>
+                            <cmdname>blocksize</cmdname>
+                        </li>
+                        <li>
+                            <cmdname>checksum</cmdname>
+                        </li>
+                        <li>
+                            <cmdname>compresstype</cmdname>
+                        </li>
+                        <li>
+                            <cmdname>compresslevel</cmdname>
+                        </li>
+                        <li>
+                            <cmdname>orientation</cmdname>
+                        </li>
+                    </ul>
+                    <p>可以为系统，数据库或用户设置默认值。
+                        有关设置存储选项的信息，请参阅服务器配置参数<codeph><xref href="../../ref_guide/config_params/guc-list.xml#gp_default_storage_options">gp_default_storage_options</xref></codeph>。
+                    </p>
+                </li>
+            </ul>
+            <note type="important">当前的Greenplum数据库Postgres优化器允许使用具有多列（复合）分区键的列表分区。
+                GPORCA不支持复合键，因此不建议使用复合分区键。
+            </note>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>在名为<codeph>baby</codeph>的模式中创建一个名为<codeph>rank</codeph>的表，
+                并使用<codeph>rank</codeph>，<codeph>gender</codeph>和<codeph>year</codeph>列分发数据：
+            </p>
+            <codeblock>CREATE TABLE baby.rank (id int, rank int, year smallint,
+gender char(1), count int ) DISTRIBUTED BY (rank, gender,
 year);</codeblock>
-      <p>Create table films and table distributors (the primary key will be used as the Greenplum
-        distribution key by default): </p>
+      <p>创建表files和表分配器（默认情况下，主键将用作Greenplum分布键）：</p>
       <codeblock>CREATE TABLE films (
 code        char(5) CONSTRAINT firstkey PRIMARY KEY,
 title       varchar(40) NOT NULL,
@@ -811,12 +845,11 @@ CREATE TABLE distributors (
 did    integer PRIMARY KEY DEFAULT nextval('serial'),
 name   varchar(40) NOT NULL CHECK (name &lt;&gt; '')
 );</codeblock>
-      <p>Create a gzip-compressed, append-optimized table:</p>
+      <p>创建一个gzip压缩的，追加优化的表：</p>
       <codeblock>CREATE TABLE sales (txn_id int, qty int, date date) 
 WITH (appendoptimized=true, compresslevel=5) 
 DISTRIBUTED BY (txn_id);</codeblock>
-      <p>Create a three level partitioned table using subpartition templates and default partitions
-        at each level:</p>
+      <p>使用子分区模板和每个级别的默认分区创建一个三级分区表：</p>
       <codeblock>CREATE TABLE sales (id int, year int, month int, day int, 
 region text)
 DISTRIBUTED BY (id)
@@ -835,70 +868,105 @@ PARTITION BY RANGE (year)
        DEFAULT SUBPARTITION other_regions)
 
 ( START (2008) END (2016) EVERY (1),
-  DEFAULT PARTITION outlying_years);</codeblock>
-    </section>
-    <section id="section7">
-      <title>Compatibility</title>
-      <p><codeph>CREATE TABLE</codeph> command conforms to the SQL standard, with the following
-        exceptions:</p>
-      <ul>
-        <li id="cd150267"><b>Temporary Tables</b> — In the SQL standard, temporary tables are
-          defined just once and automatically exist (starting with empty contents) in every session
-          that needs them. Greenplum Database instead requires each session to issue its own
-            <codeph>CREATE TEMPORARY TABLE</codeph> command for each temporary table to be used.
-          This allows different sessions to use the same temporary table name for different
-          purposes, whereas the standard's approach constrains all instances of a given temporary
-          table name to have the same table structure. <p>The standard's distinction between global
-            and local temporary tables is not in Greenplum Database. Greenplum Database will accept
-            the <codeph>GLOBAL</codeph> and <codeph>LOCAL</codeph> keywords in a temporary table
-            declaration, but they have no effect and are deprecated.</p><p>If the <codeph>ON
-              COMMIT</codeph> clause is omitted, the SQL standard specifies that the default
-            behavior as <codeph>ON COMMIT DELETE ROWS</codeph>. However, the default behavior in
-            Greenplum Database is <codeph>ON COMMIT PRESERVE ROWS</codeph>. The <codeph>ON COMMIT
-              DROP</codeph> option does not exist in the SQL standard. </p></li>
-        <li id="cd150376"><b>Column Check Constraints</b> — The SQL standard says that
-            <codeph>CHECK</codeph> column constraints may only refer to the column they apply to;
-          only <codeph>CHECK</codeph> table constraints may refer to multiple columns. Greenplum
-          Database does not enforce this restriction; it treats column and table check constraints
-          alike. </li>
-        <li id="cd150386"><b>NULL Constraint</b> — The <codeph>NULL</codeph> constraint is a
-          Greenplum Database extension to the SQL standard that is included for compatibility with
-          some other database systems (and for symmetry with the <codeph>NOT NULL</codeph>
-          constraint). Since it is the default for any column, its presence is not required.</li>
-        <li id="cd150401"><b>Inheritance</b> — Multiple inheritance via the
-            <codeph>INHERITS</codeph> clause is a Greenplum Database language extension. SQL:1999
-          and later define single inheritance using a different syntax and different semantics.
-          SQL:1999-style inheritance is not yet supported by Greenplum Database. </li>
-        <li id="cd153512"><b>Partitioning</b> — Table partitioning via the <codeph>PARTITION
-            BY</codeph> clause is a Greenplum Database language extension. </li>
-        <li id="cd150414"><b>Zero-column tables</b> — Greenplum Database allows a table of no
-          columns to be created (for example, <codeph>CREATE TABLE foo();</codeph>). This is an
-          extension from the SQL standard, which does not allow zero-column tables. Zero-column
-          tables are not in themselves very useful, but disallowing them creates odd special cases
-          for <codeph>ALTER TABLE DROP COLUMN</codeph>, so Greenplum decided to ignore this spec
-          restriction. </li>
-        <li><b>LIKE</b> — While a <codeph>LIKE</codeph> clause exists in the SQL standard, many of the
-          options that Greenplum Database accepts for it are not
-          in the standard, and some of the standard's options are not implemented
-          by Greenplum Database.</li>
-        <li id="cd150435"><b>WITH clause</b> — The <codeph>WITH</codeph> clause is a Greenplum
-          Database extension; neither storage parameters nor OIDs are in the standard. </li>
-        <li id="cd150445"><b>Tablespaces</b> — The Greenplum Database concept of tablespaces is not
-          part of the SQL standard. The clauses <codeph>TABLESPACE</codeph> and <codeph>USING INDEX
-            TABLESPACE</codeph> are extensions. </li>
-        <li id="cd150459"><b>Data Distribution</b> — The Greenplum Database concept of a parallel or
-          distributed database is not part of the SQL standard. The <codeph>DISTRIBUTED</codeph>
-          clauses are extensions.</li>
-      </ul>
-    </section>
-    <section id="section8">
-      <title>See Also</title>
-      <p><codeph><xref href="ALTER_TABLE.xml#topic1" type="topic" format="dita">ALTER
-          TABLE</xref></codeph>, <codeph><xref href="./DROP_TABLE.xml#topic1" type="topic"
-            format="dita">DROP TABLE</xref></codeph>, <codeph><xref
-            href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic" format="dita">CREATE EXTERNAL
-            TABLE</xref></codeph>, <codeph><xref href="./CREATE_TABLE_AS.xml#topic1" type="topic"
-            format="dita">CREATE TABLE AS</xref></codeph></p>
-    </section>
-  </body>
+  DEFAULT PARTITION outlying_years);</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p><codeph>CREATE TABLE</codeph>命令符合SQL标准，但以下情况除外：
+            </p>
+            <ul>
+                <li id="cd150267">
+                    <b>Temporary Tables</b>
+                    — 在SQL标准中，临时表仅定义一次，并在每个需要它们的会话中自动存在（从空内容开始）。
+                    相反，Greenplum数据库要求每个会话为要使用的每个临时表发出自己的<codeph>CREATE TEMPORARY TABLE</codeph>命令。
+                    这允许不同的会话出于不同的目的而使用相同的临时表名称，而标准的方法将给定临时表名称的所有实例约束为具有相同的表结构。
+                    <p>全局和本地临时表之间的标准区别不在Greenplum数据库中。
+                        Greenplum数据库将在临时表声明中接受<codeph>GLOBAL</codeph>和<codeph>LOCAL</codeph>关键字，但它们无效且已弃用。
+                    </p>
+                    <p>如果省略<codeph>ON COMMIT</codeph>子句，则SQL标准将默认行为指定为<codeph>ON COMMIT DELETE ROWS</codeph>。
+                        但是，Greenplum数据库中的默认行为是<codeph>ON COMMIT PRESERVE ROWS</codeph>。
+                        SQL标准中不存在<codeph>ON COMMIT DROP</codeph>选项。
+                    </p>
+                </li>
+                <li id="cd150376">
+                    <b>Column Check Constraints</b>
+                    — SQL标准说，<codeph>CHECK</codeph>列约束只能引用它们所适用的列。
+                    只有<codeph>CHECK</codeph>表约束可以引用多个列。
+                    Greenplum数据库不强制执行此限制；它对待列和表检查约束都一样。
+                </li>
+                <li id="cd150386">
+                    <b>NULL Constraint</b>
+                    — <codeph>NULL</codeph>约束是对SQL标准的Greenplum数据库扩展，
+                    为了与某些其他数据库系统兼容（以及对称的<codeph>NOT NULL</codeph>约束）。
+                    由于它是任何列的默认值，因此不需要它的存在。
+                </li>
+                <li id="cd150401">
+                    <b>Inheritance</b>
+                    — 通过<codeph>INHERITS</codeph>子句的多重继承是Greenplum数据库语言的扩展。
+                    SQL：1999及更高版本使用不同的语法和语义定义了单个继承。
+                    Greenplum数据库尚不支持SQL：1999样式的继承。
+                </li>
+                <li id="cd153512">
+                    <b>Partitioning</b>
+                    — 通过<codeph>PARTITION BY</codeph>子句进行的表分区是Greenplum数据库语言的扩展。
+                </li>
+                <li id="cd150414">
+                    <b>Zero-column tables</b>
+                    — Greenplum数据库允许创建不包含任何列的表（例如<codeph>CREATE TABLE foo();</codeph>）。
+                    这是SQL标准的扩展，不允许使用零列表。
+                    零列表本身并没有什么用，但是不允许使用零列表在<codeph>ALTER TABLE DROP COLUMN</codeph>时会产生奇怪的特殊情况，
+                    因此Greenplum决定忽略此规范限制。
+                </li>
+                <li>
+                    <b>LIKE</b>
+                    — 尽管SQL标准中存在<codeph>LIKE</codeph>子句，
+                    但Greenplum数据库接受的许多选项都不在该标准中，并且Greenplum数据库并未实现该标准的某些选项。
+                </li>
+                <li id="cd150435">
+                    <b>WITH clause</b>
+                    — <codeph>WITH</codeph>子句是Greenplum数据库扩展。
+                    存储参数和OID都不在标准中。
+                </li>
+                <li id="cd150445">
+                    <b>Tablespaces</b>
+                    — 表空间的Greenplum数据库概念不是SQL标准的一部分。
+                    子句<codeph>TABLESPACE</codeph>和<codeph>USING INDEX TABLESPACE</codeph>是扩展。
+                </li>
+                <li id="cd150459">
+                    <b>Data Distribution</b>
+                    — 并行或分布式数据库的Greenplum数据库概念不是SQL标准的一部分。
+                    <codeph>DISTRIBUTED</codeph>子句是扩展。
+                </li>
+            </ul>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_TABLE.xml#topic1" type="topic" format="dita">ALTER
+                        TABLE
+                    </xref>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./DROP_TABLE.xml#topic1" type="topic"
+                          format="dita">DROP TABLE
+                    </xref>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic" format="dita">CREATE EXTERNAL
+                        TABLE
+                    </xref>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./CREATE_TABLE_AS.xml#topic1" type="topic"
+                          format="dita">CREATE TABLE AS
+                    </xref>
+                </codeph>
+            </p>
+        </section>
+    </body>
 </topic>

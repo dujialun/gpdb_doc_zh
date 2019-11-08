@@ -4,9 +4,9 @@
 <topic id="topic1">
     <title id="bv20941">CREATE LANGUAGE</title>
     <body>
-        <p id="sql_command_desc">Defines a new procedural language.</p>
+        <p id="sql_command_desc">定义一种新的过程语言。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">CREATE [ OR REPLACE ] [ PROCEDURAL ] LANGUAGE <varname>name</varname>
 
 CREATE [ OR REPLACE ] [ TRUSTED ] [ PROCEDURAL ] LANGUAGE <varname>name</varname>
@@ -15,164 +15,137 @@ CREATE [ OR REPLACE ] [ TRUSTED ] [ PROCEDURAL ] LANGUAGE <varname>name</varname
             </codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>CREATE LANGUAGE</codeph> registers a new procedural language with a Greenplum
-                database. Subsequently, functions and trigger procedures can be defined in this new
-                language.</p> 
-            <note>Procedural languages for Greenplum Database have been made into "extensions," and
-                should therefore be installed with <xref href="CREATE_EXTENSION.xml#topic1"/>, not
-                    <codeph>CREATE LANGUAGE</codeph>. Using <codeph>CREATE LANGUAGE</codeph>
-                directly should be restricted to extension installation scripts. If you have a
-                "bare" language in your database, perhaps as a result of an upgrade, you can convert
-                it to an extension using <codeph>CREATE EXTENSION <varname>langname</varname> FROM
-                    unpackaged</codeph>. </note>
-            <p>Superusers can register a new language with a Greenplum database. A database owner
-                can also register within that database any language listed in the
-                    <codeph>pg_pltemplate</codeph> catalog in which the
-                    <codeph>tmpldbacreate</codeph> field is true. The default configuration allows
-                only trusted languages to be registered by database owners. The creator of a
-                language becomes its owner and can later drop it, rename it, or assign ownership to
-                a new owner.</p>
-            <p><codeph>CREATE OR REPLACE LANGUAGE</codeph> will either create a
-                new language, or replace an existing definition. If the language
-                already exists, its parameters are updated according to the values
-                specified or taken from <varname>pg_pltemplate</varname>,
-                but the language's ownership and permissions settings do not change,
-                and any existing functions written in the language are assumed to still
-                be valid. In addition to the normal privilege requirements for creating
-                a language, the user must be superuser or owner of the existing language.
-                The <codeph>REPLACE</codeph> case is mainly meant to be used to
-                ensure that the language exists. If the language has a
-                <varname>pg_pltemplate</varname> entry then <codeph>REPLACE</codeph>
-                will not actually change anything about an existing definition, except in
-                the unusual case where the <varname>pg_pltemplate</varname> entry
-                has been modified since the language was created.
+            <title>描述</title>
+            <p><codeph>CREATE LANGUAGE</codeph>在Greenplum数据库中注册了新的过程语言。
+                随后，可以用这种新语言定义函数和触发过程。
+                </p>
+            <note>Greenplum数据库的过程语言已被制成“扩展名”，
+                因此应与<xref href="CREATE_EXTENSION.xml#topic1"/>一起安装，而不是<codeph>CREATE LANGUAGE</codeph>。
+                直接使用<codeph>CREATE LANGUAGE</codeph>应该仅限于扩展安装脚本。
+                如果数据库中存在“裸”语言（可能是升级的结果），
+                则可以使用<codeph>CREATE EXTENSION <varname>langname</varname> FROM unpackaged</codeph>将其转换为扩展名。
+                </note>
+            <p>超级用户可以在Greenplum数据库中注册新语言。
+                数据库所有者还可以在该数据库中注册<codeph>pg_pltemplate</codeph> catalog中列出的<codeph>tmpldbacreate</codeph>字段为true的任何语言。
+                默认配置仅允许数据库所有者注册受信任的语言。
+                语言的创建者成为其所有者，以后可以将其删除，重命名或将所有权分配给新所有者。
+                </p>
+            <p><codeph>CREATE OR REPLACE LANGUAGE</codeph>将创建新语言或替换现有定义。
+                如果该语言已经存在，则其参数将根据<varname>pg_pltemplate</varname>中指定的值或从<varname>pg_pltemplate</varname>中获取的值进行更新，
+                但该语言的所有权和权限设置不会更改，并且假定使用该语言编写的任何现有函数仍然有效。
+                除了创建语言的正常特权要求外，用户还必须是现有语言的超级用户或所有者。
+                <codeph>REPLACE</codeph>情况主要用于确保该语言存在。
+                如果该语言具有<varname>pg_pltemplate</varname>条目，则<codeph>REPLACE</codeph>实际上不会更改有关现有定义的任何内容，
+                除非在异常情况下自创建该语言以来已对<varname>pg_pltemplate</varname>条目进行了修改。
             </p>
-            <p><codeph>CREATE LANGUAGE</codeph> effectively associates the language name with
-                handler function(s) that are responsible for executing functions written in that language. For a
-                function written in a procedural language (a language other than C or SQL), the
-                database server has no built-in knowledge about how to interpret the function's
-                source code. The task is passed to a special handler that knows the details of the
-                language. The handler could either do all the work of parsing, syntax analysis,
-                execution, and so on or it could serve as a bridge between Greenplum Database and an
-                existing implementation of a programming language. The handler itself is a C
-                language function compiled into a shared object and loaded on demand, just like any
-                other C function. Therese procedural language packages are included in the standard
-                Greenplum Database distribution: PL/pgSQL, PL/Perl, and PL/Python. Language handlers
-                have also been added for PL/Java and PL/R, but those languages are not pre-installed
-                with Greenplum Database. See the topic on <xref
-                    href="https://www.postgresql.org/docs/8.3/xplang.html" scope="external"
-                    format="html">Procedural Languages</xref> in the PostgreSQL documentation for
-                more information on developing functions using these procedural languages.</p>
-            <p>The PL/Perl, PL/Java, and PL/R libraries require the correct versions of Perl, Java,
-                and R to be installed, respectively. </p>
+            <p><codeph>CREATE LANGUAGE</codeph>有效地将语言名称与处理程序函数关联，该处理函数负责执行以该语言编写的函数。
+                对于以过程语言（C或SQL以外的语言）编写的函数，数据库服务器没有有关如何解释函数源代码的内置知识。
+                该任务将传递给知道该语言详细信息的特殊处理程序。
+                处理程序可以执行解析，语法分析，执行等所有工作，也可以充当Greenplum数据库与编程语言的现有实现之间的桥梁。
+                处理程序本身是一种C语言函数，已编译为共享对象并按需加载，就像其他任何C函数一样。
+                这些过程语言程序包包含在标准的Greenplum数据库发行版中：PL/pgSQL，PL/Perl和PL/Python。
+                还为PL/Java和PL/R添加了语言处理程序，但是Greenplum数据库未预安装这些语言。
+                有关使用这些过程语言开发函数的更多信息，请参见PostgreSQL文档中有关<xref
+                        href="https://www.postgresql.org/docs/8.3/xplang.html" scope="external"
+                        format="html">过程语言</xref>的主题。
+                </p>
+            <p>PL/Perl，PL/Java和PL/R库分别需要安装正确版本的Perl，Java和R。
+                </p>
             <p otherprops="pivotal">On RHEL and SUSE platforms, download the appropriate extensions
                 from <xref href="https://network.pivotal.io/products/pivotal-gpdb" scope="external" format="html">Pivotal
                     Network</xref>, then install the extensions using the Greenplum Package Manager
                     (<codeph>gppkg</codeph>) utility to ensure that all dependencies are installed
                 as well as the extensions. See the Greenplum Database Utility Guide for details
                 about <codeph>gppkg</codeph>. </p>
-            <p>There are two forms of the <codeph>CREATE LANGUAGE</codeph> command. In the first
-                form, the user specifies the name of the desired language and the Greenplum Database
-                server uses the <codeph>pg_pltemplate</codeph> system catalog to determine the
-                correct parameters. In the second form, the user specifies the language parameters
-                as well as the language name. You can use the second form to create a language that
-                is not defined in <codeph>pg_pltemplate</codeph>. </p>
-            <p>When the server finds an entry in the <codeph>pg_pltemplate</codeph> catalog for the
-                given language name, it will use the catalog data even if the command includes
-                language parameters. This behavior simplifies loading of old dump files, which are
-                likely to contain out-of-date information about language support functions.</p>
+            <p><codeph>CREATE LANGUAGE</codeph>命令有两种形式。
+                在第一种形式中，用户指定所需语言的名称，Greenplum数据库服务器使用<codeph>pg_pltemplate</codeph>系统catalog来确定正确的参数。
+                在第二种形式中，用户指定语言参数以及语言名称。
+                您可以使用第二种形式来创建<codeph>pg_pltemplate</codeph>中未定义的语言。
+                </p>
+            <p>当服务器在<codeph>pg_pltemplate</codeph> catalog中找到给定语言名称的条目时，即使命令包含语言参数，它也会使用catalog数据。
+                此行为简化了旧转储文件的加载，这些文件可能包含有关语言支持函数的过时信息。
+                </p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt>TRUSTED</pt>
-                    <pd><codeph>TRUSTED</codeph> specifies that the language does
-                        not grant access to data that the user would not otherwise
-                        have. If this key word is omitted
-                        when registering the language, only users with the
-                        Greenplum Database superuser privilege can
-                        use this language to create new functions.</pd>
+                    <pd><codeph>TRUSTED</codeph>指定该语言不会授予用户原本就不会访问的数据的访问权限。
+                        如果在注册语言时省略此关键字，则只有具有Greenplum数据库超级用户特权的用户才能使用该语言创建新函数。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>PROCEDURAL</pt>
-                    <pd>This is a noise word.</pd>
+                    <pd>这是一个干扰词。</pd>
                 </plentry>
                 <plentry>
                     <pt>
                         <varname>name</varname>
                     </pt>
-                    <pd>The name of the new procedural language. The name must be unique among the
-                        languages in the database. Built-in support is included for
-                            <codeph>plpgsql</codeph>, <codeph>plperl</codeph>, and
-                            <codeph>plpythonu</codeph>. The languages <codeph>plpgsql</codeph>
-                        (PL/pgSQL) and <codeph>plpythonu</codeph> (PL/Python) are installed by
-                        default in Greenplum Database.</pd>
+                    <pd>新过程语言的名称。
+                        该名称在数据库中的语言之间必须唯一。
+                        包含对<codeph>plpgsql</codeph>，<codeph>plperl</codeph>和<codeph>plpythonu</codeph>的内置支持。
+                        默认情况下，在Greenplum数据库中已默认安装了语言<codeph>plpgsql</codeph>（PL/pgSQL）和<codeph>plpythonu</codeph>（PL/Python）。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>HANDLER <varname>call_handler</varname></pt>
-                    <pd>Ignored if the server has an entry for the specified language name in
-                            <codeph>pg_pltemplate</codeph>. The name of a previously registered
-                        function that will be called to execute the procedural language functions.
-                        The call handler for a procedural language must be written in a compiled
-                        language such as C with version 1 call convention and registered with
-                        Greenplum Database as a function taking no arguments and returning the
-                            <codeph>language_handler</codeph> type, a placeholder type that is
-                        simply used to identify the function as a call handler.</pd>
+                    <pd>如果服务器在<codeph>pg_pltemplate</codeph>中有用于指定语言名称的条目则忽略。
+                        先前注册的函数的名称，将调用该函数来执行过程语言函数。
+                        程序语言的调用处理程序必须使用编译后的语言编写，
+                        例如使用版本1调用约定的C语言，并在Greenplum数据库中注册为不带任何参数的函数，
+                        并返回<codeph>language_handler</codeph>类型，该仅是用于标识函数的占位符类型作为呼叫处理程序。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>INLINE <varname>inline_handler</varname></pt>
-                    <pd>The name of a previously registered function that is called to execute an
-                        anonymous code block in this language that is created with the <codeph><xref
-                                href="DO.xml#topic1"/></codeph> command. If an
-                            <codeph>inline_handler</codeph> function is not specified, the language
-                        does not support anonymous code blocks. The handler function must take one
-                        argument of type <codeph>internal</codeph>, which is the <codeph><xref
-                                href="DO.xml#topic1"/></codeph> command internal representation. The
-                        function typically return <codeph>void</codeph>. The return value of the
-                        handler is ignored. </pd>
+                    <pd>以前注册的函数的名称，该函数被调用以执行用<codeph><xref href="DO.xml#topic1"/></codeph>命令创建的该语言的匿名代码块。
+                        如果未指定<codeph>inline_handler</codeph>函数，则该语言不支持匿名代码块。
+                        处理函数必须采用类型为<codeph>internal</codeph>的一个参数，即<codeph><xref href="DO.xml#topic1"/></codeph>命令的内部表示形式。
+                        该函数通常返回<codeph>void</codeph>。
+                        处理程序的返回值将被忽略。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>VALIDATOR <varname>valfunction</varname></pt>
-                    <pd>Ignored if the server has an entry for the specified language name in
-                            <codeph>pg_pltemplate</codeph>. The name of a previously registered
-                        function that will be called to execute the procedural language functions.
-                        The call handler for a procedural language must be written in a compiled
-                        language such as C with version 1 call convention and registered with
-                        Greenplum Database as a function taking no arguments and returning the
-                            <codeph>language_handler</codeph> type, a placeholder type that is
-                        simply used to identify the function as a call handler.</pd>
+                    <pd>如果服务器在<codeph>pg_pltemplate</codeph>中有用于指定语言名称的条目则忽略。
+                        先前注册的函数的名称，将调用该函数来执行过程语言函数。
+                        程序语言的调用处理程序必须使用编译式语言编写，
+                        例如使用版本1调用约定的C语言，并在Greenplum数据库中注册为不带任何参数的函数，
+                        并返回<codeph>language_handler</codeph>类型，该仅是用于标识函数的占位符类型作为呼叫处理程序。
+                        </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Notes</title>
-            <p>The PL/pgSQL language is already registered in all databases by default. The
-                PL/Python language extension is installed but not registered.</p>
-            <p>The system catalog <codeph>pg_language</codeph> records information about the
-                currently installed languages.</p>
-            <p>To create functions in a procedural language, a user must have the
-                    <codeph>USAGE</codeph> privilege for the language. By default,
-                    <codeph>USAGE</codeph> is granted to <codeph>PUBLIC</codeph> (everyone) for
-                trusted languages. This may be revoked if desired. </p>
-            <p>Procedural languages are local to individual databases. You create and drop languages
-                for individual databases.</p>
-            <p>The call handler function and the validator function (if any) must already exist if
-                the server does not have an entry for the language in
-                <codeph>pg_pltemplate</codeph>. But when there is an entry, the functions need not
-                already exist; they will be automatically defined if not present in the database. </p>
-            <p>Any shared library that implements a language must be located in the same
-                    <codeph>LD_LIBRARY_PATH</codeph> location on all segment hosts in your Greenplum
-                Database array.</p>
+            <title>注解</title>
+            <p>默认情况下，PL/pgSQL语言已在所有数据库中注册。
+                PL/Python语言扩展已安装但未注册。
+                </p>
+            <p>系统catalog <codeph>pg_language</codeph>记录有关当前安装的语言的信息。
+                </p>
+            <p>要使用过程语言创建函数，用户必须具有该语言的<codeph>USAGE</codeph>特权。
+                默认情况下，<codeph>USAGE</codeph>被授予<codeph>PUBLIC</codeph>（每个人）用于受信任的语言。
+                如果需要，可以将其撤消。
+                </p>
+            <p>过程语言是各个数据库的本地语言。
+                您为单个数据库创建和删除语言。
+                </p>
+            <p>如果服务器在<codeph>pg_pltemplate</codeph>中没有该语言的条目，则调用处理程序函数和验证器函数（如果有）必须已经存在。
+                但是，当有一个条目时，函数就不必已经存在了。
+                如果数据库中不存在它们，它们将被自动定义。
+                </p>
+            <p>任何实现一种语言的共享库都必须位于Greenplum数据库阵列中所有segment主机上的<codeph>LD_LIBRARY_PATH</codeph>位置中。
+                </p>
         </section>
         <section id="section6">
-            <title>Examples</title>
-            <p>The preferred way of creating any of the standard procedural languages is to use
-                    <codeph>CREATE EXTENSION</codeph> instead of <codeph>CREATE LANGUAGE</codeph>.
-                For example:</p>
+            <title>示例</title>
+            <p>创建任何标准过程语言的首选方法是使用<codeph>CREATE EXTENSION</codeph>而不是<codeph>CREATE LANGUAGE</codeph>。
+                例如：
+                </p>
             <codeblock>CREATE EXTENSION plperl;</codeblock>
-            <p>For a language not known in the <codeph>pg_pltemplate</codeph> catalog:</p>
+            <p>对于<codeph>pg_pltemplate</codeph> catalog中未知的语言：</p>
             <codeblock>CREATE FUNCTION plsample_call_handler() RETURNS 
 language_handler
     AS '$libdir/plsample'
@@ -181,11 +154,11 @@ CREATE LANGUAGE plsample
     HANDLER plsample_call_handler;</codeblock>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p><codeph>CREATE LANGUAGE</codeph> is a Greenplum Database extension. </p>
+            <title>兼容性</title>
+            <p><codeph>CREATE LANGUAGE</codeph>是Greenplum数据库扩展。</p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="ALTER_LANGUAGE.xml#topic1" type="topic" format="dita"/></codeph>,
                         <codeph><xref href="CREATE_EXTENSION.xml" type="topic" format="dita"
                     /></codeph>, <codeph><xref href="CREATE_FUNCTION.xml#topic1" type="topic"

@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="bf20941">CHECKPOINT</title><body><p id="sql_command_desc">Forces a transaction log checkpoint.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">CHECKPOINT</codeblock></section><section id="section3"><title>Description</title><p>A checkpoint is a point in the transaction log sequence at which all
-data files have been updated to reflect the information in the log. All
-data files will be flushed to disk.</p>
-  <p>The <codeph>CHECKPOINT</codeph> command forces an immediate checkpoint when the command is
-        issued, without waiting for a regular checkpoint scheduled by the system.
-          <codeph>CHECKPOINT</codeph> is not intended for use during normal operation.</p>
-  <p>If executed during recovery, the <codeph>CHECKPOINT</codeph> command
-    will force a restartpoint rather than writing a new checkpoint.</p>
-  <p>Only superusers may call <codeph>CHECKPOINT</codeph>.</p></section><section id="section4"><title>Compatibility</title><p>The <codeph>CHECKPOINT</codeph> command is a Greenplum Database
-extension.</p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="bf20941">CHECKPOINT</title>
+    <body>
+        <p id="sql_command_desc">强制执行事务日志检查点。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CHECKPOINT</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p>检查点是事务日志序列中的一点，所有数据文件都已在该点更新，以反映日志中的信息。
+                所有数据文件将刷新到磁盘。
+            </p>
+            <p>发出该命令时，<codeph>CHECKPOINT</codeph>命令将强制立即执行检查点，而无需等待系统安排的常规检查点。
+                <codeph>CHECKPOINT</codeph>不适合在常规操作中使用。
+            </p>
+            <p>如果在恢复期间执行，则<codeph>CHECKPOINT</codeph>命令将强制重新启动点，而不是写入新的检查点。
+            </p>
+            <p>只有超级用户可以调用<codeph>CHECKPOINT</codeph>。
+            </p>
+        </section>
+        <section id="section4">
+            <title>兼容性</title>
+            <p><codeph>CHECKPOINT</codeph>命令是Greenplum数据库扩展。
+            </p>
+        </section>
+    </body>
+</topic>

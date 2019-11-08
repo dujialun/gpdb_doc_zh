@@ -4,90 +4,83 @@
 <topic id="topic1">
     <title id="bv20941">CREATE PROTOCOL</title>
     <body>
-        <p id="sql_command_desc">Registers a custom data access protocol that can be specified when
-            defining a Greenplum Database external table.</p>
+        <p id="sql_command_desc">注册自定义数据访问协议，该协议可以在定义Greenplum数据库外部表时指定。
+            </p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">CREATE [TRUSTED] PROTOCOL <varname>name</varname> (
    [readfunc='<varname>read_call_handler</varname>'] [, writefunc='<varname>write_call_handler</varname>']
    [, validatorfunc='<varname>validate_handler</varname>' ])</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>CREATE PROTOCOL</codeph> associates a data access protocol name with call
-                handlers that are responsible for reading from and writing data to an external data
-                source. You must be a superuser to create a protocol.</p>
-            <p>The <codeph>CREATE PROTOCOL</codeph> command must specify either a read call handler
-                or a write call handler. The call handlers specified in the <codeph>CREATE
-                    PROTOCOL</codeph> command must be defined in the database.</p>
-            <p>The protocol name can be specified in a <codeph>CREATE EXTERNAL TABLE</codeph>
-                command. </p>
-            <p> For information about creating and enabling a custom data access protocol, see
-                "Example Custom Data Access Protocol" in the <cite>Greenplum Database Administrator
-                    Guide</cite>.</p>
+            <title>描述</title>
+            <p><codeph>CREATE PROTOCOL</codeph>将数据访问协议名称与负责从外部数据源读取数据和将数据写入外部数据源的调用处理程序相关联。
+                您必须是超级用户才能创建协议。
+                </p>
+            <p><codeph>CREATE PROTOCOL</codeph>命令必须指定读调用处理程序或写调用处理程序。
+                必须在数据库中定义<codeph>CREATE PROTOCOL</codeph>命令中指定的调用处理程序。
+                </p>
+            <p>可以在<codeph>CREATE EXTERNAL TABLE</codeph>命令中指定协议名称。
+                </p>
+            <p>有关创建和启用自定义数据访问协议的信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的“示例自定义数据访问协议”。
+                </p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt>TRUSTED</pt>
-                    <pd>If not specified, only superusers and the protocol owner can create external
-                        tables using the protocol. If specified, superusers and the protocol owner
-                        can <codeph>GRANT</codeph> permissions on the protocol to other database
-                        roles.</pd>
+                    <pd>如果未指定，则只有超级用户和协议所有者才能使用协议创建外部表。
+                        如果指定，超级用户和协议所有者可以将协议的许可权限授予其他数据库角色。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>
                         <varname>name</varname>
                     </pt>
-                    <pd>The name of the data access protocol. The protocol name is case sensitive.
-                        The name must be unique among the protocols in the database. </pd>
+                    <pd>数据访问协议的名称。协议名称区分大小写。该名称在数据库中的协议之间必须唯一。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>readfunc= '<varname>read_call_handler</varname>'</pt>
-                    <pd>The name of a previously registered function that Greenplum Database calls
-                        to read data from an external data source. The command must specify either a
-                        read call handler or a write call handler.</pd>
+                    <pd>Greenplum数据库调用以从外部数据源读取数据的先前注册函数的名称。
+                        该命令必须指定读调用处理程序或写调用处理程序。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>writefunc= '<varname>write_call_handler</varname>'</pt>
-                    <pd>The name of a previously registered function that Greenplum Database calls
-                        to write data to an external data source. The command must specify either a
-                        read call handler or a write call handler.</pd>
+                    <pd>Greenplum数据库调用以将数据写入外部数据源时调用的先前注册函数的名称。
+                        该命令必须指定读调用处理程序或写调用处理程序。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>validatorfunc='<varname>validate_handler</varname>'</pt>
-                    <pd>An optional validator function that validates the URL specified in the
-                            <codeph>CREATE EXTERNAL TABLE</codeph> command.</pd>
+                    <pd>可选的验证器函数，用于验证<codeph>CREATE EXTERNAL TABLE</codeph>命令中指定的URL。
+                        </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Notes</title>
-            <p>Greenplum Database handles external tables of type <codeph>file</codeph>,
-                    <codeph>gpfdist</codeph>, and <codeph>gpfdists</codeph> internally. 
-                See
-                    <xref href="../../admin_guide/external/g-s3-protocol.xml#amazon-emr/s3_prereq"/>
-                for information about enabling the <codeph>S3</codeph> protocol. See the <xref
-                    href="../../pxf/overview_pxf.html" type="topic" format="html">Greenplum Platform
-                    Extension Framework (PXF)</xref> documentation for information about configuring
-                the PXF extension and using the <codeph>pxf</codeph> protocol.</p>
-            <p>Any shared library that implements a data access protocol must be located in the same
-                location on all Greenplum Database segment hosts. For example, the shared library
-                can be in a location specified by the operating system environment variable
-                    <codeph>LD_LIBRARY_PATH</codeph> on all hosts. You can also specify the location
-                when you define the handler function. For example, when you define the
-                    <codeph>s3</codeph> protocol in the <codeph>CREATE PROTOCOL</codeph> command,
-                you specify <codeph>$libdir/gps3ext.so</codeph> as the location of the shared
-                object, where <codeph>$libdir</codeph> is located at
-                <codeph>$GPHOME/lib</codeph>.</p>
+            <title>注解</title>
+            <p>Greenplum数据库在内部处理类型为<codeph>file</codeph>，<codeph>gpfdist</codeph>和<codeph>gpfdists</codeph>的外部表。
+                有关启用<codeph>S3</codeph>协议的信息，请参见<xref href="../../admin_guide/external/g-s3-protocol.xml#amazon-emr/s3_prereq"/>。
+                有关配置PXF扩展和使用<codeph>pxf</codeph>协议的信息，
+                请参阅<xref href="../../pxf/overview_pxf.html" type="topic" format="html">Greenplum平台扩展框架（PXF）</xref>文档。
+                </p>
+            <p>任何实现数据访问协议的共享库都必须位于所有Greenplum数据库segment主机上的同一位置。
+                例如，共享库可以位于所有主机上的操作系统环境变量<codeph>LD_LIBRARY_PATH</codeph>指定的位置。
+                定义处理程序函数时，也可以指定位置。
+                例如，当您在<codeph>CREATE PROTOCOL</codeph>命令中定义<codeph>s3</codeph>协议时，
+                您将<codeph>$libdir/gps3ext.so</codeph>指定为共享库的位置，
+                其中<codeph>$libdir</codeph>位于<codeph>$GPHOME/lib</codeph>。
+                </p>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p><codeph>CREATE PROTOCOL</codeph> is a Greenplum Database extension. </p>
+            <title>兼容性</title>
+            <p><codeph>CREATE PROTOCOL</codeph>是Greenplum数据库扩展。</p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="ALTER_PROTOCOL.xml#topic1"/></codeph>, <codeph><xref
                         href="CREATE_EXTERNAL_TABLE.xml#topic1"/></codeph>, <codeph><xref
                         href="DROP_PROTOCOL.xml#topic1"/></codeph>, <xref href="GRANT.xml#topic1"

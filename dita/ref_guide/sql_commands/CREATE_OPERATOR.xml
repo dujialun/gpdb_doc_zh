@@ -1,188 +1,328 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="bw20941">CREATE OPERATOR</title><body><p id="sql_command_desc">Defines a new operator.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">CREATE OPERATOR <varname>name</varname> ( 
-       PROCEDURE = <varname>funcname</varname>
-       [, LEFTARG = <varname>lefttype</varname>] [, RIGHTARG = <varname>righttype</varname>]
-       [, COMMUTATOR = <varname>com_op</varname>] [, NEGATOR = <varname>neg_op</varname>]
-       [, RESTRICT = <varname>res_proc</varname>] [, JOIN = <varname>join_proc</varname>]
-       [, HASHES] [, MERGES] )</codeblock></section><section id="section3"><title>Description</title><p><codeph>CREATE OPERATOR</codeph> defines a new operator. The user who
-defines an operator becomes its owner. </p><p>The operator name is a sequence of up to <codeph>NAMEDATALEN</codeph>-1
-(63 by default) characters from the following list: <codeph>+ - * / &lt;
-&gt; = ~ ! @ # % ^ &amp; | ` ?</codeph></p><p>There are a few restrictions on your choice of name: </p><ul><li id="bw144996"><codeph>--</codeph> and <codeph>/*</codeph> cannot appear anywhere in
-an operator name, since they will be taken as the start of a comment.
-</li><li id="bw144998">A multicharacter operator name cannot end in <codeph>+</codeph> or <codeph>-</codeph>,
-unless the name also contains at least one of these characters: <codeph>~
-! @ # % ^ &amp; | ` ?</codeph></li></ul><p>For example, <codeph>@-</codeph> is an allowed operator name, but <codeph>*-</codeph>
-is not. This restriction allows Greenplum Database to parse SQL-compliant
-commands without requiring spaces between tokens. </p>
-<p>The use of <codeph>=&gt;</codeph> as an operator name is deprecated.  
-It may be disallowed altogether in a future release.</p>
-<p>The operator <codeph>!=</codeph> is mapped to <codeph>&lt;&gt;</codeph>
-on input, so these two names are always equivalent. </p><p>At least one of <codeph>LEFTARG</codeph> and <codeph>RIGHTARG</codeph>
-must be defined. For binary operators, both must be defined. For right
-unary operators, only <codeph>LEFTARG</codeph> should be defined, while
-for left unary operators only <codeph>RIGHTARG</codeph> should be defined.
-</p><p>The <varname>funcname</varname> procedure must have been previously defined using
-<codeph>CREATE FUNCTION</codeph>, must be <codeph>IMMUTABLE</codeph>,
-and must be defined to accept the correct number of arguments (either
-one or two) of the indicated types. </p><p>The other clauses specify optional operator optimization clauses.
-These clauses should be provided whenever appropriate to speed up queries
-that use the operator. But if you provide them, you must be sure that
-they are correct. Incorrect use of an optimization clause can result
-in server process crashes, subtly wrong output, or other unexpected results.
-You can always leave out an optimization clause if you are not sure about
-it.</p>
-            <p>To be able to create an operator, you must have <codeph>USAGE</codeph> privilege on
-                the argument types and the return type, as well as <codeph>EXECUTE</codeph>
-                privilege on the underlying function. If a commutator or negator operator is
-                specified, you must own these operators.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The (optionally schema-qualified) name of the operator to be defined.
-Two operators in the same schema can have the same name if they operate
-on different data types.</pd></plentry><plentry><pt><varname>funcname</varname></pt><pd>The function used to implement this operator (must be an <codeph>IMMUTABLE</codeph>
-function).</pd></plentry><plentry><pt><varname>lefttype</varname></pt><pd>The data type of the operator's left operand, if any. This option
-would be omitted for a left-unary operator. </pd></plentry><plentry><pt><varname>righttype</varname></pt><pd>The data type of the operator's right operand, if any. This option
-would be omitted for a right-unary operator.</pd></plentry><plentry><pt><varname>com_op</varname></pt><pd>The optional <codeph>COMMUTATOR</codeph> clause names an operator
-that is the commutator of the operator being defined. We say that operator
-A is the commutator of operator B if (x A y) equals (y B x) for all possible
-input values x, y. Notice that B is also the commutator of A. For example,
-operators <codeph>&lt;</codeph> and <codeph>&gt;</codeph> for a particular
-data type are usually each others commutators, and operator + is usually
-commutative with itself. But operator <codeph>-</codeph> is usually not
-commutative with anything. The left operand type of a commutable operator
-is the same as the right operand type of its commutator, and vice versa.
-So the name of the commutator operator is all that needs to be provided
-in the <codeph>COMMUTATOR</codeph> clause. </pd></plentry><plentry><pt><varname>neg_op</varname></pt><pd>The optional <codeph>NEGATOR</codeph> clause names an operator that
-is the negator of the operator being defined. We say that operator A
-is the negator of operator B if both return Boolean results and (x A
-y) equals NOT (x B y) for all possible inputs x, y. Notice that B is
-also the negator of A. For example, <codeph>&lt;</codeph> and <codeph>&gt;=</codeph>
-are a negator pair for most data types. An operator's negator must
-have the same left and/or right operand types as the operator to be defined,
-so only the operator name need be given in the <codeph>NEGATOR</codeph>
-clause.</pd></plentry><plentry><pt><varname>res_proc</varname></pt><pd>The optional <codeph>RESTRICT</codeph> names a restriction selectivity
-estimation function for the operator. Note that this is a function name,
-not an operator name. <codeph>RESTRICT</codeph> clauses only make sense
-for binary operators that return <codeph>boolean</codeph>. The idea behind
-a restriction selectivity estimator is to guess what fraction of the
-rows in a table will satisfy a <codeph>WHERE</codeph>-clause condition
-of the form:</pd><pd><codeblock>column OP constant</codeblock></pd><pd>for the current operator and a particular constant value. This assists
-the optimizer by giving it some idea of how many rows will be eliminated
-by <codeph>WHERE</codeph> clauses that have this form. </pd><pd>You can usually just use one of the following system standard estimator functions for many of
-                        your own operators: <p><codeph>eqsel</codeph> for =
-                                </p><p><codeph>neqsel</codeph> for &lt;&gt;
-                                </p><p><codeph>scalarltsel</codeph> for &lt; or &lt;=
-                                </p><p><codeph>scalargtsel</codeph> for &gt; or &gt;= </p></pd></plentry><plentry><pt><varname>join_proc</varname></pt><pd>The optional <codeph>JOIN</codeph> clause names a join selectivity
-estimation function for the operator. Note that this is a function name,
-not an operator name. <codeph>JOIN</codeph> clauses only make sense for
-binary operators that return <codeph>boolean</codeph>. The idea behind
-a join selectivity estimator is to guess what fraction of the rows in
-a pair of tables will satisfy a <codeph>WHERE</codeph>-clause condition
-of the form</pd><pd><codeblock>table1.column1 OP table2.column2</codeblock></pd><pd>for the current operator. This helps the optimizer by letting it figure
-out which of several possible join sequences is likely to take the least
-work.</pd><pd>You can usually just use one of the following system standard join selectivity estimator
-                        functions for many of your own operators:<p><codeph>eqjoinsel</codeph> for =
-                                </p><p><codeph>neqjoinsel</codeph> for &lt;&gt;
-                                </p><p><codeph>scalarltjoinsel</codeph> for &lt; or &lt;=
-                                </p><p><codeph>scalargtjoinsel</codeph> for &gt; or &gt;=
-                                </p><p><codeph>areajoinsel</codeph> for 2D area-based comparisons
-                                </p><p><codeph>positionjoinsel</codeph> for 2D position-based
-                            comparisons </p><p><codeph>contjoinsel</codeph> for 2D containment-based
-                            comparisons </p></pd></plentry><plentry><pt>HASHES</pt><pd>The optional <codeph>HASHES</codeph> clause tells the system that it is permissible to use the
-                        hash join method for a join based on this operator. <codeph>HASHES</codeph>
-                        only makes sense for a binary operator that returns
-                        <codeph>boolean</codeph>. The hash join operator can only return true for
-                        pairs of left and right values that hash to the same hash code. If two
-                        values are put in different hash buckets, the join will never compare them,
-                        implicitly assuming that the result of the join operator must be false.
-                        Because of this, it never makes sense to specify <codeph>HASHES</codeph> for
-                        operators that do not represent equality. </pd>
-                    <pd>In most cases, it is only practical to support hashing for operators that
-                        take the same data type on both sides. However, you can design compatible
-                        hash functions for two or more data types, which are functions that will
-                        generate the same hash codes for "equal" values, even if the values are
-                        differently represented. </pd><pd>To be marked <codeph>HASHES</codeph>, the join operator must appear in a hash index operator
-                        class. Attempts to use the operator in hash joins will fail at run time if
-                        no such operator class exists. The system needs the operator class to find
-                        the data-type-specific hash function for the operator's input data type. You
-                        must also supply a suitable hash function before you can create the operator
-                        class. Exercise care when preparing a hash function, as there are
-                        machine-dependent ways in which it could fail to function correctly. For
-                        example, on machines that meet the IEEE floating-point standard, negative
-                        zero and positive zero are different values (different bit patterns) but are
-                        defined to compare as equal. If a float value could contain a negative zero,
-                        define it to generate the same hash value as positive zero.</pd>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="bw20941">CREATE OPERATOR</title>
+    <body>
+        <p id="sql_command_desc">定义一个新的运算符。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CREATE OPERATOR <varname>name</varname> (
+        PROCEDURE = <varname>funcname</varname>
+        [, LEFTARG = <varname>lefttype</varname>] [, RIGHTARG = <varname>righttype</varname>]
+        [, COMMUTATOR = <varname>com_op</varname>] [, NEGATOR = <varname>neg_op</varname>]
+        [, RESTRICT = <varname>res_proc</varname>] [, JOIN = <varname>join_proc</varname>]
+        [, HASHES] [, MERGES] )</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CREATE OPERATOR</codeph>定义一个新的运算符。
+                定义运算符的用户将成为其所有者。
+            </p>
+            <p>运算符名称是以下列表中最多<codeph>NAMEDATALEN</codeph>-1（默认为63）个字符的序列：
+                <codeph>+ - * / &lt;
+                    &gt; = ~ ! @ # % ^ &amp; | ` ?
+                </codeph>
+            </p>
+            <p>名称的选择有一些限制：</p>
+            <ul>
+                <li id="bw144996">
+                    <codeph>--</codeph>和<codeph>/*</codeph>不能出现在运算符名称的任何位置，因为它们将被用作注释的开头。
+                </li>
+                <li id="bw144998">多字符运算符名称不能以<codeph>+</codeph>或<codeph>-</codeph>结尾，除非该名称也包含以下至少一个字符：
+                    <codeph>~
+                        ! @ # % ^ &amp; | ` ?
+                    </codeph>
+                </li>
+            </ul>
+            <p>例如，<codeph>@-</codeph>是允许的运算符名称，但<codeph>*-</codeph>不是。
+                此限制使Greenplum数据库可以解析与SQL兼容的命令，而无需在标记之间使用空格。
+            </p>
+            <p>不建议将<codeph>=&gt;</codeph>用作运算符。在将来的版本中可能完全不允许使用它。
+            </p>
+            <p>运算符<codeph>!=</codeph>在输入时映射为<codeph>&lt;&gt;</codeph>，因此这两个名称始终相等。
+            </p>
+            <p>必须至少定义<codeph>LEFTARG</codeph>和<codeph>RIGHTARG</codeph>之一。
+                对于二元运算符，必须同时定义两者。
+                对于右一元运算符，仅应定义<codeph>LEFTARG</codeph>，而对于左一元运算符，仅应定义<codeph>RIGHTARG</codeph>。
+            </p>
+            <p><varname>funcname</varname>过程必须事先使用<codeph>CREATE FUNCTION</codeph>定义，
+                必须是<codeph>IMMUTABLE</codeph>，并且必须定义为接受所指示类型的正确数量的参数（一个或两个）。
+            </p>
+            <p>其他子句指定可选的运算符优化子句。
+                适当时应提供这些子句，以加快使用运算符的查询的速度。
+                但是，如果提供它们，则必须确保它们是正确的。
+                错误地使用优化子句可能导致服务器进程崩溃，错误的输出或其他意外结果。
+                如果您不确定优化子句，则可以始终忽略该子句。
+            </p>
+            <p>为了能够创建运算符，您必须对参数类型和返回类型具有<codeph>USAGE</codeph>特权，并且对基础函数具有<codeph>EXECUTE</codeph>特权。
+                如果指定了换向或负运算符，则您必须拥有这些运算符。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要定义的运算符的名称（可以由模式指定）。
+                        如果同一模式中的两个运算符对不同的数据类型进行运算，则它们可以具有相同的名称。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>funcname</varname>
+                    </pt>
+                    <pd>用于实现此运算符的函数（必须为<codeph>IMMUTABLE</codeph>函数）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>lefttype</varname>
+                    </pt>
+                    <pd>运算符的左操作数的数据类型（如果有）。
+                        左一元运算符将忽略此选项。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>righttype</varname>
+                    </pt>
+                    <pd>运算符的右操作数的数据类型（如果有）。
+                        右一元运算符将忽略此选项。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>com_op</varname>
+                    </pt>
+                    <pd>可选的<codeph>COMMUTATOR</codeph>子句命名一个运算符，该运算符是要定义的运算符的交换器。
+                        我们说如果对于所有可能的输入值x，y，（x A y）等于（y B x），则算符A是算符B的交换子。
+                        请注意，B也是A的交换子。
+                        例如，特定数据类型的运算符<codeph>&lt;</codeph>和<codeph>&gt;</codeph>通常是彼此的交换子，而运算符 <codeph>+</codeph> 通常是与自身交换的。
+                        但是运算符<codeph>-</codeph>通常不与任何东西互换。
+                        可交换运算符的左操作数类型与其交换器的右操作数类型相同，反之亦然。
+                        因此，只需在<codeph>COMMUTATOR</codeph>子句中提供交换器运算符的名称即可。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>neg_op</varname>
+                    </pt>
+                    <pd>可选的<codeph>NEGATOR</codeph>子句命名一个运算符，该运算符是要定义的运算符的否定符。
+                        我们说如果两个操作符都返回布尔结果，并且对于所有可能的输入x，y，（x A y）等于NOT（x B y），则运算符A是运算符B的否定符。
+                        请注意，B也是A的否定符。例如，<codeph>&lt;</codeph>和<codeph>&gt;=</codeph>是大多数数据类型的否定符对。
+                        运算符的否定符必须具有与要定义的运算符相同的左右操作数类型，因此，在<codeph>NEGATOR</codeph>子句中仅需要指定运算符名称。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>res_proc</varname>
+                    </pt>
+                    <pd>可选的<codeph>RESTRICT</codeph>为运算符命名了一个限制选择性估计函数。
+                        请注意，这是一个函数名称，而不是运算符名称。
+                        <codeph>RESTRICT</codeph>子句仅对返回布尔值的二元运算符有意义。
+                        限制选择性估计器背后的想法是猜测表中哪几部分行将满足以下形式的<codeph>WHERE</codeph>子句条件：
+                    </pd>
                     <pd>
-                        <p>A hash-joinable operator must have a commutator (itself, if the two
-                            operand data types are the same, or a related equality operator if they
-                            are different) that appears in the same operator family. Otherwise,
-                            planner errors can occur when the operator is used. For better
-                            optimization, a hash operator family that supports multiple data types
-                            should provide equality operators for every combination of the data
-                            types. <note>The function underlying a hash-joinable operator must be
-                                marked immutable or stable; an operator marked as volatile will not
-                                be used. If a hash-joinable operator has an underlying function that
-                                is marked strict, the function must also be complete, returning true
-                                or false, and not null, for any two non-null inputs.</note></p>
-                    </pd></plentry><plentry><pt>MERGES</pt><pd>The <codeph>MERGES</codeph> clause, if present, tells the system
-that it is permissible to use the merge-join method for a join based
-on this operator. <codeph>MERGES</codeph> only makes sense for a binary
-operator that returns <codeph>boolean</codeph>, and in practice the operator
-must represent equality for some data type or pair of data types. </pd>
-                    <pd>Merge join is based on the idea of sorting the left- and right-hand tables
-                        into order and then scanning them in parallel. This means both data types
-                        must be capable of being fully ordered, and the join operator must be one
-                        that can only succeed for pairs of values that fall at equivalent places in
-                        the sort order. In practice, this means that the join operator must behave
-                        like an equality operator. However, you can merge-join two distinct data
-                        types so long as they are logically compatible. For example, the
-                            <codeph>smallint-versus-integer</codeph> equality operator is
-                        merge-joinable. Only sorting operators that bring both data types into a
-                        logically compatible sequence are needed. </pd>
-                    <pd>To be marked <codeph>MERGES</codeph>, the join operator must appear as an
-                        equality member of a btree index operator family. This is not enforced when
-                        you create the operator, because the referencing operator family does not
-                        exist until later. However, the operator will not actually be used for merge
-                        joins unless a matching operator family can be found. The
-                            <codeph>MERGE</codeph> flag thus acts as a suggestion to the planner to
-                        look for a matching operator family.</pd>
-                    <pd>A merge-joinable operator must have a commutator that appears in the same
-                        operator family. This would be itself, if the two operand data types are the
-                        same, or a related equality operator if the data types are different.
-                        Without an appropriate commutator, planner errors can occur when the
-                        operator is used. Also, although not strictly required, a btree operator
-                        family that supports multiple data types should be able to provide equality
-                        operators for every combination of the data types; this allows better
-                        optimization. <note><codeph>SORT1</codeph>, <codeph>SORT2</codeph>,
-                                <codeph>LTCMP</codeph>, and <codeph>GTCMP</codeph> were formerly
-                            used to specify the names of sort operators associated with a
-                            merge-joinable operator. Information about associated operators is now
-                            found by looking at B-tree operator families; specifying any of these
-                            operators will be ignored, except that it will implicitly set
-                                <codeph>MERGES</codeph> to true. </note></pd></plentry></parml></section><section id="section5"><title>Notes</title><p>Any functions used to implement the operator must be defined as <codeph>IMMUTABLE</codeph>.</p>
-                     <p>   It is not possible to specify an operator's lexical precedence in
-                           <codeph>CREATE OPERATOR</codeph>, because the parser's precedence behavior
-                         is hard-wired. See <xref href="https://www.postgresql.org/docs/9.4/sql-syntax-lexical.html#SQL-PRECEDENCE" 
-                             scope="external" format="html">Operator Precedence</xref> in the PostgreSQL 
-                         documentation for precedence details.</p>
-                      <p>Use <codeph><xref href="DROP_OPERATOR.xml#topic1">DROP
-                    OPERATOR</xref></codeph> to delete user-defined operators from a database. Use
-                        <codeph><xref href="ALTER_OPERATOR.xml#topic1">ALTER
-                    OPERATOR</xref></codeph> to modify operators in a database.</p></section>
-    <section id="section6"><title>Examples</title><p>Here is an example of creating an operator for adding two complex numbers,
-assuming we have already created the definition of type <codeph>complex</codeph>.
-First define the function that does the work, then define the operator:
-</p><codeblock>CREATE FUNCTION complex_add(complex, complex)
-    RETURNS complex
-    AS 'filename', 'complex_add'
-    LANGUAGE C IMMUTABLE STRICT;
-CREATE OPERATOR + (
-    leftarg = complex,
-    rightarg = complex,
-    procedure = complex_add,
-    commutator = +
-);</codeblock><p>To use this operator in a query: </p><codeblock>SELECT (a + b) AS c FROM test_complex;</codeblock></section><section id="section7"><title>Compatibility</title><p><codeph>CREATE OPERATOR</codeph> is a Greenplum Database language extension.
-The SQL standard does not provide for user-defined operators.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="CREATE_FUNCTION.xml#topic1" type="topic" format="dita"/></codeph>,
-                        <codeph><xref href="./CREATE_TYPE.xml#topic1" type="topic" format="dita"
-                    /></codeph>, <codeph><xref href="ALTER_OPERATOR.xml#topic1" type="topic"
-                        format="dita"/></codeph>, <codeph><xref href="./DROP_OPERATOR.xml#topic1"
-                        type="topic" format="dita"/></codeph></p></section></body></topic>
+                        <codeblock>column OP constant</codeblock>
+                    </pd>
+                    <pd>用于当前运算符和特定的常量值。
+                        这有助于优化器了解具有这种形式的<codeph>WHERE</codeph>子句将消除多少行。
+                    </pd>
+                    <pd>You can usually just use one of the following system standard estimator functions for many of
+                        your own operators:
+                        <p>
+                            <codeph>eqsel</codeph>
+                            为 =
+                        </p>
+                        <p>
+                            <codeph>neqsel</codeph>
+                            为 &lt;&gt;
+                        </p>
+                        <p>
+                            <codeph>scalarltsel</codeph>
+                            为 &lt; 或 &lt;=
+                        </p>
+                        <p>
+                            <codeph>scalargtsel</codeph>
+                            为 &gt; 或 &gt;=
+                        </p>
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>join_proc</varname>
+                    </pt>
+                    <pd>可选的<codeph>JOIN</codeph>子句为运算符命名联接选择性估计函数。
+                        请注意，这是一个函数名称，而不是运算符名称。
+                        <codeph>JOIN</codeph>子句仅对返回布尔值的二元运算符有意义。
+                        连接选择性估计器背后的想法是猜测一对表中的哪几部分行将满足以下<codeph>WHERE</codeph>子句条件
+                    </pd>
+                    <pd>
+                        <codeblock>table1.column1 OP table2.column2</codeblock>
+                    </pd>
+                    <pd>对于当前的运算符。通过让优化器找出几个可能的连接序列中哪一个可能花费最少的工作，可以帮助优化器。
+                    </pd>
+                    <pd>通常，您可以对许多自己的运算符使用以下系统标准联接选择性估计器函数之一：
+                        <p>
+                            <codeph>eqjoinsel</codeph>
+                            为 =
+                        </p>
+                        <p>
+                            <codeph>neqjoinsel</codeph>
+                            为 &lt;&gt;
+                        </p>
+                        <p>
+                            <codeph>scalarltjoinsel</codeph>
+                            为 &lt; 或 &lt;=
+                        </p>
+                        <p>
+                            <codeph>scalargtjoinsel</codeph>
+                            为 &gt; 或 &gt;=
+                        </p>
+                        <p>
+                            <codeph>areajoinsel</codeph>
+                            为基于2D区域的比较
+                        </p>
+                        <p>
+                            <codeph>positionjoinsel</codeph>
+                            为基于2D位置的比较
+                        </p>
+                        <p>
+                            <codeph>contjoinsel</codeph>
+                            为基于2D包含的比较
+                        </p>
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>HASHES</pt>
+                    <pd>可选的<codeph>HASHES</codeph>子句告诉系统允许使用哈希联接方法进行基于此运算符的联接。
+                        <codeph>HASHES</codeph>仅对返回布尔值的二元运算符有意义。
+                        哈希联接运算符只能对哈希到同一哈希代码的一对左右值返回true。
+                        如果将两个值放在不同的哈希存储桶中，则联接将永远不会比较它们，
+                        隐式地假设联接运算符的结果必须为false。
+                        因此，为不表示相等性的运算符指定<codeph>HASHES</codeph>永远没有意义。
+                    </pd>
+                    <pd>在大多数情况下，仅在两侧采用相同数据类型的运算符支持散列。
+                        但是，您可以为两个或多个数据类型设计兼容的哈希函数，
+                        即使这些值的表示方式不同，这些函数也会为“相等”值生成相同的哈希码。
+                    </pd>
+                    <pd>要标记为<codeph>HASHES</codeph>，联接运算符必须出现在哈希索引运算符类中。
+                        如果不存在此类运算符类，则尝试在哈希联接中使用运算符将在运行时失败。
+                        系统需要运算符类为运算符的输入数据类型查找特定于数据类型的哈希函数。
+                        在创建运算符类之前，还必须提供合适的哈希函数。
+                        在准备散列函数时，请格外小心，因为存在与机器相关的方法，散列函数可能无法正确运行。
+                        例如，在满足IEEE浮点标准的计算机上，负零和正零是不同的值（不同的位模式），但被定义为相等。
+                        如果浮点值可以包含负零，则将其定义为生成与正零相同的哈希值。
+                    </pd>
+                    <pd>
+                        <p>可哈希连接的运算符必须具有出现在同一运算符族中的换向符
+                            （如果两个操作数数据类型相同，则为自身，或者如果两个运算符数据类型不同，则为相关的相等运算符）。
+                            否则，使用运算符时可能会发生优化器错误。
+                            为了更好的优化，支持多种数据类型的哈希运算符族应为数据类型的每种组合提供相等运算符。
+                            <note>哈希可连接运算符的基础函数必须标记为不可变或稳定的；标记为volatile的运算符将不会使用。
+                                如果可哈希连接的运算符具有标记为严格的基础函数，则该函数也必须是完整的，
+                                对于任何两个非空输入都返回true或false，并且不返回null。
+                            </note>
+                        </p>
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>MERGES</pt>
+                    <pd><codeph>MERGES</codeph>子句（如果存在）告诉系统允许使用merge-join方法基于该运算符进行联接。
+                        <codeph>MERGES</codeph>仅对返回布尔值的二元运算符有意义，并且在实践中，
+                        该运算符必须表示某些数据类型或一对数据类型的相等性。
+                    </pd>
+                    <pd>合并联接基于的想法是将左表和右表排序，然后并行扫描它们。
+                        这意味着这两种数据类型都必须能够完全排序，
+                        并且联接运算符必须是仅对按排序顺序位于相等位置的值对成功的运算符。
+                        实际上，这意味着联接运算符必须表现得像相等运算符。
+                        但是，您可以合并联接两种不同的数据类型，只要它们在逻辑上是兼容的。
+                        例如，<codeph>smallint-versus-integer</codeph>等价运算符是可合并连接的。
+                        仅需要将两种数据类型都放入逻辑兼容序列的排序运算符。
+                    </pd>
+                    <pd>要标记为<codeph>MERGES</codeph>，联接运算符必须显示为btree索引运算符族的相等成员。
+                        创建运算符时不会强制执行此操作，因为引用运算符族直到稍后才存在。
+                        但是，除非可以找到匹配的运算符族，否则该运算符实际上不会用于合并联接。
+                        因此，<codeph>MERGE</codeph>标记可作为对优化器的建议，以寻找匹配的运算符族。
+                    </pd>
+                    <pd>可合并连接的运算符必须具有出现在同一运算符族中的换向器。
+                        如果两个操作数数据类型相同，则其为数据本身；
+                        如果数据类型不同，则为相关的相等运算符。
+                        如果没有合适的换向器，则在使用运算符时会发生优化器错误。
+                        同样，尽管不是严格要求，但是支持多种数据类型的btree运算符族应该能够为数据类型的每种组合提供相等运算符；
+                        这样可以实现更好的优化。
+                        <note><codeph>SORT1</codeph>，<codeph>SORT2</codeph>，
+                            <codeph>LTCMP</codeph>和<codeph>GTCMP</codeph>以前用于指定与可合并连接运算符关联的排序运算符的名称。
+                            现在，通过查看B树运算符族可以找到有关关联运算符的信息。
+                            指定这些运算符中的任何一个都将被忽略，除非它将隐式地将<codeph>MERGES</codeph>设置为true。
+                        </note>
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p>用于实现运算符的任何函数都必须定义为<codeph>IMMUTABLE</codeph>。
+            </p>
+            <p>在<codeph>CREATE OPERATOR</codeph>中不能指定运算符的词法优先级，因为解析器的优先级行为是固定的。
+                有关优先级的详细信息，请参见PostgreSQL文档中的<xref
+                        href="https://www.postgresql.org/docs/9.4/sql-syntax-lexical.html#SQL-PRECEDENCE"
+                        scope="external" format="html">运算符优先级</xref>。
+            </p>
+            <p>使用<codeph><xref href="DROP_OPERATOR.xml#topic1">DROP OPERATOR</xref></codeph>从数据库中删除用户定义的运算符。
+                使用<codeph><xref href="ALTER_OPERATOR.xml#topic1">ALTER OPERATOR</xref></codeph>修改数据库中的运算符。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>假设我们已经创建了<codeph>complex</codeph>类型的定义，这是创建一个用于添加两个复数的运算符的示例。
+                首先定义完成工作的函数，然后定义运算符：
+            </p>
+            <codeblock>CREATE FUNCTION complex_add(complex, complex)
+                RETURNS complex
+                AS 'filename', 'complex_add'
+                LANGUAGE C IMMUTABLE STRICT;
+                CREATE OPERATOR + (
+                leftarg = complex,
+                rightarg = complex,
+                procedure = complex_add,
+                commutator = +
+                );
+            </codeblock>
+            <p>要在查询中使用此运算符：</p>
+            <codeblock>SELECT (a + b) AS c FROM test_complex;</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p><codeph>CREATE OPERATOR</codeph>是一个Greenplum数据语言的扩展。
+                SQL标准不提供用户定义的运算符。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="CREATE_FUNCTION.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./CREATE_TYPE.xml#topic1" type="topic" format="dita"
+                    />
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="ALTER_OPERATOR.xml#topic1" type="topic"
+                          format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./DROP_OPERATOR.xml#topic1"
+                          type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>
