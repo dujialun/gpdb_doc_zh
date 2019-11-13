@@ -6,94 +6,89 @@
   domains="(topic ui-d) (topic hi-d) (topic pr-d) (topic sw-d)                          (topic ut-d) (topic indexing-d)"
   class="- topic/topic ">
   <title id="me143671" class="- topic/title ">orafce</title>
-  <shortdesc>Describes the Oracle Compatibility SQL functions in Greenplum Database. These functions
-    target PostgreSQL but can also be used in Greenplum Database.</shortdesc>
+  <shortdesc>描述Greenplum数据库中的Oracle兼容SQL函数。
+      这些函数针对PostgreSQL，但也可以在Greenplum数据库中使用。
+      </shortdesc>
   <topic id="topic_fpb_kbk_4gb">
-    <title>About the Oracle Compatibility Functions for Greenplum Database</title>
+    <title>关于Greenplum数据库的Oracle兼容性函数</title>
     <body>
-      <p>Oracle Compatibility Functions for Greenplum Database is based on the open source Orafce
-        project at <xref href="https://github.com/github.com/orafce/orafce" format="html"
-          scope="external"><codeph>https://github.com/orafce/orafce</codeph></xref>. </p>
-      <p>The modified Orafce source files for Greenplum Database can be found in the
-          <codeph>gpcontrib/orafce</codeph> directory in the <xref
-          href="https://github.com/greenplum-db/gpdb" format="html" scope="external">Greenplum
-          Database open source project</xref>. The source includes the Orafce 3.6.1 release and
-        additional commits to <xref
-          href="https://github.com/orafce/orafce/tree/3af70a28f6ab81f43c990fb5661df99a37328b8a"
-          format="html" scope="external">3af70a28f6</xref>.</p>
-      <p>The following functions are available by default in Greenplum Database and do not require
-        installing Oracle Compatibility Functions:</p>
+      <p>用于Greenplum数据库的Oracle兼容性函数基于<xref href="https://github.com/github.com/orafce/orafce" format="html"
+                                           scope="external"><codeph>https://github.com/orafce/orafce</codeph></xref>上的开源Orafce项目。
+          </p>
+      <p>可以在<xref
+              href="https://github.com/greenplum-db/gpdb" format="html" scope="external">Greenplum数据库开源项目</xref>的<codeph>gpcontrib/orafce</codeph>目录中找到经过修改的Greenplum数据库的Orafce源文件。
+          源文件包括Orafce 3.6.1版本和对<xref
+                  href="https://github.com/orafce/orafce/tree/3af70a28f6ab81f43c990fb5661df99a37328b8a"
+                  format="html" scope="external">3af70a28f6</xref>的其他提交。
+          </p>
+      <p>以下函数默认情况下在Greenplum数据库中可用，并且不需要安装Oracle兼容性函数：</p>
 	<ul>
          <li>sinh</li>
          <li>tanh</li>
          <li>cosh</li>
-         <li>decode (See <xref href="#topic3" format="dita"/> for more information.)</li>
+         <li>decode (更多信息请参考<xref href="#topic3" format="dita"/>。)</li>
         </ul>
-      <p>For information about using the Oracle Compatibility Functions, refer to the documentation
-        at the Orafce project home at <xref
-          href="https://github.com/orafce/orafce/tree/3af70a28f6ab81f43c990fb5661df99a37328b8a"
-          format="html" scope="external">https://github.com/orafce/orafce</xref>. The source files
-        for the documentation in the Orafce project are also included in the Greenplum Database open
-        source project.</p>
+      <p>有关使用Oracle兼容性函数的信息，请参阅Orafce项目主页上的文档，网址为<xref
+              href="https://github.com/orafce/orafce/tree/3af70a28f6ab81f43c990fb5661df99a37328b8a"
+              format="html" scope="external">https://github.com/orafce/orafce</xref>。
+          Orafce项目中文档的源文件也包含在Greenplum数据库开源项目中。
+          </p>
     </body>
   </topic>
   <topic id="topic2" xml:lang="en" ditaarch:DITAArchVersion="1.1"
     domains="(topic ui-d) (topic hi-d) (topic pr-d) (topic sw-d)                          (topic ut-d) (topic indexing-d)"
     class="- topic/topic ">
-    <title class="- topic/title ">Installing Oracle Compatibility Functions</title>
+    <title class="- topic/title ">安装Oracle兼容性函数</title>
     <body class="- topic/body ">
-      <note>Always use the Oracle Compatibility Functions module included with your Greenplum
-        Database version. Before upgrading to a new Greenplum Database version, uninstall the
-        compatibility functions from each of your databases, and then, when the upgrade is complete,
-        reinstall the compatibility functions from the new Greenplum Database release. See the
-        Greenplum Database release notes for upgrade prerequisites and procedures.</note>
-      <p>Install the Oracle Compatibility Functions in each of your databases using the
-          <codeph>CREATE EXTENSION</codeph> SQL command.</p>
+      <note>始终使用Greenplum数据库版本随附的Oracle兼容性函数模块。
+          在升级到新的Greenplum数据库版本之前，请从每个数据库中卸载兼容性函数，然后，在升级完成后，
+          从新的Greenplum数据库版本中重新安装兼容性函数。
+          有关升级先决条件和步骤，请参阅Greenplum数据库发行说明。
+          </note>
+      <p>使用<codeph>CREATE EXTENSION</codeph> SQL命令在每个数据库中安装Oracle兼容性函数。
+        </p>
       <codeblock>$ psql -d <varname>db_name</varname> -c 'CREATE EXTENSION orafce;'</codeblock>
-      <note type="note" class="- topic/note ">Some Oracle Compatibility Functions reside in the
-          <codeph class="+ topic/ph pr-d/codeph ">oracle</codeph> schema. To access them set the
-        search path for the database to include the <codeph>oracle</codeph> schema name. For
-        example, this command sets the default search path for a database to include the
-          <codeph>oracle</codeph>
-        schema:<codeblock>ALTER DATABASE <varname>db_name</varname> SET <varname>search_path</varname> = "$user", public, oracle;</codeblock></note>
-      <p>To uninstall Oracle Compatibility Functions, drop the <codeph>orafce</codeph> extension
-        using the <codeph>DROP EXTENSION</codeph> SQL command.</p>
+      <note type="note" class="- topic/note ">某些Oracle兼容性函数位于<codeph class="+ topic/ph pr-d/codeph ">oracle</codeph>模式中。
+          要访问它们，请为数据库设置搜索路径以包括<codeph>oracle</codeph>模式名称。
+          例如，此命令设置数据库的默认搜索路径以包括<codeph>oracle</codeph>模式：
+          <codeblock>ALTER DATABASE <varname>db_name</varname> SET <varname>search_path</varname> = "$user", public, oracle;</codeblock></note>
+      <p>要卸载Oracle兼容性函数，请使用<codeph>DROP EXTENSION</codeph> SQL命令删除<codeph>orafce</codeph>扩展。
+        </p>
       <codeblock>$ psql -d <varname>db_name</varname> -c 'DROP EXTENSION orafce;'</codeblock>
-      <p>If you are uninstalling the compatibility functions from a Greenplum Database 5.x release,
-        use this command instead:</p>
+      <p>如果要从Greenplum数据库5.x发行版中卸载兼容性函数，请改用以下命令：
+          </p>
       <codeblock>$ psql -d db_name -f $GPHOME/share/postgresql/contrib/uninstall_orafunc.sql</codeblock>
     </body>
   </topic>
   <topic id="topic3" xml:lang="en" ditaarch:DITAArchVersion="1.1"
     domains="(topic ui-d) (topic hi-d) (topic pr-d) (topic sw-d)                          (topic ut-d) (topic indexing-d)"
     class="- topic/topic ">
-    <title class="- topic/title ">Oracle and Greenplum Implementation Differences</title>
+    <title class="- topic/title ">Oracle和Greenplum的实现差异</title>
     <body class="- topic/body ">
-      <p>There are some differences in the implementation of the compatibility functions in
-        Greenplum Database from the Oracle implementation. If you use validation scripts, the output
-        may not be exactly the same as in Oracle. Some of the differences are as follows:</p>
+      <p>Greenplum数据库中兼容性函数的实现与Oracle实现之间存在一些差异。
+          如果使用验证脚本，则输出可能与Oracle中的输出不完全相同。
+          一些区别如下：
+        </p>
       <ul class="- topic/ul ">
-        <li id="me144138" class="- topic/li ">Oracle performs a decimal round off, Greenplum
-          Database does not:<ul id="ul_yt5_bz1_1p">
-            <li>2.00 becomes 2 in Oracle</li>
-            <li>2.00 remains 2.00 in Greenplum Database</li>
+        <li id="me144138" class="- topic/li ">Oracle执行十进制舍入，Greenplum数据库则不：
+            <ul id="ul_yt5_bz1_1p">
+            <li>2.00在Oracle中变成2</li>
+            <li>Greenplum数据库中的2.00仍为2.00</li>
           </ul></li>
-        <li id="me144139" class="- topic/li ">The provided Oracle compatibility functions handle
-          implicit type conversions differently. For example, using the <codeph
-            class="+ topic/ph pr-d/codeph ">decode</codeph>
-            function:<codeblock>decode(<varname>expression</varname>, <varname>value</varname>, <varname>return</varname> [,<varname>value</varname>, <varname>return</varname>]...
-            [, default])</codeblock><p>Oracle
-            automatically converts <varname>expression</varname> and each <varname>value</varname>
-            to the data type of the first <varname>value</varname> before comparing. Oracle
-            automatically converts <varname>return</varname> to the same data type as the first
-            result. </p><p>The Greenplum Database implementation restricts <varname>return</varname>
-            and <codeph class="+ topic/ph pr-d/codeph ">default</codeph> to be of the same data
-            type. The <varname>expression</varname> and <varname>value</varname> can be different
-            types if the data type of <varname>value</varname> can be converted into the data type
-            of the <varname>expression</varname>. This is done implicitly. Otherwise, <codeph
-              class="+ topic/ph pr-d/codeph ">decode</codeph> fails with an <codeph
-              class="+ topic/ph pr-d/codeph ">invalid input syntax</codeph> error. For
-          example:</p><codeblock>SELECT decode('a','M',true,false);
+        <li id="me144139" class="- topic/li ">
+            提供的Oracle兼容性函数以不同的方式处理隐式类型转换。
+            例如，使用<codeph class="+ topic/ph pr-d/codeph ">decode</codeph>函数：
+            <codeblock>decode(<varname>expression</varname>, <varname>value</varname>, <varname>return</varname> [,<varname>value</varname>, <varname>return</varname>]...
+            [, default])</codeblock>
+            <p>Oracle在比较之前自动将表达式和每个值转换为第一个值的数据类型。
+                Oracle自动将<varname>return</varname>转换为与第一个结果相同的数据类型。
+                </p>
+            <p>Greenplum数据库实现将<varname>return</varname>和<codeph class="+ topic/ph pr-d/codeph ">default</codeph>限制为相同的数据类型。
+                如果可以将值的数据类型转换为表达式的数据类型，则表达式和值可以是不同的类型。
+                这是隐式完成的。
+                否则，<codeph class="+ topic/ph pr-d/codeph ">decode</codeph>将失败，并出现<codeph class="+ topic/ph pr-d/codeph ">invalid input syntax</codeph>错误。
+                例如：
+                </p><codeblock>SELECT decode('a','M',true,false);
 CASE
 ------
  f
@@ -101,35 +96,36 @@ CASE
 SELECT decode(1,'M',true,false);
 ERROR: Invalid input syntax for integer:<i>"M" 
 </i>LINE 1: SELECT decode(1,'M',true,false);</codeblock></li>
-        <li id="me144144" class="- topic/li ">Numbers in <codeph class="+ topic/ph pr-d/codeph "
-            >bigint</codeph> format are displayed in scientific notation in Oracle, but not in
-          Greenplum Database:<ul id="ul_cld_kz1_1p">
-            <li>9223372036854775 displays as 9.2234E+15 in Oracle</li>
-            <li>9223372036854775 remains 9223372036854775 in Greenplum Database</li>
+        <li id="me144144" class="- topic/li ">
+            <codeph class="+ topic/ph pr-d/codeph ">bigint</codeph>格式的数字在Oracle中以科学计数法显示，
+            但在Greenplum数据库中不是这样：
+            <ul id="ul_cld_kz1_1p">
+            <li>9223372036854775在Oracle中显示为9.2234E + 15</li>
+            <li>9223372036854775在Greenplum数据库中仍为9223372036854775</li>
           </ul></li>
-        <li id="me144146" class="- topic/li ">The default date and timestamp format in Oracle is
-          different than the default format in Greenplum Database. If the following code is
-            executed:<codeblock>CREATE TABLE TEST(date1 date, time1 timestamp, time2 
+        <li id="me144146" class="- topic/li ">
+            Oracle中的默认日期和时间戳格式与Greenplum数据库中的默认格式不同。
+            如果执行以下代码：
+            <codeblock>CREATE TABLE TEST(date1 date, time1 timestamp, time2
                   timestamp with time zone);
 INSERT INTO TEST VALUES ('2001-11-11','2001-12-13 
                  01:51:15','2001-12-13 01:51:15 -08:00');
-SELECT DECODE(date1, '2001-11-11', '2001-01-01') FROM TEST;</codeblock><p>Greenplum
-            Database returns the row, but Oracle returns no rows.</p><note>The correct syntax in
-            Oracle to return the row
-            is:<codeblock>SELECT DECODE(to_char(date1, 'YYYY-MM-DD'), '2001-11-11', 
+SELECT DECODE(date1, '2001-11-11', '2001-01-01') FROM TEST;</codeblock>
+            <p>Greenplum数据库返回该行，但是Oracle不返回任何行。</p>
+            <note>Oracle中返回该行的正确语法是：<codeblock>SELECT DECODE(to_char(date1, 'YYYY-MM-DD'), '2001-11-11',
               '2001-01-01') FROM TEST</codeblock></note></li>
       </ul>
-      <p>Following are differences between using the Oracle Compatibility Functions with PostgreSQL
-        and Greenplum Database. </p>
+      <p>以下是将Oracle兼容函数与PostgreSQL和Greenplum数据库结合使用的区别。
+          </p>
       <ul id="ul_njs_p4l_4gb">
-        <li>The <codeph>decode()</codeph> function is removed from the Greenplum Database Oracle
-          Compatibility Functions. The Greenplum Database parser converts <codeph>decode()</codeph>
-          -          function calls to <codeph>case</codeph> statements.</li>
-        <li>The functions in the Oracle Compatibility Functions <codeph>dbms_pipe</codeph> package
-          execute only on the Greenplum Database master host.</li>
-        <li>The functions in the Oracle Compatibility Functions <codeph>dbms_alert</codeph> package
-          are not implemented for Greenplum Database.</li>
-        <li>The upgrade scripts in the Orafce project do not work with Greenplum Database.</li>
+        <li>从Greenplum数据库Oracle兼容性函数中删除了<codeph>decode()</codeph>函数。
+            Greenplum数据库解析器将<codeph>decode()</codeph> - 函数调用转换为<codeph>case</codeph>语句。
+            </li>
+        <li>Oracle兼容性函数<codeph>dbms_pipe</codeph>软件包中的函数仅在Greenplum数据库master主机上执行。
+            </li>
+        <li>没有为Greenplum数据库实现Oracle兼容性函数<codeph>dbms_alert</codeph>软件包中的函数。
+            </li>
+        <li>Orafce项目中的升级脚本不适用于Greenplum数据库。</li>
       </ul>
     </body>
   </topic>

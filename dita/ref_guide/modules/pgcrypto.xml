@@ -4,22 +4,17 @@
   <topic id="topic_qml_2rd_yz">
     <title>pgcrypto</title>
     <body>
-      <p>Greenplum Database is installed with an optional module of encryption/decryption
-        functions called <codeph>pgcrypto</codeph>. The <codeph>pgcrypto</codeph>
-        functions allow database administrators to store certain columns of data
-        in encrypted form. This adds an extra layer of protection for sensitive
-        data, as data stored in Greenplum Database in encrypted form cannot be
-        read by anyone who does not have the encryption key, nor can it be read
-        directly from the disks.</p>
-      <note>The <codeph>pgcrypto</codeph> functions run inside the database server,
-        which means that all the data and passwords move between
-        <codeph>pgcrypto</codeph> and the client application in clear-text. For
-        optimal security, consider also using SSL connections between the client
-        and the Greenplum master server.</note>
-      <p>See
-            <xref href="https://www.postgresql.org/docs/9.4/pgcrypto.html" format="html"
-            scope="external">pgcrypto</xref> in the PostgreSQL documentation for more information
-          about the individual functions in this module.</p>
+      <p>Greenplum数据库安装有一个可选的加密/解密函数模块<codeph>pgcrypto</codeph>。
+          <codeph>pgcrypto</codeph>函数允许数据库管理员以加密形式存储数据的某些列。
+          这为敏感数据增加了一层额外的保护，
+          因为没有加密密钥的任何人都无法读取以加密形式存储在Greenplum数据库中的数据，也不能直接从磁盘读取该数据。
+          </p>
+      <note><codeph>pgcrypto</codeph>函数在数据库服务器内部运行，这意味着所有数据和密码都以明文形式在<codeph>pgcrypto</codeph>和客户端应用程序之间传输。
+          为了获得最佳安全性，请考虑在客户端和Greenplum主服务器之间使用SSL连接。
+          </note>
+      <p>有关此模块中各个函数的更多信息，
+          请参见PostgreSQL文档中的<xref href="https://www.postgresql.org/docs/9.4/pgcrypto.html" format="html" scope="external">pgcrypto</xref>。
+          </p>
     </body>
   </topic>
 </dita>

@@ -1,43 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_khf_ltc_vbb">
-  <title>Additional Supplied Modules</title>
+  <title>附加提供的模块</title>
   <body>
-     <p>This section describes additional modules available in the Greenplum Database
-      installation. These modules may be PostgreSQL- or Greenplum-sourced.</p>
-     <p otherprops="oss-only"><codeph>contrib</codeph> modules are typically
-       packaged as extensions. You register a module in a database using the
-       <codeph><xref href="../sql_commands/CREATE_EXTENSION.xml#topic1">CREATE EXTENSION</xref></codeph>
-       command. You remove a module from a database with <codeph><xref href="../sql_commands/DROP_EXTENSION.xml#topic1">DROP EXTENSION</xref></codeph>.</p>
-     <p>The following Greenplum Database and PostgreSQL <codeph>contrib</codeph>
-        modules are installed; refer to the linked module documentation for usage
-        instructions.</p>
+     <p>本节介绍了Greenplum数据库安装中可用的其他模块。
+         这些模块可能来自PostgreSQL或Greenplum。
+         </p>
+     <p otherprops="oss-only"><codeph>contrib</codeph>模块通常打包为扩展。
+         您可以使用<codeph><xref href="../sql_commands/CREATE_EXTENSION.xml#topic1">CREATE EXTENSION</xref></codeph>命令在数据库中注册模块。
+         您可以使用<codeph><xref href="../sql_commands/DROP_EXTENSION.xml#topic1">DROP EXTENSION</xref></codeph>从数据库中删除模块。</p>
+     <p>安装了以下Greenplum数据库和PostgreSQL <codeph>contrib</codeph>模块；
+         有关使用说明，请参阅链接的模块文档。
+        </p>
      <ul>
-       <li><codeph><xref href="citext.xml" scope="peer" format="dita"
-              >citext</xref></codeph> - Provides a case-insensitive, multibyte-aware text
-          data type.</li>
-       <li><codeph><xref href="dblink.xml" scope="peer" format="dita"
-              >dblink</xref></codeph> - Provides connections to other Greenplum databases.</li>
-       <li><codeph><xref href="fuzzystrmatch.xml" scope="peer"
-             format="dita">fuzzystrmatch</xref></codeph> - Determines similarities and differences
-         between strings.</li>
+       <li><codeph><xref href="citext.xml" scope="peer" format="dita">citext</xref></codeph> -
+           提供不区分大小写，可识别多字节的文本数据类型。</li>
+       <li><codeph><xref href="dblink.xml" scope="peer" format="dita">dblink</xref></codeph> -
+           提供与其他Greenplum数据库的连接。</li>
+       <li><codeph><xref href="fuzzystrmatch.xml" scope="peer" format="dita">fuzzystrmatch</xref></codeph> -
+           确定字符串之间的相似性和差异。</li>
        <li><codeph><xref
           href="https://github.com/greenplum-db/gpdb/tree/master/gpcontrib/gp_sparse_vector/README"
-          format="html" scope="external">gp_sparse_vector</xref></codeph> - Implements
-         a Greenplum Database data type that uses compressed storage of zeros to help
-         with floating point calculations.</li>
-       <li><codeph><xref href="hstore.xml" scope="peer" format="dita"
-             >hstore</xref></codeph> - Provides a data type for storing sets of key/value pairs
-         within a single PostgreSQL value.</li>
-       <li><codeph><xref href="orafce_ref.xml" scope="peer" format="dita"
-             >orafce</xref></codeph> - Provides Greenplum Database-specific Oracle
-          SQL compatibility functions.</li>
+          format="html" scope="external">gp_sparse_vector</xref></codeph> -
+           实现Greenplum数据库数据类型，该数据类型使用零压缩存储来帮助进行浮点计算。
+           </li>
+       <li><codeph><xref href="hstore.xml" scope="peer" format="dita">hstore</xref></codeph> -
+           提供一种数据类型，用于在单个PostgreSQL值中存储键/值对的集合。</li>
+       <li><codeph><xref href="orafce_ref.xml" scope="peer" format="dita">orafce</xref></codeph> -
+           提供Greenplum数据库特定的Oracle SQL兼容性函数。</li>
        <li><codeph><xref href="https://www.postgresql.org/docs/9.4/pageinspect.html"
-             scope="external" format="html">pageinspect</xref></codeph> - Functions for low level
-         inspection of the contents of database pages; available to superusers only.</li>
-       <li><codeph><xref href="pgcrypto.xml" scope="peer" format="dita"
-             >pgcrypto</xref></codeph> - Provides cryptographic functions for Greenplum
-         Database.</li>
+             scope="external" format="html">pageinspect</xref></codeph> -
+           低级检查数据库页面内容的函数；仅对超级用户可用。</li>
+       <li><codeph><xref href="pgcrypto.xml" scope="peer" format="dita">pgcrypto</xref></codeph> -
+           为Greenplum数据库提供加密函数。</li>
      </ul>
    </body>
 </topic>
