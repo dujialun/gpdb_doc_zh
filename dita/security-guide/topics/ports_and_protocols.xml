@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="greenplum_database_ports_and_protocols">
-  <title>Greenplum Database Ports and Protocols</title>
-  <shortdesc>Lists network ports and protocols used within the Greenplum cluster.</shortdesc>
+  <title>Greenplum数据库端口和协议</title>
+  <shortdesc>列出Greenplum集群内使用的网络端口和协议。</shortdesc>
   <body>
-    <p>Greenplum Database clients connect with TCP to the Greenplum master instance at the client
-      connection port, 5432 by default. The listen port can be reconfigured in the
-        <filepath>postgresql.conf</filepath> configuration file. Client connections use the
-      PostgreSQL libpq API. The <codeph>psql</codeph> command-line interface, several Greenplum
-      utilities, and language-specific programming APIs all either use the libpq library directly or
-      implement the libpq protocol internally. </p>
-    <p>Each segment instance also has a client connection port, used solely by the master instance
-      to coordinate database operations with the segments. The <codeph>gpstate -p</codeph> command,
-      executed on the Greenplum master, lists the port assignments for the Greenplum master and the
-      primary segments and mirrors. For example:
+    <p>Greenplum数据库客户端用TCP在客户端连接端口（默认为5432）上连接到Greenplum的Master实例。这个监听端口可以在
+        <filepath>postgresql.conf</filepath>配置文件中重新配置。客户端连接使用PostgreSQL的libpq API。
+        <codeph>psql</codeph>命令行接口、一些Greenplum工具以及特定语言的编程API也将直接使用libpq库或者在内部实现libpq协议。</p>
+    <p>每一个Segment实例也有一个客户端连接端口，它被Master实例单独用来与Segment协调数据库操作。在Greenplum的Master上执行的<codeph>gpstate -p</codeph>命令，会列出Greenplum的Master以及主Segment和镜像Segment的端口分配。例如：
       <codeblock>[gpadmin@mdw ~]$ gpstate -p 
 20190403:02:57:04:011030 gpstate:mdw:gpadmin-[INFO]:-Starting gpstate with args: -p
 20190403:02:57:05:011030 gpstate:mdw:gpadmin-[INFO]:-local Greenplum Version: 'postgres (Greenplum Database) 5.17.0 build commit:fc9a9d4cad8dd4037b9bc07bf837c0b958726103'
@@ -42,180 +36,134 @@
 20190403:02:57:05:011030 gpstate:mdw:gpadmin-[INFO]:-   sdw3   /data/primary/gpseg8   20002
 20190403:02:57:05:011030 gpstate:mdw:gpadmin-[INFO]:-   sdw1   /data/mirror/gpseg8    21002
 </codeblock></p>
-    <p>Additional Greenplum Database network connections are created for features such as standby
-      replication, segment mirroring, statistics collection, and data exchange between segments.
-      Some persistent connections are established when the database starts up and other transient
-      connections are created during operations such as query execution. Transient connections for
-      query execution processes, data movement, and statistics collection use available ports in the
-      range 1025 to 65535 with both TCP and UDP protocols. </p>
-    <note>To avoid port conflicts between Greenplum Database and other applications when
-      initializing Greenplum Database, do not specify Greenplum Database ports in the range
-      specified by the operating system parameter <codeph>net.ipv4.ip_local_port_range</codeph>. For
-      example, if <codeph>net.ipv4.ip_local_port_range = 10000 65535</codeph>, you could set the
-      Greenplum Database base port numbers to values outside of that
-      range:<codeblock>PORT_BASE = 6000
+    <p>诸如后备复制、Segment镜像、统计信息收集以及Segment之间的数据交换等特性也会创建额外的Greenplum数据库网络连接。
+    数据库启动时会创建一些持久连接而在查询执行之类的操作期间会创建临时连接。用于查询执行处理、数据移动以及统计信息收集的临时连接使用TCP和UDP协议在1025到65535范围内的可用端口。 </p>
+    <note>为避免在初始化Greenplum数据库时Greenplum数据库与其他应用程序之间的端口冲突，请不要在操作系统参数<codeph>net.ipv4.ip_local_port_range</codeph>指定的范围内指定Greenplum数据库端口。 例如，如果
+    <codeph>net.ipv4.ip_local_port_range = 10000 65535</codeph>, 用户可以将Greenplum数据库基本端口号设置为该值以外的
+       范围：<codeblock>PORT_BASE = 6000
 MIRROR_PORT_BASE = 7000
 REPLICATION_PORT_BASE = 8000
 MIRROR_REPLICATION_PORT_BASE = 9000</codeblock></note>
-    <p>Some add-on products and services that work with Greenplum Database have additional
-      networking requirements. The following table lists ports and protocols used within the
-      Greenplum cluster, and includes services and applications that integrate with Greenplum
-      Database.</p>
+    <p>用于Greenplum数据库的某些附加产品和服务有额外的网络需求。下面的表格列出了在Greenplum集群内使用的端口和协议，
+    并且包括与Greenplum数据库集成的服务和应用。</p>
     <table frame="all" rowsep="1" colsep="1" id="table_zf3_lzz_s5">
-      <title>Greenplum Database Ports and Protocols</title>
+      <title>Greenplum数据库端口和协议</title>
       <tgroup cols="3">
         <colspec colname="newCol1" colnum="1" colwidth="1*"/>
         <colspec colname="c1" colnum="2" colwidth="1.0*"/>
         <colspec colname="c3" colnum="3" colwidth="2.0*"/>
         <thead>
           <row>
-            <entry>Service</entry>
-            <entry>Protocol/Port</entry>
-            <entry>Description</entry>
+            <entry>服务</entry>
+            <entry>协议/端口</entry>
+            <entry>描述</entry>
           </row>
         </thead>
         <tbody>
           <row>
-            <entry>Master SQL client connection</entry>
+            <entry>Master的SQL客户端连接</entry>
             <entry>TCP 5432, libpq</entry>
-            <entry>SQL client connection port on the Greenplum master host. Supports clients using
-              the PostgreSQL libpq API. Configurable.</entry>
+            <entry>Greenplum的Master主机上的SQL客户端连接端口。使用PostgreSQL的libpq API支持客户端。可配置。</entry>
           </row>
           <row>
-            <entry>Segment SQL client connection</entry>
-            <entry>varies, libpq</entry>
-            <entry>The SQL client connection port for a segment instance. Each primary and mirror
-              segment on a host must have a unique port. Ports are assigned when the Greenplum
-              system is initialized or expanded. The <codeph>gp_segment_configuration</codeph>
-              system catalog records port numbers for each segment in the <codeph>port</codeph>
-              column. Run <codeph>gpstate -p</codeph> to view the ports in use.</entry>
+            <entry>Segment的SQL客户端连接</entry>
+            <entry>可变，libpq</entry>
+            <entry>Segment实例的SQL客户端连接端口。主机上的每一个主Segment和镜像Segment都必须有唯一的端口。
+                端口在Greenplum系统初始化或者扩展时分配。<codeph>gp_segment_configuration</codeph>系统目录在<codeph>port</codeph>
+                列中为每个Segment记录端口号。运行<codeph>gpstate -p</codeph>可以查看使用中的端口。</entry>
           </row>
           <row>
-            <entry>Segment mirroring port</entry>
-            <entry>varies, libpq</entry>
-            <entry>The port where a segment receives mirrored blocks from its primary. The port is
-              assigned when the mirror is set up. The port number is stored in the
-                <codeph>gp_segment_configuration</codeph> system catalog in the
-                <codeph>mirror_port</codeph> column.</entry>
+            <entry>Segment镜像端口</entry>
+            <entry>可变，libpq</entry>
+            <entry>Segment从其主Segment接收镜像块的端口。该端口在镜像被设置时分配。端口号存储在<codeph>gp_segment_configuration</codeph>
+                系统目录的<codeph>mirror_port</codeph>列中。</entry>
           </row>
           <row>
-            <entry>Greenplum Database Interconnect</entry>
-            <entry>UDP 1025-65535, dynamically allocated</entry>
-            <entry>The Interconnect transports database tuples between Greenplum segments during
-              query execution. </entry>
+            <entry>Greenplum数据库的Interconnect</entry>
+            <entry>UDP 1025-65535，动态分配</entry>
+            <entry>在查询执行期间，Interconnect在Greenplum的Segment之间传输数据库元组。</entry>
           </row>
           <row>
-            <entry>Standby master client listener</entry>
+            <entry>后备Master的客户端监听器</entry>
             <entry>TCP 5432, libpq</entry>
-            <entry>SQL client connection port on the standby master host. Usually the same as the
-              master client connection port. Configure with the <codeph>gpinitstandby</codeph>
-              utility <codeph>-P</codeph> option.</entry>
+            <entry>后备Master主机上的SQL客户端连接端口。通常和Master的客户端连接端口相同。可以用<codeph>gpinitstandby</codeph>工具的<codeph>-P</codeph>选项配置。</entry>
           </row>
           <row>
-            <entry>Standby master replicator</entry>
+            <entry>后备Master复制器</entry>
             <entry>TCP 1025-65535, gpsyncmaster</entry>
-            <entry>The <codeph>gpsyncmaster</codeph> process on the master host establishes a
-              connection to the secondary master host to replicate the master's log to the standby
-              master. </entry>
+            <entry>Master主机上的<codeph>gpsyncmaster</codeph>进程会建立一个到第二Master主机的连接来把Master的日志复制到后备Master上。</entry>
           </row>
           <row>
-            <entry>Greenplum Database file load and transfer utilities: gpfdist, gpload.</entry>
+            <entry>Greenplum数据库文件装载和传输工具：gpfdist、gpload、gptransfer</entry>
             <entry>TCP 8080, HTTP<p>TCP 9000, HTTPS</p></entry>
-            <entry>The gpfdist file serving utility can run on Greenplum hosts or external hosts.
-              Specify the connection port with the <codeph>-p</codeph> option when starting the
-              server. <p>The gpload utility runs one or more instances of gpfdist with ports or port
-                ranges specified in a configuration file.</p></entry>
+            <entry>gpfdist文件服务工具能够在Greenplum主机或者外部主机上运行。在启动该服务器时用<codeph>-p</codeph>选项指定连接端口。
+                <p>gpload和gptransfer工具会用一个配置文件中指定的端口或者端口范围运行一个或者更多gpfdist。</p></entry>
           </row>
           <row>
-            <entry>Gpperfmon agents</entry>
+            <entry>Gpperfmon代理</entry>
             <entry>TCP 8888</entry>
-            <entry>Connection port for gpperfmon agents (<codeph>gpmmon</codeph> and
-                <codeph>gpsmon</codeph>) executing on Greenplum Database hosts. Configure by setting
-              the <codeph>gpperfmon_port</codeph> configuration variable in
-                <filepath>postgresql.conf</filepath> on master and segment hosts.</entry>
+            <entry>执行在每一台Greenplum主机上的gpperfmon代理(<codeph>gpmmon</codeph> 和
+                <codeph>gpsmon</codeph>)的连接端口。通过Master和Segment主机上<filepath>postgresql.conf</filepath>中的配置变量<codeph>gpperfmon_port</codeph>设置。</entry>
           </row>
           <row>
-            <entry>Backup completion notification</entry>
+            <entry>备份完成通知</entry>
             <entry>TCP 25, TCP 587, SMTP</entry>
-            <entry>The <codeph>gpbackup</codeph> backup utility can optionally send email to a list
-              of email addresses at completion of a backup. The SMTP service must be enabled on the
-              Greenplum master host. </entry>
+            <entry><codeph>gpbackup</codeph>备份工具可以选择在备份完成时向一个email地址列表发送邮件。SMTP服务必须在Greenplum的Master主机上被启用。 </entry>
           </row>
           <row>
-            <entry>Greenplum Database secure shell (SSH): gpssh, gpscp, gpssh-exkeys, gppkg,
-              gpseginstall</entry>
+            <entry>Greenplum数据库的安全shell（SSH）：gpssh、gpscp、gpssh-exkeys、gppkg、gpseginstall</entry>
             <entry>TCP 22, SSH</entry>
-            <entry>Many Greenplum utilities use scp and ssh to transfer files between hosts and
-              manage the Greenplum system within the cluster. </entry>
+            <entry>很多Greenplum的工具使用scp和ssh在主机之间传输文件并且管理集群中的Greenplum系统。 </entry>
           </row>
           <row>
-            <entry>Greenplum Platform Extension Framework (PXF)</entry>
+            <entry>Greenplum平台扩展框架(PXF)</entry>
             <entry>TCP 5888</entry>
-            <entry>The PXF Java service runs on port number 5888 on each Greenplum Database segment
-              host.</entry>
+            <entry>PXF Java服务运行在每个Greenplum数据库segment主机上的5888端口。</entry>
           </row>
           <row otherprops="pivotal">
             <entry morerows="2">Greenplum Command Center (GPCC)</entry>
             <entry>TCP 28080, HTTP/HTTPS</entry>
-            <entry>The GPCC web server (<codeph>gpccws</codeph> process) executes on the Greenplum Database master
-              host or standby master host. The port number is configured at installation
-              time.</entry>
+            <entry>GPCC Web服务器（<codeph>gpccws</codeph>进程）运行在Greenplum数据库master主机或备用master主机。端口号是在安装时配置的。</entry>
           </row>
           <row otherprops="pivotal">
-            <entry>TCP 8899, rcp port</entry>
-            <entry>A GPCC agent (<codeph>ccagent</codeph> process) on each Greenplum Database segment host connects
-              to the GPCC rpc backend at port number 8899 on the GPCC web server host.</entry>
+            <entry>TCP 8899, rcp 端口</entry>
+            <entry>每个Greenplum数据库segment主机上的GPCC代理（<codeph>ccagent</codeph>进程）通过GPCC Web服务器主机上的端口号8899连接到GPCC rpc后端。</entry>
           </row>
           <row otherprops="pivotal">
-            <entry>UNIX domain socket, agent</entry>
-            <entry>Greenplum Database processes transmit datagrams to the GPCC agent (<codeph>ccagent</codeph>
-              process) on each segment host using a UNIX domain socket.</entry>
+            <entry>UNIX套接字, 代理</entry>
+            <entry>Greenplum数据库进程使用UNIX域套接字将数据报传输到每个segment主机上的GPCC代理（<codeph>ccagent</codeph>进程）。</entry>
           </row>
           <row otherprops="pivotal">
             <entry morerows="1">GPText</entry>
-            <entry>TCP 2188 (base port)</entry>
-            <entry>ZooKeeper client ports. ZooKeeper uses a range of ports beginning at the base port
-              number. The base port number and maximum port number are set in the GPText installation 
-              configuration file at installation time. The default base port number is 2188.</entry>
+            <entry>TCP 2188 (基本端口)</entry>
+            <entry>ZooKeeper客户端端口。 ZooKeeper使用从基本端口号开始的一系列端口。基本端口号和最大端口号在安装时在GPText安装配置文件中设置。默认基本端口号是2188。</entry>
           </row>
           <row otherprops="pivotal">
-            <entry>TCP 18983 (base port)</entry>
-            <entry>GPText (Apache Solr) nodes. GPText nodes use a range of ports beginning at the base 
-              port number. The base port number and maximum port number are set in the GPText installation 
-              configuration file at installation time. The default base port number is 18983.</entry>
+            <entry>TCP 18983 (基本端口)</entry>
+            <entry>GPText（Apache Solr）节点。GPText节点使用从基本端口号开始的一系列端口。 
+                基本端口号和最大端口号在安装时在GPText安装配置文件中设置。默认基本端口号是18983。</entry>
           </row>
           <row otherprops="pivotal">
-            <entry morerows="3">EMC Data Domain and DD Boost</entry>
-            <entry>TCP/UDP 111, NFS portmapper </entry>
-            <entry>Used to assign a random port for the mountd service used by NFS and DD Boost. The
-              mountd service port can be statically assigned on the Data Domain server.</entry>
+            <entry morerows="3">EMC Data Domain 和 DD Boost</entry>
+            <entry>TCP/UDP 111, NFS端口映射器 </entry>
+            <entry>用于为NFS和DD Boost使用的已挂载服务分配随机端口。可以在Data Domain服务器上静态分配mountd服务端口。</entry>
           </row>
           <row otherprops="pivotal">
             <entry>TCP 2052</entry>
-            <entry>Main port used by NFS mountd. This port can be set on the Data Domain system
-              using the <codeph>nfs set mountd-port</codeph> command .</entry>
+            <entry>NFS mountd使用的主端口。可以使用<codeph>nfs set mountd-port</codeph>命令在Data Domain系统上设置此端口。</entry>
           </row>
           <row otherprops="pivotal">
             <entry>TCP 2049, NFS</entry>
-            <entry>Main port used by NFS. This port can be configured using the <codeph>nfs set
-                server-port</codeph> command on the Data Domain server. </entry>
+            <entry>NFS使用的主端口。可以使用Data Domain服务器上的<codeph>nfs set server-port</codeph>命令配置此端口。</entry>
           </row>
           <row otherprops="pivotal">
-            <entry>TCP 2051, replication</entry>
-            <entry>Used when replication is configured on the Data Domain system. This port can be
-              configured using the <codeph>replication modify</codeph> command on the Data Domain
-              server.</entry>
+            <entry>TCP 2051, 复制</entry>
+            <entry>在Data Domain系统上配置复制时使用。 可以使用Data Domain服务器上的<codeph>replication modify</codeph>命令配置此端口。</entry>
           </row>
           <row>
-            <entry>Pgbouncer connection pooler</entry>
+            <entry>Pgbouncer连接池</entry>
             <entry>TCP, libpq</entry>
-            <entry>The pgbouncer connection pooler runs between libpq clients and Greenplum (or
-              PostgreSQL) databases. It can be run on the Greenplum master host, but running it on a
-              host outside of the Greenplum cluster is recommended. When it runs on a separate host,
-              pgbouncer can act as a warm standby mechanism for the Greenplum master host, switching
-              to the Greenplum standby host without requiring clients to reconfigure. Set the client
-              connection port and the Greenplum master host address and port in the
-                <filepath>pgbouncer.ini</filepath> configuration file. </entry>
+            <entry>pgbouncer连接池运行在libpq客户端和Greenplum（或者PostgreSQL）数据库之间。它可以运行在Greenplum的Master主机上，但推荐将它运行在Greenplum集群之外的一台主机上。当它运行在一台单独的主机上时，pgbouncer可以当作Greenplum的Master主机的温备机制，切换到Greenplum后备主机不要求重新配置客户端。在<filepath>pgbouncer.ini</filepath>配置文件中设置客户端连接端口和Greenplum的Master主机地址。</entry>
           </row>
         </tbody>
       </tgroup>

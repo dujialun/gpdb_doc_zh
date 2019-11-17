@@ -1,116 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_nyc_mdf_jr">
-  <title>Security Best Practices</title>
-  <shortdesc>Describes basic security best practices that you should follow to ensure the highest
-    level of system security. </shortdesc>
+  <title>安全性最佳实践</title>
+  <shortdesc>这一章描述用户应该遵循的基本安全性最佳实践，它可以确保最高级别的系统安全性。 </shortdesc>
   <body>
-    <p>In the default Greenplum Database security configuration:<ul id="ul_mhk_rrg_4r">
-        <li>Only local connections are allowed. </li>
-        <li>Basic authentication is configured for the superuser (<codeph>gpadmin</codeph>).</li>
-        <li>The superuser is authorized to do anything.</li>
-        <li>Only database role passwords are encrypted.</li>
+    <p>Greenplum数据库的默认安全性配置：<ul id="ul_mhk_rrg_4r">
+        <li>仅允许本地连接。 </li>
+        <li>为超级用户（<codeph>gpadmin</codeph>）配置的基本认证。</li>
+        <li>超级用户被授权做任何事情。</li>
+        <li>只有数据库角色的口令被加密。</li>
       </ul></p>
     <section>
-      <title>System User (gpadmin)</title>
-      <p>Secure and limit access to the <codeph>gpadmin</codeph> system user. </p>
-      <p>Greenplum requires a UNIX user id to install and initialize the Greenplum Database system.
-        This system user is referred to as <codeph>gpadmin</codeph> in the Greenplum documentation.
-        The <codeph>gpadmin</codeph> user is the default database superuser in Greenplum Database,
-        as well as the file system owner of the Greenplum installation and its underlying data
-        files. The default administrator account is fundamental to the design of Greenplum Database.
-        The system cannot run without it, and there is no way to limit the access of the
-          <codeph>gpadmin</codeph> user id. </p>
-      <p>The <codeph>gpadmin</codeph> user can bypass all security features of Greenplum Database.
-        Anyone who logs on to a Greenplum host with this user id can read, alter, or delete any
-        data, including system catalog data and database access rights. Therefore, it is very
-        important to secure the <codeph>gpadmin</codeph> user id and only allow essential system
-        administrators access to it. </p>
-      <p>Administrators should only log in to Greenplum as <codeph>gpadmin</codeph> when performing
-        certain system maintenance tasks (such as upgrade or expansion). </p>
-      <p>Database users should never log on as <codeph>gpadmin</codeph>, and ETL or production
-        workloads should never run as <codeph>gpadmin</codeph>. </p>
+      <title>系统用户（gpadmin）</title>
+      <p>保护和限制对<codeph>gpadmin</codeph>系统用户的访问。</p>
+      <p>Greenplum要求一个UNIX用户ID来安装和初始化Greenplum数据库系统。这个系统用户在Greenplum文档中被称作<codeph>gpadmin</codeph>。<codeph>gpadmin</codeph>用户是Greenplum数据库中的默认数据库超级用户，也是Greenplum安装及其底层数据文件的文件系统拥有者。默认的管理员账户是Greenplum数据库设计的根本。没有它系统无法运行，并且也没有办法限制<codeph>gpadmin</codeph>用户ID的访问。</p>
+      <p>这个<codeph>gpadmin</codeph>用户可以绕过Greenplum数据库的所有安全性特性。任何人通过这一用户ID登入到Greenplum主机，就可以读取、修改或者删除任何数据，包括系统目录数据和数据库访问权限。因此，非常有必要保护好<codeph>gpadmin</codeph>用户ID并且只允许必要的系统管理员可以接触到它。</p>
+      <p>只有在执行特定系统维护任务（例如升级或扩展）时，管理员才应该作为<codeph>gpadmin</codeph>登入到Greenplum。 </p>
+      <p>数据库用户绝不应作为<codeph>gpadmin</codeph>登录，并且也绝不应以<codeph>gpadmin</codeph>运行ETL或者生产负载。</p>
     </section>
     <section>
-      <title>Superusers</title>
-      <p>Roles granted the <codeph>SUPERUSER</codeph> attribute are superusers. Superusers bypass
-        all access privilege checks and resource queues. Only system administrators should be given
-        superuser rights. </p>
-      <p> See "Altering Role Attributes" in the <i>Greenplum Database Administrator Guide</i>. </p>
+      <title>超级用户</title>
+      <p>被授予<codeph>SUPERUSER</codeph>属性的角色是超级用户。超级用户会绕过所有访问特权检查和资源队列。只有系统管理员应该被给予超级用户权利。</p>
+        <p>请见<i>Greenplum数据库管理员指南</i>中的“修改角色属性”。</p>
     </section>
     <section>
-      <title>Login Users</title>
-      <p>Assign a distinct role to each user who logs in and set the <codeph>LOGIN</codeph>
-        attribute. </p>
-      <p>For logging and auditing purposes, each user who is allowed to log in to Greenplum Database
-        should be given their own database role. For applications or web services, consider creating
-        a distinct role for each application or service. See "Creating New Roles (Users)" in the
-          <i>Greenplum Database Administrator Guide</i>. </p>
-      <p>Each login role should be assigned to a single, non-default resource queue.</p>
+      <title>登录用户</title>
+      <p>为每个登入系统的用户指派一个不同的角色并且设置<codeph>LOGIN</codeph>属性。</p>
+        <p>为了登录和审计的目的，每个被允许登入Greenplum数据库的用户应该被给予他们自己的数据库角色。对于应用或者Web服务，考虑为每一种应用或服务创建一个不同的角色。请见<i>Greenplum数据库管理员指南</i>中的“创建新角色（用户）”。</p>
+      <p>每一个登录角色应该被指派给一个单一的、非默认的资源队列。</p>
     </section>
     <section>
-      <title>Groups</title>
-      <p>Use groups to manage access privileges.</p>
-      <p>Create a group for each logical grouping of object/access permissions. </p>
-      <p>Every login user should belong to one or more roles. Use the <codeph>GRANT</codeph>
-        statement to add group access to a role. Use the <codeph>REVOKE</codeph> statement to remove
-        group access from a role. </p>
-      <p>The <codeph>LOGIN</codeph> attribute should not be set for group roles. </p>
-      <p>See "Creating Groups (Role Membership)" in the <i>Greenplum Database Administrator
-          Guide</i>. </p>
+      <title>组</title>
+      <p>使用组管理访问特权。</p>
+      <p>为每个对象/访问权限的逻辑分组创建一个组。</p>
+      <p>每个登录用户应该属于一个或者更多角色。使用<codeph>GRANT</codeph>语句给角色增加组访问。使用<codeph>REVOKE</codeph>语句从角色移除组访问。</p>
+      <p>不应该为组角色设置<codeph>LOGIN</codeph>属性。</p>
+        <p>见<i>Greenplum数据库管理员指南</i>中的“创建组（角色成员关系）”。</p>
     </section>
     <section>
-      <title>Object Privileges</title>
-      <p>Only the owner and superusers have full permissions to new objects. Permission must be
-        granted to allow other rules (users or groups) to access objects. Each type of database
-        object has different privileges that may be granted. Use the <codeph>GRANT</codeph>
-        statement to add a permission to a role and the <codeph>REVOKE</codeph> statement to remove
-        the permission.</p>
-      <p>You can change the owner of an object using the <codeph>REASIGN OWNED BY</codeph>
-        statement. For example, to prepare to drop a role, change the owner of the objects that
-        belong to the role. Use the <codeph>DROP OWNED BY</codeph> to drop objects, including
-        dependent objects, that are owned by a role.</p>
-      <p>Schemas can be used to enforce an additional layer of object permissions checking, but
-        schema permissions do not override object privileges set on objects contained within the
-        schema.</p>
+      <title>对象特权</title>
+      <p>只有拥有者和超级用户对新对象拥有完全的权限。权限必须被授予给其他角色（用户或组）以允许它们访问对象。每种类型的数据库对象都有不同的可以被授予的特权。使用<codeph>GRANT</codeph>语句给角色增加权限，使用<codeph>REVOKE</codeph>语句来移除权限。</p>
+      <p>用户可以使用<codeph>REASIGN OWNED BY</codeph>语句更改对象的拥有者。例如，要准备删除一个角色，先要更改属于该角色的对象的拥有者。使用<codeph>DROP OWNED BY</codeph>删除角色拥有的对象，包括依赖对象。</p>
+      <p>方案可以被用于实施额外的对象权限检查层，但是方案权限不会覆盖包含在该方案中对象上设置的对象特权。</p>
     </section>
     <section id="password-strength-recommendations">
-      <title>Operating System Users and File System</title>
-      <p> To protect the network from intrusion, system administrators should verify the passwords
-        used within an organization are sufficiently strong. The following recommendations can
-        strengthen a password: </p>
+      <title>操作系统用户和文件系统</title>
+      <p>要防止网络入侵，系统管理员应该验证在组织内使用的口令足够强。下面的推荐可以强化口令： </p>
       <ul>
-        <li> Minimum password length recommendation: At least 9 characters. MD5 passwords should be
-          15 characters or longer. </li>
-        <li> Mix upper and lower case letters. </li>
-        <li> Mix letters and numbers. </li>
-        <li> Include non-alphanumeric characters. </li>
-        <li> Pick a password you can remember. </li>
+        <li> 最小口令强度推荐：至少9个字符。MD5口令应该为至少15个字符。 </li>
+        <li> 混合大小写字母。 </li>
+        <li> 混合字母和数字。 </li>
+        <li> 包括非字母数字字符。 </li>
+        <li> 选择一个用户可以记住的口令。 </li>
       </ul>
-      <p> The following are recommendations for password cracker software that you can use to
-        determine the strength of a password. </p>
+      <p> 下面推荐了一些可以用来确定口令强度的口令破解软件。 </p>
       <ul id="ul_gd3_fxg_4r">
-        <li> John The Ripper. A fast and flexible password cracking program. It allows the use of
-          multiple word lists and is capable of brute-force password cracking. It is available
-          online at <xref href="http://www.openwall.com/john/" format="html" scope="external"
-            >http://www.openwall.com/john/</xref>. </li>
-        <li>Crack. Perhaps the most well-known password cracking software, Crack is also very fast,
-          though not as easy to use as John The Ripper. It can be found online at <xref
+        <li> John The Ripper。 一种快速灵活的口令破解程序。它允许使用多个单词列表并且可以进行蛮力口令破解。该程序可以从<xref href="http://www.openwall.com/john/" format="html" scope="external"
+            >http://www.openwall.com/john/</xref>得到。</li>
+        <li>Crack。可能是最著名的口令破解软件，Crack也非常快，但是可能不如John The Ripper那么易用。该软件可以在 <xref
             href="https://dropsafe.crypticide.com/alecm/software/crack/c50-faq.html" format="html"
             scope="external"
-            >https://dropsafe.crypticide.com/alecm/software/crack/c50-faq.html</xref>.  </li>
+            >https://dropsafe.crypticide.com/alecm/software/crack/c50-faq.html</xref>得到。 </li>
       </ul>
-      <p>The security of the entire system depends on the strength of the root password. This
-        password should be at least 12 characters long and include a mix of capitalized letters,
-        lowercase letters, special characters, and numbers. It should not be based on any dictionary
-        word. </p>
-      <p> Password expiration parameters should be configured. </p>
-      <p> Ensure the following line exists within the file <codeph>/etc/libuser.conf</codeph> under
-        the <codeph>[import]</codeph> section. </p>
+      <p>整个系统的安全性依赖于root口令的强度。该口令应该至少长达12个字符并且包括大写字母、小写字母、特殊字符和数字的组合。它不能基于任何词典中的词。</p>
+      <p>应该配置口令过期参数。</p>
+      <p>确保下面的行存在于文件<codeph>/etc/libuser.conf</codeph>的<codeph>[import]</codeph>小节中。</p>
       <codeblock>login_defs = /etc/login.defs
 </codeblock>
-      <p> Ensure no lines in the <codeph>[userdefaults]</codeph> section begin with the following
-        text, as these words override settings from <codeph>/etc/login.defs</codeph>: </p>
+      <p>确保在<codeph>[userdefaults]</codeph>小节中没有以下列文本开头的行，因为这些词会覆盖来自<codeph>/etc/login.defs</codeph>的设置： </p>
       <ul id="ul_ef3_fxg_4r">
         <li>
           <codeph>LU_SHADOWMAX</codeph>
@@ -122,94 +79,66 @@
           <codeph>LU_SHADOWWARNING</codeph>
         </li>
       </ul>
-      <p> Ensure the following command produces no output. Any accounts listed by running this
-        command should be locked. </p>
+      <p>确保下面的命令不会产生输出。通过这一命令列出的任何账号都应该被锁定。 </p>
       <codeblock>
 grep &quot;^+:&quot; /etc/passwd /etc/shadow /etc/group
 </codeblock>
-      <p> Note: We strongly recommend that customers change their passwords after initial setup. </p>
+      <p> 注意：我们强烈推荐客户在初始设置后更改他们的口令。 </p>
       <codeblock>
 cd /etc
 chown root:root passwd shadow group gshadow
 chmod 644 passwd group
 chmod 400 shadow gshadow
 </codeblock>
-      <p> Find all the files that are world-writable and that do not have their sticky bits set. </p>
+      <p> 找出所有全域可写的文件以及没有设置其粘滞位的文件。 </p>
       <codeblock>
 find / -xdev -type d \( -perm -0002 -a ! -perm -1000 \) -print
 </codeblock>
-      <p> Set the sticky bit (<codeph># chmod +t {dir}</codeph>) for all the directories that result
-        from running the previous command. </p>
-      <p> Find all the files that are world-writable and fix each file listed. </p>
+      <p> 为前一个命令结果中的所有目录设置其粘滞位（<codeph># chmod +t {dir}</codeph>）。 </p>
+      <p> 找出所有全域可写的文件并且修正每一个被列出的文件。 </p>
       <codeblock>
 find / -xdev -type f -perm -0002 -print
 </codeblock>
-      <p> Set the right permissions (<codeph># chmod o-w {file}</codeph>) for all the files
-        generated by running the aforementioned command. </p>
-      <p> Find all the files that do not belong to a valid user or group and either assign an owner
-        or remove the file, as appropriate. </p>
+      <p> 为前述命令给出的所有文件设置正确的权限（<codeph># chmod o-w {file}</codeph>）。</p>
+      <p> 找出所有不属于有效用户或组的文件，然后为它们分配一个拥有者或者移除文件。</p>
       <codeblock>
 find / -xdev \( -nouser -o -nogroup \) -print
 </codeblock>
-      <p> Find all the directories that are world-writable and ensure they are owned by either root
-        or a system account (assuming only system accounts have a User ID lower than 500). If the
-        command generates any output, verify the assignment is correct or reassign it to root. </p>
+      <p> 找出所有全域可写的目录并且确认它们属于root或者某个系统账户（假定只有系统账户的用户ID低于500）。如果该命令生成输出，验证其分配是否正确或者将它们重新分配给root。 </p>
       <codeblock>
 find / -xdev -type d -perm -0002 -uid +500 -print
 </codeblock>
-      <p> Authentication settings such as password quality, password expiration policy, password
-        reuse, password retry attempts, and more can be configured using the Pluggable
-        Authentication Modules (PAM) framework. PAM looks in the directory
-          <codeph>/etc/pam.d</codeph> for application-specific configuration information. Running
-          <codeph>authconfig</codeph> or <codeph>system-config-authentication</codeph> will re-write
-        the PAM configuration files, destroying any manually made changes and replacing them with
-        system defaults. </p>
-      <p> The default <codeph>pam_cracklib</codeph> PAM module provides strength checking for
-        passwords. To configure <codeph>pam_cracklib</codeph> to require at least one uppercase
-        character, lowercase character, digit, and special character, as recommended by the U.S.
-        Department of Defense guidelines, edit the file <codeph>/etc/pam.d/system-auth</codeph> to
-        include the following parameters in the line corresponding to password requisite
-          <codeph>pam_cracklib.so try_first_pass</codeph>. </p>
+      <p> 口令质量、口令过期策略、口令重用、口令重试尝试以及更多认证设置可以通过可插拔认证模块（PAM）框架配置。PAM在目录<codeph>/etc/pam.d</codeph>中查找应用相关的配置信息。运行<codeph>authconfig</codeph>或者<codeph>system-config-authentication</codeph>将重写PAM配置文件，这会毁掉任何手工更改并且将它们替换为系统默认配置。</p>
+      <p> 默认的PAM模块<codeph>pam_cracklib</codeph>提供了口令的强度检查。要配置<codeph>pam_cracklib</codeph>以要求至少一个大写字符、小写字符、数字和特殊字符（U.S.国防部指导方针推荐），可编辑文件<codeph>/etc/pam.d/system-auth</codeph>并且在对应于口令前置条件<codeph>pam_cracklib.so try_first_pass</codeph>的行中包括下列参数。</p>
       <codeblock>retry=3:
 dcredit=-1. Require at least one digit
 ucredit=-1. Require at least one upper case character
 ocredit=-1. Require at least one special character
 lcredit=-1. Require at least one lower case character
 minlen-14. Require a minimum password length of 14.</codeblock>
-      <p> For example: </p>
+      <p> 例如： </p>
       <codeblock>
 password required pam_cracklib.so try_first_pass retry=3\minlen=14 dcredit=-1 ucredit=-1 ocredit=-1 lcredit=-1
 </codeblock>
-      <p> These parameters can be set to reflect your security policy requirements. Note that the
-        password restrictions are not applicable to the root password. </p>
-      <p> The <codeph>pam_tally2</codeph> PAM module provides the capability to lock out user
-        accounts after a specified number of failed login attempts. To enforce password lockout,
-        edit the file <codeph>/etc/pam.d/system-auth</codeph> to include the following lines:<ul
+      <p> 可以设置这些参数来反映用户的安全性策略需求。注意口令限制不适用于root口令。</p>
+      <p> PAM模块<codeph>pam_tally2</codeph>提供了在指定失次数的败登录尝试之后锁住用户账户的功能。要实施口令封锁，可编辑文件<codeph>/etc/pam.d/system-auth</codeph>来包括下列行：<ul
           id="ul_ehw_ls2_lr">
-          <li>The first of the auth lines should
-            include:<codeblock>auth required pam_tally2.so deny=5 onerr=fail unlock_time=900</codeblock></li>
-          <li>The first of the account lines should
-            include:<codeblock>account required pam_tally2.so</codeblock></li>
+          <li>第一个认证行应该包括：
+              <codeblock>auth required pam_tally2.so deny=5 onerr=fail unlock_time=900</codeblock></li>
+          <li>第一个账户行应该包括：
+              <codeblock>account required pam_tally2.so</codeblock></li>
         </ul></p>
-      <p>Here, the deny parameter is set to limit the number of retries to 5 and the
-          <codeph>unlock_time</codeph> has been set to 900 seconds to keep the account locked for
-        900 seconds before it is unlocked. These parameters may be configured appropriately to
-        reflect your security policy requirements. A locked account can be manually unlocked using
-        the <codeph>pam_tally2</codeph>
-        utility:<codeblock>
+        <p>这里，deny参数被设置以限制重试次数为5并且<codeph>unlock_time</codeph>已经被设置为900秒来保持账户在被解锁前锁定900秒。请配置这些参数以反映用户的安全性策略需求。被锁定的账户可以用<codeph>pam_tally2</codeph>工具手工解锁：
+            <codeblock>
 /sbin/pam_tally2 --user {username} -reset
 </codeblock></p>
-      <p> You can use PAM to limit the reuse of recent passwords. The remember option for the
-          <codeph>pam_ unix</codeph> module can be set to remember the recent passwords and prevent
-        their reuse. To accomplish this, edit the appropriate line in
-          <codeph>/etc/pam.d/system-auth</codeph> to include the remember option. </p>
-      <p> For example: </p>
+      <p> 用户可以使用PAM限制重用最近用过的口令。可以设置<codeph>pam_ unix</codeph>模块的remember选项来记住最近的口令并且阻止重用它们。要做到这一点，可在<codeph>/etc/pam.d/system-auth</codeph>中编辑适当的行来包括remember选项。 </p>
+      <p> 例如： </p>
       <codeblock>
 password sufficient pam_unix.so [ … existing_options …] 
 remember=5
 </codeblock>
-      <p> You can set the number of previous passwords to remember to appropriately reflect your
-        security policy requirements. </p>
+      <p> 用户可以设置要记住的历史口令的数量以正确地反映其安全性策略需求。 </p>
       <codeblock>
 cd /etc
 chown root:root passwd shadow group gshadow
