@@ -68,7 +68,7 @@ FORMAT 'TEXT' ( DELIMITER '|' NULL ' ') ;
       <p>在实现数据库内加密之前，考虑下列PGP限制。<ul
           id="ul_ihq_xt4_kr">
           <li> 不支持签名。这也意味着检查加密子密钥是否属于主密钥。</li>
-          <li> 不支持加密密钥作为主密钥。通常不鼓励这种实践，因为这类限制不应该成为问题。/li>
+		  <li> 不支持加密密钥作为主密钥。通常不鼓励这种实践，因为这类限制不应该成为问题。</li>
           <li> 不支持多个子密钥。这可能看起来像是一个问题，因为这是常见的做法。在另一方面，用户不应将自己的常规GPG/PGP密钥用于pgcrypto，而是创建新的密钥，因为使用场景很不相同。</li>
         </ul></p>
       <p>Greenplum数据库默认编译了zlib，这允许PGP加密函数在加密前压缩数据。在编译有OpenSSL时，将有更多算法可用。</p>
@@ -223,7 +223,7 @@ sec   2048R/2027CC30 2015-01-13 [expires: 2016-01-13]
 uid                  John Doe &lt;jdoe@email.com&gt;
                   ssb   2048R/4FD2EFBB 2015-01-13</codeblock><p>2027CC30是公钥并且将被用于<i>加密</i>数据库中的数据。4FD2EFBB是私（秘密）钥并且将被用来<i>解密</i>数据。</p></li>
           <li>使用下面的命令导出密钥：
-              codeblock># gpg -a --export 4FD2EFBB &gt; public.key
+			  <codeblock># gpg -a --export 4FD2EFBB &gt; public.key
 # gpg -a --export-secret-keys 2027CC30 &gt; secret.key</codeblock></li>
         </ol>
         <p>更多有关PGP加密函数的信息，请见<xref href="https://www.postgresql.org/docs/9.4/pgcrypto.html"
