@@ -1,125 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_zyt_rxp_f5">
-  <title>Greenplum Command Center Security</title>
+  <title>Greenplum Command Center安全配置</title>
   <body>
-    <p>Greenplum Command Center (GPCC) is a web-based application for monitoring and managing
-      Greenplum clusters. GPCC works with data collected by agents running on the segment hosts and
-      saved to the gpperfmon database. The gpperfmon database is created by running the
-        <codeph>gpperfmon_install</codeph> utility, which also creates the <codeph>gpmon</codeph>
-      database role that GPCC uses to access the gpperfmon database. </p>
+    <p>Greenplum Command Center（GPCC）是基于Web的应用程序，用于监视和管理Greenplum集群。 GPCC处理由运行在segment主机上的代理收集的数据并保存到gpperfmon数据库。 通过运行<codeph>gpperfmon_install</codeph>实用程序来创建gpperfmon数据库，该实用程序还会创建GPCC用于访问gpperfmon数据库的<codeph>gpmon</codeph>数据库角色。 </p>
     <section>
-      <title>The gpmon User</title>
-      <p>The <codeph>gpperfmon_install</codeph> utility creates the <codeph>gpmon</codeph> database
-        role and adds the role to the <codeph>pg_hba.conf</codeph> file with the following
-        entries:<codeblock>local    gpperfmon   gpmon         md5
+      <title>gpmon用户</title>
+      <p><codeph>gpperfmon_install</codeph>实用程序创建<codeph>gpmon</codeph>数据库角色，并使用以下命令将该角色添加到<codeph>pg_hba.conf</codeph>文件中：
+         <codeblock>local    gpperfmon   gpmon         md5
 host     all         gpmon         127.0.0.1/28    md5
-host     all         gpmon         ::1/128         md5</codeblock>These
-        entries allow <codeph>gpmon</codeph> to establish a local socket connection to the gpperfmon
-        database and a TCP/IP connection to any database. </p>
-      <p>The <codeph>gpmon</codeph> database role is a superuser. In a secure or production
-        environment, it may be desirable to restrict the <codeph>gpmon</codeph> user to just the
-        gpperfmon database. Do this by editing the <codeph>gpmon</codeph> host entry in the
-          <codeph>pg_hba.conf</codeph> file and changing <codeph>all</codeph> in the database field
-        to
-        <codeph>gpperfmon</codeph>:<codeblock>local   gpperfmon   gpmon                        md5
+host     all         gpmon         ::1/128         md5</codeblock>这些条目
+          允许<codeph>gpmon</codeph>建立与gpperfmon数据库的本地套接字连接以及与任何数据库的TCP/IP连接。</p>
+      <p><codeph>gpmon</codeph>数据库角色是超级用户。 在安全或生产环境中，可能希望将<codeph>gpmon</codeph>用户限制为仅针对gpperfmon数据库。为此，请编辑pg_hba.conf文件中的gpmon主机条目，并将数据库字段中的<codeph>all</codeph>更改为<codeph>gpperfmon</codeph>：
+          <codeblock>local   gpperfmon   gpmon                        md5
 host    gpperfmon   gpmon    127.0.0.1/28        md5
 host    gpperfmon   gpmon    ::1/128             md5</codeblock></p>
-      <p>The password used to authenticate the <codeph>gpmon</codeph> user is set by the
-          <codeph>gpperfmon_install</codeph> utility and is stored in the <codeph>gpadmin</codeph>
-        home directory in the <codeph>~/.pgpass</codeph> file. The <codeph>~/.pgpass</codeph> file
-        must be owned by the <codeph>gpadmin</codeph> user and be RW-accessible only by the
-          <codeph>gpadmin</codeph> user. To change the <codeph>gpmon</codeph> password, use the
-          <codeph>ALTER ROLE</codeph> command to change the password in the database, change the
-        password in the <codeph>~/.pgpass</codeph> file, and then restart GPCC with the
-          <codeph>gpcmdr --restart <varname>instance_name</varname></codeph> command. </p>
-      <note>The GPCC web server can be configured to encrypt connections with SSL. Two-way
-        authentication with public keys can also be enabled for GPCC users. However, the
-          <codeph>gpmon</codeph> user always uses md5 authentication with the password saved in the
-          <codeph>~/.pgpass</codeph> file.</note>
-      <p>GPCC does not allow logins from any role configured with trust authentication, including
-        the <codeph>gpadmin</codeph> user. </p>
-      <p>The <codeph>gpmon</codeph> user can log in to the Command Center Console and has access to
-        all of the application's features. You can allow other database roles access to GPCC so that
-        you can secure the <codeph>gpmon</codeph> user and restrict other users' access to GPCC
-        features. Setting up other GPCC users is described in the next section. </p>
+      <p>用于验证<codeph>gpmon</codeph>用户的密码由<codeph>gpperfmon_install</codeph>实用程序设置，并存储在<codeph>gpadmin</codeph>主目录中的<codeph>~/.pgpass</codeph>文件。<codeph>~/.pgpass</codeph>文件必须由<codeph>gpadmin</codeph>用户拥有，并且只能由<codeph>gpadmin</codeph>用户进行读写访问。 要更改<codeph>gpmon</codeph>密码，请使用<codeph>ALTER ROLE</codeph>命令更改数据库中的密码，更改<codeph>~/.pgpass</codeph>文件中的密码 ，然后使用<codeph>gpcmdr --restart <varname>instance_name</varname></codeph>命令重新启动GPCC。</p>
+      <note>可以将GPCC Web服务器配置为使用SSL加密连接。 还可以为GPCC用户启用带有公钥的双重身份认证。但是，
+          <codeph>gpmon</codeph>用户必须始终使用md5身份验证，并将密码保存在<codeph>~/.pgpass</codeph> 文件。</note>
+        <p>GPCC不允许从任何配置了信任身份验证的角色登录GPCC（包括<codeph>gpadmin</codeph>用户）。</p>
+      <p><codeph>gpmon</codeph>用户可以登录到命令中心控制台，并可以访问该应用程序的所有功能。 您可以允许其他数据库角色访问GPCC，以便保护<codeph>gpmon</codeph>用户并限制其他用户对GPCC功能的访问。 下一节将介绍如何设置其他GPCC用户。</p>
     </section>
     <section>
-      <title>Greenplum Command Center Users</title>
-      <p>GPCC has the following types of users:<ul id="ul_tdv_qnt_g5">
-          <li><i>Self Only</i> users can view metrics and view and cancel their own queries. Any
-            Greenplum Database user successfully authenticated through the Greenplum Database
-            authentication system can access Greenplum Command Center with Self Only permission.
-            Higher permission levels are required to view and cancel other’s queries and to access
-            the System and Admin Control Center features.</li>
-          <li><i>Basic</i> users can view metrics, view all queries, and cancel their own queries.
-            Users with Basic permission are members of the Greenplum Database
-              <codeph>gpcc_basic</codeph> group. </li>
-          <li><i>Operator Basic</i> users can view metrics, view their own and others’ queries,
-            cancel their own queries, and view the System and Admin screens. Users with Operator
-            Basic permission are members of the Greenplum Database
-              <codeph>gpcc_operator_basic</codeph> group.</li>
-          <li><i>Operator</i> users can view their own and others’ queries, cancel their own and
-            other’s queries, and view the System and Admin screens. Users with Operator permission
-            are members of the Greenplum Database <codeph>gpcc_operator</codeph> group.</li>
-          <li><i>Admin</i> users can access all views and capabilities in the Command Center.
-            Greenplum Database users with the <codeph>SUPERUSER</codeph> privilege have Admin
-            permissions in Command Center.</li>
+      <title>Greenplum Command Center 用户</title>
+      <p>GGPCC具有以下类型的用户：<ul id="ul_tdv_qnt_g5">
+          <li><i>Self Only</i> 用户可以查看指标并查看和取消自己的查询。 任何已通过Greenplum数据库成功认证
+             身份验证系统的Greenplum数据库用户，可以使用Self Only权限访问Greenplum Command Center。
+             需要更高的权限级别才能查看和取消其他人的查询以及访问系统和管理控制中心功能。</li>
+          <li><i>Basic</i> 用户可以查看指标，查看所有查询以及取消自己的查询。具有Basic权限的用户是Greenplum数据库
+              <codeph>gpcc_basic</codeph> 组的成员。 </li>
+          <li><i>Operator Basic</i> 用户可以查看指标，查看自己和其他人的查询，取消自己的查询，并查看“系统”和“管理”屏幕。具有Operator Basic权限
+              的用户是Greenplum数据库<codeph>gpcc_operator_basic</codeph>组的成员。</li>
+          <li><i>Operator</i> 用户可以查看自己和其他人的查询，取消自己和其他人的查询，以及查看“系统”和“管理”屏幕。 具有Operator权限的用户
+              是Greenplum数据库<codeph>gpcc_operator</codeph>组的成员。</li>
+          <li><i>Admin</i> 用户可以在Command Center中访问所有视图和功能。 具有<codeph>SUPERUSER</codeph>特权的Greenplum数据库用户在Command Center具有Admin权限。</li>
         </ul></p>
-      <p>To log in to the GPCC web application, a user must be allowed access to the gpperfmon
-        database in <codeph>pg_hba.conf</codeph>. For example, to make <codeph>user1</codeph> a
-        regular GPCC user, edit the <codeph>pg_hba.conf</codeph> file and either add or edit a line
-        for the user so that the gpperfmon database is included in the database field. For
-        example:</p>
+      <p>要登录GPCC Web应用程序，必须允许用户访问<codeph>pg_hba.conf</codeph>中的gpperfmon数据库。 例如，将<codeph>user1</codeph>设为
+         普通GPCC用户，编辑<codeph>pg_hba.conf</codeph>文件，然后添加或编辑一行用户，以便gpperfmon数据库包含在数据库字段中。 例如：</p>
       <codeblock>host     gpperfmon,accounts   user1     127.0.0.1/28    md5</codeblock>
-      <p>To designate a user as an operator, grant the <codeph>gpcc_operator</codeph> role to the
-        user:<codeblock>=# GRANT gpcc_operator TO <varname>user</varname>;</codeblock></p>
-      <p>You can also grant <codeph>gpcc_operator</codeph> to a group role to make all members of
-        the group GPCC operators.</p>
-      <p>See the <codeph>gpperfmon_install</codeph> reference in <cite>Greenplum Database Utility
-          Guide</cite> for more information about managing the <codeph>gpperfmon</codeph>
-        database.</p>
+      <p>要将用户指定为操作员，请将<codeph>gpcc_operator</codeph>角色授予
+         用户：<codeblock>=# GRANT gpcc_operator TO <varname>user</varname>;</codeblock></p>
+      <p>用户还可以将<codeph>gpcc_operator</codeph>授予组角色，以使GPCC的所有组成员为操作员。</p>
+      <p>请参阅<cite>Greenplum Database Utility Guide</cite>中的<codeph>gpperfmon_install</codeph>参考
+           指南以获取有关管理<codeph>gpperfmon</codeph>数据库的更多信息。</p>
     </section>
     <section>
-      <title>Enabling SSL for Greenplum Command Center</title>
-      <p>The GPCC web server can be configured to support SSL so that client connections are
-        encrypted. A server certificate can be generated when the Command Center instance is created
-        or you can supply an existing certificate. </p>
-      <p>Two-way authentication with public key encryption can also be enabled for GPCC. See the
-          <cite>Greenplum Command Center Administration Guide</cite> for instructions. </p>
+      <title>为Greenplum Command Center启用SSL</title>
+      <p>可以将GPCC Web服务器配置为支持SSL，以便对客户端连接进行加密。 创建Command Center实例时可以生成服务器证书，也可以提供现有证书。</p>
+      <p>还可以为GPCC用户启用带有公钥的双重身份认证。请参阅<cite>Greenplum Command Center Administration Guide</cite> 。</p>
     </section>
     <section>
-      <title>Enabling Kerberos Authentication for Greenplum Command Center Users</title>
-      <p>If Kerberos authentication is enabled for Greenplum Database, Command Center users can also
-        authenticate with Kerberos. Command Center supports three Kerberos authentication modes:
+      <title>为Greenplum Command Center用户启用Kerberos身份验证</title>
+      <p>如果为Greenplum数据库启用了Kerberos身份验证，则Command Center用户也可以使用Kerberos进行身份验证。Command Center支持三种
+          Kerberos身份验证模式：
           <i>strict</i>, <i>normal</i>, and <i>gpmon-only</i>. </p>
       <parml>
         <plentry>
           <pt>Strict</pt>
-          <pd>Command Center has a Kerberos keytab file containing the Command Center service
-            principal and a principal for every Command Center user. If the principal in the
-            client’s connection request is in the keytab file, the web server grants the client
-            access and the web server connects to Greenplum Database using the client’s principal
-            name. If the principal is not in the keytab file, the connection request fails.</pd>
+          <pd>Command Center具有Kerberos秘钥文件，其中包含Command Center服务主体和每个Command Center用户的主体。 
+              如果客户端连接请求中的委托人位于秘钥文件中，则Web服务器会授予客户端访问权限，并且Web服务器将使用客户端的委托人名称连接到Greenplum数据库。如果主体不在秘钥文件中，则连接请求失败。</pd>
         </plentry>
         <plentry>
           <pt>Normal</pt>
-          <pd>The Command Center Kerberos keytab file contains the Command Center principal and may
-            contain principals for Command Center users. If the principal in the client’s connection
-            request is in Command Center’s keytab file, it uses the client’s principal for database
-            connections. Otherwise, Command Center uses the <codeph>gpmon</codeph> user for database
-            connections.</pd>
+          <pd>Command Center Kerberos 秘钥文件包含Command Center主体，并且可能包含Command Center用户的主体。 
+              如果客户端的连接请求中的主体位于Command Center的秘钥文件中，则它将客户端的主体用于数据库连接。否则，命令中心将使用<codeph>gpmon</codeph>用户进行数据库连接。</pd>
         </plentry>
         <plentry>
           <pt>gpmon-only</pt>
-          <pd>The Command Center uses the <codeph>gpmon</codeph> database role for all Greenplum
-            Database connections. No client principals are needed in the Command Center’s keytab
-            file.</pd>
+          <pd>Command Center对所有Greenplum数据库连接使用<codeph>gpmon</codeph>数据库角色。在Command Center的密钥表中不需要客户端主体
+             文件。</pd>
         </plentry>
       </parml>
     </section>
-    <p>See the <xref href="http://gpcc.docs.pivotal.io" format="html" scope="external">Greenplum
-        Command Center documentation</xref> for instructions to enable Kerberos authentication with
-      Greenplum Command Center</p>
+    <p>请参阅<xref href="http://gpcc.docs.pivotal.io" format="html" scope="external">Greenplum
+        Command Center documentation</xref>有关使用Greenplum Command Center启用Kerberos身份验证的说明。</p>
   </body>
 </topic>

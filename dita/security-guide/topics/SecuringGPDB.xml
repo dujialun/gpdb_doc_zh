@@ -1,45 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_iqr_ym2_jr">
-  <title>Securing the Database</title>
-  <shortdesc>Introduces Greenplum Database security topics.</shortdesc>
+  <title>保护数据库</title>
+  <shortdesc>介绍Greenplum数据库的安全性主题。</shortdesc>
   <body>
-    <p>The intent of security configuration is to configure the Greenplum Database server to
-      eliminate as many security vulnerabilities as possible. This guide provides a baseline for
-      minimum security requirements, and is supplemented by additional security documentation. </p>
-    <p>The essential security requirements fall into the following categories: <ul
+    <p>安全性配置的目的是配置Greenplum数据库服务器以消除尽可能多的安全性缺陷。
+    这份指南为最小安全性需求提供了底线，并且有额外的安全性文档对其进行补充。 </p>
+    <p>根本的安全性需求有下面几类： <ul
         id="ul_fwy_bn2_jr">
-        <li><xref href="Authenticate.xml#topic_n5w_gtd_jr">Authentication</xref> covers the
-          mechanisms that are supported and that can be used by the Greenplum database server to
-          establish the identity of a client application.</li>
-        <li><xref href="Authorization.xml#topic_ivr_cs2_jr">Authorization</xref> pertains to the
-          privilege and permission models used by the database to authorize client access. </li>
-        <li><xref href="Auditing.xml#topic_ufw_zn2_jr">Auditing</xref>, or log settings, covers the
-          logging options available in Greenplum Database to track successful or failed user
-          actions.</li>
-        <li><xref href="Encryption.xml#topic_th5_5bf_jr">Data Encryption</xref> addresses the
-          encryption capabilities that are available for protecting data at rest and data in
-          transit. This includes the security certifications that are relevant to the Greenplum
-          Database. </li>
+        <li><xref href="Authenticate.xml#topic_n5w_gtd_jr">认证</xref> 覆盖Greenplum数据库服务器支持并且用来建立客户端应用标识的机制。</li>
+        <li><xref href="Authorization.xml#topic_ivr_cs2_jr">授权</xref>与数据库用来授权客户端访问使用的特权和权限模型相关。 </li>
+        <li><xref href="Auditing.xml#topic_ufw_zn2_jr">审计</xref>, 或者日志设置覆盖Greenplum数据库中跟踪成功或者失败的用户动作的可用日志选项。</li>
+        <li><xref href="Encryption.xml#topic_th5_5bf_jr">数据加密</xref> 阐述可用来保护静态数据以及传输中数据的加密功能。
+            这包括与Greenplum数据库相关的安全性证书。 </li>
       </ul></p>
     <section>
-      <title>Accessing a Kerberized Hadoop Cluster</title>
-      <p>You can use the Greenplum Platform Extension Framework (PXF) to read or write
-        external tables referencing files in a Hadoop file system. If the Hadoop cluster
-        is secured with Kerberos ("Kerberized"), you must configure Greenplum Database
-        and PXF to allow users accessing external tables to authenticate with Kerberos.
-        Refer to <xref
-          href="../../pxf/pxf_kerbhdfs.html" scope="peer" format="html">Configuring PXF for Secure HDFS</xref> for the procedure to perform this setup. </p>
+      <title>访问Kerberos化的Hadoop集群</title>
+      <p>用户可以使用Greenplum平台扩展框架（PXF）进行读写Hadoop文件系统中的外部表。如果Hadoop集群受到Kerberos的保护（Kerberos化），Greenplum数据库必须被配置为允许外部表拥有者用Kerberos认证。执行这种设置的步骤请见<xref
+          href="../../pxf/pxf_kerbhdfs.html" scope="peer" format="html">为保护HDFS配置PXF</xref>。</p>
     </section>
     <section>
-      <title>Platform Hardening</title>
-      <p>Platform hardening involves assessing and minimizing system vulnerability by following best
-        practices and enforcing federal security standards. Hardening the product is based on the US
-        Department of Defense (DoD) guidelines Security Template Implementation Guides (STIG).
-        Hardening removes unnecessary packages, disables services that are not required, sets up
-        restrictive file and directory permissions, removes unowned files and directories, performs
-        authentication for single-user mode, and provides options for end users to configure the
-        package to be compliant to the latest STIGs.  </p>
+      <title>平台加固</title>
+      <p>平台加固涉及通过遵循最佳实践和实施联邦安全性标准来评估以及最小化系统弱点。
+        加固产品基于US国防部的指导方针“安全性模板实现指南（STIG）”。加固工作移除不必要的包、禁用不需要的服务、设置严格的
+        文件和目录权限、移除无主的文件和目录、为单用户模式执行认证并且为最终用户提供选项以配置服从最新STIG的包。 </p>
     </section>
   </body>
 </topic>

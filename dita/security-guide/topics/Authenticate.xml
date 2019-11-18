@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_n5w_gtd_jr">
-  <title>Configuring Client Authentication</title>
-  <shortdesc>Describes the available methods for authenticating Greenplum Database
-    clients.</shortdesc>
+  <title>配置客户端认证</title>
+  <shortdesc>描述认证Greenplum数据库客户端的可用方法。</shortdesc>
   <body>
-    <p>When a Greenplum Database system is first initialized, the system contains one predefined
-      superuser role. This role will have the same name as the operating system user who initialized
-      the Greenplum Database system. This role is referred to as gpadmin. By default, the system is
-      configured to only allow local connections to the database from the gpadmin role. If you want
-      to allow any other roles to connect, or if you want to allow connections from remote hosts,
-      you have to configure Greenplum Database to allow such connections. This section explains how
-      to configure client connections and authentication to Greenplum Database.<ul
+    <p>在Greenplum数据库系统第一次被初始化时，系统含有一个预定义的超级用户角色。这个角色将具有与初始化该Greenplum数据库系统的操作系统用户相同的名称。这个角色被称作gpadmin。默认情况下，系统被配置为只允许来自gpadmin角色的对数据库的本地连接。如果用户想要允许任<ul
         id="ul_kpg_sgq_kr">
         <li><xref href="#topic_ln1_ptd_jr" format="dita"/></li>
         <li><xref href="#topic_xwr_rvd_jr" format="dita"/></li>
@@ -21,177 +14,94 @@
       </ul></p>
   </body>
   <topic id="topic_ln1_ptd_jr">
-    <title>Allowing Connections to Greenplum Database</title>
+    <title>允许到Greenplum数据库的连接</title>
     <body>
-      <p>Client access and authentication is controlled by a configuration file named
-          <codeph>pg_hba.conf</codeph> (the standard PostgreSQL host-based authentication file). For
-        detailed information about this file, see <xref
-          href="https://www.postgresql.org/docs/9.1/auth-pg-hba-conf.html" format="html"
-          scope="external">The pg_hba.conf File</xref> in the PostgreSQL documentation. </p>
-      <p>In Greenplum Database, the <codeph>pg_hba.conf</codeph> file of the master instance
-        controls client access and authentication to your Greenplum system. The segments also have
-          <codeph>pg_hba.conf</codeph> files, but these are already correctly configured to only
-        allow client connections from the master host. The segments never accept outside client
-        connections, so there is no need to alter the <codeph>pg_hba.conf</codeph> file on segments. </p>
-      <p>The general format of the <codeph>pg_hba.conf</codeph> file is a set of records, one per
-        line. Blank lines are ignored, as is any text after a # comment character. A record is made
-        up of a number of fields which are separated by spaces and/or tabs. Fields can contain white
-        space if the field value is quoted. Records cannot be continued across lines. Each remote
-        client access record is in this format:
+      <p>客户端访问和认证受到配置文件<codeph>pg_hba.conf</codeph>（标准的PostgreSQL基于主机认证文件）的控制。有关该文件的详细信息请见PostgreSQL文档中的<xref href="https://www.postgresql.org/docs/9.1/auth-pg-hba-conf.html" format="html" scope="external">pg_hba.conf文件</xref> </p>
+      <p>在Greenplum数据库中，Master实例的<codeph>pg_hba.conf</codeph>文件控制着对Greenplum系统的客户端访问和认证。Segment也有自己的<codeph>pg_hba.conf</codeph>文件，但是它们已经被正确地配置为仅允许来自Master主机的客户端连接。Segment从不接受外部的客户端连接，因此没有必要修改Segment上的<codeph>pg_hba.conf</codeph>文件。</p>
+      <p><codeph>pg_hba.conf</codeph>文件的一般格式是一组记录，每个记录一行。空行会被忽略，任何#号注释字符之后的文本也同样会被忽略。记录由若干个被空格或者制表符分隔的域构成。如果域值被加上引号，其中可以包含空格。记录不能跨行。每个远程客户端访问记录都是如下格式：
         <codeblock>host   database   role   address   authentication-method
 </codeblock></p>
-      <p>A UNIX-domain socket access record is in this format:
+      <p>每个UNIX域套接字访问记录是如下格式：
         <codeblock>local   database   role   authentication-method
 </codeblock></p>
-      <p>The meaning of the <codeph>pg_hba.conf</codeph> fields is as follows: <parml>
+      <p><codeph>pg_hba.conf</codeph>域的含义如下：<parml>
           <plentry>
             <pt>local</pt>
-            <pd> Matches connection attempts using UNIX-domain sockets. Without a record of this
-              type, UNIX-domain socket connections are disallowed. </pd>
+            <pd> 匹配使用UNIX域套接字的连接尝试。如果没有这类记录，就不允许UNIX域套接字连接。</pd>
           </plentry>
           <plentry>
             <pt>host</pt>
-            <pd>Matches connection attempts made using TCP/IP. Remote TCP/IP connections will not be
-              possible unless the server is started with an appropriate value for the
-                <codeph>listen_addresses</codeph> server configuration parameter. </pd>
+            <pd>匹配使用TCP/IP的连接尝试。除非服务器使用服务器配置参数<codeph>listen_addresses</codeph>的合适值启动，远程TCP/IP连接将不可能成功。 </pd>
           </plentry>
           <plentry>
             <pt>hostssl</pt>
-            <pd>Matches connection attempts made using TCP/IP, but only when the connection is made
-              with SSL encryption. SSL must be enabled at server start time by setting the
-                <codeph>ssl</codeph> configuration parameter. Requires SSL authentication be
-              configured in <codeph>postgresql.conf</codeph>. See <xref
+            <pd>匹配使用TCP/IP的连接尝试，但是只匹配使用SSL加密建立的连接。SSL必须在服务器启动时通过设置<codeph>ssl</codeph>配置参数来启用。对SSL认证的要求可以在<codeph>postgresql.conf</codeph>中配置。见<xref
                 href="#topic_fzv_wb2_jr/ssl_postgresql" format="dita"/>. </pd>
           </plentry>
           <plentry>
             <pt>hostnossl</pt>
-            <pd> Matches connection attempts made over TCP/IP that do not use SSL. Requires SSL
-              authentication be configured in <codeph>postgresql.conf</codeph>. See <xref
+            <pd> 匹配使用TCP/IP但不用SSL的连接尝试。对SSL认证的要求可以在<codeph>postgresql.conf</codeph>中配置。见<xref
                 href="#topic_fzv_wb2_jr/ssl_postgresql" format="dita"/>.</pd>
           </plentry>
           <plentry>
             <pt>database</pt>
-            <pd>Specifies which database names this record matches. The value <codeph>all</codeph>
-              specifies that it matches all databases. Multiple database names can be supplied by
-              separating them with commas. A separate file containing database names can be
-              specified by preceding the file name with <codeph>@</codeph>. </pd>
+            <pd>指定这个记录匹配哪些数据库名。值all指定它匹配所有数据库。通过用逗号分隔数据库名，可以提供多个数据库名。可以指定一个包含数据库名的单独文件，方法是在这个域中给出加上前缀<codeph>@</codeph>的文件名。</pd>
           </plentry>
           <plentry>
             <pt> role </pt>
-            <pd>Specifies which database role names this record matches. The value all specifies
-              that it matches all roles. If the specified role is a group and you want all members
-              of that group to be included, precede the role name with a <codeph>+</codeph>.
-              Multiple role names can be supplied by separating them with commas. A separate file
-              containing role names can be specified by preceding the file name with a
-                <codeph>@</codeph>. </pd>
+            <pd>指定这个记录匹配哪些数据库角色名。值all指定它匹配所哟角色。如果指定的角色是一个组并且想包括其中的所有成员，可在角色名前面放一个<codeph>+</codeph>。通过用逗号分隔角色名，可以提供多个角色名。可以指定一个包含角色名的单独文件，方法是在这个域中给出加上前缀<codeph>@</codeph>的文件名。</pd>
           </plentry>
           <plentry>
             <pt> address </pt>
-            <pd>Specifies the client machine addresses that this record matches. This field can
-              contain an IP address, an IP address range, or a host name. </pd>
-            <pd>An IP address range is specified using standard numeric notation for the range's
-              starting address, then a slash (<codeph>/</codeph>) and a CIDR mask length. The mask
-              length indicates the number of high-order bits of the client IP address that must
-              match. Bits to the right of this should be zero in the given IP address. There must
-              not be any white space between the IP address, the <codeph>/</codeph>, and the CIDR
-              mask length.</pd>
-            <pd>Typical examples of an IPv4 address range specified this way are
-                <codeph>172.20.143.89/32</codeph> for a single host, or
-                <codeph>172.20.143.0/24</codeph> for a small network, or
-                <codeph>10.6.0.0/16</codeph> for a larger one. An IPv6 address range might look like
-                <codeph>::1/128</codeph> for a single host (in this case the IPv6 loopback address)
-              or <codeph>fe80::7a31:c1ff:0000:0000/96</codeph> for a small network.
-                <codeph>0.0.0.0/0</codeph> represents all IPv4 addresses, and <codeph>::0/0</codeph>
-              represents all IPv6 addresses. To specify a single host, use a mask length of 32 for
-              IPv4 or 128 for IPv6. In a network address, do not omit trailing zeroes.</pd>
-            <pd>An entry given in IPv4 format will match only IPv4 connections, and an entry given
-              in IPv6 format will match only IPv6 connections, even if the represented address is in
-              the IPv4-in-IPv6 range.
-              <note>Entries in IPv6 format will be rejected if the host system C library does not
-                have support for IPv6 addresses.</note></pd>
-            <pd>If a host name is specified (an address that is not an IP address or IP range is
-              treated as a host name), that name is compared with the result of a reverse name
-              resolution of the client IP address (for example, reverse DNS lookup, if DNS is used).
-              Host name comparisons are case insensitive. If there is a match, then a forward name
-              resolution (for example, forward DNS lookup) is performed on the host name to check
-              whether any of the addresses it resolves to are equal to the client IP address. If
-              both directions match, then the entry is considered to match. </pd>
-            <pd>Some host name databases allow associating an IP address with multiple host names,
-              but the operating system only returns one host name when asked to resolve an IP
-              address. The host name that is used in <codeph>pg_hba.conf</codeph> must be the one
-              that the address-to-name resolution of the client IP address returns, otherwise the
-              line will not be considered a match. </pd>
-            <pd>When host names are specified in <codeph>pg_hba.conf</codeph>, you should ensure
-              that name resolution is reasonably fast. It can be of advantage to set up a local name
-              resolution cache such as <codeph>nscd</codeph>. Also, you can enable the server
-              configuration parameter <codeph>log_hostname</codeph> to see the client host name
-              instead of the IP address in the log. </pd>
+            <pd>指定这个记录匹配的客户端机器地址。该字段可以包含IP地址，IP地址范围或主机名。</pd>
+            <pd>IP地址范围是使用标准点分指定范围的起始地址，然后是斜杠（<codeph> / </ codeph>）和CIDR掩码长度。掩码长度表明客户端IP地址必须匹配的高位二进制位数。给定IP地址中在这一长度右边的二进制位必须为零。在IP地址、<codeph>/</codeph>、CIDR掩码长度之间不能有任何空格。</pd>
+            <pd>IPv4地址范围的典型例子有
+                <codeph>172.20.143.89/32</codeph> 是单台主机, 或
+                <codeph>172.20.143.0/24</codeph> 是一个小型网络, 或
+                <codeph>10.6.0.0/16</codeph> 是一个大型网络. 对于单个主机，IPv6地址范围可能类似于<codeph>::1/128</codeph>（在本例中为IPv6环回地址）或<codeph>fe80::7a31:c1ff:0000:0000/96</codeph>用于小型网络。
+                <codeph>0.0.0.0/0</codeph> 代表所有IPv4地址, <codeph>::0/0</codeph>
+             代表所有IPv6地址。要指定单台主机，对于IPv4和IPv6分别使用CIDR掩码32和128.在网络地址中，不要省略拖尾的零。</pd>
+            <pd>以IPv4格式给出的条目将仅匹配IPv4连接，以IPv6格式给出的条目将仅匹配IPv6连接，即使所表示的地址在IPv4-in-IPv6范围内。
+              <note>如果主机系统C库不支持IPv6地址，则IPv6格式的条目将被拒绝。</note></pd>
+            <pd>如果指定了主机名（将非IP地址或IP范围的地址视为主机名），则将该名称与反向名称的结果进行比较客户端IP地址的分辨率（例如，如果使用DNS，则为反向DNS查找）。 主机名比较不区分大小写。 如果匹配，则转发名称对主机名执行解析（例如，正向DNS查找）以检查其解析为的地址是否等于客户端IP地址。如果两个方向都匹配，则认为该条目匹配。</pd>
+            <pd>某些主机名数据库允许将IP地址与多个主机名相关联，但是当要求系统解析IP时，操作系统仅返回一个主机名地址。<codeph>pg_hba.conf</codeph>中使用的主机名必须是客户端IP地址的地址到名称解析返回的主机名，否则行将不被视为匹配项。</pd>
+            <pd>在<codeph>pg_hba.conf </codeph>中指定了主机名时，应确保名称解析相当快。设置本地名称解析缓存（例如<codeph>nscd</codeph>）可能是有利的。另外，用户可以启用服务器配置参数<codeph>log_hostname</codeph>以查看客户端主机名而不是日志中的IP地址。</pd>
           </plentry>
           <plentry>
-            <pt>IP-address</pt>
-            <pt>IP-mask </pt>
-            <pd>These fields can be used as an alternative to the CIDR address notation. Instead of
-              specifying the mask length, the actual mask is specified in a separate column. For
-              example, <codeph>255.0.0.0</codeph> represents an IPv4 CIDR mask length of 8, and
-                <codeph>255.255.255.255</codeph> represents a CIDR mask length of 32. </pd>
+            <pt>IP-地址</pt>
+            <pt>IP-掩码 </pt>
+            <pd>这些域可以被用作CIDR-地址记法的替换选择。与指定掩码长度不同，真实的掩码在一个单独的列中指定。例如，<codeph>255.0.0.0</codeph>表示一个IPv4的CIDR掩码长度8，而<codeph>255.255.255.255</codeph>表示CIDR掩码长度32。</pd>
           </plentry>
           <plentry>
             <pt> authentication-method </pt>
-            <pd> Specifies the authentication method to use when connecting. See <xref
-                href="#topic_nyh_gwd_jr" format="dita"/> for options. </pd>
+            <pd> 指定连接时要使用的认证方法。详见 <xref
+                href="#topic_nyh_gwd_jr" format="dita"/></pd>
           </plentry>
         </parml></p>
-      <note type="caution">For a more secure system, consider removing records for remote
-        connections that use trust authentication from the <codeph>pg_hba.conf</codeph> file. Trust
-        authentication grants any user who can connect to the server access to the database using
-        any role they specify. You can safely replace trust authentication with ident authentication
-        for local UNIX-socket connections. You can also use ident authentication for local and
-        remote TCP clients, but the client host must be running an ident service and you must trust
-        the integrity of that machine.</note>
+      <note type="caution">对于一个更安全的系统，考虑从Master的<codeph>pg_hba.conf</codeph>中移除所有使用trust认证的连接。trust认证意味着不做任何认证就授予角色访问，因此会绕过所有安全性。如果系统具有可用的ident服务，可以把trust项替换为ident认证。</note>
     </body>
   </topic>
   <topic id="topic_xwr_rvd_jr">
-    <title>Editing the pg_hba.conf File</title>
+    <title>编辑pg_hba.conf文件</title>
     <body>
-      <p>Initially, the <codeph>pg_hba.conf</codeph> file is set up with generous permissions for
-        the gpadmin user and no database access for other Greenplum Database roles. You will need to
-        edit the <codeph>pg_hba.conf</codeph> file to enable users' access to databases and to
-        secure the gpadmin user. Consider removing entries that have trust authentication, since
-        they allow anyone with access to the server to connect with any role they choose. For local
-        (UNIX socket) connections, use ident authentication, which requires the operating system
-        user to match the role specified. For local and remote TCP connections, ident authentication
-        requires the client's host to run an indent service. You could install an ident service on
-        the master host and then use ident authentication for local TCP connections, for example
-          <codeph>127.0.0.1/28</codeph>. Using ident authentication for remote TCP connections is
-        less secure because it requires you to trust the integrity of the ident service on the
-        client's host. </p>
-      <p>This example shows how to edit the <codeph>pg_hba.conf</codeph> file of the master to allow
-        remote client access to all databases from all roles using encrypted password
-        authentication. </p>
-      <p>To edit <codeph>pg_hba.conf</codeph>:<ol id="ol_krz_zvd_jr">
-          <li>Open the file <codeph>$MASTER_DATA_DIRECTORY/pg_hba.conf</codeph> in a text
-            editor.</li>
-          <li>Add a line to the file for each type of connection you want to allow. Records are read
-            sequentially, so the order of the records is significant. Typically, earlier records
-            will have tight connection match parameters and weaker authentication methods, while
-            later records will have looser match parameters and stronger authentication methods. For
-            example:<codeblock># allow the gpadmin user local access to all databases
-# using ident authentication
+      <p>最初，<codeph>pg_hba.conf</codeph>文件被设置成gpadmin用户对数据库具有完全访问权限，而其他Greenplum Database角色则没有数据库访问权限。用户需要编辑<codeph>pg_hba.conf</codeph>文件，以使用户能够访问数据库并保证gpadmin用户的安全。需要考虑删除具有信任身份验证的条目，因为它们允许有权访问服务器的任何人以他们选择的任何角色进行连接。对于本地（UNIX套接字）连接，可使用ident身份验证，这要求操作系统用户匹配指定的角色。对于本地和远程TCP连接，身份验证要求客户端的主机运行ident服务。用户可以在主控主机上安装ident服务，然后对本地TCP连接使用ident身份验证，例如<codeph>127.0.0.1/28</codeph>。将身份验证用于远程TCP连接的安全性较差，因为它要求用户信任客户端主机上身份服务的完整性。</p>
+      <p>这个例子展示如何编辑Master的<codeph>pg_hba.conf</codeph>文件来允许对从所有角色访问所有数据库的远程客户端使用加密口令认证。 </p>
+      <p>要编辑<codeph>pg_hba.conf</codeph>：<ol id="ol_krz_zvd_jr">
+          <li>在一个文本编辑器中打开文件<codeph>$MASTER_DATA_DIRECTORY/pg_hba.conf</codeph>。</li>
+          <li>为想要允许的每一类连接在文件中增加一行。记录会被顺序读取，因此记录的顺序是有意义的。通常，较早出现的记录将有比较严格的连接匹配参数以及较弱的认证方法，而较晚出现的记录将有较宽松的匹配参数和较强的认证方法。例如：<codeblock># 允许gpadmin用户使用ident认证本地访问所有数据库
 local   all   gpadmin   ident         sameuser
 host    all   gpadmin   127.0.0.1/32  ident
 host    all   gpadmin   ::1/128       ident
-# allow the 'dba' role access to any database from any
-# host with IP address 192.168.x.x and use md5 encrypted
-# passwords to authenticate the user
-# Note that to use SHA-256 encryption, replace md5 with
-# password in the line below
+# 允许'dba'角色从任何具有IP地址192.168.x.x的主机访问任何数据库
+# 并且是用md5加密的口令来认证用户
+# 注意要使用SHA-256加密，用password替换下面行中的md5
 host    all   dba   192.168.0.0/32  md5
 </codeblock></li>
         </ol></p>
     </body>
   </topic>
   <topic id="topic_nyh_gwd_jr">
-    <title>Authentication Methods</title>
+    <title>认证方法</title>
     <body>
       <ul id="ul_qgp_1jq_kr">
         <li>
@@ -214,169 +124,140 @@ host    all   dba   192.168.0.0/32  md5
         </li>
       </ul>
       <section id="basic_auth">
-        <title>Basic Authentication</title>
-        <p>The following basic authentication methods are supported: <parml id="ul_zsk_kwd_jr">
+        <title>基本认证</title>
+        <p>支持下列基本认证方法： <parml id="ul_zsk_kwd_jr">
             <plentry>
-              <pt>Password or MD5</pt>
-              <pd>Requires clients to provide a password, one of either: <ul id="ul_m21_nwd_jr">
-                  <li>Md5 &#8211; password transmitted as an MD5 hash.</li>
-                  <li>Password &#8211; A password transmitted in clear text. Always use SSL
-                    connections to prevent password sniffing during transit. This is configurable,
-                    see "Encrypting Passwords" in the <i>Greenplum Database Administrator Guide</i>
-                    for more information.</li>
+              <pt>Password 或者 MD5</pt>
+              <pd>要求客户端提供一个口令，可以为两者之一：<ul id="ul_m21_nwd_jr">
+                  <li>Md5 &#8211; 口令作为MD5哈希传输。</li>
+                  <li>Password &#8211; 口令以明文传输。传输过程中应该总是使用SSL连接来防止口令嗅探。这是可配置的，更多信息请见<i>Greenplum数据库管理员指南</i>中的“加密口令”。</li>
                 </ul></pd>
             </plentry>
             <plentry>
               <pt>Reject</pt>
-              <pd>Reject the connections with the matching parameters. You should typically use this
-                to restrict access from specific hosts or insecure connections.</pd>
+              <pd>拒绝有匹配参数的连接。用户通常应该使用这种方法来限制来自特定主机或者不安全连接的访问。</pd>
             </plentry>
             <plentry>
               <pt>Ident</pt>
-              <pd>Authenticates based on the client's operating system user name. This is secure for
-                local socket connections. Using ident for TCP connections from remote hosts requires
-                that the client's host is running an ident service. The ident authentication method
-                should only be used with remote hosts on a trusted, closed network. </pd>
+              <pd>基于客户端的操作系统用户名的认证。用户只对本地连接使用这种方法。对来自远程主机的TCP连接使用ident要求客户端的主机正在运行ident服务。身份认证方法仅应与受信任的封闭网络上的远程主机一起使用。</pd>
             </plentry>
           </parml></p>
-        <p>Following are some sample <codeph>pg_hba.conf</codeph> basic authentication
+        <p>下面是<codeph>pg_hba.conf</codeph>基本认证项的一些例子：
           entries:<codeblock>hostnossl    all   all        0.0.0.0   reject
 hostssl      all   testuser   0.0.0.0/0 md5
 local        all   gpuser               ident
 </codeblock></p>
       </section>
       <section id="kerberos_auth">
-        <title>Kerberos Authentication</title>
-        <p>You can authenticate against a Kerberos server (RFC 2743, 1964).</p>
-        <p>The format for Kerberos authentication in the <codeph>pg_hba.conf</codeph> file
-          is:<codeblock>servicename/hostname@realm</codeblock></p>
-        <p>The following options may be added to the entry:<parml>
+        <title>Kerberos认证</title>
+        <p>用户可以用一台Kerberos服务器（RFC 2743, 1964）认证。</p>
+        <p><codeph>pg_hba.conf</codeph> 文件中Kerberos认证的格式是：
+            <codeblock>servicename/hostname@realm</codeblock></p>
+        <p>可以把下列选项加到该项中：<parml>
             <plentry>
               <pt>Map</pt>
-              <pd>Map system and database users.</pd>
+              <pd>映射系统和数据库用户。</pd>
             </plentry>
             <plentry>
               <pt>Include_realm</pt>
-              <pd>Option to specify realm name included in the system-user name in the ident map
-                file.</pd>
+              <pd>在ident映射文件中指定系统用户名中包括的realm名称的选项。</pd>
             </plentry>
             <plentry>
               <pt>Krb_realm</pt>
-              <pd>Specify the realm name for matching the principals.</pd>
+              <pd>为匹配的主体指定realm名称。</pd>
             </plentry>
             <plentry>
               <pt>Krb_server_hostname</pt>
-              <pd>The hostname of the service principal.</pd>
+              <pd>服务主体的主机名。</pd>
             </plentry>
           </parml></p>
-        <p>Following is an example <codeph>pg_hba.conf</codeph> entry for
-          Kerberos:<codeblock>host    all all 0.0.0.0/0   krb5
-hostssl all all 0.0.0.0/0   krb5 map=krbmap
-</codeblock></p>
-        <p>The following Kerberos server settings are specified in <codeph>postgresql.conf</codeph>: <parml>
+        <p>下面是一个<codeph>pg_hba.conf</codeph>的Kerberos项的例子：
+            <codeblock>host    all all 0.0.0.0/0   krb5
+                       hostssl all all 0.0.0.0/0   krb5 map=krbmap
+            </codeblock></p>
+          <p>下列Kerberos服务器设置在<codeph>postgresql.conf</codeph>中被指定：<parml>
             <plentry>
               <pt><codeph>krb_server_key <i>file</i></codeph></pt>
-              <pd>Sets the location of the Kerberos server key file.</pd>
+              <pd>设置Kerberos服务器密钥文件的位置。</pd>
             </plentry>
             <plentry>
               <pt>
                 <codeph>krb_srvname <i>string</i></codeph></pt>
-              <pd>Kerberos service name.</pd>
+              <pd>Kerberos服务名。</pd>
             </plentry>
             <plentry>
               <pt><codeph>krb_caseins_users <i>boolean</i></codeph></pt>
-              <pd>Case-sensitivity. The default is off. </pd>
+              <pd>大小写敏感性。默认为off。</pd>
             </plentry>
           </parml></p>
-        <p>The following client setting is specified as a connection parameter: <parml>
+        <p>下面的客户端设置作为连接参数被指定：<parml>
             <plentry>
               <pt>
                 <codeph>Krbsrvname</codeph></pt>
-              <pd>The Kerberos service name to use for authentication.</pd>
+              <pd>要用于认证的Kerberos服务名。</pd>
             </plentry>
           </parml>
         </p>
       </section>
       <section id="ldap_auth">
-        <title>LDAP Authentication</title>
-        <p>You can authenticate against an LDAP directory.</p>
+        <title>LDAP认证</title>
+        <p>用户可以用一个LDAP目录认证。</p>
         <ul>
-          <li>LDAPS and LDAP over TLS options encrypt the connection to the LDAP server.</li>
-          <li>The connection from the client to the server is not encrypted unless SSL is enabled.
-            Configure client connections to use SSL to encrypt connections from the client.</li>
-          <li>To configure or customize LDAP settings, set the <codeph>LDAPCONF</codeph> environment
-            variable with the path to the <codeph>ldap.conf</codeph> file and add this to the
-              <codeph>greenplum_path.sh</codeph> script.</li>
+          <li>LDAPS和TLS上的LDAP选项可以加密到LDAP服务器的连接。</li>
+          <li>除非SSL被启用，从客户端到服务器的连接不会被加密。配置客户端连接以使用SSL加密来自该客户端的连接。</li>
+          <li>要配置或者自定义LDAP设置，将<codeph>LDAPCONF</codeph> 环境变量设置为到<codeph>ldap.conf</codeph>文件的路径并且将它加入到<codeph>greenplum_path.sh</codeph>脚本。</li>
         </ul>
-        <p>Following are the recommended steps for configuring your system for LDAP authentication: <ol>
-            <li> Set up the LDAP server with the database users/roles to be authenticated via
-              LDAP.</li>
-            <li>On the database:<ol>
-                <li>Verify that the database users to be authenticated via LDAP exist on the
-                  database. LDAP is only used for verifying username/password pairs, so the roles
-                  should exist in the database.</li>
-                <li>Update the <codeph>pg_hba.conf</codeph> file in the
-                    <codeph>$MASTER_DATA_DIRECTORY</codeph> to use LDAP as the authentication method
-                  for the respective users. Note that the first entry to match the user/role in the
-                    <codeph>pg_hba.conf</codeph> file will be used as the authentication mechanism,
-                  so the position of the entry in the file is important.</li>
-                <li>Reload the server for the <codeph>pg_hba.conf</codeph> configuration settings to
-                  take effect (<codeph>gpstop -u</codeph>).</li>
+        <p>下面是为用户系统配置LDAP认证的推荐步骤： <ol>
+            <li>用要通过LDAP认证的数据库用户/角色设置LDAP服务器。</li>
+            <li>在数据库上：<ol>
+                <li>验证要通过LDAP认证的数据库用户存在于数据库上。LDAP仅被用于验证用户名/口令对，因此角色应该存在于数据库中。</li>
+                <li>更新<codeph>$MASTER_DATA_DIRECTORY</codeph>中的<codeph>pg_hba.conf</codeph>文件为相应的用户使用LDAP作为认证方法。注意<codeph>pg_hba.conf</codeph>文件中第一个匹配用户/角色的项将被用作认证机制，因此项在该文件中的位置很重要。</li>
+                <li>重载服务器让<codeph>pg_hba.conf</codeph>配置设置生效(<codeph>gpstop -u</codeph>)。</li>
               </ol>
             </li>
           </ol></p>
-        <p>Specify the following parameter <codeph>auth-options</codeph>. <parml>
+        <p>在<codeph>auth-options</codeph>中指定下面的参数。<parml>
             <plentry>
               <pt>ldapserver</pt>
-              <pd>Names or IP addresses of LDAP servers to connect to. Multiple servers may be
-                specified, separated by spaces.</pd>
+              <pd>要连接的LDAP服务器的名称或者IP地址。可以指定多个服务器，用空格分隔。</pd>
             </plentry>
             <plentry>
               <pt>ldapprefix</pt>
-              <pd>String to prepend to the user name when forming the DN to bind as, when doing
-                simple bind authentication.</pd>
+              <pd>在做简单绑定认证时，形成要绑定为的DN时自动加在用户名前面的字符串。</pd>
             </plentry>
             <plentry>
               <pt>ldapsuffix</pt>
-              <pd>String to append to the user name when forming the DN to bind as, when doing
-                simple bind authentication.</pd>
+              <pd>在做简单绑定认证时，形成要绑定为的DN时自动加在用户名后面的字符串。</pd>
             </plentry>
             <plentry>
               <pt>ldapport</pt>
-              <pd>Port number on LDAP server to connect to. If no port is specified, the LDAP
-                library's default port setting will be used.</pd>
+              <pd>要连接的LDAP服务器上的端口号。如果没有指定端口，将使用LDAP库的默认端口设置。</pd>
             </plentry>
             <plentry>
               <pt>ldaptls</pt>
-              <pd>Set to 1 to make the connection between PostgreSQL and the LDAP server use TLS
-                encryption. Note that this only encrypts the traffic to the LDAP server — the
-                connection to the client will still be unencrypted unless SSL is used.</pd>
+              <pd>设置为1让PostgreSQL和LDAP服务器之间的连接是用TLS加密。注意这只加密到LDAP服务器的流量 — 到客户端的连接仍将是未加密的（除非使用了SSL）。</pd>
             </plentry>
             <plentry>
               <pt>ldapbasedn</pt>
-              <pd>Root DN to begin the search for the user in, when doing search+bind
-                authentication.</pd>
+              <pd>在做搜索+绑定认证时，要开始在其中搜索用户的根DN。</pd>
             </plentry>
             <plentry>
               <pt>ldapbinddn</pt>
-              <pd>DN of user to bind to the directory with to perform the search when doing
-                search+bind authentication.</pd>
+              <pd>在做搜索+绑定认证时，绑定到目录以执行搜索的用户的DN。</pd>
             </plentry>
             <plentry>
               <pt>ldapbindpasswd</pt>
-              <pd>Password for user to bind to the directory with to perform the search when doing
-                search+bind authentication.</pd>
+              <pd>在做搜索+绑定认证时，绑定到目录以执行搜索的用户的口令。</pd>
             </plentry>
             <plentry>
               <pt>ldapsearchattribute</pt>
-              <pd>Attribute to match against the user name in the search when doing search+bind
-                authentication.</pd>
+              <pd>在做搜索+绑定认证时，匹配正在搜索的用户名的属性。</pd>
             </plentry>
           </parml>
         </p>
         <p>Example:
           <codeblock>ldapserver=ldap.greenplum.com prefix="cn=" suffix=", dc=greenplum, dc=com"</codeblock></p>
-        <p>Following are sample <codeph>pg_hba.conf</codeph> file entries for LDAP authentication:
+        <p>下面是LDAP认证的<codeph>pg_hba.conf</codeph>文件项的例子：
           <codeblock>host all testuser 0.0.0.0/0 ldap ldap
 ldapserver=ldapserver.greenplum.com ldapport=389 ldapprefix="cn=" ldapsuffix=",ou=people,dc=greenplum,dc=com"
 hostssl   all   ldaprole   0.0.0.0/0   ldap
@@ -386,131 +267,108 @@ ldapserver=ldapserver.greenplum.com ldaptls=1 ldapprefix="cn=" ldapsuffix=",ou=p
     </body>
   </topic>
   <topic id="topic_fzv_wb2_jr">
-    <title>SSL Client Authentication</title>
+    <title>SSL客户端认证</title>
     <body>
-      <p>SSL authentication compares the Common Name (cn) attribute of an SSL certificate provided
-        by the connecting client during the SSL handshake to the requested database user name. The
-        database user should exist in the database. A map file can be used for mapping between
-        system and database user names. </p>
+      <p>SSL认证将正在连接的客户端在SSL握手期间提供的SSL证书的公用名（cn）属性与被请求的数据库用户名进行比较。数据库用户应该在数据库中存在。映射文件可以被用来在系统用户名和数据库用户名之间进行映射。</p>
       <section>
-        <title>SSL Authentication Parameters</title>
-        <p>Authentication method:<ul id="ul_fr4_fc2_jr">
-            <li>Cert<p>Authentication options:<parml>
+        <title>SSL认证参数</title>
+        <p>认证方法：<ul id="ul_fr4_fc2_jr">
+            <li>Cert<p>认证选项：<parml>
                   <plentry>
                     <pt>Hostssl</pt>
-                    <pd>Connection type must be hostssl.</pd>
+                    <pd>连接类型必须是hostssl。</pd>
                   </plentry>
                   <plentry>
                     <pt>map=<varname>mapping</varname></pt>
-                    <pd>mapping. </pd>
-                    <pd>This is specified in the <codeph>pg_ident.conf</codeph>, or in the file
-                      specified in the <codeph>ident_file</codeph> server setting.</pd>
+                    <pd>映射。</pd>
+                    <pd>这在<codeph>pg_ident.conf</codeph>文件中被指定，或者在<codeph>ident_file</codeph>服务器设置中指定的文件中指定。</pd>
                   </plentry>
-                </parml></p><p>Following are sample <codeph>pg_hba.conf</codeph> entries for SSL
-                client
-                authentication:<codeblock>Hostssl testdb certuser 192.168.0.0/16 cert
-Hostssl testdb all 192.168.0.0/16 cert map=gpuser
-</codeblock></p></li>
+                </parml></p><p>下面是SSL客户端认证的<codeph>pg_hba.conf</codeph>项的例子：
+                <codeblock>Hostssl testdb certuser 192.168.0.0/16 cert
+                           Hostssl testdb all 192.168.0.0/16 cert map=gpuser
+                </codeblock></p></li>
           </ul></p>
       </section>
       <section id="openssl_config">
-        <title>OpenSSL Configuration</title>
-        <p>Greenplum Database reads the OpenSSL configuration file specified in
-            <codeph>$GP_HOME/etc/openssl.cnf</codeph> by default. You can make changes to the
-          default configuration for OpenSSL by modifying or updating this file and restarting the
-          server.</p>
+        <title>OpenSSL配置</title>
+        <p>Greenplum数据库默认会读取<codeph>$GP_HOME/etc/openssl.cnf</codeph>中指定的OpenSSL配置文件。用户可以通过修改或者更新这个文件并且重启服务器对OpenSSL的默认配置做更改。</p>
       </section>
       <section id="create_a_cert">
-        <title>Creating a Self-Signed Certificate</title>
-        <p>A self-signed certificate can be used for testing, but a certificate signed by a
-          certificate authority (CA) (either one of the global CAs or a local one) should be used in
-          production so that clients can verify the server's identity. If all the clients are local
-          to the organization, using a local CA is recommended. </p>
-        <p>To create a self-signed certificate for the server:<ol id="ol_qpr_p4x_kr">
-            <li>Enter the following <codeph>openssl</codeph>
+        <title>创建一个自签名证书</title>
+        <p>自签名证书可以被用来测试，但是生产中应该使用由证书颁发机构（CA）（全球CA或者本地CA）签发的证书，这样客户端就能够验证服务器的身份。如果所有的客户端都是组织本地的，推荐使用本地CA。 </p>
+        <p>要为服务器创建一个自签名证书：<ol id="ol_qpr_p4x_kr">
+            <li>输入下列<codeph>openssl</codeph>命令：
               command:<codeblock>openssl req -new -text -out server.req</codeblock></li>
-            <li>Enter the requested information at the prompts. <p>Make sure you enter the local
-                host name for the Common Name. The challenge password can be left blank. </p></li>
-            <li>The program generates a key that is passphrase-protected; it does not accept a
-              passphrase that is less than four characters long. To remove the passphrase (and you
-              must if you want automatic start-up of the server), run the following
-              command:<codeblock>openssl rsa -in privkey.pem -out server.key rm privkey.pem</codeblock></li>
-            <li>Enter the old passphrase to unlock the existing key. Then run the following
-                command:<codeblock>openssl req -x509 -in server.req -text -key server.key -out server.crt</codeblock><p>This
-                turns the certificate into a self-signed certificate and copies the key and
-                certificate to where the server will look for them. </p></li>
-            <li>Finally, run the following
+            <li>在提示中输入要求的信息。<p>确保为公共名输入本地主机名。挑战口令可以留空。</p></li>
+            <li>这个程序生成受口令保护的密钥，它不接受短于四字符的口令。要移除口令（如果想让服务器自动启动还必须移除），运行下面的命令:
+                <codeblock>openssl rsa -in privkey.pem -out server.key rm privkey.pem</codeblock></li>
+            <li>输入旧口令解锁现有的密钥。然后输入下面的命令：
+                <codeblock>openssl req -x509 -in server.req -text -key server.key -out server.crt</codeblock>
+                <p>这会把证书转变成一个自签名的证书并且把密钥和证书拷贝到服务器将查找它们的地方。</p></li>
+            <li>最后，运行下列命令：
               command:<codeblock>chmod og-rwx server.key</codeblock></li>
           </ol></p>
-        <p>For more details on how to create your server private key and certificate, refer to the
-          OpenSSL documentation. </p>
+        <p>更多如何创建服务器私钥和证书的细节，请参考OpenSSL的文档。</p>
       </section>
       <section id="ssl_postgresql">
-        <title>Configuring postgresql.conf for SSL Authentication</title>
-        <p>The following Server settings need to be specified in the
-            <codeph>postgresql.conf</codeph> configuration file: <ul id="ul_bzs_b22_jr">
+        <title>为SSL认证配置postgresql.conf</title>
+        <p>下面的服务器设置需要在<codeph>postgresql.conf</codeph>配置文件中被指定：
+             <ul id="ul_bzs_b22_jr">
             <li><codeph>ssl</codeph>
-              <i>boolean</i>. Enables SSL connections.</li>
+              <i>boolean</i>。 启用SSL连接。</li>
             <li><codeph>ssl_renegotiation_limit</codeph>
-              <i>integer</i>. Specifies the data limit before key renegotiation.</li>
+              <i>integer</i>。 指定密钥重新协商之前的数据限制。</li>
             <li><codeph>ssl_ciphers</codeph>
-              <i>string</i>. Lists SSL ciphers that are allowed.</li>
+              <i>string</i>。 列出允许的SSL加密算法。</li>
           </ul></p>
-        <p>The following SSL server files can be found in the Master Data Directory: <ul
+        <p>下列SSL服务器文件可以在Master的数据目录下找到： <ul
             id="ul_gzs_b22_jr">
-            <li><codeph>server.crt</codeph>. Server certificate.</li>
-            <li><codeph>server.key</codeph>. Server private key.</li>
-            <li><codeph>root.crt</codeph>. Trusted certificate authorities.</li>
-            <li><codeph>root.crl</codeph>. Certificates revoked by certificate authorities.</li>
+            <li><codeph>server.crt</codeph>。 服务器证书。</li>
+            <li><codeph>server.key</codeph>。服务器私钥。</li>
+            <li><codeph>root.crt</codeph>。可信的证书机构。</li>
+            <li><codeph>root.crl</codeph>。被证书机构撤销的证书。</li>
           </ul></p>
       </section>
       <section id="config_ssl_client_conn">
-        <title>Configuring the SSL Client Connection</title>
+        <title>配置SSL客户端连接</title>
       </section>
-      <p>SSL options:<parml>
+      <p>SSL选项：<parml>
           <plentry>
             <pt>
               <codeph>require</codeph>
             </pt>
-            <pd>Only use SSL connection. If a root CA file is present, verify the certificate in the
-              same way as if <codeph>verify-ca</codeph> was specified.</pd>
+            <pd>仅使用SSL连接。如果存在一个根CA文件，以指定<codeph>verify-ca</codeph>时同样的方式验证证书。</pd>
           </plentry>
           <plentry>
             <pt>
               <codeph>verify-ca</codeph>
             </pt>
-            <pd>Only use an SSL connection. Verify that the server certificate is issued by a
-              trusted CA.</pd>
+            <pd>仅使用SSL连接。验证服务器证书由一个可信的CA发出。</pd>
           </plentry>
           <plentry>
             <pt>
               <codeph>verify-full</codeph>
             </pt>
-            <pd>Only use an SSL connection. Verify that the server certificate is issued by a
-              trusted CA and that the server host name matches that in the certificate.</pd>
+            <pd>仅使用SSL连接。验证服务器证书由一个可信的CA发出并且该服务器主机名匹配证书中的名称。</pd>
           </plentry>
           <plentry>
             <pt>sslcert</pt>
-            <pd>The file name of the client SSL certificate. The default is
-                <codeph>~/.postgresql/postgresql.crt</codeph>. </pd>
+            <pd>客户端SSL证书的文件名。默认是<codeph>~/.postgresql/postgresql.crt</codeph>。</pd>
           </plentry>
           <plentry>
             <pt>sslkey</pt>
-            <pd>The secret key used for the client certificate. The default is
-                <codeph>~/.postgresql/postgresql.key</codeph>.</pd>
+            <pd>用于客户端证书的密钥。默认是<codeph>~/.postgresql/postgresql.key</codeph>。</pd>
           </plentry>
           <plentry>
             <pt>sslrootcert</pt>
-            <pd>The name of a file containing SSL Certificate Authority certificate(s). The default
-              is <codeph>~/.postgresql/root.crt</codeph>.</pd>
+            <pd>包含SSL证书机构证书的文件名。默认是<codeph>~/.postgresql/root.crt</codeph>。</pd>
           </plentry>
           <plentry>
             <pt>sslcrl</pt>
-            <pd>The name of the SSL certificate revocation list. The default is
-                <codeph>~/.postgresql/root.crl</codeph>.</pd>
+            <pd>SSL证书撤销列表的名称。默认是<codeph>~/.postgresql/root.crl</codeph>。</pd>
           </plentry>
         </parml></p>
-      <p>The client connection parameters can be set using the following environment variables:<ul
+      <p>客户端连接参数可以使用下列环境变量设置：<ul
           id="ul_yph_5g2_jr">
           <li><codeph>sslmode</codeph> – <codeph>PGSSLMODE</codeph></li>
           <li><codeph>sslkey</codeph> – <codeph>PGSSLKEY</codeph></li>
@@ -521,134 +379,96 @@ Hostssl testdb all 192.168.0.0/16 cert map=gpuser
     </body>
   </topic>
   <topic id="topic_yxp_5h2_jr">
-    <title>PAM Based Authentication</title>
+    <title>基于PAM的认证</title>
     <body>
-      <p>"PAM" (Pluggable Authentication Modules) is used to validate username/password pairs,
-        similar to basic authentication. PAM authentication only works if the users already exist in
-        the database. </p>
+      <p>“PAM”（可插拔认证模块）被用来验证用户名/口令对，类似于基本认证。PAM认证只在用户已经在数据库中存在时才有用。</p>
       <section>
-        <title>Parameters</title>
+        <title>参数</title>
         <p>
           <parml>
             <plentry>
               <pt>
                 <codeph>pamservice</codeph>
               </pt>
-              <pd>The default PAM service is <codeph>postgresql</codeph>. Note that if PAM is set up
-                to read <codeph>/etc/shadow</codeph>, authentication will fail because the
-                PostgreSQL server is started by a non-root user.</pd>
+              <pd>默认的PAM服务是<codeph>postgresql</codeph>。注意如果PAM被设置为读取<codeph>/etc/shadow</codeph>，认证将会失败因为PostgreSQL服务器由一个非根用户启动。</pd>
             </plentry>
           </parml>
         </p>
-        <p>Following are sample <codeph>pg_hba.conf</codeph> entries for PAM client
-          authentication:<codeblock>local    all gpuser am pamservice=postgresql</codeblock></p>
+          <p>下面是PAM客户端认证的<codeph>pg_hba.conf</codeph>项的例子：
+            <codeblock>local    all gpuser am pamservice=postgresql</codeblock></p>
       </section>
     </body>
   </topic>
   <topic id="topic_ed4_d32_jr">
-    <title>Radius Authentication</title>
+    <title>Radius认证</title>
     <body>
-      <p>RADIUS (Remote Authentication Dial In User Service) authentication works by sending an
-        Access Request message of type 'Authenticate Only' to a configured RADIUS server. It
-        includes parameters for user name, password (encrypted), and the Network Access Server (NAS)
-        Identifier. The request is encrypted using the shared secret specified in the
-          <codeph>radiussecret</codeph> option. The RADIUS server responds with either
-          <codeph>Access Accept</codeph> or <codeph>Access Reject</codeph>. </p>
-      <note>RADIUS accounting is not supported.</note>
-      <p> RADIUS authentication only works if the users already exist in the database.</p>
-      <p>The RADIUS encryption vector requires SSL to be enabled in order to be cryptographically
-        strong.</p>
+      <p>RADIUS（远程认证拨号用户服务）认证通过向一台配置好的RADIUS服务器发送'Authenticate Only'类型的Access Request消息工作。它包括用于用户名、口令（加密）以及网络访问服务器（NAS）标识符的参数。这个请求使用由<codeph>radiussecret</codeph>选项中指定的共享秘密加密。RADIUS服务器会响应<codeph>Access Accept</codeph>或者<codeph>Access Reject</codeph>。</p>
+      <note>不支持RADIUS计费。</note>
+      <p>只有用户已经在数据库中存在时，RADIUS认证才有用。</p>
+      <p>为了强密码，RADIUS加密向量要求SSL被启用。</p>
       <section>
-        <title>RADIUS Authentication Options</title>
+        <title>RADIUS认证选项</title>
         <parml>
           <plentry>
             <pt>radiusserver</pt>
-            <pd>The name of the RADIUS server.</pd>
+            <pd>RADIUS服务器的名称。</pd>
           </plentry>
           <plentry>
             <pt>radiussecret</pt>
-            <pd>The RADIUS shared secret.</pd>
+            <pd>RADIUS共享秘密。</pd>
           </plentry>
           <plentry>
             <pt>radiusport</pt>
-            <pd>The port to connect to on the RADIUS server.</pd>
+            <pd>RADIUS服务器上要连接的端口。</pd>
           </plentry>
           <plentry>
             <pt>radiusidentifier</pt>
-            <pd>NAS identifier in RADIUS requests.</pd>
+            <pd>RADIUS请求中的NAS标识符。</pd>
           </plentry>
         </parml>
       </section>
-      <p>Following are sample <codeph>pg_hba.conf</codeph> entries for RADIUS client
-        authentication:<codeblock>hostssl  all all 0.0.0.0/0 radius radiusserver=servername radiussecret=<varname>sharedsecret</varname></codeblock></p>
+      <p>下面是RADIUS客户端认证的<codeph>pg_hba.conf</codeph>项的例子：
+          <codeblock>hostssl  all all 0.0.0.0/0 radius radiusserver=servername radiussecret=<varname>sharedsecret</varname></codeblock></p>
     </body>
   </topic>
   <topic id="topic_hwn_bk2_jr">
-    <title>Limiting Concurrent Connections</title>
+    <title>限制并发连接</title>
     <body>
-      <p>To limit the number of active concurrent sessions to your Greenplum Database system, you
-        can configure the <codeph>max_connections</codeph> server configuration parameter. This is a
-        local parameter, meaning that you must set it in the <codeph>postgresql.conf</codeph> file
-        of the master, the standby master, and each segment instance (primary and mirror). The value
-        of <codeph>max_connections</codeph> on segments must be 5-10 times the value on the master. </p>
-      <p>When you set <codeph>max_connections</codeph>, you must also set the dependent parameter
-          <codeph>max_prepared_transactions</codeph>. This value must be at least as large as the
-        value of <codeph>max_connections</codeph> on the master, and segment instances should be set
-        to the same value as the master. </p>
-      <p>In <codeph>$MASTER_DATA_DIRECTORY/postgresql.conf</codeph> (including standby
-        master):<codeblock>max_connections=100
+      <p>要限制对Greenplum数据库系统的活动并发会话的数量，用户可以配置<codeph>max_connections</codeph>服务器配置参数。这是一个本地参数，意味着用户必须在Master、后备Master和每个Segment实例（主Segment和镜像Segment）的<codeph>postgresql.conf</codeph>文件中设置它。Segment上<codeph>max_connections</codeph>的值必须是Master上该值的5-10倍。</p>
+      <p>在用户设置<codeph>max_connections</codeph>时，还必须设置依赖参数<codeph>max_prepared_transactions</codeph>。在Master上，这个值必须被设置为至少和<codeph>max_connections</codeph>值一样大，而在Segment实例上应该设置为和Master上一样的值。</p>
+      <p>在<codeph>$MASTER_DATA_DIRECTORY/postgresql.conf</codeph>（包括后备Master）中：
+        <codeblock>max_connections=100
 max_prepared_transactions=100</codeblock></p>
-      <p>In <codeph>SEGMENT_DATA_DIRECTORY/postgresql.conf</codeph> for all segment
-        instances:<codeblock>max_connections=500
+      <p>在所有Segment实例的<codeph>SEGMENT_DATA_DIRECTORY/postgresql.conf</codeph>中：
+        <codeblock>max_connections=500
 max_prepared_transactions=100</codeblock></p>
-      <note>Note: Raising the values of these parameters may cause Greenplum Database to request
-        more shared memory. To mitigate this effect, consider decreasing other memory-related
-        parameters such as <codeph>gp_cached_segworkers_threshold</codeph>.</note>
-      <p>To change the number of allowed connections:<ol id="ol_etb_rk2_jr">
-          <li>Stop your Greenplum Database system:<codeblock>$ gpstop</codeblock></li>
-          <li>On the master host, edit <codeph>$MASTER_DATA_DIRECTORY/postgresql.conf</codeph> and
-            change the following two parameters:<ul id="ul_e5k_vk2_jr">
-              <li><codeph>max_connections</codeph> – the number of active user sessions you want to
-                allow plus the number of <codeph>superuser_reserved_connections</codeph>.</li>
-              <li><codeph>max_prepared_transactions</codeph> – must be greater than or equal to
+      <note>注意： 调高这些参数的值可能会导致Greenplum数据库请求更多共享内存。为了缓和这种影响，考虑降低其他内存相关的参数，例如 <codeph>gp_cached_segworkers_threshold</codeph>。</note>
+      <p>要更改允许的连接数：<ol id="ol_etb_rk2_jr">
+          <li>停止Greenplum数据库系统：<codeblock>$ gpstop</codeblock></li>
+          <li>在Master主机上，编辑<codeph>$MASTER_DATA_DIRECTORY/postgresql.conf</codeph>并且更改下面两个参数：
+              <ul id="ul_e5k_vk2_jr">
+              <li><codeph>max_connections</codeph> – 想要允许的活动用户会话数加上<codeph>superuser_reserved_connections</codeph>的数量</li>
+              <li><codeph>max_prepared_transactions</codeph> – 必须大于等于
                   <codeph>max_connections</codeph>.</li>
             </ul></li>
-          <li>On each segment instance, edit <codeph>SEGMENT_DATA_DIRECTORY/postgresql.conf</codeph>
-            and change the following two parameters:<ul id="ul_iwf_1l2_jr">
-              <li><codeph>max_connections</codeph> – must be 5-10 times the value on the
-                master.</li>
-              <li><codeph>max_prepared_transactions</codeph> – must be equal to the value on the
-                master.</li>
+          <li>在每个Segment实例上，编辑<codeph>SEGMENT_DATA_DIRECTORY/postgresql.conf</codeph>并且更改下面两个参数：
+              <ul id="ul_iwf_1l2_jr">
+              <li><codeph>max_connections</codeph> – 必须是Master上值的5-10倍。</li>
+              <li><codeph>max_prepared_transactions</codeph> – 必须等于Master上的值。</li>
             </ul></li>
-          <li>Restart your Greenplum Database system:<codeblock>$ gpstart</codeblock></li>
+          <li>重启Greenplum数据库系统：<codeblock>$ gpstart</codeblock></li>
         </ol></p>
     </body>
   </topic>
   <topic id="topic_ibc_nl2_jr">
-    <title>Encrypting Client/Server Connections</title>
+    <title>加密客户端/服务器连接</title>
     <body>
-      <p>Greenplum Database has native support for SSL connections between the client and the master
-        server. SSL connections prevent third parties from snooping on the packets, and also prevent
-        man-in-the-middle attacks. SSL should be used whenever the client connection goes through an
-        insecure link, and must be used whenever client certificate authentication is used. </p>
-      <note>For information about encrypting data between the <codeph>gpfdist</codeph> server and
-        Greenplum Database segment hosts, see <xref href="Encryption.xml#gpfdist_connections"/>. </note>
-      <p>To enable SSL requires that OpenSSL be installed on both the client and the master server
-        systems. Greenplum can be started with SSL enabled by setting the server configuration
-        parameter <codeph>ssl=on</codeph> in the master <codeph>postgresql.conf</codeph>. When
-        starting in SSL mode, the server will look for the files <codeph>server.key</codeph> (server
-        private key) and <codeph>server.crt</codeph> (server certificate) in the master data
-        directory. These files must be set up correctly before an SSL-enabled Greenplum system can
-        start.</p>
-      <note type="important">Do not protect the private key with a passphrase. The server does not
-        prompt for a passphrase for the private key, and the database startup fails with an error if
-        one is required.</note>
-      <p>A self-signed certificate can be used for testing, but a certificate signed by a
-        certificate authority (CA) should be used in production, so the client can verify the
-        identity of the server. Either a global or local CA can be used. If all the clients are
-        local to the organization, a local CA is recommended. See <xref
-          href="#topic_fzv_wb2_jr/create_a_cert" format="dita"/> for steps to create a self-signed
-        certificate.</p>
+      <p>Greenplum数据库对于客户端和Master服务器之间的SSL连接有原生支持。SSL连接可以防止第三方进行包嗅探，还能防止中间人攻击。只要客户端连接会通过不安全的链接，就应该使用SSL，并且只要使用客户端证书认证也应该使用SSL。</p>
+      <note>有关在<codeph>gpfdist</codeph>服务器和Greenplum数据库Segment主机之间加密数据的信息，请见<xref href="Encryption.xml#gpfdist_connections"/>. </note>
+      <p>启用SSL要求在客户端和Master服务器系统上都安装OpenSSL。可通过在Master的<codeph>postgresql.conf</codeph>中设置服务器配置参数<codeph>ssl=on</codeph>让Greenplum以启用SSL的方式启动。在以SSL模式启动时，服务器将在Master的数据目录中查找<codeph>server.key</codeph>（服务器私钥）文件和<codeph>server.crt</codeph>（服务器证书）文件。在启用SSL的Greenplum系统能启动之前，这些文件必须被正确地设置好。</p>
+      <note type="important">不要用口令保护私钥。服务器不会为私钥提示要求口令，而不提供口令数据库启动会失败并且报出错误。</note>
+      <p>自签名证书可以被用来测试，但是生产中应该使用由证书颁发机构（CA）（全球CA或者本地CA）签发的证书，这样客户端就能够验证服务器的身份。如果所有的客户端都是组织本地的，推荐使用本地CA。创建自签名证书的步骤请见 <xref
+          href="#topic_fzv_wb2_jr/create_a_cert" format="dita"/></p>
     </body>
   </topic>
 </topic>

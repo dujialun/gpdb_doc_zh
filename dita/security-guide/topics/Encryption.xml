@@ -1,91 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_th5_5bf_jr">
-  <title>Encrypting Data and Database Connections</title>
-  <shortdesc>Describes how to encrypt data at rest in the database or in transit over the network,
-    to protect from evesdroppers or man-in-the-middle attacks.</shortdesc>
+  <title>加密数据和数据库连接</title>
+  <shortdesc>描述如何在数据库中或者在网络上传输时加密数据以防止窃听攻击或者中间人攻击。</shortdesc>
   <body>
     <ul id="ul_wxd_dxc_lr">
-      <li>Connections between clients and the master database can be encrypted with SSL. This is
-        enabled with the <codeph>ssl</codeph> server configuration parameter, which is
-          <codeph>off</codeph> by default. Setting the <codeph>ssl</codeph> parameter to
-          <codeph>on</codeph> allows client communications with the master to be encrypted. The
-        master database must be set up for SSL. See <xref
-          href="Authenticate.xml#topic_fzv_wb2_jr/openssl_config"/> for more about encrypting client
-        connections with SSL.</li>
-      <li>Greenplum Database allows SSL encryption of data in transit between the Greenplum parallel
-        file distribution server, <codeph>gpfdist</codeph>, and segment hosts. See <xref
-          href="#gpfdist_connections" format="dita"/> for more information. </li>
-      <li>The <codeph>pgcrypto</codeph> module of encryption/decryptions functions protect data at
-        rest in the database. Encryption at the column level protects sensitive information, such as
-        social security numbers or credit card numbers. See <xref href="#pgcrypto" format="dita"/>
-        for more information. </li>
+      <li>客户端和Master数据库之间的连接可以用SSL加密。这可以用<codeph>ssl</codeph>服务器配置参数启用，该参数默认为<codeph>off</codeph>。
+          将<codeph>ssl</codeph>参数设置为<codeph>on</codeph>允许客户端与Master的通信被加密。Master数据库必须为SSL设置好。
+          更多有关用SSL加密客户端连接的信息请见<xref
+          href="Authenticate.xml#topic_fzv_wb2_jr/openssl_config"/>OpenSSL配置。</li>
+      <li>Greenplum数据库允许在Greenplum并行文件分发服务器、<codeph>gpfdist</codeph>以及Segment主机之间传输的数据的SSL加密。
+          更多信息请见<xref href="#gpfdist_connections" format="dita"/> 加密gpfdist连接。</li>
+      <li><codeph>pgcrypto</codeph>包中的加密/解密函数可以保护数据库中静止的数据。列级的加密可以保护敏感信息，例如社会保险号码或信用卡号。更多信息请见<xref href="#pgcrypto" format="dita"/>用pgcrypto加密静止数据。</li>
     </ul>
   </body>
   <topic id="gpfdist_connections">
-    <title>Encrypting gpfdist Connections</title>
+    <title>加密gpfdist连接</title>
     <body>
-      <p>The <codeph>gpfdists</codeph> protocol is a secure version of the <codeph>gpfdist</codeph>
-        protocol that securely identifies the file server and the Greenplum Database and encrypts
-        the communications between them. Using <codeph>gpfdists</codeph> protects against
-        eavesdropping and man-in-the-middle attacks.</p>
-      <p> The <codeph>gpfdists</codeph> protocol implements client/server SSL security with the
-        following notable features: </p>
+      <p><codeph>gpfdists</codeph>协议是<codeph>gpfdists</codeph>协议的一个安全版本，它安全地标识文件服务器和Greenplum数据库并且加密它们之间的通信。使用<codeph>gpfdists</codeph>可以防止窃听攻击和中间人攻击。</p>
+      <p> <codeph>gpfdists</codeph>协议用下列显著的特性实现了客户端/服务器的SSL安全性：</p>
       <ul id="ul_yyk_vq4_kr">
-        <li>Client certificates are required. </li>
-        <li>Multilingual certificates are not supported. </li>
-        <li>A Certificate Revocation List (CRL) is not supported. </li>
-        <li>The TLSv1 protocol is used with the <codeph>TLS_RSA_WITH_AES_128_CBC_SHA</codeph>
-          encryption algorithm. These SSL parameters cannot be changed. </li>
-        <li>SSL renegotiation is supported. </li>
-        <li>The SSL ignore host mismatch parameter is set to false. </li>
-        <li>Private keys containing a passphrase are not supported for the <codeph>gpfdist</codeph>
-          file server (server.key) or for the Greenplum Database (client.key). </li>
-        <li>It is the user's responsibility to issue certificates that are appropriate for the
-          operating system in use. Generally, converting certificates to the required format is
-          supported, for example using the SSL Converter at <xref
+        <li>要求客户端证书。</li>
+        <li>不支持多语言证书。</li>
+        <li>不支持证书撤销列表（CRL）。</li>
+        <li>TLSv1协议被用于<codeph>TLS_RSA_WITH_AES_128_CBC_SHA</codeph>加密算法。这些SSL参数不能更改。 </li>
+        <li>支持SSL重新协商。 </li>
+        <li>SSL的忽略主机失配参数被设置为假。</li>
+        <li>gpfdist文件服务器（server.key）和Greenplum数据库（client.key）不支持含有口令的私钥。</li>
+        <li>发出适合于使用中的操作系统的证书是用户的责任。通常，支持将证书转换成必要的格式，例如使用<xref
             href="http://www.commoncriteriaportal.org/products/?expand#ALL" format="html"
-            scope="external">https://www.sslshopper.com/ssl-converter.html</xref>. </li>
+            scope="external">https://www.sslshopper.com/ssl-converter.html</xref>上的SSL转换器。</li>
       </ul>
-      <p>A <codeph>gpfdist</codeph> server started with the <codeph>--ssl</codeph> option can only
-        communicate with the <codeph>gpfdists</codeph> protocol. A <codeph>gpfdist</codeph> server
-        started without the <codeph>--ssl</codeph> option can only communicate with the
-          <codeph>gpfdist</codeph> protocol. For more detail about <codeph>gpfdist</codeph> refer to
-        the <i>Greenplum Database Administrator Guide</i>.</p>
-      <p>There are two ways to enable the <codeph>gpfdists</codeph> protocol: <ul id="ul_xdc_ycd_lr">
-          <li>Run <codeph>gpfdist</codeph> with the <codeph>--ssl</codeph> option and then use the
-              <codeph>gpfdists</codeph> protocol in the <codeph>LOCATION</codeph> clause of a
-              <codeph>CREATE EXTERNAL TABLE</codeph> statement. </li>
-          <li> Use a YAML control file with the SSL option set to true and run
-              <codeph>gpload</codeph>. Running <codeph>gpload</codeph> starts the
-              <codeph>gpfdist</codeph> server with the <codeph>--ssl</codeph> option and then uses
-            the <codeph>gpfdists</codeph> protocol. </li>
+        <p>用--ssl选项启动的<codeph>gpfdist</codeph>服务器只能用<codeph>gpfdist</codeph>协议通信。没有用<codeph>--ssl</codeph>选项启动的<codeph>gpfdists</codeph>服务器只能用<codeph>gpfdists</codeph>协议通信。更多<codeph>gpfdists</codeph>的细节请参考<i>Greenplum数据库管理员指南</i>。</p>
+      <p>有两种方法启用<codeph>gpfdists</codeph>协议： <ul id="ul_xdc_ycd_lr">
+          <li>用<codeph>--ssl</codeph>选项运行<codeph>gpfdist</codeph>然后在<codeph>CREATE EXTERNAL TABLE</codeph>语句的<codeph>LOCATION</codeph>子句中使用gpfdists协议。</li>
+          <li> 使用一个SSL选项被设置为真的YAML控制文件并且运行<codeph>gpload</codeph>。运行<codeph>gpload</codeph>会用<codeph>--ssl</codeph>选项启动<codeph>gpfdist</codeph>服务器然后使用<codeph>gpfdist</codeph>协议。</li>
         </ul></p>
-      <p> When using gpfdists, the following client certificates must be located in the
-          <codeph>$PGDATA/gpfdists</codeph> directory on each segment:</p>
+      <p> 在使用gpfdists时，下列客户端证书必须位于每一个Segment的<codeph>$PGDATA/gpfdists</codeph>目录中：</p>
       <ul id="ul_afc_bdd_lr">
-        <li>The client certificate file, <codeph>client.crt</codeph>
-        </li>
-        <li>The client private key file, <codeph>client.key</codeph>
-        </li>
-        <li>The trusted certificate authorities, <codeph>root.crt</codeph>
-        </li>
+        <li>客户端证书文件<codeph>client.crt</codeph></li>
+        <li>客户端私钥文件<codeph>client.key</codeph></li>
+        <li>可信证书机构<codeph>root.crt</codeph></li>
       </ul>
-      <note type="important"> Do not protect the private key with a passphrase. The server does not
-        prompt for a passphrase for the private key, and loading data fails with an error if one is
-        required. </note>
-      <p>When using <codeph>gpload</codeph> with SSL you specify the location of the server
-        certificates in the YAML control file. When using <codeph>gpfdist</codeph> with SSL, you
-        specify the location of the server certificates with the --ssl option. </p>
-      <p>The following example shows how to securely load data into an external table. The example
-        creates a readable external table named <codeph>ext_expenses</codeph> from all files with
-        the <codeph>txt</codeph> extension, using the <codeph>gpfdists</codeph> protocol. The files
-        are formatted with a pipe (<codeph>|</codeph>) as the column delimiter and an empty space as
-        null. <ol id="ol_wwy_j2d_lr">
-          <li>Run <codeph>gpfdist</codeph> with the <codeph>--ssl</codeph> option on the segment
-            hosts. </li>
-          <li>Log into the database and execute the following
-            command:<codeblock>
+      <note type="important">不要用口令保护私钥。服务器不会为私钥提示要求口令，因此数据装载会在要求口令的情况下失败并且报出错误。 </note>
+      <p>在使用带有SSL的<codeph>gpload</codeph>时，用户在YAML控制文件中指定服务器证书的位置。在使用带有SSL的<codeph>gpfdist</codeph>时，用户用--ssl选项指定服务器证书的位置。</p>
+      <p>下面的例子展示如何安全地把数据装载到一个外部表中。这个例子从所有扩展名为txt的文件使用gpfdists协议创建了一个名为<codeph>ext_expenses</codeph>的可读外部表。这些文件被格式化为使用竖线（<codeph>|</codeph>）作为列定界符并且使用空格作为空值。 <ol id="ol_wwy_j2d_lr">
+          <li>在Segment主机上用<codeph>--ssl</codeph>选项运行<codeph>gpfdist</codeph>。</li>
+          <li>登入数据库并执行下面的命令：<codeblock>
 =# CREATE EXTERNAL TABLE ext_expenses 
    ( name text, date date, amount float4, category text, desc1 text )
 LOCATION ('gpfdists://etlhost-1:8081/*.txt', 'gpfdists://etlhost-2:8082/*.txt')
@@ -95,58 +56,37 @@ FORMAT 'TEXT' ( DELIMITER '|' NULL ' ') ;
     </body>
   </topic>
   <topic id="pgcrypto">
-    <title>Encrypting Data at Rest with pgcrypto</title>
+    <title>用pgcrypto加密静止数据</title>
     <body>
-      <p>The pgcrypto module for Greenplum Database provides functions for encrypting data at rest
-        in the database. Administrators can encrypt columns with sensitive information, such as
-        social security numbers or credit card numbers, to provide an extra layer of protection.
-        Database data stored in encrypted form cannot be read by users who do not have the
-        encryption key, and the data cannot be read directly from disk. </p>
-      <p>pgcrypto is installed by default when you install Greenplum Database. You must
-        explicitly enable pgcrypto in each database in which you want to use the module.</p>
-      <p>pgcrypto allows PGP encryption using symmetric and asymmetric encryption. Symmetric
-        encryption encrypts and decrypts data using the same key and is faster than asymmetric
-        encryption. It is the preferred method in an environment where exchanging secret keys is not
-        an issue. With asymmetric encryption, a public key is used to encrypt data and a private key
-        is used to decrypt data. This is slower then symmetric encryption and it requires a stronger
-        key. </p>
-      <p>Using pgcrypto always comes at the cost of performance and maintainability. It is important
-        to use encryption only with the data that requires it. Also, keep in mind that you cannot
-        search encrypted data by indexing the data. </p>
-      <p>Before you implement in-database encryption, consider the following PGP limitations.<ul
+      <p>Greenplum数据库的pgcrypto包提供加密静止在数据库中数据的函数。管理员可以加密有敏感信息的列已提供额外的保护层，
+        例如社会保险号码或者信用卡号。存储为加密形式的数据库数据不能被不掌握加密密钥的用户读取，并且数据也无法直接从磁盘上读出。 </p>
+      <p>当用户安装Greenplum数据库时，默认情况下会安装pgcrypto。用户必须在要使用该模块的每个数据库中显式启用pgcrypto。</p>
+      <p>pgcrypto允许使用对称和非对称加密的PGP加密。对称加密使用相同的密钥加密和解密数据，并且比非对称加密更快。
+        在密钥交换不成为问题的环境中，对称加密是首选方法。对于非对称加密，公钥被用来加密数据而私钥被用来解密数据。
+        这种方法比对称加密要慢一些并且要求更强的密钥。 </p>
+      <p>使用pgcrypto总是会带来性能和可维护性方面的代价。有必要只对需要的数据使用加密。还有，记住无法通过索引来搜索加密数据。</p>
+      <p>在实现数据库内加密之前，考虑下列PGP限制。<ul
           id="ul_ihq_xt4_kr">
-          <li> No support for signing. That also means that it is not checked whether the encryption
-            sub-key belongs to the master key.</li>
-          <li> No support for encryption key as master key. This practice is generally discouraged,
-            so this limitation should not be a problem.</li>
-          <li> No support for several subkeys. This may seem like a problem, as this is common
-            practice. On the other hand, you should not use your regular GPG/PGP keys with pgcrypto,
-            but create new ones, as the usage scenario is rather different.</li>
+          <li> 不支持签名。这也意味着检查加密子密钥是否属于主密钥。</li>
+          <li> 不支持加密密钥作为主密钥。通常不鼓励这种实践，因为这类限制不应该成为问题。/li>
+          <li> 不支持多个子密钥。这可能看起来像是一个问题，因为这是常见的做法。在另一方面，用户不应将自己的常规GPG/PGP密钥用于pgcrypto，而是创建新的密钥，因为使用场景很不相同。</li>
         </ul></p>
-      <p>Greenplum Database is compiled with zlib by default; this allows PGP encryption functions
-        to compress data before encrypting. When compiled with OpenSSL, more algorithms will be
-        available. </p>
-      <p>Because pgcrypto functions run inside the database server, the data and passwords move
-        between pgcrypto and the client application in clear-text. For optimal security, you should
-        connect locally or use SSL connections and you should trust both the system and database
-        administrators. </p>
-      <p>pgcrypto configures itself according to the findings of the main PostgreSQL configure
-        script.</p>
-      <p>When compiled with <codeph>zlib</codeph>, pgcrypto encryption functions are able to
-        compress data before encrypting. </p>
-      <p>Pgcrypto has various levels of encryption ranging from basic to advanced built-in
-        functions. The following table shows the supported encryption algorithms.</p>
+      <p>Greenplum数据库默认编译了zlib，这允许PGP加密函数在加密前压缩数据。在编译有OpenSSL时，将有更多算法可用。</p>
+      <p>因为pgcrypto函数在数据库服务器内部运行，数据和口令在pgcrypto和客户端应用之间以明文形式移动。为了最好的安全性，用户应该使用本地连接或者SSL连接并且用户应该信任系统管理员和数据库管理员。</p>
+      <p>pgcrypto会根据主PostgreSQL配置脚本的发现配置其自身。</p>
+      <p>当编译有<codeph>zlib</codeph>时，pgcrypto加密函数能够在加密前压缩数据。</p>
+      <p>pgcrypto有多种加密级别，范围从基本加密到高级内建函数。下面的表格显示所支持的加密算法。</p>
       <table id="table_wzb_4fd_lr">
-        <title>Pgcrypto Supported Encryption Functions</title>
+        <title>表 1. pgcrypto支持的加密函数</title>
         <tgroup cols="4">
           <colspec colwidth="33*" align="left"/>
           <colspec colwidth="33*" align="left"/>
           <colspec colwidth="33*" align="left"/>
           <thead>
             <row>
-              <entry> Value Functionality </entry>
-              <entry> Built-in </entry>
-              <entry> With OpenSSL </entry>
+              <entry> 值功能 </entry>
+              <entry> 内建 </entry>
+              <entry> 带有OpenSSL </entry>
             </row>
           </thead>
           <tbody>
@@ -163,14 +103,12 @@ FORMAT 'TEXT' ( DELIMITER '|' NULL ' ') ;
             <row>
               <entry> SHA224/256/384/512 </entry>
               <entry> yes </entry>
-              <entry> yes <fn>SHA2 algorithms were added to OpenSSL in version 0.9.8. For older
-                  versions, pgcrypto will use built-in code.</fn></entry>
+              <entry> yes <fn>SHA2算法在版本0.9.8中被加入到OpenSSL，pgcrypto将使用内建代码。</fn></entry>
             </row>
             <row>
-              <entry> Other digest algorithms </entry>
+              <entry> 其他摘要算法 </entry>
               <entry> no </entry>
-              <entry> yes <fn>Any digest algorithm OpenSSL supports is automatically picked up. This
-                  is not possible with ciphers, which need to be supported explicitly.</fn></entry>
+              <entry> yes <fn>任何OpenSSL支持的摘要算法都被自动的取用。但对加密不能这样，加密需要被明确地支持。</fn></entry>
             </row>
             <row>
               <entry> Blowfish </entry>
@@ -180,8 +118,7 @@ FORMAT 'TEXT' ( DELIMITER '|' NULL ' ') ;
             <row>
               <entry> AES </entry>
               <entry> yes </entry>
-              <entry> yes<fn>AES is included in OpenSSL since version 0.9.7. For older versions,
-                  pgcrypto will use built-in code.</fn></entry>
+              <entry> yes<fn>从版本0.9.7开始OpenSSL中就包括了AES。对于较老的版本，pgcrypto将使用内建代码。</fn></entry>
             </row>
             <row>
               <entry> DES/3DES/CAST5 </entry>
@@ -207,18 +144,12 @@ FORMAT 'TEXT' ( DELIMITER '|' NULL ' ') ;
         </tgroup>
       </table>
       <section id="creating_pgp_keys">
-        <title>Creating PGP Keys</title>
-        <p>To use PGP asymmetric encryption in Greenplum Database, you must first create public and
-          private keys and install them. </p>
-        <p>This section assumes you are installing Greenplum Database on a Linux machine with the
-          Gnu Privacy Guard (<codeph>gpg</codeph>) command line tool. Use the latest version of GPG
-          to create keys. Download and install Gnu Privacy Guard (GPG) for your operating system
-          from <xref href="https://www.gnupg.org/download/" format="html" scope="external"/>. On the
-          GnuPG website you will find installers for popular Linux distributions and links for
-          Windows and Mac OS X installers. </p>
+        <title>创建PGP密钥</title>
+        <p>要在Greenplum数据库中使用PGP非对称加密，用户必须首先创建公私钥并且安装它们。 </p>
+        <p>这一节假定用户正在一台Linux机器上用GNU隐私保护（<codeph>gpg</codeph>）命令行工具安装Greenplum数据库。使用最新版本的GPG来创建密钥。从<xref href="https://www.gnupg.org/download/" format="html" scope="external"/>为用户的操作系统下载和安装GNU隐私保护（GPG）。在GnuPG网站用户将找到流行的Linux发布的安装器以及Windows和Mac OS X安装器的链接。</p>
         <ol id="ol_vnm_h54_kr">
-          <li>As root, execute the following command and choose option 1 from the
-            menu:<codeblock># gpg --gen-key 
+          <li>作为root，执行下面的命令并且从菜单中选择选项1：
+              <codeblock># gpg --gen-key 
 gpg (GnuPG) 2.0.14; Copyright (C) 2009 Free Software Foundation, Inc.
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
@@ -234,8 +165,7 @@ Please select what kind of key you want:
  (3) DSA (sign only)
  (4) RSA (sign only)
 Your selection? <b>1</b></codeblock></li>
-          <li>Respond to the prompts and follow the instructions, as shown in this
-            example:<codeblock>RSA keys may be between 1024 and 4096 bits long.
+          <li>如这个例子中所示，对提示做出响应并且遵照指示：<codeblock>RSA keys may be between 1024 and 4096 bits long.
 What keysize do you want? (2048) Press enter to accept default key size
 Requested keysize is 2048 bits
 Please specify how long the key should be valid.
@@ -285,30 +215,26 @@ pub   2048R/2027CC30 2015-01-13 [expires: 2016-01-13]
 uid                  John Doe &lt;jdoe@email.com>
 sub   2048R/4FD2EFBB 2015-01-13 [expires: 2016-01-13]
 </codeblock></li>
-          <li>List the PGP keys by entering the following
-              command:<codeblock>gpg --list-secret-keys 
+          <li>通过输入下面的命令列出PGP密钥：
+              <codeblock>gpg --list-secret-keys 
 /root/.gnupg/secring.gpg
 ------------------------
 sec   2048R/2027CC30 2015-01-13 [expires: 2016-01-13]
 uid                  John Doe &lt;jdoe@email.com&gt;
-ssb   2048R/4FD2EFBB 2015-01-13</codeblock><p>2027CC30
-              is the public key and will be used to <i>encrypt</i> data in the database. 4FD2EFBB is
-              the private (secret) key and will be used to <i>decrypt</i> data.</p></li>
-          <li>Export the keys using the following
-            commands:<codeblock># gpg -a --export 4FD2EFBB &gt; public.key
+                  ssb   2048R/4FD2EFBB 2015-01-13</codeblock><p>2027CC30是公钥并且将被用于<i>加密</i>数据库中的数据。4FD2EFBB是私（秘密）钥并且将被用来<i>解密</i>数据。</p></li>
+          <li>使用下面的命令导出密钥：
+              codeblock># gpg -a --export 4FD2EFBB &gt; public.key
 # gpg -a --export-secret-keys 2027CC30 &gt; secret.key</codeblock></li>
         </ol>
-        <p>See the <xref href="https://www.postgresql.org/docs/9.4/pgcrypto.html"
-            format="html" scope="external">pgcrypto</xref> documentation for more information about
-          PGP encryption functions. </p>
+        <p>更多有关PGP加密函数的信息，请见<xref href="https://www.postgresql.org/docs/9.4/pgcrypto.html"
+            format="html" scope="external">pgcrypto</xref>的文档。 </p>
       </section>
       <section>
-        <title>Encrypting Data in Tables using PGP</title>
-        <p>This section shows how to encrypt data inserted into a column using the PGP keys you
-          generated. </p>
+        <title>使用PGP加密表中的数据</title>
+        <p>这一节显示如何使用刚生成的PGP密钥加密插入到列中的数据。</p>
         <ol id="ol_nty_qzd_lr">
-          <li>Dump the contents of the <codeph>public.key</codeph> file and then copy it to the
-            clipboard:<codeblock># cat public.key
+          <li>转储<codeph>public.key</codeph>文件的内容然后把它拷贝到剪切板：
+              <codeblock># cat public.key
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v2.0.14 (GNU/Linux)
             
@@ -340,9 +266,7 @@ Pv2MikPS2fKOAg1R3LpMa8zDEtl4w3vckPQNrQNnYuUtfj6ZoCxv
 =XZ8J
 -----END PGP PUBLIC KEY BLOCK-----
 </codeblock></li>
-          <li>Create a table called <codeph>userssn</codeph> and insert some sensitive data, social
-            security numbers for Bob and Alice, in this example. Paste the public.key contents after
-            "dearmor(".
+          <li>创建一个名为<codeph>userssn</codeph>的表并且插入一些敏感数据，这个例子中是Bob和Alice的社会保险号码。在"dearmor("之后粘贴public.key的内容。
             <codeblock>CREATE TABLE userssn( ssn_id SERIAL PRIMARY KEY, 
     username varchar(100), ssn bytea); 
 
@@ -382,8 +306,8 @@ Pv2MikPS2fKOAg1R3LpMa8zDEtl4w3vckPQNrQNnYuUtfj6ZoCxv
 =XZ8J
 -----END PGP PUBLIC KEY BLOCK-----' AS pubkey) AS keys;
 </codeblock></li>
-          <li>Verify that the <codeph>ssn</codeph> column is
-            encrypted.<codeblock>test_db=# select * from userssn;
+          <li>验证<codeph>ssn</codeph>列被加密。
+              <codeblock>test_db=# select * from userssn;
 ssn_id   | 1
 username | Alice
 ssn      | \301\300L\003\235M%_O\322\357\273\001\010\000\272\227\010\341\216\360\217C\020\261)_\367
@@ -419,7 +343,8 @@ L[v\262k\244\2435\264\232B\357\370d9\375\011\002\327\235&lt;\246\210b\030\012\33
 \347\240\005\213\0078\036\210\307$\317\322\311\222\035\354\006&lt;\266\264\004\376\251q\256\220(+\030\
 3270\013c\327\272\212%\363\033\252\322\337\354\276\225\232\201\212^\304\210\2269@\3230\370{
 </codeblock></li>
-          <li>Extract the public.key ID from the database: <codeblock>SELECT pgp_key_id(dearmor('-----BEGIN PGP PUBLIC KEY BLOCK-----
+          <li>从数据库中提取public.key的ID：
+              <codeblock>SELECT pgp_key_id(dearmor('-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v2.0.14 (GNU/Linux)
 
 mQENBFS1Zf0BCADNw8Qvk1V1C36Kfcwd3Kpm/dijPfRyyEwB6PqKyA05jtWiXZTh
@@ -452,10 +377,8 @@ Pv2MikPS2fKOAg1R3LpMa8zDEtl4w3vckPQNrQNnYuUtfj6ZoCxv
 
 pgp_key_id | 9D4D255F4FD2EFBB
 </codeblock>
-            <p>This shows that the PGP key ID used to encrypt the <codeph>ssn</codeph> column is
-              9D4D255F4FD2EFBB. It is recommended to perform this step whenever a new key is created
-              and then store the ID for tracking. </p><p>You can use this key to see which key pair
-              was used to encrypt the data:</p>
+            <p>这显示用于加密<codeph>ssn</codeph>列的PGP密钥ID是9D4D255F4FD2EFBB。每当新密钥被创建时推荐执行这一步，然后把ID存起来便于跟踪。</p>
+            <p>用户可以使用这个密钥来查看哪个密钥对被用来加密数据：</p>
             <codeblock>SELECT username, pgp_key_id(ssn) As key_used
 FROM userssn;
 username | Bob
@@ -464,13 +387,11 @@ key_used | 9D4D255F4FD2EFBB
 username | Alice
 key_used | 9D4D255F4FD2EFBB
 </codeblock>
-            <note>Different keys may have the same ID. This is rare, but is a normal event. The
-              client application should try to decrypt with each one to see which fits — like
-              handling <codeph>ANYKEY</codeph>. See <xref
+              <note>不同的密钥可能有相同的ID。这很少见，但是是一种正常事件。客户端应用应该尝试用每一个来解密看看哪个适合 — 就像处理<codeph>ANYKEY</codeph>一样。请见pgcrypto文档中的<xref
                 href="https://www.postgresql.org/docs/9.4/pgcrypto.html" format="html"
-                scope="external">pgp_key_id()</xref> in the pgcrypto documentation. </note>
+                scope="external">pgp_key_id()</xref>。</note>
           </li>
-          <li>Decrypt the data using the private key.
+          <li>使用私钥解密数据。
               <codeblock>SELECT username, pgp_pub_decrypt(ssn, keys.privkey) 
                  AS decrypted_ssn FROM userssn
                  CROSS JOIN
@@ -538,28 +459,23 @@ username | decrypted_ssn
  Bob      | 123-45-6799
 (2 rows)
 
-</codeblock><p>If
-              you created a key with passphrase, you may have to enter it here. However for the
-              purpose of this example, the passphrase is blank. </p></li>
+</codeblock><p>如果用户创建了一个带有口令的密钥，用户可能不得不在这里输入它。不过对于这个例子的目的，口令为空。</p></li>
         </ol>
       </section>
       <section>
-        <title>Key Management</title>
-        <p>Whether you are using symmetric (single private key) or asymmetric (public and private
-          key) cryptography, it is important to store the master or private key securely. There are
-          many options for storing encryption keys, for example, on a file system, key vault,
-          encrypted USB, trusted platform module (TPM), or hardware security module (HSM). </p>
-        <p>Consider the following questions when planning for key management:</p>
+        <title>密钥管理</title>
+        <p>根据用户是使用对称（单私钥）还是非对称（公私钥）加密算法，有必要安全地存放主密钥或私钥。存储加密密钥有很多种选项，例如放在文件系统中、密钥保险箱、加密USB、可信平台模块（TPM）或者硬件安全性模块（HSM）。 </p>
+        <p>在规划密钥管理时，考虑下列问题：</p>
         <ul id="ul_vqd_sl2_lr">
-          <li> Where will the keys be stored?</li>
-          <li> When should keys expire?</li>
-          <li> How are keys protected?</li>
-          <li> How are keys accessed?</li>
-          <li> How can keys be recovered and revoked?</li>
+          <li> 密钥将被存储在哪里?</li>
+          <li> 密钥应该何时过期？</li>
+          <li> 如何保护密钥？</li>
+          <li> 如何访问密钥？</li>
+          <li> 密钥如何能被恢复和收回？</li>
         </ul>
-        <p>The Open Web Application Security Project (OWASP) provides a very comprehensive <xref
+        <p>开放Web应用安全性项目（OWASP）为保护加密密钥提供了一份非常全面的指南。<xref
             href="https://www.owasp.org/index.php/Cryptographic_Storage_Cheat_Sheet" format="html"
-            scope="external">guide to securing encryption keys</xref>.</p>
+            scope="external">guide to securing encryption keys</xref></p>
       </section>
     </body>
   </topic>
