@@ -28,15 +28,16 @@
     - 使用外部数据 （完成：杜佳伦）
     - Loading and Unloading Data （完成：武宁）
     - Managing Performance （完成：钱晨）
-- Security Configuration Guide （翻译中：武宁，进度：5/9）
+- Security Configuration Guide （完成：武宁）
+    - Demo: [http://47.92.231.67:8080/6-0/security-guide/](http://47.92.231.67:8080/6-0/security-guide/)
 - Best Practices Guide （完成：苑泽福）
     - Demo: [http://47.92.231.67:8080/6-0/best_practices/](http://47.92.231.67:8080/6-0/best_practices/)
-- Utility Guide （翻译中：苑泽福，进度：22/53）
-- Reference Guide 进行中（参与者：肖磊、杜佳伦、何江、李想）
+- Utility Guide （翻译中：苑泽福，进度：28/53）
+- Reference Guide 完成（参与者：肖磊、杜佳伦、何江、李想）
     - Demo: [http://47.92.231.67:8080/6-0/ref_guide/](http://47.92.231.67:8080/6-0/ref_guide/)
     - SQL Command Reference（完成：肖磊，杜佳伦）
     - System Catalog Reference（完成：杜佳伦）
-    - The gp_toolkit Administrative Schema（翻译中：杜佳伦，进度：4/12）
+    - The gp_toolkit Administrative Schema（完成：杜佳伦）
     - The gpperfmon Database（完成：何江）
     - Greenplum Database Data Types（完成：何江）
     - Server Configuration Parameters（完成：杜佳伦）
