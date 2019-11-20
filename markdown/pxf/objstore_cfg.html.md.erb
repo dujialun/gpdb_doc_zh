@@ -130,7 +130,6 @@ PXF支持以下AWS SSE加密密钥管理方案:
 
 无论数据是否经过加密，您的S3访问密钥和秘密密钥都将控制您对所有S3存储桶对象的访问
 
-S3 transparently decrypts data during a read operation of an encrypted file that you access via a readable external table that is created by specifying the `pxf` protocol and an `s3:*` profile. No additional configuration is required.
 在您通过指定`pxf`协议和`s3：*`配置文件创建的可读外部表访问的加密文件的读取操作期间，S3透明地解密数据。 无需其他配置。
 
 要加密通过这种类型的外部表写入S3的数据，您有两个选择：

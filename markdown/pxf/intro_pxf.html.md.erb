@@ -16,7 +16,6 @@ GPDB集群包含一个master节点(master node)和多个segment主机(segment ho
 
 连接器是一个通用的术语,他封装了读取和写入外部数据存储所需要的实现细节。PXF提供创建了与Hadoop (HDFS,Hive,Hbase),对象存储(Azure,Google Cloud Storage, Minio, S3)和sql数据库(通过jdbc)的连接器。
 
-A PXF *server* is a named configuration for Hadoop or an object store connector. A server definition provides the information required for PXF to access a external data source. This configuration information is data-store-specific, and may include server location and access credentials.
 PXF服务是连接器的命名配置，他定义提供PXF访问外部数据源所需要的信息，此类配置信息是特定于数据存储的，并且可以包含服务器位置,访问凭证和其他属性。
 
 <div class="note">PXF目前支持以明文形式在配置文件中存储对象存储凭证。</div>
@@ -29,7 +28,6 @@ GPDB数据库管理员将为每个允许GPDB用户访问的外部数据存储配
 
 ## <a id="create_external_table"></a> 创建一个外部表
 
-PXF implements a Greenplum Database protocol named `pxf` that you can use to create an external table that references data in an external data store. The syntax for a [`CREATE EXTERNAL TABLE`](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command that specifies the `pxf` protocol follows:
 PXF实现了一个叫做pxf的GPDB协议,你可以使用这个协议去创建一个外部表。指定pxf协议的[`CREATE EXTERNAL TABLE`](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令语法如下:
 
 ``` sql
@@ -43,7 +41,6 @@ FORMAT '[TEXT|CSV|CUSTOM]' (<formatting-properties>);
 
 使用问号(?)引入的URI的查询部分来标识PXF服务器和配置文件名称。
 
-PXF may require additional information to read or write certain data formats. You provide profile-specific information using the optional \<custom-option\>=\<value\> component of the `LOCATION` string and formatting information via the \<formatting-properties\> component of the string. The custom options and formatting properties supported by a specific profile vary; they are identified in usage documentation for the profile.
 PXF可能需要额外的信息来读取和写入某些数据格式，可以使用LOCATION字符串的可选组件<custom-option> = <value>来提供配置文件的信息，并通过字符串的<formatting-properties>组件提供格式信息。
 
 <caption><span class="tablecap">Table 1. CREATE EXTERNAL TABLE参数值和描述</span></caption>

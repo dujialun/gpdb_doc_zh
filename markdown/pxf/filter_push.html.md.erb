@@ -8,7 +8,6 @@ title: PXF谓词下推
 除非适用法律要求或书面同意，否则根据“许可”分发的软件将按“原样”分发，没有任何明示或暗示的保证或条件。请参阅许可证，以了解许可证下管理权限和限制的特定语言。
 -->
 
-PXF supports filter pushdown. When filter pushdown is enabled, the constraints from the `WHERE` clause of a `SELECT` query can be extracted and passed to the external data source for filtering. This process can improve query performance, and can also reduce the amount of data that is transferred to Greenplum Database.
 PXF支持谓词下推。启用谓词下推时,可以提取SELECT查询中WHERE子句的约束并将其传递到外部数据源进行过滤。此过程可以提高查询性能，还可以减少传输到Greenplum数据库的数据量。
 
 通过设置`gp_external_enable_filter_pushdown`服务器配置参数，可以为所有外部表协议（包括pxf）启用或禁用谓词下推。此配置参数的默认值为on;将其设置为关闭以禁用谓词下推。例如：
@@ -20,7 +19,6 @@ SET gp_external_enable_filter_pushdown TO 'on';
 
 **Note:** 某些外部数据源不支持谓词下推。此外，某些数据类型或运算符可能不支持谓词下推。如果查询访问不支持谓词下推的数据源，则执行查询时不进行谓词下推（数据传输到Greenplum数据库后进行过滤）
 
-PXF accesses data sources using different connectors, and filter pushdown support is determined by the specific connector implementation. The following PXF connectors support filter pushdown:
 PXF使用不同的连接器访问数据源，谓词下推支持由特定的连接器实现方式决定。以下PXF连接器支持谓词下推：
 
 - Hive Connector
