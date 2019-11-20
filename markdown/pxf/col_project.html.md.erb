@@ -9,7 +9,7 @@ PXF支持列投影，始终是启用状态。使用列投影时，只从外部�
 `pxf`外部表协议自动启用列投影。PXF使用不同的连接器访问外部数据源，列投影支持也由特定的连接器实现决定。 以下PXF连接器和配置文件组合支持读取操作的列投影:
 - PXF Hive Connector, `HiveORC` profile
 - PXF JDBC Connector, `Jdbc` profile
-- PXF Hadoop and Object Store Connectors, `hdfs:parquet`, `adl:parquet`, `gs:parquet`,`s3:parquet`, and `wasbs:parquet` profiles
+- PXF Hadoop 和 Object Store Connectors, `hdfs:parquet`, `adl:parquet`, `gs:parquet`,`s3:parquet`, 和 `wasbs:parquet` profiles
 
 **Note:** 如果无法成功序列化查询过滤条件，PXF可能会禁用列投影; 例如，当WHERE子句解析为布尔类型时。
 

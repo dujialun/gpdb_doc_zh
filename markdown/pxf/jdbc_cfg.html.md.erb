@@ -4,12 +4,10 @@ title: 配置JDBC连接器（可选）
 
 您可以使用PXF访问包括MySQL，ORACLE，PostgreSQL，Apache Ignite和Hive在内的外部SQL数据库。本主题描述如何配置PXF JDBC连接器以访问这些外部数据源。
 
-*If you do not plan to use the PXF JDBC Connector, then you do not need to perform this procedure.*
 *如果您不打算使用PXF JDBC连接器，则不需要执行此过程。*
 
 ## <a id="about_cfg"></a>JDBC配置
 
-To access data in an external SQL database with the PXF JDBC Connector, you must:
 要使用PXF JDBC连接器访问外部SQL数据库中的数据，您必须:
 
 - 注册兼容的JDBC驱动程序JAR文件
@@ -21,7 +19,6 @@ To access data in an external SQL database with the PXF JDBC Connector, you must
 
 ### <a id="cfg_jar"></a>注册JDBC驱动程序JAR
 
-The PXF JDBC connector is installed with the `postgresql-8.4-702.jdbc4.jar` JAR file. If you require a different JDBC driver, ensure that you install the JDBC driver JAR file for the external SQL database in the `$PXF_CONF/lib` directory on each segment host. Be sure to install JDBC driver JAR files that are compatible with your JRE version. See [Registering PXF JAR Dependencies](reg_jar_depend.html) for additional information.
 PXF JDBC连接器与`postgresql-8.4-702.jdbc4.jar` JAR文件一起安装。如果需要其他JDBC驱动程序，请确保在每个segment主机的`$PXF_CONF/lib`目录中为外部SQL数据库安装JDBC驱动程序JAR文件。确保安装与您的JRE版本兼容的JDBC驱动程序JAR文件。更多参阅[Registering PXF JAR Dependencies](reg_jar_depend.html)
 
 ### <a id="cfg_server"></a>JDBC服务配置
