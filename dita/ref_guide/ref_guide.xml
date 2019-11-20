@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_tx5_3nf_kp">
-  <title>Greenplum Database Reference Guide</title>
+  <title>Greenplum数据库参考指南</title>
   <!--HTML-only page-->
   <titlealts>
-    <navtitle>Reference Guide</navtitle>
+    <navtitle>参考指南</navtitle>
   </titlealts>
-  <shortdesc> Reference information for Greenplum Database systems including SQL commands, system
-    catalogs, environment variables, server configuration parameters, character set support,
-    datatypes, and Greenplum Database extensions. </shortdesc>
+  <shortdesc>Greenplum数据库系统的参考信息，包括SQL命令，系统catalog，环境变量，服务器配置参数，字符集支持，数据类型和Greenplum数据库扩展。
+    </shortdesc>
 </topic>
