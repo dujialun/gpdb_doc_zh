@@ -1,5 +1,5 @@
 ---
-title: About this Documentation
+title: 关于此文档
 ---
 
 <!--
@@ -21,37 +21,29 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Source code for the Greenplum Database documentation is shared between Greenplum Database and
-Pivotal Greenplum Database. Some features of Pivotal Greenplum Database are not present in the
-open source Greenplum Database code but are described in the Greenplum Database documentation. 
+Greenplum数据库文档的源代码在Greenplum数据库和Pivotal Greenplum数据库。
+Pivotal Greenplum数据库的某些特性未在开源Greenplum数据库代码，但在Greenplum数据库文档中进行了描述。
 
-In general, the term "Pivotal Greenplum Database" refers to Pivotal's commercial, supported
-version of Greenplum Database and is used in this documentation when describing features that
-are only supported in the commercial Greenplum Database software. The term "Greenplum
-Database" refers to features available in both open source Greenplum Database and Pivotal
-Greenplum Database. 
+通常，术语“Pivotal Greenplum数据库”是指Pivotal的商业支持版本的Greenplum数据库，在描述仅商业Greenplum数据库软件支持的特性时在本文档中使用。
+术语“ Greenplum数据库”是指开源Greenplum数据库和Pivotal Greenplum数据库中都可用的特性。
 
-Features that are only supported with Pivotal Greenplum Database are noted in sections that
-contain primary documentation for the features. 
+在包含主要特性文档的部分中提到了仅Pivotal Greenplum数据库支持的特性。
 
-The following is a list of Pivotal Greenplum Database features that are unsupported in open
-source Greenplum Database but may be documented or referenced in this documentation.
+以下是Pivotal Greenplum数据库特性，这些特性在开源Greenplum数据库中不受支持，但在本文档中可能会记录或引用。
 
-- Code to produce the Pivotal Greenplum Database binary installer packages is not included
-in the open source Greenplum Database repository. 
+- 开源Greenplum数据库存储库中不包含用于生成Pivotal Greenplum数据库二进制安装程序包的代码。
 
-- Greenplum Database does not include EMC DD Boost integration. Backing up to an EMC Data
-Domain appliance is only supported when the Data Domain system is mounted as an NFS share on
-the Greenplum hosts. 
+- Greenplum数据库不包括EMC DD Boost集成。
+仅当在Greenplum主机上将Data Domain系统作为NFS共享挂载时，才支持备份到EMC Data Domain设备。
 
-- Greenplum Database does not include Symantec NetBackup integration. 
+- Greenplum数据库不包括Symantec NetBackup集成。
 
-- The QuickLZ compression method is not available in Greenplum Database. QuickLZ <codeph>compresstype</codeph> values are ignored when specified in a <codeph>CREATE TABLE
-[AS]</codeph> operation, but will cause an error on subsequent <codeph>INSERT</codeph> or
-<codeph>SELECT</codeph> operations on the table.
+- QuickpZ压缩方法在Greenplum数据库中不可用。
+在<codeph>CREATE TABLE [AS]</codeph>操作中指定QuickLZ <codeph>compresstype</codeph>值时将被忽略，但它将在随后的对该表的<codeph>INSERT</codeph>或<codeph>SELECT</codeph>操作中引起错误。
 
-- The deprecated <codeph>gpcheck</codeph> management utility and its replacement <codeph>gpsupport</codeph> are only supported with Pivotal Greenplum Database. 
+- 仅Pivotal Greenplum数据库支持不推荐使用的<codeph>gpcheck</codeph>管理工具及其替代<codeph>gpsupport</codeph>。
 
-- To use the Greenplum Platform Extension Framework (PXF) with open source Greenplum Database, you must separately build and install the PXF server software. Refer to the build instructions in the PXF README files in the Greenplum Database and PXF repositories.
+- 要将Greenplum平台扩展框架（PXF）与开源Greenplum数据库一起使用，必须分别构建和安装PXF服务器软件。
+请参阅Greenplum数据库和PXF存储库中的PXF README文件中的构建说明。
 
-- Suggestions to contact Pivotal Technical Support in this documentation are intended only for Pivotal Greenplum Database customers. 
+- 本文档中有关联系Pivotal技术支持的建议仅适用于Pivotal Greenplum数据库客户。
