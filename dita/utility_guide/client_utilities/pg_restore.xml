@@ -4,10 +4,10 @@
 <topic id="topic1">
   <title id="ov137116">pg_restore</title>
   <body>
-    <p id="client_util_desc">Restores a database from an archive file created by
-        <codeph>pg_dump</codeph>.</p>
+    <p id="client_util_desc">从<codeph>pg_dump</codeph>创建的存档文件中恢复数据库。
+      </p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="client_util_synopsis"><b>pg_restore</b> [<varname>connection-option</varname> ...] [<varname>restore_option</varname> ...] <varname>filename</varname>
 
 <b>pg_restore</b> <b>-? | --help</b>
@@ -15,331 +15,320 @@
 <b>pg_restore</b> <b>-V | --version</b></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>pg_restore</codeph> is a utility for restoring a database from an archive created
-        by <codeph><xref href="pg_dump.xml#topic1" type="topic" format="dita"/></codeph> in one of
-        the non-plain-text formats. It will issue the commands necessary to reconstruct the database
-        to the state it was in at the time it was saved. The archive files also allow
-          <codeph>pg_restore</codeph> to be selective about what is restored, or even to reorder the
-        items prior to being restored.</p>
-      <p><codeph>pg_restore</codeph> can operate in two modes. If a database name is specified, the
-        archive is restored directly into the database. Otherwise, a script containing the SQL
-        commands necessary to rebuild the database is created and written to a file or standard
-        output. The script output is equivalent to the plain text output format of
-          <codeph>pg_dump</codeph>. Some of the options controlling the output are therefore
-        analogous to <codeph>pg_dump</codeph> options. </p>
-      <p><codeph>pg_restore</codeph> cannot restore information that is not present in the archive
-        file. For instance, if the archive was made using the "dump data as <codeph>INSERT</codeph>
-        commands" option, <codeph>pg_restore</codeph> will not be able to load the data using
-          <codeph>COPY</codeph> statements.</p>
-      <note>The <codeph>--ignore-version</codeph> option is deprecated and will be removed in a
-        future release.</note>
+      <title>描述</title>
+      <p><codeph>pg_restore</codeph>是一种工具，用于从<codeph><xref href="pg_dump.xml#topic1" type="topic" format="dita"/></codeph>创建的非明文格式之一的存档中恢复数据库。
+        它将发出将数据库重建到保存时所处状态的必要命令。
+        存档文件还允许<codeph>pg_restore</codeph>对恢复的内容具有选择性，甚至可以在恢复之前对项目进行重新排序。
+        </p>
+      <p><codeph>pg_restore</codeph>可以在两种模式下运行。
+        如果指定了数据库名称，则存档将直接还原到数据库中。
+        否则，将创建一个脚本，该脚本包含重建数据库所需的SQL命令，并将其写入文件或标准输出。
+        脚本输出等效于<codeph>pg_dump</codeph>的纯文本输出格式。
+        因此，控制输出的某些选项类似于<codeph>pg_dump</codeph>选项。
+        </p>
+      <p><codeph>pg_restore</codeph>无法恢复存档文件中不存在的信息。
+        例如，如果使用“将数据作为<codeph>INSERT</codeph>命令转储”选项进行归档，则<codeph>pg_restore</codeph>将无法使用<codeph>COPY</codeph>语句加载数据。
+        </p>
+      <note><codeph>--ignore-version</codeph>选项已弃用，在以后的版本中将被删除。
+        </note>
     </section>
     <section id="section4">
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
           <pt>
             <varname>filename</varname>
           </pt>
-          <pd>Specifies the location of the archive file (or directory, for a
-            directory-format archive) to be restored. If not specified, the
-            standard input is used.</pd>
+          <pd>指定要还原的档案文件的位置（或目录，对于目录格式归档）。
+            如果未指定，则使用标准输入。
+            </pd>
         </plentry>
       </parml>
       <sectiondiv>
-        <b>Restore Options</b>
+        <b>恢复选项</b>
         <parml>
           <plentry>
             <pt>-a | --data-only</pt>
-            <pd>Restore only the data, not the schema (data definitions). Table data and sequence
-              values are restored, if present in the archive.<p>This option is similar to, but for
-                historical reasons not identical to, specifying
-              <codeph>--section=data</codeph>.</p></pd>
+            <pd>仅转储数据，而不转储模式（数据定义）。表数据和序列值将转储，如果在归档文件中有的话。
+              <p>此选项与<codeph>--section=data</codeph>相似，但由于历史原因不同。
+                </p></pd>
           </plentry>
           <plentry>
             <pt>-c | --clean</pt>
-            <pd>Clean (drop) database objects before recreating them. (This might generate some
-              harmless error messages, if any objects were not present in the destination
-              database.)</pd>
+            <pd>在重新创建数据库对象之前，先对其进行清理（删除）。
+              （如果目标数据库中不存在任何对象，则恢复可能会生成一些无害的错误消息。）
+              </pd>
           </plentry>
           <plentry>
             <pt>-C | --create</pt>
-            <pd>Create the database before restoring into it. If <codeph>--clean</codeph> is also
-              specified, drop and recreate the target database before connecting to it.</pd>
-            <pd>When this option is used, the database named with <codeph>-d</codeph> is used only
-              to issue the initial <codeph>DROP DATABASE</codeph> and <codeph>CREATE
-                DATABASE</codeph> commands. All data is restored into the database name that appears
-              in the archive.</pd>
+            <pd>在还原到数据库之前先创建它。
+              如果还指定了<codeph>--clean</codeph>，请在连接到目标数据库之前删除并重新创建目标数据库。
+              </pd>
+            <pd>使用此选项时，以<codeph>-d</codeph>命名的数据库仅用于发出初始<codeph>DROP DATABASE</codeph>和<codeph>CREATE DATABASE</codeph>命令。
+              所有数据都将还原到存档中显示的数据库名称中。
+              </pd>
           </plentry>
           <plentry>
             <pt>-d <varname>dbname</varname> | --dbname=<varname>dbname</varname></pt>
-            <pd>Connect to this database and restore directly into this database. This utility, like
-              most other Greenplum Database utilities, also uses the environment variables supported
-              by <codeph>libpq</codeph>. However it does not read <codeph>PGDATABASE</codeph> when a
-              database name is not supplied.</pd>
+            <pd>连接到该数据库，然后直接还原到该数据库。
+              与大多数其他Greenplum数据库工具一样，该工具也使用<codeph>libpq</codeph>支持的环境变量。
+              但是，如果未提供数据库名称，它将不会读取<codeph>PGDATABASE</codeph>。
+              </pd>
           </plentry>
           <plentry>
             <pt>-e | --exit-on-error</pt>
-            <pd>Exit if an error is encountered while sending SQL commands to the database. The
-              default is to continue and to display a count of errors at the end of the
-              restoration.</pd>
+            <pd>如果在向数据库发送SQL命令时遇到错误，则退出。
+              默认设置为继续并在还原结束时显示错误计数。
+              </pd>
           </plentry>
           <plentry>
             <pt>-f <varname>outfilename</varname> | --file=<varname>outfilename</varname></pt>
-            <pd>Specify output file for generated script, or for the listing when used with
-                <codeph>-l</codeph>. Default is the standard output.</pd>
+            <pd>为生成的脚本或与<codeph>-l</codeph>一起使用的列表指定输出文件。默认为标准输出。
+              </pd>
           </plentry>
           <plentry>
             <pt>-F c|d|t | --format={custom | directory | tar}</pt>
-            <pd>The format of the archive produced by <codeph><xref href="pg_dump.xml#topic1"
-                  type="topic" format="dita"/></codeph>. It is not necessary to specify the format,
-              since <codeph>pg_restore</codeph> will determine the format automatically. Format can
-              be <codeph>custom</codeph>, <codeph>directory</codeph>, or <codeph>tar</codeph>.</pd>
+            <pd><codeph><xref href="pg_dump.xml#topic1" type="topic" format="dita"/></codeph>生成的归档文件格式。
+              无需指定格式，因为<codeph>pg_restore</codeph>将自动确定格式。
+              格式可以是<codeph>custom</codeph>，<codeph>directory</codeph>或<codeph>tar</codeph>。
+              </pd>
           </plentry>
           <plentry>
             <pt>-i | --ignore-version</pt>
-            <pd><note>This option is deprecated and will be removed in a future
-              release.</note>Ignore database version checks.</pd>
+            <pd><note>此选项已被弃用，并将在以后的版本中删除。</note>
+              忽略数据库版本检查。</pd>
           </plentry>
           <plentry>
             <pt>-I <varname>index</varname> | --index=<varname>index</varname></pt>
-            <pd>Restore definition of named index only. </pd>
+            <pd>仅还原命名索引的定义。</pd>
           </plentry>
           <plentry>
             <pt>-j | --number-of-jobs | --jobs=<varname>number-of-jobs</varname></pt>
-            <pd>Run the most time-consuming parts of <codeph>pg_restore</codeph> — those which load
-              data, create indexes, or create constraints — using multiple concurrent jobs. This
-              option can dramatically reduce the time to restore a large database to a server
-              running on a multiprocessor machine.</pd>
-            <pd>Each job is one process or one thread, depending on the operating system, and uses a
-              separate connection to the server.</pd>
-            <pd>The optimal value for this option depends on the hardware setup of the server, of
-              the client, and of the network. Factors include the number of CPU cores and the disk
-              setup. A good place to start is the number of CPU cores on the server, but values
-              larger than that can also lead to faster restore times in many cases. Of course,
-              values that are too high will lead to decreased performance because of thrashing. </pd>
-            <pd>Only the custom archive format is supported with this option. The input file must be
-              a regular file (not, for example, a pipe). This option is ignored when emitting a
-              script rather than connecting directly to a database server. Also, multiple jobs
-              cannot be used together with the option <codeph>--single-transaction</codeph>.</pd>
+            <pd>使用多个并发作业运行<codeph>pg_restore</codeph>中最耗时的部分 - 加载数据，创建索引或创建约束的部分。
+              此选项可以大大减少将大型数据库还原到多处理器计算机上运行的服务器的时间。
+              </pd>
+            <pd>每个作业是一个进程或一个线程，具体取决于操作系统，并使用与服务器的单独连接。
+              </pd>
+            <pd>此选项的最佳值取决于服务器，客户端和网络的硬件设置。
+              影响因素包括CPU内核数和磁盘设置。
+              一个不错的起点是服务器上的CPU内核数量，但是在许多情况下，大于该数量的值也可以缩短还原时间。
+              当然，太高的值会由于抖动而导致性能下降。
+              </pd>
+            <pd>此选项仅支持自定义存档格式。
+              输入文件必须是常规文件（例如，不是管道）。
+              发出脚本而不是直接连接到数据库服务器时，将忽略此选项。
+              另外，不能将多个作业与<codeph>--single-transaction</codeph>选项一起使用。
+              </pd>
           </plentry>
           <plentry>
             <pt>-l | --list</pt>
-            <pd>List the contents of the archive. The output of this operation can be used with the
-                <codeph>-L</codeph> option to restrict and reorder the items that are restored.</pd>
+            <pd>列出归档的内容。
+              此操作的输出可与<codeph>-L</codeph>选项一起使用，以限制和重新排序要还原的项目。
+              </pd>
           </plentry>
           <plentry>
             <pt>-L <varname>list-file</varname> | --use-list=<varname>list-file</varname></pt>
-            <pd>Restore elements in the <varname>list-file</varname> only, and in the order they
-              appear in the file. Note that if filtering switches such as <codeph>-n</codeph> or
-                <codeph>-t</codeph> are used with <codeph>-L</codeph>, they will further restrict
-              the items restored. <p><varname>list-file</varname> is normally created by editing the
-                output of a previous <codeph>-l</codeph> operation. Lines can be moved or removed,
-                and can also be commented out by placing a semicolon (;) at the start of the line.
-                See below for examples.</p></pd>
+            <pd>仅还原<varname>list-file</varname>中的元素，并还原它们在文件中出现的顺序。
+              请注意，如果将<codeph>-n</codeph>或<codeph>-t</codeph>之类的过滤开关与<codeph>-L</codeph>一起使用，它们将进一步限制恢复的项目。
+              <p>通常，通过编辑先前的<codeph>-l</codeph>操作的输出来创建<varname>list-file</varname>。
+                可以移动或删除行，也可以通过在行的开头放置分号（;）来注释掉行。
+                请参阅下面的示例。
+                </p></pd>
           </plentry>
           <plentry>
             <pt>-n <varname>schema</varname> | --schema=<varname>schema</varname></pt>
-            <pd>Restore only objects that are in the named schema. This can be combined with the
-                <codeph>-t</codeph> option to restore just a specific table. </pd>
+            <pd>仅还原命名模式中的对象。
+              可以将其与<codeph>-t</codeph>选项结合使用以仅还原特定表。
+              </pd>
           </plentry>
           <plentry>
             <pt>-O | --no-owner</pt>
-            <pd>Do not output commands to set ownership of objects to match the original database.
-              By default, <codeph>pg_restore</codeph> issues <codeph>ALTER OWNER</codeph> or
-                <codeph>SET SESSION AUTHORIZATION</codeph> statements to set ownership of created
-              schema elements. These statements will fail unless the initial connection to the
-              database is made by a superuser (or the same user that owns all of the objects in the
-              script). With <codeph>-O</codeph>, any user name can be used for the initial
-              connection, and this user will own all the created objects.</pd>
+            <pd>不要输出命令来设置对象的所有权以匹配原始数据库。
+              默认情况下，<codeph>pg_restore</codeph>发出<codeph>ALTER OWNER</codeph>或<codeph>SET SESSION AUTHORIZATION</codeph>语句来设置所创建模式元素的所有权。
+              除非由超级用户（或拥有脚本中所有对象的同一用户）建立与数据库的初始连接，否则这些语句将失败。
+              使用<codeph>-O</codeph>，可以将任何用户名用于初始连接，并且该用户将拥有所有创建的对象。
+              </pd>
           </plentry>
           <plentry>
             <pt>-P '<varname>function-name</varname>(<varname>argtype</varname> [, ...])' |
                 --function='<varname>function-name</varname>(<varname>argtype</varname> [,
               ...])'</pt>
-            <pd>Restore the named function only. The function name must be enclosed in quotes. Be
-              careful to spell the function name and arguments exactly as they appear in the dump
-              file's table of contents (as shown by the <codeph>--list</codeph> option).</pd>
+            <pd>仅还原命名函数。
+              函数名称必须用引号引起来。
+              注意，函数名称和参数的拼写必须与转储文件的目录中的拼写完全相同（如<codeph>--list</codeph>选项所示）。
+              </pd>
           </plentry>
           <plentry>
             <pt>-s | --schema-only</pt>
-            <pd>Restore only the schema (data definitions), not data, to the extent that schema
-              entries are present in the archive.<p>This option is the inverse of
-                  <codeph>--data-only</codeph>. It is similar to, but for historical reasons not
-                identical to, specifying <codeph>--section=pre-data
-                --section=post-data</codeph>.</p><p>(Do not confuse this with the
-                  <codeph>--schema</codeph> option, which uses the word "schema" in a different
-                meaning.)</p></pd>
+            <pd>如果模式条目存在于归档中，则仅还原模式（数据定义），而不还原数据。
+              <p>此选项与<codeph>--data-only</codeph>相反。
+                它类似于<codeph>--section=pre-data --section=post-data</codeph>，但由于历史原因不同。
+                </p>
+              <p>（不要将此与<codeph>--schema</codeph>选项混淆，该选项以不同的含义使用“schema”一词。）
+                </p></pd>
           </plentry>
           <plentry>
             <pt>-S <varname>username</varname> | --superuser=<varname>username</varname></pt>
-            <pd>Specify the superuser user name to use when disabling triggers. This is only
-              relevant if <codeph>--disable-triggers</codeph> is used.<note>Greenplum Database does
-                not support user-defined triggers.</note></pd>
+            <pd>指定禁用触发器时要使用的超级用户名。
+              仅在使用<codeph>--disable-triggers</codeph>时才有意义。
+              <note>Greenplum数据库不支持用户定义的触发器。</note></pd>
           </plentry>
           <plentry>
             <pt>-t <varname>table</varname> | --table=<varname>table</varname></pt>
-            <pd>Restore definition and/or data of named table only. Multiple tables may be specified
-              with multiple <codeph>-t</codeph> switches. This can be combined with the
-                <codeph>-n</codeph> option to specify a schema.</pd>
+            <pd>仅还原命名表的定义和/或数据。
+              可以使用多个<codeph>-t</codeph>开关指定多个表。
+              可以将它与<codeph>-n</codeph>选项结合使用以指定模式。
+              </pd>
           </plentry>
           <plentry>
             <pt>-T <varname>trigger</varname> | --trigger=<varname>trigger</varname></pt>
-            <pd>Restore named trigger only.<note>Greenplum Database does not support user-defined
-                triggers.</note></pd>
+            <pd>仅还原命名触发器。
+              <note>Greenplum数据库不支持用户定义的触发器。</note></pd>
           </plentry>
           <plentry>
             <pt>-v | --verbose</pt>
-            <pd>Specifies verbose mode.</pd>
+            <pd>指定详细模式。</pd>
           </plentry>
           <plentry>
             <pt>-V | --version</pt>
-            <pd>Print the <codeph>pg_restore</codeph> version and exit.</pd>
+            <pd>打印<codeph>pg_restore</codeph>版本并退出。</pd>
           </plentry>
           <plentry>
             <pt>-x | --no-privileges | --no-acl</pt>
-            <pd>Prevent restoration of access privileges (<codeph>GRANT/REVOKE</codeph>
-              commands).</pd>
+            <pd>防止转储访问权限（<codeph>GRANT/REVOKE</codeph>命令）。
+              </pd>
           </plentry>
           <plentry>
             <pt>-1 | --single-transaction</pt>
-            <pd>Execute the restore as a single transaction. This ensures that either all the
-              commands complete successfully, or no changes are applied.</pd>
+            <pd>作为单个事务执行还原。
+              这样可以确保所有命令都成功完成，或者不应用任何更改。
+              </pd>
           </plentry>
           <plentry>
             <pt>--disable-triggers</pt>
-            <pd>This option is relevant only when performing a data-only restore. It instructs
-                <codeph>pg_restore</codeph> to execute commands to temporarily disable triggers on
-              the target tables while the data is reloaded. Use this if you have triggers on the
-              tables that you do not want to invoke during data reload. The commands emitted for
-                <codeph>--disable-triggers</codeph> must be done as superuser. So you should also
-              specify a superuser name with <codeph>-S</codeph> or, preferably, run
-                <codeph>pg_restore</codeph> as a superuser. <note>Greenplum Database does not
-                support user-defined triggers.</note></pd>
+            <pd>仅当创建仅数据恢复时，此选项才相关。
+              它指示<codeph>pg_restore</codeph>在重载数据时执行命令以临时禁用目标表上的触发器。
+              如果不想在数据重装期间调用的表上有触发器，请使用此选项。
+              为<codeph>--disable-triggers</codeph>发出的命令必须以超级用户身份执行。
+              因此，您还应该使用<codeph>-S</codeph>指定超级用户名，或者最好以超级用户身份运行<codeph>pg_restore</codeph>。
+              <note>Greenplum数据库不支持用户定义的触发器。</note></pd>
           </plentry>
           <plentry>
             <pt>--no-data-for-failed-tables</pt>
-            <pd>By default, table data is restored even if the creation command for the table failed
-              (e.g., because it already exists). With this option, data for such a table is skipped.
-              This behavior is useful when the target database may already contain the desired table
-              contents. Specifying this option prevents duplicate or obsolete data from being
-              loaded. This option is effective only when restoring directly into a database, not
-              when producing SQL script output.</pd>
+            <pd>默认情况下，即使表的创建命令失败（例如，因为它已经存在），表数据也将还原。
+              使用此选项，将跳过此类表的数据。
+              当目标数据库可能已经包含所需的表内容时，此行为很有用。
+              指定此选项可防止加载重复或过时的数据。
+              该选项仅在直接还原到数据库中时才有效，在生成 SQL 脚本输出时无效。
+              </pd>
           </plentry>
           <plentry>
             <pt>--no-security-labels</pt>
-            <pd>Do not output commands to restore security labels, even if the archive contains
-              them.</pd>
+            <pd>即使存档包含安全标签，也不要输出命令以还原安全标签。
+              </pd>
           </plentry>
           <plentry>
             <pt>--no-tablespaces</pt>
-            <pd>Do not output commands to select tablespaces. With this option, all objects will be
-              created in whichever tablespace is the default during restore.</pd>
+            <pd>不输出命令以选择表空间。
+              使用此选项，将在还原期间的默认表空间中创建所有对象。
+              </pd>
           </plentry>
           <plentry>
             <pt>--section=<varname>sectionname</varname></pt>
-            <pd>Only restore the named section. The section name can be <codeph>pre-data</codeph>,
-                <codeph>data</codeph>, or <codeph>post-data</codeph>. This option can be specified
-              more than once to select multiple sections. </pd>
-            <pd>The default is to restore all sections.</pd>
+            <pd>仅还原命名节。
+              节名称可以是<codeph>pre-data</codeph>，<codeph>data</codeph>或<codeph>post-data</codeph>。
+              可以多次指定此选项以选择多个节。
+              </pd>
+            <pd>默认为还原所有节。</pd>
           </plentry>
           <plentry>
             <pt>--use-set-session-authorization</pt>
-            <pd>Output SQL-standard <codeph>SET SESSION AUTHORIZATION</codeph> commands instead of
-                <codeph>ALTER OWNER</codeph> commands to determine object ownership. This makes the
-              dump more standards-compatible, but depending on the history of the objects in the
-              dump, it might not restore properly.</pd>
+            <pd>输出SQL标准的<codeph>SET SESSION AUTHORIZATION</codeph>命令而不是<codeph>ALTER OWNER</codeph>命令来确定对象所有权。
+              这使转储更加符合标准，但是依赖转储中对象的历史记录，可能无法正确还原。
+              </pd>
           </plentry>
           <plentry>
             <pt>-? | --help</pt>
-            <pd>Show help about <codeph>pg_restore</codeph> command line arguments, and exit.</pd>
+            <pd>显示有关<codeph>pg_restore</codeph>命令行参数的帮助，然后退出。</pd>
           </plentry>
         </parml>
       </sectiondiv>
       <sectiondiv id="section5">
-        <b>Connection Options</b>
+        <b>连接选项</b>
         <parml>
           <plentry>
             <pt>-h <varname>host</varname> | --host <varname>host</varname></pt>
-            <pd>The host name of the machine on which the Greenplum
-              master database server is running. If not specified, reads from the environment
-              variable <codeph>PGHOST</codeph> or defaults to localhost.</pd>
+            <pd>运行Greenplum数据库master数据库服务器的计算机的主机名。
+              如果未指定，则从环境变量<codeph>PGHOST</codeph>读取或默认为localhost。
+              </pd>
           </plentry>
           <plentry>
             <pt>-p <varname>port</varname> | --port <varname>port</varname></pt>
-            <pd>The TCP port on which the Greenplum Database master database server is
-              listening for connections. If not specified, reads from the environment variable
-                <codeph>PGPORT</codeph> or defaults to 5432.</pd>
+            <pd>Greenplum master数据库服务器正在侦听连接的TCP端口。
+              如果未指定，则从环境变量<codeph>PGPORT</codeph>读取或默认为5432。
+              </pd>
           </plentry>
           <plentry>
             <pt>-U <varname>username</varname> | --username <varname>username</varname></pt>
-            <pd>The database role name to connect as. If not specified, reads from the environment
-              variable <codeph>PGUSER</codeph> or defaults to the current system role name.</pd>
+            <pd>要用作连接的数据库角色名称。
+              如果未指定，则从环境变量<codeph>PGUSER</codeph>读取或默认为当前系统角色名称。
+              </pd>
           </plentry>
           <plentry>
             <pt>-w | --no-password</pt>
-            <pd>Never issue a password prompt. If the server requires password
-              authentication and a password is not available by other means such
-              as a <codeph>.pgpass</codeph> file the connection attempt will
-              fail. This option can be useful in batch jobs and scripts where no
-              user is present to enter a password.</pd>
+            <pd>不发出密码提示。
+              如果服务器要求密码验证，而其他方式（例如<codeph>.pgpass</codeph>文件）无法使用密码，则连接尝试将失败。
+              此选项在没有用户输入密码的批处理作业和脚本中很有用。</pd>
           </plentry>
           <plentry>
             <pt>-W | --password</pt>
-            <pd>Force a password prompt.</pd>
+            <pd>强制输入密码提示。</pd>
           </plentry>
           <plentry>
             <pt>--role=<varname>rolename</varname></pt>
-            <pd>Specifies a role name to be used to perform the restore. This
-              option causes <codeph>pg_restore</codeph> to issue a <codeph>SET
-                ROLE <varname>rolename</varname></codeph> command after
-              connecting to the database. It is useful when the authenticated
-              user (specified by <codeph>-U</codeph>) lacks privileges needed by
-                <codeph>pg_restore</codeph>, but can switch to a role with the
-              required rights. Some installations have a policy against logging
-              in directly as a superuser, and use of this option allows restores
-              to be performed without violating the policy.</pd>
+            <pd>指定用于执行还原的角色名称。
+              此选项使<codeph>pg_restore</codeph>在连接到数据库后发出<codeph>SET ROLE <varname>rolename</varname></codeph>命令。
+              当通过身份验证的用户（由<codeph>-U</codeph>指定）缺少<codeph>pg_restore</codeph>所需的特权，但可以切换到具有所需权限的角色时，此功能很有用。
+              某些安装有禁止直接以超级用户身份登录的策略，并且使用此选项可以在不违反策略的情况下进行还原。
+              </pd>
           </plentry>
         </parml>
       </sectiondiv>
     </section>
     <section id="section6">
-      <title>Notes</title>
-      <p>If your installation has any local additions to the <codeph>template1</codeph> database, be
-        careful to load the output of <codeph>pg_restore</codeph> into a truly empty database;
-        otherwise you are likely to get errors due to duplicate definitions of the added objects. To
-        make an empty database without any local additions, copy from <codeph>template0</codeph> not
-          <codeph>template1</codeph>, for example:</p>
+      <title>注解</title>
+      <p>如果您的安装对<codeph>template1</codeph>数据库有任何本地添加，请小心将<codeph>pg_restore</codeph>的输出加载到一个真正的空数据库中；
+        否则，由于添加对象的重复定义，您很可能会出错。
+        要创建没有任何本地添加的空数据库，请从<codeph>template0</codeph>而不是<codeph>template1</codeph>复制，例如：
+        </p>
       <codeblock>CREATE DATABASE foo WITH TEMPLATE template0;</codeblock>
-      <p>When restoring data to a pre-existing table and the option
-          <codeph>--disable-triggers</codeph> is used, <codeph>pg_restore</codeph> emits commands to
-        disable triggers on user tables before inserting the data, then emits commands to re-enable
-        them after the data has been inserted. If the restore is stopped in the middle, the system
-        catalogs may be left in the wrong state.</p>
-      <p>See also the <codeph>pg_dump</codeph> documentation for details on limitations of
-          <codeph>pg_dump</codeph>. </p>
-      <p>Once restored, it is wise to run <codeph>ANALYZE</codeph> on each restored table so the
-        query planner has useful statistics.</p>
+      <p>当将数据恢复到预先存在的表并使用选项<codeph>--disable-triggers</codeph>时，
+        <codeph>pg_restore</codeph>在插入数据之前发出命令以禁用用户表上的触发器，然后在插入数据后发出命令以重新启用它们。
+        如果还原在中间停止，则系统catalog可能处于错误状态。
+        </p>
+      <p>另请参阅<codeph>pg_dump</codeph>文档以获取有关<codeph>pg_dump</codeph>限制的详细信息。
+        </p>
+      <p>还原后，明智的做法是在每个还原的表上运行<codeph>ANALYZE</codeph>，以便查询优化器具有有用的统计信息。
+        </p>
     </section>
     <section id="section7">
-      <title>Examples</title>
-      <p>Assume we have dumped a database called <codeph>mydb</codeph> into a custom-format dump
-        file: </p>
+      <title>示例</title>
+      <p>假设我们已经将名为<codeph>mydb</codeph>的数据库转储到了自定义格式的转储文件中：
+        </p>
       <codeblock>pg_dump -Fc mydb &gt; db.dump</codeblock>
-      <p>To drop the database and recreate it from the dump: </p>
+      <p>删除数据库并从转储中重新创建它：</p>
       <codeblock>dropdb mydb
 pg_restore -C -d template1 db.dump</codeblock>
-      <p>To reload the dump into a new database called <codeph>newdb</codeph>. Notice there is no
-          <codeph>-C</codeph>, we instead connect directly to the database to be restored into. Also
-        note that we clone the new database from <codeph>template0</codeph> not
-          <codeph>template1</codeph>, to ensure it is initially empty: </p>
+      <p>要将转储重新加载到名为<codeph>newdb</codeph>的新数据库中。
+        请注意，这里没有<codeph>-C</codeph>，而是直接连接到要还原到的数据库。
+        还要注意，我们从<codeph>template0</codeph>而不是<codeph>template1</codeph>克隆新数据库，以确保它最初是空的：
+        </p>
       <codeblock>createdb -T template0 newdb
 pg_restore -d newdb db.dump</codeblock>
-      <p>To reorder database items, it is first necessary to dump the table of contents of the
-        archive:</p>
+      <p>要重新排序数据库项，首先必须转储归档的目录：
+        </p>
       <codeblock>pg_restore -l db.dump &gt; db.list</codeblock>
-      <p>The listing file consists of a header and one line for each item, for example,</p>
+      <p>清单文件由一个标题和每个项目的一行组成，例如，</p>
       <codeblock>; Archive created at Mon Sep 14 13:55:39 2009
 ;     dbname: DBDEMOS
 ;     TOC Entries: 81
@@ -358,20 +347,21 @@ pg_restore -d newdb db.dump</codeblock>
 1862; 0 0 ACL - public pasha
 317; 1247 17715 TYPE public composite pasha
 319; 1247 25899 DOMAIN public domain0 pasha2</codeblock>
-      <p>Semicolons start a comment, and the numbers at the start of lines refer to the internal
-        archive ID assigned to each item. Lines in the file can be commented out, deleted, and
-        reordered. For example:</p>
+      <p>分号开始注释，行开头的数字指代分配给每个项目的内部档案ID。
+        文件中的行可以被注释掉，删除和重新排序。
+        例如：
+        </p>
       <codeblock>10; 145433 TABLE map_resolutions postgres
 ;2; 145344 TABLE species postgres
 ;4; 145359 TABLE nt_header postgres
 6; 145402 TABLE species_records postgres
 ;8; 145416 TABLE ss_old postgres</codeblock>
-      <p>Could be used as input to <codeph>pg_restore</codeph> and would only restore items 10 and
-        6, in that order:</p>
+      <p>可以用作<codeph>pg_restore</codeph>的输入，并且只能按以下顺序恢复项目10和6：
+        </p>
       <codeblock>pg_restore -L db.list db.dump</codeblock>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p>
         <codeph>
           <xref href="pg_dump.xml#topic1" type="topic" format="dita"/>
