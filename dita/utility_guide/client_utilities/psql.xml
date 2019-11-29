@@ -441,7 +441,7 @@ testdb=#</codeblock>
           <pt>\d [<varname>relation_pattern</varname>]  | \d+ [<varname>relation_pattern</varname>]
             | \dS [<varname>relation_pattern</varname>]</pt>
           <pd>对于每个匹配pattern的关系 (表、视图、索引、序列或外部表)或复合类型，
-            显示所有列、它们的类型、表空间(如果不是缺省的)和任何特殊属性(诸如<codeph>NOT NULL<、codeph>或缺省等)。
+            显示所有列、它们的类型、表空间(如果不是缺省的)和任何特殊属性(诸如<codeph>NOT NULL</codeph>或缺省等)。
             相关的索引、约束、规则、触发器也同样显示出来。
             对于外部表，也显示相关的外部服务器。
             <ul
