@@ -1,58 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="pc137116">dropdb</title><body><p id="client_util_desc">Removes a database.</p><section id="section2"><title>Synopsis</title><codeblock id="client_util_synopsis"><b>dropdb</b> [<varname>connection-option</varname> ...] [<b>-e</b>] [<b>-i</b>] <varname>dbname</varname>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="pc137116">dropdb</title>
+    <body>
+        <p id="client_util_desc">删除数据库。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="client_util_synopsis"><b>dropdb</b> [<varname>connection-option</varname> ...] [<b>-e</b>] [<b>-i</b>] <varname>dbname</varname>
 
 <b>dropdb</b> <b>-? | --help</b>
 
-<b>dropdb</b> <b>-V | --version</b></codeblock></section><section id="section3"><title>Description</title><p><codeph>dropdb</codeph> destroys an existing database. The user who
-executes this command must be a superuser or the owner of the database
-being dropped. </p><p><codeph>dropdb</codeph> is a wrapper around the SQL command <codeph>DROP DATABASE</codeph>. <ph
-                                       >See the <i>Greenplum Database Reference
-                                                Guide</i> for information about <codeph>DROP
-                                                DATABASE.</codeph></ph></p></section><section id="section4"><title>Options</title><parml><plentry><pt><varname>dbname</varname></pt><pd>The name of the database to be removed.</pd></plentry><plentry><pt>-e | --echo</pt><pd>Echo the commands that <codeph>dropdb</codeph> generates and sends
-to the server. </pd></plentry><plentry><pt>-i | --interactive</pt><pd>Issues a verification prompt before doing anything destructive. </pd></plentry>
-       <plentry>
-          <pt>-V | --version</pt>
-          <pd>Print the <codeph>dropdb</codeph> version and exit.</pd>
-        </plentry>
-        <plentry>
-          <pt>--if-exists</pt>
-          <pd>Do not throw an error if the database does not exist. A notice is issued in this
-            case.</pd>
-        </plentry>
-        <plentry>
-          <pt>-? | --help</pt>
-          <pd>Show help about <codeph>dropdb</codeph> command line arguments, and exit.</pd>
-        </plentry></parml><sectiondiv id="section5"><b>Connection Options</b><parml><plentry><pt>-h <varname>host</varname> | --host=<varname>host</varname></pt><pd>The host name of the machine on which the Greenplum master database
-                                                  server is running. If not specified, reads from
-                                                  the environment variable <codeph>PGHOST</codeph>
-                                                  or defaults to localhost.</pd></plentry><plentry><pt>-p <varname>port</varname> | --port=<varname>port</varname></pt><pd>The TCP port on which the Greenplum master database server is
-                                                  listening for connections. If not specified, reads
-                                                  from the environment variable
-                                                  <codeph>PGPORT</codeph> or defaults to 5432.</pd></plentry><plentry><pt>-U <varname>username</varname> | --username=<varname>username</varname></pt><pd>The database role name to connect as. If not specified, reads from
-the environment variable <codeph>PGUSER</codeph> or defaults to the current
-system role name.</pd></plentry><plentry><pt>-w | --no-password</pt><pd>Never issue a password prompt. If the server requires password authentication
-and a password is not available by other means such as a <codeph>.pgpass</codeph>
-file, the connection attempt will fail. This option can be useful in
-batch jobs and scripts where no user is present to enter a password.</pd></plentry><plentry><pt>-W | --password</pt><pd>Force a password prompt.</pd></plentry>
-          <plentry>
-            <pt>--maintenance-db=<varname>dbname</varname></pt>
-            <pd>Specifies the name of the database to connect to in order to drop the target
-              database. If not specified, the <codeph>postgres</codeph> database will be used; if
-              that does not exist (or if it is the name of the database being dropped),
-                <codeph>template1</codeph> will be used.</pd>
-          </plentry></parml></sectiondiv></section><section id="section6"><title>Examples</title><p>To destroy the database named <codeph>demo</codeph> using default connection parameters:</p><codeblock>dropdb demo</codeblock><p>To destroy the database named <codeph>demo</codeph> using connection options, with verification,
-        and a peek at the underlying command:</p><codeblock><b>dropdb -p 54321 -h masterhost -i -e demo</b>
+<b>dropdb</b> <b>-V | --version</b></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>dropdb</codeph>销毁现有数据库。
+                执行此命令的用户必须是超级用户或要删除的数据库的所有者。
+            </p>
+            <p><codeph>dropdb</codeph>是SQL命令<codeph>DROP DATABASE</codeph>的包装。
+                <ph>有关<codeph>DROP DATABASE</codeph>的信息，请参阅《Greenplum数据库参考指南》。</ph>
+            </p>
+        </section>
+        <section id="section4">
+            <title>选项</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>dbname</varname>
+                    </pt>
+                    <pd>要删除的数据库的名称。</pd>
+                </plentry>
+                <plentry>
+                    <pt>-e | --echo</pt>
+                    <pd>回显<codeph>dropdb</codeph>生成并发送到服务器的命令。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-i | --interactive</pt>
+                    <pd>在执行破坏性操作之前发出验证提示。</pd>
+                </plentry>
+                <plentry>
+                    <pt>-V | --version</pt>
+                    <pd>打印<codeph>dropdb</codeph>版本并退出。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>--if-exists</pt>
+                    <pd>如果数据库不存在，请不要报错。在这种情况下发出通知。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-? | --help</pt>
+                    <pd>显示有关<codeph>dropdb</codeph>命令行参数的帮助，然后退出。
+                    </pd>
+                </plentry>
+            </parml>
+            <sectiondiv id="section5">
+                <b>连接选项</b>
+                <parml>
+                    <plentry>
+                        <pt>-h <varname>host</varname> | --host=<varname>host</varname>
+                        </pt>
+                        <pd>运行Greenplum master数据库服务器的计算机的主机名。
+                            如果未指定，则从环境变量<codeph>PGHOST</codeph>读取或默认为localhost。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-p <varname>port</varname> | --port=<varname>port</varname>
+                        </pt>
+                        <pd>Greenplum master数据库服务器正在侦听连接的TCP端口。
+                            如果未指定，则从环境变量<codeph>PGPORT</codeph>读取或默认为5432。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-U <varname>username</varname> | --username=<varname>username</varname>
+                        </pt>
+                        <pd>要用作连接的数据库角色名称。
+                            如果未指定，则从环境变量<codeph>PGUSER</codeph>读取或默认为当前系统角色名称。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-w | --no-password</pt>
+                        <pd>不发出密码提示。
+                            如果服务器要求密码验证，而其他方式（例如<codeph>.pgpass</codeph>文件）无法使用密码，则连接尝试将失败。
+                            此选项在没有用户输入密码的批处理作业和脚本中很有用。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-W | --password</pt>
+                        <pd>强制输入密码提示。</pd>
+                    </plentry>
+                    <plentry>
+                        <pt>--maintenance-db=<varname>dbname</varname>
+                        </pt>
+                        <pd>指定要删除目标数据库要连接的数据库的名称。
+                            如果未指定，将使用<codeph>postgres</codeph>数据库。
+                            如果不存在（或者它是要删除的数据库的名称），则将使用<codeph>template1</codeph>。
+                        </pd>
+                    </plentry>
+                </parml>
+            </sectiondiv>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>要使用默认连接参数销毁名为<codeph>demo</codeph>的数据库：
+            </p>
+            <codeblock>dropdb demo</codeblock>
+            <p>要使用连接选项（带有验证）并查看基础命令来删除名为<codeph>demo</codeph>的数据库：
+                To destroy the database named <codeph>demo</codeph> using connection options, with verification,
+                and a peek at the underlying command:
+            </p>
+            <codeblock><b>dropdb -p 54321 -h masterhost -i -e demo</b>
 Database "demo" will be permanently deleted.
 Are you sure? (y/n) <b>y</b>
 DROP DATABASE "demo"
-DROP DATABASE</codeblock></section><section id="section7">
-                        <title>See Also</title>
-                        <p><ph otherprops="op-print"><codeph>DROP DATABASE</codeph> in the
-                                                <i>Greenplum Database Reference Guide</i></ph><ph
-                                        otherprops="op-help"><codeph><xref
-                                                  href="createdb.xml#topic1"/></codeph>, <codeph><xref
-                                                  href="../../ref_guide/sql_commands/DROP_DATABASE.xml#topic1"
-                                                /></codeph></ph></p>
-                </section></body></topic>
+DROP DATABASE</codeblock>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <ph otherprops="op-print">
+                    <codeph>DROP DATABASE</codeph>
+                    in the
+                    <i>Greenplum Database Reference Guide</i>
+                </ph>
+                <ph
+                        otherprops="op-help">
+                    <codeph>
+                        <xref
+                                href="createdb.xml#topic1"/>
+                    </codeph>
+                    ,
+                    <codeph>
+                        <xref
+                                href="../../ref_guide/sql_commands/DROP_DATABASE.xml#topic1"
+                        />
+                    </codeph>
+                </ph>
+            </p>
+        </section>
+    </body>
+</topic>

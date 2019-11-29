@@ -4,9 +4,9 @@
 <topic id="topic1">
   <title id="ph137116">vacuumdb</title>
   <body>
-    <p id="client_util_desc">Garbage-collects and analyzes a database.</p>
+    <p id="client_util_desc">垃圾收集并分析数据库。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="client_util_synopsis"><b>vacuumdb</b> [<varname>connection-option</varname>...] [--full | -f] [<b>--freeze</b> | <b>-F</b>] [<b>--verbose</b> | <b>-v</b>]
     [<b>--analyze</b> | <b>-z</b>] [<b>--analyze-only</b> | <b>-Z</b>] [<b>--table</b> | <b>-t</b> <varname>table</varname> [( <varname>column</varname> [,...] )] ] [<varname>dbname</varname>]
 
@@ -19,136 +19,134 @@
 <b>vacuumdb</b> <b>-V | --version</b></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>vacuumdb</codeph> is a utility for cleaning a Greenplum Database database.
-        <codeph>vacuumdb</codeph> will
-        also generate internal statistics used by the Greenplum Database query optimizer.</p>
-      <p><codeph>vacuumdb</codeph> is a wrapper around the SQL command <codeph>VACUUM</codeph>.
-        There is no effective difference between vacuuming databases via this utility and via other
-        methods for accessing the server. </p>
+      <title>描述</title>
+      <p><codeph>vacuumdb</codeph>是用于清理Greenplum数据库的工具。
+        <codeph>vacuumdb</codeph>还将生成Greenplum数据库查询优化器使用的内部统计信息。
+        </p>
+      <p><codeph>vacuumdb</codeph>是SQL命令<codeph>VACUUM</codeph>的包装。
+        通过此工具和通过其他访问服务器的方法来清理数据库之间没有明显的区别。
+        </p>
     </section>
     <section id="section4">
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
           <pt>-a | --all</pt>
-          <pd>Vacuums all databases.</pd>
+          <pd>清理所有数据库。</pd>
         </plentry>
         <plentry>
           <pt>[-d] <varname>dbname</varname> | [--dbname=]<varname>dbname</varname></pt>
-          <pd>The name of the database to vacuum. If this is not specified and
-            <codeph>-a</codeph> (or <codeph>--all</codeph>)
-            is not used, the database name is read from the environment variable
-              <codeph>PGDATABASE</codeph>. If that is not set, the user name specified for the
-            connection is used.</pd>
+          <pd>要清理的数据库的名称。
+            如果未指定此选项，并且未使用<codeph>-a</codeph>（或<codeph>--all</codeph>），则从环境变量PGDATABASE读取数据库名称。
+            如果未设置，则使用为连接指定的用户名。
+            </pd>
         </plentry>
         <plentry>
           <pt>-e | --echo</pt>
-          <pd>Echo the commands that <codeph>reindexdb</codeph> generates and sends to the
-            server.</pd>
+          <pd>回显vacuumdb生成并发送到服务器的命令。</pd>
         </plentry>
         <plentry>
           <pt>-f | --full</pt>
-          <pd>Selects a full vacuum, which may reclaim more space, but takes much longer and
-            exclusively locks the table. <note type="warning">A <codeph>VACUUM FULL</codeph> is not
-              recommended in Greenplum Database.</note></pd>
+          <pd>选择完全清理，这可以回收更多空间，但是需要更长的时间并排他锁定表。
+            <note type="warning">在Greenplum数据库中不建议使用<codeph>VACUUM FULL</codeph>。
+              </note></pd>
         </plentry>
         <plentry>
           <pt>-F | --freeze</pt>
-          <pd>Freeze row transaction information.</pd>
+          <pd>冻结行事务信息。</pd>
         </plentry>
         <plentry>
           <pt>-q | --quiet</pt>
-          <pd>Do not display a response.</pd>
+          <pd>不显示响应。</pd>
         </plentry>
         <plentry>
-          <pt>-t <varname>table</varname> [(<varname>column</varname>)] | --table=
-              <varname>table</varname> [(<varname>column</varname>)]</pt>
-          <pd>Clean or analyze this table only. Column names may be specified only in conjunction
-            with the <codeph>--analyze</codeph> or <codeph>--analyze-all</codeph> options.
-            Multiple tables can be vacuumed by writing multiple <codeph>-t</codeph> switches.
-            If you specify columns, you probably have to escape the parentheses from the shell.</pd>
+          <pt>-t <varname>table</varname> [(<varname>column</varname>)] | --table=<varname>table</varname> [(<varname>column</varname>)]</pt>
+          <pd>仅清理或分析该表。
+            只能与<codeph>--analyze</codeph>或<codeph>--analyze-all</codeph>选项一起指定列名。
+            可以通过写入多个<codeph>-t</codeph>开关来清理多个表。
+            如果指定列，则可能必须从shell转义括号。
+            </pd>
         </plentry>
         <plentry>
           <pt>-v | --verbose</pt>
-          <pd>Print detailed information during processing.</pd>
+          <pd>在处理过程中打印详细信息。</pd>
         </plentry>
         <plentry>
           <pt>-z | --analyze</pt>
-          <pd>Collect statistics for use by the query planner.</pd>
+          <pd>收集统计信息以供查询优化器使用。</pd>
         </plentry>
         <plentry>
           <pt>-Z | --analyze-only</pt>
-          <pd>Only calculate statistics for use by the query planner (no vacuum).</pd>
+          <pd>仅计算统计信息以供查询优化器使用（不清理）。</pd>
         </plentry>
         <plentry>
           <pt>-V | --version</pt>
-          <pd>Print the <codeph>vacuumdb</codeph> version and exit.</pd>
+          <pd>打印<codeph>vacuumdb</codeph>版本并退出。</pd>
         </plentry>
         <plentry>
           <pt>-? | --help</pt>
-          <pd>Show help about <codeph>vacuumdb</codeph> command line arguments, and exit.</pd>
+          <pd>显示有关<codeph>vacuumdb</codeph>命令行参数的帮助，然后退出。</pd>
         </plentry>
       </parml>
       <sectiondiv id="section5">
-        <b>Connection Options</b>
+        <b>连接选项</b>
         <parml>
           <plentry>
             <pt>-h <varname>host</varname> | --host=<varname>host</varname></pt>
-            <pd>Specifies the host name of the machine on which the Greenplum master database server is running. If not specified,
-              reads from the environment variable <codeph>PGHOST</codeph> or defaults to
-              localhost.</pd>
+            <pd>运行Greenplum master数据库服务器的计算机的主机名。
+              如果未指定，则从环境变量<codeph>PGHOST</codeph>读取或默认为localhost。
+              </pd>
           </plentry>
           <plentry>
             <pt>-p <varname>port</varname> | --port=<varname>port</varname></pt>
-            <pd>Specifies the TCP port on which the Greenplum master
-              database server is listening for connections. If not specified, reads from the
-              environment variable <codeph>PGPORT</codeph> or defaults to 5432.</pd>
+            <pd>Greenplum master数据库服务器正在侦听连接的TCP端口。
+              如果未指定，则从环境变量<codeph>PGPORT</codeph>读取或默认为5432。
+              </pd>
           </plentry>
           <plentry>
             <pt>-U <varname>username</varname> | --username=<varname>username</varname></pt>
-            <pd>The database role name to connect as. If not specified, reads from the environment
-              variable <codeph>PGUSER</codeph> or defaults to the current system user name.</pd>
+            <pd>要用作连接的数据库角色名称。
+              如果未指定，则从环境变量<codeph>PGUSER</codeph>读取或默认为当前系统角色名称。
+              </pd>
           </plentry>
           <plentry>
             <pt>-w | --no-password</pt>
-            <pd>Never issue a password prompt. If the server requires password authentication and a
-              password is not available by other means such as a <codeph>.pgpass</codeph> file, the
-              connection attempt will fail. This option can be useful in batch jobs and scripts
-              where no user is present to enter a password.</pd>
+            <pd>不发出密码提示。
+              如果服务器要求密码验证，而其他方式（例如<codeph>.pgpass</codeph>文件）无法使用密码，则连接尝试将失败。
+              此选项在没有用户输入密码的批处理作业和脚本中很有用。</pd>
           </plentry>
           <plentry>
             <pt>-W | --password</pt>
-            <pd>Force a password prompt.</pd>
+            <pd>强制输入密码提示。</pd>
           </plentry>
           <plentry>
             <pt>--maintenance-db=<varname>dbname</varname></pt>
-            <pd>Specifies the name of the database to connect to discover what other databases
-              should be vacuumed. If not specified, the <codeph>postgres</codeph> database will be
-              used, and if that does not exist, <codeph>template1</codeph> will be used.</pd>
+            <pd>指定要连接以发现应清理哪些其他数据库的数据库名称。
+              如果未指定，将使用<codeph>postgres</codeph>数据库，如果不存在，将使用<codeph>template1</codeph>。
+              </pd>
           </plentry>
         </parml>
       </sectiondiv>
     </section>
     <section id="section6">
-      <title>Notes</title>
-      <p><codeph>vacuumdb</codeph> might need to connect several times to the master server, asking
-        for a password each time. It is convenient to have a <codeph>~/.pgpass</codeph> file in such
-        cases. </p>
+      <title>注解</title>
+      <p><codeph>vacuumdb</codeph>可能需要连接几次master服务器，每次都要求输入密码。
+        在这种情况下，使用<codeph>~/.pgpass</codeph>文件很方便。
+        </p>
     </section>
     <section id="section7">
-      <title>Examples</title>
-      <p>To clean the database <codeph>test</codeph>:</p>
+      <title>示例</title>
+      <p>清理数据库<codeph>test</codeph>：</p>
       <codeblock>vacuumdb test</codeblock>
-      <p>To clean and analyze a database named <codeph>bigdb</codeph>:</p>
+      <p>清理分析数据库<codeph>bigdb</codeph>：</p>
       <codeblock>vacuumdb --analyze bigdb</codeblock>
-      <p>To clean a single table <codeph>foo</codeph> in a database named <codeph>mydb</codeph>, and
-        analyze a single column <codeph>bar</codeph> of the table. Note the quotes around the table
-        and column names to escape the parentheses from the shell:</p>
+      <p>要清理名为<codeph>mydb</codeph>的数据库中的单个表<codeph>foo</codeph>，并分析表的单个列<codeph>bar</codeph>。
+        请注意表名和列名两边的引号，从shell转义括号：
+        </p>
       <codeblock>vacuumdb --analyze --verbose --table 'foo(bar)' mydb</codeblock>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p>
         <ph otherprops="op-print"><codeph>VACUUM</codeph> and <codeph>ANALYZE</codeph> in the
             <i>Greenplum Database Reference Guide</i></ph>
