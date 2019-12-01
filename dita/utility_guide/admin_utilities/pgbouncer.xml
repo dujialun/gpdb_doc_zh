@@ -3,9 +3,9 @@
   <topic id="topic1">
     <title>pgbouncer</title>
     <body>
-      <p>Manages database connection pools.</p>
+      <p>管理数据库连接池。</p>
       <section>
-        <title>Synopsis</title>
+        <title>概要</title>
         <codeblock>pgbouncer [OPTION ...] pgbouncer.ini
 
   OPTION
@@ -18,87 +18,73 @@
 pgbouncer [ -V | --version ] | [ -h | --help ]</codeblock>
       </section>
       <section>
-        <title>Description</title>
-        <p>PgBouncer is a light-weight connection pool manager for Greenplum and
-          PostgreSQL databases. PgBouncer maintains a pool of connections for each
-          database user and database combination. PgBouncer either creates a new
-          database connection for the client or reuses an existing pooled connection
-          for the same user and database. When the client disconnects, PgBouncer
-          returns the connection to the pool for re-use. </p>
-        <p>PgBouncer supports the standard connection interface shared by PostgreSQL
-          and Greenplum Database. The Greenplum Database client application (for example,
-          <codeph>psql</codeph>) should connect to the host and port on which PgBouncer
-          is running rather than directly to the Greenplum Database master host and port.</p>
-         <p>You configure PgBouncer and its access to Greenplum Database via a
-           configuration file. You provide the configuration file name, usually <codeph>pgbouncer.ini</codeph>,
-           when you run the <codeph>pgbouncer</codeph> command. This file provides location information
-           for Greenplum databases. The <codeph>pgbouncer.ini</codeph> file also specifies
-           process, connection pool, authorized users, and authentication configuration
-           for PgBouncer, among other configuration options.</p>
-        <p>By default, the <codeph>pgbouncer</codeph> process runs as a foreground
-          process. You can optionally start <codeph>pgbouncer</codeph> as a
-          background (daemon) process with the <codeph>-d</codeph> option.</p>
- 
-        <p>The <codeph>pgbouncer</codeph> process is owned by the operating system
-          user that starts the process. You can optionally specify a different
-          user name under which to start <codeph>pgbouncer</codeph>.</p>
-        <p>PgBouncer includes a <codeph>psql</codeph>-like administration console.
-          Authorized users can connect to a virtual database to monitor and
-          manage PgBouncer. You can manage a PgBouncer daemon process via the admin
-          console. You can also use the console to update and reload the PgBouncer 
-          configuration at runtime without stopping and restarting the process.</p>
-        <p>For additional information about PgBouncer, refer to the
+        <title>描述</title>
+        <p>PgBouncer是Greenplum和PostgreSQL数据库的轻量级连接池管理器。
+          gBouncer为每个数据库用户和数据库组合创建一个池。PgBouncer或者为客户端创建一个新的数据库连接，
+          或者重用一个现有的连接。当客户端断开连接时，连接被返回到池中以供重用。</p>
+        <p>PgBouncer支持PostgreSQL和Greenplum数据库共享的标准连接接口。
+          Greenplum数据库客户端程序（例如<codeph>psql</codeph>）可以连接到PgBouncer
+          正在运行的主机和端口号，而不是直接连接Greenplum数据库的主机或端口号。</p>
+        <p>可以通过配置文件声明PgBouncer和他的Greenplum数据库访问。提供的配置文件名
+          通常为<codeph>pgbouncer.ini</codeph>，供<codeph>pgbouncer</codeph>
+          命令使用。该配置文件还能提供Greenplum数据库位置信息。<codeph>pgbouncer.ini</codeph>
+          配置文件也定义了线程数、连接池、授权用户和授权配置信息，另外还有一些其他信息。</p>
+        <p>默认情况下，<codeph>pgbouncer</codeph>作为一个前端进程运行。可以通过
+          启动<codeph>pgbouncer</codeph>时指定<codeph>-d</codeph>选项来让其
+          在后台执行。</p>
+        <p><codeph>pgbouncer</codeph>进程被操作系统用户拥有。在启动<codeph>pgbouncer</codeph>
+          时可以指定一个不同的用户名。</p>
+        <p>PgBouncer包括一个类似<codeph>psql</codeph>的管理控制台。
+          授权用户可以连接到虚拟数据库来监控和管理PgBouncer。也可以通过管理控制台来监控和管理后台进程。
+          也可以使用控制台更新和重载PgBouncer配置文件，此时不需要通知或重启该进程。</p>
+        <p>有关PgBouncer的更多信息，请参考
           <xref href="https://pgbouncer.github.io/faq.html" format="html" scope="external"
-            >PgBouncer FAQ</xref>.</p>
+            >PgBouncer FAQ</xref>。</p>
       </section>
       <section>
-        <title>Options</title>
+        <title>选项</title>
         <parml>
           <plentry>
             <pt>-d | --daemon</pt>
-            <pd>Run PgBouncer as a daemon (a background process). The default start-up
-              mode is to run as a foreground process.</pd>
-            <pd>When run as a daemon, PgBouncer displays start-up messages to
-              <codeph>stdout</codeph>. To suppress the display of these messages,
-              include the <codeph>-q</codeph> option when you start PgBouncer.</pd>
-            <pd>To stop a PgBouncer process that was started as a daemon, issue the
-                <codeph>SHUTDOWN</codeph> command from the PgBouncer administration
-                console.</pd>
+            <pd>运行PgBouncer作为守护进程（后台进程）。默认是作为前台进程运行。</pd>
+            <pd>作为守护进程启动时，PgBouncer显示启动消息到<codeph>stdout</codeph>。
+              要禁止显示消息，请添加<codeph>-q</codeph>选项。</pd>
+            <pd>要关闭PgBouncer守护程序，请登录管理控制台并发出<codeph>SHUTDOWN</codeph>命令。
+                 </pd>
           </plentry>
           <plentry>
             <pt>-R | --restart </pt>
-            <pd>Restart PgBouncer using the specified command line arguments. Non-TLS connections to
-              databases are maintained during restart; TLS connections are dropped.</pd>
-            <pd>To restart PgBouncer as a daemon, specify the options
-              <codeph>-Rd</codeph>.<note>Restart is available only if the operating
-               system supports Unix sockets and the PgBouncer <codeph>unix_socket_dir</codeph>
-               configuration is not disabled.</note></pd>
+            <pd>使用指定的命令行参数重新启动PgBouncer。在重新启动期间，维护与数据库的非TLS连接，TLS连接被丢弃。
+              </pd>
+            <pd>要作为守护程序重新启动PgBouncer，请指定选项<codeph>-Rd</codeph>。
+              <note>仅在操作系统支持Unix套接字且PgBouncer配置没有
+                <codeph>unix_socket_dir</codeph>的情况下有效。</note></pd>
           </plentry>
           <plentry>
             <pt>-q | --quiet </pt>
-            <pd>Run quietly. Do not display messages to <codeph>stdout</codeph>.</pd>
+            <pd>安静地运行，不在命令行（<codeph>stdout</codeph>）上显示消息。</pd>
           </plentry>
           <plentry>
             <pt>-v | --verbose</pt>
-            <pd>Increase message verbosity. Can be specified multiple times.</pd>
+            <pd>增加消息详细度。显示额外的消息。可以多次使用。</pd>
           </plentry>
           <plentry>
             <pt>{-u | --user}=<varname>username</varname></pt>
-            <pd>Assume the identity of <varname>username</varname> on PgBouncer process start-up.</pd>
+            <pd>PgBouncer进程假定的<varname>username</varname>的身份。</pd>
           </plentry>
           <plentry>
             <pt>-V | --version</pt>
-            <pd>Show the version and exit.</pd>
+            <pd>显示版本并退出。</pd>
           </plentry>
           <plentry>
             <pt>-h | --help</pt>
-            <pd>Show the command help message and exit.</pd>
+            <pd>显示帮助信息并退出。</pd>
           </plentry>
         </parml>
       </section>
       <section id="section7">
-      <title>See Also</title>
-      <p><codeph><xref href="pgbouncer-ini.xml#topic1" type="topic" format="dita"/></codeph>,
+      <title>另见</title>
+      <p><codeph><xref href="pgbouncer-ini.xml#topic1" type="topic" format="dita"/></codeph>、
             <codeph><xref href="pgbouncer-admin.xml#topic1" type="topic" format="dita"/></codeph></p>
     </section>
     </body>
