@@ -3,9 +3,9 @@
 <topic id="topic1">
   <title>gpbackup</title>
   <body>
-    <p>Create a Greenplum Database backup for use with the <codeph>gprestore</codeph> utility. </p>
+    <p>创建一个可以给<codeph>gprestore</codeph>工具使用的Greenplum数据库备份。</p>
     <section>
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><b>gpbackup --dbname</b> <varname>database_name</varname>
    [<b>--backup-dir</b> <varname>directory</varname>]
    [<b>--compression-level</b> <varname>level</varname>]
@@ -32,366 +32,297 @@
 <b>gpbackup --help</b> </codeblock>
     </section>
     <section>
-      <title>Description</title>
-      <p>The <codeph>gpbackup</codeph> utility backs up the contents of a database into a collection
-        of metadata files and data files that can be used to restore the database at a later time
-        using <codeph>gprestore</codeph>. When you back up a database, you can specify table level
-        and schema level filter options to back up specific tables. For example, you can combine
-        schema level and table level options to back up all the tables in a schema except for a
-        single table. </p>
-      <p>By default, <codeph>gpbackup</codeph> backs up objects in the specified database as well as
-        global Greenplum Database system objects. You can optionally supply the
-          <codeph>--with-globals</codeph> option with <codeph>gprestore</codeph> to restore global
-        objects. See <xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_x3s_lqj_tbb"/>
-        for additional information.</p>
-      <p><codeph>gpbackup</codeph> stores the object metadata files and DDL files for a backup in
-        the Greenplum Database master data directory by default. Greenplum Database segments use the
-          <codeph>COPY ... ON SEGMENT</codeph> command to store their data for backed-up tables in
-        compressed CSV data files, located in each segment's data directory. See <xref
-          href="../../admin_guide/managing/backup-gpbackup.xml#topic_xnj_b4c_tbb"/> for additional
-        information.</p>
-      <p>You can add the <codeph>--backup-dir</codeph> option to copy all backup files from the
-        Greenplum Database master and segment hosts to an absolute path for later use. Additional
-        options are provided to filter the backup set in order to include or exclude specific
-        tables.</p>
-      <p>You can create an incremental backup with the <codeph><xref href="#topic1/incremental"
-            format="dita">--incremental</xref></codeph> option. Incremental backups are efficient
-        when the total amount of data in append-optimized tables or table partitions that changed is
-        small compared to the data has not changed. See <xref
-          href="../../admin_guide/managing/backup-gpbackup-incremental.xml"/> for information about
-        incremental backups. </p>
-      <p>With the default <codeph>--jobs</codeph> option (1 job), each <codeph>gpbackup</codeph>
-        operation uses a single transaction on the Greenplum Database master host. The <codeph>COPY
-          ... ON SEGMENT</codeph> command performs the backup task in parallel on each segment host.
-        The backup process acquires an <codeph>ACCESS SHARE</codeph> lock on each table that is
-        backed up. During the table locking process, the database should be in a quiescent
-        state.</p>
-      <p>When a back up operation completes, <codeph>gpbackup</codeph> returns a status code. See
-          <xref href="#topic1/return_codes" format="dita"/>. </p>
-      <p>The <codeph>gpbackup</codeph> utility cannot be run while <codeph>gpexpand</codeph> is
-        initializing new segments. Backups created before the expansion cannot be restored with
-          <codeph>gprestore</codeph> after the cluster expansion is completed.</p>
-      <p><codeph>gpbackup</codeph> can send status email notifications after a back up operation
-        completes. You specify when the utility sends the mail and the email recipients in a
-        configuration file. See <xref
+      <title>描述</title>
+      <p><codeph>gpbackup</codeph>工具用来备份数据库的内容到元数据文件集合和数据文件集合，这些文件可以被
+        <codeph>gprestore</codeph>工具用来恢复数据库。当备份数据库时，可以通过指定表级别和模式级别选项来
+        备份某些特定的表。例如，可以通过组合模式级别和表级别选项来备份模式下的所有表，并排除某一张单独的表。
+      </p>
+      <p>默认情况下，<codeph>gpbackup</codeph>备份指定数据库的对象和Greenplum数据库系统全局对象。可以通过
+        <codeph>gprestore</codeph>工具指定可选参数<codeph>--with-globals</codeph>来恢复全局对象。更多
+        信息请见<xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_x3s_lqj_tbb"/>
+        。</p>
+      <p><codeph>gpbackup</codeph>默认将Greenplum数据库备份对象元数据文件和DDL文件存储在Master数据目录下。
+        Greenplum Segment使用<codeph>COPY ... ON SEGMENT</codeph>命令将数据备份为压缩CSV数据文件，并
+        存储在每个Segment的数据目录下。更多信息请见<xref
+          href="../../admin_guide/managing/backup-gpbackup.xml#topic_xnj_b4c_tbb"/>。</p>
+      <p>可以通过指定<codeph>--backup-dir</codeph>选项将Master和Segment主机上的数据备份到一个绝对
+        路径下。可以通过指定其他选项来过滤备份集合来排除或包含指定的表。</p>
+      <p>可以通过指定
+        <codeph><xref href="#topic1/incremental"
+            format="dita">--incremental</xref></codeph>选项来启动增量备份。增量备份在追加优化表或
+        表分区上的变化数据小于未发生变化的数据时有效。有关增量备份的详细信息，请见<xref
+          href="../../admin_guide/managing/backup-gpbackup-incremental.xml"/>。</p>
+      <p>指定<codeph>--jobs</codeph>选项（1 job），Greenplum数据库Master主机上的每个
+        <codeph>gpbackup</codeph>操作都会启动一个单独的事务。<codeph>COPY
+          ... ON SEGMENT</codeph>命令在每个Segment主机上并行执行备份任务。备份进程会在备份的每张表
+        上唤起<codeph>ACCESS SHARE</codeph>锁。在表锁处理过程中，数据库处于静止状态。</p>
+      <p>当备份操作完成后，<codeph>gpbackup</codeph>会返回状态码。详情请见
+          <xref href="#topic1/return_codes" format="dita"/>。</p>
+      <p><codeph>gpexpand</codeph>正在初始化新segments时，<codeph>gpbackup</codeph>工具不能
+        运行。集群扩展完成后，在扩展之前创建的备份不能被<codeph>gprestore</codeph>使用。</p>
+      <p><codeph>gpbackup</codeph>可以在备份操作完成后发送Email状态通知。客户可以在配置文件中
+        创建工具发送和接收服务器信息。详情请见<xref
           href="../../admin_guide/managing/backup-gpbackup.xml#topic_qwd_d5d_tbb" format="dita"
-        />.</p>
-      <note>This utility uses secure shell (SSH) connections between systems to perform its tasks.
-        In large Greenplum Database deployments, cloud deployments, or deployments with a large
-        number of segments per host, this utility may exceed the host's maximum threshold for
-        unauthenticated connections. Consider updating the SSH <codeph>MaxStartups</codeph>
-        configuration parameter to increase this threshold. For more information about SSH
-        configuration options, refer to the SSH documentation for your Linux distribution.</note>
+        />。</p>
+      <note>
+        该工具在系统内部采用SSH连接执行各项操作任务。在大型Greenplum集群、云部署或每台主机部署了大量的
+        segment实例时，可能会遇到超过主机最大授权连接数限制的情况。此时需要考虑更新SSH配置参数<codeph>MaxStartups</codeph>
+        以提高该限制。更多关于SSH配置的选项，请参考您的Linux分发版的SSH文档。</note>
     </section>
     <section>
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
           <pt><b>--dbname</b>
             <varname>database_name</varname></pt>
-          <pd>Required. Specifies the database to back up.</pd>
+          <pd>必须。指定要备份的数据库。</pd>
         </plentry>
         <plentry>
           <pt><b>--backup-dir</b>
             <varname>directory</varname></pt>
-          <pd>Optional. Copies all required backup files (metadata files and data files) to the
-            specified directory. You must specify <varname>directory</varname> as an absolute path
-            (not relative). If you do not supply this option, metadata files are created on the
-            Greenplum Database master host in the
-              <filepath>$MASTER_DATA_DIRECTORY/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath>
-            directory. Segment hosts create CSV data files in the
-              <filepath>&lt;seg_dir>/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath> directory. When you
-            specify a custom backup directory, files are copied to these paths in subdirectories of
-            the backup directory.</pd>
-          <pd>You cannot combine this option with the option <codeph>--plugin-config</codeph>.</pd>
+          <pd>可选。复制所有备份文件（元数据文件和数据文件）到指定路径。必须指定<varname>directory</varname>
+            为绝对路径（不能是相对路径）。如果不提供该选项，元数据文件会保存在Greenplum Master主机的
+            <filepath>$MASTER_DATA_DIRECTORY/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath>
+            路径下。Segment主机的CSV数据文件保存在<filepath>&lt;seg_dir>/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath>
+            路径下。当指定该选项时，文件会被复制到备份目录的子路径下。</pd>
+          <pd>该选项不能和<codeph>--plugin-config</codeph>一起使用。</pd>
         </plentry>
         <plentry>
           <pt><b>--compression-level</b>
             <varname>level</varname></pt>
-          <pd>Optional. Specifies the gzip compression level (from 1 to 9) used to compress data
-            files. The default is 1. Note that <codeph>gpbackup</codeph> uses compression by
-            default.</pd>
+          <pd>可选。指定用来压缩数据文件的gzip压缩级别（从1到9）。默认为1。注意，<codeph>gpbackup</codeph>
+            默认使用压缩。</pd>
         </plentry>
         <plentry>
           <pt><b>--data-only</b></pt>
-          <pd>Optional. Backs up only the table data into CSV files, but does not backup metadata
-            files needed to recreate the tables and other database objects.</pd>
+          <pd>可选。仅将表数据备份到CSV文件，不备份用来重建表和其他数据库对象的元数据文件。</pd>
         </plentry>
         <plentry>
           <pt><b>--debug</b></pt>
-          <pd>Optional. Displays verbose debug messages during operation.</pd>
+          <pd>可选。显示操作期间的调试信息。</pd>
         </plentry>
         <plentry>
           <pt><b>--exclude-schema</b>
             <varname>schema_name</varname></pt>
-          <pd>Optional. Specifies a database schema to exclude from the backup. You can specify this
-            option multiple times to exclude multiple schemas. You cannot combine this option with
-            the option <codeph>--include-schema</codeph>, or a table filtering option such as
-              <codeph>--include-table</codeph>. See <xref
-              href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/> for more
-            information.</pd>
+          <pd>可选。指定要被排除备份的模式名。该参数可以指定多次以排除多个模式。该选项不能与
+            <codeph>--include-schema</codeph>一起使用，也不能与表过滤选项例如：
+            <codeph>--include-table</codeph>一起使用。更多信息请见<xref
+              href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>。</pd>
         </plentry>
         <plentry>
           <pt><b>--exclude-table</b>
             <varname>schema.table</varname></pt>
-          <pd>Optional. Specifies a table to exclude from the backup. The table must be in the
-            format <codeph>&lt;schema-name>.&lt;table-name></codeph>. If a table or schema name uses
-            any character other than a lowercase letter, number, or an underscore character, then
-            you must include that name in double quotes. You can specify this option multiple times.
-            You cannot combine this option with the option <codeph>--exclude-schema</codeph>, or
-            another a table filtering option such as <codeph>--include-table</codeph>.</pd>
-          <pd>You cannot use this option in combination with <codeph>--leaf-partition-data</codeph>.
-            Although you can specify leaf partition names, <codeph>gpbackup</codeph> ignores the
-            partition names.</pd>
-          <pd>See <xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>
-            for more information.</pd>
+          <pd>可选。指定要排除在备份中的表。被排除的表必须为格式<codeph>&lt;schema-name>.&lt;table-name></codeph>
+            。如果表或模式名使用了任何非小写字母、数字或下划线，必须用双引号包裹名字。该选项可以指定多次。
+            该选项不能与<codeph>--exclude-schema</codeph>或<codeph>--include-table</codeph>同时使用。
+          </pd>
+          <pd>该选项不能和<codeph>--leaf-partition-data</codeph>组合使用。虽然您可以指定子分区名字，但是
+            <codeph>gpbackup</codeph>会忽略分区名称。</pd>
+          <pd>更多信息详见<xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>
+            。</pd>
         </plentry>
         <plentry>
           <pt><b>--exclude-table-file</b>
             <varname>file_name</varname></pt>
-          <pd>Optional. Specifies a text file containing a list of tables to exclude from the
-            backup. Each line in the text file must define a single table using the format
-              <codeph>&lt;schema-name>.&lt;table-name></codeph>. The file must not include trailing
-            lines. If a table or schema name uses any character other than a lowercase letter,
-            number, or an underscore character, then you must include that name in double quotes.
-            You cannot combine this option with the option <codeph>--exclude-schema</codeph>, or
-            another a table filtering option such as <codeph>--include-table</codeph>.</pd>
-          <pd>You cannot use this option in combination with <codeph>--leaf-partition-data</codeph>.
-            Although you can specify leaf partition names in a file specified with
-              <codeph>--exclude-table-file</codeph>, <codeph>gpbackup</codeph> ignores the partition
-            names.</pd>
-          <pd>See <xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>
-            for more information.</pd>
+          <pd>可选。指定一个包含需要排除在备份之外的列表文件。每行必须指定一个单独的表，格式为
+              <codeph>&lt;schema-name>.&lt;table-name></codeph>。文件不能包含多余的行。
+            如果表或模式名使用了任何非小写字母、数字或下划线，必须用双引号包裹名字。该选项可以指定多次。
+            该选项不能与<codeph>--exclude-schema</codeph>或<codeph>--include-table</codeph>同时使用。
+          </pd>
+          <pd>该选项不能和<codeph>--leaf-partition-data</codeph>组合使用。虽然您可以在<codeph>--exclude-table-file</codeph>
+            中指定子分区名字，但是<codeph>gpbackup</codeph>会忽略分区名称。
+            </pd>
+          <pd>更多信息请见<xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>
+           。</pd>
         </plentry>
         <plentry>
           <pt><b>--include-schema</b>
             <varname>schema_name</varname></pt>
-          <pd>Optional. Specifies a database schema to include in the backup. You can specify this
-            option multiple times to include multiple schemas. If you specify this option, any
-            schemas that are not included in subsequent <codeph>--include-schema</codeph> options
-            are omitted from the backup set. You cannot combine this option with the options
-              <codeph>--exclude-schema</codeph>, <codeph>--include-table</codeph>, or
-              <codeph>--include-table-file</codeph>. See <xref
-              href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/> for more
-            information.</pd>
+          <pd>可选。指定要包含在备份中的数据库模式名。可以多次指定该参数来包含多个备份模式。如果指定该选项，
+            任何不包含在<codeph>--include-schema</codeph>中的模式都不会放在备份集中。该选项不能与选项
+            <codeph>--exclude-schema</codeph>、<codeph>--include-table</codeph>或
+            <codeph>--include-table-file</codeph>一起使用。更多详情请见<xref
+              href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>。</pd>
         </plentry>
         <plentry>
           <pt><b>--include-table</b>
             <varname>schema.table</varname></pt>
-          <pd>Optional. Specifies a table to include in the backup. The table must be in the format
-              <codeph>&lt;schema-name>.&lt;table-name></codeph>. If a table or schema name uses any
-            character other than a lowercase letter, number, or an underscore character, then you
-            must include that name in single quotes. See <xref href="#topic1/table_names" format="dita"
-              >Schema and Table Names</xref> for information about characters that are supported in
-            schema and table names.</pd>
-          <pd>You can specify this option multiple times. You cannot combine this option with a
-            schema filtering option such as <codeph>--include-schema</codeph>, or another table
-            filtering option such as <codeph>--exclude-table-file</codeph>.</pd>
-          <pd>You can also specify the qualified name of a sequence or a view. </pd>
-          <pd>If you specify this option, the utility does not automatically back up dependent
-            objects. You must also explicitly specify dependent objects that are required. For
-            example if you back up a view, you must also back up the tables that the view uses. If
-            you back up a table that uses a sequence, you must also back up the sequence.</pd>
-          <pd>You can optionally specify a table leaf partition name in place of the table name, to
-            include only specific leaf partitions in a backup with the
-              <codeph>--leaf-partition-data</codeph> option. When a leaf partition is backed up, the
-            leaf partition data is backed up along with the metadata for the partitioned table.</pd>
-          <pd>See <xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>
-            for more information.</pd>
+          <pd>可选。指定一个要包含在备份中的表。该表的格式必须为<codeph>&lt;schema-name>.&lt;table-name></codeph>。
+            如果表或模式名使用了任何非小写字母、数字或下划线，必须用双引号包裹名字。有关模式和表名中支持的
+            字符信息详情，请见<xref href="#topic1/table_names" format="dita"
+              ></xref>中的模式和表名部分。</pd>
+          <pd>该选项可以指定多次。该选项不能和模式筛选选项<codeph>--include-schema</codeph>或<codeph>--exclude-table-file</codeph>等
+            一起使用。</pd>
+          <pd>客户也可以指定序列或视图的名字。</pd>
+          <pd>如果指定该选项，该工具不会自动备份依赖对象。客户必须指定相关依赖对象。例如，如果备份了视图，
+            客户必须备份试图所用的表。如果备份表用到了一个序列，客户必须也备份相关的序列。</pd>
+          <pd>可以在表名处通过指定<codeph>--leaf-partition-data</codeph>选项来指定表子分区名字，
+            仅备份指定的分区。当指定子分区备份时，子分区数据和分区表的元数据信息都会被备份。</pd>
+          <pd>更多信息请见<xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>
+            。</pd>
         </plentry>
         <plentry>
           <pt><b>--include-table-file</b>
             <varname>file_name</varname></pt>
-          <pd>Optional. Specifies a text file containing a list of tables to include in the backup.
-            Each line in the text file must define a single table using the format
-              <codeph>&lt;schema-name>.&lt;table-name></codeph>. The file must not include trailing
-            lines. See <xref href="#topic1/table_names" format="dita">Schema and Table Names</xref>
-            for information about characters that are supported in schema and table names. </pd>
-          <pd>Any tables not listed in this file are omitted from the backup set. You cannot combine
-            this option with a schema filtering option such as <codeph>--include-schema</codeph>, or
-            another table filtering option such as <codeph>--exclude-table-file</codeph>.</pd>
-          <pd>You can also specify the qualified name of a sequence or a view. </pd>
-          <pd>If you specify this option, the utility does not automatically back up dependent
-            objects. You must also explicitly specify dependent objects that are required. For
-            example if you back up a view, you must also specify the tables that the view uses. If
-            you specify a table that uses a sequence, you must also specify the sequence.</pd>
-          <pd>You can optionally specify a table leaf partition name in place of the table name, to
-            include only specific leaf partitions in a backup with the
-              <codeph>--leaf-partition-data</codeph> option. When a leaf partition is backed up, the
-            leaf partition data is backed up along with the metadata for the partitioned table.</pd>
-          <pd>See <xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>
-            for more information.</pd>
+          <pd>可选。指定一个备份时需要的表名列表文件。文件中的每行必须定义为单独的表名，格式为：
+              <codeph>&lt;schema-name>.&lt;table-name></codeph>。该文件不能包含多余的列。
+            有关模式和表名中支持的
+            字符信息详情，请见<xref href="#topic1/table_names" format="dita"
+              ></xref>中的模式和表名部分。</pd>
+          <pd>任何没有列在文件中的表都会被排除在备份集以外。该选项不能与模式过滤选项<codeph>--include-schema</codeph>
+            或<codeph>--exclude-table-file</codeph>等一起使用。</pd>
+          <pd>该选项也可以指定序列和视图名称。</pd>
+          <pd>如果指定该选项，该工具不会自动备份依赖对象。客户必须指定相关依赖对象。例如，如果备份了视图，
+            客户必须备份试图所用的表。如果备份表用到了一个序列，客户必须也备份相关的序列。</pd>
+          <pd>可以在表名处通过指定<codeph>--leaf-partition-data</codeph>选项来指定表子分区名字，
+            仅备份指定的分区。当指定子分区备份时，子分区数据和分区表的元数据信息都会被备份。</pd>
+          <pd>更多信息请见<xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>
+            。</pd>
         </plentry>
         <plentry id="incremental">
           <pt><b>--incremental</b></pt>
-          <pd>Specify this option to add an incremental backup to an incremental backup set. A
-            backup set is a full backup and one or more incremental backups. The backups in the set
-            must be created with a consistent set of backup options to ensure that the backup set
-            can be used in a restore operation. </pd>
-          <pd>By default, <codeph>gpbackup</codeph> attempts to find the most recent existing backup
-            with a consistent set of options. If the backup is a full backup, the utility creates a
-            backup set. If the backup is an incremental backup, the utility adds the backup to the
-            existing backup set. The incremental backup is added as the latest backup in the backup
-            set. You can specify <codeph>--from-timestamp</codeph> to override the default
-            behavior.</pd>
+          <pd>指定该选项可以增加一个增量备份到增量备份集中。一个备份集包括一个全量备份和一个或多个增量备份。
+            该备份集合必须是连续性的，以保证在恢复时是可用的。</pd>
+          <pd>默认情况下，<codeph>gpbackup</codeph>会找出最近的备份。如果该备份是全备份，工具会创建一个
+            备份集合。如果备份为增量备份，工具会将备份增加到已经存在的备份集。增量备份被增加到备份集的最后
+            。可以通过指定<codeph>--from-timestamp</codeph>来覆盖默认的行为。</pd>
           <pd>
             <parml>
               <plentry>
                 <pt><b>--from-timestamp</b>
                   <varname>backup-timestamp</varname></pt>
-                <pd>Optional. Specifies the timestamp of a backup. The specified backup must have
-                  backup options that are consistent with the incremental backup that is being
-                  created. If the specified backup is a full backup, the utility creates a backup
-                  set. If the specified backup is an incremental backup, the utility adds the
-                  incremental backup to the existing backup set.</pd>
+                <pd>可选。指定备份时间戳。指定的备份必须已经有增量备份存在。如果指定的备份只有全量备份，该工具
+                  会创建一个备份集。如果指定的备份是增量备份，工具会将增量备份直接备份到该备份集合。</pd>
               </plentry>
             </parml>
           </pd>
-          <pd>You must specify <codeph>--leaf-partition-data</codeph> with this option. You cannot
-            combine this option with <codeph>--data-only</codeph> or
-              <codeph>--metadata-only</codeph>.</pd>
-          <pd>A backup is not created and the utility returns an error if the backup cannot add the
-            backup to an existing incremental backup set or cannot use the backup to create a backup
-            set.</pd>
-          <pd>For information about creating and using incremental backups, see <xref
-              href="../../admin_guide/managing/backup-gpbackup-incremental.xml"/>.</pd>
+          <pd>该选项必须与<codeph>--leaf-partition-data</codeph>选项一起使用。不能与<codeph>--data-only</codeph>
+            或<codeph>--metadata-only</codeph>一起使用。</pd>
+          <pd>如果备份操作不能增加备份到已经存在的增量备份集或者不能使用备份来创建一个备份集，工具将不能创建备份
+            并且工具会返回错误。</pd>
+          <pd>有关创建和使用增量备份的详细信息，请见<xref
+              href="../../admin_guide/managing/backup-gpbackup-incremental.xml"/>。</pd>
         </plentry>
         <plentry>
           <pt><b>--jobs</b>
             <varname>int</varname></pt>
-          <pd>Optional. Specifies the number of jobs to run in parallel when backing up tables. By
-            default, <codeph>gpbackup</codeph> uses 1 job (database connection). Increasing this
-            number can improve the speed of backing up data. When running multiple jobs, each job
-            backs up tables in a separate transaction. For example, if you specify <codeph>--jobs
-              2</codeph>, the utility creates two processes, each process starts a single
-            transaction, and the utility backs up the tables in parallel using the two processes.
-            <note type="important">If you specify a value higher than 1, the database must be in a
-              quiescent state while the utility acquires a lock on the tables that are being backed
-              up. If database operations are being performed on tables that are being backed up
-              during the table locking process, consistency between tables that are backed up in
-              different transactions cannot be guaranteed.</note></pd>
-          <pd>You cannot use this option in combination with the options
-              <codeph>--metadata-only</codeph>, <codeph>--single-data-file</codeph>, or
-              <codeph>--plugin-config</codeph>.</pd>
+          <pd>可选。指定进行表备份的并行任务数量。默认<codeph>gpbackup</codeph>采用1个任务（数据库连接）。
+            增加该参数的值可以提高数据备份的速度。多运行多个任务时，每个任务会在一个单独的事务中备份表。
+            例如，如果指定<codeph>--jobs 2</codeph>，工具会创建2个进程，每个进程启动一个单独的事务，
+            工具会使用这两个进程并行的备份表。
+            <note type="important">如果指定超过1的值，数据库在工具从表上获取备份用的锁时处于静默状态。
+              如果数据库操作正在那些被备份的表上执行，此时进行备份的话这些表在不同事务中的锁处理和一致性
+              问题不能被保证。</note></pd>
+          <pd>该选项不能和<codeph>--metadata-only</codeph>、<codeph>--single-data-file</codeph>或
+            <codeph>--plugin-config</codeph>一起使用。</pd>
         </plentry>
         <plentry>
           <pt><b>--leaf-partition-data</b></pt>
-          <pd>Optional. For partitioned tables, creates one data file per leaf partition instead of
-            one data file for the entire table (the default). Using this option also enables you to
-            specify individual leaf partitions to include in a backup, with the
-              <codeph>--include-table-file</codeph> option. You cannot use this option in
-            combination with <codeph>--exclude-table-file</codeph> or
-              <codeph>--exclude-table</codeph>.</pd>
+          <pd>可选。对于分区表，该选项定义后会为每一个子分区创建一个单独的数据文件，而不是为整个表创建一个
+            完成的文件（默认）。使用该选项要求客户通过<codeph>--include-table-file</codeph>选项指定
+            包含在备份中的单独子节点分区。该选项不能与<codeph>--exclude-table-file</codeph>或
+              <codeph>--exclude-table</codeph>选项同时使用。</pd>
         </plentry>
         <plentry>
           <pt><b>--metadata-only</b></pt>
-          <pd>Optional. Creates only the metadata files (DDL) needed to recreate the database
-            objects, but does not back up the actual table data.</pd>
+          <pd>可选。仅创建可用来重建数据库的元数据文件（DDL），不备份表的实际数据。</pd>
         </plentry>
         <plentry>
           <pt><b>--no-compression</b></pt>
-          <pd>Optional. Do not compress the table data CSV files.</pd>
+          <pd>可选。不对表数据CSV文件进行压缩。</pd>
         </plentry>
         <plentry>
           <pt><b>--plugin-config</b>
             <varname>config-file_location</varname></pt>
-          <pd>Specify the location of the <codeph>gpbackup</codeph> plugin configuration file, a
-            YAML-formatted text file. The file contains configuration information for the plugin
-            application that <codeph>gpbackup</codeph> uses during the backup operation.</pd>
-          <pd>If you specify the <codeph>--plugin-config</codeph> option when you back up a
-            database, you must specify this option with configuration information for a
-            corresponding plugin application when you restore the database from the backup.</pd>
-          <pd>You cannot combine this option with the option <codeph>--backup-dir</codeph>.</pd>
-          <pd>For information about using storage plugin applications, see <xref
-              href="../../admin_guide/managing/backup-plugins.xml">Using gpbackup Storage
-              Plugins</xref>.</pd>
+          <pd>指定<codeph>gpbackup</codeph>插件配置文件的位置，该文件是一个YAML格式的文本文件。
+            该文件包含<codeph>gpbackup</codeph>在备份操作期间使用的配置信息。</pd>
+          <pd>如果在备份数据库时指定了<codeph>--plugin-config</codeph>选项，那么在从备份
+            恢复数据库时也需要同样指定对应的配置信息。</pd>
+          <pd>该选项不能与<codeph>--backup-dir</codeph>一起使用。</pd>
+          <pd>有关使用存储插件应用的详细信息，请见<xref
+              href="../../admin_guide/managing/backup-plugins.xml">使用gpbackup存储插件</xref>部分。</pd>
         </plentry>
         <plentry>
           <pt><b>--quiet</b></pt>
-          <pd>Optional. Suppress all non-warning, non-error log messages.</pd>
+          <pd>可选。不显示所有非告警、非错误日志信息。</pd>
         </plentry>
         <plentry>
           <pt><b>--single-data-file</b></pt>
-          <pd>Optional. Create a single data file on each segment host for all tables backed up on
-            that segment. By default, each <codeph>gpbackup</codeph> creates one compressed CSV file
-            for each table that is backed up on the segment.
-            <note>If you use the <codeph>--single-data-file</codeph> option to combine table backups
-              into a single file per segment, you cannot set the <codeph>gprestore</codeph> option
-                <codeph>--jobs</codeph> to a value higher than 1 to perform a parallel restore
-              operation.</note></pd>
+          <pd>可选。在每个Segment主机上为所有备份的表创建一个单独的数据文件。默认情况下，每个<codeph>gpbackup</codeph>
+            会为每张表创建一个压缩CSV文件。
+            <note>如果选用<codeph>--single-data-file</codeph>选项来将每个Segment上的数据备份为1个文件，
+              就不能在使用<codeph>gprestore</codeph>时指定<codeph>--jobs</codeph>选项为超过1的值来执行
+              并行恢复。</note></pd>
         </plentry>
         <plentry>
           <pt><b>--verbose</b></pt>
-          <pd>Optional. Print verbose log messages.</pd>
+          <pd>可选。打印详细日志信息。</pd>
         </plentry>
         <plentry>
           <pt><b>--version</b></pt>
-          <pd>Optional. Print the version number and exit.</pd>
+          <pd>可选。打印工具版本号并退出。</pd>
         </plentry>
         <plentry>
           <pt><b>--with-stats</b></pt>
-          <pd>Optional. Include query plan statistics in the backup set.</pd>
+          <pd>可选。在备份集中包含查询计划统计信息。</pd>
         </plentry>
         <plentry>
           <pt>--help</pt>
-          <pd>Displays the online help.</pd>
+          <pd>显示在线帮助信息。</pd>
         </plentry>
       </parml>
     </section>
     <section id="return_codes">
-      <title>Return Codes</title>
-      <p>One of these codes is returned after <codeph>gpbackup</codeph> completes.<ul
+      <title>返回码</title>
+      <p><codeph>gpbackup</codeph>完成后会返回如下返回码之一。<ul
           id="ul_hhb_sqp_n4">
-          <li><b>0</b> – Backup completed with no problems.</li>
-          <li><b>1</b> – Backup completed with non-fatal errors. See log file for more
-            information.</li>
-          <li><b>2</b> – Backup failed with a fatal error. See log file for more information.</li>
+          <li><b>0</b> – 成功完成备份。</li>
+          <li><b>1</b> – 备份完成，没有严重错误。具体信息见日志文件。
+            </li>
+        <li><b>2</b> – 备份失败，有严重错误。具体信息见日志文件。</li>
         </ul></p>
     </section>
     <section id="table_names">
-      <title>Schema and Table Names</title>
-      <p>When specifying the table filtering option <codeph>--include-table</codeph> or
-          <codeph>--include-table-file</codeph> to list tables to be backed up, the
-          <codeph>gpbackup</codeph> utility supports backing up schemas or tables when the name
-        contains upper-case characters or these special characters. </p>
+      <title>模式和表名</title>
+      <p>当指定表过滤项<codeph>--include-table</codeph>或<codeph>--include-table-file</codeph>
+        为列表文件时，<codeph>gpbackup</codeph>支持备份模式或表名包含以下特殊字符时。</p>
       <p><codeph> ~ # $ % ^ &amp; * ( ) _ - + [ ] { } > &lt; \ | ; : / ? ! ,</codeph>
       </p>
-      <p>If a name contains an upper-case or special character and is specified on the command line
-        with <codeph>--include-table</codeph>, the name must be enclosed in single quotes.
-        <codeblock>gpbackup --dbname test --include-table 'my#1schema'.'my_$42_Table'</codeblock></p>
-      <p>When the table is listed in a file for use with <codeph>--include-table-file</codeph>,
-        single quotes are not required. For example, this is the contents of a text file that is
-        used with <codeph>--include-table-file</codeph> to back up two
-        tables.<codeblock>my#1schema.my_$42_Table
-my#1schema.my_$590_Table</codeblock></p>
-      <note>The <codeph>--include-table</codeph> and <codeph>--include-table-file</codeph> options
-        do not support schema or table names that contain the character double quote
-          (<codeph>"</codeph>), period (<codeph>.</codeph>) , newline (<codeph>\n</codeph>), or
-        space (<codeph> </codeph>).</note>
+      <p>如果在命令行指定<codeph>--include-table</codeph>选项时，名字包含大写字母或特殊字符时，名字必须被
+        单引号包裹。
+        <codeblock>gpbackup --dbname test --include-table 'my#1schema'.'my_$42_Table'</codeblock>
+      </p>
+      <p>当使用<codeph>--include-table-file</codeph>选项，表名被放在文件中时，不需要使用单引号。例如，
+        使用<codeph>--include-table-file</codeph>选项备份两个表。
+        <codeblock>my#1schema.my_$42_Table
+my#1schema.my_$590_Table</codeblock>
+      </p>
+      <note><codeph>--include-table</codeph>和<codeph>--include-table-file</codeph>选项不支持
+        模式名或表名包含双引号（<codeph>"</codeph>）、点号（<codeph>.</codeph>）、换行符（<codeph>\n</codeph>）
+        或空格符（<codeph> </codeph>）。</note>
     </section>
     <section>
-      <title>Examples</title>
-      <p>Backup all schemas and tables in the "demo" database, including global Greenplum Database
-        system objects statistics:<codeblock>$ gpbackup --dbname demo</codeblock></p>
-      <p>Backup all schemas and tables in the "demo" database except for the "twitter"
-        schema:<codeblock>$ gpbackup --dbname demo --exclude-schema twitter</codeblock></p>
-      <p>Backup only the "twitter" schema in the "demo"
-        database:<codeblock>$ gpbackup --dbname demo --include-schema twitter</codeblock></p>
-      <p>Backup all schemas and tables in the "demo" database, including global Greenplum Database
-        system objects and query statistics, and copy all backup files to the
-          <filepath>/home/gpadmin/backup</filepath>
-        directory:<codeblock>$ gpbackup --dbname demo --with-stats --backup-dir /home/gpadmin/backup</codeblock></p>
-      <p>This example uses <codeph>--include-schema</codeph> with <codeph>--exclude-table</codeph>
-        to back up a schema except for a single table. </p>
+      <title>示例</title>
+      <p>备份"demo"数据库中的所有模式和表，包括Greenplum数据库全局系统对象：
+        <codeblock>$ gpbackup --dbname demo</codeblock></p>
+      <p>备份"demo"数据库中除了"twitter"模式以外的所有模式和表：
+        <codeblock>$ gpbackup --dbname demo --exclude-schema twitter</codeblock></p>
+      <p>仅备份"demo"数据库中的"twitter"模式：
+        <codeblock>$ gpbackup --dbname demo --include-schema twitter</codeblock></p>
+      <p>备份"demo"数据库中的所有模式和表，包括Greenplum数据库全局系统对象，将所有备份文件复制到
+        <filepath>/home/gpadmin/backup</filepath>路径下。
+        <codeblock>$ gpbackup --dbname demo --with-stats --backup-dir /home/gpadmin/backup</codeblock></p>
+      <p>该示例使用<codeph>--include-schema</codeph>和<codeph>--exclude-table</codeph>
+        备份指定模式，除了单独的一张表。</p>
       <codeblock>$ gpbackup --dbname demo --include-schema mydata --exclude-table mydata.addresses</codeblock>
-      <p>You cannot use the option <codeph>--exclude-schema</codeph> with a table filtering option
-        such as <codeph>--include-table</codeph>.</p>
+      <p><codeph>--exclude-schema</codeph>选项不能与表过滤选项一起使用，例如<codeph>--include-table</codeph>。
+      </p>
     </section>
     <section id="section9">
-      <title>See Also</title>
+      <title>另见</title>
       <p>
-        <codeph><xref href="./gprestore.xml" type="topic" format="dita"/></codeph>, <xref
-          href="../../admin_guide/managing/backup-gpbackup.xml" format="dita"/> and <xref
+        <codeph><xref href="./gprestore.xml" type="topic" format="dita"/></codeph>、<xref
+          href="../../admin_guide/managing/backup-gpbackup.xml" format="dita"/>和<xref
           href="../../admin_guide/managing/backup-s3-plugin.xml"/></p>
     </section>
   </body>
