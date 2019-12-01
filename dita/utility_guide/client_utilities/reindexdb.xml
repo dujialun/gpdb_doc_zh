@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="pg137116">reindexdb</title><body><p id="client_util_desc">Rebuilds indexes in a database.</p><section id="section2"><title>Synopsis</title><codeblock id="client_util_synopsis"><b>reindexdb</b> [<varname>connection-option</varname> ...] [<b>--table</b> | <b>-t</b> <varname>table</varname> ] 
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="pg137116">reindexdb</title>
+    <body>
+        <p id="client_util_desc">重建数据库中的索引。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="client_util_synopsis"><b>reindexdb</b> [<varname>connection-option</varname> ...] [<b>--table</b> | <b>-t</b> <varname>table</varname> ]
         [<b>--index</b> | <b>-i</b> <varname>index</varname> ] [<varname>dbname</varname>]
 
 <b>reindexdb</b> [<varname>connection-option</varname> ...] <b>--all</b> | <b>-a</b>
@@ -10,41 +16,143 @@
 
 <b>reindexdb</b> <b>-? | --help</b>
 
-<b>reindexdb</b> <b>-V | --version</b></codeblock></section><section id="section3"><title>Description</title><p><codeph>reindexdb</codeph> is a utility for rebuilding indexes in Greenplum Database.</p>
-<p> <codeph>reindexdb</codeph> is a wrapper around the SQL command <codeph>REINDEX</codeph>. There is no effective difference between reindexing databases via this utility and via other methods for accessing the server. </p></section>
-<section id="section4"><title>Options</title><parml><plentry><pt>-a | --all</pt><pd>Reindex all databases.</pd></plentry><plentry><pt>[-d] <varname>dbname</varname> | [--dbname=]<varname>dbname</varname></pt><pd>Specifies the name of the database to be reindexed. If this is not specified and
-              <codeph>-all</codeph> is not used, the database name is read from the environment
-            variable <codeph>PGDATABASE</codeph>. If that is not set, the user name specified for
-            the connection is used.</pd></plentry><plentry><pt>-e | --echo</pt><pd>Echo the commands that <codeph>reindexdb</codeph> generates and sends
-to the server.</pd></plentry><plentry><pt>-i <varname>index</varname> | --index=<varname>index</varname></pt><pd>Recreate index only.</pd></plentry><plentry><pt>-q | --quiet</pt><pd>Do not display a response.</pd></plentry><plentry><pt>-s | --system</pt><pd>Reindex system catalogs.</pd></plentry><plentry><pt>-t <varname>table</varname> | --table=<varname>table</varname></pt><pd>Reindex table only. Multiple tables can be reindexed by writing multiple <codeph>-t</codeph> switches.</pd></plentry>
-        <plentry>
-          <pt>-V | --version</pt>
-          <pd>Print the <codeph>reindexdb</codeph> version and exit.</pd>
-        </plentry>
-        <plentry>
-          <pt>-? | --help</pt>
-          <pd>Show help about <codeph>reindexdb</codeph> command line arguments, and exit.</pd>
-        </plentry></parml><sectiondiv id="section5"><b>Connection Options</b><parml><plentry><pt>-h <varname>host</varname> | --host=<varname>host</varname></pt><pd>Specifies the host name of the machine on which the Greenplum
-              master database server is running. If not specified, reads from the environment
-              variable <codeph>PGHOST</codeph> or defaults to localhost.</pd></plentry><plentry><pt>-p <varname>port</varname> | --port=<varname>port</varname></pt><pd>Specifies the TCP port on which the Greenplum master database
-              server is listening for connections. If not specified, reads from the environment
-              variable <codeph>PGPORT</codeph> or defaults to 5432.</pd></plentry><plentry><pt>-U <varname>username</varname> | --username=<varname>username</varname></pt><pd>The database role name to connect as. If not specified, reads from
-the environment variable <codeph>PGUSER</codeph> or defaults to the current
-system user name.</pd></plentry><plentry><pt>-w | --no-password</pt><pd>Never issue a password prompt. If the server requires password authentication
-and a password is not available by other means such as a <codeph>.pgpass</codeph>
-file, the connection attempt will fail. This option can be useful in
-batch jobs and scripts where no user is present to enter a password.</pd></plentry><plentry><pt>-W | --password</pt><pd>Force a password prompt.</pd></plentry>
-          <plentry>
-            <pt>--maintenance-db=<varname>dbname</varname></pt>
-            <pd>Specifies the name of the database to connect to discover what other databases
-              should be reindexed. If not specified, the <codeph>postgres</codeph> database will be
-              used, and if that does not exist, <codeph>template1</codeph> will be used.</pd>
-          </plentry></parml></sectiondiv></section><section id="section6"><title>Notes</title><p><codeph>reindexdb</codeph> might need to connect several times to the
-master server, asking for a password each time. It is convenient to have
-a <codeph>~/.pgpass</codeph> file in such cases. </p></section><section id="section7"><title>Examples</title><p>To reindex the database <codeph>mydb</codeph>:</p><codeblock>reindexdb mydb</codeblock><p>To reindex the table <codeph>foo</codeph> and the index <codeph>bar</codeph> in a database named
-          <codeph>abcd</codeph>:</p><codeblock>reindexdb --table foo --index bar abcd</codeblock></section><section id="section8">
-      <title>See Also</title>
-      <p><ph otherprops="op-print"><codeph>REINDEX</codeph> in the <i>Greenplum Database Reference
-            Guide</i></ph><ph otherprops="op-help"><codeph><xref
-              href="../../ref_guide/sql_commands/REINDEX.xml#topic1"/></codeph></ph></p>
-    </section></body></topic>
+<b>reindexdb</b> <b>-V | --version</b></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>reindexdb</codeph>是用于在Greenplum数据库中重建索引的工具。
+            </p>
+            <p><codeph>reindexdb</codeph>是SQL命令<codeph>REINDEX</codeph>的包装。
+                通过此工具和通过其他访问服务器的方法为数据库重新索引之间没有明显的区别。
+            </p>
+        </section>
+        <section id="section4">
+            <title>选项</title>
+            <parml>
+                <plentry>
+                    <pt>-a | --all</pt>
+                    <pd>重新索引所有数据库。</pd>
+                </plentry>
+                <plentry>
+                    <pt>[-d] <varname>dbname</varname> | [--dbname=]<varname>dbname</varname>
+                    </pt>
+                    <pd>指定要重新建立索引的数据库的名称。
+                        如果未指定并且未使用<codeph>-all</codeph>，则从环境变量<codeph>PGDATABASE</codeph>读取数据库名称。
+                        如果未设置，则使用为连接指定的用户名。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-e | --echo</pt>
+                    <pd>回显<codeph>reindexdb</codeph>生成并发送到服务器的命令。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-i <varname>index</varname> | --index=<varname>index</varname>
+                    </pt>
+                    <pd>仅重新创建索引。</pd>
+                </plentry>
+                <plentry>
+                    <pt>-q | --quiet</pt>
+                    <pd>不显示响应。</pd>
+                </plentry>
+                <plentry>
+                    <pt>-s | --system</pt>
+                    <pd>重新索引系统catalog。</pd>
+                </plentry>
+                <plentry>
+                    <pt>-t <varname>table</varname> | --table=<varname>table</varname>
+                    </pt>
+                    <pd>仅重新索引表。可以通过编写多个<codeph>-t</codeph>开关为多个表重新索引。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-V | --version</pt>
+                    <pd>打印<codeph>reindexdb</codeph>版本并退出。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-? | --help</pt>
+                    <pd>显示有关<codeph>reindexdb</codeph>命令行参数的帮助，然后退出。
+                    </pd>
+                </plentry>
+            </parml>
+            <sectiondiv id="section5">
+                <b>连接选项</b>
+                <parml>
+                    <plentry>
+                        <pt>-h <varname>host</varname> | --host=<varname>host</varname>
+                        </pt>
+                        <pd>运行Greenplum master数据库服务器的计算机的主机名。
+                            如果未指定，则从环境变量<codeph>PGHOST</codeph>读取或默认为localhost。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-p <varname>port</varname> | --port=<varname>port</varname>
+                        </pt>
+                        <pd>Greenplum master数据库服务器正在侦听连接的TCP端口。
+                            如果未指定，则从环境变量<codeph>PGPORT</codeph>读取或默认为5432。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-U <varname>username</varname> | --username=<varname>username</varname>
+                        </pt>
+                        <pd>要用作连接的数据库角色名称。
+                            如果未指定，则从环境变量<codeph>PGUSER</codeph>读取或默认为当前系统角色名称。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-w | --no-password</pt>
+                        <pd>不发出密码提示。
+                            如果服务器要求密码验证，而其他方式（例如<codeph>.pgpass</codeph>文件）无法使用密码，则连接尝试将失败。
+                            此选项在没有用户输入密码的批处理作业和脚本中很有用。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-W | --password</pt>
+                        <pd>强制输入密码提示。</pd>
+                    </plentry>
+                    <plentry>
+                        <pt>--maintenance-db=<varname>dbname</varname>
+                        </pt>
+                        <pd>指定要连接以发现应重新索引哪些其他数据库的数据库的名称。
+                            如果未指定，将使用<codeph>postgres</codeph>数据库，如果不存在，将使用<codeph>template1</codeph>。
+                        </pd>
+                    </plentry>
+                </parml>
+            </sectiondiv>
+        </section>
+        <section id="section6">
+            <title>注解</title>
+            <p><codeph>reindexdb</codeph>可能需要连接几次master服务器，每次都要求输入密码。
+                在这种情况下，使用<codeph>~/.pgpass</codeph>文件很方便。
+            </p>
+        </section>
+        <section id="section7">
+            <title>示例</title>
+            <p>要重新索引数据库<codeph>mydb</codeph>：
+            </p>
+            <codeblock>reindexdb mydb</codeblock>
+            <p>要在名为<codeph>abcd</codeph>的数据库中为表<codeph>foo</codeph>和索引<codeph>bar</codeph>重建索引：
+            </p>
+            <codeblock>reindexdb --table foo --index bar abcd</codeblock>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <ph otherprops="op-print">
+                    <codeph>REINDEX</codeph>
+                    in the
+                    <i>Greenplum Database Reference
+                        Guide
+                    </i>
+                </ph>
+                <ph otherprops="op-help">
+                    <codeph>
+                        <xref
+                                href="../../ref_guide/sql_commands/REINDEX.xml#topic1"/>
+                    </codeph>
+                </ph>
+            </p>
+        </section>
+    </body>
+</topic>

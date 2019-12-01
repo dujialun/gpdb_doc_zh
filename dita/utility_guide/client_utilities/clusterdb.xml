@@ -1,52 +1,151 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="oy139586">clusterdb</title><body><p id="client_util_desc">Reclusters tables that were previously clustered with <codeph>CLUSTER</codeph>.</p><section id="section2"><title>Synopsis</title><codeblock id="client_util_synopsis"><b>clusterdb</b> [<varname>connection-option</varname> ...] [<b>--verbose | -v</b>] [<b>--table | -t</b> <varname>table</varname>] [[<b>--dbname | -d</b>] <varname>dbname</varname>]
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="oy139586">clusterdb</title>
+    <body>
+        <p id="client_util_desc">重新群集之前用<codeph>CLUSTER</codeph>群集过的表。
+        </p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="client_util_synopsis"><b>clusterdb</b> [<varname>connection-option</varname> ...] [<b>--verbose | -v</b>] [<b>--table | -t</b> <varname>table</varname>] [[<b>--dbname | -d</b>] <varname>dbname</varname>]
 
 <b>clusterdb</b> [<varname>connection-option</varname> ...] [<b>--all | -a</b>] [<b>--verbose | -v</b>]
 
 <b>clusterdb</b> <b>-? | --help</b>
 
-<b>clusterdb</b> <b>-V | --version</b></codeblock></section><section id="section3"><title>Description</title><p>To cluster a table means to physically reorder a table on disk according
-to an index so that index scan operations can access data on disk in
-a somewhat sequential order, thereby improving index seek performance
-for queries that use that index. </p><p>The <codeph>clusterdb</codeph> utility will find any tables in a database
-that have previously been clustered with the <codeph>CLUSTER</codeph>
-SQL command, and clusters them again on the same index that was last
-used. Tables that have never been clustered are not affected. </p><p><codeph>clusterdb</codeph> is a wrapper around the SQL command <codeph>CLUSTER</codeph>.
-Although clustering a table in this way is supported in Greenplum Database,
-it is not recommended because the <codeph>CLUSTER</codeph> operation
-itself is extremely slow. </p><p>If you do need to order a table in this way to improve your query performance,
-        use a <codeph>CREATE TABLE AS</codeph> statement to reorder the table on disk
-        rather than using <codeph>CLUSTER</codeph>. If you do 'cluster' a table in this way, then
-          <codeph>clusterdb</codeph> would not be relevant.</p></section><section id="section4"><title>Options</title><parml><plentry><pt>-a | --all</pt><pd>Cluster all databases. </pd></plentry><plentry><pt>[-d] <varname>dbname</varname> | [--dbname=]<varname>dbname</varname></pt><pd>Specifies the name of the database to be clustered. If this is not
-specified, the database name is read from the environment variable <codeph>PGDATABASE</codeph>.
-If that is not set, the user name specified for the connection is used.</pd></plentry><plentry><pt>-e | --echo</pt><pd>Echo the commands that <codeph>clusterdb</codeph> generates and sends
-  to the server.</pd></plentry><plentry><pt>-q | --quiet</pt><pd>Do not display a response.</pd></plentry><plentry>
-          <pt>-t <varname>table</varname> | --table=<varname>table</varname></pt>
-          <pd>Cluster the named table only. Multiple tables can be clustered by writing multiple
-              <codeph>-t</codeph> switches. </pd></plentry><plentry><pt>-v | --verbose</pt><pd>Print detailed information during processing.</pd></plentry>
-        <plentry>
-          <pt>-V | --version</pt>
-          <pd>Print the <codeph>clusterdb</codeph> version and exit.</pd>
-        </plentry>
-        <plentry>
-          <pt>-? | --help</pt>
-          <pd>Show help about <codeph>clusterdb</codeph> command line arguments, and exit.</pd>
-        </plentry></parml><sectiondiv id="section5"><b>Connection Options</b><parml><plentry><pt>-h <varname>host</varname> | --host=<varname>host</varname></pt><pd>The host name of the machine on which the Greenplum master database
-server is running. If not specified, reads from the environment variable
-<codeph>PGHOST</codeph> or defaults to localhost.</pd></plentry><plentry><pt>-p <varname>port</varname> | --port=<varname>port</varname></pt><pd>The TCP port on which the Greenplum master database server is listening
-for connections. If not specified, reads from the environment variable
-<codeph>PGPORT</codeph> or defaults to 5432.</pd></plentry><plentry><pt>-U <varname>username</varname> | --username=<varname>username</varname></pt><pd>The database role name to connect as. If not specified, reads from
-the environment variable <codeph>PGUSER</codeph> or defaults to the current
-system role name.</pd></plentry><plentry><pt>-w | --no-password</pt><pd>Never issue a password prompt. If the server requires password authentication
-and a password is not available by other means such as a <codeph>.pgpass</codeph>
-file, the connection attempt will fail. This option can be useful in
-batch jobs and scripts where no user is present to enter a password.</pd></plentry><plentry><pt>-W | --password</pt><pd>Force a password prompt.</pd></plentry>
-          <plentry>
-            <pt>--maintenance-db=<varname>dbname</varname></pt>
-            <pd> Specifies the name of the database to connect to discover what other databases
-              should be clustered. If not specified, the <codeph>postgres</codeph> database will
-              be used, and if that does not exist, <codeph>template1</codeph> will be used. </pd>
-          </plentry></parml></sectiondiv></section><section id="section6"><title>Examples</title><p>To cluster the database <codeph>test</codeph>:</p><codeblock>clusterdb test</codeblock><p>To cluster a single table <codeph>foo</codeph> in a database named <codeph>xyzzy</codeph>:</p><codeblock>clusterdb --table foo xyzzyb</codeblock></section><section id="section7"><title>See Also</title><p><ph otherprops="op-print"><codeph>CLUSTER</codeph> in the <i>Greenplum Database Reference
-            Guide</i></ph><ph otherprops="op-help"><codeph><xref href="../../ref_guide/sql_commands/CLUSTER.xml#topic1"/></codeph></ph></p></section></body></topic>
+<b>clusterdb</b> <b>-V | --version</b></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p>对表进行群集意味着根据索引对磁盘上的表进行物理重新排序，以便索引扫描操作可以按某种顺序访问磁盘上的数据，从而提高使用该索引的查询的索引查找性能。
+            </p>
+            <p><codeph>clusterdb</codeph>工具将在数据库中找到以前已使用<codeph>CLUSTER</codeph> SQL命令进行群集的任何表，并将它们再次群集在最后使用的同一索引上。
+                从未群集过的表不受影响。
+            </p>
+            <p><codeph>clusterdb</codeph>是SQL命令<codeph>CLUSTER</codeph>的包装。
+                尽管Greenplum数据库支持以这种方式对表进行群集，但是不建议这样做，因为<codeph>CLUSTER</codeph>操作本身非常慢。
+            </p>
+            <p>如果确实需要以这种方式对表进行排序以提高查询性能，
+                请使用<codeph>CREATE TABLE AS</codeph>语句对磁盘上的表进行重新排序，而不要使用<codeph>CLUSTER</codeph>。
+                如果您以这种方式"群集"表，那么<codeph>clusterdb</codeph>将不相关。
+            </p>
+        </section>
+        <section id="section4">
+            <title>选项</title>
+            <parml>
+                <plentry>
+                    <pt>-a | --all</pt>
+                    <pd>群集所有数据库。</pd>
+                </plentry>
+                <plentry>
+                    <pt>[-d] <varname>dbname</varname> | [--dbname=]<varname>dbname</varname>
+                    </pt>
+                    <pd>指定要群集的数据库的名称。
+                        如果未指定，则从环境变量<codeph>PGDATABASE</codeph>读取数据库名称。
+                        如果未设置，则使用为连接指定的用户名。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-e | --echo</pt>
+                    <pd>输出<codeph>clusterdb</codeph>生成并发送到服务器的命令。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-q | --quiet</pt>
+                    <pd>不显示响应。</pd>
+                </plentry>
+                <plentry>
+                    <pt>-t <varname>table</varname> | --table=<varname>table</varname>
+                    </pt>
+                    <pd>仅群集命名表。可以通过编写多个<codeph>-t</codeph>开关来群集多个表。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-v | --verbose</pt>
+                    <pd>在处理过程中打印详细信息。</pd>
+                </plentry>
+                <plentry>
+                    <pt>-V | --version</pt>
+                    <pd>打印<codeph>clusterdb</codeph>版本并退出。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-? | --help</pt>
+                    <pd>显示有关<codeph>clusterdb</codeph>命令行参数的帮助，然后退出。
+                    </pd>
+                </plentry>
+            </parml>
+            <sectiondiv id="section5">
+                <b>连接选项</b>
+                <parml>
+                    <plentry>
+                        <pt>-h <varname>host</varname> | --host=<varname>host</varname>
+                        </pt>
+                        <pd>运行Greenplum master数据库服务器的计算机的主机名。
+                            如果未指定，则从环境变量<codeph>PGHOST</codeph>读取或默认为localhost。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-p <varname>port</varname> | --port=<varname>port</varname>
+                        </pt>
+                        <pd>Greenplum master数据库服务器正在侦听连接的TCP端口。
+                            如果未指定，则从环境变量<codeph>PGPORT</codeph>读取或默认为5432。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-U <varname>username</varname> | --username=<varname>username</varname>
+                        </pt>
+                        <pd>要用作连接的数据库角色名称。
+                            如果未指定，则从环境变量<codeph>PGUSER</codeph>读取或默认为当前系统角色名称。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-w | --no-password</pt>
+                        <pd>不发出密码提示。
+                            如果服务器要求密码验证，而其他方式（例如<codeph>.pgpass</codeph>文件）无法使用密码，则连接尝试将失败。
+                            此选项在没有用户输入密码的批处理作业和脚本中很有用。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-W | --password</pt>
+                        <pd>强制输入密码提示。</pd>
+                    </plentry>
+                    <plentry>
+                        <pt>--maintenance-db=<varname>dbname</varname>
+                        </pt>
+                        <pd>指定要连接以发现还应群集哪些其他数据库的数据库的名称。
+                            如果未指定，将使用<codeph>postgres</codeph>数据库，如果不存在，将使用<codeph>template1</codeph>。
+                        </pd>
+                    </plentry>
+                </parml>
+            </sectiondiv>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>群集数据库<codeph>test</codeph>：
+            </p>
+            <codeblock>clusterdb test</codeblock>
+            <p>在名为<codeph>xyzzy</codeph>的数据库中群集单个表<codeph>foo</codeph>：
+            </p>
+            <codeblock>clusterdb --table foo xyzzyb</codeblock>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <ph otherprops="op-print">
+                    <codeph>CLUSTER</codeph>
+                    in the
+                    <i>Greenplum Database Reference
+                        Guide
+                    </i>
+                </ph>
+                <ph otherprops="op-help">
+                    <codeph>
+                        <xref href="../../ref_guide/sql_commands/CLUSTER.xml#topic1"/>
+                    </codeph>
+                </ph>
+            </p>
+        </section>
+    </body>
+</topic>

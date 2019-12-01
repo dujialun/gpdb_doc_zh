@@ -1,55 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_ivr_cs2_jr">
-  <title>Configuring Database Authorization</title>
-  <shortdesc>Describes how to restrict authorization access to database data at the user level by
-    using roles and permissions.</shortdesc>
+  <title>配置数据库授权</title>
+  <shortdesc>描述如何通过使用角色和权限在用户级别限制对数据库数据的授权访问。</shortdesc>
   <topic id="topic_k35_qtx_kr">
-    <title>Access Permissions and Roles</title>
+    <title>访问权限和角色</title>
     <body>
-      <p>Greenplum Database manages database access permissions using <i>roles</i>. The concept of
-        roles subsumes the concepts of users and groups. A role can be a database user, a group, or
-        both. Roles can own database objects (for example, tables) and can assign privileges on
-        those objects to other roles to control access to the objects. Roles can be members of other
-        roles, thus a member role can inherit the object privileges of its parent role. </p>
-      <p>Every Greenplum Database system contains a set of database roles (users and groups). Those
-        roles are separate from the users and groups managed by the operating system on which the
-        server runs. However, for convenience you may want to maintain a relationship between
-        operating system user names and Greenplum Database role names, since many of the client
-        applications use the current operating system user name as the default. </p>
-      <p> In Greenplum Database, users log in and connect through the master instance, which
-        verifies their role and access privileges. The master then issues out commands to the
-        segment instances behind the scenes using the currently logged in role. </p>
-      <p> Roles are defined at the system level, so they are valid for all databases in the system. </p>
-      <p> To bootstrap the Greenplum Database system, a freshly initialized system always contains
-        one predefined superuser role (also referred to as the system user). This role will have the
-        same name as the operating system user that initialized the Greenplum Database system.
-        Customarily, this role is named <codeph>gpadmin</codeph>. To create more roles you first
-        must connect as this initial role. </p>
+        <p>Greenplum数据库使用<i>角色</i>管理数据库访问权限。角色的概念包括了用户和组的概念。一个角色可以是一个数据库用户、组或者两者皆有。角色可以拥有数据库对象（例如表）并且可以把那些对象上的特权指派给其他角色以控制对那些对象的访问。角色可以是其他角色的成员，因此成员角色可以继承其父角色的对象特权。</p>
+      <p>每一个Greenplum数据库系统都包含一组数据库角色（用户和组）。那些角色独立于服务器所运行的操作系统管理的用户和组。不过，为了方便用户可能想要维护操作系统用户名和Greenplum数据库角色名之间的关系，因为很多客户端应用使用当前的操作系统用户名作为默认的数据库用户名。</p>
+      <p>在Greenplum数据库中，用户通过Master实例登入和连接，Master实例会验证它们的角色和访问特权。然后Master将在幕后用当前登入的角色向Segment实例发出命令。</p>
+      <p>角色被定义在系统层面上，因此它们对系统中的所有数据库都有效。</p>
+      <p>要让Greenplum数据库系统自举，刚刚初始化好的系统总是包含一个预定义的超级用户角色（也被称作系统该用户）。这个角色将和初始化Greenplum数据库系统的操作系统用户具有相同的名称。习惯上，这个角色被命名为<codeph>gpadmin</codeph>。要创建更多角色，用户首先必须作为这个初始角色连接。</p>
     </body>
   </topic>
   <topic id="managing_obj_priv">
-    <title>Managing Object Privileges</title>
+    <title>管理对象特权</title>
     <body>
-      <p> When an object (table, view, sequence, database, function, language, schema, or
-        tablespace) is created, it is assigned an owner. The owner is normally the role that
-        executed the creation statement. For most kinds of objects, the initial state is that only
-        the owner (or a superuser) can do anything with the object. To allow other roles to use it,
-        privileges must be granted. Greenplum Database supports the following privileges for each
-        object type: </p>
+      <p>当一个对象（表、视图、序列、数据库、函数、语言、方案或表空间）被创建时，它会被指派一个拥有者。拥有者通常就是执行创建语句的角色。对于大部分种类的对象，初始状态只有拥有者（或者超级用户）可以对该对象做任何事情。要允许其他角色使用对象，必须授予特权。对每一类对象，Greenplum数据库支持下面的特权：</p>
       <table>
         <tgroup cols="0">
           <colspec colwidth="50*" align="left"/>
           <colspec colwidth="50*" align="left"/>
           <thead>
             <row>
-              <entry> Object Type </entry>
-              <entry> Privileges </entry>
+              <entry> 对象类型 </entry>
+              <entry> 特权 </entry>
             </row>
           </thead>
           <tbody>
             <row>
-              <entry> Tables, Views, Sequences </entry>
+              <entry> 表、视图、序列 </entry>
               <entry>
                 <sl>
                   <sli>
@@ -74,7 +54,7 @@
               </entry>
             </row>
             <row>
-              <entry> External Tables </entry>
+              <entry> 外部表 </entry>
               <entry>
                 <sl>
                   <sli>
@@ -90,7 +70,7 @@
               </entry>
             </row>
             <row>
-              <entry> Databases </entry>
+              <entry> 数据库 </entry>
               <entry>
                 <sl>
                   <sli>
@@ -109,7 +89,7 @@
               </entry>
             </row>
             <row>
-              <entry> Functions </entry>
+              <entry> 函数 </entry>
               <entry>
                 <codeph>EXECUTE</codeph>
               </entry>
@@ -121,7 +101,7 @@
               </entry>
             </row>
             <row>
-              <entry> Schemas </entry>
+              <entry> 方案 </entry>
               <entry>
                 <sl>
                   <sli>
@@ -139,92 +119,72 @@
           </tbody>
         </tgroup>
       </table>
-      <p> Privileges must be granted for each object individually. For example, granting
-          <codeph>ALL</codeph> on a database does not grant full access to the objects within that
-        database. It only grants all of the database-level privileges (<codeph>CONNECT</codeph>,
-          <codeph>CREATE</codeph>, <codeph>TEMPORARY</codeph>) to the database itself. </p>
-      <p> Use the <codeph>GRANT</codeph> SQL command to give a specified role privileges on an
-        object. For example: <codeblock>=# GRANT INSERT ON mytable TO jsmith; </codeblock></p>
-      <p> To revoke privileges, use the <codeph>REVOKE</codeph> command. For example:
+      <p> 特权必须为每个对象单独授予。例如，在一个数据库上授予<codeph>ALL</codeph>并不会为该数据库中的对象授予完全的访问。它只授予所有的数据库级别特权（<codeph>CONNECT</codeph>, <codeph>CREATE</codeph>, <codeph>TEMPORARY</codeph>）给数据库本身。</p>
+      <p> 使用SQL命令<codeph>GRANT</codeph>把对象上的特权给一个特定角色。例如：
+          <codeblock>=# GRANT INSERT ON mytable TO jsmith; </codeblock></p>
+      <p> T要收回特权，可使用<codeph>REVOKE</codeph>命令。例如：
         <codeblock>=# REVOKE ALL PRIVILEGES ON mytable FROM jsmith; </codeblock></p>
-      <p> You can also use the <codeph>DROP OWNED</codeph> and <codeph>REASSIGN OWNED</codeph>
-        commands for managing objects owned by deprecated roles. (Note: only an object's owner or a
-        superuser can drop an object or reassign ownership.) For example:
+      <p> 用户还可以使用<codeph>DROP OWNED</codeph>以及<codeph>REASSIGN OWNED</codeph>命令来管理弃用角色所拥有的对象（注意：只有对象的拥有者或者超级用户可以删除一个对象或者重新指派拥有关系）。例如：
         <codeblock> =# REASSIGN OWNED BY sally TO bob;
- =# DROP OWNED BY visitor; </codeblock></p>
+                    =# DROP OWNED BY visitor; </codeblock></p>
     </body>
   </topic>
   <topic id="using-ssh-256">
-    <title>Using SSH-256 Encryption</title>
+    <title>使用SHA-256加密</title>
     <body>
-      <p>Greenplum Database access control corresponds roughly to the Orange Book 'C2' level of
-        security, not the 'B1' level. Greenplum Database currently supports access privileges at the
-        object level. Greenplum Database does not support row-level access or row-level, labeled security. </p>
-      <p>You can simulate row-level access by using views to restrict the
-        rows that are selected. You can simulate row-level labels by adding an extra column
-        to the table to store sensitivity information, and then using views to control row-level
-        access based on this column. You can then grant roles access to the views rather than the
-        base table. While these workarounds do not provide the same as "B1" level security, they may
-        still be a viable alternative for many organizations. </p>
-      <p> To use SHA-256 encryption, you must set a parameter either at the system or the session
-        level. This section outlines how to use a server parameter to implement SHA-256 encrypted
-        password storage. Note that in order to use SHA-256 encryption for storage, the client
-        authentication method must be set to password rather than the default, MD5. (See <xref
-          href="Authenticate.xml#topic_fzv_wb2_jr/config_ssl_client_conn"/> for more details.) This
-        means that the password is transmitted in clear text over the network, so we highly
-        recommend that you set up SSL to encrypt the client server communication channel. </p>
-      <p> You can set your chosen encryption method system-wide or on a per-session basis. The
-        available encryption methods are SHA-256  and MD5 (for backward compatibility). </p>
+      <p>Greenplum数据库的访问控制大概能对应桔皮书的“C2”级安全性，而不是“B1”级。Greenplum数据库当前支持对象级别的访问特权。行级或者列级访问不被支持，标记安全性也不被支持。</p>
+      <p>行级和列级访问可以使用限制被选择的行列的视图来模拟。行级标签可以通过为表增加存储敏感度信息的额外列模拟，然后使用视图来控制基于该列的行级访问。然后可以为角色授予对视图的访问而不是对基表的访问。虽然这些变通方案不能提供和“B1”级安全性相同的安全性，但对于很多组织来说它们仍然是一种可行的替代方案。</p>
+      <p>要使用SHA-256加密，用户必须在系统或者会话级别上设置一个参数。这一节介绍如何使用一个服务器参数来实现SHA-256加密的口令存储。注意为了使用SHA-256加密进行存储，客户端认证方法必须被设置为password而不是默认的MD5（详见 <xref
+          href="Authenticate.xml#topic_fzv_wb2_jr/config_ssl_client_conn"/>）。这意味着口令在网络上以明文方式传输，因此我们高度推荐用户设置SSL来加密客户端和服务器之间的通信信道。</p>
+      <p>用户可以在系统范围或者以会话为基础设置选择的加密方法。可用的加密方法是SHA-256以及MD5（为了向后兼容性）。</p>
     </body>
     <topic id="system-wide">
-      <title>Setting Encryption Method System-wide</title>
+      <title>在系统范围设置加密方法</title>
       <body>
-        <p>To set the <codeph>password_hash_algorithm</codeph> server parameter on a complete
-          Greenplum system (master and its segments): <ol id="ol_hcg_hw2_jr">
-            <li> Log in to your Greenplum Database instance as a superuser. </li>
-            <li> Execute <codeph>gpconfig</codeph> with the <codeph>password_hash_algorithm</codeph>
-              set to
-              SHA-256:<codeblock>$ gpconfig -c password_hash_algorithm -v 'SHA-256' </codeblock></li>
-            <li> Verify the setting: <codeblock>$ gpconfig -s</codeblock><p> You will see:
+        <p>要在整个Greenplum系统（Master及其Segment）上设置<codeph>password_hash_algorithm</codeph>服务器参数：
+            <ol id="ol_hcg_hw2_jr">
+            <li> 作为超级用户登入Greenplum数据库实例。 </li>
+            <li> 执行<codeph>gpconfig</codeph>把<codeph>password_hash_algorithm</codeph>设置为SHA-256：
+                <codeblock>$ gpconfig -c password_hash_algorithm -v 'SHA-256' </codeblock></li>
+            <li> 验证设置： <codeblock>$ gpconfig -s</codeblock><p> 将看到：
                 <codeblock>Master value: SHA-256
 Segment value: SHA-256 </codeblock></p></li>
           </ol></p>
       </body>
     </topic>
     <topic id="individual_session">
-      <title>Setting Encryption Method for an Individual Session</title>
+      <title>为单个会话设置加密方法</title>
       <body>
-        <p> To set the <codeph>password_hash_algorithm</codeph> server parameter for an individual
-          session: </p>
+        <p> 要为单个会话设置<codeph>password_hash_algorithm</codeph>服务器参数： </p>
         <ol id="ol_iv1_cvx_kr">
-          <li> Log in to your Greenplum Database instance as a superuser. </li>
-          <li> Set the <codeph>password_hash_algorithm</codeph> to
-            SHA-256:<codeblock># set password_hash_algorithm = 'SHA-256'
-  </codeblock></li>
-          <li> Verify the setting: <codeblock># show password_hash_algorithm;</codeblock><p> You
-              will see: </p><codeblock>SHA-256 </codeblock></li>
+          <li> 作为超级用户登入Greenplum数据库实例。 </li>
+          <li> 设置<codeph>password_hash_algorithm</codeph>为SHA-256：
+              <codeblock># set password_hash_algorithm = 'SHA-256'
+            </codeblock></li>
+          <li> 验证设置： <codeblock># show password_hash_algorithm;</codeblock><p> 将会看到：
+              </p><codeblock>SHA-256 </codeblock></li>
         </ol>
-        <p> Following is an example of how the new setting works: </p>
+        <p> 下面是展示新设置效果的例子： </p>
         <ol id="ol_ex1_cvx_kr">
-          <li> Log in as a super user and verify the password hash algorithm
-            setting:<codeblock># show password_hash_algorithm 
+          <li> 作为超级用户登入并且验证口令哈希算法设置：
+              <codeblock># show password_hash_algorithm 
  password_hash_algorithm 
  ------------------------------- 
  SHA-256</codeblock></li>
-          <li> Create a new role with password that has login privileges.
+          <li> 创建一个带有口令且有登录特权的新角色。
             <codeblock>create role testdb with password 'testdb12345#' LOGIN; </codeblock></li>
-          <li> Change the client authentication method to allow for storage of SHA-256 encrypted
-              passwords:<p> Open the <codeph>pg_hba.conf</codeph> file on the master and add the
-              following line: </p><codeblock>host all testdb 0.0.0.0/0 password
+          <li> 更改客户端认证方法以允许SHA-256加密口令的存储：
+              <p> 在Master上打开<codeph>pg_hba.conf</codeph>文件并且加入下面的行：
+              </p><codeblock>host all testdb 0.0.0.0/0 password
   </codeblock></li>
-          <li> Restart the cluster. </li>
-          <li> Log in to the database as the user just created, <codeph>testdb</codeph>.
+          <li> 重启集群。 </li>
+          <li> 作为刚创建好的用户<codeph>testdb</codeph>登入数据库。
             <codeblock>psql -U testdb</codeblock></li>
-          <li> Enter the correct password at the prompt. </li>
-          <li> Verify that the password is stored as a SHA-256 hash. <p> Password hashes are stored
-              in <codeph>pg_authid.rolpasswod</codeph>. </p></li>
-          <li> Log in as the super user. </li>
-          <li> Execute the following query:
+          <li> 在提示下输入正确的口令。</li>
+          <li> 验证口令被存储为SHA-256哈希。<p> 口令的哈希被存储在<codeph>pg_authid.rolpasswod</codeph>中。
+              </p></li>
+          <li> 作为超级用户登入。 </li>
+          <li> 执行下列查询：
             <codeblock>
     # SELECT rolpassword FROM pg_authid WHERE rolname = 'testdb';
     Rolpassword
@@ -237,43 +197,28 @@ Segment value: SHA-256 </codeblock></p></li>
     </topic>
   </topic>
   <topic id="time-based-restriction">
-    <title>Restricting Access by Time</title>
+    <title>用时间限制访问</title>
     <body>
-      <p> Greenplum Database enables the administrator to restrict access to certain times by role.
-        Use the <codeph>CREATE ROLE</codeph> or <codeph>ALTER ROLE</codeph> commands to specify
-        time-based constraints. </p>
-      <p> Access can be restricted by day or by day and time. The constraints are removable without
-        deleting and recreating the role. </p>
-      <p> Time-based constraints only apply to the role to which they are assigned. If a role is a
-        member of another role that contains a time constraint, the time constraint is not
-        inherited. </p>
-      <p> Time-based constraints are enforced only during login. The <codeph>SET ROLE</codeph> and
-          <codeph>SET SESSION AUTHORIZATION</codeph> commands are not affected by any time-based
-        constraints. </p>
-      <p> Superuser or <codeph>CREATEROLE</codeph> privileges are required to set time-based
-        constraints for a role. No one can add time-based constraints to a superuser. </p>
-      <p> There are two ways to add time-based constraints. Use the keyword <codeph>DENY</codeph> in
-        the <codeph>CREATE ROLE</codeph> or <codeph>ALTER ROLE</codeph> command followed by one of
-        the following. <ul id="ul_bjq_jz2_jr">
-          <li> A day, and optionally a time, when access is restricted. For example, no access on
-            Wednesdays. </li>
-          <li> An interval—that is, a beginning and ending day and optional time—when access is
-            restricted. For example, no access from Wednesday 10 p.m. through Thursday at 8 a.m.
+      <p> Greenplum数据库让管理员能够限制角色在特定时间的访问。可使用<codeph>CREATE ROLE</codeph>或者<codeph>ALTER ROLE</codeph>命令指定基于时间的约束。</p>
+      <p> 可以用日期或者日期和时间限制访问。无需删除和重建角色就可以移除这些约束。 </p>
+      <p> 基于时间的约束只适用于它们指派给的角色。如果角色是另一个有时间约束的角色的成员，时间约束不会被继承。 </p>
+      <p> 基于时间的约束仅在登录时被实施。<codeph>SET ROLE</codeph>以及<codeph>SET SESSION AUTHORIZATION</codeph>命令不受任何基于时间的约束的影响。</p>
+      <p> 要为角色设置基于时间的约束，要求超级用户或者<codeph>CREATEROLE</codeph>特权。没有人可以为超级用户增加基于时间的约束。</p>
+      <p> 有两种方法增加基于时间的约束。在<codeph>CREATE ROLE</codeph>或者<codeph>ALTER ROLE</codeph>命令中使用关键词<codeph>DENY</codeph>，后面接上下面的一种形式：。 <ul id="ul_bjq_jz2_jr">
+          <li> 访问被限制的一个日子，以及可选的时间。例如，在周三不能访问。</li>
+          <li> 一个区间——也就是一个开始日期和结束日期以及可选的时间——在其间访问被限制。例如，从周三下午10点到周四上午8点期间不能访问。
           </li>
         </ul></p>
-      <p> You can specify more than one restriction; for example, no access Wednesdays at any time
-        and no access on Fridays between 3:00 p.m. and 5:00 p.m.  </p>
-      <p> There are two ways to specify a day. Use the word <codeph>DAY</codeph> followed by either
-        the English term for the weekday, in single quotation marks, or a number between 0 and 6, as
-        shown in the table below. </p>
+      <p> 用户可以指定多个限制，例如，周三的任何时间都不能访问并且在周五的下午3点到5点之间不能访问。 </p>
+      <p> 有两种方法指定一个日子。使用后面跟着带单引号的英语中平日术语的<codeph>DAY</codeph>或者0到6之间的一个数字，如下表所示。</p>
       <table id="table_az1_cvx_kr">
         <tgroup cols="0">
           <colspec colwidth="50*" align="left"/>
           <colspec colwidth="50*" align="left"/>
           <thead>
             <row>
-              <entry> English Term </entry>
-              <entry> Number </entry>
+              <entry> 英语术语 </entry>
+              <entry> 数字 </entry>
             </row>
           </thead>
           <tbody>
@@ -308,19 +253,12 @@ Segment value: SHA-256 </codeblock></p></li>
           </tbody>
         </tgroup>
       </table>
-      <p> A time of day is specified in either 12- or 24-hour format. The word <codeph>TIME</codeph>
-        is followed by the specification in single quotation marks. Only hours and minutes are
-        specified and are separated by a colon ( : ). If using a 12-hour format, add
-          <codeph>AM</codeph> or <codeph>PM</codeph> at the end. The following examples show various
-        time specifications. </p>
+      <p> 日子中的时间可以以12小时制或者24小时制指定。在词<codeph>TIME</codeph>后面接上带单引号的说明。只能指定小时和分钟并且用分号分隔（:）。如果使用12小时制，在最后加上<codeph>AM</codeph>或者<codeph>PM</codeph>。下面的例子展示了多种时间说明。</p>
       <codeblock>TIME '14:00'     # 24-hour time implied
 TIME '02:00 PM'  # 12-hour time specified by PM 
 TIME '02:00'     # 24-hour time implied. This is equivalent to TIME '02:00 AM'. </codeblock>
-      <note type="important">Time-based authentication is enforced with the server time. Timezones
-        are disregarded. </note>
-      <p> To specify an interval of time during which access is denied, use two day/time
-        specifications with the words <codeph>BETWEEN</codeph> and <codeph>AND</codeph>, as shown.
-          <codeph>DAY</codeph> is always required. </p>
+      <note type="important">基于时间的约束根据服务器时间实施。不考虑时区。 </note>
+      <p> 要指定一个时间区间，在其间访问被禁止，可以用词<codeph>BETWEEN</codeph>和<codeph>AND</codeph>指定两个日子/时间说明。如下所示。<codeph>DAY</codeph>总是需要的。 </p>
       <codeblock>BETWEEN DAY 'Monday' AND DAY 'Tuesday' 
 
 BETWEEN DAY 'Monday' TIME '00:00' AND
@@ -332,30 +270,26 @@ BETWEEN DAY 'Monday' TIME '12:00 AM' AND
 BETWEEN DAY 'Monday' TIME '00:00' AND
         DAY 'Tuesday' TIME '02:00'
         DAY 2 TIME '02:00'</codeblock>
-      <p>The last three statements are equivalent. </p>
-      <note>Intervals of days cannot wrap past Saturday.</note>
-      <p>The following syntax is not correct:
+      <p>最后三个语句等效。</p>
+      <note>区间不能在周六之后回卷。</note>
+      <p>下面的语法不正确：
         <codeblock>DENY BETWEEN DAY 'Saturday' AND DAY 'Sunday'</codeblock>
       </p>
-      <p> The correct specification uses two DENY clauses, as follows: </p>
+      <p> 正确的说明是使用两个DENY子句，如下所示： </p>
       <codeblock>DENY DAY 'Saturday'
 DENY DAY 'Sunday'</codeblock>
-      <p> The following examples demonstrate creating a role with time-based constraints and
-        modifying a role to add time-based constraints. Only the statements needed for time-based
-        constraints are shown. For more details on creating and altering roles see the descriptions
-        of <codeph>CREATE ROLE</codeph> and <codeph>ALTER ROLE</codeph> in in the <i>Greenplum
-          Database Reference Guide</i>. </p>
+        <p> 下面的例子展示了创建带有基于时间约束的角色并且修改角色以增加基于时间的约束。只有基于时间约束所需的语句被显示。更多有关创建和修改角色的细节请见 <i>Greenplum数据库参考指南</i>中<codeph>CREATE ROLE</codeph> 和 <codeph>ALTER ROLE</codeph>的描述。</p>
       <section>
-        <title> Example 1 – Create a New Role with Time-based Constraints </title>
-        <p> No access is allowed on weekends. </p>
+        <title> 例 1 – 创建带有基于时间约束的新角色 </title>
+        <p> 在周末不允许访问。 </p>
         <codeblock> CREATE ROLE generaluser
  DENY DAY 'Saturday'
  DENY DAY 'Sunday'
  ... </codeblock>
       </section>
       <section>
-        <title>Example 2 – Alter a Role to Add Time-based Constraints </title>
-        <p> No access is allowed every night between 2:00 a.m. and 4:00 a.m. </p>
+        <title>例 2 – 修改角色以增加基于时间的约束</title>
+        <p> 每晚的凌晨2点到4点之间不允许访问。 </p>
         <codeblock>ALTER ROLE generaluser
  DENY BETWEEN DAY 'Monday' TIME '02:00' AND DAY 'Monday' TIME '04:00'
  DENY BETWEEN DAY 'Tuesday' TIME '02:00' AND DAY 'Tuesday' TIME '04:00'
@@ -367,8 +301,8 @@ DENY DAY 'Sunday'</codeblock>
   ... </codeblock>
       </section>
       <section>
-        <title>Excample 3 – Alter a Role to Add Time-based Constraints </title>
-        <p> No access is allowed Wednesdays or Fridays between 3:00 p.m. and 5:00 p.m. </p>
+        <title>例 3 – 修改角色以增加基于时间的约束 </title>
+        <p> 在周三或者周五下午的3点到5点间不允许访问。 </p>
         <codeblock>ALTER ROLE generaluser
  DENY DAY 'Wednesday'
  DENY BETWEEN DAY 'Friday' TIME '15:00' AND DAY 'Friday' TIME '17:00'
@@ -377,24 +311,16 @@ DENY DAY 'Sunday'</codeblock>
     </body>
   </topic>
   <topic id="drop_timebased_restriction">
-    <title> Dropping a Time-based Restriction </title>
+    <title> 删除基于时间的约束 </title>
     <body>
-      <p> To remove a time-based restriction, use the ALTER ROLE command. Enter the keywords DROP
-        DENY FOR followed by a day/time specification to drop. </p>
+      <p> 要移除基于时间的约束，请使用ALTER ROLE命令。输入后面跟着要删除的日子/时间说明的关键词DROP DENY FOR。</p>
       <codeblock>DROP DENY FOR DAY 'Sunday' </codeblock>
-      <p> Any constraint containing all or part of the conditions in a DROP clause is removed. For
-        example, if an existing constraint denies access on Mondays and Tuesdays, and the DROP
-        clause removes constraints for Mondays, the existing constraint is completely dropped. The
-        DROP clause completely removes all constraints that overlap with the constraint in the drop
-        clause. The overlapping constraints are completely removed even if they contain more
-        restrictions that the restrictions mentioned in the DROP clause. </p>
-      <p> Example 1 - Remove a Time-based Restriction from a Role </p>
+      <p> 任何含有DROP子句中全部或者部分条件的约束都会被移除。例如，如果一条现有的约束否定周一和周二的访问，并且DROP子句移除周一的约束，则这一条现有的约束会被完全删除。DROP子句会完全移除所有与DROP子句中约束交叠的约束。即便发生交叠的约束包含有比DROP子句更多的限制，它们也会被完全删除。 </p>
+      <p> 例 1 - 从一个角色移除一条基于时间的限制 </p>
       <codeblock> ALTER ROLE generaluser
  DROP DENY FOR DAY 'Monday'
     ... </codeblock>
-      <p> This statement would remove all constraints that overlap with a Monday constraint for the
-        role <codeph>generaluser</codeph> in Example 2, even if there are additional
-        constraints.</p>
+      <p> 这个语句将为例2中的<codeph>generaluser</codeph>角色移除所有与周一约束交叠的约束，即便其中有额外的约束。</p>
     </body>
   </topic>
 </topic>

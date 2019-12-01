@@ -4,9 +4,9 @@
 <topic id="topic1">
   <title id="ce20941">CREATE TABLE AS</title>
   <body>
-    <p id="sql_command_desc">Defines a new table from the results of a query.</p>
+    <p id="sql_command_desc">根据查询结果定义一个新表。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">CREATE [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ] TABLE <varname>table_name</varname>
         [ (<varname>column_name</varname> [, ...] ) ]
         [ WITH ( <varname>storage_parameter</varname> [= <varname>value</varname>] [, ... ] ) | WITH OIDS | WITHOUT OIDS ]
@@ -16,7 +16,7 @@
         [ WITH [ NO ] DATA ]
         [ DISTRIBUTED BY (column [, ... ] ) | DISTRIBUTED RANDOMLY | DISTRIBUTED REPLICATED ]
       </codeblock>
-      <p>where <varname>storage_parameter</varname> is:</p>
+      <p>其中<varname>storage_parameter</varname>是：</p>
       <codeblock>   appendoptimized={TRUE|FALSE}
    blocksize={8192-2097152}
    orientation={COLUMN|ROW}
@@ -26,206 +26,195 @@
    oids[=TRUE|FALSE]</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>CREATE TABLE AS</codeph> creates a table and fills it with data computed by a
-            <codeph><xref href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph> command.
-        The table columns have the names and data types associated with the output columns of the
-          <codeph>SELECT</codeph>, however you can override the column names by giving an explicit
-        list of new column names. </p>
-      <p><codeph>CREATE TABLE AS</codeph> creates a new table and evaluates the query just once to
-        fill the new table initially. The new table will not track subsequent changes to the source
-        tables of the query.</p>
+      <title>描述</title>
+      <p><codeph>CREATE TABLE AS</codeph>创建一个表，
+        并用<codeph><xref href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph>命令计算的数据填充该表。
+        表列具有与<codeph>SELECT</codeph>的输出列关联的名称和数据类型，但是您可以通过提供新列名称的显式列表来覆盖列名称。
+        </p>
+      <p><codeph>CREATE TABLE AS</codeph>创建一个新表并仅对查询进行一次取值以填充一次新表。
+        新表将不会跟踪对查询源表的后续更改。
+        </p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>GLOBAL | LOCAL</pt>
-          <pd>Ignored for compatibility. These keywords are deprecated; refer to <xref
-              href="CREATE_TABLE.xml#topic1"/> for details.</pd>
+          <pd>忽略兼容性。
+            这些关键字已弃用；有关详细信息，请参考<xref href="CREATE_TABLE.xml#topic1"/>。</pd>
         </plentry>
         <plentry>
           <pt>TEMPORARY | TEMP</pt>
-          <pd>If specified, the new table is created as a temporary table. Temporary tables are
-            automatically dropped at the end of a session, or optionally at the end of the current
-            transaction (see <codeph>ON COMMIT</codeph>). Existing permanent tables with the same
-            name are not visible to the current session while the temporary table exists, unless
-            they are referenced with schema-qualified names. Any indexes created on a temporary
-            table are automatically temporary as well.</pd>
+          <pd>如果指定，则将新表创建为临时表。
+            临时表在会话结束时或在当前事务结束时自动删除（请参见<codeph>ON COMMIT</codeph>）。
+            临时表存在时，具有相同名称的现有永久表在当前会话中不可见，除非使用模式限定名称引用它们。
+            在临时表上创建的所有索引也会自动成为临时索引。
+            </pd>
         </plentry>
         <plentry>
           <pt>UNLOGGED</pt>
-          <pd>If specified, the table is created as an unlogged table. Data written to unlogged
-            tables is not written to the write-ahead (WAL) log, which makes them considerably faster
-            than ordinary tables. However, the contents of an unlogged table are not replicated to
-            mirror segment instances. Also an unlogged table is not crash-safe. After a segment
-            instance crash or unclean shutdown, the data for the unlogged table on that segment is
-            truncated. Any indexes created on an unlogged table are automatically unlogged as
-            well.</pd>
+          <pd>如果指定，该表将创建为未记录表。
+            写入未记录表的数据不会写入预写（WAL）日志，这使它们比普通表快得多。
+            但是，未记录表的内容不会复制到mirror实例。
+            同样，未记录的表也不是崩溃安全的。
+            segment实例崩溃或异常关闭后，该segment上未记录表的数据将被截断。
+            在未记录表上创建的所有索引也会自动成为未记录索引。
+            </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>table_name</varname>
           </pt>
-          <pd>The name (optionally schema-qualified) of the new table to be created. </pd>
+          <pd>要创建的新表的名称（可以由模式指定）。</pd>
         </plentry>
         <plentry>
           <pt>
             <varname>column_name</varname>
           </pt>
-          <pd>The name of a column in the new table. If column names are not provided, they are
-            taken from the output column names of the query. </pd>
+          <pd>新表中的列名。如果未提供列名，则它们取自查询的输出列名。
+            </pd>
         </plentry>
         <plentry>
           <pt>WITH ( <varname>storage_parameter=value</varname> )</pt>
-          <pd>The <codeph>WITH</codeph> clause can be used to set storage options for the table or
-            its indexes. Note that you can also set different storage parameters on a particular
-            partition or subpartition by declaring the <codeph>WITH</codeph> clause in the partition
-            specification. The following storage options are available:</pd>
-          <pd><b>appendoptimized</b> — Set to <codeph>TRUE</codeph> to create the table as an append-optimized
-            table. If <codeph>FALSE</codeph> or not declared, the table will be created as a regular
-            heap-storage table.</pd>
-          <pd><b>blocksize</b> — Set to the size, in bytes for each block in a table. The <codeph>blocksize
-            </codeph> must be between 8192 and 2097152 bytes, and be a multiple of 8192. The default
-            is 32768.</pd>
-          <pd><b>orientation</b> — Set to <codeph>column</codeph> for column-oriented storage, or
-              <codeph>row</codeph> (the default) for row-oriented storage. This option is only valid
-            if <codeph>appendoptimized=TRUE</codeph>. Heap-storage tables can only be row-oriented.</pd>
-          <pd><b>compresstype</b> — Set to <codeph>ZLIB</codeph> (the default), <codeph>ZSTD</codeph>, or
-              <codeph>QUICKLZ</codeph><sup>1</sup> to specify the type of compression used. The
-            value <codeph>NONE</codeph> disables compression. Zstd provides for both speed or a
-            good compression ratio, tunable with the <codeph>compresslevel</codeph> option.
-            QuickLZ and zlib are provided for backwards-compatibility. Zstd outperforms these
-            compression types on usual workloads. The <codeph>compresstype</codeph> option is
-            valid only if <codeph>appendoptimized=TRUE</codeph>.<note
-              type="note"><sup>1</sup>QuickLZ compression is available only in the commercial
-              release of Pivotal Greenplum Database.</note></pd>
-          <pd><b>compresslevel</b> — For Zstd compression of append-optimized tables, set to an
-            integer value from 1 (fastest compression) to 19 (highest compression ratio). For
-            zlib compression, the valid range is from 1 to 9. QuickLZ compression level can only
-            be set to 1. If not declared, the default is 1. The <codeph>compresslevel</codeph>
-            option is valid only if <codeph>appendoptimized=TRUE</codeph>.</pd>
-          <pd><b>fillfactor</b> — See <codeph><xref href="CREATE_INDEX.xml#topic1" type="topic"
-                format="dita"/></codeph> for more information about this index storage parameter. </pd>
-          <pd><b>oids</b> — Set to <codeph>oids=FALSE</codeph> (the default) so that rows do not have
-            object identifiers assigned to them. Greenplum strongly recommends that you do not
-            enable OIDS when creating a table. On large tables, such as those in a typical Greenplum
-            Database system, using OIDs for table rows can cause wrap-around of the 32-bit OID
-            counter. Once the counter wraps around, OIDs can no longer be assumed to be unique,
-            which not only makes them useless to user applications, but can also cause problems in
-            the Greenplum Database system catalog tables. In addition, excluding OIDs from a table
-            reduces the space required to store the table on disk by 4 bytes per row, slightly
-            improving performance. OIDS are not allowed on column-oriented tables.</pd>
+          <pd><codeph>WITH</codeph>子句可用于设置表或其索引的存储选项。
+            请注意，您还可以通过在分区规范中声明<codeph>WITH</codeph>子句，在特定分区或子分区上设置不同的存储参数。
+            可以使用以下存储选项：
+            </pd>
+          <pd><b>appendoptimized</b> — 设置为<codeph>TRUE</codeph>可将表创建为追加优化的表。
+            如果为<codeph>FALSE</codeph>或未声明，则将表创建为常规堆存储表。
+            </pd>
+          <pd><b>blocksize</b> — 设置为表中每个块的大小（以字节为单位）。
+            <codeph>blocksize</codeph>必须介于8192和2097152字节之间，并且是8192的倍数。默认值为32768。
+            </pd>
+          <pd><b>orientation</b> — 设置为<codeph>column</codeph>以用于列式存储，或设置为<codeph>row</codeph>（默认）以用于行式存储。
+            仅当<codeph>appendoptimized=TRUE</codeph>时，此选项才有效。
+            堆存储表只能是面向行的。</pd>
+          <pd><b>compresstype</b> — 设置为<codeph>ZLIB</codeph>（默认值），<codeph>ZSTD</codeph>或<codeph>QUICKLZ</codeph><sup>1</sup>以指定使用的压缩类型。
+            值<codeph>NONE</codeph>禁用压缩。
+            Zstd提供速度或良好的压缩率，可通过<codeph>compresslevel</codeph>选项进行调整。
+            提供QuickLZ和zlib是为了向后兼容。
+            在通常的工作负载上，Zstd的性能优于这些压缩类型。
+            仅当<codeph>appendoptimized=TRUE</codeph>时，<codeph>compresstype</codeph>选项才有效。
+            <note type="note"><sup>1</sup>QuickLZ压缩仅在Pivotal Greenplum数据库的商业版本中可用。</note></pd>
+          <pd><b>compresslevel</b> — 对于附加优化表的Zstd压缩，请将其设置为1（最快压缩）到19（最高压缩率）之间的整数值。
+            对于zlib压缩，有效范围是1到9。
+            QuickLZ压缩级别只能设置为1。
+            如果未声明，则默认值为1。
+            <codeph>compresslevel</codeph>选项仅在<codeph>appendoptimized=TRUE</codeph>时有效。
+            </pd>
+          <pd><b>fillfactor</b> — 有关此索引存储参数的更多信息，请参见<codeph><xref href="CREATE_INDEX.xml#topic1" type="topic" format="dita"/></codeph>。</pd>
+          <pd><b>oids</b> — 设置为<codeph>oids=FALSE</codeph>（默认值），以便不为行分配对象标识符。
+            Greenplum强烈建议您在创建表时不要启用OIDS。
+            在大型表上（例如典型的Greenplum数据库系统中的表），对表行使用OID可能会导致32位OID计数器的折回。
+            一旦计数器回绕，就不能再认为OID是唯一的，这不仅使它们对用户应用程序无用，
+            而且还会在Greenplum数据库系统catalog表中引起问题。
+            此外，从表中排除OID会使表每行存储在磁盘上所需的空间减少了每行4个字节，从而略微提高了性能。
+            面向列的表不允许使用OIDS。
+            </pd>
         </plentry>
         <plentry>
           <pt>ON COMMIT</pt>
-          <pd>The behavior of temporary tables at the end of a transaction block can be controlled
-            using <codeph>ON COMMIT</codeph>. The three options are: </pd>
-          <pd>PRESERVE ROWS — No special action is taken at the ends of transactions for temporary
-            tables. This is the default behavior. </pd>
-          <pd>DELETE ROWS — All rows in the temporary table will be deleted at the end of each
-            transaction block. Essentially, an automatic <codeph>TRUNCATE</codeph> is done at each
-            commit. </pd>
-          <pd>DROP — The temporary table will be dropped at the end of the current transaction
-            block. </pd>
+          <pd>可以使用<codeph>ON COMMIT</codeph>控制事务块末尾的临时表的行为。
+            这三个选项是：</pd>
+          <pd>PRESERVE ROWS — 临时表的事务结束时不会采取任何特殊操作。这是默认行为。
+            </pd>
+          <pd>DELETE ROWS — 临时表中的所有行将在每个事务块的末尾删除。
+            本质上，每次提交都会自动执行一次<codeph>TRUNCATE</codeph>。
+            </pd>
+          <pd>DROP — 临时表将在当前事务块的末尾删除。</pd>
         </plentry>
         <plentry>
           <pt>TABLESPACE <varname>tablespace_name</varname></pt>
-          <pd>The <varname>tablespace_name</varname> parameter is the name of the tablespace in
-            which the new table is to be created. If not specified, the database's default
-            tablespace is used.</pd>
+          <pd><varname>tablespace_name</varname>参数是要在其中创建新表的表空间的名称。
+            如果未指定，则使用数据库的默认表空间。
+            </pd>
         </plentry>
         <plentry>
           <pt>AS <varname>query</varname></pt>
-          <pd>A <codeph><xref href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph>,
-                <codeph><xref href="SELECT.xml#topic1/table-command">TABLE</xref></codeph>, or
-                <codeph><xref href="./VALUES.xml#topic1" type="topic" format="dita"/></codeph>
-            command, or an <codeph><xref href="./EXECUTE.xml#topic1" type="topic" format="dita"
-              /></codeph> command that runs a prepared <codeph>SELECT</codeph> or
-              <codeph>VALUES</codeph> query.</pd>
+          <pd><codeph><xref href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph>，
+            <codeph><xref href="SELECT.xml#topic1/table-command">TABLE</xref></codeph>或<codeph><xref href="./VALUES.xml#topic1" type="topic" format="dita"/></codeph>命令，
+            或运行准备的<codeph>SELECT</codeph>或<codeph>VALUES</codeph>查询的<codeph><xref href="./EXECUTE.xml#topic1" type="topic" format="dita"/></codeph>命令。
+            </pd>
         </plentry>
         <plentry>
           <pt>DISTRIBUTED BY ({<varname>column</varname> [<varname>opclass</varname>]}, [ ... ]
             )</pt>
           <pt>DISTRIBUTED RANDOMLY</pt>
           <pt>DISTRIBUTED REPLICATED</pt>
-          <pd>Used to declare the Greenplum Database distribution policy for the table.
-              <codeph>DISTRIBUTED BY</codeph> uses hash distribution with one or more columns
-            declared as the distribution key. For the most even data distribution, the distribution
-            key should be the primary key of the table or a unique column (or set of columns). If
-            that is not possible, then you may choose <codeph>DISTRIBUTED RANDOMLY</codeph>, which
-            will send the data round-robin to the segment instances.</pd>
-          <pd><codeph>DISTRIBUTED REPLICATED</codeph> replicates all rows in the table to all
-            Greenplum Database segments. It cannot be used with partitioned tables or with tables
-            that inhert from other tables.</pd>
-          <pd>The Greenplum Database server configuration parameter
-              <codeph>gp_create_table_random_default_distribution</codeph> controls the default
-            table distribution policy if the <cmdname>DISTRIBUTED BY</cmdname> clause is not
-            specified when you create a table. Greenplum Database follows these rules to create a
-            table if a distribution policy is not specified.<ul id="ul_ejv_m1b_kr">
-              <li>If the Postgres query optimizer creates the table, and the value of the parameter is
-                  <codeph>off</codeph>, the table distribution policy is determined based on the
-                command.</li>
-              <li>If the Postgres query optimizer creates the table, and the value of the parameter is
-                  <codeph>on</codeph>, the table distribution policy is random.</li>
-              <li>If GPORCA creates the table, the table distribution policy is random. The
-                parameter value has no effect. </li>
+          <pd>用于声明表的Greenplum数据库分发策略。
+            <codeph>DISTRIBUTED BY</codeph>使用具有一个或多个声明为分发键的列的哈希分发。
+            为了获得最均匀的数据分配，分发键应为表的主键或唯一列（或一组列）。
+            如果无法做到这一点，则可以选择<codeph>DISTRIBUTED RANDOMLY</codeph>，它将数据轮询发送到segment实例。
+            </pd>
+          <pd><codeph>DISTRIBUTED REPLICATED</codeph>将表中的所有行复制到所有Greenplum数据库segment。
+            它不能与分区表或从其他表继承的表一起使用。
+            </pd>
+          <pd>如果在创建表时未指定<cmdname>DISTRIBUTED BY</cmdname>子句，
+            则Greenplum数据库服务器配置参数<codeph>gp_create_table_random_default_distribution</codeph>将控制默认表分发策略。
+            如果未指定分发策略，Greenplum数据库将遵循以下规则来创建表。
+            <ul id="ul_ejv_m1b_kr">
+              <li>如果Postgres查询优化器创建了表，并且该参数的值是<codeph>off</codeph>，则根据命令确定表分配策略。
+                </li>
+              <li>如果Postgres查询优化器创建了表，并且该参数的值为<codeph>on</codeph>，则表分配策略是随机的。
+                </li>
+              <li>如果GPORCA创建表，则表分配策略是随机的。参数值无效。
+                </li>
             </ul></pd>
-          <pd>For more information about setting the default table distribution policy, see <xref
-              href="../config_params/guc-list.xml#gp_create_table_random_default_distribution"
-                ><codeph>gp_create_table_random_default_distribution</codeph></xref>. For
-            information about the Postgres query optimizer and GPORCA, see <xref
-              href="../../admin_guide/query/topics/query.xml#topic1">Querying Data</xref> in the
-              <cite>Greenplum Database Administrator Guide</cite>.</pd>
+          <pd>有关设置默认表分发策略的更多信息，
+            请参见<xref href="../config_params/guc-list.xml#gp_create_table_random_default_distribution"><codeph>gp_create_table_random_default_distribution</codeph></xref>。
+            有关Postgres查询优化器和GPORCA的信息，
+            请参阅<cite>Greenplum数据库管理员指南</cite>中的<xref href="../../admin_guide/query/topics/query.xml#topic1">查询数据</xref>。
+            </pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Notes</title>
-      <p>This command is functionally similar to <codeph><xref href="./SELECT_INTO.xml#topic1"
-            type="topic" format="dita"/></codeph>, but it is preferred since it is less likely to be
-        confused with other uses of the <codeph>SELECT INTO</codeph> syntax. Furthermore,
-          <codeph>CREATE TABLE AS</codeph> offers a superset of the functionality offered by
-          <codeph>SELECT INTO</codeph>. </p>
-      <p><codeph>CREATE TABLE AS</codeph> can be used for fast data loading from external table data
-        sources. See <codeph><xref href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic"
-            format="dita"/></codeph>.</p>
+      <title>注解</title>
+      <p>该命令在功能上类似于<codeph><xref href="./SELECT_INTO.xml#topic1" type="topic" format="dita"/></codeph>，但它是首选的，
+        因为它不太可能与<codeph>SELECT INTO</codeph>语法的其他用法混淆。
+        此外，<codeph>CREATE TABLE AS</codeph>提供了<codeph>SELECT INTO</codeph>提供的功能的超集。
+        </p>
+      <p><codeph>CREATE TABLE AS</codeph>可用于从外部表数据源快速加载数据。
+        请参阅<codeph><xref href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic" format="dita"/></codeph>。
+        </p>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>Create a new table <codeph>films_recent</codeph> consisting of only recent entries from the
-        table <codeph>films</codeph>:</p>
+      <title>示例</title>
+      <p>创建一个新表<codeph>films_recent</codeph>，该表仅包含表<codeph>films</codeph>中的最新条目：
+        </p>
       <codeblock>CREATE TABLE films_recent AS SELECT * FROM films WHERE 
 date_prod &gt;= '2007-01-01';</codeblock>
-      <p>Create a new temporary table <codeph>films_recent</codeph>, consisting of only recent
-        entries from the table films, using a prepared statement. The new table has OIDs and will be
-        dropped at commit: </p>
+      <p>使用预编译语句创建一个新的临时表<codeph>films_recent</codeph>，该表仅包含表films中的最新条目。
+        新表具有OID，并将在提交时删除：
+        </p>
       <codeblock>PREPARE recentfilms(date) AS SELECT * FROM films WHERE 
 date_prod &gt; $1;
 CREATE TEMP TABLE films_recent WITH (OIDS) ON COMMIT DROP AS 
 EXECUTE recentfilms('2007-01-01');</codeblock>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p><codeph>CREATE TABLE AS</codeph> conforms to the SQL standard, with the following
-        exceptions: </p>
+      <title>兼容性</title>
+      <p><codeph>CREATE TABLE AS</codeph>符合SQL标准，但以下情况除外：</p>
       <ul>
-        <li id="ce151719">The standard requires parentheses around the subquery clause; in Greenplum
-          Database, these parentheses are optional. </li>
-        <li id="ce151721">The standard defines a <codeph>WITH [NO] DATA</codeph> clause; this is not
-          currently implemented by Greenplum Database. The behavior provided by Greenplum Database
-          is equivalent to the standard's <codeph>WITH DATA</codeph> case. <codeph>WITH NO
-            DATA</codeph> can be simulated by appending <codeph>LIMIT 0</codeph> to the query. </li>
-        <li id="ce151723">Greenplum Database handles temporary tables differently from the standard;
-          see <codeph>CREATE TABLE</codeph> for details.</li>
-        <li id="ce151725">The <codeph>WITH</codeph> clause is a Greenplum Database extension;
-          neither storage parameters nor <codeph>OIDs</codeph> are in the standard. </li>
-        <li id="ce151727">The Greenplum Database concept of tablespaces is not part of the standard.
-          The <codeph>TABLESPACE</codeph> clause is an extension.</li>
+        <li id="ce151719">该标准要求在子查询子句两边加上括号；在Greenplum数据库中，这些括号是可选的。
+          </li>
+        <li id="ce151721">该标准定义了<codeph>WITH [NO] DATA</codeph>子句；Greenplum数据库当前未实现此功能。
+          Greenplum数据库提供的行为等同于标准的<codeph>WITH DATA</codeph>情况。
+          可以通过将<codeph>LIMIT 0</codeph>附加到查询来模拟<codeph>WITH NO DATA</codeph>。
+          </li>
+        <li id="ce151723">Greenplum数据库对临时表的处理方式与标准处理方式有所不同。
+          有关详细信息，请参见<codeph>CREATE TABLE</codeph>。
+          </li>
+        <li id="ce151725"><codeph>WITH</codeph>子句是Greenplum数据库扩展。
+          storage参数和<codeph>OIDs</codeph>都不在标准中。
+          </li>
+        <li id="ce151727">表空间的Greenplum数据库概念不是该标准的一部分。
+          <codeph>TABLESPACE</codeph>子句是扩展。
+          </li>
       </ul>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic" format="dita"
         /></codeph>, <codeph><xref href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic"
             format="dita"/></codeph>, <codeph><xref href="./EXECUTE.xml#topic1" type="topic"

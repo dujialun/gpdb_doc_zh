@@ -1,12 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="dg20941">DROP SCHEMA</title><body><p id="sql_command_desc">Removes a schema.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">DROP SCHEMA [IF EXISTS] <varname>name</varname> [, ...] [CASCADE | RESTRICT]</codeblock></section><section id="section3"><title>Description</title><p><codeph>DROP SCHEMA</codeph> removes schemas from the database. A schema can only be dropped by
-        its owner or a superuser. Note that the owner can drop the schema (and thereby all contained
-        objects) even if he does not own some of the objects within the schema.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt>IF EXISTS</pt><pd>Do not throw an error if the schema does not exist. A notice is issued
-in this case.</pd></plentry><plentry><pt><varname>name</varname></pt><pd>The name of the schema to remove.</pd></plentry><plentry><pt>CASCADE</pt><pd>Automatically drops any objects contained in the schema (tables,
-functions, etc.). </pd></plentry><plentry><pt>RESTRICT</pt><pd>Refuse to drop the schema if it contains any objects. This is the
-default. </pd></plentry></parml></section><section id="section5"><title>Examples</title><p>Remove the schema <codeph>mystuff</codeph> from the database, along with everything it contains: </p><codeblock>DROP SCHEMA mystuff CASCADE;</codeblock></section><section id="section6"><title>Compatibility</title><p><codeph>DROP SCHEMA</codeph> is fully conforming with the SQL standard,
-except that the standard only allows one schema to be dropped per command.
-Also, the <codeph>IF EXISTS</codeph> option is a Greenplum Database extension.</p></section><section id="section7"><title>See Also</title><p><codeph><xref href="CREATE_SCHEMA.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="ALTER_SCHEMA.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="dg20941">DROP SCHEMA</title>
+    <body>
+        <p id="sql_command_desc">删除模式。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">DROP SCHEMA [IF EXISTS] <varname>name</varname> [, ...] [CASCADE | RESTRICT]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>DROP SCHEMA</codeph>从数据库中删除模式。
+                模式只能由其所有者或超级用户删除。
+                请注意，即使所有者不拥有该模式内的某些对象，所有者也可以删除该模式（从而删除所有包含的对象）。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>IF EXISTS</pt>
+                    <pd>如果该模式不存在，请不要报错。在这种情况下会发出通知。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要删除的模式的名称。</pd>
+                </plentry>
+                <plentry>
+                    <pt>CASCADE</pt>
+                    <pd>自动删除模式中包含的所有对象（表，函数等）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>RESTRICT</pt>
+                    <pd>如果模式包含任何对象，则拒绝删除该模式。这是默认值。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>从数据库中删除模式<codeph>mystuff</codeph>及其包含的所有内容：
+            </p>
+            <codeblock>DROP SCHEMA mystuff CASCADE;</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p><codeph>DROP SCHEMA</codeph>完全符合SQL标准，但该标准仅允许每个命令删除一个模式。
+                另外，<codeph>IF EXISTS</codeph>选项是Greenplum数据库扩展。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="CREATE_SCHEMA.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="ALTER_SCHEMA.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

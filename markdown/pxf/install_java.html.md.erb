@@ -1,27 +1,27 @@
 ---
-title: Installing Java for PXF
+title: 为PXF安装JAVA环境
 ---
 
-PXF is a Java service. It requires a Java 1.8 installation on each Greenplum Database host.
+PXF是一个Java服务，他需要在每个GPDB节点上安装Java1.8的环境。
 
-*If an appropriate version of Java is already installed on each Greenplum Database host, you need not perform the procedure in this topic.*
+*如果已在每个Greenplum数据库主机上安装了适当版本的Java，则无需执行本主题中的过程。*
 
 
-## <a id="prereq"></a>Prerequisites
+## <a id="prereq"></a>准备
 
-Ensure that you have access to, or superuser permissions to install, Java version 1.8 on each Greenplum Database host.
+确保您在每个Greenplum数据库主机上具有访问或安装Java版本1.8的权限。
 
-## <a id="proc"></a>Procedure
+## <a id="proc"></a>过程
 
-Perform the following procedure to install Java on the master and on each segment host in your Greenplum Database cluster. You will use the `gpssh` utility where possible to run a command on multiple hosts.
+执行以下过程，在master和各个segment上安装Java，可以使用`gpssh`命令在多个主机上执行。
 
-1. Log in to your Greenplum Database master node:
+1. 登录greenplum的master节点
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. Create a text file that lists your Greenplum Database segment hosts, one host name per line. For example, a file named `seghostfile` may include:
+2. 创建一个text文件列出你的gp集群的segment节点，每行一个主机名。例如，一个叫做`seghostfile`的文件
 
     ``` pre
     seghost1
@@ -29,19 +29,18 @@ Perform the following procedure to install Java on the master and on each segmen
     seghost3
     ```
 
-3. Install Java on the master and on each Greenplum Database segment host, and then set up the Java environment on each host.
+3. 在master节点和各个segment节点上安装Java，然后在每个主机上配置环境变量
 
-    1. Install the Java package. For example, to install Java version 1.8:
+    1. 安装java包。比如安装java 1.8:
 
         ``` shell
         gpadmin@gpmaster$ sudo yum -y install java-1.8.0-openjdk-1.8.0*
         gpadmin@gpmaster$ gpssh -e -v -f seghostfile sudo yum -y install java-1.8.0-openjdk-1.8.0*
         ```
 
-    2. Identify the Java base install directory. Update the `gpadmin` user's `.bashrc` file on each segment host to include this `$JAVA_HOME` setting if it is not already present. For example:
+    2. 确定java的安装目录，在每个主机上修改gpadmin用户的.bashrc文件，设置`$JAVA_HOME`
 
         ``` shell
         gpadmin@gpmaster$ echo 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.x86_64/jre' >> /home/gpadmin/.bashrc
         gpadmin@gpmaster$ gpssh -e -v -f seghostfile "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.x86_64/jre' >> /home/gpadmin/.bashrc"
         ```
-

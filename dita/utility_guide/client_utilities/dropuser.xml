@@ -1,49 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="pe137116">dropuser</title><body><p id="client_util_desc">Removes a database role.</p><section id="section2"><title>Synopsis</title><codeblock id="client_util_synopsis"><b>dropuser</b> [<varname>connection-option</varname> ...] [<b>-e</b>] [<b>-i</b>] <varname>role_name</varname>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="pe137116">dropuser</title>
+    <body>
+        <p id="client_util_desc">删除数据库角色。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="client_util_synopsis"><b>dropuser</b> [<varname>connection-option</varname> ...] [<b>-e</b>] [<b>-i</b>] <varname>role_name</varname>
 
 <b>dropuser</b> <b>-? | --help</b> 
 
-<b>dropuser</b> <b>-V | --version</b></codeblock></section><section id="section3"><title>Description</title><p><codeph>dropuser</codeph> removes an existing role from Greenplum Database. Only
-        superusers and users with the <codeph>CREATEROLE</codeph> privilege can remove roles. To
-        remove a superuser role, you must yourself be a superuser.</p><p><codeph>dropuser</codeph> is a wrapper around the SQL command <codeph>DROP
-ROLE</codeph>.</p></section><section id="section4"><title>Options</title><parml><plentry><pt><varname>role_name</varname></pt><pd>The name of the role to be removed. You will be prompted for a name if not specified on the
-  command line and the <codeph>-i</codeph>/<codeph>--interactive</codeph> option
-  is used.</pd></plentry><plentry><pt>-e | --echo</pt><pd>Echo the commands that <codeph>dropuser</codeph> generates and sends
-    to the server. </pd></plentry><plentry><pt>-i | --interactive</pt><pd>Prompt for confirmation before actually removing the role, and prompt for the role name if none
-            is specified on the command line.</pd></plentry>
-        <plentry>
-          <pt>--if-exists</pt>
-          <pd>Do not throw an error if the user does not exist. A notice is
-            issued in this case.</pd>
-        </plentry>
-       <plentry>
-          <pt>-V | --version</pt>
-          <pd>Print the <codeph>dropuser</codeph> version and exit.</pd>
-        </plentry>
-        <plentry>
-          <pt>-? | --help</pt>
-          <pd>Show help about <codeph>dropuser</codeph> command line arguments, and exit.</pd>
-        </plentry></parml><sectiondiv id="section5"><b>Connection Options</b><parml><plentry><pt>-h <varname>host</varname> | --host=<varname>host</varname></pt><pd>The host name of the machine on which the Greenplum master database
-              server is running. If not specified, reads from the environment variable
-                <codeph>PGHOST</codeph> or defaults to localhost.</pd></plentry><plentry><pt>-p <varname>port</varname> | --port=<varname>port</varname></pt><pd>The TCP port on which the Greenplum master database server is
-              listening for connections. If not specified, reads from the environment variable
-                <codeph>PGPORT</codeph> or defaults to 5432.</pd></plentry><plentry><pt>-U <varname>username</varname> | --username=<varname>username</varname></pt><pd>The database role name to connect as. If not specified, reads from
-the environment variable <codeph>PGUSER</codeph> or defaults to the current
-system role name.</pd></plentry><plentry><pt>-w | --no-password</pt><pd>Never issue a password prompt. If the server requires password authentication
-and a password is not available by other means such as a <codeph>.pgpass</codeph>
-file, the connection attempt will fail. This option can be useful in
-batch jobs and scripts where no user is present to enter a password.</pd></plentry><plentry><pt>-W | --password</pt><pd>Force a password prompt.</pd></plentry></parml></sectiondiv></section><section id="section6"><title>Examples</title><p>To remove the role <codeph>joe</codeph> using default connection options:</p><codeblock>dropuser joe
-DROP ROLE</codeblock><p>To remove the role <varname>joe</varname> using connection options, with verification,
-and a peek at the underlying command:</p><codeblock><b>dropuser -p 54321 -h masterhost -i -e joe</b>
+<b>dropuser</b> <b>-V | --version</b></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>dropuser</codeph>从Greenplum数据库中删除现有角色。
+                只有超级用户和具有<codeph>CREATEROLE</codeph>特权的用户才能删除角色。
+                要删除超级用户角色，您必须自己是超级用户。
+            </p>
+            <p><codeph>dropuser</codeph>是SQL命令<codeph>DROP ROLE</codeph>的包装。
+            </p>
+        </section>
+        <section id="section4">
+            <title>选项</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>role_name</varname>
+                    </pt>
+                    <pd>要删除的角色的名称。
+                        如果未在命令行上指定，则将提示您输入名称，并且使用了<codeph>-i</codeph>/<codeph>--interactive</codeph>选项。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-e | --echo</pt>
+                    <pd>回显<codeph>dropuser</codeph>生成并发送到服务器的命令。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-i | --interactive</pt>
+                    <pd>在实际删除角色之前提示确认，如果在命令行上未指定角色名称，则提示输入角色名称。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>--if-exists</pt>
+                    <pd>如果用户不存在，请不要报错。在这种情况下发出通知。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-V | --version</pt>
+                    <pd>打印<codeph>dropuser</codeph>版本并退出。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-? | --help</pt>
+                    <pd>显示有关<codeph>dropuser</codeph>命令行参数的帮助，然后退出。
+                    </pd>
+                </plentry>
+            </parml>
+            <sectiondiv id="section5">
+                <b>连接选项</b>
+                <parml>
+                    <plentry>
+                        <pt>-h <varname>host</varname> | --host=<varname>host</varname>
+                        </pt>
+                        <pd>运行Greenplum master数据库服务器的计算机的主机名。
+                            如果未指定，则从环境变量<codeph>PGHOST</codeph>读取或默认为localhost。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-p <varname>port</varname> | --port=<varname>port</varname>
+                        </pt>
+                        <pd>Greenplum master数据库服务器正在侦听连接的TCP端口。
+                            如果未指定，则从环境变量<codeph>PGPORT</codeph>读取或默认为5432。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-U <varname>username</varname> | --username=<varname>username</varname>
+                        </pt>
+                        <pd>要用作连接的数据库角色名称。
+                            如果未指定，则从环境变量<codeph>PGUSER</codeph>读取或默认为当前系统角色名称。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-w | --no-password</pt>
+                        <pd>不发出密码提示。
+                            如果服务器要求密码验证，而其他方式（例如<codeph>.pgpass</codeph>文件）无法使用密码，则连接尝试将失败。
+                            此选项在没有用户输入密码的批处理作业和脚本中很有用。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-W | --password</pt>
+                        <pd>强制输入密码提示。</pd>
+                    </plentry>
+                </parml>
+            </sectiondiv>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>要使用默认连接选项删除角色<codeph>joe</codeph>：
+            </p>
+            <codeblock>dropuser joe
+DROP ROLE</codeblock>
+            <p>要使用连接选项（带有验证）并查看基本命令来删除角色<varname>joe</varname>：
+            </p>
+            <codeblock><b>dropuser -p 54321 -h masterhost -i -e joe</b>
 Role "joe" will be permanently removed.
 Are you sure? (y/n) <b>y</b>
 DROP ROLE "joe"
-DROP ROLE</codeblock></section><section id="section7">
-      <title>See Also</title>
-      <p><ph otherprops="op-print"><codeph>DROP ROLE</codeph> in the <i>Greenplum Database Reference
-            Guide</i></ph><ph otherprops="op-help"><codeph><xref
-              href="createuser.xml#topic1"/></codeph>, <codeph><xref
-              href="../../ref_guide/sql_commands/DROP_ROLE.xml#topic1"/></codeph></ph></p>
-    </section></body></topic>
+DROP ROLE</codeblock>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <ph otherprops="op-print">
+                    <codeph>DROP ROLE</codeph>
+                    in the
+                    <i>Greenplum Database Reference
+                        Guide
+                    </i>
+                </ph>
+                <ph otherprops="op-help">
+                    <codeph>
+                        <xref
+                                href="createuser.xml#topic1"/>
+                    </codeph>
+                    ,
+                    <codeph>
+                        <xref
+                                href="../../ref_guide/sql_commands/DROP_ROLE.xml#topic1"/>
+                    </codeph>
+                </ph>
+            </p>
+        </section>
+    </body>
+</topic>

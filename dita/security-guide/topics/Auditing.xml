@@ -1,43 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_ufw_zn2_jr">
-  <title>Auditing</title>
-  <shortdesc>Describes Greenplum Database events that are logged and should be monitored to detect
-    security threats.</shortdesc>
+  <title>审计</title>
+  <shortdesc>描述被记录并且应该被监控以检测安全性威胁的Greenplum数据库事件。</shortdesc>
   <body>
-    <p>Greenplum Database is capable of auditing a variety of events, including startup and shutdown
-      of the system, segment database failures, SQL statements that result in an error, and all
-      connection attempts and disconnections. Greenplum Database also logs SQL statements and
-      information regarding SQL statements, and can be configured in a variety of ways to record
-      audit information with more or less detail. The <codeph>log_error_verbosity</codeph>
-      configuration parameter controls the amount of detail written in the server log for each
-      message that is logged.  Similarly, the <codeph>log_min_error_statement</codeph> parameter
-      allows administrators to configure the level of detail recorded specifically for SQL
-      statements, and the <codeph>log_statement</codeph> parameter determines the kind of SQL
-      statements that are audited. Greenplum Database records the username for all auditable events,
-      when the event is initiated by a subject outside the Greenplum Database.</p>
-    <p>Greenplum Database prevents unauthorized modification and deletion of audit records by only
-      allowing administrators with an appropriate role to perform any operations on log files.  Logs
-      are stored in a proprietary format using comma-separated values (CSV).  Each segment and the
-      master stores its own log files, although these can be accessed remotely by an administrator. 
-      Greenplum Database also authorizes overwriting of old log files via the
-        <codeph>log_truncate_on_rotation</codeph> parameter.  This is a local parameter and must be
-      set on each segment and master configuration file.</p>
-    <p>Greenplum provides an administrative schema called <codeph>gp_toolkit</codeph> that you can
-      use to query log files, as well as system catalogs and operating environment for system status
-      information. For more information, including usage, refer to <i>The gp_tookit Administrative
-        Schema</i> appendix in the <i>Greenplum Database Reference Guide</i>.</p>
+    <p>Greenplum数据库有能力审计很多事件，包括系统的启动和关闭、Segment数据库失效、导致错误的SQL语句以及所有的连接尝试和断开连接。Greenplum数据库还记录SQL语句和关于SQL语句的信息，并且可以以多种方式配置来记录不同细节的审计信息。<codeph>log_error_verbosity</codeph>配置参数控制写入到服务器日志中的每一条消息的细节多少。类似地，<codeph>log_min_error_statement</codeph>参数允许管理员配置为SQL语句记录的细节层次，而<codeph>log_statement</codeph>参数确定要被审计的SQL语句的种类。当可审计事件由Greenplum数据库外部的主体发起时，Greenplum数据库会为所有可审计事件记录用户名。</p>
+    <p>Greenplum数据库通过只允许具有适当角色的管理员在日志文件上执行操作来防止对审计记录的未授权修改和删除。日志以一种使用逗号分隔值（CSV）的专有格式存储。每个Segment和Master都存储有自己的日志文件，不过这些都可以由管理员从远程访问。Greenplum数据库还通过<codeph>log_truncate_on_rotation</codeph>参数授权对旧日志文件的覆盖。这是一个本地参数并且必须在每个Segment和Master的配置文件中设置。</p>
+      <p>Greenplum提供了一个名为<codeph>gp_toolkit</codeph>的管理方案，用户可以用它来查询日志文件、系统目录和操作环境得到系统状态信息。包括用法在内的更多信息，请参考<i>Greenplum数据库参考指南</i>中的<i>gp_tookit管理方案</i>附录。</p>
     <section>
-      <title>Viewing the Database Server Log Files</title>
-      <p> Every database instance in Greenplum Database (master and segments) is a running
-        PostgreSQL database server with its own server log file. Daily log files are created in the
-          <codeph>pg_log</codeph> directory of the master and each segment data directory. </p>
-      <p> The server log files are written in comma-separated values (CSV) format. Not all log
-        entries will have values for all of the log fields. For example, only log entries associated
-        with a query worker process will have the <codeph>slice_id</codeph> populated. Related log
-        entries of a particular query can be identified by its session identifier
-          (<codeph>gp_session_id</codeph>) and command identifier
-        (<codeph>gp_command_count</codeph>).</p>
+      <title>查看数据库服务器的日志文件</title>
+      <p>Greenplum数据库中的每一个数据库实例（Master和Segment）都是一个运行着的PostgreSQL数据库服务器，它们都有自己的服务器日志文件。每天的日志文件被创建在Master和每个Segment的数据目录下的<codeph>pg_log</codeph>目录中。</p>
+      <p>服务器日志文件被写为逗号分隔值（CSV）格式。不是所有的日志项在所有的日志域中都有值。例如，只有与查询工作者进程相关的日志项才会有<codeph>slice_id</codeph>值。一个特定查询的相关日志项可以通过其会话标识符（<codeph>gp_session_id</codeph>）和命令标识符（<codeph>gp_command_count</codeph>）确定。</p>
       <table>
         <tgroup cols="0">
           <colspec colwidth="10*" align="left"/>
@@ -50,13 +23,13 @@
                 <p> # </p>
               </entry>
               <entry>
-                <p> Field Name </p>
+                <p> 域名 </p>
               </entry>
               <entry>
-                <p> Data Type </p>
+                <p> 数据类型 </p>
               </entry>
               <entry>
-                <p> Description </p>
+                <p> 描述 </p>
               </entry>
             </row>
           </thead>
@@ -72,7 +45,7 @@
                 <p> timestamp with time zone </p>
               </entry>
               <entry>
-                <p> Time that the log entry was written to the log </p>
+                <p> 日志项被写到日志中的时间 </p>
               </entry>
             </row>
             <row>
@@ -86,7 +59,7 @@
                 <p> varchar(100) </p>
               </entry>
               <entry>
-                <p> The database user name </p>
+                <p> 数据库用户名 </p>
               </entry>
             </row>
             <row>
@@ -100,7 +73,7 @@
                 <p> varchar(100) </p>
               </entry>
               <entry>
-                <p> The database name </p>
+                <p> 数据库名 </p>
               </entry>
             </row>
             <row>
@@ -114,7 +87,7 @@
                 <p> varchar(10) </p>
               </entry>
               <entry>
-                <p> The system process id (prefixed with &quot;p&quot;) </p>
+                <p> 系统进程ID（带前缀&quot;p&quot;） </p>
               </entry>
             </row>
             <row>
@@ -128,7 +101,7 @@
                 <p> varchar(50) </p>
               </entry>
               <entry>
-                <p> The thread count (prefixed with &quot;th&quot;) </p>
+                <p> 线程计数（带前缀&quot;th&quot;） </p>
               </entry>
             </row>
             <row>
@@ -142,8 +115,7 @@
                 <p> varchar(100) </p>
               </entry>
               <entry>
-                <p> On the master, the hostname/address of the client machine. On the segment, the
-                  hostname/address of the master. </p>
+                <p> 在Master上，是客户端机器的主机名/地址。在Segment上，是Master的主机名/地址。</p>
               </entry>
             </row>
             <row>
@@ -157,7 +129,7 @@
                 <p> varchar(10) </p>
               </entry>
               <entry>
-                <p> The segment or master port number </p>
+                <p> Segment或Master的端口号 </p>
               </entry>
             </row>
             <row>
@@ -171,7 +143,7 @@
                 <p> timestamp with time zone </p>
               </entry>
               <entry>
-                <p> Time session connection was opened </p>
+                <p> 会话连接打开的时间 </p>
               </entry>
             </row>
             <row>
@@ -185,8 +157,7 @@
                 <p> int </p>
               </entry>
               <entry>
-                <p> Top-level transaction ID on the master. This ID is the parent of any
-                  subtransactions. </p>
+                <p> Master上的顶层事务ID。这个ID是任何子事务的父级。 </p>
               </entry>
             </row>
             <row>
@@ -200,7 +171,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> Session identifier number (prefixed with &quot;con&quot;) </p>
+                <p> 会话标识符号（带前缀&quot;con&quot;）</p>
               </entry>
             </row>
             <row>
@@ -214,7 +185,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> The command number within a session (prefixed with &quot;cmd&quot;) </p>
+                <p> 会话内部的命令编号（带前缀&quot;cmd&quot;）</p>
               </entry>
             </row>
             <row>
@@ -228,8 +199,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> The segment content identifier (prefixed with &quot;seg&quot; for primaries or
-                  &quot;mir&quot; for mirrors). The master always has a content id of -1. </p>
+                <p> Segment内容标识符（对主Segment带前缀&quot;seg&quot;，镜像Segment带前缀&quot;mir&quot;）。Master的内容id总是-1。</p>
               </entry>
             </row>
             <row>
@@ -243,7 +213,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> The slice id (portion of the query plan being executed) </p>
+                <p> 切片id（查询计划被执行的部分） </p>
               </entry>
             </row>
             <row>
@@ -257,7 +227,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> Distributed transaction ID </p>
+                <p> 分布式事务ID </p>
               </entry>
             </row>
             <row>
@@ -271,7 +241,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> Local transaction ID </p>
+                <p> 本地事务ID </p>
               </entry>
             </row>
             <row>
@@ -285,7 +255,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> Subtransaction ID </p>
+                <p> 子事务ID </p>
               </entry>
             </row>
             <row>
@@ -299,7 +269,7 @@
                 <p> varchar(10) </p>
               </entry>
               <entry>
-                <p> Values include: LOG, ERROR, FATAL, PANIC, DEBUG1, DEBUG2 </p>
+                <p> 值包括：LOG、ERROR、FATAL、PANIC、DEBUG1、DEBUG2 </p>
               </entry>
             </row>
             <row>
@@ -313,7 +283,7 @@
                 <p> varchar(10) </p>
               </entry>
               <entry>
-                <p> SQL state code associated with the log message </p>
+                <p> 与日志消息相关的SQL状态代码 </p>
               </entry>
             </row>
             <row>
@@ -327,7 +297,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> Log or error message text </p>
+                <p> 日志或者错误消息文本 </p>
               </entry>
             </row>
             <row>
@@ -341,7 +311,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> Detail message text associated with an error or warning message </p>
+                <p> 与错误或者警告消息相关的详细消息文本 </p>
               </entry>
             </row>
             <row>
@@ -355,7 +325,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> Hint message text associated with an error or warning message </p>
+                <p> 与错误或者警告消息相关的提示消息文本 </p>
               </entry>
             </row>
             <row>
@@ -369,7 +339,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> The internally-generated query text </p>
+                <p> 内部产生的查询文本 </p>
               </entry>
             </row>
             <row>
@@ -383,7 +353,7 @@
                 <p> int </p>
               </entry>
               <entry>
-                <p> The cursor index into the internally-generated query text </p>
+                <p> 指向内部产生的查询文本中的光标 </p>
               </entry>
             </row>
             <row>
@@ -397,7 +367,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> The context in which this message gets generated </p>
+                <p> 产生消息的上下文 </p>
               </entry>
             </row>
             <row>
@@ -411,8 +381,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> User-supplied query string with full detail for debugging. This string can be
-                  modified for internal use. </p>
+                <p> 带有完整细节的用户提供的查询字符串，用于调试。这个字符串可能会由于内部使用而修改。</p>
               </entry>
             </row>
             <row>
@@ -426,7 +395,7 @@
                 <p> int </p>
               </entry>
               <entry>
-                <p> The cursor index into the query string </p>
+                <p> 指向查询字符串中的光标 </p>
               </entry>
             </row>
             <row>
@@ -440,7 +409,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> The function in which this message is generated </p>
+                <p> 产生这个消息的函数 </p>
               </entry>
             </row>
             <row>
@@ -454,7 +423,7 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> The internal code file where the message originated </p>
+                <p> 产生消息的内部代码文件 </p>
               </entry>
             </row>
             <row>
@@ -468,7 +437,7 @@
                 <p> int </p>
               </entry>
               <entry>
-                <p> The line of the code file where the message originated </p>
+                <p> 产生消息的内部代码文件的行号 </p>
               </entry>
             </row>
             <row>
@@ -482,25 +451,18 @@
                 <p> text </p>
               </entry>
               <entry>
-                <p> Stack trace text associated with this message </p>
+                <p> 与这个消息相关的栈跟踪文本 </p>
               </entry>
             </row>
           </tbody>
         </tgroup>
       </table>
-      <p>Greenplum provides a utility called <codeph>gplogfilter</codeph> that can be used to search
-        through a Greenplum Database log file for entries matching the specified criteria. By
-        default, this utility searches through the Greenplum master log file in the default logging
-        location. For example, to display the last three lines of the master log file:
+      <p>Greenplum提供一个名为<codeph>gplogfilter</codeph>的工具，它能被用来在一个Greenplum数据库日志文件中搜索匹配指定条件的项。这个工具默认会搜索位于默认日志位置的Greenplum的Master日志文件。例如，要显示Master日志文件的最后三行：
         <codeblock>$ gplogfilter -n 3</codeblock></p>
-      <p> You can also use <codeph>gplogfilter</codeph> to search through all segment log files at
-        once by running it through the <codeph>gpssh</codeph> utility. For example, to display the
-        last three lines of each segment log
-        file:<codeblock>$ gpssh -f seg_host_file
+      <p> 用户还可以通过<codeph>gpssh</codeph>工具运行<codeph>gplogfilter</codeph>来立刻搜索所有的Segment日志文件。例如，要显示每个Segment日志文件的最后三行：<codeblock>$ gpssh -f seg_host_file
   => source /usr/local/greenplum-db/greenplum_path.sh
   => gplogfilter -n 3 /gpdata/gp*/pg_log/gpdb*.csv</codeblock></p>
-      <p> The following are the Greenplum security-related audit (or logging) server configuration
-        parameters that are set in the postgresql.conf configuration file:</p>
+      <p> 下面是Greenplum与安全相关的审计（或者日志）服务器配置参数，它们可以在postgresql.conf配置文件中设置：</p>
       <table>
         <tgroup cols="0">
           <colspec colwidth="15*" align="left"/>
@@ -510,16 +472,16 @@
           <thead>
             <row>
               <entry>
-                <p> Field Name </p>
+                <p> 域名 </p>
               </entry>
               <entry>
-                <p> Value Range </p>
+                <p> 值范围 </p>
               </entry>
               <entry>
-                <p> Default </p>
+                <p> 默认 </p>
               </entry>
               <entry>
-                <p> Description </p>
+                <p> 描述 </p>
               </entry>
             </row>
           </thead>
@@ -535,10 +497,7 @@
                 <p> off </p>
               </entry>
               <entry>
-                <p> This outputs a line to the server log detailing each successful connection. Some
-                  client programs, like psql, attempt to connect twice while determining if a
-                  password is required, so duplicate “connection received” messages do not always
-                  indicate a problem. </p>
+                <p> 这会对服务器日志输出一行详细描述每个成功的连接。某些客户端程序（如psql）在决定是否要求口令时会尝试连接两次，因此重复的“connection received”消息并非总是表示问题。</p>
               </entry>
             </row>
             <row>
@@ -552,8 +511,7 @@
                 <p> off </p>
               </entry>
               <entry>
-                <p> This outputs a line in the server log at termination of a client session, and
-                  includes the duration of the session. </p>
+                <p> 在一个客户端会话终止时，这会在服务器日志中输出一行，其中会包括该会话的持续时间。 </p>
               </entry>
             </row>
             <row>
@@ -570,10 +528,7 @@
                 <p> ALL </p>
               </entry>
               <entry>
-                <p> Controls which SQL statements are logged. DDL logs all data definition commands
-                  like CREATE, ALTER, and DROP commands. MOD logs all DDL statements, plus INSERT,
-                  UPDATE, DELETE, TRUNCATE, and COPY FROM. PREPARE and EXPLAIN ANALYZE statements
-                  are also logged if their contained command is of an appropriate type. </p>
+                <p> 控制那些SQL语句会被记录。DDL记录所有数据定义命令，如CREATE、ALTER和DROP命令。MOD记录所有DDL语句外加INSERT、UPDATE、DELETE、TRUNCATE以及COPY FROM。如果PREPARE和EXPLAIN ANALYZE语句中如果包含有适当类型的命令，它们也会被日志记录。</p>
               </entry>
             </row>
             <row>
@@ -587,10 +542,7 @@
                 <p> off </p>
               </entry>
               <entry>
-                <p> By default, connection log messages only show the IP address of the connecting
-                  host. Turning on this option causes logging of the host name as well. Note that
-                  depending on your host name resolution setup this might impose a non-negligible
-                  performance penalty. </p>
+                <p> 连接日志消息默认只显示连接主机的IP地址。把这个选项打开会导致主机名也被记录。注意这依赖于用户的主机名解析设置，而且这有可能会带来不可忽视的性能损失。 </p>
               </entry>
             </row>
             <row>
@@ -604,8 +556,7 @@
                 <p> off </p>
               </entry>
               <entry>
-                <p> Causes the duration of every completed statement which satisfies log_statement
-                  to be logged. </p>
+                <p> 致使每一个满足log_statement的完成语句的持续时间被记录。 </p>
               </entry>
             </row>
             <row>
@@ -621,8 +572,7 @@
                 <p> DEFAULT </p>
               </entry>
               <entry>
-                <p> Controls the amount of detail written in the server log for each message that is
-                  logged. </p>
+                <p> 为被记录的每条消息控制写入到服务器日志的细节多少。</p>
               </entry>
             </row>
             <row>
@@ -636,12 +586,7 @@
                 <p> -1 </p>
               </entry>
               <entry>
-                <p> Logs the statement and its duration on a single log line if its duration is
-                  greater than or equal to the specified number of milliseconds. Setting this to 0
-                  will print all statements and their durations. -1 disables the feature. For
-                  example, if you set it to 250 then all SQL statements that run 250ms or longer
-                  will be logged. Enabling this option can be useful in tracking down unoptimized
-                  queries in your applications. </p>
+                <p> 如果语句的持续时间大于等于指定的毫秒数，则在一个日志行中记录该语句和它的持续时间。将这个参数设置为0将打印出所有的语句及其持续时间。-1禁用这一特性。例如，如果用户将它设置为250，那么所有运行时间大于等于250ms的SQL语句将被记录。在跟踪应用中的未优化查询时，启用这一选项非常有用。 </p>
               </entry>
             </row>
             <row>
@@ -666,9 +611,7 @@
                 <p> NOTICE </p>
               </entry>
               <entry>
-                <p> Controls which message levels are written to the server log. Each level includes
-                  all the levels that follow it. The later the level, the fewer messages are sent to
-                  the log. </p>
+                <p> 控制哪些消息级别会被写入到服务器日志。每个级别包括其后的所有级别。级别越靠后，发送到日志的消息就越少。</p>
               </entry>
             </row>
             <row>
@@ -678,8 +621,7 @@
               <entry>0 - INT_MAX/1024 kilobytes</entry>
               <entry>1048576</entry>
               <entry>
-                <p>When greater than 0, a new log file is created when this number of kilobytes have
-                  been written to the log. Set to zero to disable size-based creation of new log files. </p>
+                <p>大于0时，将这个千字节数写入日志后，将创建一个新的日志文件。设置为零可禁用基于大小的新日志文件的创建。 </p>
               </entry>
             </row>
             <row>
@@ -693,9 +635,7 @@
                 <p> 1d </p>
               </entry>
               <entry>
-                <p> Determines the lifetime of an individual log file. When this amount of time has
-                  elapsed since the current log file was created, a new log file will be created.
-                  Set to zero to disable time-based creation of new log files. </p>
+                <p> 决定个体日志文件的最大生存时间。在这个时间过去之后，一个新的日志文件将被创建。设置为零可禁用新日志文件基于时间创建。</p>
               </entry>
             </row>
             <row>
@@ -709,8 +649,7 @@
                 <p> off </p>
               </entry>
               <entry>
-                <p> For each query, write total performance statistics of the query parser, planner,
-                  and executor to the server log. This is a crude profiling instrument. </p>
+                <p> 对每个查询，写入查询解析器、规划器和执行器的整体性能统计信息到服务器日志中。这是一种粗糙的画像手段。 </p>
               </entry>
             </row>
             <row>
@@ -724,12 +663,7 @@
                 <p> off </p>
               </entry>
               <entry>
-                <p> Truncates (overwrites), rather than appends to, any existing log file of the
-                  same name. Truncation will occur only when a new file is being opened due to
-                  time-based rotation. For example, using this setting in combination with a
-                  log_filename such as gpseg#-%H.log would result in generating twenty-four hourly
-                  log files and then cyclically overwriting them. When off, pre-existing files will
-                  be appended to in all cases. </p>
+                <p> 截断（重写）而不是追加到任何现存的同名日志文件。仅当一个新文件由于基于时间的轮转而被打开时，截断才会发生。例如，使用这个设置配合gpseg#-%H.log这样的log_filename会导致产生24个每小时的日志文件，然后循环地重写它们。关闭这一设置时，预先已经存在的文件在所有的情况下都会被追加内容。</p>
               </entry>
             </row>
           </tbody>

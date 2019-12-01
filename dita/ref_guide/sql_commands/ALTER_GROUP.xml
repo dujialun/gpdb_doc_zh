@@ -4,9 +4,9 @@
 <topic id="topic1">
   <title id="ao20941">ALTER GROUP</title>
   <body>
-    <p id="sql_command_desc">Changes a role name or membership.</p>
+    <p id="sql_command_desc">更改角色名称或成员关系。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">ALTER GROUP <varname>groupname</varname> ADD USER <varname>username</varname> [, ... ]
 
 ALTER GROUP <varname>groupname</varname> DROP USER <varname>username</varname> [, ... ]
@@ -14,45 +14,41 @@ ALTER GROUP <varname>groupname</varname> DROP USER <varname>username</varname> [
 ALTER GROUP <varname>groupname</varname> RENAME TO <varname>newname</varname></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>ALTER GROUP</codeph> changes the attributes of a user group. This is an obsolete
-        command, though still accepted for backwards compatibility, because users and groups are
-        superseded by the more general concept of roles. See <codeph><xref
-            href="./ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph> for more
-        information.</p>
-      <p>The first two variants add users to a group or remove them from a group. Any role can play
-        the part of <varname>groupname</varname> or <varname>username</varname>. The preferred
-        method for accomplishing these tasks is to use <xref href="./GRANT.xml#topic1">GRANT</xref>
-        and <xref href="./REVOKE.xml#topic1">REVOKE</xref>.</p>
+      <title>描述</title>
+      <p><codeph>ALTER GROUP</codeph> 更改了用户组的属性，这是一个被废弃的命令，不过为了向后兼容
+	  还是被接受的。组和用户被更一般的概念角色所替代，参阅 <codeph><xref
+            href="./ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph> 获取更多信息</p>
+      <p>前面两个语句往组里面添加或者删除一个用户，任何角色都可以当作是用户名或者组名。完成这种
+		任务的首选方式是使用<xref href="./GRANT.xml#topic1">GRANT</xref>
+        和 <xref href="./REVOKE.xml#topic1">REVOKE</xref>.</p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><varname>groupname</varname></pt>
-          <pd>The name of the group (role) to modify. </pd>
+          <pd>要修改的组（角色）的名称 </pd>
         </plentry>
         <plentry>
           <pt><varname>username</varname></pt>
-          <pd>Users (roles) that are to be added to or removed from the group. The users (roles)
-            must already exist. </pd>
+          <pd>要添加到组或从组中删除的用户（角色）。用户（角色）必须已经存在。 </pd>
         </plentry>
         <plentry>
           <pt><varname>newname</varname></pt>
-          <pd>The new name of the group (role). </pd>
+          <pd>组（角色）的新名称。 </pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Examples</title>
-      <p>To add users to a group: </p>
+      <title>示例</title>
+      <p>要将用户添加到组中： </p>
       <codeblock>ALTER GROUP staff ADD USER karl, john;</codeblock>
-      <p>To remove a user from a group:</p>
+      <p>从组中删除用户:</p>
       <codeblock>ALTER GROUP workers DROP USER beth;</codeblock>
     </section>
     <section id="section6">
-      <title>Compatibility</title>
-      <p>There is no <codeph>ALTER GROUP</codeph> statement in the SQL standard. </p>
+      <title>兼容性</title>
+      <p>在SQL标准中没有<codeph>ALTER GROUP</codeph>语句 </p>
     </section>
     <section id="section7">
       <title>See Also</title>

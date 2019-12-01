@@ -4,105 +4,96 @@
 <topic id="topic1">
   <title id="cf20941">CREATE TABLESPACE</title>
   <body>
-    <p id="sql_command_desc">Defines a new tablespace.</p>
+    <p id="sql_command_desc">定义一个新的表空间。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">CREATE TABLESPACE <varname>tablespace_name</varname> [OWNER <varname>username</varname>]  LOCATION '<varname>/path/to/dir</varname>' 
    [WITH (content<varname>ID_1</varname>='<varname>/path/to/dir1</varname>'[, content<varname>ID_2</varname>='<varname>/path/to/dir2</varname>' ... ])]</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>CREATE TABLESPACE</codeph> registers and configures a new tablespace for your
-        Greenplum Database system. The tablespace name must be distinct from the name of any
-        existing tablespace in the system. A tablespace is a Greenplum Database system object (a
-        global object), you can use a tablespace from any database if you have appropriate
-        privileges.</p>
-      <p>A tablespace allows superusers to define an alternative host file system location where the
-        data files containing database objects (such as tables and indexes) reside.</p>
-      <p>A user with appropriate privileges can pass a tablespace name to <codeph><xref
-            href="CREATE_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="CREATE_TABLE.xml#topic1" type="topic" format="dita"/></codeph>, or <codeph><xref
-            href="CREATE_INDEX.xml#topic1" type="topic" format="dita"/></codeph> to have the data
-        files for these objects stored within the specified tablespace.</p>
-      <p>In Greenplum Database, the file system location must exist on all hosts including the hosts
-        running the master, standby mirror, each primary segment, and each mirror segment. </p>
+      <title>描述</title>
+      <p><codeph>CREATE TABLESPACE</codeph>为Greenplum数据库系统注册并配置新的表空间。
+        表空间名称必须不同于系统中任何现有表空间的名称。
+        表空间是Greenplum数据库系统对象（全局对象），如果您具有适当的特权，则可以使用任何数据库中的表空间。
+        </p>
+      <p>表空间允许超级用户定义包含数据库对象（例如表和索引）的数据文件所在的备用主机文件系统位置。
+        </p>
+      <p>具有适当特权的用户可以将表空间名称传递给<codeph><xref href="CREATE_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>，
+        <codeph><xref href="CREATE_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>或<codeph><xref href="CREATE_INDEX.xml#topic1" type="topic" format="dita"/></codeph>，
+        以将这些对象的数据文件存储在指定的表空间中。
+        </p>
+      <p>在Greenplum数据库中，文件系统位置必须存在于所有主机上，
+        包括运行master，standby，每个primary和每个mirror的主机。</p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><varname>tablespacename</varname></pt>
-          <pd>The name of a tablespace to be created. The name cannot begin with
-              <codeph>pg_</codeph> or <codeph>gp_</codeph>, as such names are reserved for system
-            tablespaces. </pd>
+          <pd>要创建的表空间的名称。
+            该名称不能以<codeph>pg_</codeph>或<codeph>gp_</codeph>开头，因为此类名称是为系统表空间保留的。
+            </pd>
         </plentry>
         <plentry>
           <pt>OWNER <varname>username</varname></pt>
-          <pd>The name of the user who will own the tablespace. If omitted, defaults to the user
-            executing the command. Only superusers can create tablespaces, but they can assign
-            ownership of tablespaces to non-superusers. </pd>
+          <pd>拥有表空间的用户名。
+            如果省略，则默认为执行命令的用户。
+            只有超级用户可以创建表空间，但是他们可以将表空间的所有权分配给非超级用户。
+            </pd>
         </plentry>
         <plentry>
           <pt>LOCATION '<varname>/path/to/dir</varname>'</pt>
-          <pd>The absolute path to the directory (host system file location) that will be the root
-            directory for the tablespace. When registering a tablepace, the directory should be
-            empty and must be owned by the Greenplum Database system user. The directory must be
-            specified by an absolute path name.</pd>
-          <pd>For each segment instance, you can specify a different directory for the tablespace in
-            the <codeph>WITH</codeph> clause.</pd>
+          <pd>目录的绝对路径（主机系统文件位置），它将是表空间的根目录。
+            注册表空间时，该目录应该为空，并且必须归Greenplum数据库系统用户所有。
+            该目录必须由绝对路径名指定。
+            </pd>
+          <pd>对于每个segment实例，您可以在<codeph>WITH</codeph>子句中为表空间指定不同的目录。
+            </pd>
         </plentry>
         <plentry>
           <pt>content<varname>ID_i</varname>='<varname>/path/to/dir_i</varname>'</pt>
-          <pd>The value <varname>ID_i</varname> is the content ID for the segment instance.
-              <varname>/path/to/dir_i</varname> is the absolute path to the host system file location
-            that the segment instance uses as the root directory for the tablespace. You cannot
-            specify the content ID of the master instance (<codeph>-1</codeph>). You can specify the
-            same directory for multiple segments. </pd>
-          <pd>If a segment instance is not listed in the <codeph>WITH</codeph> clause, Greenplum
-            Database uses the directory specified in the <codeph>LOCATION</codeph> clause.</pd>
-          <pd>When registering a tablepace, the directories should be empty and must be owned by the
-            Greenplum Database system user.</pd>
+          <pd>值<varname>ID_i</varname>是segment实例的content ID。
+            <varname>/path/to/dir_i</varname>是segment实例用作表空间的根目录的主机系统文件位置的绝对路径。
+            您不能指定master实例的content ID（<codeph>-1</codeph>）。
+            您可以为多个segment指定相同的目录。</pd>
+          <pd>如果<codeph>WITH</codeph>子句中未列出segment实例，
+            则Greenplum数据库将使用<codeph>LOCATION</codeph>子句指定的目录。</pd>
+          <pd>注册表空间时，目录应为空，并且必须由Greenplum数据库系统用户拥有。
+            </pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Notes</title>
-      <p>Tablespaces are only supported on systems that support symbolic links. </p>
-      <p><codeph>CREATE TABLESPACE</codeph> cannot be executed inside a transaction block.</p>
-      <p>When creating tablespaces, ensure that file system locations have sufficient I/O speed and
-        available disk space.</p>
-      <p>
-        <codeph>CREATE TABLESPACE</codeph> creates symbolic links from the
-          <codeph>pg_tblspc</codeph> directory in the master and segment instance data directory to
-        the directories specified in the command. </p>
-      <p>The system catalog table <codeph>pg_tablespace</codeph> stores tablespace information. This
-        command displays the tablespace OID values, names, and
-        owner.<codeblock>SELECT oid, spcname, spcowner FROM pg_tablespace ;</codeblock></p>
-      <p>The Greenplum Database built-in function
-            <codeph>gp_tablespace_location(<varname>tablespace_oid</varname>)</codeph> displays the
-        tablespace host system file locations for all segment instances. This command lists the
-        segment database IDs and host system file locations for the tablespace with OID
-          <codeph>16385</codeph>.<codeblock>SELECT * FROM gp_tablespace_location(16385) </codeblock></p>
+      <title>注解</title>
+      <p>表空间仅在支持符号链接的系统上受支持。</p>
+      <p><codeph>CREATE TABLESPACE</codeph>不能在事务块内执行。</p>
+      <p>创建表空间时，请确保文件系统位置具有足够的I/O速度和可用磁盘空间。</p>
+      <p><codeph>CREATE TABLESPACE</codeph>创建从master和segment实例数据目录中的<codeph>pg_tblspc</codeph>目录到命令中指定目录的符号链接。</p>
+      <p>系统catalog表<codeph>pg_tablespace</codeph>存储表空间信息。
+        此命令显示表空间的OID值，名称和所有者。
+        <codeblock>SELECT oid, spcname, spcowner FROM pg_tablespace ;</codeblock></p>
+      <p>Greenplum数据库内置函数<codeph>gp_tablespace_location(<varname>tablespace_oid</varname>)</codeph>显示所有segment实例的表空间主机系统文件位置。
+        此命令列出OID为<codeph>16385</codeph>的表空间的segment数据库ID和主机系统文件位置。
+        <codeblock>SELECT * FROM gp_tablespace_location(16385) </codeblock></p>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>Create a new tablespace and specify the file system location for the master and all segment
-        instances: </p>
+      <title>示例</title>
+      <p>创建一个新表空间，并为master和所有segment实例指定文件系统位置：</p>
       <codeblock>CREATE TABLESPACE mytblspace LOCATION '/gpdbtspc/mytestspace' ;</codeblock>
-      <p>Create a new tablespace and specify a location for segment instances with content ID 0 and
-        1. For the master and segment instances not listed in the <codeph>WITH</codeph> clause, the
-        file system location for the tablespace is specified in the <codeph>LOCATION</codeph>
-        clause. </p>
+      <p>创建一个新表空间，并为content ID为0和1的segment实例指定一个位置。
+        对于未在<codeph>WITH</codeph>子句中列出的master和segment实例，
+        在<codeph>LOCATION</codeph>子句中指定该表空间的文件系统位置。
+        </p>
       <codeblock>CREATE TABLESPACE mytblspace LOCATION '/gpdbtspc/mytestspace' WITH (content0='/temp/mytest', content1='/temp/mytest');</codeblock>
-      <p>The example specifies the same location for the two segment instances. You can a specify
-        different location for each segment.</p>
+      <p>该示例为两个segment实例指定了相同的位置。
+        您可以为每个segment指定不同的位置。</p>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p><codeph>CREATE TABLESPACE</codeph> is a Greenplum Database extension. </p>
+      <title>兼容性</title>
+      <p><codeph>CREATE TABLESPACE</codeph>是Greenplum数据库扩展。</p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="CREATE_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="CREATE_TABLE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="CREATE_INDEX.xml#topic1" type="topic" format="dita"/></codeph>,

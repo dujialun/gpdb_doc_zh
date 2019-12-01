@@ -1,10 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="cs20941">DROP DOMAIN</title><body><p id="sql_command_desc">Removes a domain.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">DROP DOMAIN [IF EXISTS] <varname>name</varname> [, ...]  [CASCADE | RESTRICT]</codeblock></section><section id="section3"><title>Description</title><p><codeph>DROP DOMAIN</codeph> removes a previously defined domain. You
-must be the owner of a domain to drop it.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt>IF EXISTS</pt><pd>Do not throw an error if the domain does not exist. A notice is issued
-in this case. </pd></plentry><plentry><pt><varname>name</varname></pt><pd>The name (optionally schema-qualified) of an existing domain.</pd></plentry><plentry><pt>CASCADE</pt><pd>Automatically drop objects that depend on the domain (such as table
-columns). </pd></plentry><plentry><pt>RESTRICT</pt><pd>Refuse to drop the domain if any objects depend on it. This is the
-default.</pd></plentry></parml></section><section id="section5"><title>Examples</title><p>Drop the domain named <codeph>zipcode</codeph>: </p><codeblock>DROP DOMAIN zipcode;</codeblock></section><section id="section6"><title>Compatibility</title><p>This command conforms to the SQL standard, except for the <codeph>IF
-EXISTS</codeph> option, which is a Greenplum Database extension. </p></section><section id="section7"><title>See Also</title><p><codeph><xref href="ALTER_DOMAIN.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="CREATE_DOMAIN.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="cs20941">DROP DOMAIN</title>
+    <body>
+        <p id="sql_command_desc">删除域。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">DROP DOMAIN [IF EXISTS] <varname>name</varname> [, ...] [CASCADE | RESTRICT]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>DROP DOMAIN</codeph>删除先前定义的域。
+                您必须是域的所有者才能删除它。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>IF EXISTS</pt>
+                    <pd>如果域不存在，请不要报错。在这种情况下会发出通知。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>现有域的名称（可以用模式指定）。</pd>
+                </plentry>
+                <plentry>
+                    <pt>CASCADE</pt>
+                    <pd>自动删除依赖域的对象（例如表列）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>RESTRICT</pt>
+                    <pd>如果有任何对象依赖该域，则拒绝删除该域。这是默认值。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>删除名为<codeph>zipcode</codeph>的域：
+            </p>
+            <codeblock>DROP DOMAIN zipcode;</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p>此命令符合SQL标准，但<codeph>IF EXISTS</codeph>选项是Greenplum数据库扩展。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_DOMAIN.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="CREATE_DOMAIN.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

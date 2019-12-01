@@ -2,17 +2,10 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1" xml:lang="en">
-  <title id="nk110126">Greenplum Database Security Configuration Guide</title>
+  <title id="nk110126">安全性配置指南</title>
   <body>
-    <p>This guide describes how to secure a Greenplum Database system. The guide assumes knowledge
-      of Linux/UNIX system administration and database management systems. Familiarity with
-      structured query language (SQL) is helpful.</p>
-    <p>Because Greenplum Database is based on PostgreSQL 9.4, this guide assumes some familiarity
-      with PostgreSQL. References to <xref
-        href="https://www.postgresql.org/docs/9.4/index.html" scope="external" format="html"
-          ><ph>PostgreSQL documentation</ph></xref> are provided throughout this guide for features
-      that are similar to those in Greenplum Database.</p>
-    <p>This information is intended for system administrators responsible for administering a
-      Greenplum Database system.</p>
+    <p>这份指南描述了如何保护一个Greenplum数据库系统。这份指南假定读者有Linux/UNIX系统管理和数据库管理系统的知识。熟悉结构查询语言（SQL）也很有帮助。</p>
+    <p>因为Greenplum数据库是基于PostgreSQL 9.4的，这份指南假定读者对PostgreSQL比较熟悉。这份指南中通篇都为Greenplum数据库中类似的特性提供了对PostgreSQL文档的引用。<xref href="https://www.postgresql.org/docs/9.4/index.html" scope="external" format="html"><ph>PostgreSQL documentation</ph></xref></p>
+    <p>这份指南为负责管理Greenplum数据库系统的系统管理员提供信息。</p>
   </body>
 </topic>

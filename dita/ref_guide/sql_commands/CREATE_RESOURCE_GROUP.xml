@@ -4,11 +4,11 @@
 <topic id="topic1">
   <title id="by20941">CREATE RESOURCE GROUP</title>
   <body>
-    <p id="sql_command_desc">Defines a new resource group.</p>
+    <p id="sql_command_desc">定义一个新的资源组。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">CREATE RESOURCE GROUP <varname>name</varname> WITH (<varname>group_attribute</varname>=<varname>value</varname> [, ... ])</codeblock>
-      <p>where <varname>group_attribute</varname> is:</p>
+      <p>其中<varname>group_attribute</varname>是：</p>
       <codeblock>CPU_RATE_LIMIT=<varname>integer</varname> | CPUSET=<varname>tuple</varname>
 MEMORY_LIMIT=<varname>integer</varname>
 [ CONCURRENCY=<varname>integer</varname> ]
@@ -17,95 +17,138 @@ MEMORY_LIMIT=<varname>integer</varname>
 [ MEMORY_AUDITOR= {vmtracker | cgroup} ]</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>Creates a new resource group for Greenplum Database resource management. You can create resource groups to manage resources for roles or 
-        to manage the resources of a Greenplum Database external component such as PL/Container.</p>
-       <p>A resource
-         group that you create to manage a user role identifies concurrent transaction, memory,
-         and CPU limits for the role when resource groups are enabled. You may assign such resource groups to one or more roles.</p>
-      <p>A resource group that you create to manage the resources of a Greenplum Database external component such as PL/Container identifies the memory and CPU limits for the component when resource groups are enabled. These resource groups use cgroups for both CPU and memory management. Assignment of resource groups to external components is component-specific. For example, you assign a PL/Container resource group when you configure a PL/Container runtime. You cannot assign a resource group that you create for external components to a role, nor can you assign a resource group that you create for roles to an external component.</p>
-      <p>You must have <codeph>SUPERUSER</codeph> privileges to create a resource group. The maximum number of resource groups allowed in your Greenplum Database cluster is 100.</p>
-      <p>Greenplum Database pre-defines two default resource groups: <codeph>admin_group</codeph>
-         and <codeph>default_group</codeph>. These group names, as well as the group name <codeph>none</codeph>, are reserved.</p>
-      <p>
-        To set appropriate limits for resource groups, the Greenplum Database administrator must
-        be familiar with the queries typically executed on the system, as well as the users/roles executing those queries and the external components they may be using, such as PL/Containers.</p>
-      <p>
-        After creating a resource group for a role, assign the group to one or more roles using the <codeph><xref
-            href="ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph> or <codeph><xref
-            href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph> commands.</p>
-      <p>
-        After you create a resource group to manage the CPU and memory resources of an external component, configure the external component to use the resource group. For example, configure the PL/Container runtime <codeph>resource_group_id</codeph>.</p>
+      <title>描述</title>
+      <p>为Greenplum数据库资源管理创建一个新的资源组。
+        您可以创建资源组来管理角色资源或管理Greenplum数据库外部组件（例如PL/Container）的资源。
+        </p>
+       <p>启用资源组后，您创建的用于管理用户角色的资源组将标识该角色的并发事务，内存和CPU限制。
+         您可以将此类资源组分配给一个或多个角色。</p>
+      <p>您创建的用于管理Greenplum数据库外部组件（例如PL/Container）的资源的资源组会在启用资源组时标识该组件的内存和CPU限制。
+        这些资源组使用cgroup进行CPU和内存管理。
+        将资源组分配给外部组件是特定于组件的。
+        例如，当您配置PL/Container运行时时，您将分配一个PL/Container资源组。
+        您不能将为外部组件创建的资源组分配给角色，也不能将为角色创建的资源组分配给外部组件。</p>
+      <p>您必须具有<codeph>SUPERUSER</codeph>特权才能创建资源组。
+        Greenplum数据库群集中允许的最大资源组数为100。
+        </p>
+      <p>Greenplum数据库预定义了两个默认资源组：<codeph>admin_group</codeph>和<codeph>default_group</codeph>。
+        这些组名以及组名<codeph>none</codeph>均保留。
+        </p>
+      <p>要为资源组设置适当的限制，Greenplum数据库管理员必须熟悉通常在系统上执行的查询，
+        以及执行这些查询的用户/角色以及他们可能使用的外部组件，例如PL/Containers。
+        </p>
+      <p>创建资源组的角色后，
+        组分配给使用<codeph><xref href="ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph>或<codeph><xref href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>命令一个或多个角色。
+      </p>
+      <p>创建资源组以管理外部组件的CPU和内存资源后，将外部组件配置为使用该资源组。
+        例如，配置PL/Container运行时<codeph>resource_group_id</codeph>。</p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>
             <varname>name</varname>
           </pt>
-          <pd>The name of the resource group.</pd>
+          <pd>资源组的名称。</pd>
         </plentry>
         <plentry>
           <pt>CONCURRENCY <varname>integer</varname></pt>
-          <pd>The maximum number of concurrent transactions, including active and idle transactions, that are permitted for this resource group. The <codeph>CONCURRENCY</codeph> value must be an integer in the range [0 .. <codeph>max_connections</codeph>]. The default <codeph>CONCURRENCY</codeph> value  for resource groups defined for roles is 20.</pd>
-          <pd>You must set <codeph>CONCURRENCY</codeph> to zero (0) for resource groups that you create for external components.</pd>
-          <pd><note>You cannot set the <codeph>CONCURRENCY</codeph> value for the <codeph>admin_group</codeph> to zero (0).</note></pd>
+          <pd>此资源组允许的最大并发事务数，包括活动和空闲事务。
+            <codeph>CONCURRENCY</codeph>值必须是[0 .. <codeph>max_connections</codeph>]范围内的整数。
+            为角色定义的资源组的默认<codeph>CONCURRENCY</codeph>值为20。</pd>
+          <pd>对于为外部组件创建的资源组，必须将<codeph>CONCURRENCY</codeph>设置为零（0）。</pd>
+          <pd><note>您不能将<codeph>admin_group</codeph>的<codeph>CONCURRENCY</codeph>值设置为零（0）。</note></pd>
         </plentry>
         <plentry>
           <pt>CPU_RATE_LIMIT <varname>integer</varname></pt>
           <pt>CPUSET <varname>tuple</varname></pt>
-          <pd>Required. You must specify only one of <codeph>CPU_RATE_LIMIT</codeph> or <codeph>CPUSET</codeph> when you create a resource group.</pd>
-          <pd><codeph>CPU_RATE_LIMIT</codeph> is the percentage of CPU resources to allocate to this resource group. The minimum CPU percentage you can specify for a resource group is 1. The maximum is 100. The sum of the <codeph>CPU_RATE_LIMIT</codeph> values specified for all resource groups defined in the Greenplum Database cluster must be less than or equal to 100.
+          <pd>需要。创建资源组时，只能指定<codeph>CPU_RATE_LIMIT</codeph>或<codeph>CPUSET</codeph>之一。</pd>
+          <pd><codeph>CPU_RATE_LIMIT</codeph>是分配给该资源组的CPU资源的百分比。
+            您可以为资源组指定的最小CPU百分比为1。
+            最大为100。
+            为Greenplum数据库集群中定义的所有资源组指定的<codeph>CPU_RATE_LIMIT</codeph>值的总和必须小于或等于100。
+            </pd>
+          <pd>CPUSET标识要为此资源组保留的CPU核心。
+            您在<varname>tuple</varname>中指定的CPU核心必须在系统中可用，并且不能与您为其他资源组指定的任何CPU核心重叠。
           </pd>
-          <pd><codeph>CPUSET</codeph> identifies the CPU cores to reserve for this resource group. The CPU cores that you specify in <varname>tuple</varname> must be available in the system and cannot overlap with any CPU cores that you specify for other resource groups.</pd><pd><varname>tuple</varname> is a comma-separated list of single core numbers or core number intervals. You must enclose <varname>tuple</varname> in single quotes, for example, '1,3-4'.</pd><pd><note>You can configure <codeph>CPUSET</codeph> for a resource group only after you have enabled resource group-based resource management for your Greenplum Database cluster.</note>
+          <pd><varname>tuple</varname>是用逗号分隔的单个核心号或核心号间隔的列表。
+            您必须将元组用单引号引起来，例如'1,3-4'。
+            </pd>
+          <pd><note>仅在为Greenplum数据库集群启用基于资源组的资源管理之后，才能为资源组配置<codeph>CPUSET</codeph>。
+            </note>
           </pd>
         </plentry>
         <plentry>
           <pt>MEMORY_LIMIT <varname>integer</varname></pt>
-          <pd>Required. The total percentage of Greenplum Database memory resources to allocate to this resource group. The minimum memory percentage you can specify for a resource group is 1. The maximum is 100. The sum of the <codeph>MEMORY_LIMIT</codeph> values specified for all resource groups defined in the Greenplum Database cluster must be less than or equal to 100.</pd>
+          <pd>需要。分配给该资源组的Greenplum数据库内存资源的总百分比。
+            您可以为资源组指定的最小内存百分比为1。
+            最大为100。
+            为Greenplum数据库集群中定义的所有资源组指定的<codeph>MEMORY_LIMIT</codeph>值的总和必须小于或等于100。
+            </pd>
         </plentry>
         <plentry>
           <pt>MEMORY_SHARED_QUOTA <varname>integer</varname></pt>
-          <pd>The quota of shared memory in the resource group. Resource groups with a <codeph>MEMORY_SHARED_QUOTA</codeph> threshold set aside a percentage of memory allotted to the resource group to share across transactions. This shared memory is allocated on a first-come, first-served basis as available. A transaction may use none, some, or all of this memory. The minimum memory shared quota percentage you can specify for a resource group is 0. The maximum is 100. The default <codeph>MEMORY_SHARED_QUOTA</codeph> value is 20.</pd>
+          <pd>资源组中共享内存的配额。
+            具有<codeph>MEMORY_SHARED_QUOTA</codeph>阈值的资源组预留了分配给资源组以在事务之间共享的内存的百分比。
+            共享内存将按先到先得的原则分配。
+            事务可能不使用任何，部分或全部内存。
+            您可以为资源组指定的最小内存共享配额百分比为0。
+            最大为100。
+            默认的<codeph>MEMORY_SHARED_QUOTA</codeph>值为20。
+            </pd>
         </plentry>
         <plentry>
           <pt>MEMORY_SPILL_RATIO <varname>integer</varname></pt>
-          <pd>The memory usage threshold for memory-intensive operators in a transaction. When this threshold is reached, a transaction spills to disk. The minimum memory spill ratio percentage you can specify for a resource group is 0. The maximum is 100. The default <codeph>MEMORY_SPILL_RATIO</codeph> value is 20.</pd>
+          <pd>事务中内存密集型运算的内存使用量阈值。
+            当达到此阈值时，事务会溢出到磁盘。
+            您可以为资源组指定的最小内存溢出率百分比是0。
+            最大值是100。
+            默认的<codeph>MEMORY_SPILL_RATIO</codeph>值为20。
+            </pd>
         </plentry>
         <plentry>
           <pt>MEMORY_AUDITOR {vmtracker | cgroup}</pt>
-          <pd>The memory auditor for the resource group. Greenplum Database employs virtual memory tracking for role resources and cgroup memory tracking for resources used by external components. The default <codeph>MEMORY_AUDITOR</codeph> is <codeph>vmtracker</codeph>. When you create a resource group with <codeph>vmtracker</codeph> memory auditing, Greenplum Database tracks that resource group's memory internally.</pd>
-          <pd>When you create a resource group specifying the <codeph>cgroup</codeph> <codeph>MEMORY_AUDITOR</codeph>, Greenplum Database defers the accounting of memory used by that resource group to cgroups. <codeph>CONCURRENCY</codeph> must be zero (0) for a resource group that you create for external components such as PL/Container. You cannot assign a resource group that you create for external components to a Greenplum Database role.</pd>
+          <pd>资源组的内存审核员。
+            Greenplum数据库对角色资源使用虚拟内存跟踪，对外部组件使用的资源使用cgroup内存跟踪。
+            默认的<codeph>MEMORY_AUDITOR</codeph>为<codeph>vmtracker</codeph>。
+            使用<codeph>vmtracker</codeph>内存审核创建资源组时，Greenplum数据库在内部跟踪该资源组的内存。
+            </pd>
+          <pd>当您创建指定<codeph>cgroup</codeph> <codeph>MEMORY_AUDITOR</codeph>的资源组时，
+            Greenplum数据库会将该资源组使用的内存记账推迟到cgroup。
+            对于您为外部组件（例如PL/Container）创建的资源组，<codeph>CONCURRENCY</codeph>必须为零（0）。
+            您不能将为外部组件创建的资源组分配给Greenplum数据库角色。
+            </pd>
         </plentry>
       </parml>
     </section>
-    <section id="section5"><title>Notes</title>
-        <p>You cannot submit a <codeph>CREATE RESOURCE GROUP</codeph> command in an explicit transaction or sub-transaction.</p>
-        <p>Use the
-          <codeph>gp_toolkit.gp_resgroup_config</codeph> system view to display the limit 
-        settings of all resource groups:</p><codeblock>SELECT * FROM gp_toolkit.gp_resgroup_config;</codeblock>
+    <section id="section5"><title>注解</title>
+        <p>您不能在显式事务或子事务中提交<codeph>CREATE RESOURCE GROUP</codeph>命令。
+          </p>
+        <p>使用<codeph>gp_toolkit.gp_resgroup_config</codeph>系统视图显示所有资源组的限制设置：
+          </p><codeblock>SELECT * FROM gp_toolkit.gp_resgroup_config;</codeblock>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>Create a resource group with CPU and memory limit percentages of 35: </p>
+      <title>示例</title>
+      <p>创建一个CPU和内存限制百分比为35的资源组：</p>
       <codeblock>CREATE RESOURCE GROUP rgroup1 WITH (CPU_RATE_LIMIT=35, MEMORY_LIMIT=35);</codeblock>
-      <p>Create a resource group with a concurrent transaction limit of 20, a memory limit of 15, and a CPU limit of 25:</p>
+      <p>创建一个资源组，其并发事务限制为20，内存限制为15，CPU限制为25：</p>
       <codeblock>CREATE RESOURCE GROUP rgroup2 WITH (CONCURRENCY=20, 
   MEMORY_LIMIT=15, CPU_RATE_LIMIT=25);</codeblock>
-      <p>Create a resource group to manage PL/Container resources specifying a memory limit of 10, and a CPU limit of 10:</p>
+      <p>创建一个资源组来管理PL/Container资源，指定内存限制为10，CPU限制为10：</p>
       <codeblock>CREATE RESOURCE GROUP plc_run1 WITH (MEMORY_LIMIT=10, CPU_RATE_LIMIT=10,
   CONCURRENCY=0, MEMORY_AUDITOR=cgroup);</codeblock>
-      <p>Create a resource group with a memory limit percentage of 11 to which you assign CPU cores 1 to 3:</p>
+      <p>创建一个内存限制百分比为11的资源组，并为其分配CPU核心1至3：</p>
       <codeblock>CREATE RESOURCE GROUP rgroup3 WITH (CPUSET='1-3', MEMORY_LIMIT=11);</codeblock>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p><codeph>CREATE RESOURCE GROUP</codeph> is a Greenplum Database extension. There is no
-        provision for resource groups or resource management in the SQL standard.</p>
+      <title>兼容性</title>
+      <p><codeph>CREATE RESOURCE GROUP</codeph>是Greenplum数据扩展。
+        在SQL标准中没有资源组或资源管理。
+        </p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="ALTER_ROLE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="ALTER_RESOURCE_GROUP.xml#topic1" type="topic" format="dita"

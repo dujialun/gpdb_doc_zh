@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="aj20941">ALTER DOMAIN</title><body><p id="sql_command_desc">Changes the definition of a domain.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">ALTER DOMAIN <varname>name</varname> { SET DEFAULT <varname>expression</varname> | DROP DEFAULT }
+<topic id="topic1"><title id="aj20941">ALTER DOMAIN</title><body><p id="sql_command_desc">更改现有域的定义。</p><section id="section2"><title>概要</title><codeblock id="sql_command_synopsis">ALTER DOMAIN <varname>name</varname> { SET DEFAULT <varname>expression</varname> | DROP DEFAULT }
 
 ALTER DOMAIN <varname>name</varname> { SET | DROP } NOT NULL
 
@@ -17,71 +17,47 @@ ALTER DOMAIN <varname>name</varname> OWNER TO <varname>new_owner</varname>
   
 ALTER DOMAIN <varname>name</varname> RENAME TO <varname>new_name</varname>
 
-ALTER DOMAIN <varname>name</varname> SET SCHEMA <varname>new_schema</varname></codeblock></section><section id="section3"><title>Description</title><p><codeph>ALTER DOMAIN</codeph> changes the definition of an existing
-domain. There are several sub-forms: </p><ul><li id="aj136679"><b>SET/DROP DEFAULT</b> — These forms set or remove the default value
-for a domain. Note that defaults only apply to subsequent <codeph>INSERT</codeph>
-commands. They do not affect rows already in a table using the domain.
-</li><li id="aj136731"><b>SET/DROP NOT NULL</b> — These forms change whether a domain is
-marked to allow <codeph>NULL</codeph> values or to reject <codeph>NULL</codeph>
-values. You may only <codeph>SET NOT NULL</codeph> when the columns using
-the domain contain no null values.</li>
-        <li id="aj136747"><b>ADD <varname>domain_constraint</varname> [ NOT VALID ]</b> — This form
-          adds a new constraint to a domain using the same syntax as <codeph>CREATE DOMAIN</codeph>.
-          When a new constraint is added to a domain, all columns using that domain will be checked
-          against the newly added constraint. These checks can be suppressed by adding the new
-          constraint using the <codeph>NOT VALID</codeph> option; the constraint can later be made
-          valid using <codeph>ALTER DOMAIN ... VALIDATE CONSTRAINT</codeph>. Newly inserted or
-          updated rows are always checked against all constraints, even those marked <codeph>NOT
-            VALID</codeph>. <codeph>NOT VALID</codeph> is only accepted for <codeph>CHECK</codeph>
-          constraints. </li>
-        <li id="aj136757"><b>DROP CONSTRAINT [ IF EXISTS ]</b> — This form drops constraints on a
-          domain. If <codeph>IF EXISTS</codeph> is specified and the constraint does not exist, no
-          error is thrown. In this case a notice is issued instead. </li>
-        <li><b>RENAME CONSTRAINT</b> — This form changes the name of a constraint on a domain.</li>
-        <li><b>VALIDATE CONSTRAINT</b> — This form validates a constraint previously added as
-            <codeph>NOT VALID</codeph>, that is, verify that all data in columns using the domain
-          satisfy the specified constraint.</li>
+ALTER DOMAIN <varname>name</varname> SET SCHEMA <varname>new_schema</varname></codeblock></section><section id="section3"><title>描述</title><p><codeph>ALTER DOMAIN</codeph>更改一个现有域的定义。 有几种形式：</p><ul><li id="aj136679"><b>SET/DROP DEFAULT</b> —  这些形式设置或删除域的默认值。默认值仅适用于后续的<codeph>INSERT</codeph>
+命令。它们不影响使用域的表中已经存在的行。
+</li><li id="aj136731"><b>SET/DROP NOT NULL</b> — 这些形式会改变域是否被标记为允许<codeph>NULL</codeph> 值或者拒绝 <codeph>NULL</codeph>
+值。用户只能  <codeph>SET NOT NULL</codeph> 当使用域的列不包含空值时。</li>
+        <li id="aj136747"><b>ADD <varname>domain_constraint</varname> [ NOT VALID ]</b> —  这种形式使用和 <codeph>CREATE DOMAIN</codeph>相同的语法为域增加一个新的约束。如果一个新的约束被添加到域中，所有在这个域中的列都会根据新添加的约束重新检查，这些检查可以用<codeph>NOT VALID</codeph> 选项来限制; 这些约束可以被随后的 <codeph>ALTER DOMAIN ... VALIDATE CONSTRAINT</codeph>来使之可用，新插入或这更新的行会永远根据所有的约束最检查，即使那些被标记为<codeph>NOT
+            VALID</codeph>的约束，<codeph>NOT VALID</codeph> 只能定义在 <codeph>CHECK</codeph>
+          的约束上。</li>
+        <li id="aj136757"><b>DROP CONSTRAINT [ IF EXISTS ]</b> — 此形式删除域的约束。如果提供了 <codeph>IF EXISTS</codeph> 选项而要删除的约束不存在，语句只会抛出一个提醒而不会抛出错误。</li>
+        <li><b>RENAME CONSTRAINT</b> — 此形式改稿一个现有域的约束的名字</li>
+        <li><b>VALIDATE CONSTRAINT</b> — 此形式会验证之前被标记为
+            <codeph>NOT VALID</codeph>的约束，这样会验证在这个约束中的列的所有数据</li>
   <li id="aj136764"><b>OWNER</b> — This form changes the owner of the domain to the specified
 user. </li>
-        <li><b>RENAME</b> — This form changes the name of the domain. </li>
-  <li id="aj136771"><b>SET SCHEMA</b> — This form changes the schema of the domain. Any
-constraints associated with the domain are moved into the new schema
-as well. </li></ul><p>You must own the domain to use <codeph>ALTER DOMAIN</codeph>. To change
-the schema of a domain, you must also have <codeph>CREATE</codeph> privilege
-on the new schema. To alter the owner, you must also be a direct or indirect
-member of the new owning role, and that role must have <codeph>CREATE</codeph>
-privilege on the domain's schema. (These restrictions enforce that
-altering the owner does not do anything you could not do by dropping
-and recreating the domain. However, a superuser can alter ownership of
-any domain anyway.)</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The name (optionally schema-qualified) of an existing domain to alter.
-</pd></plentry><plentry><pt><varname>domain_constraint</varname></pt><pd>New domain constraint for the domain. </pd></plentry><plentry><pt><varname>constraint_name</varname></pt><pd>Name of an existing constraint to drop or rename. </pd></plentry>
+        <li><b>RENAME</b> — 此形式将域的所有者更改为指定的用户。 </li>
+  <li id="aj136771"><b>SET SCHEMA</b> — 此形式更改域的模式。与域相关联的任何约束也被移动到新的模式中。 </li></ul><p>  
+  用户必须拥有域才能<codeph>ALTER DOMAIN</codeph>. 要更改域的模式，用户还必须对新模式具有 <codeph>CREATE</codeph> 特权 要更改所有者，用户还必须是新拥有角色的直接或间接成员，并且该角色必须对该域的模式具有 <codeph>CREATE</codeph>特权。 这些限制强制修改拥有者不能做一些通过删除和重 建域做不到的事情。不过，一个超级用户怎么都能更改任何域的所有权。）。</p></section><section id="section4"><title>参数</title><parml><plentry><pt><varname>name</varname></pt><pd>要更改的现有域的名称（可选方案限定。
+</pd></plentry><plentry><pt><varname>domain_constraint</varname></pt><pd>域的新域约束。</pd></plentry><plentry><pt><varname>constraint_name</varname></pt><pd>要修改护着删除的约束名 </pd></plentry>
         <plentry>
           <pt>NOT VALID</pt>
-          <pd>Do not verify existing column data for constraint validity.</pd>
-        </plentry><plentry><pt>CASCADE</pt><pd>Automatically drop objects that depend on the constraint. </pd></plentry><plentry><pt>RESTRICT</pt><pd>Refuse to drop the constraint if there are any dependent objects.
-This is the default behavior. </pd></plentry>
+          <pd>不检查在约束中定义的已存在的数据。</pd>
+        </plentry><plentry><pt>CASCADE</pt><pd>自动删除依赖于此约束的所有对象。</pd></plentry><plentry><pt>RESTRICT</pt><pd>如果有任何依赖对象，拒绝删除约束。这是默认行为。</pd></plentry>
         <plentry>
           <pt><varname>new_name</varname></pt>
-          <pd>The new name for the domain.</pd>
+          <pd>新的域名。</pd>
         </plentry>
         <plentry>
           <pt><varname>new_constraint_name</varname></pt>
-          <pd>The new name for the constraint.</pd>
-        </plentry><plentry><pt><varname>new_owner</varname></pt><pd>The user name of the new owner of the domain. </pd></plentry><plentry><pt><varname>new_schema</varname></pt><pd>The new schema for the domain. </pd></plentry></parml></section><section id="section5"><title>Examples</title><p>To add a <codeph>NOT NULL</codeph> constraint to a domain: </p>
+          <pd>新的约束名。</pd>
+        </plentry><plentry><pt><varname>new_owner</varname></pt><pd>域的新所有者的用户名。</pd></plentry><plentry><pt><varname>new_schema</varname></pt><pd>域的新模式。</pd></plentry></parml></section><section id="section5"><title>示例</title><p>添加<codeph>NOT NULL</codeph> 约束到一个域：</p>
           <codeblock>ALTER DOMAIN zipcode SET NOT NULL;</codeblock>
-          <p>To remove a <codeph>NOT NULL</codeph> constraint from a domain: </p>
+          <p>从一个域中移除<codeph>NOT NULL</codeph>约束：</p>
           <codeblock>ALTER DOMAIN zipcode DROP NOT NULL;</codeblock>
-          <p>To add a check constraint to a domain: </p>
+          <p>向域添加检查约束：</p>
           <codeblock>ALTER DOMAIN zipcode ADD CONSTRAINT zipchk CHECK (char_length(VALUE) = 5);</codeblock>
-          <p>To remove a check constraint from a domain: </p>
+          <p>从域中删除检查约束：</p>
           <codeblock>ALTER DOMAIN zipcode DROP CONSTRAINT zipchk;</codeblock>
-          <p>To rename a check constraint on a domain: </p>
+          <p>在一个域中从命名一个约束</p>
           <codeblock>ALTER DOMAIN zipcode RENAME CONSTRAINT zipchk TO zip_check;</codeblock>
-          <p>To move the domain into a different schema:</p>
-          <codeblock>ALTER DOMAIN zipcode SET SCHEMA customers;</codeblock></section><section id="section6"><title>Compatibility</title>
-      <p><codeph>ALTER DOMAIN</codeph> conforms to the SQL standard, except for the
+          <p>将域移动到不同的模式：</p>
+          <codeblock>ALTER DOMAIN zipcode SET SCHEMA customers;</codeblock></section><section id="section6"><title>兼容性</title>
+      <p><codeph>ALTER DOMAIN</codeph> 符合SQL标准，除了
           <codeph>OWNER</codeph>, <codeph>RENAME</codeph>, <codeph>SET SCHEMA</codeph>, and
-          <codeph>VALIDATE CONSTRAINT</codeph> variants, which are Greenplum Database extensions.
-        The <codeph>NOT VALID</codeph> clause of the <codeph>ADD CONSTRAINT</codeph> variant is also
-        a Greenplum Database extension. </p></section><section id="section7"><title>See Also</title><p><codeph><xref href="./CREATE_DOMAIN.xml#topic1" type="topic" format="dita"/></codeph>,
+          <codeph>VALIDATE CONSTRAINT</codeph> 变形，这些是Greenplum Database的扩展功能。 <codeph>ADD CONSTRAINT</codeph>中的<codeph>NOT VALID</codeph>变形也是Greenplum Database的扩展功能。</p></section><section id="section7"><title>另见</title><p><codeph><xref href="./CREATE_DOMAIN.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_DOMAIN.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>

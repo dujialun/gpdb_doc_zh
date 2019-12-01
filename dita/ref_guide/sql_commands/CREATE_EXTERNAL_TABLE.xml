@@ -4,9 +4,9 @@
 <topic id="topic1">
   <title id="br20941">CREATE EXTERNAL TABLE</title>
   <body>
-    <p id="sql_command_desc">Defines a new external table.</p>
+    <p id="sql_command_desc">定义一个新的外部表。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">CREATE [READABLE] EXTERNAL [TEMPORARY | TEMP] TABLE <varname>table_name</varname>     
     ( <varname>column_name</varname> <varname>data_type</varname> [, ...] | LIKE <varname>other_table </varname>)
      LOCATION ('file://<varname>seghost</varname>[:<varname>port</varname>]/<varname>path</varname>/<varname>file</varname>' [, ...])
@@ -121,385 +121,329 @@ CREATE WRITABLE EXTERNAL WEB [TEMPORARY | TEMP] TABLE <varname>table_name</varna
     [ DISTRIBUTED BY ({<varname>column</varname> [<varname>opclass</varname>]}, [ ... ] ) | DISTRIBUTED RANDOMLY ]</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>See "Working with External Tables" in the <cite>Greenplum Database Administrator
-          Guide</cite> for detailed information about external tables.</p>
-      <p><codeph>CREATE EXTERNAL TABLE</codeph> or <codeph>CREATE EXTERNAL WEB TABLE</codeph>
-        creates a new readable external table definition in Greenplum Database. Readable external
-        tables are typically used for fast, parallel data loading. Once an external table is
-        defined, you can query its data directly (and in parallel) using SQL commands. For example,
-        you can select, join, or sort external table data. You can also create views for external
-        tables. DML operations (<codeph>UPDATE</codeph>, <codeph>INSERT</codeph>,
-          <codeph>DELETE</codeph>, or <codeph>TRUNCATE</codeph>) are not allowed on readable
-        external tables, and you cannot create indexes on readable external tables.</p>
-      <p><codeph>CREATE WRITABLE EXTERNAL TABLE</codeph> or <codeph>CREATE WRITABLE EXTERNAL WEB
-          TABLE</codeph> creates a new writable external table definition in Greenplum Database.
-        Writable external tables are typically used for unloading data from the database into a set
-        of files or named pipes. Writable external web tables can also be used to output data to an
-        executable program. Writable external tables can also be used as output targets for
-        Greenplum parallel MapReduce calculations. Once a writable external table is defined, data
-        can be selected from database tables and inserted into the writable external table. Writable
-        external tables only allow <codeph>INSERT</codeph> operations – <codeph>SELECT</codeph>,
-          <codeph>UPDATE</codeph>, <codeph>DELETE</codeph> or <codeph>TRUNCATE</codeph> are not
-        allowed.</p>
-      <p>The main difference between regular external tables and external web tables is their data
-        sources. Regular readable external tables access static flat files, whereas external web
-        tables access dynamic data sources – either on a web server or by executing OS commands or
-        scripts. </p>
+      <title>描述</title>
+      <p>有关外部表的详细信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的“使用外部表”。
+        </p>
+      <p><codeph>CREATE EXTERNAL TABLE</codeph>或<codeph>CREATE EXTERNAL WEB TABLE</codeph>在Greenplum数据库中创建一个新的可读外部表定义。
+        可读的外部表通常用于快速并行数据加载。
+        定义外部表后，您可以使用SQL命令直接（或并行）查询其数据。
+        例如，您可以选择，联接或排序外部表数据。
+        您也可以为外部表创建视图。
+        可读外部表上不允许DML操作（<codeph>UPDATE</codeph>，<codeph>INSERT</codeph>，<codeph>DELETE</codeph>或<codeph>TRUNCATE</codeph>），并且您不能在可读外部表上创建索引。
+        </p>
+      <p><codeph>CREATE WRITABLE EXTERNAL TABLE</codeph>或<codeph>CREATE WRITABLE EXTERNAL WEB TABLE</codeph>在Greenplum数据库中创建新的可写外部表定义。
+        可写的外部表通常用于将数据库中的数据卸载到一组文件或命名管道中。
+        可写的外部Web表也可以用于将数据输出到可执行程序。
+        可写的外部表也可以用作Greenplum并行MapReduce计算的输出目标。
+        一旦定义了可写外部表，就可以从数据库表中选择数据并将其插入可写外部表中。
+        可写的外部表仅允许<codeph>INSERT</codeph>操作 – 不允许执行<codeph>SELECT</codeph>，<codeph>UPDATE</codeph>，<codeph>DELETE</codeph>或<codeph>TRUNCATE</codeph>。
+        </p>
+      <p>常规外部表和外部Web表之间的主要区别在于它们的数据源。
+        常规可读的外部表访问静态平面文件，而外部Web表访问动态数据源 - 在Web服务器上或通过执行OS命令或脚本。
+        </p>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>READABLE | WRITABLE</pt>
-          <pd>Specifies the type of external table, readable being the default. Readable external
-            tables are used for loading data into Greenplum Database. Writable external tables are
-            used for unloading data. </pd>
+          <pd>指定外部表的类型，默认为可读。
+            可读的外部表用于将数据加载到Greenplum数据库中。
+            可写的外部表用于卸载数据。
+            </pd>
         </plentry>
         <plentry>
           <pt>WEB</pt>
-          <pd>Creates a readable or writable external web table definition in Greenplum Database.
-            There are two forms of readable external web tables – those that access files via the
-              <codeph>http://</codeph> protocol or those that access data by executing OS commands.
-            Writable external web tables output data to an executable program that can accept an
-            input stream of data. External web tables are not rescannable during query
-            execution.</pd>
-          <pd>The <codeph>s3</codeph> protocol does not support external web tables. You can,
-            however, create an external web table that executes a third-party tool to read data from
-            or write data to S3 directly.</pd>
+          <pd>在Greenplum数据库中创建一个可读或可写的外部Web表定义。
+            可读的外部Web表有两种形式 - 通过<codeph>http://</codeph>协议访问文件的表或通过执行OS命令访问数据的表。
+            可写的外部Web表将数据输出到可执行程序，该程序可以接受输入的数据流。
+            外部Web表在查询执行期间不可重新扫描。
+            </pd>
+          <pd><codeph>s3</codeph>协议不支持外部Web表。
+            但是，您可以创建一个外部Web表，该表执行第三方工具以从S3读取数据或直接向S3写入数据。
+            </pd>
         </plentry>
         <plentry>
           <pt>TEMPORARY | TEMP</pt>
-          <pd>If specified, creates a temporary readable or writable external table definition
-            in Greenplum Database. Temporary external tables exist in a special schema; you cannot
-            specify a schema name when you create the table. Temporary external tables are
-            automatically dropped at the end of a session.</pd>
-          <pd>An existing permanent table with the same name is not visible to the current session
-            while the temporary table exists, unless you reference the permanent table with its
-            schema-qualified name.</pd>
+          <pd>如果指定，则在Greenplum数据库中创建一个临时的可读或可写外部表定义。
+            临时外部表存在于特殊模式中。
+            创建表时，无法指定模式名称。
+            在会话结束时，将自动删除临时外部表。
+            </pd>
+          <pd>临时表存在时，当前会话将看不到具有相同名称的已知永久表，除非您引用具有其模式限定名称的永久表。
+            </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>table_name</varname>
           </pt>
-          <pd>The name of the new external table.</pd>
+          <pd>新外部表的名称。</pd>
         </plentry>
         <plentry>
           <pt>
             <varname>column_name</varname>
           </pt>
-          <pd>The name of a column to create in the external table definition. Unlike regular
-            tables, external tables do not have column constraints or default values, so do not
-            specify those.</pd>
+          <pd>要在外部表定义中创建的列的名称。
+            与常规表不同，外部表没有列约束或默认值，因此请不要指定它们。
+            </pd>
         </plentry>
         <plentry>
           <pt>LIKE <varname>other_table</varname></pt>
-          <pd>The <codeph>LIKE</codeph> clause specifies a table from which the new external table
-            automatically copies all column names, data types and Greenplum distribution policy. If
-            the original table specifies any column constraints or default column values, those will
-            not be copied over to the new external table definition.</pd>
+          <pd><codeph>LIKE</codeph>子句指定一个表，新的外部表将从该表中自动复制所有列名称，数据类型和Greenplum分配策略。
+            如果原始表指定了任何列约束或默认列值，则不会将这些约束复制到新的外部表定义中。
+            </pd>
         </plentry>
         <plentry>
           <pt>
             <varname>data_type</varname>
           </pt>
-          <pd>The data type of the column.</pd>
+          <pd>列的数据类型。</pd>
         </plentry>
         <plentry>
           <pt>LOCATION <varname>('protocol://[host[:port]]/path/file' [, ...])</varname></pt>
-          <pd>If you use the <codeph>pxf</codeph> protocol to access an external data source,
-          refer to the PXF <xref href="../../pxf/intro_pxf.html#create_external_table" format="html">Creating an External Table</xref>
-          documentation for detailed information about
-          the <codeph>pxf</codeph> protocol <codeph>LOCATION</codeph> clause syntax.</pd>
-          <pd>If you use the <codeph>s3</codeph> protocol to read or write to S3, refer to <xref
-              href="../../admin_guide/external/g-s3-protocol.xml#amazon-emr/section_stk_c2r_kx"/>
-            for additional information about the <codeph>s3</codeph> protocol
-              <codeph>LOCATION</codeph> clause syntax.</pd>
-          <pd>For readable external tables, specifies the URI of the external data source(s) to be
-            used to populate the external table or web table. Regular readable external tables allow
-            the <codeph>gpfdist</codeph> or <codeph>file</codeph> protocols. External web tables
-            allow the <codeph>http</codeph> protocol. If <codeph>port</codeph> is omitted, port
-              <codeph>8080</codeph> is assumed for <codeph>http</codeph> and
-              <codeph>gpfdist</codeph> protocols.
-            If using the <codeph>gpfdist</codeph> protocol, the <codeph>path</codeph> is
-            relative to the directory from which <codeph>gpfdist</codeph> is serving files (the
-            directory specified when you started the <codeph>gpfdist</codeph> program). Also,
-              <codeph>gpfdist</codeph> can use wildcards or other C-style pattern matching (for
-            example, a whitespace character is <codeph>[[:space:]]</codeph>) to denote multiple
-            files in a directory. For example:</pd>
+          <pd>如果使用<codeph>pxf</codeph>协议访问外部数据源，请参阅PXF<xref href="../../pxf/intro_pxf.html#create_external_table" format="html">创建外部表</xref>文档，
+            以获取有关<codeph>pxf</codeph>协议<codeph>LOCATION</codeph>子句语法的详细信息。
+            </pd>
+          <pd>如果使用<codeph>s3</codeph>协议读取或写入S3，请参阅<xref href="../../admin_guide/external/g-s3-protocol.xml#amazon-emr/section_stk_c2r_kx"/>，
+            以获取有关<codeph>s3</codeph>协议<codeph>LOCATION</codeph>子句语法的其他信息。
+            </pd>
+          <pd>对于可读的外部表，指定用于填充外部表或Web表的外部数据源的URI。
+            常规的可读外部表允许使用<codeph>gpfdist</codeph>或<codeph>file</codeph>协议。
+            外部Web表允许使用<codeph>http</codeph>协议。
+            如果省略<codeph>port</codeph>，则将<codeph>http</codeph>和<codeph>gpfdist</codeph>协议的端口假定为<codeph>8080</codeph>。
+            如果使用<codeph>gpfdist</codeph>协议，则<codeph>path</codeph>是相对于<codeph>gpfdist</codeph>从中提供文件的目录（启动<codeph>gpfdist</codeph>程序时指定的目录）。
+            另外，<codeph>gpfdist</codeph>可以使用通配符或其他C样式模式匹配（例如，空格字符为<codeph>[[:space:]]</codeph>）来表示目录中的多个文件。
+            例如：
+            </pd>
           <pd>
             <codeblock>'gpfdist://filehost:8081/*'
 'gpfdist://masterhost/my_load_file'
 'file://seghost1/dbfast1/external/myfile.txt'
 'http://intranet.example.com/finance/expenses.csv'</codeblock>
           </pd>
-          <pd>For writable external tables, specifies the URI location of the
-              <codeph>gpfdist</codeph> process or S3 protocol that will collect data output from the
-            Greenplum segments and write it to one or more named files. For <codeph>gpfdist</codeph>
-            the <codeph>path</codeph> is relative to the directory from which
-              <codeph>gpfdist</codeph> is serving files (the directory specified when you started
-            the <codeph>gpfdist</codeph> program). If multiple <codeph>gpfdist</codeph> locations
-            are listed, the segments sending data will be evenly divided across the available output
-            locations. For example:</pd>
+          <pd>对于可写的外部表，指定<codeph>gpfdist</codeph>进程或S3协议的URI位置，该进程将收集Greenplum segment中的数据输出并将其写入一个或多个命名文件。
+            对于<codeph>gpfdist</codeph>，该路径是相对于<codeph>gpfdist</codeph>从中提供文件的目录（启动<codeph>gpfdist</codeph>程序时指定的目录）的。
+            如果列出了多个<codeph>gpfdist</codeph>位置，则发送数据的segment将在可用的输出位置之间平均分配。
+            例如：
+            </pd>
           <pd>
             <codeblock>'gpfdist://outputhost:8081/data1.out',
 'gpfdist://outputhost:8081/data2.out'</codeblock>
           </pd>
-          <pd>With two <codeph>gpfdist</codeph> locations listed as in the above example, half of
-            the segments would send their output data to the <codeph>data1.out</codeph> file and the
-            other half to the <codeph>data2.out</codeph> file.</pd>
-          <pd>With the option <codeph>#transform=<varname>trans_name</varname></codeph>, you can
-            specify a transform to apply when loading or extracting data. The
-              <varname>trans_name</varname> is the name of the transform in the YAML configuration
-            file you specify with the you run the <codeph>gpfdist</codeph> utility. For information
-            about specifying a transform, see <xref
-              href="../../utility_guide/admin_utilities/gpfdist.xml#topic1"
-              ><codeph>gpfdist</codeph></xref> in the <cite>Greenplum Utility Guide</cite>. </pd>
+          <pd>在上面的示例中列出了两个<codeph>gpfdist</codeph>位置的情况下，一半的segment会将其输出数据发送到<codeph>data1.out</codeph>文件，另一半发送到<codeph>data2.out</codeph>文件。
+            </pd>
+          <pd>使用<codeph>#transform=<varname>trans_name</varname></codeph>选项，可以指定在加载或提取数据时要应用的转换。
+            <varname>trans_name</varname>是您在运行<codeph>gpfdist</codeph>实用程序时指定的YAML配置文件中转换的名称。
+            有关指定转换的信息，请参阅<cite>Greenplum实用程序指南</cite>中的<xref href="../../utility_guide/admin_utilities/gpfdist.xml#topic1"><codeph>gpfdist</codeph></xref>。
+            </pd>
         </plentry>
         <plentry>
           <pt>ON MASTER</pt>
-          <pd>Restricts all table-related operations to the Greenplum master segment. Permitted only
-            on readable and writable external tables created with the <codeph>s3</codeph> or custom
-            protocols. The <codeph>gpfdist</codeph>, <codeph>gpfdists</codeph>,
-              <codeph>pxf</codeph>, and <codeph>file</codeph> protocols do not support <codeph>ON
-              MASTER</codeph>. <note>Be aware of potential resource impacts when reading from or
-              writing to external tables you create with the <codeph>ON MASTER</codeph> clause. You
-              may encounter performance issues when you restrict table operations solely to the
-              Greenplum master segment.</note></pd>
+          <pd>将所有与表相关的操作限制为Greenplum master。
+            仅允许使用<codeph>s3</codeph>或自定义协议创建的可读写外部表。
+            <codeph>gpfdist</codeph>，<codeph>gpfdists</codeph>，<codeph>pxf</codeph>和<codeph>file</codeph>协议不支持<codeph>ON MASTER</codeph>。
+            <note>在使用<codeph>ON MASTER</codeph>子句读取或写入创建的外部表时，请注意潜在的资源影响。
+              当您仅将表操作限制为Greenplum master时，可能会遇到性能问题。
+              </note></pd>
         </plentry>
         <plentry>
           <pt>EXECUTE <varname>'command'</varname> [ON ...]</pt>
-          <pd>Allowed for readable external web tables or writable external tables only. For
-            readable external web tables, specifies the OS command to be executed by the segment
-            instances. The <varname>command</varname> can be a single OS command or a script. The
-              <codeph>ON</codeph> clause is used to specify which segment instances will execute the
-            given command.<ul id="ul_xd1_wq2_m4">
-              <li id="br150831">ON ALL is the default. The command will be executed by every active
-                (primary) segment instance on all segment hosts in the Greenplum Database system. If
-                the command executes a script, that script must reside in the same location on all
-                of the segment hosts and be executable by the Greenplum superuser
-                  (<codeph>gpadmin</codeph>).</li>
-              <li id="br153076">ON MASTER runs the command on the master host only. <note>Logging is
-                  not supported for external web tables when the <codeph>ON MASTER</codeph> clause
-                  is specified.</note></li>
-              <li id="br150832">ON <varname>number</varname> means the command will be executed by
-                the specified number of segments. The particular segments are chosen randomly at
-                runtime by the Greenplum Database system. If the command executes a script, that
-                script must reside in the same location on all of the segment hosts and be
-                executable by the Greenplum superuser (<codeph>gpadmin</codeph>). </li>
-              <li id="br150833">HOST means the command will be executed by one segment on each
-                segment host (once per segment host), regardless of the number of active segment
-                instances per host. </li>
-              <li id="br153082">HOST <varname>segment_hostname</varname> means the command will be
-                executed by all active (primary) segment instances on the specified segment host. </li>
-              <li id="br153092">SEGMENT <varname>segment_id</varname> means the command will be
-                executed only once by the specified segment. You can determine a segment instance's
-                ID by looking at the <varname>content</varname> number in the system catalog table
-                  <xref href="../system_catalogs/gp_segment_configuration.xml" type="topic"
-                  format="dita"/>. The <varname>content</varname> ID of the Greenplum Database
-                master is always <codeph>-1</codeph>.</li>
-            </ul><p>For writable external tables, the <varname>command</varname> specified in the
-                <codeph>EXECUTE</codeph> clause must be prepared to have data piped into it. Since
-              all segments that have data to send will write their output to the specified command
-              or program, the only available option for the <codeph>ON</codeph> clause is <codeph>ON
-                ALL</codeph>.</p></pd>
+          <pd>只允许可读的外部Web表或可写的外部表。
+            对于可读的外部Web表，指定要由segment实例执行的OS命令。
+            该<varname>command</varname>可以是单个OS命令或脚本。
+            <codeph>ON</codeph>子句用于指定哪些segment实例将执行给定命令。
+            <ul id="ul_xd1_wq2_m4">
+              <li id="br150831">默认为ON ALL。
+                该命令将由Greenplum数据库系统中所有segment主机上的每个活动primary实例执行。
+                如果命令执行脚本，则该脚本必须位于所有segment主机上的相同位置，并且可由Greenplum超级用户（<codeph>gpadmin</codeph>）执行。
+                </li>
+              <li id="br153076">ON MASTER仅在master主机上运行命令。
+                <note>指定<codeph>ON MASTER</codeph>子句时，外部Web表不支持日志记录。</note>
+                </li>
+              <li id="br150832">ON <varname>number</varname>表示将按指定的segment数执行命令。
+                特定的segment是在运行时由Greenplum数据库系统随机选择的。
+                如果命令执行脚本，则该脚本必须位于所有segment主机上的相同位置，并且可由Greenplum超级用户（<codeph>gpadmin</codeph>）执行。
+                </li>
+              <li id="br150833">HOST表示该命令将由每个segment主机上的一个segment执行（每个segment主机一次），而不管每个主机的活动segment实例数量如何。
+                </li>
+              <li id="br153082">HOST <varname>segment_hostname</varname>表示命令将由指定的segment主机上的所有活动primary实例执行。
+                </li>
+              <li id="br153092">SEGMENT <varname>segment_id</varname>表示命令只能由指定的segment执行一次。
+                您可以通过查看系统catalog表<xref href="../system_catalogs/gp_segment_configuration.xml" type="topic" format="dita"/>中的<varname>content</varname>编号来确定segment实例的ID。
+                Greenplum数据库主数据库的content  ID始终为<codeph>-1</codeph>。
+                </li>
+            </ul>
+            <p>对于可写外部表，必须准备在<codeph>EXECUTE</codeph>子句中指定的<varname>command</varname>以将数据传递到其中。
+              由于所有要发送数据的segment都会将其输出写入指定的命令或程序，因此<codeph>ON</codeph>子句的唯一可用选项是<codeph>ON ALL</codeph>。</p></pd>
         </plentry>
       </parml>
       <parml>
         <plentry>
           <pt>FORMAT 'TEXT | CSV' <varname>(options)</varname></pt>
-          <pd>When the <codeph>FORMAT</codeph> clause identfies delimited text (<codeph>TEXT</codeph>)
-            or comma separated values (<codeph>CSV</codeph>) format, formatting options are similar
-        to those available with the
-        PostgreSQL <codeph><xref href="COPY.xml#topic1" type="topic" format="dita"/></codeph>
-        command. If the data in the file does not use the default column delimiter, escape
-        character, null string and so on, you must specify the additional formatting options so that
-        the data in the external file is read correctly by Greenplum Database. For information about
-        using a custom format, see "Loading and Unloading Data" in the <cite>Greenplum Database
-          Administrator Guide</cite>.</pd>
-          <pd>If you use the <codeph>pxf</codeph> protocol to access an external data source,
-          refer to the PXF <xref href="../../pxf/intro_pxf.html#create_external_table" format="html">Creating an External Table</xref>
-          documentation for detailed information about
-          the <codeph>pxf</codeph> protocol <codeph>FORMAT</codeph> clause syntax.</pd>
+          <pd>当<codeph>FORMAT</codeph>子句标识定界文本（<codeph>TEXT</codeph>）或逗号分隔值（<codeph>CSV</codeph>）格式时，
+            格式设置选项与PostgreSQL <codeph><xref href="COPY.xml#topic1" type="topic" format="dita"/></codeph>命令可用的格式设置选项相似。
+            如果文件中的数据不使用默认的列定界符，转义符，空字符串等，则必须指定其他格式选项，以便Greenplum数据库可以正确读取外部文件中的数据。
+            有关使用自定义格式的信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的“加载和卸载数据”。
+            </pd>
+          <pd>如果使用<codeph>pxf</codeph>协议访问外部数据源，
+            请参阅PXF<xref href="../../pxf/intro_pxf.html#create_external_table" format="html">创建外部表</xref>文档，以获取有关<codeph>pxf</codeph>协议<codeph>FORMAT</codeph>子句语法的详细信息。
+            </pd>
         </plentry>
         <plentry>
           <pt>FORMAT 'CUSTOM' (formatter=<varname>formatter_specification</varname>)</pt>
-          <pd>Specifies a custom data format. The <varname>formatter_specification</varname>
-            specifies the function to use to format the data, followed by comma-separated parameters
-            to the formatter function. The length of the formatter specification, the string
-            including <codeph>Formatter=</codeph>, can be up to approximately 50K bytes.</pd>
-          <pd>If you use the <codeph>pxf</codeph> protocol to access an external data source,
-          refer to the PXF <xref href="../../pxf/intro_pxf.html#create_external_table" format="html">Creating an External Table</xref>
-          documentation for detailed information about
-          the <codeph>pxf</codeph> protocol <codeph>FORMAT</codeph> clause syntax.</pd>
-          <pd>For general information about using a custom format, see "Loading and Unloading Data" in the
-              <cite>Greenplum Database Administrator Guide</cite>.</pd>
+          <pd>指定自定义数据格式。
+            <varname>formatter_specification</varname>指定用于格式化数据的函数，后跟格式化函数的逗号分隔参数。
+            格式化程序规范的长度（包括<codeph>Formatter=</codeph>的字符串）最多可达到约50K字节。
+            </pd>
+          <pd>如果使用<codeph>pxf</codeph>协议访问外部数据源，
+            请参阅PXF<xref href="../../pxf/intro_pxf.html#create_external_table" format="html">创建外部表</xref>文档，
+            以获取有关<codeph>pxf</codeph>协议<codeph>FORMAT</codeph>子句语法的详细信息。
+            </pd>
+          <pd>有关使用自定义格式的一般信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的“加载和卸载数据”。
+            </pd>
         </plentry>
         <plentry>
           <pt>DELIMITER</pt>
-          <pd>Specifies a single ASCII character that separates columns within each row (line) of
-            data. The default is a tab character in <codeph>TEXT</codeph> mode, a comma in
-              <codeph>CSV</codeph> mode. In <codeph>TEXT</codeph> mode for readable external tables,
-            the delimiter can be set to <codeph>OFF</codeph> for special use cases in which
-            unstructured data is loaded into a single-column table. </pd>
-          <pd>For the <codeph>s3</codeph> protocol, the delimiter cannot be a newline character
-              (<codeph>\n</codeph>) or a carriage return character (<codeph>\r</codeph>).</pd>
+          <pd>指定一个ASCII字符，用于分隔数据的每一行（行）中的列。
+            默认为<codeph>TEXT</codeph>模式下的制表符，而<codeph>CSV</codeph>模式下为逗号。
+            在用于可读外部表的<codeph>TEXT</codeph>模式下，对于将非结构化数据加载到单列表的特殊用例，可以将定界符设置为<codeph>OFF</codeph>。
+            </pd>
+          <pd>对于<codeph>s3</codeph>协议，定界符不能为换行符（<codeph>\n</codeph>）或回车符（<codeph>\r</codeph>）。
+            </pd>
         </plentry>
         <plentry>
           <pt>NULL</pt>
-          <pd>Specifies the string that represents a <codeph>NULL</codeph> value. The default is
-              <codeph>\N</codeph> (backslash-N) in <codeph>TEXT</codeph> mode, and an empty value
-            with no quotations in <codeph>CSV</codeph> mode. You might prefer an empty string even
-            in <codeph>TEXT</codeph> mode for cases where you do not want to distinguish
-              <codeph>NULL</codeph> values from empty strings. When using external and web tables,
-            any data item that matches this string will be considered a <codeph>NULL</codeph> value. </pd>
-          <pd>As an example for the <codeph>text</codeph> format, this <codeph>FORMAT</codeph>
-            clause can be used to specify that the string of two single quotes (<codeph>''</codeph>)
-            is a <codeph>NULL</codeph> value. </pd>
+          <pd>指定表示<codeph>NULL</codeph>值的字符串。
+            在<codeph>TEXT</codeph>模式下，默认值为<codeph>\N</codeph>（反斜杠-N），在<codeph>CSV</codeph>模式下，默认值为无引号的空值。
+            对于不希望将<codeph>NULL</codeph>值与空字符串区分开的情况，即使在<codeph>TEXT</codeph>模式下，您也可能更喜欢空字符串。
+            使用外部表和Web表时，与该字符串匹配的任何数据项都将被视为<codeph>NULL</codeph>值。
+            </pd>
+          <pd>作为<codeph>text</codeph>格式的示例，此<codeph>FORMAT</codeph>子句可用于指定两个单引号（<codeph>''</codeph>）的字符串为<codeph>NULL</codeph>值。
+            </pd>
           <pd>
             <codeblock>FORMAT 'text' (delimiter ',' null '\'\'\'\'' )</codeblock>
           </pd>
         </plentry>
         <plentry>
           <pt>ESCAPE</pt>
-          <pd>Specifies the single character that is used for C escape sequences (such as
-              <codeph>\n</codeph>,<codeph>\t</codeph>,<codeph>\100</codeph>, and so on) and for
-            escaping data characters that might otherwise be taken as row or column delimiters. Make
-            sure to choose an escape character that is not used anywhere in your actual column data.
-            The default escape character is a \ (backslash) for text-formatted files and a
-              <codeph>"</codeph> (double quote) for csv-formatted files, however it is possible to
-            specify another character to represent an escape. It is also possible to disable
-            escaping in text-formatted files by specifying the value <codeph>'OFF'</codeph> as the
-            escape value. This is very useful for data such as text-formatted web log data that has
-            many embedded backslashes that are not intended to be escapes.</pd>
+          <pd>指定用于C转义序列的单个字符（例如<codeph>\n</codeph>，<codeph>\t</codeph>，<codeph>\100</codeph>等）和转义可能用作行或列定界符的数据字符。
+            确保选择一个在实际列数据中未使用的转义字符。
+            对于文本格式的文件，默认转义字符是\（反斜杠），对于csv格式的文件，默认转义字符是<codeph>"</codeph>（双引号），但是可以指定另一个字符来表示转义。
+            也可以通过将值<codeph>'OFF'</codeph>指定为转义值在文本格式化文件中禁用文本转义。
+            这对于诸如文本格式的Web日志数据之类的数据非常有用，该数据具有许多嵌入式反斜杠，而这些反斜杠并非旨在转义。
+            </pd>
         </plentry>
         <plentry>
           <pt>NEWLINE</pt>
-          <pd>Specifies the newline used in your data files – <codeph>LF</codeph> (Line feed, 0x0A),
-              <codeph>CR</codeph> (Carriage return, 0x0D), or <codeph>CRLF</codeph> (Carriage return
-            plus line feed, 0x0D 0x0A). If not specified, a Greenplum Database segment will detect
-            the newline type by looking at the first row of data it receives and using the first
-            newline type encountered.</pd>
+          <pd>指定数据文件中使用的换行符 – <codeph>LF</codeph>（换行，0x0A），
+            <codeph>CR</codeph>（回车，0x0D）或<codeph>CRLF</codeph>（回车加换行，0x0D 0x0A）。
+            如果未指定，Greenplum数据库segment将通过查看接收到的第一行数据并使用遇到的第一个换行符类型来检测换行符类型。
+            </pd>
         </plentry>
         <plentry>
           <pt>HEADER</pt>
-          <pd>For readable external tables, specifies that the first line in the data file(s) is a
-            header row (contains the names of the table columns) and should not be included as data
-            for the table. If using multiple data source files, all files must have a header
-            row.</pd>
-          <pd>For the <codeph>s3</codeph> protocol, the column names in the header row cannot
-            contain a newline character (<codeph>\n</codeph>) or a carriage return
-              (<codeph>\r</codeph>).</pd>
-          <pd>The <codeph>pxf</codeph> protocol does not support the <codeph>HEADER</codeph> formatting option.</pd>
+          <pd>对于可读的外部表，指定数据文件中的第一行是标题行（包含表列的名称），并且不应包括表的数据在内。
+            如果使用多个数据源文件，则所有文件都必须具有标题行。
+            </pd>
+          <pd>对于<codeph>s3</codeph>协议，标题行中的列名称不能包含换行符（<codeph>\n</codeph>）或回车符（<codeph>\r</codeph>）。
+            </pd>
+          <pd><codeph>pxf</codeph>协议不支持<codeph>HEADER</codeph>格式化选项。</pd>
         </plentry>
         <plentry>
           <pt>QUOTE</pt>
-          <pd>Specifies the quotation character for <codeph>CSV</codeph> mode. The default is
-            double-quote (<codeph>"</codeph>).</pd>
+          <pd>指定<codeph>CSV</codeph>模式的引号字符。默认值为双引号（<codeph>"</codeph>）。
+            </pd>
         </plentry>
         <plentry>
           <pt>FORCE NOT NULL</pt>
-          <pd>In <codeph>CSV</codeph> mode, processes each specified column as though it were quoted
-            and hence not a <codeph>NULL</codeph> value. For the default null string in
-              <codeph>CSV</codeph> mode (nothing between two delimiters), this causes missing values
-            to be evaluated as zero-length strings.</pd>
+          <pd>在<codeph>CSV</codeph>模式下，处理每个指定的列就好像被引用了一样，因此不是<codeph>NULL</codeph>值。
+            对于<codeph>CSV</codeph>模式下的默认空字符串（两个定界符之间都不存在），这将导致缺失值被评估为零长度字符串。
+            </pd>
         </plentry>
         <plentry>
           <pt>FORCE QUOTE</pt>
-          <pd>In <codeph>CSV</codeph> mode for writable external tables, forces quoting to be used
-            for all non-<codeph>NULL</codeph> values in each specified column. If <codeph>*</codeph>
-            is specified then non-<codeph>NULL</codeph> values will be quoted in all columns.
-            <codeph>NULL</codeph> output is never quoted.</pd>
+          <pd>在可写外部表的<codeph>CSV</codeph>模式下，强制将引号用于每个指定列中的所有非<codeph>NULL</codeph>值。
+            如果指定<codeph>*</codeph>，则在所有列中都引用非<codeph>NULL</codeph>值。
+            <codeph>NULL</codeph>输出从不引用。
+            </pd>
         </plentry>
         <plentry>
           <pt>FILL MISSING FIELDS</pt>
-          <pd>In both <codeph>TEXT</codeph> and <codeph>CSV</codeph> mode for readable external
-            tables, specifying <codeph>FILL MISSING FIELDS</codeph> will set missing trailing field
-            values to <codeph>NULL</codeph> (instead of reporting an error) when a row of data has
-            missing data fields at the end of a line or row. Blank rows, fields with a <codeph>NOT
-              NULL</codeph> constraint, and trailing delimiters on a line will still report an
-            error.</pd>
+          <pd>对于可读外部表，在<codeph>TEXT</codeph>和<codeph>CSV</codeph>模式下，指定<codeph>FILL MISSING FIELDS</codeph>时，
+            如果一行数据的行或行末尾缺少数据字段，则将缺少的尾随字段值设置为<codeph>NULL</codeph>（而不是报告错误）。
+            空白行，具有<codeph>NOT NULL</codeph>约束的字段以及行尾的定界符仍然会报告错误。
+            </pd>
         </plentry>
         <plentry>
           <pt>ENCODING <varname>'encoding'</varname></pt>
-          <pd>Character set encoding to use for the external table. Specify a string constant (such
-            as <codeph>'SQL_ASCII'</codeph>), an integer encoding number, or
-              <codeph>DEFAULT</codeph> to use the default client encoding. See <xref
-              href="../character_sets.xml" type="topic" format="dita"/>.</pd>
+          <pd>用于外部表的字符集编码。
+            指定字符串常量（例如<codeph>'SQL_ASCII'</codeph>），整数编码数字或<codeph>DEFAULT</codeph>以使用默认的客户端编码。
+            请参见<xref href="../character_sets.xml" type="topic" format="dita"/>。
+            </pd>
         </plentry>
         <plentry>
           <pt>LOG ERRORS</pt>
-          <pd>This is an optional clause that can precede a <codeph>SEGMENT REJECT LIMIT</codeph>
-            clause to log information about rows with formatting errors. The error log information
-            is stored internally and is accessed with the Greenplum Database built-in SQL function
-              <codeph>gp_read_error_log()</codeph>.</pd>
-          <pd>See <xref href="#topic1/section8" format="dita"/> for information about the error log
-            information and built-in functions for viewing and managing error log information.</pd>
+          <pd>这是一个可选的子句，可以在<codeph>SEGMENT REJECT LIMIT</codeph>子句之前记录有关具有格式错误的行的信息。
+            错误日志信息存储在内部，并可以通过Greenplum数据库内置的SQL函数<codeph>gp_read_error_log()</codeph>进行访问。
+            </pd>
+          <pd>请参阅<xref href="#topic1/section8" format="dita"/>以获取有关错误日志信息的信息以及用于查看和管理错误日志信息的内置函数。
+            </pd>
         </plentry>
         <plentry>
           <pt>SEGMENT REJECT LIMIT <varname>count</varname> [ROWS | PERCENT]</pt>
-          <pd>Runs a <codeph>COPY FROM</codeph> operation in single row error isolation mode. If the
-            input rows have format errors they will be discarded provided that the reject limit
-            count is not reached on any Greenplum segment instance during the load operation. The
-            reject limit count can be specified as number of rows (the default) or percentage of
-            total rows (1-100). If <codeph>PERCENT</codeph> is used, each segment starts calculating
-            the bad row percentage only after the number of rows specified by the parameter
-              <codeph>gp_reject_percent_threshold</codeph> has been processed. The default for
-              <codeph>gp_reject_percent_threshold</codeph> is 300 rows. Constraint errors such as
-            violation of a <codeph>NOT NULL</codeph>, <codeph>CHECK</codeph>, or
-              <codeph>UNIQUE</codeph> constraint will still be handled in "all-or-nothing" input
-            mode. If the limit is not reached, all good rows will be loaded and any error rows
-            discarded.</pd>
+          <pd>在单行错误隔离模式下运行<codeph>COPY FROM</codeph>操作。
+            如果输入行存在格式错误，只要在加载操作期间未在任何Greenplum segment实例上达到拒绝限制计数，它们将被丢弃。
+            拒绝限制计数可以指定为行数（默认）或总行数的百分比（1-100）。
+            如果使用<codeph>PERCENT</codeph>，则只有在处理了参数<codeph>gp_reject_percent_threshold</codeph>指定的行数之后，每个segment才开始计算错误行百分比。
+            <codeph>gp_reject_percent_threshold</codeph>的默认值为300行。
+            约束错误（例如违反<codeph>NOT NULL</codeph>，<codeph>CHECK</codeph>或<codeph>UNIQUE</codeph>约束）仍将在“全有或全无”输入模式下处理。
+            如果未达到限制，则将加载所有正确的行，并丢弃所有错误行。
+            </pd>
           <pd>
-            <note>When reading an external table, Greenplum Database limits the initial number of
-              rows that can contain formatting errors if the <codeph>SEGMENT REJECT LIMIT</codeph>
-              is not triggered first or is not specified. If the first 1000 rows are rejected, the
-                <codeph>COPY</codeph> operation is stopped and rolled back. <p>The limit for the
-                number of initial rejected rows can be changed with the Greenplum Database server
-                configuration parameter <codeph>gp_initial_bad_row_limit</codeph>. See <xref
-                  href="../config_params/guc_config.xml#topic1"/> for information about the
-                parameter. </p></note>
+            <note>读取外部表时，如果未首先触发<codeph>SEGMENT REJECT LIMIT</codeph>或未指定<codeph>SEGMENT REJECT LIMIT</codeph>，
+              则Greenplum数据库会限制可能包含格式错误的初始行数。
+              如果前1000行被拒绝，则<codeph>COPY</codeph>操作将停止并回滚。
+              <p>可以使用Greenplum数据库服务器配置参数<codeph>gp_initial_bad_row_limit</codeph>更改初始拒绝行数的限制。
+                有关参数的信息，请参阅<xref href="../config_params/guc_config.xml#topic1"/>。
+                </p></note>
           </pd>
         </plentry>
         <plentry>
           <pt>DISTRIBUTED BY ({<varname>column</varname> [<varname>opclass</varname>]}, [ ... ]
             )</pt>
           <pt>DISTRIBUTED RANDOMLY</pt>
-          <pd>Used to declare the Greenplum Database distribution policy for a writable external
-            table. By default, writable external tables are distributed randomly. If the source
-            table you are exporting data from has a hash distribution policy, defining the same
-            distribution key column(s) and operator class(es), <codeph>oplcass</codeph>, for the
-            writable external table will improve unload performance by eliminating the need to move
-            rows over the interconnect. When you issue an unload command such as <codeph>INSERT INTO
-                <varname>wex_table</varname> SELECT * FROM <varname>source_table</varname></codeph>,
-            the rows that are unloaded can be sent directly from the segments to the output location
-            if the two tables have the same hash distribution policy.</pd>
+          <pd>用于声明可写外部表的Greenplum数据库分发策略。
+            默认情况下，可写外部表是随机分布的。
+            如果要从中导出数据的源表具有哈希分发策略，并且为可写外部表定义了相同的分发键列和运算符类<codeph>oplcass</codeph>，
+            则将消除在interconnect上移动行的需要，从而提高了卸载性能。
+            当您发出诸如<codeph>INSERT INTO <varname>wex_table</varname> SELECT * FROM <varname>source_table</varname></codeph>之类的卸载命令时，
+            如果两个表具有相同的哈希分配策略，则可以将这些已卸载的行直接从segment发送到输出位置。
+            </pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Examples</title>
-      <p>Start the <codeph>gpfdist</codeph> file server program in the background on port
-          <codeph>8081</codeph> serving files from directory <codeph>/var/data/staging</codeph>: </p>
+      <title>示例</title>
+      <p>在端口<codeph>8081</codeph>的后台启动<codeph>gpfdist</codeph>文件服务器程序，以服务目录<codeph>/var/data/staging</codeph>中的文件：
+        </p>
       <codeblock>gpfdist -p 8081 -d /var/data/staging -l /home/<varname>gpadmin</varname>/log &amp;</codeblock>
-      <p>Create a readable external table named <codeph>ext_customer</codeph> using the
-          <codeph>gpfdist</codeph> protocol and any text formatted files (<codeph>*.txt</codeph>)
-        found in the <codeph>gpfdist</codeph> directory. The files are formatted with a pipe
-          (<codeph>|</codeph>) as the column delimiter and an empty space as <codeph>NULL</codeph>.
-        Also access the external table in single row error isolation mode:</p>
+      <p>使用<codeph>gpfdist</codeph>协议和<codeph>gpfdist</codeph>目录中找到的所有文本格式文件（<codeph>*.txt</codeph>）创建一个名为<codeph>ext_customer</codeph>的可读外部表。
+        使用竖线（<codeph>|</codeph>）作为列定界符，并使用空白作为<codeph>NULL</codeph>来格式化文件。
+        还要以单行错误隔离模式访问外部表：
+        </p>
       <codeblock>CREATE EXTERNAL TABLE ext_customer
    (id int, name text, sponsor text) 
    LOCATION ( 'gpfdist://filehost:8081/*.txt' ) 
    FORMAT 'TEXT' ( DELIMITER '|' NULL ' ')
    LOG ERRORS SEGMENT REJECT LIMIT 5;</codeblock>
-      <p>Create the same readable external table definition as above, but with CSV formatted
-        files:</p>
+      <p>创建与上述相同的可读外部表定义，但使用CSV格式的文件：
+        </p>
       <codeblock>CREATE EXTERNAL TABLE ext_customer 
    (id int, name text, sponsor text) 
    LOCATION ( 'gpfdist://filehost:8081/*.csv' ) 
    FORMAT 'CSV' ( DELIMITER ',' );</codeblock>
-      <p>Create a readable external table named <codeph>ext_expenses</codeph> using the
-          <codeph>file</codeph> protocol and several CSV formatted files that have a header row:</p>
+      <p>使用<codeph>file</codeph>协议和一些带有标题行的CSV格式的文件，创建一个名为<codeph>ext_expenses</codeph>的可读外部表：
+        </p>
       <codeblock>CREATE EXTERNAL TABLE ext_expenses (name text, date date, 
 amount float4, category text, description text) 
 LOCATION ( 
@@ -511,74 +455,68 @@ LOCATION (
 'file://seghost3/dbfast/external/expenses6.csv' 
 )
 FORMAT 'CSV' ( HEADER );</codeblock>
-      <p>Create a readable external web table that executes a script once per segment host:</p>
+      <p>创建一个可读的外部Web表，每个表主机执行一次脚本：</p>
       <codeblock>CREATE EXTERNAL WEB TABLE log_output (linenum int, message 
 text)  EXECUTE '/var/load_scripts/get_log_data.sh' ON HOST 
  FORMAT 'TEXT' (DELIMITER '|');</codeblock>
-      <p>Create a writable external table named <codeph>sales_out</codeph> that uses
-          <codeph>gpfdist</codeph> to write output data to a file named <codeph>sales.out</codeph>.
-        The files are formatted with a pipe (<codeph>|</codeph>) as the column delimiter and an
-        empty space as <codeph>NULL</codeph>.</p>
+      <p>创建一个名为<codeph>sales_out</codeph>的可写外部表，该表使用<codeph>gpfdist</codeph>将输出数据写入名为<codeph>sales.out</codeph>的文件。
+        使用竖线（<codeph>|</codeph>）作为列定界符，并使用空白作为<codeph>NULL</codeph>来格式化文件。
+        </p>
       <codeblock>CREATE WRITABLE EXTERNAL TABLE sales_out (LIKE sales) 
    LOCATION ('gpfdist://etl1:8081/sales.out')
    FORMAT 'TEXT' ( DELIMITER '|' NULL ' ')
    DISTRIBUTED BY (txn_id);</codeblock>
-      <p>Create a writable external web table that pipes output data received by the segments to an
-        executable script named <codeph>to_adreport_etl.sh</codeph>:</p>
+      <p>创建一个可写的外部Web表，将segment接收的输出数据通过管道传输到名为<codeph>to_adreport_etl.sh</codeph>的可执行脚本：
+        </p>
       <codeblock>CREATE WRITABLE EXTERNAL WEB TABLE campaign_out 
 (LIKE campaign) 
  EXECUTE '/var/unload_scripts/to_adreport_etl.sh'
  FORMAT 'TEXT' (DELIMITER '|');</codeblock>
-      <p>Use the writable external table defined above to unload selected data:</p>
+      <p>使用上面定义的可写外部表来卸载所选数据：</p>
       <codeblock>INSERT INTO campaign_out SELECT * FROM campaign WHERE 
 customer_id=123;</codeblock>
     </section>
     <section id="section8">
-      <title>Notes</title>
-      <p>When you specify the <codeph>LOG ERRORS</codeph> clause, Greenplum Database captures errors
-        that occur while reading the external table data. You can view and manage the captured error
-        log data. </p>
+      <title>注解</title>
+      <p>当您指定<codeph>LOG ERRORS</codeph>子句时，Greenplum数据库将捕获读取外部表数据时发生的错误。
+        您可以查看和管理捕获的错误日志数据。
+        </p>
       <ul id="ul_wk3_jdj_bp">
-        <li>Use the built-in SQL function
-            <codeph>gp_read_error_log('<varname>table_name</varname>')</codeph>. It requires
-            <codeph>SELECT</codeph> privilege on <varname>table_name</varname>. This example
-          displays the error log information for data loaded into table
-            <codeph>ext_expenses</codeph> with a <codeph>COPY</codeph>
-            command:<codeblock>SELECT * from gp_read_error_log('ext_expenses');</codeblock><p>For
-            information about the error log format, see <xref
-              href="../../admin_guide/load/topics/g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58"
-              >Viewing Bad Rows in the Error Log</xref> in the <cite>Greenplum Database
-              Administrator Guide</cite>.</p><p>The function returns <codeph>FALSE</codeph> if
-              <varname>table_name</varname> does not exist.</p></li>
-        <li>If error log data exists for the specified table, the new error log data is appended to
-          existing error log data. The error log information is not replicated to mirror
-          segments.</li>
-        <li>Use the built-in SQL function
-              <codeph>gp_truncate_error_log('<varname>table_name</varname>')</codeph> to delete the
-          error log data for <varname>table_name</varname>. It requires the table owner privilege
-          This example deletes the error log information captured when moving data into the table
-            <codeph>ext_expenses</codeph>:<codeblock>SELECT gp_truncate_error_log('ext_expenses'); </codeblock><p>The
-            function returns <codeph>FALSE</codeph> if <varname>table_name</varname> does not
-            exist.</p><p>Specify the <codeph>*</codeph> wildcard character to delete error log
-            information for existing tables in the current database. Specify the string
-              <codeph>*.*</codeph> to delete all database error log information, including error log
-            information that was not deleted due to previous database issues. If * is specified,
-            database owner privilege is required. If <codeph>*.*</codeph> is specified, operating
-            system super-user privilege is required.</p></li>
+        <li>使用内置的SQL函数<codeph>gp_read_error_log('<varname>table_name</varname>')</codeph>。
+          它要求对<varname>table_name</varname>具有<codeph>SELECT</codeph>特权。
+          本示例使用<codeph>COPY</codeph>命令显示加载到表<codeph>ext_expenses</codeph>中的数据的错误日志信息：
+          <codeblock>SELECT * from gp_read_error_log('ext_expenses');</codeblock>
+          <p>有关错误日志格式的信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的<xref href="../../admin_guide/load/topics/g-viewing-bad-rows-in-the-error-table-or-error-log.xml#topic58">查看错误日志中的坏行</xref>。
+            </p>
+          <p>如果<varname>table_name</varname>不存在，则该函数返回<codeph>FALSE</codeph>。
+            </p></li>
+        <li>如果指定表存在错误日志数据，则新的错误日志数据将附加到现有错误日志数据中。
+          错误日志信息不会复制到mirror。
+          </li>
+        <li>使用内置的SQL函数<codeph>gp_truncate_error_log('<varname>table_name</varname>')</codeph>删除<varname>table_name</varname>的错误日志数据。
+          它需要表所有者特权。本示例删除将数据移入表<codeph>ext_expenses</codeph>时捕获的错误日志信息：
+          <codeblock>SELECT gp_truncate_error_log('ext_expenses'); </codeblock>
+          <p>如果<varname>table_name</varname>不存在，则该函数返回<codeph>FALSE</codeph>。
+            </p>
+          <p>指定<codeph>*</codeph>通配符可删除当前数据库中现有表的错误日志信息。
+            指定字符串<codeph>*.*</codeph>以删除所有数据库错误日志信息，包括由于先前的数据库问题而未被删除的错误日志信息。
+            如果指定<codeph>*</codeph>，则需要数据库所有者特权。
+            如果指定<codeph>*.*</codeph>，则需要操作系统超级用户特权。
+            </p></li>
       </ul>
-      <p>When multiple Greenplum Database external tables are defined with the
-          <codeph>gpfdist</codeph>, <codeph>gpfdists</codeph>, or <codeph>file</codeph> protocol and
-        access the same named pipe a Linux system, Greenplum Database restricts access to the named
-        pipe to a single reader. An error is returned if a second reader attempts to access the
-        named pipe. </p>
+      <p>当使用<codeph>gpfdist</codeph>，<codeph>gpfdists</codeph>或<codeph>file</codeph>协议定义了多个Greenplum数据库外部表并访问Linux系统中的同一命名管道时，
+        Greenplum数据库会将对命名管道的访问限制为单个读取器。
+        如果第二个读取器尝试访问命名管道，则返回错误。
+        </p>
     </section>
     <section id="section6">
-      <title>Compatibility</title>
-      <p><codeph>CREATE EXTERNAL TABLE</codeph> is a Greenplum Database extension. The SQL standard
-        makes no provisions for external tables.</p>
+      <title>兼容性</title>
+      <p><codeph>CREATE EXTERNAL TABLE</codeph>是Greenplum数据库扩展。
+        SQL标准没有为外部表做任何准备。
+        </p>
     </section>
     <section id="section7">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="./CREATE_TABLE_AS.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./CREATE_TABLE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="COPY.xml#topic1" type="topic" format="dita"/></codeph>,

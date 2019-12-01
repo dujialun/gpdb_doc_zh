@@ -1,56 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="az137232">CREATE TEXT SEARCH DICTIONARY</title><body><p id="sql_command_desc">Defines a new text search dictionary.</p><section id="section2"><title>Synopsis</title></section>
-    <codeblock id="sql_command_synopsis">CREATE TEXT SEARCH DICTIONARY <varname>name</varname> (
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="az137232">CREATE TEXT SEARCH DICTIONARY</title>
+    <body>
+        <p id="sql_command_desc">定义一个新的文本搜索字典。</p>
+        <section id="section2">
+            <title>概要</title>
+        </section>
+        <codeblock id="sql_command_synopsis">CREATE TEXT SEARCH DICTIONARY <varname>name</varname> (
     TEMPLATE = <varname>template</varname>
     [, <varname>option</varname> = <varname>value</varname> [, ... ]]
-)</codeblock><section id="section3"><title>Description</title>
-      <p><varname>CREATE TEXT SEARCH DICTIONARY</varname> creates a new text search dictionary. A
-        text search dictionary specifies a way of recognizing interesting or uninteresting words for
-        searching. A dictionary depends on a text search template, which specifies the functions
-        that actually perform the work. Typically the dictionary provides some options that control
-        the detailed behavior of the template's functions.</p>
-      <p>If a schema name is given then the text search dictionary is created in the specified
-        schema. Otherwise it is created in the current schema.</p>
-      <p>The user who defines a text search dictionary becomes its owner.</p>
-      <p>Refer to <xref href="../../admin_guide/textsearch/full-text-search.xml#full-text-search"/>
-        for further information.</p></section><section id="section4"><title>Parameters</title>
-      <parml>
-        <plentry>
-          <pt><codeph><varname>name</varname></codeph></pt>
-          <pd>The name of the text search dictionary to be created. The name can be
-            schema-qualified.</pd>
-        </plentry>
-        <plentry>
-          <pt><codeph><varname>template</varname></codeph></pt>
-          <pd>The name of the text search template that will define the basic behavior of this
-            dictionary.</pd>
-        </plentry>
-        <plentry>
-          <pt><codeph><varname>option</varname></codeph></pt>
-          <pd>The name of a template-specific option to be set for this dictionary.</pd>
-        </plentry>
-        <plentry>
-          <pt><codeph><varname>value</varname></codeph></pt>
-          <pd>The value to use for a template-specific option. If the value is not a simple
-            identifier or number, it must be quoted (but you can always quote it, if you wish).</pd>
-        </plentry>
-      </parml>
-      <p>The options can appear in any order.</p>
-            
-</section><section id="section5">
-      <title>Examples</title>
-      <p>The following example command creates a Snowball-based dictionary with a nonstandard list
-        of stop words.</p>
-      <pre>CREATE TEXT SEARCH DICTIONARY my_russian (
+)</codeblock>
+        <section id="section3">
+            <title>描述</title>
+            <p><varname>CREATE TEXT SEARCH DICTIONARY</varname>创建一个新的文本搜索字典。
+                文本搜索字典指定一种识别有趣或不有趣的单词的搜索方式。
+                词典取决于文本搜索模板，该模板指定了实际执行工作的函数。
+                通常，字典提供一些选项来控制模板函数的详细行为。
+            </p>
+            <p>如果指定了模式名称，则会在指定的模式中创建文本搜索字典。
+                否则，它将在当前模式中创建。
+            </p>
+            <p>定义文本搜索词典的用户将成为其所有者。</p>
+            <p>更多信息请参考<xref href="../../admin_guide/textsearch/full-text-search.xml#full-text-search"/>。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <codeph>
+                            <varname>name</varname>
+                        </codeph>
+                    </pt>
+                    <pd>要创建的文本搜索字典的名称。该名称可以由模式指定。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <codeph>
+                            <varname>template</varname>
+                        </codeph>
+                    </pt>
+                    <pd>文本搜索模板的名称，它将定义此词典的基本行为。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <codeph>
+                            <varname>option</varname>
+                        </codeph>
+                    </pt>
+                    <pd>要为此字典设置的模板特定选项的名称。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <codeph>
+                            <varname>value</varname>
+                        </codeph>
+                    </pt>
+                    <pd>用于模板特定选项的值。
+                        如果该值不是简单的标识符或数字，则必须用引号引起来（但如果需要，您可以始终用引号引起来）。
+                    </pd>
+                </plentry>
+            </parml>
+            <p>选项可以按任何顺序出现。</p>
+
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>以下示例命令使用不标准的停用词列表创建一个基于Snowball的字典。
+            </p>
+            <pre>CREATE TEXT SEARCH DICTIONARY my_russian (
     template = snowball,
     language = russian,
     stopwords = myrussian
 );</pre>
-    </section><section
-          id="section6"><title>Compatibility</title><p>There is no <codeph>CREATE TEXT SEARCH
-            DICTIONARY</codeph> statement in the SQL standard.</p></section><section
-              id="section7"><title>See Also</title><p><codeph><xref href="ALTER_TEXT_SEARCH_DICTIONARY.xml#topic1" type="topic" format="dita"
-          /></codeph>, <codeph><xref href="./DROP_TEXT_SEARCH_DICTIONARY.xml#topic1" type="topic"
-            format="dita"/></codeph></p></section></body></topic>
+        </section>
+        <section
+                id="section6">
+            <title>兼容性</title>
+            <p>SQL标准中没有<codeph>CREATE TEXT SEARCH DICTIONARY</codeph>语句。
+            </p>
+        </section>
+        <section
+                id="section7">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_TEXT_SEARCH_DICTIONARY.xml#topic1" type="topic" format="dita"
+                    />
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./DROP_TEXT_SEARCH_DICTIONARY.xml#topic1" type="topic"
+                          format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

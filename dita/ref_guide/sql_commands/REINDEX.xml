@@ -1,84 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title id="dz20941">REINDEX</title>
-  <body>
-    <p id="sql_command_desc">Rebuilds indexes.</p>
-    <section id="section2"
-      ><title>Synopsis</title><codeblock id="sql_command_synopsis">REINDEX {INDEX | TABLE | DATABASE | SYSTEM} <varname>name</varname></codeblock></section>
-    <section id="section3"><title>Description</title><p><codeph>REINDEX</codeph> rebuilds an index
-        using the data stored in the index's table, replacing the old copy of the index. There are
-        several scenarios in which to use <codeph>REINDEX</codeph>: </p><ul>
-        <li id="dz154728">An index has become bloated, that is, it contains many empty or
-          nearly-empty pages. This can occur with B-tree indexes in Greenplum Database under certain
-          uncommon access patterns. <codeph>REINDEX</codeph> provides a way to reduce the space
-          consumption of the index by writing a new version of the index without the dead
-          pages.</li>
-        <li id="dz154739">You have altered the <codeph>FILLFACTOR</codeph> storage parameter for an
-          index, and wish to ensure that the change has taken full effect. </li>
-      </ul></section>
-    <section id="section4"><title>Parameters</title><parml>
-        <plentry>
-          <pt>INDEX</pt>
-          <pd>Recreate the specified index.</pd>
-        </plentry>
-        <plentry>
-          <pt>TABLE</pt>
-          <pd>Recreate all indexes of the specified table. If the table has a secondary TOAST table,
-            that is reindexed as well.</pd>
-        </plentry>
-        <plentry>
-          <pt>DATABASE</pt>
-          <pd>Recreate all indexes within the current database. Indexes on shared system catalogs
-            are also processed. This form of <codeph>REINDEX</codeph> cannot be executed inside a
-            transaction block.</pd>
-        </plentry>
-        <plentry>
-          <pt>SYSTEM</pt>
-          <pd>Recreate all indexes on system catalogs within the current database. Indexes on shared
-            system catalogs are included. Indexes on user tables are not processed. This form of
-              <codeph>REINDEX</codeph> cannot be executed inside a transaction block.</pd>
-        </plentry>
-        <plentry>
-          <pt><varname>name</varname></pt>
-          <pd>The name of the specific index, table, or database to be reindexed. Index and table
-            names may be schema-qualified. Presently, <codeph>REINDEX DATABASE</codeph> and
-              <codeph>REINDEX SYSTEM</codeph> can only reindex the current database, so their
-            parameter must match the current database's name.</pd>
-        </plentry>
-      </parml></section>
-    <section id="section5">
-      <title>Notes</title>
-      <p><codeph>REINDEX</codeph> is similar to a drop and recreate of the index in that the index
-        contents are rebuilt from scratch. However, the locking considerations are rather different.
-          <codeph>REINDEX</codeph> locks out writes but not reads of the index's parent table. It
-        also takes an exclusive lock on the specific index being processed, which will block reads
-        that attempt to use that index. In contrast, <codeph>DROP INDEX</codeph> momentarily takes
-        an exclusive lock on the parent table, blocking both writes and reads. The subsequent
-          <codeph>CREATE INDEX</codeph> locks out writes but not reads; since the index is not
-        there, no read will attempt to use it, meaning that there will be no blocking but reads may
-        be forced into expensive sequential scans. </p>
-      <p>Reindexing a single index or table requires being the owner of that index or table.
-        Reindexing a database requires being the owner of the database (note that the owner can
-        therefore rebuild indexes of tables owned by other users). Of course, superusers can always
-        reindex anything.</p>
-      <p><codeph>REINDEX</codeph> does not update the <codeph>reltuples</codeph> and
-          <codeph>relpages</codeph> statistics for the index. To update those statistics, run
-          <codeph>ANALYZE</codeph> on the table after reindexing. </p>
-      <p>If you suspect that shared global system catalog indexes are corrupted, they can only be
-        reindexed in Greenplum utility mode. The typical symptom of a corrupt shared index is "index
-        is not a btree" errors, or else the server crashes immediately at startup due to reliance on
-        the corrupted indexes. Contact Greenplum Customer Support for assistance in this
-        situation.</p></section>
-    <section id="section6"><title>Examples</title><p>Rebuild a single index:
-        </p><codeblock>REINDEX INDEX my_index;</codeblock><p>Rebuild all the indexes on the table
-          <codeph>my_table</codeph>: </p><codeblock>REINDEX TABLE my_table;</codeblock></section>
-    <section id="section7"><title>Compatibility</title><p>There is no <codeph>REINDEX</codeph>
-        command in the SQL standard.</p></section>
-    <section id="section8"><title>See Also</title><p><codeph><xref href="CREATE_INDEX.xml#topic1"
-            type="topic" format="dita"/></codeph>, <codeph><xref href="DROP_INDEX.xml#topic1"
-            type="topic" format="dita"/></codeph>, <codeph><xref href="./VACUUM.xml#topic1"
-            type="topic" format="dita"/></codeph></p></section>
-  </body>
+    <title id="dz20941">REINDEX</title>
+    <body>
+        <p id="sql_command_desc">重建索引。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">REINDEX {INDEX | TABLE | DATABASE | SYSTEM} <varname>name</varname></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>REINDEX</codeph>使用存储在索引表中的数据重建索引，替换索引的旧副本。
+                在几种情况下可以使用<codeph>REINDEX</codeph>：
+            </p>
+            <ul>
+                <li id="dz154728">索引变得肿，也就是说，它包含许多空或几乎为空的页面。
+                    在某些罕见的访问模式下，Greenplum数据库中的B树索引可能会发生这种情况。
+                    <codeph>REINDEX</codeph>提供了一种通过编写没有死页的新版本索引来减少索引空间消耗的方法。
+                </li>
+                <li id="dz154739">您已经更改了索引的<codeph>FILLFACTOR</codeph>存储参数，并希望确保所做的更改完全生效。
+                </li>
+            </ul>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>INDEX</pt>
+                    <pd>重新创建指定的索引。</pd>
+                </plentry>
+                <plentry>
+                    <pt>TABLE</pt>
+                    <pd>重新创建指定表的所有索引。
+                        如果该表具有辅助TOAST表，则该表也将重新编制索引。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>DATABASE</pt>
+                    <pd>重新创建当前数据库内的所有索引。
+                        共享系统目录上的索引也会被处理。
+                        这种形式的<codeph>REINDEX</codeph>不能在事务块内执行。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>SYSTEM</pt>
+                    <pd>在当前数据库内的系统目录上重新创建所有索引。
+                        包括共享系统目录上的索引。
+                        用户表上的索引未处理。
+                        这种形式的<codeph>REINDEX</codeph>不能在事务块内执行。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要重新建立索引的特定索引，表或数据库的名称。
+                        索引和表名可以是模式限定的。
+                        当前，<codeph>REINDEX DATABASE</codeph>和<codeph>REINDEX SYSTEM</codeph>只能重新索引当前数据库，
+                        因此它们的参数必须与当前数据库的名称匹配。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p><codeph>REINDEX</codeph>与删除索引和重新创建索引相似，因为索引内容是从头开始重建的。
+                但是，锁定注意事项却大不相同。
+                <codeph>REINDEX</codeph>锁定对索引的父表的写入但不锁定读取。
+                它还对正在处理的特定索引采取排他锁，这将阻塞该索引的读取。
+                相反，<codeph>DROP INDEX</codeph>会立即对父表加排他锁，从而阻止写入和读取。
+                随后的<codeph>CREATE INDEX</codeph>锁定写但不锁定读；
+                由于索引不存在，因此不会进行任何读取尝试，这意味着不会有阻塞，但读操作可能会强制进行高代价的顺序扫描。
+            </p>
+            <p>重新索引单个索引或表要求是该索引或表的所有者。
+                重新索引数据库需要成为数据库的所有者（请注意，所有者可以因此重建其他用户拥有的表的索引）。
+                当然，超级用户可以随时重新索引任何内容。
+            </p>
+            <p><codeph>REINDEX</codeph>不会更新索引的<codeph>reltuples</codeph>和<codeph>relpages</codeph>统计信息。
+                要更新这些统计信息，请在重新建立索引后在表上运行<codeph>ANALYZE</codeph>。
+            </p>
+            <p>如果您怀疑共享的全局系统目录索引已损坏，则只能在Greenplum utility模式下对它们进行索引。
+                共享索引损坏的典型症状是“索引不是btree”错误，否则服务器将在启动时由于依赖损坏的索引而立即崩溃。
+                在这种情况下，请联系Greenplum客户支持。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>重建单个索引：</p>
+            <codeblock>REINDEX INDEX my_index;</codeblock>
+            <p>重建表<codeph>my_table</codeph>上的所有索引：</p>
+            <codeblock>REINDEX TABLE my_table;</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p>SQL标准中没有<codeph>REINDEX</codeph>命令。</p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph><xref href="CREATE_INDEX.xml#topic1" type="topic" format="dita"/></codeph>
+                ,
+                <codeph><xref href="DROP_INDEX.xml#topic1" type="topic" format="dita"/></codeph>
+                ,
+                <codeph><xref href="./VACUUM.xml#topic1" type="topic" format="dita"/></codeph>
+            </p>
+        </section>
+    </body>
 </topic>

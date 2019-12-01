@@ -2,35 +2,31 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="db-socket_stats">
-   <title>socket_stats_*</title>
+   <title>socket_stats_* 表</title>
    <body>
-      <p>The <codeph>socket_stats_*</codeph> tables store statistical metrics about socket usage for
-         a Greenplum Database instance. There are three system tables, all having the same
-         columns:</p>
-      <p>These tables are in place for future use and are not currently populated.</p>
+      <p> <codeph>socket_stats_*</codeph> 表存储一个 Greenplum 数据库实例中 socket 使用统计指标。
+      一共有三张表，所有查询表都具有相同的列:</p>
+      <p>这些表为将来使用保留，当前没有填充信息。</p>
       <ul>
          <li>
-            <codeph>socket_stats_now</codeph> is an external table whose data files are stored in
+            <codeph>socket_stats_now</codeph> 是一个外部表，它的数据存储在
                <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>.</li>
          <li>
-            <codeph>socket_stats_tail</codeph> is an external table whose data files are stored in
-               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. This is a transitional table
-            for socket statistical metrics that has been cleared from
-               <codeph>socket_stats_now</codeph> but has not yet been committed to
-               <codeph>socket_stats_history</codeph>. It typically only contains a few minutes worth
-            of data.</li>
+            <codeph>socket_stats_tail</codeph> 是一个外部表，它的数据存储在
+               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. 这是一个过渡表，当数据已经从
+               <codeph>socket_stats_now</codeph> 中清除，但还没有提交到
+               <codeph>socket_stats_history</codeph>中时，暂存在这里。它通常仅包含数据几分钟时间。</li>
          <li>
-            <codeph>socket_stats_history</codeph> is a regular table that stores historical socket
-            statistical metrics. It is pre-partitioned into monthly partitions. Partitions are
-            automatically added in two month increments as needed. </li>
+            <codeph>socket_stats_history</codeph> 是一个常规表，用于存储 socket 历史统计指标。
+            它已预先设置为按月分区。分区会根据需要以两个月为增量自动添加。</li>
       </ul>
       <table>
          <tgroup cols="2">
             <thead>
                <row>
-                  <entry>Column</entry>
-                  <entry>Type</entry>
-                  <entry>Description</entry>
+                  <entry>列</entry>
+                  <entry>类型</entry>
+                  <entry>说明</entry>
                </row>
             </thead>
             <tbody>
@@ -39,77 +35,77 @@
                      <codeph>total_sockets_used</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Total sockets used in the system.</entry>
+                  <entry>系统中的 socket 总数.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>tcp_sockets_inuse</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Number of TCP sockets in use.</entry>
+                  <entry>使用中的 TCP socket 数量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>tcp_sockets_orphan</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Number of TCP sockets orphaned.</entry>
+                  <entry>孤儿 TCP socket 数量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>tcp_sockets_timewait</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Number of TCP sockets in Time-Wait.</entry>
+                  <entry>Time-Wait 状态的 TCP socket 数量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>tcp_sockets_alloc</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Number of TCP sockets allocated.</entry>
+                  <entry>已分配的 TCP socket 数量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>tcp_sockets_memusage_inbytes</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Amount of memory consumed by TCP sockets.</entry>
+                  <entry>TCP socket 消耗的内存总量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>udp_sockets_inuse</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Number of UDP sockets in use.</entry>
+                  <entry>使用中的 UDP socket 数量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>udp_sockets_memusage_inbytes</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Amount of memory consumed by UDP sockets.</entry>
+                  <entry>UDP socket 消耗的内存总量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>raw_sockets_inuse</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Number of RAW sockets in use.</entry>
+                  <entry>使用中的 RAW socket 数量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>frag_sockets_inuse</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Number of FRAG sockets in use.</entry>
+                  <entry>使用中的 FRAG socket 数量.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>frag_sockets_memusage_inbytes</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>Amount of memory consumed by FRAG sockets.</entry>
+                  <entry>FRAG socket 消耗的内存总量.</entry>
                </row>
             </tbody>
          </tgroup>

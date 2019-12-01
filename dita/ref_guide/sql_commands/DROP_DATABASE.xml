@@ -1,15 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="cr20941">DROP DATABASE</title><body><p id="sql_command_desc">Removes a database.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">DROP DATABASE [IF EXISTS] <varname>name</varname></codeblock></section><section id="section3"><title>Description</title><p><codeph>DROP DATABASE</codeph> drops a database. It removes the catalog entries for the database
-        and deletes the directory containing the data. It can only be executed by the database
-        owner. Also, it cannot be executed while you or anyone else are connected to the target
-        database. (Connect to <codeph>postgres</codeph> or any other database to issue this
-        command.) </p><note type="warning"><codeph>DROP DATABASE</codeph> cannot be undone. Use it with care!</note></section><section id="section4"><title>Parameters</title><parml><plentry><pt>IF EXISTS</pt><pd>Do not throw an error if the database does not exist. A notice is
-issued in this case. </pd></plentry><plentry><pt><varname>name</varname></pt><pd>The name of the database to remove.</pd></plentry></parml></section><section id="section5"><title>Notes</title><p><codeph>DROP DATABASE</codeph> cannot be executed inside a transaction
-block.</p><p>This command cannot be executed while connected to the target database.
-Thus, it might be more convenient to use the program <codeph>dropdb</codeph>
-instead, which is a wrapper around this command.</p></section><section id="section6"><title>Examples</title><p>Drop the database named <codeph>testdb</codeph>: </p><codeblock>DROP DATABASE testdb;</codeblock></section><section id="section7"><title>Compatibility</title><p>There is no <codeph>DROP DATABASE</codeph> statement in the SQL standard.
-</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="ALTER_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="CREATE_DATABASE.xml#topic1" type="topic" format="dita"
-        /></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="cr20941">DROP DATABASE</title>
+    <body>
+        <p id="sql_command_desc">删除数据库。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">DROP DATABASE [IF EXISTS] <varname>name</varname></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>DROP DATABASE</codeph>删除数据库。
+                它删除数据库的catalog条目，并删除包含数据的目录。
+                它只能由数据库所有者执行。
+                另外，当您或其他任何人连接到目标数据库时，也无法执行该命令。
+                （连接到<codeph>postgres</codeph>或任何其他数据库以发出此命令。）
+            </p>
+            <note type="warning">
+                <codeph>DROP DATABASE</codeph>无法撤消。小心使用！
+            </note>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>IF EXISTS</pt>
+                    <pd>如果数据库不存在，请不要报错。在这种情况下会发出通知。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要删除的数据库的名称。</pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p>无法在事务块内部执行<codeph>DROP DATABASE</codeph>。
+            </p>
+            <p>连接到目标数据库时无法执行此命令。
+                因此，改为使用程序<codeph>dropdb</codeph>可能更方便，该程序是该命令的包装器。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>删除名为<codeph>testdb</codeph>的数据库：
+            </p>
+            <codeblock>DROP DATABASE testdb;</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p>SQL标准中没有<codeph>DROP DATABASE</codeph>语句。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_DATABASE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="CREATE_DATABASE.xml#topic1" type="topic" format="dita"
+                    />
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

@@ -3,52 +3,53 @@
 <topic id="topic1">
   <title id="af20941">DROP COLLATION</title>
   <body>
-    <p id="sql_command_desc">Removes a previously defined collation. </p>
+    <p id="sql_command_desc">删除以前定义的排序规则。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">DROP COLLATION [ IF EXISTS ] <varname>name</varname> [ CASCADE | RESTRICT ]</codeblock>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><codeph>IF EXISTS</codeph></pt>
-          <pd> Do not throw an error if the collation does not exist. A notice is issued in this
-            case. </pd>
+          <pd>如果排序规则不存在，请不要抛出错误。
+            在这种情况下会发出通知。
+            </pd>
         </plentry>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd> The name of the collation. The collation name can be schema-qualified. </pd>
+          <pd>排序规则的名称。排序规则名称可以是模式限定的。</pd>
         </plentry>
         <plentry>
           <pt><codeph>CASCADE</codeph></pt>
-          <pd> Automatically drop objects that depend on the collation. </pd>
+          <pd>自动删除依赖于排序规则的对象。</pd>
         </plentry>
         <plentry>
           <pt><codeph>RESTRICT</codeph></pt>
-          <pd> Refuse to drop the collation if any objects depend on it. This is the default. </pd>
+          <pd>如果有任何对象依赖该排序规则，则拒绝删除该排序规则。这是默认值。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Notes</title>
-      <p>
-        <codeph>DROP COLLATION</codeph> removes a previously defined collation. To be able to drop a
-        collation, you must own the collation.</p>
+      <title>注解</title>
+      <p><codeph>DROP COLLATION</codeph>删除以前定义的排序规则。
+        要删除排序规则，您必须拥有该排序规则。
+        </p>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p> To drop the collation named <codeph>german</codeph>:
+      <title>示例</title>
+      <p>删除<codeph>german</codeph>的排序规则：
         <codeblock>DROP COLLATION german;</codeblock>
       </p>
     </section>
     <section id="section7">
-      <title>Compatibility</title>
-      <p> The <codeph>DROP COLLATION</codeph> command conforms to the SQL standard, apart from the
-          <codeph>IF EXISTS</codeph> option, which is a Greenplum Database extension. </p>
+      <title>兼容性</title>
+      <p>除了<codeph>IF EXISTS</codeph>选项（这是Greenplum数据库扩展名）之外，<codeph>DROP COLLATION</codeph>命令符合SQL标准。
+        </p>
     </section>
     <section id="section8">
-      <title>See Also</title>
+      <title>另见</title>
       <p>
         <codeph>
           <xref href="./ALTER_COLLATION.xml#topic1" type="topic" format="dita"/></codeph>,

@@ -4,54 +4,58 @@
 <topic id="topic1">
     <title id="bv20941">CREATE USER MAPPING</title>
     <body>
-        <p id="sql_command_desc">Defines a new mapping of a user to a foreign server.</p>
+        <p id="sql_command_desc">定义用户到外部服务器的新映射。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">CREATE USER MAPPING FOR { <varname>username</varname> | USER | CURRENT_USER | PUBLIC }
     SERVER <varname>servername</varname>
     [ OPTIONS ( <varname>option</varname> '<varname>value</varname>' [, ... ] ) ]</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>CREATE USER MAPPING</codeph> defines a mapping of a user to a foreign server.
-                You must be the owner of the server to define user mappings for it.</p>
+            <title>描述</title>
+            <p><codeph>CREATE USER MAPPING</codeph>定义用户到外部服务器的映射。
+                您必须是服务器的所有者才能为其定义用户映射。</p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt><varname>username</varname></pt>
                     <pd>
-                        <p>The name of an existing user that is mapped to the foreign server.
-                                <codeph>CURRENT_USER</codeph> and <codeph>USER</codeph> match the
-                            name of the current user. <codeph>PUBLIC</codeph> is used to match all
-                            present and future user names in the system. </p>
+                        <p>映射到外部服务器的现有用户的名称。
+                            <codeph>CURRENT_USER</codeph>和<codeph>USER</codeph>与当前用户的名称匹配。
+                            <codeph>PUBLIC</codeph>用于匹配系统中所有当前和将来的用户名。
+                            </p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>servername</varname></pt>
                     <pd>
-                        <p>The name of an existing server for which Greenplum Database is to create the user mapping.</p>
+                        <p>Greenplum数据库要为其创建用户映射的现有服务器的名称。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>OPTIONS ( <varname>option</varname> '<varname>value</varname>' [, ... ] )</pt>
                     <pd>
-                        <p>The options for the new user mapping. The options typically define the actual user name and password of the mapping. Option names must be unique. The option names and values are specific to the server's foreign-data wrapper.</p>
+                        <p>新用户映射的选项。
+                            这些选项通常定义映射的实际用户名和密码。
+                            选项名称必须唯一。
+                            选项名称和值特定于服务器的外部数据包装器。</p>
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section6">
-            <title>Examples</title>
-            <p>Create a user mapping for user <codeph>bob</codeph>, server <codeph>foo</codeph>:</p><codeblock>CREATE USER MAPPING FOR bob SERVER foo OPTIONS (user 'bob', password 'secret');</codeblock>
+            <title>示例</title>
+            <p>为用户<codeph>bob</codeph>和服务器<codeph>foo</codeph>创建用户映射：</p>
+            <codeblock>CREATE USER MAPPING FOR bob SERVER foo OPTIONS (user 'bob', password 'secret');</codeblock>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p><codeph>CREATE USER MAPPING</codeph> conforms to ISO/IEC 9075-9 (SQL/MED).</p>
+            <title>兼容性</title>
+            <p><codeph>CREATE USER MAPPING</codeph>符合ISO/IEC 9075-9（SQL/MED）。</p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="ALTER_USER_MAPPING.xml#topic1">ALTER USER MAPPING</xref></codeph>,
                         <codeph><xref href="DROP_USER_MAPPING.xml#topic1">DROP
                     USER MAPPING</xref></codeph>,

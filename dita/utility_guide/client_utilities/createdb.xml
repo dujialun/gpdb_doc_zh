@@ -1,80 +1,199 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="oz137116">createdb</title><body><p id="client_util_desc">Creates a new database.</p><section id="section2"><title>Synopsis</title><codeblock id="client_util_synopsis"><b>createdb</b> [<varname>connection-option</varname> ...] [<varname>option</varname> ...] [<varname>dbname</varname> ['<varname>description</varname>']]
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="oz137116">createdb</title>
+    <body>
+        <p id="client_util_desc">创建一个新的数据库。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="client_util_synopsis"><b>createdb</b> [<varname>connection-option</varname> ...] [<varname>option</varname> ...] [<varname>dbname</varname> ['<varname>description</varname>']]
 
 <b>createdb</b> <b>-? | --help</b>
 
-<b>createdb</b> <b>-V | --version</b></codeblock></section><section id="section3"><title>Description</title><p><codeph>createdb</codeph> creates a new database in a Greenplum Database system. </p><p>Normally, the database user who executes this command becomes the
-owner of the new database. However, a different owner can be specified
-via the <codeph>-O</codeph> option, if the executing user has appropriate
-privileges.</p><p><codeph>createdb</codeph> is a wrapper around the SQL command <codeph><xref
-              href="../../ref_guide/sql_commands/CREATE_DATABASE.xml#topic1"/>
-</codeph>.</p></section><section id="section4"><title>Options</title><parml><plentry><pt><varname>dbname</varname></pt><pd>The name of the database to be created. The name must be unique among all other databases in the
-              Greenplum system. If not specified, reads from the
-            environment variable <codeph>PGDATABASE</codeph>, then <codeph>PGUSER</codeph> or
-            defaults to the current system user.</pd></plentry><plentry><pt><varname>description</varname></pt><pd>A comment to be associated with the newly created database. Descriptions
-              containing white space must be enclosed in quotes.</pd></plentry><plentry><pt>-D <varname>tablespace</varname> | --tablespace=<varname>tablespace</varname></pt><pd>Specifies the default tablespace for the database. (This name
-                is processed as a double-quoted identifier.)</pd></plentry><plentry><pt>-e echo</pt><pd>Echo the commands that <codeph>createdb</codeph> generates and sends to the server.</pd></plentry>
-        <plentry><pt>-E <varname>encoding</varname> | --encoding <varname>encoding</varname></pt><pd>Character set encoding to use in the new database. Specify a string constant (such as
-              <codeph>'UTF8'</codeph>), an integer encoding number, or <codeph>DEFAULT</codeph> to
-            use the default encoding. <ph>See the Greenplum Database Reference
-              Guide for information about supported character sets.</ph></pd>
-        </plentry>
-        <plentry>
-          <pt>-l <varname>locale</varname> | --locale <varname>locale</varname></pt>
-          <pd>Specifies the locale to be used in this database. This is equivalent to specifying
-            both <codeph>--lc-collate</codeph> and <codeph>--lc-ctype</codeph>.</pd>
-        </plentry>
-        <plentry>
-          <pt>--lc-collate <varname>locale</varname></pt>
-          <pd>Specifies the <codeph>LC_COLLATE</codeph>  setting to be used in this database.</pd>
-        </plentry>
-        <plentry>
-          <pt>--lc-ctype <varname>locale</varname></pt>
-          <pd>Specifies the LC_CTYPE setting to be used in this database.</pd>
-        </plentry>
-        <plentry>
-          <pt>--maintenance-db=<varname>dbname</varname></pt>
-          <pd>Specifies the name of the database to connect to when creating the new database. If
-            not specified, the <codeph>postgres</codeph> database will be used; if that does not
-            exist (or if it is the name of the new database being created),
-              <codeph>template1</codeph> will be used.</pd>
-        </plentry>
-        <plentry><pt>-O <varname>owner</varname> | --owner=<varname>owner</varname></pt><pd>The name of the database user who will own the new database. Defaults
-          to the user executing this command. (This name
-          is processed as a double-quoted identifier.)</pd></plentry><plentry><pt>-T <varname>template</varname> | --template=<varname>template</varname></pt><pd>The name of the template from which to create the new database. Defaults to
-            <codeph>template1</codeph>. (This name
-            is processed as a double-quoted identifier.)</pd></plentry>
-        <plentry>
-          <pt>-V | --version</pt>
-          <pd>Print the <codeph>createdb</codeph> version and exit.</pd>
-        </plentry>
-        <plentry>
-          <pt>-? | --help</pt>
-          <pd>Show help about <codeph>createdb</codeph> command line arguments, and exit.</pd>
-        </plentry>
-        </parml>
-      <p>The options <codeph>-D</codeph>, <codeph>-l</codeph>, <codeph>-E</codeph>, 
-          <codeph>-O</codeph>, and <codeph>-T</codeph> correspond to options of the underlying
-        SQL command <codeph>CREATE DATABASE</codeph>; see <ph><codeph><xref
-            href="../../ref_guide/sql_commands/CREATE_DATABASE.xml#topic1" otherprops="op-help"
-          /></codeph></ph><ph otherprops="op-print"><codeph>CREATE DATABASE</codeph> in the <i>Greenplum
-            Database Reference Guide</i></ph> for more information about them. </p><sectiondiv id="section5"><b>Connection Options</b><parml><plentry><pt>-h <varname>host</varname> | --host=<varname>host</varname></pt><pd>The host name of the machine on which the Greenplum master database
-              server is running. If not specified, reads from the environment variable
-                <codeph>PGHOST</codeph> or defaults to localhost.</pd></plentry><plentry><pt>-p <varname>port</varname> | --port=<varname>port</varname></pt><pd>The TCP port on which the Greenplum master database server is
-              listening for connections. If not specified, reads from the environment variable
-                <codeph>PGPORT</codeph> or defaults to 5432.</pd></plentry><plentry><pt>-U <varname>username</varname> | --username=<varname>username</varname></pt><pd>The database role name to connect as. If not specified, reads from
-the environment variable <codeph>PGUSER</codeph> or defaults to the current
-system role name.</pd></plentry><plentry><pt>-w | --no-password</pt><pd>Never issue a password prompt. If the server requires password authentication
-and a password is not available by other means such as a <codeph>.pgpass</codeph>
-file, the connection attempt will fail. This option can be useful in
-batch jobs and scripts where no user is present to enter a password.</pd></plentry><plentry><pt>-W | --password</pt><pd>Force a password prompt.</pd></plentry></parml></sectiondiv></section><section id="section6"><title>Examples</title><p>To create the database <codeph>test</codeph> using the default options:</p><codeblock>createdb test</codeblock><p>To create the database <codeph>demo</codeph> using the Greenplum
-        master on host <codeph>gpmaster</codeph>, port <codeph>54321</codeph>, using the
-          <codeph>LATIN1</codeph> encoding scheme:</p><codeblock>createdb -p 54321 -h gpmaster -E LATIN1 demo</codeblock></section><section id="section7">
-      <title>See Also</title>
-      <p><ph otherprops="op-print"><codeph>CREATE DATABASE</codeph> in the <i>Greenplum Database
-            Reference Guide</i></ph><ph otherprops="op-help"><codeph><xref
-              href="../../ref_guide/sql_commands/CREATE_DATABASE.xml#topic1"/></codeph>,
-            <codeph><xref href="dropdb.xml#topic1"/></codeph></ph></p>
-    </section></body></topic>
+<b>createdb</b> <b>-V | --version</b></codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>createdb</codeph>在Greenplum数据库系统中创建一个新数据库。
+            </p>
+            <p>通常，执行此命令的数据库用户将成为新数据库的所有者。
+                但是，如果执行用户具有适当的特权，则可以通过<codeph>-O</codeph>选项指定其他所有者。
+            </p>
+            <p><codeph>createdb</codeph>是SQL命令<codeph><xref href="../../ref_guide/sql_commands/CREATE_DATABASE.xml#topic1"/></codeph>的包装。
+            </p>
+        </section>
+        <section id="section4">
+            <title>选项</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>dbname</varname>
+                    </pt>
+                    <pd>要创建的数据库的名称。
+                        该名称在Greenplum系统中的所有其他数据库中必须唯一。
+                        如果未指定，则从环境变量<codeph>PGDATABASE</codeph>中读取，然后从<codeph>PGUSER</codeph>中读取，或者默认为当前系统用户。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>description</varname>
+                    </pt>
+                    <pd>与新创建的数据库关联的注释。
+                        包含空格的说明必须用引号引起来。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-D <varname>tablespace</varname> | --tablespace=<varname>tablespace</varname>
+                    </pt>
+                    <pd>指定数据库的默认表空间。（此名称作为双引号标识符处理。）
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-e echo</pt>
+                    <pd>回显<codeph>createdb</codeph>生成并发送到服务器的命令。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-E <varname>encoding</varname> | --encoding <varname>encoding</varname>
+                    </pt>
+                    <pd>在新数据库中使用的字符集编码。
+                        指定字符串常量（例如<codeph>'UTF8'</codeph>），整数编码数字或<codeph>DEFAULT</codeph>以使用默认编码。
+                        <ph>有关支持的字符集的信息，请参阅《Greenplum数据库参考指南》。</ph>
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-l <varname>locale</varname> | --locale <varname>locale</varname>
+                    </pt>
+                    <pd>指定此数据库中要使用的语言环境。
+                        这等效于同时指定<codeph>--lc-collate</codeph>和<codeph>--lc-ctype</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>--lc-collate <varname>locale</varname>
+                    </pt>
+                    <pd>指定要在此数据库中使用的<codeph>LC_COLLATE</codeph>设置。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>--lc-ctype <varname>locale</varname>
+                    </pt>
+                    <pd>指定要在此数据库中使用的LC_CTYPE设置。</pd>
+                </plentry>
+                <plentry>
+                    <pt>--maintenance-db=<varname>dbname</varname>
+                    </pt>
+                    <pd>指定在创建新数据库时要连接的数据库的名称。
+                        如果未指定，将使用<codeph>postgres</codeph>数据库。
+                        如果不存在（或者它是正在创建的新数据库的名称），将使用<codeph>template1</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-O <varname>owner</varname> | --owner=<varname>owner</varname>
+                    </pt>
+                    <pd>拥有新数据库的数据库用户的名称。
+                        默认为执行此命令的用户。
+                        （此名称作为双引号标识符处理。）
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-T <varname>template</varname> | --template=<varname>template</varname>
+                    </pt>
+                    <pd>从中创建新数据库的模板的名称。
+                        默认为<codeph>template1</codeph>。
+                        （此名称作为双引号标识符处理。）
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-V | --version</pt>
+                    <pd>打印<codeph>createdb</codeph>版本并退出。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>-? | --help</pt>
+                    <pd>显示有关<codeph>createdb</codeph>命令行参数的帮助，然后退出。
+                    </pd>
+                </plentry>
+            </parml>
+            <p>选项<codeph>-D</codeph>，<codeph>-l</codeph>，<codeph>-E</codeph>，<codeph>-O</codeph>和<codeph>-T</codeph>对应于基础SQL命令<codeph>CREATE DATABASE</codeph>的选项。
+                有关它们的更多信息，请参见<ph><codeph><xref href="../../ref_guide/sql_commands/CREATE_DATABASE.xml#topic1" otherprops="op-help"/></codeph></ph>。
+                <ph otherprops="op-print">
+                    <codeph>CREATE DATABASE</codeph>
+                    in the
+                    <i>Greenplum
+                        Database Reference Guide
+                    </i>
+                </ph>
+                for more information about them.
+            </p>
+            <sectiondiv id="section5">
+                <b>连接选项</b>
+                <parml>
+                    <plentry>
+                        <pt>-h <varname>host</varname> | --host=<varname>host</varname>
+                        </pt>
+                        <pd>运行Greenplum master数据库服务器的计算机的主机名。
+                            如果未指定，则从环境变量<codeph>PGHOST</codeph>读取或默认为localhost。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-p <varname>port</varname> | --port=<varname>port</varname>
+                        </pt>
+                        <pd>Greenplum master数据库服务器正在侦听连接的TCP端口。
+                            如果未指定，则从环境变量<codeph>PGPORT</codeph>读取或默认为5432。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-U <varname>username</varname> | --username=<varname>username</varname>
+                        </pt>
+                        <pd>要用作连接的数据库角色名称。
+                            如果未指定，则从环境变量<codeph>PGUSER</codeph>读取或默认为当前系统角色名称。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-w | --no-password</pt>
+                        <pd>不发出密码提示。
+                            如果服务器要求密码验证，而其他方式（例如<codeph>.pgpass</codeph>文件）无法使用密码，则连接尝试将失败。
+                            此选项在没有用户输入密码的批处理作业和脚本中很有用。
+                        </pd>
+                    </plentry>
+                    <plentry>
+                        <pt>-W | --password</pt>
+                        <pd>强制输入密码提示。</pd>
+                    </plentry>
+                </parml>
+            </sectiondiv>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>使用默认选项创建数据库<codeph>test</codeph>：
+            </p>
+            <codeblock>createdb test</codeblock>
+            <p>使用主机<codeph>gpmaster</codeph>上的Greenplum master（端口<codeph>54321</codeph>）并使用<codeph>LATIN1</codeph>编码方案来创建数据库<codeph>demo</codeph>：
+            </p>
+            <codeblock>createdb -p 54321 -h gpmaster -E LATIN1 demo</codeblock>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <ph otherprops="op-print">
+                    <codeph>CREATE DATABASE</codeph>
+                    in the
+                    <i>Greenplum Database
+                        Reference Guide
+                    </i>
+                </ph>
+                <ph otherprops="op-help">
+                    <codeph>
+                        <xref
+                                href="../../ref_guide/sql_commands/CREATE_DATABASE.xml#topic1"/>
+                    </codeph>
+                    ,
+                    <codeph>
+                        <xref href="dropdb.xml#topic1"/>
+                    </codeph>
+                </ph>
+            </p>
+        </section>
+    </body>
+</topic>

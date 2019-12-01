@@ -4,9 +4,9 @@
 <topic id="topic1">
     <title id="bc20941">ALTER USER</title>
     <body>
-        <p id="sql_command_desc">Changes the definition of a database role (user).</p>
+        <p id="sql_command_desc">更改数据库用户（角色）的定义。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">ALTER USER <varname>name</varname> RENAME TO <varname>newname</varname>
 
 ALTER USER <varname>name</varname> SET <varname>config_parameter</varname> {TO | =} {<varname>value</varname> | DEFAULT}
@@ -18,7 +18,7 @@ ALTER USER <varname>name</varname> RESOURCE QUEUE {<varname>queue_name</varname>
 ALTER USER <varname>name</varname> RESOURCE GROUP {<varname>group_name</varname> | NONE}
 
 ALTER USER <varname>name</varname> [ [WITH] <varname>option</varname> [ ... ] ]</codeblock>
-            <p>where <varname>option</varname> can be:</p>
+            <p>其中<varname>option</varname>可以是：</p>
             <codeblock>      SUPERUSER | NOSUPERUSER
     | CREATEDB | NOCREATEDB
     | CREATEROLE | NOCREATEROLE
@@ -39,15 +39,14 @@ ALTER USER <varname>name</varname> [ [WITH] <varname>option</varname> [ ... ] ]<
     | [ DROP DENY FOR <varname>deny_point</varname> ]</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>ALTER USER</codeph> is an alias for <codeph>ALTER ROLE</codeph>. See
+            <title>描述</title>
+            <p><codeph>ALTER USER</codeph>是<codeph>ALTER ROLE</codeph>的别名。 参阅
                         <codeph><xref href="ALTER_ROLE.xml#topic1" type="topic" format="dita"
-                    /></codeph> for more information.</p>
+                    /></codeph>获取更多信息。</p>
         </section>
         <section id="section4">
-            <title>Compatibility</title>
-            <p>The <codeph>ALTER USER</codeph> statement is a Greenplum Database extension. The SQL
-                standard leaves the definition of users to the implementation.</p>
+            <title>兼容性</title>
+            <p><codeph>ALTER USER</codeph>语句是一个Greenplum数据库扩展。 SQL标准中使用用户的定义来实现。</p>
         </section>
         <section id="section5">
             <title>See Also</title>

@@ -4,10 +4,10 @@
 <topic id="topic1">
     <title id="or137116">pg_dumpall</title>
     <body>
-        <p id="client_util_desc">Extracts all databases in a Greenplum Database system
-            to a single script file or other archive file.</p>
+        <p id="client_util_desc">将Greenplum数据库系统中的所有数据库提取到单个脚本文件或其他归档文件中。
+            </p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="client_util_synopsis"><b>pg_dumpall</b> [<varname>connection-option</varname> ...] [<varname>dump_option</varname> ...]
 
 <b>pg_dumpall</b> <b>-? | --help</b>
@@ -15,348 +15,311 @@
 <b>pg_dumpall</b> <b>-V | --version</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>pg_dumpall</codeph> is a standard PostgreSQL utility for backing up all
-                databases in a Greenplum Database (or PostgreSQL) instance, and is
-                also supported in Greenplum Database. It creates a single
-                (non-parallel) dump file. <ph>For routine backups of Greenplum
-                    Database it is better to use the Greenplum Database backup utility,
-                            <codeph><xref href="../admin_utilities/gpbackup.xml#topic1"
-                    /></codeph>, for the best performance.</ph></p>
-            <p><codeph>pg_dumpall</codeph> creates a single script file that contains SQL commands
-                that can be used as input to <codeph><xref href="psql.xml#topic1" type="topic"
-                        format="dita"/></codeph> to restore the databases. It does this by calling
-                        <codeph><xref href="pg_dump.xml#topic1" type="topic" format="dita"
-                    /></codeph> for each database. <codeph>pg_dumpall</codeph> also dumps global
-                objects that are common to all databases. (<codeph>pg_dump</codeph> does not save
-                these objects.) This currently includes information about database users and groups,
-                and access permissions that apply to databases as a whole.</p>
-            <p>Since <codeph>pg_dumpall</codeph> reads tables from all databases you will most
-                likely have to connect as a database superuser in order to produce a complete dump.
-                Also you will need superuser privileges to execute the saved script in order to be
-                allowed to add users and groups, and to create databases.</p>
-            <p>The SQL script will be written to the standard output. Use the
-              <codeph>[-f | --file]</codeph> option or shell operators
-                to redirect it into a file.</p>
-            <p><codeph>pg_dumpall</codeph> needs to connect several times to the Greenplum Database master server (once per database). If you use password
-                authentication it is likely to ask for a password each time. It is convenient to
-                have a <codeph>~/.pgpass</codeph> file in such cases.</p>
-            <note>The <codeph>--ignore-version</codeph> option is deprecated and will be removed in
-                a future release.</note>
+            <title>描述</title>
+            <p><codeph>pg_dumpall</codeph>是一个标准的PostgreSQL工具，
+                用于备份Greenplum数据库（或PostgreSQL）实例中的所有数据库，Greenplum数据库也支持该实用程序。
+                它创建一个（非并行）转储文件。
+                <ph>对于Greenplum数据库的常规备份，最好使用Greenplum数据库备份工具<codeph><xref href="../admin_utilities/gpbackup.xml#topic1"/></codeph>以获得最佳性能。
+                </ph></p>
+            <p><codeph>pg_dumpall</codeph>创建一个包含SQL命令的脚本文件，
+                该命令可用作<codeph><xref href="psql.xml#topic1" type="topic" format="dita"/></codeph>还原数据库的输入。
+                它通过为每个数据库调用<codeph><xref href="pg_dump.xml#topic1" type="topic" format="dita"/></codeph>来做到这一点。
+                <codeph>pg_dumpall</codeph>还转储所有数据库通用的全局对象。
+                （<codeph>pg_dump</codeph>不会保存这些对象。）
+                当前包括有关数据库用户和组的信息，以及整体上适用于数据库的访问权限。
+                </p>
+            <p>由于<codeph>pg_dumpall</codeph>从所有数据库读取表，因此您很可能必须以数据库超级用户身份连接才能产生完整的转储。
+                另外，您将需要超级用户特权才能执行保存的脚本，以便被允许添加用户和组以及创建数据库。
+                </p>
+            <p>SQL脚本将被写入标准输出。
+                使用<codeph>[-f | --file]</codeph>选项或shell运算符将其重定向到文件中。
+                </p>
+            <p><codeph>pg_dumpall</codeph>需要多次连接到Greenplum数据库master服务器（每个数据库一次）。
+                如果您使用密码验证，则很可能每次都要求输入密码。
+                在这种情况下，使用<codeph>~/.pgpass</codeph>文件很方便。
+                </p>
+            <note><codeph>--ignore-version</codeph>选项已弃用，在以后的版本中将被删除。
+                </note>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <sectiondiv id="section5">
-                <b>Dump Options</b>
+                <b>转储选项</b>
                 <parml>
                     <plentry>
                         <pt>-a | --data-only</pt>
-                        <pd>Dump only the data, not the schema (data definitions). This option is
-                            only meaningful for the plain-text format. For the archive formats, you
-                            may specify the option when you call <codeph><xref
-                                    href="./pg_restore.xml#topic1" type="topic" format="dita"
-                                /></codeph>. </pd>
+                        <pd>仅转储数据，而不转储模式（数据定义）。
+                            此选项仅对纯文本格式有意义。
+                            对于归档格式，可以在调用<codeph><xref href="./pg_restore.xml#topic1" type="topic" format="dita"/></codeph>时指定该选项。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-c | --clean</pt>
-                        <pd>Output commands to clean (drop) database objects prior to (the commands
-                            for) creating them. This option is only meaningful for the plain-text
-                            format. For the archive formats, you may specify the option when you
-                            call <codeph><xref href="./pg_restore.xml#topic1" type="topic"
-                                    format="dita"/></codeph>. </pd>
+                        <pd>在创建数据库对象（用于创建它们的命令）之前，输出用于清理（删除）数据库对象的命令。
+                            此选项仅对纯文本格式有意义。
+                            对于归档格式，可以在调用<codeph><xref href="./pg_restore.xml#topic1" type="topic" format="dita"/></codeph>时指定该选项。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-f <varname>filename</varname> | --file=<varname>filename</varname></pt>
-                        <pd>Send output to the specified file. </pd>
+                        <pd>将输出发送到指定文件。</pd>
                     </plentry>
                     <plentry>
                         <pt>-g | --globals-only</pt>
-                        <pd>Dump only global objects (roles and tablespaces), no databases.</pd>
+                        <pd>仅转储全局对象（角色和表空间），而不转储数据库。</pd>
                     </plentry>
                     <plentry>
                         <pt>-i | --ignore-version</pt>
-                        <pd><note>This option is deprecated and will be removed in a future
-                                release.</note>Ignore version mismatch between <codeph><xref
-                                    href="pg_dump.xml#topic1" type="topic" format="dita"/></codeph>
-                            and the database server. <codeph>pg_dump</codeph> can dump from servers
-                            running previous releases of Greenplum Database (or
-                            PostgreSQL), but very old versions may not be supported anymore. Use
-                            this option if you need to override the version check.</pd>
+                        <pd><note>此选项已被弃用，并将在以后的版本中删除。</note>
+                            忽略<codeph><xref href="pg_dump.xml#topic1" type="topic" format="dita"/></codeph>和数据库服务器之间的版本不匹配。
+                            <codeph>pg_dump</codeph>可以从运行早期版本的Greenplum数据库（或PostgreSQL）的服务器中转储，但是可能不再支持非常旧的版本。
+                            如果您需要覆盖版本检查，请使用此选项。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-o | --oids</pt>
-                        <pd>Dump object identifiers (OIDs) as part of the data for every table. Use
-                            of this option is not recommended for files that are intended to be
-                            restored into Greenplum Database.</pd>
+                        <pd>转储对象标识符（OID）作为每个表的数据的一部分。
+                            对于要还原到Greenplum数据库中的文件，建议不要使用此选项。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-O | --no-owner</pt>
-                        <pd>Do not output commands to set ownership of objects to match the original
-                            database. By default, <codeph><xref href="pg_dump.xml#topic1"
-                                    type="topic" format="dita"/></codeph> issues <codeph>ALTER
-                                OWNER</codeph> or <codeph>SET SESSION AUTHORIZATION</codeph>
-                            statements to set ownership of created database objects. These
-                            statements will fail when the script is run unless it is started by a
-                            superuser (or the same user that owns all of the objects in the script).
-                            To make a script that can be restored by any user, but will give that
-                            user ownership of all the objects, specify <codeph>-O</codeph>. This
-                            option is only meaningful for the plain-text format. For the archive
-                            formats, you may specify the option when you call <codeph><xref
-                                    href="./pg_restore.xml#topic1" type="topic" format="dita"
-                                /></codeph>.</pd>
+                        <pd>不要输出命令来设置对象的所有权以匹配原始数据库。
+                            默认情况下，<codeph><xref href="pg_dump.xml#topic1" type="topic" format="dita"/></codeph>发出<codeph>ALTER OWNER</codeph>或<codeph>SET SESSION AUTHORIZATION</codeph>语句来设置创建的数据库对象的所有权。
+                            除非由超级用户（或拥有脚本中所有对象的同一用户）启动脚本，否则运行脚本时这些语句将失败。
+                            要使脚本可以被任何用户恢复，但将赋予该用户所有对象的所有权，请指定<codeph>-O</codeph>。
+                            此选项仅对纯文本格式有意义。
+                            对于归档格式，可以在调用<codeph><xref href="./pg_restore.xml#topic1" type="topic" format="dita"/></codeph>时指定该选项。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-r | --roles-only</pt>
-                        <pd>Dump only roles, not databases or tablespaces.</pd>
+                        <pd>仅转储角色，而不是数据库或表空间。</pd>
                     </plentry>
                     <plentry>
                         <pt>-s | --schema-only</pt>
-                        <pd>Dump only the object definitions (schema), not data.</pd>
+                        <pd>仅转储对象定义（模式），而不转储数据。</pd>
                     </plentry>
                     <plentry>
-                        <pt>-S <varname>username</varname> |
-                            --superuser=<varname>username</varname></pt>
-                        <pd>Specify the superuser user name to use when disabling triggers. This is
-                            relevant only if <codeph>--disable-triggers</codeph> is used. It is
-                            better to leave this out, and instead start the resulting script as a
-                                superuser.<note>Greenplum Database does not support user-defined
-                                triggers.</note></pd>
+                        <pt>-S <varname>username</varname> | --superuser=<varname>username</varname></pt>
+                        <pd>指定禁用触发器时要使用的超级用户名。
+                            仅在使用<codeph>--disable-triggers</codeph>时才有意义。
+                            最好不要这样做，而是以超级用户身份启动生成的脚本。
+                            <note>Greenplum数据库不支持用户定义的触发器。</note></pd>
                     </plentry>
                     <plentry>
                         <pt>-t | --tablespaces-only</pt>
-                        <pd>Dump only tablespaces, not databases or roles.</pd>
+                        <pd>仅转储表空间，而不是数据库或角色。</pd>
                     </plentry>
                     <plentry>
                         <pt>-v | --verbose</pt>
-                        <pd>Specifies verbose mode. This will cause <codeph><xref
-                                    href="pg_dump.xml#topic1" type="topic" format="dita"/></codeph>
-                            to output detailed object comments and start/stop times to the dump
-                            file, and progress messages to standard error.</pd>
+                        <pd>指定详细模式。
+                            这将导致<codeph><xref href="pg_dump.xml#topic1" type="topic" format="dita"/></codeph>向转储文件输出详细的对象注释和开始/停止时间，并向标准错误输出消息。
+                            </pd>
                     </plentry>
                     <plentry>
                       <pt>-V | --version</pt>
-                      <pd>Print the <codeph>pg_dumpall</codeph> version and exit.</pd>
+                      <pd>打印<codeph>pg_dumpall</codeph>版本并退出。</pd>
                     </plentry>
                     <plentry>
                         <pt>-x | --no-privileges | --no-acl</pt>
-                        <pd>Prevent dumping of access privileges (<codeph>GRANT/REVOKE</codeph>
-                            commands).</pd>
+                        <pd>防止转储访问权限（<codeph>GRANT/REVOKE</codeph>命令）。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--binary-upgrade</pt>
-                        <pd>This option is for use by in-place upgrade utilities. Its use for other
-                            purposes is not recommended or supported. The behavior of the option may
-                            change in future releases without notice.</pd>
+                        <pd>此选项供就地升级工具使用。
+                            不建议或不支持将其用于其他目的。
+                            该选项的行为在将来的版本中可能会更改，恕不另行通知。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--column-inserts | --attribute-inserts</pt>
-                        <pd>Dump data as <codeph>INSERT</codeph> commands with explicit column names
-                                (<codeph>INSERT INTO <varname>table</varname>
-                                    (<varname>column</varname>, ...) VALUES ...</codeph>). This will
-                            make restoration very slow; it is mainly useful for making dumps that
-                            can be loaded into non-PostgreSQL-based databases. Also, since this
-                            option generates a separate command for each row, an error in reloading
-                            a row causes only that row to be lost rather than the entire table
-                            contents.</pd>
+                        <pd>将数据转储为带有显式列名（<codeph>INSERT INTO <varname>table</varname> (<varname>column</varname>, ...) VALUES ...</codeph>）的<codeph>INSERT</codeph>命令。
+                            这会使恢复非常缓慢。
+                            它主要用于制作可以装入非基于PostgreSQL的数据库的转储。
+                            同样，由于此选项为每一行生成一个单独的命令，因此在重新加载行时发生错误只会导致该行丢失，而不是整个表内容丢失。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--disable-dollar-quoting</pt>
-                        <pd>This option disables the use of dollar quoting for function bodies, and
-                            forces them to be quoted using SQL standard string syntax.</pd>
+                        <pd>此选项禁止对函数体使用美元引号，并强制使用SQL标准字符串语法对其进行引用。</pd>
                     </plentry>
                     <plentry>
                         <pt>--disable-triggers</pt>
-                        <pd>This option is relevant only when creating a data-only dump. It
-                            instructs <codeph>pg_dumpall</codeph> to include commands to temporarily
-                            disable triggers on the target tables while the data is reloaded. Use
-                            this if you have triggers on the tables that you do not want to invoke
-                            during data reload. The commands emitted for
-                                <codeph>--disable-triggers</codeph> must be done as superuser. So,
-                            you should also specify a superuser name with <codeph>-S</codeph>, or
-                            preferably be careful to start the resulting script as a
-                                superuser.<note>Greenplum Database does not support user-defined
-                                triggers.</note></pd>
+                        <pd>仅当创建仅数据转储时，此选项才相关。
+                            它指示<codeph>pg_dumpall</codeph>包含一些命令，以在重新加载数据时临时禁用目标表上的触发器。
+                            如果不想在数据重装期间调用的表上有触发器，请使用此选项。
+                            为<codeph>--disable-triggers</codeph>发出的命令必须以超级用户身份执行。
+                            因此，您还应该使用<codeph>-S</codeph>指定超级用户名，或者最好小心地以超级用户身份启动生成的脚本。
+                            此选项仅对纯文本格式有意义。
+                            对于归档格式，可以在调用<codeph><xref href="./pg_restore.xml#topic1" type="topic" format="dita"/></codeph>时指定该选项。
+                            <note>Greenplum数据库不支持用户定义的触发器。</note>
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--inserts</pt>
-                        <pd>Dump data as <codeph>INSERT</codeph> commands (rather than
-                                <codeph>COPY</codeph>). This will make restoration very slow; it is
-                            mainly useful for making dumps that can be loaded into
-                            non-PostgreSQL-based databases. Also, since this option generates a
-                            separate command for each row, an error in reloading a row causes only
-                            that row to be lost rather than the entire table contents. Note that the
-                            restore may fail altogether if you have rearranged column order. The
-                                <codeph>--column-inserts</codeph> option is safe against column
-                            order changes, though even slower. </pd>
+                        <pd>将数据转储为<codeph>INSERT</codeph>命令（而不是<codeph>COPY</codeph>）。
+                            这会使恢复非常缓慢。
+                            它主要用于制作可以装入非基于PostgreSQL的数据库的转储。
+                            但是，由于此选项为每一行生成一个单独的命令，因此在重新加载行时发生错误只会导致该行丢失，而不是整个表内容丢失。
+                            请注意，如果您重新排列了列顺序，则还原可能会完全失败。
+                            <codeph>--column-inserts</codeph>选项可以安全地防止列顺序更改，尽管速度更慢。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--lock-wait-timeout=<varname>timeout</varname></pt>
-                        <pd>Do not wait forever to acquire shared table locks at the beginning of
-                            the dump. Instead, fail if unable to lock a table within the specified
-                                <varname>timeout</varname>. The timeout may be specified in any of
-                            the formats accepted by <codeph>SET statement_timeout</codeph>. Allowed
-                            values vary depending on the server version you are dumping from, but an
-                            integer number of milliseconds is accepted by all Greenplum Database
-                            versions.</pd>
+                        <pd>不要在转储开始时一直等待获取共享表锁。
+                            相反，如果无法在指定的<varname>timeout</varname>时间内锁定表，则失败。
+                            可以使用<codeph>SET statement_timeout</codeph>接受的任何格式指定超时。
+                            允许的值因要从中转储的服务器版本而异，但所有Greenplum数据库版本均接受整数毫秒。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--no-security-labels</pt>
-                        <pd>Do not dump security labels.</pd>
+                        <pd>不要转储安全标签。</pd>
                     </plentry>
                     <plentry>
                         <pt>--no-tablespaces</pt>
-                        <pd>Do not output commands to select tablespaces. With this option, all
-                            objects will be created in whichever tablespace is the default during
-                            restore.</pd>
+                        <pd>不输出命令以选择表空间。
+                            使用此选项，将在还原期间的默认表空间中创建所有对象。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--no-unlogged-table-data</pt>
-                        <pd>Do not dump the contents of unlogged tables. This option has no
-                          effect on whether or not the table definitions (schema) are dumped;
-                           it only suppresses dumping the table data.</pd>
+                        <pd>不要转储未记录表的内容。
+                            此选项对是否转储表定义（模式）没有影响。
+                            它仅禁止转储表数据。
+                            从备用服务器转储时，始终排除未记录表中的数据。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--quote-all-identifiers</pt>
-                        <pd>Force quoting of all identifiers. This option is recommended when
-                          dumping a database from a server whose Greenplum Database major
-                          version is different from <codeph>pg_dumpall</codeph>'s, or when
-                          the output is intended to be loaded into a server of a different
-                           major version. By default, <codeph>pg_dumpall</codeph> quotes only
-                           identifiers that are reserved words in its own major version. This
-                           sometimes results in compatibility issues when dealing with servers
-                           of other versions that may have slightly different sets of reserved
-                           words. Using <codeph>--quote-all-identifiers</codeph> prevents such
-                           issues, at the price of a harder-to-read dump script.</pd>
+                        <pd>强制给所有标识符加上引号。
+                            当从Greenplum数据库主版本不同于<codeph>pg_dumpall</codeph>的中转储数据库时，
+                            或者打算将输出加载到其他主版本的服务器中时，建议使用此选项。
+                            默认情况下，<codeph>pg_dumpall</codeph>仅为在其主版本中为保留字的标识符加引号。
+                            在处理其他版本的保留字可能略有不同的服务器时，有时会导致兼容性问题。
+                            使用<codeph>--quote-all-identifiers</codeph>可以防止此类问题，但代价是难以阅读的转储脚本。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--resource-queues</pt>
-                        <pd>Dump resource queue definitions.</pd>
+                        <pd>转储资源队列定义。</pd>
                     </plentry>
                     <plentry>
                         <pt>--resource-groups</pt>
-                        <pd>Dump resource group definitions.</pd>
+                        <pd>转储资源组定义。</pd>
                     </plentry>
                     <plentry>
                         <pt>--use-set-session-authorization</pt>
-                        <pd>Output SQL-standard <codeph>SET SESSION AUTHORIZATION</codeph> commands
-                            instead of <codeph>ALTER OWNER</codeph> commands to determine object
-                            ownership. This makes the dump more standards compatible, but depending
-                            on the history of the objects in the dump, may not restore properly. A
-                            dump using <codeph>SET SESSION AUTHORIZATION</codeph> will require
-                            superuser privileges to restore correctly, whereas <codeph>ALTER
-                                OWNER</codeph> requires lesser privileges.</pd>
+                        <pd>输出SQL标准的<codeph>SET SESSION AUTHORIZATION</codeph>命令而不是<codeph>ALTER OWNER</codeph>命令来确定对象所有权。
+                            这使转储更加符合标准，但是依赖转储中对象的历史记录，可能无法正确还原。
+                            使用<codeph>SET SESSION AUTHORIZATION</codeph>进行的转储将需要超级用户权限才能正确还原，而<codeph>ALTER OWNER</codeph>则需要较少的权限。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--gp-syntax</pt>
-                        <pd>Output Greenplum Database syntax in the <codeph>CREATE
-                                TABLE</codeph> statements. This allows the distribution policy
-                                (<codeph>DISTRIBUTED BY</codeph> or <codeph>DISTRIBUTED
-                                RANDOMLY</codeph> clauses) of a Greenplum Database
-                            table to be dumped, which is useful for restoring into other Greenplum Database systems.</pd>
+                        <pd>使用<codeph>--gp-syntax</codeph>在<codeph>CREATE TABLE</codeph>语句中转储Greenplum数据库语法。
+                            这允许转储Greenplum数据库表的分发策略（<codeph>DISTRIBUTED BY</codeph>或<codeph>DISTRIBUTED RANDOMLY</codeph>子句），
+                            这对于还原到其他Greenplum数据库系统很有用。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>--no-gp-syntax</pt>
-                        <pd>Do not output the table distribution clauses in the <codeph>CREATE
-                                TABLE</codeph> statements. </pd>
+                        <pd>不要在<codeph>CREATE TABLE</codeph>语句中输出表分配子句。
+                            </pd>
                     </plentry>
                     <plentry>
                       <pt>-? | --help</pt>
-                      <pd>Show help about <codeph>pg_dumpall</codeph> command line arguments, and exit.</pd>
+                      <pd>显示有关<codeph>pg_dumpall</codeph>命令行参数的帮助，然后退出。</pd>
                     </plentry>
                 </parml>
             </sectiondiv>
             <sectiondiv id="section6">
-                <b>Connection Options</b>
+                <b>连接选项</b>
                 <parml>
                     <plentry>
                         <pt>-d <varname>connstr</varname> | --dbname=<varname>connstr</varname></pt>
-                        <pd>Specifies parameters used to connect to the server, as a connection
-                            string. See <xref
-                                href="https://www.postgresql.org/docs/9.4/libpq-connect.html#LIBPQ-CONNSTRING"
-                                format="html" scope="external">Connection Strings</xref> in the
-                            PostgreSQL documentation for more information.</pd>
-                        <pd>The option is called <codeph>--dbname</codeph> for consistency with
-                            other client applications, but because <codeph>pg_dumpall</codeph> needs
-                            to connect to many databases, the database name in the connection string
-                            will be ignored. Use the <codeph>-l</codeph> option to specify the name
-                            of the database used to dump global objects and to discover what other
-                            databases should be dumped.</pd>
+                        <pd>指定用于连接到服务器的参数，作为连接字符串。
+                            有关更多信息，请参见PostgreSQL文档中的<xref
+                                    href="https://www.postgresql.org/docs/9.4/libpq-connect.html#LIBPQ-CONNSTRING"
+                                    format="html" scope="external">连接字符串</xref>。
+                            </pd>
+                        <pd>为了与其他客户端应用程序保持一致，该选项称为<codeph>--dbname</codeph>，
+                            但是由于<codeph>pg_dumpall</codeph>需要连接到许多数据库，因此连接字符串中的数据库名称将被忽略。
+                            使用<codeph>-l</codeph>选项可指定用于转储全局对象并发现应转储其他数据库的数据库的名称。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-h <varname>host</varname> | --host=<varname>host</varname></pt>
-                        <pd>The host name of the machine on which the Greenplum master database server is running. If
-                            not specified, reads from the environment variable
-                                <codeph>PGHOST</codeph> or defaults to
-                            <codeph>localhost</codeph>.</pd>
+                        <pd>运行Greenplum数据库master数据库服务器的计算机的主机名。
+                            如果未指定，则从环境变量<codeph>PGHOST</codeph>读取或默认为localhost。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-l <varname>dbname</varname> | --database=<varname>dbname</varname></pt>
-                        <pd>Specifies the name of the database in which to connect to dump global objects. If not specified, the <codeph>postgres</codeph> database is used. If the <codeph>postgres</codeph> database does not exist, the <codeph>template1</codeph> database is used.</pd>
+                        <pd>指定要在其中连接以转储全局对象的数据库的名称。
+                            如果未指定，则使用<codeph>postgres</codeph>数据库。
+                            如果<codeph>postgres</codeph>数据库不存在，则使用<codeph>template1</codeph>数据库。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-p <varname>port</varname> | --port=<varname>port</varname></pt>
-                        <pd>The TCP port on which the Greenplum master
-                            database server is listening for connections. If not specified, reads
-                            from the environment variable <codeph>PGPORT</codeph> or defaults to
-                            5432.</pd>
+                        <pd>Greenplum master数据库服务器正在侦听连接的TCP端口。
+                            如果未指定，则从环境变量<codeph>PGPORT</codeph>读取或默认为5432。</pd>
                     </plentry>
                     <plentry>
-                        <pt>-U <varname>username</varname> | --username=
-                            <varname>username</varname></pt>
-                        <pd>The database role name to connect as. If not specified, reads from the
-                            environment variable <codeph>PGUSER</codeph> or defaults to the current
-                            system role name.</pd>
+                        <pt>-U <varname>username</varname> | --username=<varname>username</varname></pt>
+                        <pd>要用作连接的数据库角色名称。
+                            如果未指定，则从环境变量<codeph>PGUSER</codeph>读取或默认为当前系统角色名称。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-w | --no-password</pt>
-                        <pd>Never issue a password prompt. If the server requires password
-                            authentication and a password is not available by other means such as a
-                                <codeph>.pgpass</codeph> file the connection attempt will fail. This
-                            option can be useful in batch jobs and scripts where no user is present
-                            to enter a password.</pd>
+                        <pd>不发出密码提示。
+                            如果服务器要求密码验证，而其他方式（例如<codeph>.pgpass</codeph>文件）无法使用密码，则连接尝试将失败。
+                            此选项在没有用户输入密码的批处理作业和脚本中很有用。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-W | --password</pt>
-                        <pd>Force a password prompt.</pd>
+                        <pd>强制输入密码提示。</pd>
                     </plentry>
                     <plentry>
                         <pt>--role=<varname>rolename</varname></pt>
-                        <pd>Specifies a role name to be used to create the dump. This option causes
-                                <codeph>pg_dumpall</codeph> to issue a <codeph>SET ROLE
-                                    <varname>rolename</varname></codeph> command after connecting to
-                            the database. It is useful when the authenticated user (specified by
-                                <codeph>-U</codeph>) lacks privileges needed by
-                                <codeph>pg_dumpall</codeph>, but can switch to a role with the
-                            required rights. Some installations have a policy against logging in
-                            directly as a superuser, and use of this option allows dumps to be made
-                            without violating the policy.</pd>
+                        <pd>指定用于创建转储的角色名称。
+                            此选项使<codeph>pg_dumpall</codeph>在连接到数据库后发出<codeph>SET ROLE <varname>rolename</varname></codeph>命令。
+                            当通过身份验证的用户（由<codeph>-U</codeph>指定）缺少<codeph>pg_dumpall</codeph>所需的特权，但可以切换到具有所需权限的角色时，此功能很有用。
+                            某些安装有禁止直接以超级用户身份登录的策略，并且使用此选项可以在不违反策略的情况下进行转储。
+                            </pd>
                     </plentry>
                 </parml>
             </sectiondiv>
         </section>
         <section id="section7">
-            <title>Notes</title>
-            <p>Since <codeph>pg_dumpall</codeph> calls <codeph><xref href="pg_dump.xml#topic1"
-                        type="topic" format="dita"/></codeph> internally, some diagnostic messages
-                will refer to <codeph>pg_dump</codeph>. </p>
-            <p>Once restored, it is wise to run <codeph>ANALYZE</codeph> on each database so the
-                query planner has useful statistics. You can also run <codeph>vacuumdb -a
-                    -z</codeph> to analyze all databases. </p>
-            <p><codeph>pg_dumpall</codeph> requires all needed tablespace directories to
-                exist before the restore; otherwise, database creation will fail for
-                databases in non-default locations.</p>
+            <title>注解</title>
+            <p>由于<codeph>pg_dumpall</codeph>在内部调用<codeph><xref href="pg_dump.xml#topic1" type="topic" format="dita"/></codeph>，
+                因此某些诊断消息将引用<codeph>pg_dump</codeph>。
+                </p>
+            <p>恢复后，明智的做法是在每个数据库上运行<codeph>ANALYZE</codeph>，以便查询优化器可以得到有用的统计信息。
+                您也可以运行<codeph>vacuumdb -a -z</codeph>分析所有数据库。
+                </p>
+            <p><codeph>pg_dumpall</codeph>要求所有需要的表空间目录在还原之前都存在。
+                否则，对于非默认位置的数据库，数据库创建将失败。
+                </p>
         </section>
         <section id="section8">
-            <title>Examples</title>
-            <p>To dump all databases: </p>
+            <title>示例</title>
+            <p>转储所有数据库：</p>
             <codeblock>pg_dumpall &gt; db.out</codeblock>
-            <p>To reload database(s) from this file, you can use:</p>
+            <p>要从此文件重新加载数据库，可以使用：</p>
             <codeblock>psql template1 -f db.out</codeblock>
-            <p>To dump only global objects (including resource queues):</p>
+            <p>仅转储全局对象（包括资源队列）：</p>
             <codeblock>pg_dumpall -g --resource-queues</codeblock>
         </section>
         <section id="section9">
-            <title>See Also</title>
+            <title>另见</title>
             <p>
                 <codeph>
                     <xref href="pg_dump.xml#topic1" type="topic" format="dita"/>

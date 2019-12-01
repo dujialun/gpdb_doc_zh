@@ -4,9 +4,9 @@
 <topic id="topic1">
   <title id="pa137116">createlang</title>
   <body>
-    <p id="client_util_desc">Defines a new procedural language for a database.</p>
+    <p id="client_util_desc">为数据库定义新的过程语言。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="client_util_synopsis"><b>createlang</b> [<varname>connection_option</varname> ...] [<b>-e</b>] <varname>langname</varname> [[<b>-d</b>] <varname>dbname</varname>]
 
 <b>createlang</b> [<varname>connection-option</varname> ...] <b>-l</b> <varname>dbname</varname>
@@ -16,96 +16,96 @@
 <b>createlang</b> <b>-V | --version</b></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>The <codeph>createlang</codeph> utility adds a new procedural language to a database.
-          <codeph>createlang</codeph> is a wrapper around the <codeph>SQL</codeph> command
-          <codeph><xref
-              href="../../ref_guide/sql_commands/CREATE_EXTENSION.xml#topic1"/></codeph>.</p>
-      <note><codeph>createlang</codeph> is deprecated and may be removed in a future release. Direct
-        use of the <codeph>CREATE EXTENSION</codeph> command is recommended instead.</note>
-      <p>The procedural language packages included in the standard Greenplum Database
-        distribution are:</p>
+      <title>描述</title>
+      <p><codeph>createlang</codeph>工具将新的过程语言添加到数据库。
+          <codeph>createlang</codeph>是<codeph>SQL</codeph>命令<codeph><xref href="../../ref_guide/sql_commands/CREATE_EXTENSION.xml#topic1"/></codeph>的包装。
+        </p>
+      <note><codeph>createlang</codeph>已弃用，将来的发行版中可能会将其删除。
+          建议直接使用<codeph>CREATE EXTENSION</codeph>命令。
+        </note>
+      <p>标准Greenplum数据库分发中包含的过程语言包是：
+          </p>
       <ul>
         <li id="pa140043"><codeph>PL/pgSQL</codeph></li>
         <li id="pa140054"><codeph>PL/Perl</codeph></li>
         <li id="pa140061"><codeph>PL/Python</codeph></li>
       </ul>
-      <p>The <codeph>PL/pgSQL</codeph> language is registered in all databases by default.</p>
-      <p>Greenplum Database also has language handlers for <codeph>PL/Java</codeph> and
-          <codeph>PL/R</codeph>, but those languages are not pre-installed with Greenplum Database.
-        See the <xref href="../../ref_guide/extensions/pl_java.xml" scope="peer"
-          format="dita">Greenplum PL/Java Language Extension</xref> and
-          <xref href="../../ref_guide/extensions/pl_r.xml" scope="peer"
-          format="dita">Greenplum PL/R Language Extension</xref> sections in the
-          documentation for more information.</p>
+      <p>默认情况下，<codeph>PL/pgSQL</codeph>语言已在所有数据库中注册。</p>
+      <p>Greenplum数据库还具有用于<codeph>PL/Java</codeph>和<codeph>PL/R</codeph>的语言处理程序，
+          但是Greenplum数据库尚未预安装这些语言。
+          有关更多信息，请参阅文档中的<xref href="../../ref_guide/extensions/pl_java.xml" scope="peer"
+                              format="dita">Greenplum PL/Java语言扩展</xref>和<xref href="../../ref_guide/extensions/pl_r.xml" scope="peer"
+                                                                               format="dita">Greenplum PL/R语言扩展</xref>部分。
+        </p>
     </section>
-    <section id="section4"><title>Options</title><parml>
+    <section id="section4"><title>选项</title><parml>
         <plentry>
           <pt>langname</pt>
-          <pd>Specifies the name of the procedural language to be installed. (This name is
-            lower-cased.)</pd>
+          <pd>指定要安装的过程语言的名称。（此名称为小写。）
+            </pd>
         </plentry>
         <plentry>
           <pt>[-d] <varname>dbname</varname> | [--dbname=]<varname>dbname</varname></pt>
-          <pd>Specifies the database to which the language should be added. The default is to use the
-              <codeph>PGDATABASE</codeph> environment variable setting, or the same name as the
-            current system user.</pd>
+          <pd>指定应向其中添加语言的数据库。
+              默认设置是使用<codeph>PGDATABASE</codeph>环境变量设置，或与当前系统用户相同的名称。
+              </pd>
         </plentry>
         <plentry>
           <pt>-e | --echo</pt>
-          <pd>Echo the commands that <codeph>createlang</codeph> generates and sends to the
-            server.</pd>
+          <pd>回显<codeph>createlang</codeph>生成并发送到服务器的命令。
+              </pd>
         </plentry>
         <plentry>
           <pt>-l <varname>dbname</varname> | --list <varname>dbname</varname></pt>
-          <pd>Show a list of already installed languages in the target database. </pd>
+          <pd>显示目标数据库中已经安装的语言的列表。</pd>
         </plentry>
         <plentry>
           <pt>-V | --version</pt>
-          <pd>Print the <codeph>createlang</codeph> version and exit.</pd>
+          <pd>打印<codeph>createlang</codeph>版本并退出。</pd>
         </plentry>
         <plentry>
           <pt>-? | --help</pt>
-          <pd>Show help about <codeph>createlang</codeph> command line arguments, and exit.</pd>
+          <pd>显示有关<codeph>createlang</codeph>命令行参数的帮助，然后退出。</pd>
         </plentry>
-      </parml><sectiondiv id="section5"><b>Connection Options</b><parml>
+      </parml><sectiondiv id="section5"><b>连接选项</b><parml>
           <plentry>
             <pt>-h <varname>host</varname> | --host=<varname>host</varname></pt>
-            <pd>The host name of the machine on which the Greenplum
-              master database server is running. If not specified, reads from the environment
-              variable <codeph>PGHOST</codeph> or defaults to localhost.</pd>
+            <pd>运行Greenplum master数据库服务器的计算机的主机名。
+                如果未指定，则从环境变量<codeph>PGHOST</codeph>读取或默认为localhost。
+                </pd>
           </plentry>
           <plentry>
             <pt>-p <varname>port</varname> | --port=<varname>port</varname></pt>
-            <pd>The TCP port on which the Greenplum master database
-              server is listening for connections. If not specified, reads from the environment
-              variable <codeph>PGPORT</codeph> or defaults to <codeph>5432</codeph>.</pd>
+            <pd>Greenplum主数据库服务器正在侦听连接的TCP端口。
+                如果未指定，则从环境变量<codeph>PGPORT</codeph>读取或默认为<codeph>5432</codeph>。
+                </pd>
           </plentry>
           <plentry>
             <pt>-U <varname>username</varname> | --username=<varname>username</varname></pt>
-            <pd>The database role name to connect as. If not specified, reads from the environment
-              variable <codeph>PGUSER</codeph> or defaults to the current system role name.</pd>
+            <pd>要用作连接的数据库角色名称。
+                如果未指定，则从环境变量<codeph>PGUSER</codeph>读取或默认为当前系统角色名称。
+                </pd>
           </plentry>
           <plentry>
             <pt>-w | --no-password</pt>
-            <pd>Never issue a password prompt. If the server requires password authentication and a
-              password is not available by other means such as a <codeph>.pgpass</codeph> file, the
-              connection attempt will fail. This option can be useful in batch jobs and scripts
-              where no user is present to enter a password.</pd>
+            <pd>不发出密码提示。
+                如果服务器要求密码验证，而其他方式（例如<codeph>.pgpass</codeph>文件）无法使用密码，则连接尝试将失败。
+                此选项在没有用户输入密码的批处理作业和脚本中很有用。
+                </pd>
           </plentry>
           <plentry>
             <pt>-W | --password</pt>
-            <pd>Force a password prompt.</pd>
+            <pd>强制输入密码提示。</pd>
           </plentry>
         </parml></sectiondiv></section>
     <section id="section6">
-      <title>Examples</title>
-      <p>To install the language <codeph>plperl</codeph> into the database
-        <codeph>mytestdb</codeph>:</p>
+      <title>示例</title>
+      <p>要将语言<codeph>plperl</codeph>安装到数据库<codeph>mytestdb</codeph>中：
+        </p>
       <codeblock>createlang plperl mytestdb</codeblock>
     </section>
     <section id="section7">
-      <title>See Also</title>
+      <title>另见</title>
       <p> <ph otherprops="op-help">
         <codeph><xref href="droplang.xml#topic1"/></codeph>,
         <codeph><xref href="../../ref_guide/sql_commands/CREATE_EXTENSION.xml#topic1"/></codeph>,

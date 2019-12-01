@@ -4,9 +4,9 @@
 <topic id="topic1">
         <title id="bu20941">CREATE INDEX</title>
         <body>
-                <p id="sql_command_desc">Defines a new index.</p>
+                <p id="sql_command_desc">定义一个新索引。</p>
                 <section id="section2">
-                        <title>Synopsis</title>
+                        <title>概要</title>
                         <codeblock id="sql_command_synopsis">CREATE [UNIQUE] INDEX [<varname>name</varname>] ON <varname>table_name</varname> [USING <varname>method</varname>]
        ( {<varname>column_name</varname> | (<varname>expression</varname>)} [COLLATE <varname>parameter</varname>] [<varname>opclass</varname>] [ ASC | DESC ] [ NULLS { FIRST | LAST } ] [, ...] )
        [ WITH ( <varname>storage_parameter</varname> = <varname>value</varname> [, ... ] ) ]
@@ -14,352 +14,277 @@
        [ WHERE <varname>predicate</varname> ]</codeblock>
                 </section>
                 <section id="section3">
-                        <title>Description</title>
-                        <p><codeph>CREATE INDEX</codeph> constructs an index on the specified
-                                column(s) of the specified table. Indexes are primarily used to 
-                                enhance database performance (though inappropriate use can result in
-                                slower performance). </p>
-                        <p>The key field(s) for the index are specified as column names, or
-                                alternatively as expressions written in parentheses. Multiple fields
-                                can be specified if the index method supports multicolumn
-                                indexes.</p>
-                        <p>An index field can be an expression computed from the values of one or
-                                more columns of the table row. This feature can be used to obtain
-                                fast access to data based on some transformation of the basic data.
-                                For example, an index computed on <codeph>upper(col)</codeph> would
-                                allow the clause <codeph>WHERE upper(col) = 'JIM'</codeph> to use an
-                                index. </p>
-                        <p>Greenplum Database provides the index methods B-tree, bitmap, GiST,
-                                SP-GiST, and GIN. Users can also define their own index methods, but
-                                that is fairly complicated. </p>
-                        <p>When the <codeph>WHERE</codeph> clause is present, a partial index is
-                                created. A partial index is an index that contains entries for only
-                                a portion of a table, usually a portion that is more useful for
-                                indexing than the rest of the table. For example, if you have a
-                                table that contains both billed and unbilled orders where the
-                                unbilled orders take up a small fraction of the total table and yet
-                                is most often selected, you can improve performance by creating an
-                                index on just that portion.</p>
-                        <p>The expression used in the <codeph>WHERE</codeph> clause may refer only
-                                to columns of the underlying table, but it can use all columns, not
-                                just the ones being indexed. Subqueries and aggregate expressions
-                                are also forbidden in <codeph>WHERE</codeph>. The same restrictions
-                                apply to index fields that are expressions.</p>
-                        <p>All functions and operators used in an index definition must be
-                                immutable. Their results must depend only on their arguments and
-                                never on any outside influence (such as the contents of another
-                                table or a parameter value). This restriction ensures that the
-                                behavior of the index is well-defined. To use a user-defined
-                                function in an index expression or <codeph>WHERE</codeph> clause,
-                                remember to mark the function <codeph>IMMUTABLE</codeph> when you
-                                create it.</p>
+                        <title>描述</title>
+                        <p><codeph>CREATE INDEX</codeph>在指定表的指定列上构造索引。
+                                索引主要用于增强数据库性能（尽管使用不当会导致性能降低）。
+                                </p>
+                        <p>索引的键字段指定为列名，或者指定为用括号括起来的表达式。
+                                如果index方法支持多列索引，则可以指定多个字段。
+                               </p>
+                        <p>索引字段可以是根据表行的一个或多个列的值计算的表达式。
+                                该功能可用于基于基本数据的某种转换来快速访问数据。
+                                例如，在<codeph>upper(col)</codeph>上计算的索引将允许子句<codeph>WHERE upper(col) = 'JIM'</codeph>使用索引。
+                                </p>
+                        <p>Greenplum数据库提供了索引方法B树，位图，GiST，SP-GiST和GIN。
+                                用户还可以定义自己的索引方法，但这相当复杂。
+                                </p>
+                        <p>存在<codeph>WHERE</codeph>子句时，将创建部分索引。
+                                部分索引是仅包含表一部分的条目的索引，通常索引的部分比表的其余部分更有用。
+                                例如，如果您有一个既包含开票订单又包含未开票订单的表，
+                                其中未开票订单仅占总表的一小部分，但最常被选择，则可以通过仅在该部分上创建索引来提高性能。
+                                </p>
+                        <p><codeph>WHERE</codeph>子句中使用的表达式可能仅引用基础表的列，但它可以使用所有列，而不仅仅是被索引的列。
+                                <codeph>WHERE</codeph>中也禁止子查询和聚合表达式。
+                                相同的限制适用于作为表达式的索引字段。
+                                </p>
+                        <p>索引定义中使用的所有函数和运算符必须是不可变的。
+                                它们的结果必须仅取决于其参数，而不得取决于任何外部影响（例如另一个表的内容或参数值）。
+                                此限制可确保索引的行为得到良好定义。
+                                要在索引表达式或<codeph>WHERE</codeph>子句中使用用户定义的函数，
+                                请记住在创建函数时将其标记为<codeph>IMMUTABLE</codeph>。
+                                </p>
                 </section>
                 <section id="section4">
-                        <title>Parameters</title>
+                        <title>参数</title>
                         <parml>
                                 <plentry>
                                         <pt>UNIQUE</pt>
-                                        <pd>Checks for duplicate values in the table when the index
-                                                is created and each time data is added. Duplicate
-                                                entries will generate an error. Unique indexes only
-                                                apply to B-tree indexes. In Greenplum Database,
-                                                unique indexes are allowed only if the columns of
-                                                the index key are the same as (or a superset of) the
-                                                Greenplum distribution key. On partitioned tables, a
-                                                unique index is only supported within an individual
-                                                partition - not across all partitions.</pd>
+                                        <pd>创建索引并每次添加数据时，检查表中是否有重复值。
+                                                重复的条目将产生错误。
+                                                唯一索引仅适用于B树索引。
+                                                在Greenplum数据库中，仅当索引键的列与Greenplum分布键相同（或超集）时，才允许唯一索引。
+                                                在分区表上，唯一索引仅在单个分区中受支持 - 不可以跨所有分区。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>name</varname>
                                         </pt>
-                                        <pd>The name of the index to be created. The index is always
-                                                created in the same schema as its parent table. If
-                                                the name is omitted, Greenplum Database chooses a
-                                                suitable name based on the parent table's name and
-                                                the indexed column name(s). </pd>
+                                        <pd>要创建的索引的名称。
+                                                索引始终与其父表在相同的模式中创建。
+                                                如果省略该名称，则Greenplum数据库将基于父表的名称和索引列的名称选择一个合适的名称。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>table_name</varname>
                                         </pt>
-                                        <pd>The name (optionally schema-qualified) of the table to
-                                                be indexed. </pd>
+                                        <pd>要建立索引的表的名称（可以由模式指定）。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>method</varname>
                                         </pt>
-                                        <pd>The name of the index method to be used. Choices are
-                                                  <codeph>btree</codeph>, <codeph>bitmap</codeph>,
-                                                  <codeph>gist</codeph>, <codeph>spgist</codeph>,
-                                                and <codeph>gin</codeph>. The default method is
-                                                  <codeph>btree</codeph>. </pd>
-                                        <pd>Currently, only the B-tree, GiST, and GIN index methods
-                                                support multicolumn indexes. Up to 32 fields can be
-                                                specified by default. Only B-tree currently supports
-                                                unique indexes.</pd>
-                                        <pd>GPORCA supports only B-tree, bitmap, and GiST indexes.
-                                                GPORCA ignores indexes created with unsupported
-                                                indexing methods.</pd>
+                                        <pd>要使用的索引方法的名称。
+                                                选择为<codeph>btree</codeph>，<codeph>bitmap</codeph>，
+                                                <codeph>gist</codeph>，<codeph>spgist</codeph>和<codeph>gin</codeph>。
+                                                默认方法是<codeph>btree</codeph>。
+                                                </pd>
+                                        <pd>当前，仅B树，GiST和GIN索引方法支持多列索引。
+                                                默认情况下，最多可以指定32个字段。
+                                                当前只有B树支持唯一索引。
+                                                </pd>
+                                        <pd>GPORCA仅支持B树，位图和GiST索引。
+                                                GPORCA会忽略使用不受支持的索引方法创建的索引。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>column_name</varname>
                                         </pt>
-                                        <pd>The name of a column of the table on which to create the
-                                                index. Only the B-tree, bitmap, GiST, and GIN index
-                                                methods support multicolumn indexes.</pd>
+                                        <pd>在其上创建索引的表的列的名称。
+                                                仅B树，位图，GiST和GIN索引方法支持多列索引。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>expression</varname>
                                         </pt>
-                                        <pd>An expression based on one or more columns of the table.
-                                                The expression usually must be written with
-                                                surrounding parentheses, as shown in the syntax.
-                                                However, the parentheses may be omitted if the
-                                                expression has the form of a function call.</pd>
+                                        <pd>一种基于表的一个或多个列的表达式。
+                                                表达式通常必须用括号括起来，如语法所示。
+                                                但是，如果表达式具有函数调用的形式，则可以省略括号。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt><varname>collation</varname></pt>
-                                        <pd> The name of the collation to use for the index. By
-                                                default, the index uses the collation declared for
-                                                the column to be indexed or the result collation of
-                                                the expression to be indexed. Indexes with
-                                                non-default collations can be useful for queries
-                                                that involve expressions using non-default
-                                                collations. </pd>
+                                        <pd>索引使用的归类名称。
+                                                默认情况下，索引使用为要建立索引的列声明的归类或要建立索引的表达式的结果归类。
+                                                具有非默认归类的索引对于涉及使用非默认归类的表达式的查询很有用。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>opclass</varname>
                                         </pt>
-                                        <pd>The name of an operator class. The operator class
-                                                identifies the operators to be used by the index for
-                                                that column. For example, a B-tree index on
-                                                four-byte integers would use the
-                                                  <codeph>int4_ops</codeph> class (this operator
-                                                class includes comparison functions for four-byte
-                                                integers). In practice the default operator class
-                                                for the column's data type is usually sufficient.
-                                                The main point of having operator classes is that
-                                                for some data types, there could be more than one
-                                                meaningful ordering. For example, a complex-number
-                                                data type could be sorted by either absolute value
-                                                or by real part. We could do this by defining two
-                                                operator classes for the data type and then
-                                                selecting the proper class when making an
-                                                index.</pd>
+                                        <pd>运算符类的名称。
+                                                operator类标识该列的索引要使用的运算符。
+                                                例如，在四字节整数上的B树索引将使用<codeph>int4_ops</codeph>类（此运算符类包含四字节整数的比较函数）。
+                                                实际上，列数据类型的默认运算符类通常就足够了。
+                                                拥有运算符类的要点是，对于某些数据类型，可能会有不止一种有意义的排序。
+                                                例如，复数数据类型可以按绝对值或实数进行排序。
+                                                为此，我们可以为数据类型定义两个运算符类，然后在创建索引时选择适当的类。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>ASC</pt>
-                                        <pd>Specifies ascending sort order (which is the
-                                                default).</pd>
+                                        <pd>指定升序排序（默认）。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>DESC</pt>
-                                        <pd>Specifies descending sort order.</pd>
+                                        <pd>指定降序排序。</pd>
                                 </plentry>
                                 <plentry>
                                         <pt>NULLS FIRST</pt>
-                                        <pd>Specifies that nulls sort before non-nulls. This is the
-                                                default when <codeph>DESC</codeph> is
-                                                specified.</pd>
+                                        <pd>指定null排在非null之前。当指定<codeph>DESC</codeph>时，这是默认设置。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>NULLS LAST</pt>
-                                        <pd>Specifies that nulls sort after non-nulls. This is the
-                                                default when <codeph>DESC</codeph> is not
-                                                specified.</pd>
+                                        <pd>指定空值在非空值之后排序。如果未指定<codeph>DESC</codeph>，这是默认设置。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt><varname>storage_parameter</varname></pt>
-                                        <pd>The name of an index-method-specific storage parameter.
-                                                Each index method has its own set of allowed storage
-                                                parameters.</pd>
-                                        <pd><codeph>FILLFACTOR</codeph> - B-tree, bitmap, GiST, and
-                                                SP-GiST index methods all accept this parameter. The
-                                                  <codeph>FILLFACTOR</codeph> for an index is a
-                                                percentage that determines how full the index method
-                                                will try to pack index pages. For B-trees, leaf
-                                                pages are filled to this percentage during initial
-                                                index build, and also when extending the index at
-                                                the right (adding new largest key values). If pages
-                                                subsequently become completely full, they will be
-                                                split, leading to gradual degradation in the index's
-                                                efficiency. B-trees use a default fillfactor of 90,
-                                                but any integer value from 10 to 100 can be
-                                                selected. If the table is static then fillfactor 100
-                                                is best to minimize the index's physical size, but
-                                                for heavily updated tables a smaller fillfactor is
-                                                better to minimize the need for page splits. The
-                                                other index methods use fillfactor in different but
-                                                roughly analogous ways; the default fillfactor
-                                                varies between methods.</pd>
-                                        <pd><codeph>BUFFERING</codeph> - In addition to
-                                                  <codeph>FILLFACTOR</codeph>, GiST indexes
-                                                additionally accept the <codeph>BUFFERING</codeph>
-                                                parameter. <codeph>BUFFERING</codeph> determines
-                                                whether Greenplum Database builds the index using
-                                                the buffering build technique described in <xref
-                                                  href="https://www.postgresql.org/docs/9.4/gist-implementation.html"
-                                                  format="html" scope="external">GiST buffering
-                                                  build</xref> in the PostgreSQL documentation. With
-                                                  <codeph>OFF</codeph> it is disabled, with
-                                                  <codeph>ON</codeph> it is enabled, and with
-                                                  <codeph>AUTO</codeph> it is initially disabled,
-                                                but turned on on-the-fly once the index size reaches
-                                                  <xref
-                                                  href="../config_params/guc-list.xml#effective_cache_size"
-                                                  >effective-cache-size</xref>. The default is
-                                                  <codeph>AUTO</codeph>.</pd>
-                                        <pd><codeph>FASTUPDATE</codeph> - The GIN index method
-                                                accepts the <codeph>FASTUPDATE</codeph> storage
-                                                parameter. <codeph>FASTUPDATE</codeph> is a Boolean
-                                                parameter that disables or enables the GIN index
-                                                fast update technique. A value of ON enables fast
-                                                update (the default), and OFF disables it. See <xref
-                                                  href="https://www.postgresql.org/docs/9.4/gin-implementation.html#GIN-FAST-UPDATE"
-                                                  format="html" scope="external">GIN fast update
-                                                  technique</xref> in the PostgreSQL documentation
-                                                for more information.<note>Turning
-                                                  <codeph>FASTUPDATE</codeph> off via <codeph>ALTER
-                                                  INDEX</codeph> prevents future insertions from
-                                                  going into the list of pending index entries, but
-                                                  does not in itself flush previous entries. You
-                                                  might want to VACUUM the table afterward to ensure
-                                                  the pending list is emptied.</note></pd>
+                                        <pd>特定于索引方法的存储参数的名称。
+                                                每个索引方法都有其自己的一组允许的存储参数。
+                                                </pd>
+                                        <pd><codeph>FILLFACTOR</codeph>-B树，位图，GiST和SP-GiST索引方法都接受此参数。
+                                                索引的<codeph>FILLFACTOR</codeph>是一个百分比，它确定索引方法将尝试打包索引页面的程度。
+                                                对于B树，在初始索引构建期间以及在向右扩展索引时（添加新的最大键值），叶子页将填充到该百分比。
+                                                如果页面随后完全填满，它们将被拆分，从而导致索引效率逐渐下降。
+                                                B树使用默认填充因子90，但可以选择10到100之间的任何整数值。
+                                                如果表是静态的，则fillfactor 100最好最大程度地减小索引的物理大小，
+                                                但是对于大量更新的表，较小的fillfactor更好地最小化对页面拆分的需求。
+                                                其他索引方法以不同但大致相似的方式使用fillfactor；默认的填充因子因方法而异。
+                                                </pd>
+                                        <pd><codeph>BUFFERING</codeph> - 除<codeph>FILLFACTOR</codeph>之外，GiST索引还接受<codeph>BUFFERING</codeph>参数。
+                                                <codeph>BUFFERING</codeph>确定Greenplum数据库是否使用PostgreSQL文档中<xref
+                                                        href="https://www.postgresql.org/docs/9.4/gist-implementation.html"
+                                                        format="html" scope="external">GiST缓冲构建</xref>中描述的缓冲构建技术构建索引。
+                                                如果设置为<codeph>OFF</codeph>，则禁用它；
+                                                如果设置为<codeph>ON</codeph>，则启用；
+                                                将其设置为<codeph>AUTO</codeph>时，最初将其禁用；但是，一旦索引大小达到<xref href="../config_params/guc-list.xml#effective_cache_size">有效缓存大小</xref>，它就会即时打开。
+                                                默认为<codeph>AUTO</codeph>。
+                                                </pd>
+                                        <pd><codeph>FASTUPDATE</codeph> - GIN索引方法接受<codeph>FASTUPDATE</codeph>存储参数。
+                                                <codeph>FASTUPDATE</codeph>是一个布尔参数，用于禁用或启用GIN索引快速更新技术。
+                                                值ON启用快速更新（默认值），而值OFF禁用它。
+                                                有关更多信息，请参见PostgreSQL文档中的<xref
+                                                        href="https://www.postgresql.org/docs/9.4/gin-implementation.html#GIN-FAST-UPDATE"
+                                                        format="html" scope="external">GIN快速更新技术</xref>。
+                                                <note>通过<codeph>ALTER INDEX</codeph>关闭<codeph>FASTUPDATE</codeph>可以防止将来的插入进入挂起的索引条目列表，但本身不会刷新以前的条目。
+                                                        您可能需要稍后对表进行VACUUM处理，以确保清空待处理列表。
+                                                        </note></pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>tablespace_name</varname>
                                         </pt>
-                                        <pd>The tablespace in which to create the index. If not
-                                                specified, the default tablespace is used. </pd>
+                                        <pd>在其中创建索引的表空间。如果未指定，则使用默认表空间。
+                                                </pd>
                                 </plentry>
                                 <plentry>
                                         <pt>
                                                 <varname>predicate</varname>
                                         </pt>
-                                        <pd>The constraint expression for a partial index.</pd>
+                                        <pd>部分索引的约束表达式。</pd>
                                 </plentry>
                         </parml>
                 </section>
                 <section id="section5">
-                        <title>Notes</title>
-                        <p>An <i>operator class</i> can be specified for each column of an index.
-                                The operator class identifies the operators to be used by the index
-                                for that column. For example, a B-tree index on four-byte integers
-                                would use the int4_ops class; this operator class includes
-                                comparison functions for four-byte integers. In practice the default
-                                operator class for the column's data type is usually sufficient. The
-                                main point of having operator classes is that for some data types,
-                                there could be more than one meaningful ordering. For example, we
-                                might want to sort a complex-number data type either by absolute
-                                value or by real part. We could do this by defining two operator
-                                classes for the data type and then selecting the proper class when
-                                making an index. </p>
-                        <p>For index methods that support ordered scans (currently, only B-tree),
-                                the optional clauses <codeph>ASC</codeph>, <codeph>DESC</codeph>,
-                                        <codeph>NULLS FIRST</codeph>, and/or <codeph>NULLS
-                                        LAST</codeph> can be specified to modify the sort ordering
-                                of the index. Since an ordered index can be scanned either forward
-                                or backward, it is not normally useful to create a single-column
-                                        <codeph>DESC</codeph> index — that sort ordering is already
-                                available with a regular index. The value of these options is that
-                                multicolumn indexes can be created that match the sort ordering
-                                requested by a mixed-ordering query, such as <codeph>SELECT ...
-                                        ORDER BY x ASC, y DESC</codeph>. The <codeph>NULLS</codeph>
-                                options are useful if you need to support "nulls sort low" behavior,
-                                rather than the default "nulls sort high", in queries that depend on
-                                indexes to avoid sorting steps.</p>
-                        <p>For most index methods, the speed of creating an index is dependent on
-                                the setting of <codeph>maintenance_work_mem</codeph>. Larger values
-                                will reduce the time needed for index creation, so long as you don't
-                                make it larger than the amount of memory really available, which
-                                would drive the machine into swapping.</p>
-                        <p>When an index is created on a partitioned table, the index is propagated
-                                to all the child tables created by Greenplum Database. Creating an
-                                index on a table that is created by Greenplum Database for use by a
-                                partitioned table is not supported.</p>
-                        <p><codeph>UNIQUE</codeph> indexes are allowed only if the index columns are
-                                the same as (or a superset of) the Greenplum distribution key
-                                columns.</p>
-                        <p><codeph>UNIQUE</codeph> indexes are not allowed on append-optimized
-                                tables.</p>
-                        <p>A <codeph>UNIQUE</codeph> index can be created on a partitioned table.
-                                However, uniqueness is enforced only within a partition; uniqueness
-                                is not enforced between partitions. For example, for a partitioned
-                                table with partitions that are based on year and a subpartitions
-                                that are based on quarter, uniqueness is enforced only on each
-                                individual quarter partition. Uniqueness is not enforced between
-                                quarter partitions</p>
-                        <p>Indexes are not used for <codeph>IS NULL</codeph> clauses by default. The
-                                best way to use indexes in such cases is to create a partial index
-                                using an <codeph>IS NULL</codeph> predicate. </p>
-                        <p><codeph>bitmap</codeph> indexes perform best for columns that have
-                                between 100 and 100,000 distinct values. For a column with more than
-                                100,000 distinct values, the performance and space efficiency of a
-                                bitmap index decline. The size of a bitmap index is proportional to
-                                the number of rows in the table times the number of distinct values
-                                in the indexed column. </p>
-                        <p>Columns with fewer than 100 distinct values usually do not benefit much
-                                from any type of index. For example, a gender column with only two
-                                distinct values for male and female would not be a good candidate
-                                for an index. </p>
-                        <p>Prior releases of Greenplum Database also had an R-tree index method.
-                                This method has been removed because it had no significant
-                                advantages over the GiST method. If <codeph>USING rtree</codeph> is
-                                specified, <codeph>CREATE INDEX</codeph> will interpret it as
-                                        <codeph>USING gist</codeph>. </p>
-                        <p>For more information on the GiST index type, refer to the <xref
-                                        href="https://www.postgresql.org/docs/8.3/indexes-types.html"
-                                        scope="external" format="html">PostgreSQL
-                                        documentation</xref>.</p>
-                        <p>The use of hash indexes has been disabled in Greenplum Database.</p>
+                        <title>注解</title>
+                        <p>可以为索引的每一列指定一个运算符类。
+                                operator类标识该列的索引要使用的运算符。
+                                例如，在四字节整数上的B树索引将使用int4_ops类。
+                                此运算符类包含用于四字节整数的比较函数。
+                                实际上，列数据类型的默认运算符类通常就足够了。
+                                拥有运算符类的要点是，对于某些数据类型，可能会有不止一种有意义的排序。
+                                例如，我们可能想按绝对值或实数对复数数据类型进行排序。
+                                为此，我们可以为数据类型定义两个运算符类，然后在创建索引时选择适当的类。
+                                </p>
+                        <p>对于支持排序扫描的索引方法（当前仅支持B树），
+                                可以指定可选的子句<codeph>ASC</codeph>，<codeph>DESC</codeph>，
+                                <codeph>NULLS FIRST</codeph>和/或<codeph>NULLS LAST</codeph>来修改索引的排序顺序。
+                                由于可以向前或向后扫描有序索引，因此创建单列<codeph>DESC</codeph>索引通常没有用 - 常规索引已经可以使用排序顺序。
+                                这些选项的值在于可以创建与混合排序查询所请求的排序顺序匹配的多列索引，
+                                例如<codeph>SELECT ... ORDER BY x ASC, y DESC</codeph>。
+                                如果您需要在依赖索引以避免排序步骤的查询中支持“nulls sort low”行为，
+                                而不是默认的“nulls sort high”行为，则<codeph>NULLS</codeph>选项很有用。
+                                </p>
+                        <p>对于大多数索引方法，创建索引的速度取决于<codeph>maintenance_work_mem</codeph>的设置。
+                                较大的值将减少索引创建所需的时间，只要您不使其大于实际可用的内存量即可，这会促使计算机进行交换。
+                                </p>
+                        <p>在分区表上创建索引后，该索引将传播到Greenplum数据库创建的所有子表。
+                                不支持在由Greenplum数据库创建的表上创建索引以供分区表使用。
+                                </p>
+                        <p>仅当索引列与Greenplum分布键列相同（或超集）时，才允许使用<codeph>UNIQUE</codeph>索引。
+                                </p>
+                        <p>附加优化表上不允许使用<codeph>UNIQUE</codeph>索引。
+                                </p>
+                        <p>可以在分区表上创建<codeph>UNIQUE</codeph>索引。
+                                但是，唯一性仅在分区内有效。
+                                分区之间不强制唯一性。
+                                例如，对于具有基于年份的分区和基于季度的子分区的分区表，仅在每个单独的季度分区上实施唯一性。
+                                季度分区之间不强制唯一性
+                                </p>
+                        <p>默认情况下，索引不用于<codeph>IS NULL</codeph>子句。
+                                在这种情况下，使用索引的最佳方法是使用<codeph>IS NULL</codeph>谓词创建部分索引。
+                                </p>
+                        <p>对于具有100到100,000个不同值的列，位图索引的性能最佳。
+                                对于具有超过100,000个不同值的列，位图索引的性能和空间效率会下降。
+                                位图索引的大小与表中的行数乘以索引列中不同值的数量成正比。
+                                </p>
+                        <p>少于100个不同值的列通常不会从任何类型的索引中受益太多。
+                                例如，对于男性和女性仅具有两个不同值的性别列将不是索引的理想选择。
+                                </p>
+                        <p>Greenplum数据库的先前版本也具有R树索引方法。
+                                该方法已被删除，因为它与GiST方法相比没有明显的优势。
+                                如果指定了<codeph>USING rtree</codeph>，则<codeph>CREATE INDEX</codeph>会将其解释为<codeph>USING gist</codeph>。
+                                </p>
+                        <p>有关GiST索引类型的更多信息，请参见<xref
+                                href="https://www.postgresql.org/docs/8.3/indexes-types.html"
+                                scope="external" format="html">PostgreSQL文档</xref>。
+                                </p>
+                        <p>哈希索引的使用已在Greenplum数据库中禁用。</p>
                 </section>
                 <section id="section6">
-                        <title>Examples</title>
-                        <p>To create a B-tree index on the column <codeph>title</codeph> in the
-                                table <codeph>films</codeph>:</p>
+                        <title>示例</title>
+                        <p>要在<codeph>films</codeph>表的<codeph>title</codeph>列上创建B树索引：
+                                </p>
                         <codeblock>CREATE UNIQUE INDEX title_idx ON films (title);</codeblock>
-                        <p>To create a bitmap index on the column <codeph>gender</codeph> in the
-                                table <codeph>employee</codeph>:</p>
+                        <p>要在表<codeph>employee</codeph>中的<codeph>gender</codeph>列上创建位图索引：
+                                </p>
                         <codeblock>CREATE INDEX gender_bmp_idx ON employee USING bitmap 
 (gender);</codeblock>
-                        <p>To create an index on the expression <codeph>lower(title)</codeph>,
-                                allowing efficient case-insensitive searches:</p>
+                        <p>要在表达式<codeph>lower(title)</codeph>上创建索引，以允许有效的不区分大小写的搜索：
+                                </p>
                         <codeblock>CREATE INDEX ON films ((lower(title)));</codeblock>
-                        <p>(In this example we have chosen to omit the index name, so the system
-                                will choose a name, typically <codeph>films_lower_idx</codeph>.)
+                        <p>（在此示例中，我们选择省略索引名称，因此系统将选择一个名称，通常为<codeph>films_lower_idx</codeph>。）
                         </p>
-                        <p> To create an index with non-default collation: </p>
+                        <p>要使用非默认排序规则创建索引：</p>
                         <codeblock>CREATE INDEX title_idx_german ON films (title COLLATE "de_DE");</codeblock>
-                        <p>To create an index with non-default fill factor:</p>
+                        <p>要创建具有非默认填充因子的索引：</p>
                         <codeblock>CREATE UNIQUE INDEX title_idx ON films (title) WITH 
 (fillfactor = 70);</codeblock>
-                        <p>To create a GIN index with fast updates disabled:</p>
+                        <p>要创建禁用了快速更新的GIN索引：</p>
                         <codeblock>CREATE INDEX gin_idx ON documents_table USING gin (locations) WITH (fastupdate = off);</codeblock>
-                        <p>To create an index on the column <codeph>code</codeph> in the table
-                                        <codeph>films</codeph> and have the index reside in the
-                                tablespace <codeph>indexspace</codeph>:</p>
+                        <p>要在表<codeph>films</codeph>的列<codeph>code</codeph>上创建索引并使索引驻留在表空间<codeph>indexspace</codeph>中：</p>
                         <codeblock>CREATE INDEX code_idx ON films(code) TABLESPACE indexspace;</codeblock>
-                        <p>To create a GiST index on a point attribute so that we
-                                can efficiently use box operators on the result of the
-                                conversion function:</p>
+                        <p>要在point属性上创建GiST索引，以便我们可以对转换函数的结果有效地使用box运算符：</p>
                         <codeblock>CREATE INDEX pointloc ON points USING gist (box(location,location));
 SELECT * FROM points WHERE box(location,location) &amp;&amp; '(0,0),(1,1)'::box;</codeblock>
                 </section>
                 <section id="section7">
-                        <title>Compatibility</title>
-                        <p><codeph>CREATE INDEX</codeph> is a Greenplum Database language extension.
-                                There are no provisions for indexes in the SQL standard. </p>
-                        <p>Greenplum Database does not support the concurrent creation of indexes
-                                        (<codeph>CONCURRENTLY</codeph> keyword not supported).</p>
+                        <title>兼容性</title>
+                        <p><codeph>CREATE INDEX</codeph>是Greenplum数据库语言的扩展。
+                                SQL标准中没有索引的规定。
+                                </p>
+                        <p>Greenplum数据库不支持并发创建索引（不支持<codeph>CONCURRENTLY</codeph>关键字）。
+                                </p>
                 </section>
                 <section id="section8">
-                        <title>See Also</title>
+                        <title>另见</title>
                         <p><codeph><xref href="ALTER_INDEX.xml#topic1" type="topic" format="dita"
                                         /></codeph>, <codeph><xref href="./DROP_INDEX.xml#topic1"
                                                 type="topic" format="dita"/></codeph>, <codeph><xref

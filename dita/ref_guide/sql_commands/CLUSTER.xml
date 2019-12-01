@@ -1,91 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="bh20941">CLUSTER</title><body><p id="sql_command_desc">Physically reorders a heap storage table on disk according to an index.
-Not a recommended operation in Greenplum Database.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">CLUSTER <varname>indexname</varname> ON <varname>tablename</varname>
-
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="bh20941">CLUSTER</title>
+    <body>
+        <p id="sql_command_desc">根据索引对磁盘上的堆存储表进行物理重新排序。
+            在Greenplum数据库中不建议执行此操作。
+        </p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CLUSTER <varname>indexname</varname> ON <varname>tablename</varname>
 CLUSTER [VERBOSE] <varname>tablename</varname>
-
-CLUSTER [VERBOSE]</codeblock></section><section id="section3"><title>Description</title><p><codeph>CLUSTER</codeph> orders a heap storage table based on an index.
-<codeph>CLUSTER</codeph> is not supported on append-optmized storage
-tables. Clustering an index means that the records are physically ordered
-on disk according to the index information. If the records you need are
-distributed randomly on disk, then the database has to seek across the
-disk to get the records requested. If those records are stored more closely
-together, then the fetching from disk is more sequential. A good example
-for a clustered index is on a date column where the data is ordered sequentially
-by date. A query against a specific date range will result in an ordered
-fetch from the disk, which leverages faster sequential access.</p><p>Clustering is a one-time operation: when the table is subsequently updated, the changes are not
-clustered. That is, no attempt is made to store new or updated rows
-according to their index order. If you wish, you can periodically
-recluster by issuing the command again. Setting the table's <codeph>FILLFACTOR</codeph> storage parameter to less than
-        100% can aid in preserving cluster ordering during updates, because updated
-        rows are kept on the same page if enough space is available there.
-</p><p>When a table is clustered using this command, Greenplum Database remembers on which index it was
-                                clustered. The form <codeph>CLUSTER</codeph>
-                                <varname>tablename</varname> reclusters the table on the same index
-                                that it was clustered before. You can use the
-                                        <codeph>CLUSTER</codeph> or <codeph>SET WITHOUT
-                                        CLUSTER</codeph> forms of <codeph><xref
-                                                href="ALTER_TABLE.xml#topic1">ALTER
-                                        TABLE</xref></codeph> to set the index to use for future
-                                cluster operations, or to clear any previous setting.
-                                        <codeph>CLUSTER</codeph> without any parameter reclusters
-                                all previously clustered tables in the current database that the
-                                calling user owns, or all tables if called by a superuser. This form
-                                of <codeph>CLUSTER</codeph> cannot be executed inside a transaction
-                                block.</p><p>When a table is being clustered, an <codeph>ACCESS EXCLUSIVE</codeph>
-lock is acquired on it. This prevents any other database operations (both
-reads and writes) from operating on the table until the <codeph>CLUSTER</codeph>
-is finished.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>indexname</varname></pt><pd>The name of an index. </pd></plentry>
-                                <plentry>
-                                        <pt><codeph>VERBOSE</codeph></pt>
-                                        <pd>Prints a progress report as each table is clustered.</pd>
-                                </plentry><plentry><pt><varname>tablename</varname></pt><pd>The name (optionally schema-qualified) of a table. </pd></plentry></parml></section><section id="section5"><title>Notes</title><p>In cases where you are accessing single rows randomly within a table,
-the actual order of the data in the table is unimportant. However, if
-you tend to access some data more than others, and there is an index
-that groups them together, you will benefit from using <codeph>CLUSTER</codeph>.
-If you are requesting a range of indexed values from a table, or a single
-indexed value that has multiple rows that match, <codeph>CLUSTER</codeph>
-will help because once the index identifies the table page for the first
-row that matches, all other rows that match are probably already on the
-same table page, and so you save disk accesses and speed up the query.
-                                </p>
-                        <p><codeph>CLUSTER</codeph> can re-sort the table using either an index scan
-                                on the specified index, or (if the index is a b-tree) a sequential
-                                scan followed by sorting. It will attempt to choose the method that
-                                will be faster, based on planner cost parameters and available
-                                statistical information. </p>
-                        <p> When an index scan is used, a temporary copy of the table is created
-                                that contains the table data in the index order. Temporary copies of
-                                each index on the table are created as well. Therefore, you need
-                                free space on disk at least equal to the sum of the table size and
-                                the index sizes. </p>
-                        <p> When a sequential scan and sort is used, a temporary sort file is also
-                                created, so that the peak temporary space requirement is as much as
-                                double the table size, plus the index sizes. This method is often
-                                faster than the index scan method, but if the disk space requirement
-                                is intolerable, you can disable this choice by temporarily setting
-                                the <xref href="../config_params/guc-list.xml#enable_sort"
-                                        >enable_sort</xref> configuration parameter to
-                                        <codeph>off</codeph>. </p>
-                        <p> It is advisable to set <xref
-                                        href="../config_params/guc-list.xml#maintenance_work_mem"/>
-                                configuration parameter to a reasonably large value (but not more
-                                than the amount of RAM you can dedicate to the
-                                        <codeph>CLUSTER</codeph> operation) before clustering. </p>
-                                        <p>Because the query optimizer records statistics about the ordering of tables, it is advisable to
-        run <codeph>ANALYZE</codeph> on the newly clustered table. Otherwise, the planner may make
-                                                poor choices of query plans. </p>
-                        <p>Because <codeph>CLUSTER</codeph> remembers which indexes are clustered,
-                                you can cluster the tables you want clustered manually the first
-                                time, then set up a periodic maintenance script that executes
-                                        <codeph>CLUSTER</codeph> without any parameters, so that the
-                                desired tables are periodically reclustered.</p><note><codeph>CLUSTER</codeph> is not supported with append-optimized tables.</note></section><section id="section6"><title>Examples</title><p>Cluster the table <codeph>employees</codeph> on the basis of its index
-        <codeph>emp_ind</codeph>:</p><codeblock>CLUSTER emp_ind ON emp;</codeblock><p>Cluster a large table by recreating it and loading it in the correct index
-order:</p><codeblock>CREATE TABLE newtable AS SELECT * FROM table ORDER BY column;
+CLUSTER [VERBOSE]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CLUSTER</codeph>根据索引对堆存储表进行排序。
+                追加优化存储表不支持<codeph>CLUSTER</codeph>。
+                对索引进行聚簇意味着根据索引信息在磁盘上对记录进行物理排序。
+                如果您需要的记录随机分布在磁盘上，则数据库必须跨磁盘搜索以获取请求的记录。
+                如果将这些记录更紧密地存储在一起，则从磁盘进行的获取将更加有序。
+                聚集索引的一个很好的例子是在date列上，该列按日期顺序对数据进行排序。
+                对特定日期范围的查询将导致从磁盘中有序地进行访问，从而利用了更快的顺序访问。
+            </p>
+            <p>聚簇是一项一次性操作：表在随后进行更新时，更改不会被聚簇。
+                也就是说，没有尝试根据新的或更新的行的索引顺序来存储它们。
+                如果您愿意，可以通过再次发出命令来定期重新聚簇。
+                将表的<codeph>FILLFACTOR</codeph>存储参数设置为小于100％可以有助于在更新期间保留聚簇顺序，因为如果那里有足够的空间，则更新的行将保留在同一页上。
+            </p>
+            <p>当使用此命令将表聚簇时，Greenplum数据库会记住该表在哪个索引上聚簇。
+                形式<codeph>CLUSTER</codeph> <varname>tablename</varname>将表重新聚集在与聚簇相同的索引上。
+                您可以使用<codeph><xref href="ALTER_TABLE.xml#topic1">ALTER TABLE</xref></codeph>的<codeph>CLUSTER</codeph>或<codeph>SET WITHOUT CLUSTER</codeph>形式来设置索引以用于将来的聚簇操作，或清除任何先前的设置。
+                不带任何参数的<codeph>CLUSTER</codeph>会重新聚簇调用用户所拥有的当前数据库中所有先前聚簇的表，或者重新聚簇所有表（如果由超级用户调用）。
+                这种形式的<codeph>CLUSTER</codeph>不能在事务块内执行。
+            </p>
+            <p>对表进行聚簇时，将在其上获取<codeph>ACCESS EXCLUSIVE</codeph>锁。
+                这样可以防止在表<codeph>CLUSTER</codeph>完成之前对表执行任何其他数据库操作（读取和写入）。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>indexname</varname>
+                    </pt>
+                    <pd>索引名称。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <codeph>VERBOSE</codeph>
+                    </pt>
+                    <pd>当每个表聚簇时，打印进度报告。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>tablename</varname>
+                    </pt>
+                    <pd>表的名称（可以由模式指定）。</pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p>如果您要随机访问表中的单个行，则表中数据的实际顺序并不重要。
+                但是，如果您倾向于访问比其他数据更多的数据，并且有一个将它们分组在一起的索引，则可以从使用<codeph>CLUSTER</codeph>中受益。
+                如果要从表中请求某个范围的索引值，或者是具有多个匹配行的单个索引值，
+                则<codeph>CLUSTER</codeph>会有所帮助，因为一旦索引为匹配的第一行标识了表页面，
+                则所有其他匹配的行都可能已经在同一表页面上，因此您可以节省磁盘访问并加快查询速度。
+            </p>
+            <p><codeph>CLUSTER</codeph>可以使用对指定索引的索引扫描或顺序扫描后再排序来对表进行重新排序（如果索引是b树）。
+                它将尝试根据优化器成本参数和可用的统计信息来选择更快的方法。
+            </p>
+            <p>使用索引扫描时，将创建表的临时副本，该副本包含按索引顺序排列的表数据。
+                还将创建表上每个索引的临时副本。
+                因此，磁盘上需要的可用空间至少等于表大小和索引大小的总和。
+            </p>
+            <p>当使用顺序扫描和排序时，还会创建一个临时排序文件，因此临时空间的峰值需求是表大小加索引大小的两倍。
+                此方法通常比索引扫描方法快，但是如果磁盘空间需求无法忍受，则可以通过将<xref href="../config_params/guc-list.xml#enable_sort">enable_sort</xref>配置参数临时设置为<codeph>off</codeph>来禁用此选择。
+            </p>
+            <p>建议在聚簇之前将<xref href="../config_params/guc-list.xml#maintenance_work_mem"/>配置参数设置为一个相当大的值（但不要大于您可以用于<codeph>CLUSTER</codeph>操作的RAM数量）。
+            </p>
+            <p>因为查询优化器会记录有关表顺序的统计信息，所以建议在新的聚簇表上运行<codeph>ANALYZE</codeph>。
+                否则，优化器可能会选择错误的查询计划。
+            </p>
+            <p>由于<codeph>CLUSTER</codeph>会记住对哪些索引进行了聚簇，因此您可以在第一次手动对要聚簇的表进行聚簇，
+                然后设置一个定期维护脚本，该脚本无需任何参数即可执行<codeph>CLUSTER</codeph>，以便定期重新聚簇所需的表。
+            </p>
+            <note>追加优化表不支持<codeph>CLUSTER</codeph>。
+            </note>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>根据索引<codeph>emp_ind</codeph>对表<codeph>employees</codeph>进行聚簇：
+            </p>
+            <codeblock>CLUSTER emp_ind ON emp;</codeblock>
+            <p>通过重新创建大型表并将其以正确的索引顺序加载来对大型表进行聚簇：
+            </p>
+            <codeblock>CREATE TABLE newtable AS SELECT * FROM table ORDER BY column;
 DROP table;
 ALTER TABLE newtable RENAME TO table;
 CREATE INDEX column_ix ON table (column);
-VACUUM ANALYZE table;</codeblock></section><section id="section7"><title>Compatibility</title><p>There is no <codeph>CLUSTER</codeph> statement in the SQL standard.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="./CREATE_TABLE_AS.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="./CREATE_INDEX.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+VACUUM ANALYZE table;</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p>SQL标准中没有<codeph>CLUSTER</codeph>语句。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="./CREATE_TABLE_AS.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./CREATE_INDEX.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

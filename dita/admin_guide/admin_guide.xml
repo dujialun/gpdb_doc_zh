@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_prb_fnf_kp">
-  <title>Greenplum Database Administrator Guide</title>
+  <title>Greenplum数据库管理员指南</title>
   <!--HTML-only page-->
   <titlealts>
-    <navtitle>Administrator Guide</navtitle>
+    <navtitle>管理员指南</navtitle>
   </titlealts>
-  <shortdesc>Information about configuring, managing and monitoring Greenplum Database
-    installations, and administering, monitoring, and working with databases. The guide also
-    contains information about Greenplum Database architecture and concepts such as parallel
-    processing.</shortdesc>
+  <shortdesc>有关配置，管理和监控Greenplum数据库安装以及管理，监控和使用数据库的信息。
+    该指南还包含有关Greenplum数据库架构和概念（例如并行处理）的信息。
+    </shortdesc>
 </topic>

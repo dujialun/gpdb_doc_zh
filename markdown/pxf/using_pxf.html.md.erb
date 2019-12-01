@@ -1,5 +1,5 @@
 ---
-title: Granting Users Access to PXF
+title: 授权用户访问PXF
 ---
 
 <!--
@@ -21,63 +21,62 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The Greenplum Platform Extension Framework (PXF) implements a protocol named `pxf` that you can use to create an external table that references data in an external data store. The PXF protocol and Java service are packaged as a Greenplum Database extension.
+Greenplum平台扩展框架（PXF）实现了一个名为`pxf`的协议，您可以使用该协议创建引用外部数据存储中数据的外部表。PXF协议和Java服务打包作为Greenplum数据库扩展。
 
-You must enable the PXF extension in each database in which you plan to use the framework to access external data. You must also explicitly `GRANT` permission to the `pxf` protocol to those users/roles who require access.
+您必须在将要使用框架访问外部数据的每个数据库实例中启用PXF扩展。您还必须向需要访问权限的用户/角色明确授予`pxf`协议的`GRANT`权限。
 
-## <a id="enable-pxf-ext"></a>Enabling PXF in a Database
+## <a id="enable-pxf-ext"></a>在数据库中启用PXF
 
-You must explicitly register the PXF extension in each Greenplum Database in which you plan to use the extension. You must have Greenplum Database administrator privileges to register an extension.
+您必须在计划使用该扩展的每个Greenplum数据库中显式注册PXF扩展。您必须具有Greenplum数据库管理员权限才能注册扩展。
 
-Perform the following procedure for **_each_** database in which you want to use PXF:
+对要在其中使用PXF的**每个**数据库执行以下过程：
 
-1. Connect to the database as the `gpadmin` user:
+1. 使用`gpadmin`用户连接数据库
 
     ``` shell
     gpadmin@gpmaster$ psql -d <database-name> -U gpadmin
     ```
 
-2. Create the PXF extension. You must have Greenplum Database administrator privileges to create an extension. For example:
+2. 创建PXF扩展名。您必须具有Greenplum数据库管理员权限才能创建扩展。 例如：
 
     ``` sql
     database-name=# CREATE EXTENSION pxf;
     ```
 
-    Creating the `pxf` extension registers the `pxf` protocol and the call handlers required for PXF to access external data.
+    创建`pxf`扩展来注册`pxf`协议和PXF访问外部数据所需的调用处理程序。
 
+## <a id="disable-pxf-ext"></a>在数据库中禁用PXF
 
-## <a id="disable-pxf-ext"></a>Disabling PXF in a Database
+当您不再希望在特定数据库上使用PXF时，必须显式删除该数据库的PXF扩展名。您必须具有Greenplum数据库管理员权限才能删除扩展。
 
-When you no longer want to use PXF on a specific database, you must explicitly drop the PXF extension for that database. You must have Greenplum Database administrator privileges to drop an extension.
-
-1. Connect to the database as the `gpadmin` user:
+1. 使用`gpadmin`用户连接数据库
 
     ``` shell
     gpadmin@gpmaster$ psql -d <database-name> -U gpadmin
     ```
 
-2. Drop the PXF extension:
+2. 删除pxf扩展
 
     ``` sql
     database-name=# DROP EXTENSION pxf;
     ```
 
-    The `DROP` command fails if there are any currently defined external tables using the `pxf` protocol. Add the `CASCADE` option if you choose to forcibly remove these external tables.
+    如果当前使用`pxf`协议定义了任何外部表，则`DROP`命令将失败。 如果选择强制删除这些外部表，请添加`CASCADE`选项。
 
 
-## <a id="access_pxf"></a>Granting a Role Access to PXF
+## <a id="access_pxf"></a>授权一个用户访问PXF
 
-To read external data with PXF, you create an external table with the `CREATE EXTERNAL TABLE` command that specifies the `pxf` protocol. You must specifically grant `SELECT` permission to the `pxf` protocol to all non-`SUPERUSER` Greenplum Database roles that require such access.
+要使用PXF读取外部数据，请使用`CREATE EXTERNAL TABLE`命令创建一个外部表，该命令指定`pxf`协议。您必须向所有需要此类访问权限的非`SUPERUSER`的Greenplum数据库角色明确授予对pxf协议的`SELECT`权限。
 
-To grant a specific role access to the `pxf` protocol, use the `GRANT` command. For example, to grant the role named `bill` read access to data referenced by an external table created with the `pxf` protocol:
+要授予特定角色对`pxf`协议的访问权限，请使用`GRANT`命令。例如，要授予名为`bill`的角色对使用`pxf`协议创建的外部表引用的数据的读取访问权限，请执行以下操作：
 
 ``` sql
 GRANT SELECT ON PROTOCOL pxf TO bill;
 ```
 
-To write data to an external data store with PXF, you create an external table with the `CREATE WRITABLE EXTERNAL TABLE` command that specifies the `pxf` protocol. You must specifically grant `INSERT` permission to the `pxf` protocol to all non-`SUPERUSER` Greenplum Database roles that require such access. For example:
+
+要使用PXF将数据写入外部数据存储，请使用`CREATE WRITABLE EXTERNAL TABLE`命令创建一个外部表，该命令指定`pxf`协议。您必须向需要此类访问的所有非`SUPERUSER`的Greenplum数据库角色明确授予对`pxf`协议的`INSERT`权限。 例如：
 
 ``` sql
 GRANT INSERT ON PROTOCOL pxf TO bill;
 ```
-

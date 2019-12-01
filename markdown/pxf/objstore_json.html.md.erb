@@ -1,5 +1,5 @@
 ---
-title: Reading JSON Data from an Object Store
+title: 从对象存储中读取JSON数据
 ---
 
 <!--
@@ -21,23 +21,23 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-The PXF object store connectors support reading JSON-format data. This section describes how to use PXF to access JSON data in an object store, including how to create and query an external table that references a JSON file in the store.
+PXF 对象存储连接器支持读取JSON格式数据。 本节描述如何使用PXF访问对象存储中的JSON数据，包括如何创建和查询引用对象存储中JSON文件的外部表。
 
-**Note**: Accessing JSON-format data from an object store is very similar to accessing JSON-format data in HDFS. This topic identifies object store-specific information required to read JSON data, and links to the [PXF HDFS JSON documentation](hdfs_json.html) where appropriate for common information.
+**注意**: 从对象存储访问JSON数据和访问HDFS中的JSON数据非常相似。 本主题标识了读取对象存储中JSON数据所需的特定信息，并在通用信息的位置链接到 [PXF HDFS JSON 文档](hdfs_json.html) 。
 
-## <a id="prereq"></a>Prerequisites
+## <a id="prereq"></a>先决条件
 
-Ensure that you have met the PXF Object Store [Prerequisites](access_objstore.html#objstore_prereq) before you attempt to read data from an object store.
+在您尝试从对象存储中读取数据前，确保已满足PXF 对象存储[先决条件](access_objstore.html#objstore_prereq) 。
 
-## <a id="avro_work"></a>Working with Avro Data
+## <a id="avro_work"></a>使用JSON数据
 
-Refer to [Working with JSON Data](hdfs_json.html#hdfsjson_work) in the PXF HDFS JSON documentation for a description of the JSON text-based data-interchange format.
+有关基于JSON文本的数据交换格式的说明，请参阅PXF HDFS JSON文档中的 [使用JSON数据](hdfs_json.html#hdfsjson_work)。
 
-## <a id="json_cet"></a>Creating the External Table
+## <a id="json_cet"></a>创建外部表
 
-Use the `<objstore>:json` profile to read JSON-format files from an object store. PXF supports the following `<objstore>` profile prefixes:
+使用 `<objstore>:json` 配置文件读取对象存储中的JSON格式文件。 PXF 支持以下 `<objstore>` 配置前缀:
 
-| Object Store  | Profile Prefix |
+| 对象存储  | 配置前缀 |
 |-------|-------------------------------------|
 | Azure Blob Storage   | wasbs |
 | Azure Data Lake    | adl |
@@ -45,7 +45,7 @@ Use the `<objstore>:json` profile to read JSON-format files from an object store
 | Minio    | s3 |
 | S3    | s3 |
 
-The following syntax creates a Greenplum Database readable external table that references a JSON-format file:
+以下语法创建一个引用JSON格式文件的Greenplum数据库可读外部表：
 
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
@@ -54,30 +54,30 @@ LOCATION ('pxf://<path-to-file>?PROFILE=<objstore>:json&SERVER=<server_name>[&<c
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
-The specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) command are described in the table below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字  | 值 |
 |-------|-------------------------------------|
-| \<path&#8209;to&#8209;file\>    | The absolute path to the directory or file in the object store. |
-| PROFILE=\<objstore\>:json    | The `PROFILE` keyword must identify the specific object store. For example, `s3:json`. |
-| SERVER=\<server_name\>    | The named server configuration that PXF uses to access the data. |
-| \<custom&#8209;option\>=\<value\> | JSON supports the custom option named `IDENTIFIER` as described in the [PXF HDFS JSON documentation](hdfs_json.html#customopts). |
-| FORMAT 'CUSTOM' | Use `FORMAT` `'CUSTOM'` with  the `<objstore>:json` profile. The `CUSTOM` `FORMAT` requires that you specify `(FORMATTER='pxfwritable_import')`. |
+| \<path&#8209;to&#8209;file\>    | 对象存储中文件或目录的绝对路径 |
+| PROFILE=\<objstore\>:json    | `PROFILE` 必须指定为特定的对象存储。 例如： `s3:json` 。 |
+| SERVER=\<server_name\>    | PXF 访问数据时使用的服务配置 |
+| \<custom&#8209;option\>=\<value\> | JSON 支持的名为 `IDENTIFIER` 的自定义选项描述见 [PXF HDFS JSON 文档](hdfs_json.html#customopts) 。 |
+| FORMAT 'CUSTOM' | 在`<objstore>:json` 配置文件中使用 `FORMAT` `'CUSTOM'` 。 `CUSTOM` `FORMAT` 要求您指定为 `(FORMATTER='pxfwritable_import')`。 |
 
-If you are accessing an S3 object store, you can provide S3 credentials directly in the `CREATE EXTERNAL TABLE` command as described in [Overriding the S3 Server Configuration](access_objstore.html#s3_override).
+如果要访问S3 对象存储，则可以如 [覆盖S3服务配置](access_objstore.html#s3_override) 中所述直接在 `CREATE EXTERNAL TABLE` 命令中提供S3凭据。
 
-## <a id="example"></a>Example
+## <a id="example"></a>示例
 
-Refer to [Loading the Sample JSON Data to HDFS](hdfs_json.html#jsontohdfs) and [Example: Reading a JSON File with Single Line Records](hdfs_json.html#jsonexample1) in the PXF HDFS JSON documentation for a JSON example. Modifications that you must make to run the example with an object store include:
+有关JSON示例，请参阅PXF HDFS JSON 文档中的 [将样本JSON数据加载到HDFS](hdfs_json.html#jsontohdfs) 以及 [示例：读取单行记录的JSON文件](hdfs_json.html#jsonexample1) 。 在对象存储中运行示例，必要的修改如下：
 
-- Copying the file to the object store instead of HDFS. For example, to copy the file to S3:
+- 将文件复制到对象存储而不是HDFS。 例如，将文件复制到S3：
 
     ``` shell
     $ aws s3 cp /tmp/singleline.json s3://BUCKET/pxf_examples/
     $ aws s3 cp /tmp/multiline.json s3://BUCKET/pxf_examples/
     ```
 
-- Using the `CREATE EXTERNAL TABLE` syntax and `LOCATION` keywords and settings described above. For example, if your server name is `s3srvcfg`:
+- 使用上述的 `CREATE EXTERNAL TABLE` 语法和 `LOCATION` 关键字及设置。例如， 假设您的服务名为 `s3srvcfg` ：
 
     ``` sql
     CREATE EXTERNAL TABLE singleline_json_s3(

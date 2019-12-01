@@ -4,9 +4,9 @@
 <topic id="topic1">
     <title id="cn20941">DELETE</title>
     <body>
-        <p id="sql_command_desc">Deletes rows from a table.</p>
+        <p id="sql_command_desc">从表中删除行。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">[ WITH [ RECURSIVE ] <varname>with_query</varname> [, ...] ]
 DELETE FROM [ONLY] <varname>table</varname> [[AS] <varname>alias</varname>]
       [USING <varname>usinglist</varname>]
@@ -14,180 +14,160 @@ DELETE FROM [ONLY] <varname>table</varname> [[AS] <varname>alias</varname>]
       [RETURNING * | <varname>output_expression</varname> [[AS] <varname>output_name</varname>] [, …]]</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>DELETE</codeph> deletes rows that satisfy the <codeph>WHERE</codeph> clause
-                from the specified table. If the <codeph>WHERE</codeph> clause is absent, the effect
-                is to delete all rows in the table. The result is a valid, but empty table. </p>
-            <p>By default, <codeph>DELETE</codeph> will delete rows in the specified table and all
-                its child tables. If you wish to delete only from the specific table mentioned, you
-                must use the <codeph>ONLY</codeph> clause. </p>
-            <p>There are two ways to delete rows in a table using information contained in other
-                tables in the database: using sub-selects, or specifying additional tables in the
-                    <codeph>USING</codeph> clause. Which technique is more appropriate depends on
-                the specific circumstances. </p>
-            <p>If the <codeph>WHERE CURRENT OF</codeph> clause is specified, the row that is deleted
-                is the one most recently fetched from the specified cursor. </p>
-            <p>The <codeph>WHERE CURRENT OF</codeph> clause is not supported with replicated
-                tables.</p>
-            <p>The optional <codeph>RETURNING</codeph> clause causes <codeph>DELETE</codeph> to
-                compute and return value(s) based on each row actually deleted. Any expression using
-                the table's columns, and/or columns of other tables mentioned in
-                    <codeph>USING</codeph>, can be computed. The syntax of the
-                    <codeph>RETURNING</codeph> list is identical to that of the output list of
-                    <codeph>SELECT</codeph>.</p>
-            <p>You must have the <codeph>DELETE</codeph> privilege on the table to delete from it. </p>
-            <note>As the default, Greenplum Database acquires an <codeph>EXCLUSIVE</codeph> lock on
-                tables for <codeph>DELETE</codeph> operations on heap tables. When the Global
-                Deadlock Detector is enabled, the lock mode for <codeph>DELETE</codeph> operations
-                on heap tables is <codeph>ROW EXCLUSIVE</codeph>. See <xref
-                    href="../../admin_guide/dml.xml#topic_gdd" format="dita"/>.</note>
+            <title>描述</title>
+            <p><codeph>DELETE</codeph>从指定的表中删除满足<codeph>WHERE</codeph>子句的行。
+                如果<codeph>WHERE</codeph>子句不存在，则结果是删除表中的所有行。
+                结果是一个有效但空的表。
+                </p>
+            <p>默认情况下，<codeph>DELETE</codeph>将删除指定表及其所有子表中的行。
+                如果只希望从提到的特定表中删除，则必须使用<codeph>ONLY</codeph>子句。
+                </p>
+            <p>使用数据库中其他表中包含的信息删除表中的行有两种方法：使用子选择，或在<codeph>USING</codeph>子句中指定其他表。
+                哪种技术更合适取决于具体情况。
+                </p>
+            <p>如果指定了<codeph>WHERE CURRENT OF</codeph>子句，则删除的行是从指定游标中最新获取的行。
+                </p>
+            <p>复制表不支持<codeph>WHERE CURRENT OF</codeph>子句。
+                </p>
+            <p>可选的<codeph>RETURNING</codeph>子句使<codeph>DELETE</codeph>根据实际删除的每一行计算并返回值。
+                可以计算使用该表的列和/或<codeph>USING</codeph>中提到的其他表的列的任何表达式。
+                <codeph>RETURNING</codeph>列表的语法与<codeph>SELECT</codeph>的输出列表的语法相同。
+                </p>
+            <p>您必须对表具有<codeph>DELETE</codeph>特权才能从中删除。</p>
+            <note>默认情况下，Greenplum数据库为堆表上的<codeph>DELETE</codeph>操作获取表上的<codeph>EXCLUSIVE</codeph>锁。
+                启用全局死锁检测器后，堆表上<codeph>DELETE</codeph>操作的锁定模式为<codeph>ROW EXCLUSIVE</codeph>。
+                请参阅<xref href="../../admin_guide/dml.xml#topic_gdd" format="dita"/>。</note>
             <sectiondiv id="section4">
-                <b>Outputs</b>
-                <p>On successful completion, a <codeph>DELETE</codeph> command returns a command tag
-                    of the form</p>
+                <b>输出</b>
+                <p>成功完成后，<codeph>DELETE</codeph>命令将返回以下形式的命令标签：</p>
                 <codeblock>DELETE <varname>count</varname></codeblock>
-                <p>The <varname>count</varname> is the number of rows deleted. If <varname>count</varname> is 0, no
-                    rows were deleted by the query (this is not considered an error).</p><p>If the
-                        <codeph>DELETE</codeph> command contains a <codeph>RETURNING</codeph>
-                    clause, the result will be similar to that of a <codeph>SELECT</codeph>
-                    statement containing the columns and values defined in the
-                        <codeph>RETURNING</codeph> list, computed over the row(s) deleted by the
-                    command.</p>
+                <p><varname>count</varname>是已删除的行数。
+                    如果<varname>count</varname>为0，则查询没有删除任何行（这不视为错误）。
+                    </p>
+                <p>如果<codeph>DELETE</codeph>命令包含<codeph>RETURNING</codeph>子句，则结果将类似于<codeph>SELECT</codeph>语句的结果，
+                    该<codeph>SELECT</codeph>语句包含<codeph>RETURNING</codeph>列表中定义的列和值，该列和值是在该命令删除的行上计算的。
+                    </p>
             </sectiondiv>
         </section>
         <section id="section5">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt><varname>with_query</varname></pt>
-                    <pd>The <codeph>WITH</codeph> clause allows you to specify one or more
-                        subqueries that can be referenced by name in the <codeph>DELETE</codeph>
-                        query. </pd>
-                    <pd>For a <codeph>DELETE</codeph> command that includes a <codeph>WITH</codeph>
-                        clause, the clause can only contain <codeph>SELECT</codeph> statements, the
-                            <codeph>WITH</codeph> clause cannot contain a data-modifying command
-                            (<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or
-                            <codeph>DELETE</codeph>). </pd>
-                    <pd>See <xref
-                            href="../../admin_guide/query/topics/CTE-query.xml#topic_zhs_r1s_w1b"/>
-                        and <codeph><xref href="SELECT.xml#topic1"/></codeph> for details. </pd>
+                    <pd><codeph>WITH</codeph>子句允许您指定一个或多个子查询，这些子查询可以在<codeph>DELETE</codeph>查询中按名称引用。
+                        </pd>
+                    <pd>对于包含<codeph>WITH</codeph>子句的<codeph>DELETE</codeph>命令，该子句只能包含<codeph>SELECT</codeph>语句，
+                        而<codeph>WITH</codeph>子句不能包含数据修改命令（<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>或<codeph>DELETE</codeph>）。
+                        </pd>
+                    <pd>请参见<xref href="../../admin_guide/query/topics/CTE-query.xml#topic_zhs_r1s_w1b"/>和<codeph><xref href="SELECT.xml#topic1"/></codeph>获取详细信息。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>ONLY</pt>
-                    <pd>If specified, delete rows from the named table only. When not specified, any
-                        tables inheriting from the named table are also processed.</pd>
+                    <pd>如果指定，则仅从命名表中删除行。
+                        如果未指定，还将处理从命名表继承的任何表。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>
                         <varname>table</varname>
                     </pt>
-                    <pd>The name (optionally schema-qualified) of an existing table. </pd>
+                    <pd>现有表的名称（可以用模式指定）。</pd>
                 </plentry>
                 <plentry>
                     <pt>
                         <varname>alias</varname>
                     </pt>
-                    <pd>A substitute name for the target table. When an alias is provided, it
-                        completely hides the actual name of the table. For example, given
-                            <codeph>DELETE FROM foo AS f</codeph>, the remainder of the
-                            <codeph>DELETE</codeph> statement must refer to this table as
-                            <codeph>f</codeph> not <codeph>foo</codeph>. </pd>
+                    <pd>目标表的替代名称。提供别名后，它将完全隐藏表的实际名称。
+                        例如，给定<codeph>DELETE FROM foo AS f</codeph>，<codeph>DELETE</codeph>语句的其余部分必须将此表称为<codeph>f</codeph>而不是<codeph>foo</codeph>。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>
                         <varname>usinglist</varname>
                     </pt>
-                    <pd>A list of table expressions, allowing columns from other tables to appear in
-                        the <codeph>WHERE</codeph> condition. This is similar to the list of tables
-                        that can be specified in the <codeph>FROM</codeph> Clause of a <codeph><xref
-                                href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph>
-                        statement; for example, an alias for the table name can be specified. Do not
-                        repeat the target table in the <codeph>usinglist</codeph>, unless you wish
-                        to set up a self-join. </pd>
+                    <pd>表表达式的列表，允许其他表中的列以<codeph>WHERE</codeph>条件出现。
+                        这类似于可以在<codeph><xref href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph>语句的<codeph>FROM</codeph>子句中指定的表的列表。
+                        例如，可以指定表名的别名。
+                        除非您希望设置自连接，否则不要在<codeph>usinglist</codeph>中重复目标表。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt>
                         <varname>condition</varname>
                     </pt>
-                    <pd>An expression returning a value of type <codeph>boolean</codeph>, which
-                        determines the rows that are to be deleted.</pd>
+                    <pd>该表达式返回一个布尔类型的值，该值确定要删除的行。</pd>
                 </plentry>
                 <plentry>
                     <pt>
                         <varname>cursor_name</varname>
                     </pt>
-                    <pd>The name of the cursor to use in a <codeph>WHERE CURRENT OF</codeph>
-                        condition. The row to be deleted is the one most recently fetched from this
-                        cursor. The cursor must be a simple non-grouping query on the
-                            <codeph>DELETE</codeph> target table. </pd>
-                    <pd><codeph>WHERE CURRENT OF</codeph> cannot be specified together with a
-                        Boolean condition.</pd>
-                    <pd>The <codeph>DELETE...WHERE CURRENT OF</codeph> cursor statement can only be
-                        executed on the server, for example in an interactive psql session or a
-                        script. Language extensions such as PL/pgSQL do not have support for
-                        updatable cursors. </pd>
-                    <pd>See <codeph><xref href="DECLARE.xml#topic1" type="topic" format="dita"
-                            /></codeph> for more information about creating cursors.</pd>
+                    <pd>在<codeph>WHERE CURRENT OF</codeph>条件中使用的游标名称。
+                        要删除的行是从该游标中最近获取的行。
+                        游标必须是对<codeph>DELETE</codeph>目标表的简单非分组查询。
+                        </pd>
+                    <pd>不能与布尔条件一起指定<codeph>WHERE CURRENT OF</codeph>。
+                        </pd>
+                    <pd>游标语句的<codeph>DELETE...WHERE CURRENT OF</codeph>游标语句只能在服务器上执行，例如在交互式psql会话或脚本中。
+                        语言扩展（例如PL/pgSQL）不支持可更新的游标。
+                        </pd>
+                    <pd>有关创建游标的更多信息，请参见<codeph><xref href="DECLARE.xml#topic1" type="topic" format="dita"/></codeph>。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>output_expression</varname></pt>
-                    <pd>An expression to be computed and returned by the <codeph>DELETE</codeph>
-                        command after each row is deleted. The expression can use any column names
-                        of the table or table(s) listed in <codeph>USING</codeph>. Write * to return
-                        all columns.</pd>
+                    <pd>删除每一行后，由<codeph>DELETE</codeph>命令计算并返回的表达式。
+                        该表达式可以使用在<codeph>USING</codeph>中列出的一个或多个表的任何列名。
+                        输入*以返回所有列。
+                        </pd>
                 </plentry>
                 <plentry>
                     <pt><varname>output_name</varname></pt>
-                    <pd>A name to use for a returned column.</pd>
+                    <pd>用于返回的列的名称。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section6">
-            <title>Notes</title>
-            <p>Greenplum Database lets you reference columns of other tables in the
-                    <codeph>WHERE</codeph> condition by specifying the other tables in the
-                    <codeph>USING</codeph> clause. For example, to the name <codeph>Hannah</codeph>
-                from the <codeph>rank</codeph> table, one might do:</p>
+            <title>注解</title>
+            <p>Greenplum数据库允许您通过在<codeph>USING</codeph>子句中指定其他表来引用<codeph>WHERE</codeph>条件下其他表的列。
+                例如，从<codeph>rank</codeph>表中将其命名为<codeph>Hannah</codeph>，可以这样做：
+                </p>
             <codeblock>DELETE FROM rank USING names WHERE names.id = rank.id AND 
 name = 'Hannah';</codeblock>
-            <p>What is essentially happening here is a join between <codeph>rank</codeph> and
-                    <codeph>names</codeph>, with all successfully joined rows being marked for
-                deletion. This syntax is not standard. However, this join style is usually easier to
-                write and faster to execute than a more standard sub-select style, such as:</p>
+            <p>这里实际上发生的是<codeph>rank</codeph>和<codeph>names</codeph>之间的联接，所有成功联接的行都标记为删除。
+                此语法不是标准语法。但是，这种连接样式通常比更标准的子选择样式更易于编写和执行，例如：
+                </p>
             <codeblock>DELETE FROM rank WHERE id IN (SELECT id FROM names WHERE name 
 = 'Hannah');</codeblock>
-            <p>When using <codeph>DELETE</codeph> to remove all the rows of a table (for example:
-                    <codeph>DELETE * FROM <varname>table</varname>;</codeph>), Greenplum Database
-                adds an implicit <codeph>TRUNCATE</codeph> command (when user permissions allow).
-                The added <codeph>TRUNCATE</codeph> command frees the disk space occupied by the
-                deleted rows without requiring a <codeph>VACUUM</codeph> of the table. This improves
-                scan performance of subsequent queries, and benefits ELT workloads that frequently
-                insert and delete from temporary tables.</p>
-            <p>Execution of <codeph>UPDATE</codeph> and <codeph>DELETE</codeph> commands directly on
-                a specific partition (child table) of a partitioned table is not supported. Instead,
-                these commands must be executed on the root partitioned table, the table created
-                with the <codeph>CREATE TABLE</codeph> command.</p>
+            <p>当使用<codeph>DELETE</codeph>删除表的所有行时（例如：<codeph>DELETE * FROM <varname>table</varname>;</codeph>），
+                Greenplum数据库会添加一个隐式的<codeph>TRUNCATE</codeph>命令（当用户权限允许时）。
+                添加的<codeph>TRUNCATE</codeph>命令释放被删除的行占用的磁盘空间，而无需对表进行<codeph>VACUUM</codeph>。
+                这提高了后续查询的扫描性能，并使经常在临时表中插入和删除的ELT工作负载受益。
+                </p>
+            <p>不支持在分区表的特定分区（子表）上直接执行<codeph>UPDATE</codeph>和<codeph>DELETE</codeph>命令。
+                而是必须在根分区表（使用<codeph>CREATE TABLE</codeph>命令创建的表）上执行这些命令。
+                </p>
         </section>
         <section id="section7">
-            <title>Examples</title>
-            <p>Delete all films but musicals:</p>
+            <title>示例</title>
+            <p>删除除musicals以外的所有films：</p>
             <codeblock>DELETE FROM films WHERE kind &lt;&gt; 'Musical';</codeblock>
-            <p>Clear the table films:</p>
+            <p>清除表films：</p>
             <codeblock>DELETE FROM films;</codeblock>
-            <p>Delete completed tasks, returning full details of the deleted
-                rows:<codeblock>DELETE FROM tasks WHERE status = 'DONE' RETURNING *;</codeblock></p>
-            <p>Delete using a join:</p>
+            <p>删除已完成的任务，返回已删除行的完整详细信息：
+                <codeblock>DELETE FROM tasks WHERE status = 'DONE' RETURNING *;</codeblock></p>
+            <p>使用联接删除：</p>
             <codeblock>DELETE FROM rank USING names WHERE names.id = rank.id AND 
 name = 'Hannah';</codeblock>
         </section>
         <section id="section8">
-            <title>Compatibility</title>
-            <p>This command conforms to the SQL standard, except that the <codeph>USING</codeph> and
-                    <codeph>RETURNING</codeph> clauses are Greenplum Database extensions, as is the
-                ability to use <codeph>WITH</codeph> with <codeph>DELETE</codeph>.</p>
+            <title>兼容性</title>
+            <p>该命令符合SQL标准，不同之处在于<codeph>USING</codeph>和<codeph>RETURNING</codeph>子句是Greenplum数据库扩展，
+                以及将<codeph>WITH</codeph>和<codeph>DELETE</codeph>一起使用的功能。
+                </p>
         </section>
         <section id="section9">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="DECLARE.xml#topic1" type="topic" format="dita"/></codeph>,
                         <codeph><xref href="./TRUNCATE.xml#topic1" type="topic" format="dita"
                     /></codeph></p>

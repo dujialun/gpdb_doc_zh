@@ -1,15 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="cz20941">DROP OPERATOR</title><body><p id="sql_command_desc">Removes an operator.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">DROP OPERATOR [IF EXISTS] <varname>name</varname> ( {<varname>lefttype</varname> | NONE} , 
-    {<varname>righttype</varname> | NONE} ) [CASCADE | RESTRICT]</codeblock></section><section id="section3"><title>Description</title><p><codeph>DROP OPERATOR</codeph> drops an existing operator from the database
-system. To execute this command you must be the owner of the operator.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt>IF EXISTS</pt><pd>Do not throw an error if the operator does not exist. A notice is
-issued in this case. </pd></plentry><plentry><pt><varname>name</varname></pt><pd>The name (optionally schema-qualified) of an existing operator.</pd></plentry><plentry><pt><varname>lefttype</varname></pt><pd>The data type of the operator's left operand; write <codeph>NONE</codeph>
-if the operator has no left operand. </pd></plentry><plentry><pt><varname>righttype</varname></pt><pd>The data type of the operator's right operand; write <codeph>NONE</codeph>
-if the operator has no right operand.</pd></plentry><plentry><pt>CASCADE</pt><pd>Automatically drop objects that depend on the operator. </pd></plentry><plentry><pt>RESTRICT</pt><pd>Refuse to drop the operator if any objects depend on it. This is
-the default. </pd></plentry></parml></section><section id="section5"><title>Examples</title><p>Remove the power operator <codeph>a^b</codeph> for type <codeph>integer</codeph>:</p><codeblock>DROP OPERATOR ^ (integer, integer);</codeblock><p>Remove the left unary bitwise complement operator <codeph>~b</codeph> for type
-          <codeph>bit</codeph>:</p><codeblock>DROP OPERATOR ~ (none, bit);</codeblock><p>Remove the right unary factorial operator <codeph>x!</codeph> for type
-        <codeph>bigint</codeph>:</p><codeblock>DROP OPERATOR ! (bigint, none);</codeblock></section><section id="section6"><title>Compatibility</title><p>There is no <codeph>DROP OPERATOR</codeph> statement in the SQL standard.
-</p></section><section id="section7"><title>See Also</title><p><codeph><xref href="ALTER_OPERATOR.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="CREATE_OPERATOR.xml#topic1" type="topic" format="dita"
-        /></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="cz20941">DROP OPERATOR</title>
+    <body>
+        <p id="sql_command_desc">删除运算符。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">DROP OPERATOR [IF EXISTS] <varname>name</varname> ( {<varname>lefttype</varname> | NONE} ,
+    {<varname>righttype</varname> | NONE} ) [CASCADE | RESTRICT]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>DROP OPERATOR</codeph>从数据库系统中删除现有的运算符。
+                要执行此命令，您必须是运算符的所有者。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>IF EXISTS</pt>
+                    <pd>如果该运算符不存在，请不要报错。在这种情况下会发出通知。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>现有运算符的名称（可以由模式指定）。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>lefttype</varname>
+                    </pt>
+                    <pd>运算符的左操作数的数据类型；如果运算符没有左操作数，则写<codeph>NONE</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>righttype</varname>
+                    </pt>
+                    <pd>运算符的右操作数的数据类型；如果运算符没有右操作数，则写<codeph>NONE</codeph>。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>CASCADE</pt>
+                    <pd>自动删除依赖于运算符的对象。</pd>
+                </plentry>
+                <plentry>
+                    <pt>RESTRICT</pt>
+                    <pd>如果有任何对象依赖于该运算符，请拒绝删除该运算符。这是默认值。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>删除<codeph>integer</codeph>类型的幂运算符<codeph>a^b</codeph>：
+            </p>
+            <codeblock>DROP OPERATOR ^ (integer, integer);</codeblock>
+            <p>删除类型<codeph>bit</codeph>的左一元按位补数运算符<codeph>~b</codeph>：
+            </p>
+            <codeblock>DROP OPERATOR ~ (none, bit);</codeblock>
+            <p>删除<codeph>bigint</codeph>类型的右一元阶乘运算符<codeph>x!</codeph>：
+            </p>
+            <codeblock>DROP OPERATOR ! (bigint, none);</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p>SQL标准中没有<codeph>DROP OPERATOR</codeph>语句。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_OPERATOR.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="CREATE_OPERATOR.xml#topic1" type="topic" format="dita"
+                    />
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

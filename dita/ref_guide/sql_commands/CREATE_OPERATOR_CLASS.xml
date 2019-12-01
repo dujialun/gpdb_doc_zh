@@ -1,303 +1,340 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="bx20941">CREATE OPERATOR CLASS</title><body><p id="sql_command_desc">Defines a new operator class.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">CREATE OPERATOR CLASS <varname>name</varname> [DEFAULT] FOR TYPE <varname>data_type</varname>  
-  USING <varname>index_method</varname> [ FAMILY <varname>family_name</varname> ] AS 
-  { OPERATOR <varname>strategy_number</varname> <varname>operator_name</varname> [ ( <varname>op_type</varname>, <varname>op_type</varname> ) ] [ FOR SEARCH | FOR ORDER BY <varname>sort_family_name</varname> ]
-  | FUNCTION <varname>support_number</varname> <varname>funcname</varname> (<varname>argument_type</varname> [, ...] )
-  | STORAGE <varname>storage_type</varname>
-  } [, ... ]</codeblock></section><section id="section3"><title>Description</title><p><codeph>CREATE OPERATOR CLASS</codeph> creates a new operator class.
-An operator class defines how a particular data type can be used with
-an index. The operator class specifies that certain operators will fill
-particular roles or strategies for this data type and this index method.
-The operator class also specifies the support procedures to be used by
-the index method when the operator class is selected for an index column.
-All the operators and functions used by an operator class must be defined
-before the operator class is created. Any functions used to implement
-the operator class must be defined as <codeph>IMMUTABLE</codeph>.</p><p><codeph>CREATE OPERATOR CLASS</codeph> does not presently check whether
-the operator class definition includes all the operators and functions
-required by the index method, nor whether the operators and functions
-form a self-consistent set. It is the user's responsibility to define
-a valid operator class. </p><p>You must be a superuser to create an operator class.</p></section><section id="section4"><title>Parameters</title>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="bx20941">CREATE OPERATOR CLASS</title>
+    <body>
+        <p id="sql_command_desc">定义一个新的运算符类。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">CREATE OPERATOR CLASS <varname>name</varname> [DEFAULT] FOR TYPE <varname>data_type</varname>  
+  USING <varname>index_method</varname> [ FAMILY <varname>family_name</varname> ] AS
+  { OPERATOR <varname>strategy_number</varname> <varname>operator_name</varname> [ ( <varname>op_type</varname>, <varname>op_type</varname> ) ] [ FOR SEARCH | FOR ORDER BY <varname>sort_family_name</varname> ]
+  | FUNCTION <varname>support_number</varname> <varname>funcname</varname> (<varname>argument_type</varname> [, ...] )
+  | STORAGE <varname>storage_type</varname>
+  } [, ... ]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>CREATE OPERATOR CLASS</codeph>创建一个新的运算符类。
+                运算符类定义如何将特定数据类型与索引一起使用。
+                运算符类指定某些运算符将为此数据类型和此索引方法填充特定角色或策略。
+                当为索引列选择了运算符类时，运算符类还指定了索引方法要使用的支持过程。
+                在创建运算符类之前，必须定义运算符类使用的所有运算符和函数。
+                用于实现运算符类的任何函数都必须定义为<codeph>IMMUTABLE</codeph>。
+            </p>
+            <p><codeph>CREATE OPERATOR CLASS</codeph>目前不检查运算符类定义是否包括所有由索引方法所需的运算符和函数，
+                也不检查运算符和函数是否构成一个一致的集合。
+                定义有效的运算符类是用户的责任。
+            </p>
+            <p>您必须是超级用户才能创建运算符类。</p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
             <parml>
                 <plentry>
-                    <pt><varname>name</varname></pt>
-                    <pd>The (optionally schema-qualified) name of the operator class to be defined.
-                        Two operator classes in the same schema can have the same name only if they
-                        are for different index methods. </pd>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>要定义的运算符类的名称（可以由模式指定）。
+                        同一模式中的两个运算符类仅在用于不同的索引方法时才可以使用相同的名称。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>DEFAULT</pt>
-                    <pd>Makes the operator class the default operator class for its data type. At
-                        most one operator class can be the default for a specific data type and
-                        index method.</pd>
+                    <pd>使运算符类成为其数据类型的默认运算符类。
+                        对于特定的数据类型和索引方法，最多可以使用一个运算符类作为默认值。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>data_type</varname></pt>
-                    <pd>The column data type that this operator class is for. </pd>
+                    <pt>
+                        <varname>data_type</varname>
+                    </pt>
+                    <pd>此运算符类的列数据类型。</pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>index_method</varname></pt>
-                    <pd>The name of the index method this operator class is for. Choices are
-                            <codeph>btree</codeph>, <codeph>bitmap</codeph>, and
-                            <codeph>gist</codeph>. </pd>
+                    <pt>
+                        <varname>index_method</varname>
+                    </pt>
+                    <pd>此运算符类用于的索引方法的名称。
+                        选项为<codeph>btree</codeph>，<codeph>bitmap</codeph>和<codeph>gist</codeph>。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>family_name</varname></pt>
-                    <pd>The name of the existing operator family to add this operator class to. If
-                        not specified, a family named the same as the operator class is used
-                        (creating it, if it doesn't already exist). </pd>
+                    <pt>
+                        <varname>family_name</varname>
+                    </pt>
+                    <pd>要添加此运算符类的现有运算符符族的名称。
+                        如果未指定，则使用与运算符类相同的名称族（如果尚不存在，则创建它）。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>strategy_number</varname></pt>
-                    <pd>The operators associated with an operator class are identified by
-                            <i>strategy numbers</i>, which serve to identify the semantics of each
-                        operator within the context of its operator class. For example, B-trees
-                        impose a strict ordering on keys, lesser to greater, and so operators like
-                            <i>less than</i> and <i>greater than or equal to</i> are interesting
-                        with respect to a B-tree. These strategies can be thought of as generalized
-                        operators. Each operator class specifies which actual operator corresponds
-                        to each strategy for a particular data type and interpretation of the index
-                        semantics. The corresponding strategy numbers for each index method are as
-                            follows:<table id="bx145491">
-                            <title>B-tree and Bitmap Strategies</title>
+                    <pt>
+                        <varname>strategy_number</varname>
+                    </pt>
+                    <pd>与运算符类关联的运算符由策略编号标识，该策略编号用于标识每个运算符在其运算符类的上下文中的语义。
+                        例如，B树对键施加严格的排序，从小到大，因此对于B树来说，类似小于和大于或等于的运算符更有吸引力。
+                        可以将这些策略视为广义运算符。
+                        每个运算符类指定针对特定数据类型和索引语义解释的每个策略对应的实际运算符。
+                        每种索引方法的相应策略编号如下：
+                        <table id="bx145491">
+                            <title>B树和位图策略</title>
                             <tgroup cols="2">
                                 <colspec colnum="1" colname="col1" colwidth="110pt"/>
                                 <colspec colnum="2" colname="col2" colwidth="99pt"/>
                                 <thead>
                                     <row>
-                                        <entry colname="col1">Operation</entry>
-                                        <entry colname="col2">Strategy Number</entry>
+                                        <entry colname="col1">操作</entry>
+                                        <entry colname="col2">策略编号</entry>
                                     </row>
                                 </thead>
                                 <tbody>
                                     <row>
-                                        <entry colname="col1">less than</entry>
+                                        <entry colname="col1">小于</entry>
                                         <entry colname="col2">1</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">less than or equal</entry>
+                                        <entry colname="col1">小于等于</entry>
                                         <entry colname="col2">2</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">equal</entry>
+                                        <entry colname="col1">等于</entry>
                                         <entry colname="col2">3</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">greater than or equal</entry>
+                                        <entry colname="col1">大于等于</entry>
                                         <entry colname="col2">4</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">greater than</entry>
+                                        <entry colname="col1">大于</entry>
                                         <entry colname="col2">5</entry>
                                     </row>
                                 </tbody>
                             </tgroup>
-                        </table><table id="bx145491a">
-                            <title>GiST Two-Dimensional Strategies (R-Tree)</title>
+                        </table>
+                        <table id="bx145491a">
+                            <title>GiST二维策略（R树）</title>
                             <tgroup cols="2">
                                 <colspec colnum="1" colname="col1" colwidth="110pt"/>
                                 <colspec colnum="2" colname="col2" colwidth="99pt"/>
                                 <thead>
                                     <row>
-                                        <entry colname="col1">Operation</entry>
-                                        <entry colname="col2">Strategy Number</entry>
+                                        <entry colname="col1">操作</entry>
+                                        <entry colname="col2">策略编号</entry>
                                     </row>
                                 </thead>
                                 <tbody>
                                     <row>
-                                        <entry colname="col1">strictly left of</entry>
+                                        <entry colname="col1">严格左边</entry>
                                         <entry colname="col2">1</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">does not extend to right of</entry>
+                                        <entry colname="col1">不延伸到右边</entry>
                                         <entry colname="col2">2</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">overlaps</entry>
+                                        <entry colname="col1">覆盖</entry>
                                         <entry colname="col2">3</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">does not extend to left of</entry>
+                                        <entry colname="col1">不延伸到左边</entry>
                                         <entry colname="col2">4</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">strictly right of</entry>
+                                        <entry colname="col1">严格右边</entry>
                                         <entry colname="col2">5</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">same</entry>
+                                        <entry colname="col1">相同</entry>
                                         <entry colname="col2">6</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">contains</entry>
+                                        <entry colname="col1">包含</entry>
                                         <entry colname="col2">7</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">contained by</entry>
+                                        <entry colname="col1">被包含</entry>
                                         <entry colname="col2">8</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">does not extend above</entry>
+                                        <entry colname="col1">不延伸到上边</entry>
                                         <entry colname="col2">9</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">strictly below</entry>
+                                        <entry colname="col1">严格下边</entry>
                                         <entry colname="col2">10</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">strictly above</entry>
+                                        <entry colname="col1">严格上边</entry>
                                         <entry colname="col2">11</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">does not extend below</entry>
+                                        <entry colname="col1">不延伸到下边</entry>
                                         <entry colname="col2">12</entry>
                                     </row>
                                 </tbody>
                             </tgroup>
-                        </table></pd>
+                        </table>
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>sort_family_name</varname></pt>
-                    <pd>The name (optionally schema-qualified) of an existing
-                            <codeph>btree</codeph> operator family that describes the sort ordering
-                        associated with an ordering operator.</pd>
-                    <pd>If neither <codeph>FOR SEARCH</codeph> nor <codeph>FOR ORDER BY</codeph> is
-                        specified, <codeph>FOR SEARCH</codeph> is the default. </pd>
+                    <pt>
+                        <varname>sort_family_name</varname>
+                    </pt>
+                    <pd>现有<codeph>btree</codeph>运算符族的名称（可以由模式指定），
+                        用于描述与排序运算符关联的排序顺序。
+                    </pd>
+                    <pd>如果未指定<codeph>FOR SEARCH</codeph>或<codeph>FOR ORDER BY</codeph>，则默认为<codeph>FOR SEARCH</codeph>。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>operator_name</varname></pt>
-                    <pd>The name (optionally schema-qualified) of an operator associated with the
-                        operator class. </pd>
+                    <pt>
+                        <varname>operator_name</varname>
+                    </pt>
+                    <pd>与运算符类关联的运算符的名称（可以由模式指定）。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>op_type</varname></pt>
-                    <pd>In an <codeph>OPERATOR</codeph> clause, the operand data type(s) of the
-                        operator, or <codeph>NONE</codeph> to signify a left-unary or right-unary
-                        operator. The operand data types can be omitted in the normal case where
-                        they are the same as the operator class's data type. </pd>
-                    <pd>In a <codeph>FUNCTION</codeph> clause, the operand data type(s) the function
-                        is intended to support, if different from the input data type(s) of the
-                        function (for B-tree comparison functions and hash functions) or the class's
-                        data type (for B-tree sort support functions and all functions in GiST,
-                        SP-GiST and GIN operator classes). These defaults are correct, and so
-                            <varname>op_type</varname> need not be specified in
-                            <codeph>FUNCTION</codeph> clauses, except for the case of a B-tree sort
-                        support function that is meant to support cross-data-type comparisons.</pd>
+                    <pt>
+                        <varname>op_type</varname>
+                    </pt>
+                    <pd>在<codeph>OPERATOR</codeph>子句中，运算符的操作数数据类型，或<codeph>NONE</codeph>表示左一元或右一元运算符。
+                        在正常情况下，与运算符类的数据类型相同时，可以省略操作数数据类型。
+                    </pd>
+                    <pd>在<codeph>FUNCTION</codeph>子句中，
+                        如果与函数的输入数据类型（用于B树比较函数和哈希函数）或类的数据类型（用于B树排序支持函数以及GiST，SP-GiST和GIN运算符类中的所有函数）不同，
+                        则函数要支持的操作数数据类型。
+                        这些默认值是正确的，因此，除了B树排序支持函数旨在支持跨数据类型比较的情况外，
+                        无需在<codeph>FUNCTION</codeph>子句中指定<varname>op_type</varname>。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>support_number</varname></pt>
-                    <pd>Index methods require additional support routines in order to work. These
-                        operations are administrative routines used internally by the index methods.
-                        As with strategies, the operator class identifies which specific functions
-                        should play each of these roles for a given data type and semantic
-                        interpretation. The index method defines the set of functions it needs, and
-                        the operator class identifies the correct functions to use by assigning them
-                        to the <i>support function numbers</i> as follows:<table id="bx145974">
-                            <title>B-tree and Bitmap Support Functions</title>
+                    <pt>
+                        <varname>support_number</varname>
+                    </pt>
+                    <pd>索引方法为了工作需要额外的支持例程。
+                        这些操作是索引方法在内部使用的管理例程。
+                        与策略一样，运算符类标识对于给定的数据类型和语义解释，哪些特定函数应扮演这些角色中的每一个。
+                        索引方法定义了所需的函数集，运算符类通过将它们分配给支持函数编号来标识要使用的正确函数，如下所示：
+                        <table id="bx145974">
+                            <title>B树和位图支持函数</title>
                             <tgroup cols="2">
                                 <colspec colnum="1" colname="col1" colwidth="275pt"/>
                                 <colspec colnum="2" colname="col2" colwidth="99pt"/>
                                 <thead>
                                     <row>
-                                        <entry colname="col1">Function</entry>
-                                        <entry colname="col2">Support Number</entry>
+                                        <entry colname="col1">函数</entry>
+                                        <entry colname="col2">支持编号</entry>
                                     </row>
                                 </thead>
                                 <tbody>
                                     <row>
-                                        <entry colname="col1">Compare two keys and return an integer
-                                            less than zero, zero, or greater than zero, indicating
-                                            whether the first key is less than, equal to, or greater
-                                            than the second.</entry>
+                                        <entry colname="col1">比较两个键并返回小于零，零或大于零的整数，
+                                            指示第一个键是否小于，等于或大于第二个键。
+                                        </entry>
                                         <entry colname="col2">1</entry>
                                     </row>
                                 </tbody>
                             </tgroup>
-                        </table><table id="bx145974a">
+                        </table>
+                        <table id="bx145974a">
                             <title>GiST Support Functions</title>
                             <tgroup cols="2">
                                 <colspec colnum="1" colname="col1" colwidth="276pt"/>
                                 <colspec colnum="2" colname="col2" colwidth="99pt"/>
                                 <thead>
                                     <row>
-                                        <entry colname="col1">Function</entry>
-                                        <entry colname="col2">Support Number</entry>
+                                        <entry colname="col1">函数</entry>
+                                        <entry colname="col2">支持编号</entry>
                                     </row>
                                 </thead>
                                 <tbody>
                                     <row>
-                                        <entry colname="col1">consistent - determine whether key
-                                            satisfies the query qualifier.</entry>
+                                        <entry colname="col1">consistent - 确定键是否满足查询限定符。
+                                        </entry>
                                         <entry colname="col2">1</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">union - compute union of a set of
-                                            keys.</entry>
+                                        <entry colname="col1">union - 计算一组键的并集。
+                                        </entry>
                                         <entry colname="col2">2</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">compress - compute a compressed
-                                            representation of a key or value to be indexed.</entry>
+                                        <entry colname="col1">compress - 计算要索引的键或值的压缩表示形式。
+                                        </entry>
                                         <entry colname="col2">3</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">decompress - compute a decompressed
-                                            representation of a compressed key.</entry>
+                                        <entry colname="col1">decompress - 计算压缩键的解压缩表示。
+                                        </entry>
                                         <entry colname="col2">4</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">penalty - compute penalty for
-                                            inserting new key into subtree with given subtree's
-                                            key.</entry>
+                                        <entry colname="col1">penalty - 计算使用给定子树的键将新键插入子树的代价。
+                                        </entry>
                                         <entry colname="col2">5</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">picksplit - determine which entries of
-                                            a page are to be moved to the new page and compute the
-                                            union keys for resulting pages.</entry>
+                                        <entry colname="col1">picksplit - 确定一个页面的条目将被移动到新的页面，并计算联合键结果页面。
+                                        </entry>
                                         <entry colname="col2">6</entry>
                                     </row>
                                     <row>
-                                        <entry colname="col1">equal - compare two keys and return
-                                            true if they are equal.</entry>
+                                        <entry colname="col1">equal - 比较两个键，如果相等则返回true。
+                                        </entry>
                                         <entry colname="col2">7</entry>
                                     </row>
                                 </tbody>
                             </tgroup>
-                        </table></pd>
+                        </table>
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>funcname</varname></pt>
-                    <pd>The name (optionally schema-qualified) of a function that is an index method
-                        support procedure for the operator class. </pd>
+                    <pt>
+                        <varname>funcname</varname>
+                    </pt>
+                    <pd>函数的名称（可以由模式指定），该函数是运算符类的索引方法支持过程。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>argument_types</varname></pt>
-                    <pd>The parameter data type(s) of the function. </pd>
+                    <pt>
+                        <varname>argument_types</varname>
+                    </pt>
+                    <pd>函数的参数数据类型。</pd>
                 </plentry>
                 <plentry>
-                    <pt><varname>storage_type</varname></pt>
-                    <pd>The data type actually stored in the index. Normally this is the same as the
-                        column data type, but some index methods (currently GiST and GIN) allow it
-                        to be different. The <codeph>STORAGE</codeph> clause must be omitted unless
-                        the index method allows a different type to be used. </pd>
+                    <pt>
+                        <varname>storage_type</varname>
+                    </pt>
+                    <pd>实际存储在索引中的数据类型。
+                        通常，这与列数据类型相同，但是某些索引方法（当前为GiST和GIN）允许其不同。
+                        除非索引方法允许使用其他类型，否则必须省略<codeph>STORAGE</codeph>子句。
+                    </pd>
                 </plentry>
-            </parml></section><section id="section5"><title>Notes</title><p>Because the index machinery does not check access permissions on functions
-before using them, including a function or operator in an operator class
-is the same as granting public execute permission on it. This is usually
-not an issue for the sorts of functions that are useful in an operator
-class. </p><p>The operators should not be defined by SQL functions. A SQL function
-is likely to be inlined into the calling query, which will prevent the
-optimizer from recognizing that the query matches an index.</p><p>Any functions used to implement the operator class must be defined
-as <codeph>IMMUTABLE</codeph>.</p>
-            <p>Before Greenplum Database 6.0, the <codeph>OPERATOR</codeph> clause could include a
-                    <codeph>RECHECK</codeph> option. This option is no longer supported. Greenplum
-                Database now determines whether an index operator is "lossy" on-the-fly at run time. This
-                allows more efficient handling of cases where an operator might or might not be
-                lossy.</p></section><section id="section6"><title>Examples</title><p>The following example command defines a GiST index operator class for the data type
-                    <codeph>_int4</codeph> (array of int4). See the 
-                <codeph>intarray</codeph> contrib module for the complete example.</p><codeblock>CREATE OPERATOR CLASS gist__int_ops
+            </parml>
+        </section>
+        <section id="section5">
+            <title>注解</title>
+            <p>因为索引机制在使用函数之前不会检查对函数的访问权限，所以在运算符类中包括函数或运算符就等同于对其授予公共执行权限。
+                对于在运算符类中有用的各种函数，这通常不是问题。
+            </p>
+            <p>运算符不应由SQL函数定义。
+                SQL函数很可能内联到调用查询中，这将阻止优化器识别查询与索引匹配。
+            </p>
+            <p>用于实现运算符类的任何函数都必须定义为<codeph>IMMUTABLE</codeph>。
+            </p>
+            <p>在Greenplum数据库6.0之前，<codeph>OPERATOR</codeph>子句可以包含<codeph>RECHECK</codeph>选项。
+                此选项不再支持。
+                Greenplum数据库现在可以确定索引运算符是否在运行时是“有损的”。
+                这允许在一个运算符可能是或者可能不是有损的情况下有效地处理。
+            </p>
+        </section>
+        <section id="section6">
+            <title>示例</title>
+            <p>以下示例命令为数据类型<codeph>_int4</codeph>（int4的数组）定义了GiST索引运算符类。
+                有关完整的示例，请参见<codeph>intarray</codeph> contrib模块。
+            </p>
+            <codeblock>CREATE OPERATOR CLASS gist__int_ops
     DEFAULT FOR TYPE _int4 USING gist AS
         OPERATOR 3 &amp;&amp;,
         OPERATOR 6 = (anyarray, anyarray),
@@ -310,9 +347,31 @@ as <codeph>IMMUTABLE</codeph>.</p>
         FUNCTION 4 g_int_decompress (internal),
         FUNCTION 5 g_int_penalty (internal, internal, internal),
         FUNCTION 6 g_int_picksplit (internal, internal),
-        FUNCTION 7 g_int_same (_int4, _int4, internal);</codeblock></section><section id="section7"><title>Compatibility</title><p><codeph>CREATE OPERATOR CLASS</codeph> is a Greenplum Database extension.
-There is no <codeph>CREATE OPERATOR CLASS</codeph> statement in the SQL
-standard.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="ALTER_OPERATOR_CLASS.xml#topic1" type="topic" format="dita"/></codeph>,
-                        <codeph><xref href="./DROP_OPERATOR_CLASS.xml#topic1" type="topic"
-                        format="dita"/></codeph>, <codeph><xref href="CREATE_FUNCTION.xml#topic1"
-                        type="topic" format="dita"/></codeph></p></section></body></topic>
+        FUNCTION 7 g_int_same (_int4, _int4, internal);</codeblock>
+        </section>
+        <section id="section7">
+            <title>兼容性</title>
+            <p><codeph>CREATE OPERATOR CLASS</codeph>是Greenplum数据库扩展。
+                SQL标准中没有<codeph>CREATE OPERATOR CLASS</codeph>语句。
+            </p>
+        </section>
+        <section id="section8">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="ALTER_OPERATOR_CLASS.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="./DROP_OPERATOR_CLASS.xml#topic1" type="topic"
+                          format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref href="CREATE_FUNCTION.xml#topic1"
+                          type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>

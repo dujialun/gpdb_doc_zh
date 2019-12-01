@@ -4,9 +4,9 @@
 <topic id="topic1">
     <title id="bv20941">ALTER FOREIGN DATA WRAPPER</title>
     <body>
-        <p id="sql_command_desc">Changes the definition of a foreign-data wrapper.</p>
+        <p id="sql_command_desc">修改一个外部数据包装的定义。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">ALTER FOREIGN DATA WRAPPER <varname>name</varname>
     [ HANDLER <varname>handler_function</varname> | NO HANDLER ]
     [ VALIDATOR <varname>validator_function</varname> | NO VALIDATOR ]
@@ -16,76 +16,79 @@ ALTER FOREIGN DATA WRAPPER <varname>name</varname> OWNER TO <varname>new_owner</
 ALTER FOREIGN DATA WRAPPER <varname>name</varname> RENAME TO <varname>new_name</varname></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>ALTER FOREIGN DATA WRAPPER</codeph> changes the definition of a foreign-data wrapper.
-                The first form of the command changes the support functions or generic options of 
-                the foreign-data wrapper. Greenplum Database requires at least one clause. The second and third forms of the command change the owner or name of the foreign-data wrapper.</p>
-            <p>Only superusers can alter foreign-data wrappers. Additionally, only superusers can own foreign-data wrappers</p>
+            <title>描述</title>
+            <p><codeph>ALTER FOREIGN DATA WRAPPER</codeph>修改一个外部数据包装的定义。第一个语句修改外部数据包装的支持函数或者一个一般性的选项。Greenplum
+			数据库要求只要有一个选项。第二和第三的语句修改外部数据包装的所有者或者名字。</p>
+            <p>只有超级用户才可以修改外部数据包装。另外，只有超级用户才可以拥有外部数据包装。</p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt><varname>name</varname></pt>
                     <pd>
-                        <p>The name of an existing foreign-data wrapper.</p>
+                        <p>外部数据包装的名字。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>HANDLER <varname>handler_function</varname></pt>
                     <pd>
-                        <p>Specifies a new handler function for the foreign-data wrapper.</p>
+                        <p>为外部数据包装提供一个新的处理函数。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>NO HANDLER</pt>
                     <pd>
-                        <p>Specifies that the foreign-data wrapper should no longer have a handler function.</p> <note>You cannot access a foreign table that uses a foreign-data wrapper with no handler.</note>
+                        <p>指定外部数据包装不再拥有处理函数。</p> <note>你不能访问没有处理的外部数据包装的外部表。</note>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>VALIDATOR <varname>validator_function</varname></pt>
                     <pd>
-                        <p>Specifies a new validator function for the foreign-data wrapper.</p><p>Options to the foreign-data wrapper, servers, and user mappings may become invalid when you change the validator function. You must make sure that these options are correct before using the modified foreign-data wrapper. Note that Greenplum Database checks any options specified in this <codeph>ALTER FOREIGN DATA WRAPPER</codeph> command using the new validator.</p>
+                        <p>为外部数据包装提供一个新的验证函数。</p><p>当你修改验证函数时，外部数据包装、服务器、用户映射
+						可能会变成不可用。在修改外部数据包装前你必须要确保这些选项时正确的。注意使用新验证者时，Greenplum数据库会检查在<codeph>ALTER FOREIGN DATA WRAPPER</codeph> 命令中用到的所有选项。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>NO VALIDATOR</pt>
                     <pd>
-                        <p>Specifies that the foreign-data wrapper should no longer have a validator function.</p>
+                        <p>指定外部数据包装不再拥有验证函数。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>OPTIONS ( [ ADD | SET | DROP ] <varname>option</varname> ['<varname>value</varname>'] [, ... ] )</pt>
                     <pd>
-                        <p>Change the foreign-data wrapper's options. <codeph>ADD</codeph>, <codeph>SET</codeph>, and <codeph>DROP</codeph> specify the action to perform. If no operation is explicitly specified, the default operation is <codeph>ADD</codeph>. Option names must be unique. Greenplum Database validates names and values using the foreign-data wrapper's validator function, if any.</p>
+                        <p>修改外部数据包装的选项。<codeph>ADD</codeph>, <codeph>SET</codeph>和<codeph>DROP</codeph> 指定了操作的动作。如果没有明确指出操作，默认的操作是<codeph>ADD</codeph>。选项的名字必须是唯一的。
+						如果使用了验证函数，Greenplum会验证提供的选项名字和值。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>OWNER TO <varname>new_owner</varname></pt>
                     <pd>
-                        <p>Specifies the new owner of the foreign-data wrapper. Only superusers can own foreign-data wrappers.</p>
+                        <p>指定外部数据包装的新所有者，只有超级用户可以拥有外部数据包装。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>RENAME TO <varname>new_name</varname></pt>
                     <pd>
-                        <p>Specifies the new name of the foreign-data wrapper.</p>
+                        <p>指定外部数据包装的新名字。</p>
                     </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section6">
-            <title>Examples</title>
-            <p>Change the definition of a foreign-data wrapper named <codeph>dbi</codeph> by adding a new option named <codeph>foo</codeph>, and removing the option named <codeph>bar</codeph>:</p><codeblock>ALTER FOREIGN DATA WRAPPER dbi OPTIONS (ADD foo '1', DROP 'bar');</codeblock>
-            <p>Change the validator function for a foreign-data wrapper named <codeph>dbi</codeph> to <codeph>bob.myvalidator</codeph>:</p><codeblock>ALTER FOREIGN DATA WRAPPER dbi VALIDATOR bob.myvalidator;</codeblock>
+            <title>示例</title>
+            <p>修改外部数据包装名为<codeph>dbi</codeph>的定义，增加一个新选项<codeph>foo</codeph>，然后移除名为<codeph>bar</codeph>
+			的选项：</p><codeblock>ALTER FOREIGN DATA WRAPPER dbi OPTIONS (ADD foo '1', DROP 'bar');</codeblock>
+            <p>修改外部数据包装名为<codeph>dbi</codeph>的验证函数为 <codeph>bob.myvalidator</codeph>：</p>
+			<codeblock>ALTER FOREIGN DATA WRAPPER dbi VALIDATOR bob.myvalidator;</codeblock>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p><codeph>ALTER FOREIGN DATA WRAPPER</codeph> conforms to ISO/IEC 9075-9 (SQL/MED), with the exception that the <codeph>HANDLER</codeph>, <codeph>VALIDATOR</codeph>, <codeph>OWNER TO</codeph>, and <codeph>RENAME TO</codeph> clauses are Greenplum Database extensions.</p>
+            <title>兼容性</title>
+            <p><codeph>ALTER FOREIGN DATA WRAPPER</codeph> 适配ISO/IEC 9075-9 (SQL/MED)，但是<codeph>HANDLER</codeph>、 <codeph>VALIDATOR</codeph>、 <codeph>OWNER TO</codeph>和 <codeph>RENAME TO</codeph> 选项是Greenplum数据库的扩展。</p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="CREATE_FOREIGN_DATA_WRAPPER.xml#topic1">CREATE FOREIGN DATA WRAPPER</xref></codeph>,
                         <codeph><xref href="DROP_FOREIGN_DATA_WRAPPER.xml#topic1">DROP
                     FOREIGN DATA WRAPPER</xref></codeph></p>

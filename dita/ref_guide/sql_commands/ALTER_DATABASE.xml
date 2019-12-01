@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="ai20941">ALTER DATABASE</title><body><p id="sql_command_desc">Changes the attributes of a database.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">ALTER DATABASE <varname>name</varname> [ WITH CONNECTION LIMIT <varname>connlimit</varname> ]
+<topic id="topic1"><title id="ai20941">ALTER DATABASE</title><body><p id="sql_command_desc">修改数据库的属性</p><section id="section2"><title>概要</title><codeblock id="sql_command_synopsis">ALTER DATABASE <varname>name</varname> [ WITH CONNECTION LIMIT <varname>connlimit</varname> ]
 
 ALTER DATABASE <varname>name</varname> RENAME TO <varname>newname</varname>
 
@@ -13,47 +13,27 @@ ALTER DATABASE <varname>name</varname> SET <varname>parameter</varname> { TO | =
 ALTER DATABASE <varname>name</varname> SET <varname>parameter</varname> FROM CURRENT
 ALTER DATABASE <varname>name</varname> RESET <varname>parameter</varname>
 ALTER DATABASE <varname>name</varname> RESET ALL
-</codeblock></section><section id="section3"><title>Description</title><p><codeph>ALTER DATABASE</codeph> changes the attributes of a database.</p>
-<p>The first form changes the allowed connection limit for a database.
-Only the database owner or a superuser can change this setting. </p>
-<p>The second form changes the name of the database. Only the database
-owner or a superuser can rename a database; non-superuser owners must
-also have the <codeph>CREATEDB</codeph> privilege. You cannot rename
-the current database. Connect to a different database first.</p>
-<p>The third form changes the owner of the database. To alter the owner,
-you must own the database and also be a direct or indirect member of
-the new owning role, and you must have the <codeph>CREATEDB</codeph>
-privilege. (Note that superusers have all these privileges automatically.)</p>
-  <p>The fourth form changes the default tablespace of the database.
-    Only the database owner or a superuser can do this; you must also have
-    create privilege for the new tablespace.
-    This command physically moves any tables or indexes in the database's old
-    default tablespace to the new tablespace.  Note that tables and indexes
-    in non-default tablespaces are not affected.</p>
-<p>The remaining forms change the session default for a configuration
-parameter for a Greenplum database. Whenever a new session is subsequently
-started in that database, the specified value becomes the session default
-value. The database-specific default overrides whatever setting is present
-in the server configuration file (<codeph>postgresql.conf</codeph>).
-Only the database owner or a superuser can change the session defaults
-for a database. Certain parameters cannot be set this way, or can only
-be set by a superuser. </p>
-</section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The name of the database whose attributes are to be altered.</pd></plentry><plentry><pt><varname>connlimit</varname></pt><pd>The maximum number of concurrent connections possible. The default
-of -1 means there is no limitation.</pd></plentry><plentry><pt><varname>parameter value</varname></pt><pd>Set this database's session default for the specified configuration parameter to the given
-            value. If value is <codeph>DEFAULT</codeph> or, equivalently, <codeph>RESET</codeph> is
-            used, the database-specific setting is removed, so the system-wide default setting will
-            be inherited in new sessions. Use <codeph>RESET ALL</codeph> to clear all
-            database-specific settings. See <xref href="../config_params/guc_config.xml" type="topic" format="dita"/> for information about all
-            user-settable configuration parameters.</pd></plentry><plentry><pt><varname>newname</varname></pt><pd>The new name of the database. </pd></plentry><plentry><pt><varname>new_owner</varname></pt><pd>The new owner of the database.</pd></plentry>
+</codeblock></section><section id="section3"><title>描述</title><p><codeph>ALTER DATABASE</codeph>修改一个数据库的属性。</p>
+<p>第一个语句修改数据库的连接数。只有数据的所有者或者超级用户可以更改此设置。</p>
+<p>第二个语句修改数据库的名字。只有数据库的所有者或者超级用户可以重命名数据库;非超级用户必须拥有
+<codeph>CREATEDB</codeph> 权限。不能修改当前数据库的名字，连接到其他的数据库先。</p>
+<p>第三个聚集修改数据库的所有者。要修改所有者，你必须是新角色的直接或者间接的成员,
+而且必须有 <codeph>CREATEDB</codeph>
+的权限。（超级用户可以自动拥有所有的权限。）</p>
+  <p>第四个语句修改数据库的默认表空间。只有数据库的所有者或者超级用户可以修改默认表空，
+  你还需要在新的表空间上有创建的权限。这个命令会将这个数据库所有在默认表空间的表和索引
+  都移到新的表空间。注意，不在默认表空间的表和索引不受影响。</p>
+<p>剩下的语句是用来修改Greenplum数据库会话级别的参数默认值。当一个会话在数据库开启后，
+这个会话提供的参数值将成为默认参数值。数据库在配置文件（<codeph>postgresql.conf</codeph>）
+配置的默认值将被覆盖。只有数据库所有者或者超级用户才能修改会话默认值。某些参数不能用这
+种方式设置，或者只能被超级用户设置。 </p>
+</section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>将要被修改属性的数据库名称。</pd></plentry><plentry><pt><varname>connlimit</varname></pt><pd>最大并发连接数。缺省值-1表示没有限制</pd></plentry><plentry><pt><varname>parameter value</varname></pt><pd>将指定配置参数的数据库的会话默认值设置为给定值。如果这个值是 <codeph>DEFAULT</codeph>，或者是等效的 <codeph>RESET</codeph>，数据库的特定设置会被删除，因此系统范围的默认设置将在新会话中继承。用<codeph>RESET ALL</codeph>来清除所有的数据库设置，参见 <xref href="../config_params/guc_config.xml" type="topic" format="dita"/> 来获取更多关于用户级别的参数设置。</pd></plentry><plentry><pt><varname>newname</varname></pt><pd>新的数据库名。</pd></plentry><plentry><pt><varname>new_owner</varname></pt><pd>新的数据库所有者。</pd></plentry>
         <plentry>
           <pt><varname>new_tablespace</varname></pt>
-          <pd>The new default tablespace of the database.</pd>
-        </plentry></parml></section><section id="section5"><title>Notes</title><p>It is also possible to set a configuration parameter session default
-for a specific role (user) rather than to a database. Role-specific settings
-override database-specific ones if there is a conflict. See <codeph>ALTER
-ROLE</codeph>.</p></section><section id="section6"><title>Examples</title><p>To set the default schema search path for the <codeph>mydatabase</codeph> database:</p><codeblock>ALTER DATABASE mydatabase SET search_path TO myschema, 
-public, pg_catalog;</codeblock></section><section id="section7"><title>Compatibility</title><p>The <codeph>ALTER DATABASE</codeph> statement is a Greenplum Database
-extension. </p></section><section id="section8"><title>See Also</title><p><codeph><xref href="./CREATE_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>,
+          <pd>新的数据库默认表空间。</pd>
+        </plentry></parml></section><section id="section5"><title>注意</title><p>还可以为特定角色（用户）而不是数据库设置配置参数会话默认值。如果存在冲突，角色特定的设置将覆盖数据库特定的设置。 参见<codeph>ALTER
+ROLE</codeph>.</p></section><section id="section6"><title>示例</title><p>为数据库<codeph>mydatabase</codeph> 设置默认的模式搜索路径:</p><codeblock>ALTER DATABASE mydatabase SET search_path TO myschema, 
+public, pg_catalog;</codeblock></section><section id="section7"><title>兼容性</title><p><codeph>ALTER DATABASE</codeph> 语句是Greenplum的扩展语句。</p></section><section id="section8"><title>另见</title><p><codeph><xref href="./CREATE_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_DATABASE.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./SET.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="CREATE_TABLESPACE.xml#topic1"/></codeph></p></section></body></topic>

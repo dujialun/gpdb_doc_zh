@@ -1,15 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="co20941">DROP AGGREGATE</title><body><p id="sql_command_desc">Removes an aggregate function.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">DROP AGGREGATE [IF EXISTS] <varname>name</varname> ( <varname>type</varname> [, ...] ) [CASCADE | RESTRICT]</codeblock></section><section id="section3"><title>Description</title><p><codeph>DROP AGGREGATE</codeph> will delete an existing aggregate function.
-To execute this command the current user must be the owner of the aggregate
-function.</p></section><section id="section4"><title>Parameters</title><parml><plentry><pt>IF EXISTS</pt><pd>Do not throw an error if the aggregate does not exist. A notice is
-issued in this case. </pd></plentry><plentry><pt><varname>name</varname></pt><pd>The name (optionally schema-qualified) of an existing aggregate function.
-</pd></plentry><plentry><pt><varname>type</varname></pt><pd>An input data type on which the aggregate function operates. To reference
-a zero-argument aggregate function, write <codeph>*</codeph> in place
-of the list of input data types. </pd></plentry><plentry><pt>CASCADE</pt><pd>Automatically drop objects that depend on the aggregate function.
-</pd></plentry><plentry><pt>RESTRICT</pt><pd>Refuse to drop the aggregate function if any objects depend on it.
-This is the default. </pd></plentry></parml></section><section id="section5"><title>Examples</title><p>To remove the aggregate function <codeph>myavg</codeph> for type <codeph>integer</codeph>:</p><codeblock>DROP AGGREGATE myavg(integer);</codeblock></section><section id="section6"><title>Compatibility</title><p>There is no <codeph>DROP AGGREGATE</codeph> statement in the SQL standard.
-</p></section><section id="section7"><title>See Also</title><p><codeph><xref href="ALTER_AGGREGATE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="CREATE_AGGREGATE.xml#topic1" type="topic" format="dita"
-        /></codeph></p></section></body></topic>
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="co20941">DROP AGGREGATE</title>
+    <body>
+        <p id="sql_command_desc">删除聚合函数。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">DROP AGGREGATE [IF EXISTS] <varname>name</varname> ( <varname>type</varname> [, ...] ) [CASCADE | RESTRICT]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>DROP AGGREGATE</codeph>将删除现有的聚合函数。
+                要执行此命令，当前用户必须是聚合函数的所有者。
+            </p>
+        </section>
+        <section id="section4">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>IF EXISTS</pt>
+                    <pd>如果聚合不存在，请不要引发错误。在这种情况下会发出通知。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>name</varname>
+                    </pt>
+                    <pd>现有聚合函数的名称（可以由模式限定）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>type</varname>
+                    </pt>
+                    <pd>聚合函数所基于的输入数据类型。
+                        要引用零参数聚合函数，请写<codeph>*</codeph>代替输入数据类型列表。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>CASCADE</pt>
+                    <pd>自动删除依赖于聚合函数的对象。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>RESTRICT</pt>
+                    <pd>如果有任何对象依赖聚合函数，则拒绝删除该函数。这是默认值。
+                    </pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section5">
+            <title>示例</title>
+            <p>要删除整数类型的聚合函数<codeph>myavg</codeph>：
+            </p>
+            <codeblock>DROP AGGREGATE myavg(integer);</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p>SQL标准中没有<codeph>DROP AGGREGATE</codeph>语句。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p>
+                <codeph><xref href="ALTER_AGGREGATE.xml#topic1" type="topic" format="dita"/></codeph>
+                ,
+                <codeph><xref href="CREATE_AGGREGATE.xml#topic1" type="topic" format="dita"/></codeph>
+            </p>
+        </section>
+    </body>
+</topic>

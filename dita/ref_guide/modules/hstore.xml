@@ -3,52 +3,51 @@
 <topic id="topic_vcn_jkq_1bb">
  <title>hstore</title>
  <body>
-  <p>The <codeph>hstore</codeph> module implements a data type for storing sets of (key,value) pairs
-   within a single Greenplum Database data field. This can be useful in various scenarios, such as
-   rows with many attributes that are rarely examined, or semi-structured data.</p>
-  <p>In the current implementation, neither the key nor the value string can exceed 65535 bytes in
-   length; an error will be thrown if this limit is exceeded. These maximum lengths may change in
-   future releases.</p>
+  <p><codeph>hstore</codeph>模块实现了一种数据类型，用于在单个Greenplum数据库数据字段中存储（键，值）对的集合。
+      这在各种情况下很有用，例如具有许多很少检查的属性的行或半结构化数据。
+      </p>
+  <p>在当前的实现中，键和值字符串的长度都不能超过65535个字节。
+      如果超出此限制，将引发错误。
+      这些最大长度可能会在将来的版本中更改。
+      </p>
   <section>
-   <title>Installing hstore</title>
-   <p>Before you can use <codeph>hstore</codeph> data type and functions, run the installation
-    script <codeph>$GPHOME/share/postgresql/contrib/hstore.sql</codeph> in each database where you
-    want the ability to query other
-    databases:<codeblock>$ psql -d testdb -f $GPHOME/share/postgresql/contrib/hstore.sql</codeblock></p>
+   <title>安装hstore</title>
+   <p>在使用<codeph>hstore</codeph>数据类型和函数之前，
+       请在要查询其他数据库的每个数据库中运行安装脚本<codeph>$GPHOME/share/postgresql/contrib/hstore.sql</codeph>：
+       <codeblock>$ psql -d testdb -f $GPHOME/share/postgresql/contrib/hstore.sql</codeblock></p>
   </section>
   <section>
-   <title>hstore External Representation</title>
-   <p>The text representation of an <codeph>hstore</codeph> value includes zero or more
-     <varname>key</varname>
-    <codeph>=&gt;</codeph>
-    <varname>value</varname> items, separated by commas. For example:
+   <title>hstore外部表示</title>
+   <p><codeph>hstore</codeph>值的文本表示形式包括零个或多个<varname>key</varname><codeph>=&gt;</codeph><varname>value</varname>项，以逗号分隔。
+       例如：
     <codeblock>k => v
 foo => bar, baz => whatever
-"1-a" => "anything at all"</codeblock> The order
-    of the items is not considered significant (and may not be reproduced on output). Whitespace
-    between items or around the <codeph>=&gt;</codeph> sign is ignored. Use double quotes if a key
-    or value includes whitespace, comma, <codeph>=</codeph> or <codeph>&gt;</codeph>. To include a
-    double quote or a backslash in a key or value, precede it with another backslash. (Keep in mind
-    that depending on the setting of <varname>standard_conforming_strings</varname>, you may need to
-    double backslashes in SQL literal strings.)</p>
-   <p>A value (but not a key) can be a SQL NULL. This is represented as
-    <codeblock>key => NULL</codeblock> The <codeph>NULL</codeph> keyword is not case-sensitive.
-    Again, use double quotes if you want the string <codeph>null</codeph> to be treated as an
-    ordinary data value.</p>
-   <p>Currently, double quotes are always used to surround key and value strings on output, even
-    when this is not strictly necessary.</p>
+"1-a" => "anything at all"</codeblock>
+       项目的顺序不重要（并且可能不会在输出中复制）。
+       项目之间或<codeph>=&gt;</codeph>符号周围的空格将被忽略。
+       如果键或值包含空格，逗号，<codeph>=</codeph>或<codeph>&gt;</codeph>，请使用双引号。
+       要在键或值中包含双引号或反斜杠，请在其前面加上另一个反斜杠。
+       （请记住，根据<varname>standard_conforming_strings</varname>的设置，您可能需要在SQL文字字符串中加双反斜杠。）
+   </p><p>值（但不是键）可以是SQL NULL。
+       这表示为
+    <codeblock>key => NULL</codeblock>
+      <codeph>NULL</codeph>关键字不区分大小写。
+      同样，如果要将字符串<codeph>null</codeph>视为普通数据值，请使用双引号引起来。
+      </p>
+   <p>当前，即使不是绝对必要，双引号始终用于在输出中包含键和值字符串。
+    </p>
   </section>
   <section>
-   <title>hstore Operators and Functions</title>
+   <title>hstore运算符和函数</title>
    <table id="hstore-op-table">
-    <title>hstore Operators</title>
+    <title>hstore运算符</title>
     <tgroup cols="4">
      <thead>
       <row>
-       <entry>Operator</entry>
-       <entry>Description</entry>
-       <entry>Example</entry>
-       <entry>Result</entry>
+       <entry>运算符</entry>
+       <entry>描述</entry>
+       <entry>示例</entry>
+       <entry>结果</entry>
       </row>
      </thead>
      <tbody>
@@ -56,7 +55,7 @@ foo => bar, baz => whatever
        <entry><codeph>hstore</codeph>
         <codeph>-&gt;</codeph>
         <codeph>text</codeph></entry>
-       <entry>get value for key (null if not present)</entry>
+       <entry>获取键的值（如果不存在，则为null）</entry>
        <entry><codeph>'a=&gt;x, b=&gt;y'::hstore -&gt; 'a'</codeph></entry>
        <entry><codeph>x</codeph></entry>
       </row>
@@ -64,7 +63,7 @@ foo => bar, baz => whatever
        <entry><codeph>text</codeph>
         <codeph>=&gt;</codeph>
         <codeph>text</codeph></entry>
-       <entry>make single-item <codeph>hstore</codeph></entry>
+       <entry>制作单项<codeph>hstore</codeph></entry>
        <entry><codeph>'a' =&gt; 'b'</codeph></entry>
        <entry><codeph>"a"=&gt;"b"</codeph></entry>
       </row>
@@ -72,7 +71,7 @@ foo => bar, baz => whatever
        <entry><codeph>hstore</codeph>
         <codeph>||</codeph>
         <codeph>hstore</codeph></entry>
-       <entry>concatenation</entry>
+       <entry>连接</entry>
        <entry><codeph>'a=&gt;b, c=&gt;d'::hstore || 'c=&gt;x, d=&gt;q'::hstore</codeph></entry>
        <entry><codeph>"a"=&gt;"b", "c"=&gt;"x", "d"=&gt;"q"</codeph></entry>
       </row>
@@ -80,7 +79,7 @@ foo => bar, baz => whatever
        <entry><codeph>hstore</codeph>
         <codeph>?</codeph>
         <codeph>text</codeph></entry>
-       <entry>does <codeph>hstore</codeph> contain key?</entry>
+       <entry><codeph>hstore</codeph>是否包含键？</entry>
        <entry><codeph>'a=&gt;1'::hstore ? 'a'</codeph></entry>
        <entry><codeph>t</codeph></entry>
       </row>
@@ -88,7 +87,7 @@ foo => bar, baz => whatever
        <entry><codeph>hstore</codeph>
         <codeph>@&gt;</codeph>
         <codeph>hstore</codeph></entry>
-       <entry>does left operand contain right?</entry>
+       <entry>左操作数是否包含右操作数？</entry>
        <entry><codeph>'a=&gt;b, b=&gt;1, c=&gt;NULL'::hstore @&gt; 'b=&gt;1'</codeph></entry>
        <entry><codeph>t</codeph></entry>
       </row>
@@ -96,46 +95,47 @@ foo => bar, baz => whatever
        <entry><codeph>hstore</codeph>
         <codeph>&lt;@</codeph>
         <codeph>hstore</codeph></entry>
-       <entry>is left operand contained in right?</entry>
+       <entry>左操作数是否包含于右操作数？</entry>
        <entry><codeph>'a=&gt;c'::hstore &lt;@ 'a=&gt;b, b=&gt;1, c=&gt;NULL'</codeph></entry>
        <entry><codeph>f</codeph></entry>
       </row>
      </tbody>
     </tgroup>
    </table>
-   <note>The <codeph>=&gt;</codeph> operator is deprecated and may be removed in a future release.
-    Use the <codeph>hstore(text, text)</codeph> function instead.</note>
+   <note>不推荐使用<codeph>=&gt;</codeph>运算符，并且可能在以后的版本中将其删除。
+       请改用<codeph>hstore(text, text)</codeph>函数。
+       </note>
    <table id="hstore-func-table">
-    <title>hstore Functions</title>
+    <title>hstore函数</title>
     <tgroup cols="5">
      <thead>
       <row>
-       <entry>Function</entry>
-       <entry>Return Type</entry>
-       <entry>Description</entry>
-       <entry>Example</entry>
-       <entry>Result</entry>
+       <entry>函数</entry>
+       <entry>返回类型</entry>
+       <entry>描述</entry>
+       <entry>示例</entry>
+       <entry>结果</entry>
       </row>
      </thead>
      <tbody>
       <row>
        <entry><codeph>hstore(text, text)</codeph></entry>
        <entry><codeph>hstore</codeph></entry>
-       <entry>make single-item <codeph>hstore</codeph></entry>
+       <entry>制作单项<codeph>hstore</codeph></entry>
        <entry><codeph>hstore('a', 'b')</codeph></entry>
        <entry><codeph>"a"=&gt;"b"</codeph></entry>
       </row>
       <row>
        <entry><codeph>akeys(hstore)</codeph></entry>
        <entry><codeph>text[]</codeph></entry>
-       <entry>get <codeph>hstore</codeph>'s keys as array</entry>
+       <entry>以数组形式获取<codeph>hstore</codeph>的键</entry>
        <entry><codeph>akeys('a=&gt;1,b=&gt;2')</codeph></entry>
        <entry><codeph>{a,b}</codeph></entry>
       </row>
       <row>
        <entry><codeph>skeys(hstore)</codeph></entry>
        <entry><codeph>setof text</codeph></entry>
-       <entry>get <codeph>hstore</codeph>'s keys as set</entry>
+       <entry>以集合形式获取<codeph>hstore</codeph>的键</entry>
        <entry><codeph>skeys('a=&gt;1,b=&gt;2')</codeph></entry>
        <entry>
         <codeblock>a
@@ -145,14 +145,14 @@ b</codeblock>
       <row>
        <entry><codeph>avals(hstore)</codeph></entry>
        <entry><codeph>text[]</codeph></entry>
-       <entry>get <codeph>hstore</codeph>'s values as array</entry>
+       <entry>以数组形式获取<codeph>hstore</codeph>的值</entry>
        <entry><codeph>avals('a=&gt;1,b=&gt;2')</codeph></entry>
        <entry><codeph>{1,2}</codeph></entry>
       </row>
       <row>
        <entry><codeph>svals(hstore)</codeph></entry>
        <entry><codeph>setof text</codeph></entry>
-       <entry>get <codeph>hstore</codeph>'s values as set</entry>
+       <entry>以集合形式获取<codeph>hstore</codeph>的值</entry>
        <entry><codeph>svals('a=&gt;1,b=&gt;2')</codeph></entry>
        <entry>
         <codeblock>1
@@ -162,7 +162,7 @@ b</codeblock>
       <row>
        <entry><codeph>each(hstore)</codeph></entry>
        <entry><codeph>setof (key text, value text)</codeph></entry>
-       <entry>get <codeph>hstore</codeph>'s keys and values as set</entry>
+       <entry>以集合形式获取<codeph>hstore</codeph>的键值</entry>
        <entry><codeph>select * from each('a=&gt;1,b=&gt;2')</codeph></entry>
        <entry>
         <codeblock> key | value
@@ -174,21 +174,21 @@ b</codeblock>
       <row>
        <entry><codeph>exist(hstore,text)</codeph></entry>
        <entry><codeph>boolean</codeph></entry>
-       <entry>does <codeph>hstore</codeph> contain key?</entry>
+       <entry><codeph>hstore</codeph>是否包含键？</entry>
        <entry><codeph>exist('a=&gt;1','a')</codeph></entry>
        <entry><codeph>t</codeph></entry>
       </row>
       <row>
        <entry><codeph>defined(hstore,text)</codeph></entry>
        <entry><codeph>boolean</codeph></entry>
-       <entry>does <codeph>hstore</codeph> contain non-null value for key?</entry>
+       <entry>对于键<codeph>hstore</codeph>是否包含非空值？</entry>
        <entry><codeph>defined('a=&gt;NULL','a')</codeph></entry>
        <entry><codeph>f</codeph></entry>
       </row>
       <row>
        <entry><codeph>delete(hstore,text)</codeph></entry>
        <entry><codeph>hstore</codeph></entry>
-       <entry>delete any item matching key</entry>
+       <entry>删除匹配键的所有项</entry>
        <entry><codeph>delete('a=&gt;1,b=&gt;2','b')</codeph></entry>
        <entry><codeph>"a"=>"1"</codeph></entry>
       </row>
@@ -198,8 +198,9 @@ b</codeblock>
   </section>
   <section>
    <title>Indexes</title>
-   <p><codeph>hstore</codeph> has index support for <codeph>@&gt;</codeph> and <codeph>?</codeph>
-    operators. You can use either GiST or GIN index types. For example:</p>
+   <p><codeph>hstore</codeph>对<codeph>@&gt;</codeph>和<codeph>?</codeph>运算符有索引支持。
+       您可以使用GiST或GIN索引类型。例如：
+    </p>
    <codeblock>
 CREATE INDEX hidx ON testhstore USING GIST(h);
 
@@ -207,22 +208,23 @@ CREATE INDEX hidx ON testhstore USING GIN(h);
    </codeblock>
   </section>
   <section>
-   <title>Examples</title>
-   <p>Add a key, or update an existing key with a new value:</p>
+   <title>示例</title>
+   <p>添加键，或使用新键更新现有键：</p>
    <codeblock>UPDATE tab SET h = h || ('c' => '3');</codeblock>
-   <p>Delete a key:</p>
+   <p>删除键：</p>
    <codeblock>UPDATE tab SET h = delete(h, 'k1');</codeblock>
   </section>
   <section>
-   <title>Statistics</title>
-   <p>The <codeph>hstore</codeph> type, because of its intrinsic liberality, could contain a lot of
-    different keys. Checking for valid keys is the task of the application. Examples below
-    demonstrate several techniques for checking keys and obtaining statistics.</p>
-   <p>Simple example:</p>
+   <title>统计</title>
+   <p><codeph>hstore</codeph>类型由于其固有的自由度，可能包含许多不同的键。
+       检查有效键是应用程序的任务。
+       下面的示例演示了几种用于检查键和获取统计信息的技术。
+       </p>
+   <p>简单示例：</p>
    <codeblock>SELECT * FROM each('aaa=>bq, b=>NULL, ""=>1');</codeblock>
-   <p>Using a table:</p>
+   <p>使用表：</p>
    <codeblock>SELECT (each(h)).key, (each(h)).value INTO stat FROM testhstore;</codeblock>
-   <p>Online statistics:</p>
+   <p>在线统计：</p>
    <codeblock>SELECT key, count(*) FROM
   (SELECT (each(h)).key FROM testhstore) AS stat
   GROUP BY key

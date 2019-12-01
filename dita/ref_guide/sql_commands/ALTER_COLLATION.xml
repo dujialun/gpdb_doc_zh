@@ -4,8 +4,8 @@
 <topic id="topic1">
   <title id="ah136704">ALTER COLLATION</title>
   <body>
-    <p id="sql_command_desc">Changes the definition of a collation.</p>
-    <section id="section2"><title>Synopsis</title>
+    <p id="sql_command_desc">修改字符集的定义。</p>
+    <section id="section2"><title>概要</title>
       <codeblock id="sql_command_synopsis">ALTER COLLATION <varname>name</varname> RENAME TO <varname>new_name</varname>
 
 ALTER COLLATION <varname>name</varname> OWNER TO <varname>new_owner</varname>
@@ -13,47 +13,44 @@ ALTER COLLATION <varname>name</varname> OWNER TO <varname>new_owner</varname>
 ALTER COLLATION <varname>name</varname> SET SCHEMA <varname>new_schema</varname></codeblock>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd>The name (optionally schema-qualified) of an existing collation.</pd>
+          <pd>现有字符集名称。（可以是限定模式）</pd>
         </plentry>
         <plentry>
           <pt><varname>new_name</varname></pt>
-          <pd>The new name of the collation.</pd>
+          <pd>新的字符集名称</pd>
         </plentry>
         <plentry>
           <pt><varname>new_owner</varname></pt>
-          <pd>The new owner of the collation.</pd>
+          <pd>新的字符集所有者。</pd>
         </plentry>
         <plentry>
           <pt><varname>new_schema</varname></pt>
-          <pd>The new schema for the collation.</pd>
+          <pd>新的字符集模式。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>You must own the collation to use <codeph>ALTER COLLATION</codeph>. To alter the owner, you
-        must also be a direct or indirect member of the new owning role, and that role must have
-          <codeph>CREATE</codeph> privilege on the collation's schema. (These restrictions enforce
-        that altering the owner doesn't do anything you couldn't do by dropping and recreating the
-        collation. However, a superuser can alter ownership of any collation anyway.) </p>
+      <title>描述</title>
+      <p>你必须是字符集的所有者才能使用 <codeph>ALTER COLLATION</codeph>。要更改字符集的所有者，你还必须是新角色的直接或者成员，而且新角色必须在字符集的模式上面拥有
+          <codeph>CREATE</codeph> 的权限。（这些限制强制要求拥有者不能通过丢弃并重建该字符集来做任何不能做的事情。然而，超级用户可以改变任何字符集的所有权。） </p>
     </section>
     <section id="section5">
-      <title>Examples</title>
-      <p>To rename the collation <varname>de_DE</varname> to <codeph>german</codeph>: </p>
+      <title>示例</title>
+      <p>将字符集名从<varname>de_DE</varname> 修改为 <codeph>german</codeph>: </p>
       <codeblock>ALTER COLLATION "de_DE" RENAME TO german;</codeblock>
-      <p>To change the owner of the collation <codeph>en_US</codeph> to <codeph>joe</codeph>: </p>
+      <p>将字符集<codeph>en_US</codeph> 的所有者修改为 <codeph>joe</codeph>: </p>
       <codeblock>ALTER COLLATION "en_US" OWNER TO joe;</codeblock>
     </section>
     <section id="section6">
-      <title>Compatibility</title>
-      <p>There is no <codeph>ALTER COLLATION</codeph> statement in the SQL standard.</p>
+      <title>兼容性</title>
+      <p>SQL标准中没有 <codeph>ALTER COLLATION</codeph> 语法。</p>
     </section>
     <section id="section7">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="./CREATE_COLLATION.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_COLLATION.xml#topic1" type="topic" format="dita"
         /></codeph></p>

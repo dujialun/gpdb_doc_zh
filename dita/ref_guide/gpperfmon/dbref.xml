@@ -1,192 +1,159 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="overview">
-  <title>The gpperfmon Database</title>
+  <title>gpperfmon 数据库</title>
   <body>
-    <p>The <codeph>gpperfmon</codeph> database is a dedicated database where data collection agents
-      on Greenplum segment hosts save query and system statistics. <ph otherprops="pivotal">The
-        optional Greenplum Command Center management tool depends upon the
-          <codeph>gpperfmon</codeph> database for query history.</ph></p>
-    <p>The <codeph>gpperfmon</codeph> database is created using the
-        <codeph>gpperfmon_install</codeph> command-line utility. The utility creates the database
-      and the <codeph>gpmon</codeph> database role and enables the data collection agents on the
-      master and segment hosts. See the <codeph>gpperfmon_install</codeph> reference in the
-        <cite>Greenplum Database Utility Guide</cite> for information about using the utility and
-      configuring the data collection agents.</p>
-    <p>The <codeph>gpperfmon</codeph> database consists of three sets of tables that capture query
-      and system status information at different stages.</p>
+    <p> <codeph>gpperfmon</codeph> 数据库是一个专用数据库，Greenplum segment 主机上的数据收集代理
+    程序将查询和系统统计信息保存在这个数据库中。
+    <ph otherprops="pivotal">可选组件 Greenplum 命令中心管理工具依赖 <codeph>gpperfmon</codeph>
+    数据库保存查询历史信息。</ph></p>
+    <p> <codeph>gpperfmon</codeph> 数据库通过 <codeph>gpperfmon_install</codeph> 命令行工具创建。
+    这个工具然后创建 <codeph>gpmon</codeph> 数据库角色并启用 master 和 segment 主机上的数据收集代理
+    程序。更多关于该工具使用和数据收集代理配置的信息，请参考 <cite>Greenplum 数据库工具指南</cite>
+    中的 <codeph>gpperfmon_install</codeph> 参考手册。</p>
+    <p> <codeph>gpperfmon</codeph> 数据库由三组表组成。它们分别用于在不同阶段捕捉查询和系统状态信息。</p>
     <ul id="ul_oqn_xsy_tz">
-      <li><codeph>_now</codeph> tables store current system metrics such as active queries. </li>
-      <li><codeph>_tail</codeph> tables are used to stage data before it is saved to the
-          <codeph>_history</codeph> tables. The <codeph>_tail</codeph> tables are for internal use
-        only and not to be queried by users.</li>
-      <li><codeph>_history</codeph> tables store historical metrics. </li>
+      <li><codeph>_now</codeph> 系列表存储当前系统指标，例如活动查询等。</li>
+      <li><codeph>_tail</codeph> 系列表用于在数据保存到 <codeph>_history</codeph> 系列表之前暂存数据。
+      <codeph>_tail</codeph> 系列表仅供内部使用，不提供用户查询。</li>
+      <li><codeph>_history</codeph> 系列表用于存储历史数据。</li>
     </ul>
-    <p>The data for <codeph>_now</codeph> and <codeph>_tail</codeph> tables are stored as text files
-      on the master host file system, and are accessed in the <codeph>gpperfmon</codeph> database
-      via external tables. The <codeph>history</codeph> tables are regular heap database tables in
-      the <codeph>gpperfmon</codeph> database. History is saved only for queries that run for a
-      minimum number of seconds, 20 by default. You can set this threshold to another value by
-      setting the <codeph>min_query_time</codeph> parameter in the
-        <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/conf/gpperfmon.conf</codeph> configuration file.
-      Setting the value to 0 saves history for all queries.</p>
-    <note><codeph>gpperfmon</codeph> does not support SQL <codeph>ALTER</codeph> commands.
-        <codeph>ALTER</codeph> queries are not recorded in the <codeph>gpperfmon</codeph> query
-      history tables.</note>
-    <p>The <codeph>history</codeph> tables are partitioned by month. See <xref
-        href="#overview/section_et2_wmt_n1b" format="dita"/> for information about removing old
-      partitions.</p>
-    <p>The database contains the following categories of tables:</p>
+    <p> <codeph>_now</codeph> 和 <codeph>_tail</codeph> 表的数据存储为文本文件，保存在 master 主机
+    文件系统中，通过外部表在 <codeph>gpperfmon</codeph> 数据库中访问。<codeph>history</codeph> 系列表
+    是 <codeph>gpperfmon</codeph> 数据库的常规内存表。只有运行超过一定时间(默认是 20 秒)的查询才会
+    保存到历史数据表中。 你可以通过设置 <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/conf/gpperfmon.conf</codeph> 
+    中的 <codeph>min_query_time</codeph> 参数来修改这个门限值。设置为 0 将会保存所有查询历史信息。 </p>
+    <note><codeph>gpperfmon</codeph> 不支持 <codeph>ALTER</codeph> SQL 命令。
+        <codeph>ALTER</codeph> 查询不会被记录在 <codeph>gpperfmon</codeph> 历史查询表中。</note>
+    <p> <codeph>历史查询</codeph> 表按月进行分区。关于移除老分区的信息，请参见 <xref
+        href="#overview/section_et2_wmt_n1b" format="dita"/> 。</p>
+    <p>该数据库包含以下几类表:</p>
     <ul>
-      <li>The <codeph><xref href="db-database.xml#db-database">database_*</xref></codeph> tables
-        store query workload information for a Greenplum Database instance.</li>
-      <li>The <codeph><xref href="db-diskspace.xml#db-diskspac">diskspace_*</xref></codeph> tables
-        store diskspace metrics.</li>
-      <li>The <codeph><xref href="db-log-alert.xml#CommandCenterDatabaseReference-log_alert"
-            >log_alert_*</xref></codeph> tables store error and warning messages from <codeph>pg_log</codeph>.</li>
-      <li>The <codeph><xref href="db-queries.xml#db-queries">queries_*</xref></codeph> tables store
-        high-level query status information.</li>
-      <li>The <codeph><xref href="db-segment.xml#db-segment">segment_*</xref></codeph> tables store
-        memory allocation statistics for the Greenplum Database segment instances.</li>
-      <li>The <codeph><xref href="db-socket-stats.xml#db-socket_stats"
-          >socket_stats_*</xref></codeph> tables store statistical metrics about socket usage for a
-        Greenplum Database instance. Note: These tables are in place for future use and are not
-        currently populated.</li>
-      <li>The <codeph><xref href="db-system.xml#db-system">system_*</xref></codeph> tables store
-        system utilization metrics.</li>
+      <li> <codeph><xref href="db-database.xml#db-database">database_*</xref></codeph> 系列表存储一个
+      Greenplum 数据库实例的查询负载信息。</li>
+      <li> <codeph><xref href="db-diskspace.xml#db-diskspac">diskspace_*</xref></codeph> 系列表存储磁盘
+      空间指标。</li>
+      <li> <codeph><xref href="db-log-alert.xml#CommandCenterDatabaseReference-log_alert"
+            >log_alert_*</xref></codeph> 系列表存储 <codeph>pg_log</codeph> 中的错误和警告消息。</li>
+      <li> <codeph><xref href="db-queries.xml#db-queries">queries_*</xref></codeph> 系列表存储高级查询
+      状态信息。</li>
+      <li> <codeph><xref href="db-segment.xml#db-segment">segment_*</xref></codeph> 系列表存储 Greenplum
+      数据库 segment 实例的内存分配和统计信息。</li>
+      <li> <codeph><xref href="db-socket-stats.xml#db-socket_stats"
+          >socket_stats_*</xref></codeph> 系列表存储一个 Greenplum 数据库实例中 socket 使用统计指标信息。
+      注意: 这些表为将来使用保留，当前没有填充信息。</li>
+      <li> <codeph><xref href="db-system.xml#db-system">system_*</xref></codeph> 系列表存储系统工具程序指标。</li>
     </ul>
-    <p>The <codeph>gpperfmon</codeph> database also contains the following views:</p>
+    <p> <codeph>gpperfmon</codeph> 数据库还包含下列视图:</p>
     <ul>
-      <li>The <codeph><xref
+      <li> <codeph><xref
             href="db-dynamic-memory-info.xml#CommandCenterDatabaseReference-dynamic_memory_info"
-            >dynamic_memory_info</xref></codeph> view shows an aggregate of all the segments per
-        host and the amount of dynamic memory used per host.</li>
-      <li>The <codeph><xref href="db-memory-info.xml#CommandCenterDatabaseReference-memory_info"
-            >memory_info</xref></codeph> view shows per-host memory information from the
-          <codeph>system_history</codeph> and <codeph>segment_history</codeph> tables.</li>
+            >dynamic_memory_info</xref></codeph> 视图展示每个主机中所有 segments 的汇总, 以及每个主机中
+      动态内存使用量。</li>
+      <li> <codeph><xref href="db-memory-info.xml#CommandCenterDatabaseReference-memory_info"
+            >memory_info</xref></codeph> 视图展示来自 <codeph>system_history</codeph> 和 
+      <codeph>segment_history</codeph> 表的每个主机的内存信息.</li>
     </ul>
     <section id="section_et2_wmt_n1b">
-      <title>History Table Partition Retention</title>
-      <p>The <codeph>history</codeph> tables in the <codeph>gpperfmon</codeph> database are
-        partitioned by month. Partitions are automatically added in two month increments as needed. </p>
-      <p>The <codeph>partition_age</codeph> parameter in the
-          <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/conf/gpperfmon.conf</codeph> file can be set to
-        the maximum number of monthly partitions to keep. Partitions older than the specified value
-        are removed automatically when new partitions are added. </p>
-      <p>The default value for <codeph>partition_age</codeph> is <codeph>0</codeph>, which means
-        that administrators must manually remove unneeded partitions.</p>
+      <title>历史查询表分区保留</title>
+      <p> <codeph>gpperfmon</codeph> 数据库中的 <codeph>历史查询</codeph> 表按月进行分区。分区
+      在需要时会以两个月为增量自动添加。</p>
+      <p> <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/conf/gpperfmon.conf</codeph> 配置文件中的 
+      <codeph>partition_age</codeph> 参数可以设置为要保留的每月最大分区数。添加新分区时，将自动
+      删除早于指定值的分区。</p>
+      <p> <codeph>partition_age</codeph> 的默认值是 <codeph>0</codeph>, 这意味着管理员必须手动删除
+      不需要的分区。</p>
     </section>
     <section id="section_ok2_wd1_41b">
-      <title>Alert Log Processing and Log Rotation</title>
-      <p>When the <codeph>gp_gperfmon_enable</codeph> server configuration parameter is set to true,
-        the Greenplum Database syslogger writes alert messages to a <codeph>.csv</codeph> file in
-        the <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/logs</codeph> directory. </p>
-      <p>The level of messages written to the log can be set to <codeph>none</codeph>,
-          <codeph>warning</codeph>, <codeph>error</codeph>, <codeph>fatal</codeph>, or
-          <codeph>panic</codeph> by setting the <codeph>gpperfmon_log_alert_level</codeph> server
-        configuration parameter in <codeph>postgresql.conf</codeph>. The default message level is
-          <codeph>warning</codeph>.</p>
-      <p>The directory where the log is written can be changed by setting the
-          <codeph>log_location</codeph> configuration variable in the
-          <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/conf/gpperfmon.conf</codeph> configuration file. </p>
-      <p>The syslogger rotates the alert log every 24 hours or when the current log file reaches or
-        exceeds 1MB. </p>
-      <p>A rotated log file can exceed 1MB if a single error message contains a large SQL statement
-        or a large stack trace. Also, the syslogger processes error messages in chunks, with a
-        separate chunk for each logging process. The size of a chunk is OS-dependent; on Red Hat
-        Enterprise Linux, for example, it is 4096 bytes. If many Greenplum Database sessions
-        generate error messages at the same time, the log file can grow significantly before its
-        size is checked and log rotation is triggered.</p>
+      <title>警报日志处理和日志轮换</title>
+      <p>当 <codeph>gp_gperfmon_enable</codeph> 服务期配置参数设置为 true 时,
+        Greenplum 数据库 syslogger 会把警报消息写到一个 <codeph>.csv</codeph> 文件中。该文件位于
+      <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/logs</codeph> 目录。</p>
+      <p>通过修改 <codeph>postgresql.conf</codeph> 文件中的 <codeph>gpperfmon_log_alert_level</codeph>
+      服务期配置参数，可以将写入日志消息级别设置为 <codeph>none</codeph>,
+          <codeph>warning</codeph>, <codeph>error</codeph>, <codeph>fatal</codeph>, 或者
+          <codeph>panic</codeph>。默认的消息基本是 <codeph>warning</codeph>。</p>
+      <p>日志存储的目录可以通过设置 <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/conf/gpperfmon.conf</codeph>
+      配置文件中的 <codeph>log_location</codeph> 配置变量来改变。</p>
+      <p> syslogger 每 24 小时，或在当前日志文件达到或超过 1MB 时轮换警报日志。</p>
+      <p>如果单条错误消息包含一个长 SQL 语句或者长堆栈信息时，轮换日志文件可能超过 1MB。
+      此外，syslogger 会分批处理错误消息，每个日志记录过程分别对应一个单独的分块。日志块的
+      大小取决于操作系统; 例如，在 Red Hat Enterprise Linux 系统中, 它是 4096 字节。如果许多
+      Greenplum 数据库会话同时生成错误消息，则在检查文件大小并触发日志轮换之前，
+      日志文件可能会显着增长。</p>
     </section>
     <section id="rotation">
-      <title>gpperfmon Data Collection Process</title>
-      <p>When Greenplum Database starts up with gpperfmon support enabled, it forks a
-          <codeph>gpmmon</codeph> agent process. <codeph>gpmmon</codeph> then starts a
-          <codeph>gpsmon</codeph> agent process on the master host and every segment host in the
-        Greenplum Database cluster. The Greenplum Database postmaster process monitors the
-          <codeph>gpmmon</codeph> process and restarts it if needed, and the <codeph>gpmmon</codeph>
-        process monitors and restarts <codeph>gpsmon</codeph> processes as needed.</p>
-      <p>The <codeph>gpmmon</codeph> process runs in a loop and at configurable intervals retrieves
-        data accumulated by the <codeph>gpsmon</codeph> processes, adds it to the data files for the
-          <codeph>_now</codeph> and <codeph>_tail</codeph> external database tables, and then into
-        the <codeph>_history</codeph> regular heap database tables. </p>
-      <note>The <codeph>log_alert</codeph> tables in the <codeph>gpperfmon</codeph> database follow
-        a different process, since alert messages are delivered by the Greenplum Database system
-        logger instead of through <codeph>gpsmon</codeph>. See <xref
-          href="#overview/section_ok2_wd1_41b" format="dita"/> for more information.</note>
-      <p>Two configuration parameters in the
-          <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/conf/gpperfmon.conf</codeph> configuration file
-        control how often <codeph>gpmmon</codeph> activities are triggered:</p>
+      <title>gpperfmon 数据收集过程</title>
+      <p>当 Greenplum 数据库启用 gpperfmon 支持下启动时, 它将创建一个 <codeph>gpmmon</codeph> 代理进程。
+      <codeph>gpmmon</codeph> 然后在 Greenplum 数据库集群的 master 主机和每个 segment 主机上启动一个
+      <codeph>gpsmon</codeph> 代理进程。Greenplum 数据库的 postmaster 进程监视 <codeph>gpmmon</codeph> 
+      进程并在需要时重启该进程；<codeph>gpmmon</codeph> 进程监视和在需要时重启 <codeph>gpsmon</codeph> 进程。</p>
+      <p> <codeph>gpmmon</codeph> 进程以循环方式运行，并按一个可配置间隔检索 <codeph>gpsmon</codeph> 
+      系列进程聚合的数据，并将其添加到 <codeph>_now</codeph> 和 <codeph>_tail</codeph> 外部数据库表
+      的数据文件, 然后存入 <codeph>_history</codeph> 常规内存数据库表中。</p>
+      <note> <codeph>gpperfmon</codeph> 中的 <codeph>log_alert</codeph> 表流程不同于此，因为警报消息
+      由 Greenplum 数据库系统 logger 发送，而不是通过 <codeph>gpsmon</codeph> 发送。参见 <xref
+          href="#overview/section_ok2_wd1_41b" format="dita"/> 了解更多信息。</note>
+      <p><codeph>$MASTER_DATA_DIRECTORY/gpperfmon/conf/gpperfmon.conf</codeph> 配置文件中的
+      两个配置参数控制着 <codeph>gpmmon</codeph> 被触发的频度:</p>
       <ul id="ul_r1h_14b_41b">
-        <li>The <codeph>quantum</codeph> parameter is how frequently, in seconds,
-            <codeph>gpmmon</codeph> requests data from the <codeph>gpsmon</codeph> agents on the
-          segment hosts and adds retrieved data to the <codeph>_now</codeph> and
-            <codeph>_tail</codeph> external table data files. Valid values for the
-            <codeph>quantum</codeph> parameter are 10, 15, 20, 30, and 60. The default is 15.</li>
-        <li>The <codeph>harvest_interval</codeph> parameter is how frequently, in seconds, data in
-          the <codeph>_tail</codeph> tables is moved to the <codeph>_history</codeph> tables. The
-            <codeph>harvest_interval</codeph> must be at least 30. The default is 120. </li>
+        <li> <codeph>quantum</codeph> 参数是以秒为单位的频率, <codeph>gpmmon</codeph> 依此频率向
+        segment 节点的 <codeph>gpsmon</codeph> 代理进程请求数据，并将获取到的数据添加到
+        <codeph>_now</codeph> 和 <codeph>_tail</codeph> 外部表数据文件中。 <codeph>quantum</codeph>
+        参数的有效设定值是 10, 15, 20, 30, 以及 60. 默认值是 15.</li>
+        <li> <codeph>harvest_interval</codeph> 参数是以秒为单位的频率, 依此频率将 <codeph>_tail</codeph> 
+        表中的数据移动到 <codeph>_history</codeph> 表中。 <codeph>harvest_interval</codeph>
+        至少是 30. 默认值为 120. </li>
       </ul>
-      <p>See the <codeph>gpperfmon_install</codeph> management utility reference in the
-          <cite>Greenplum Database Utility Guide</cite> for the complete list of gpperfmon
-        configuration parameters.</p>
+      <p>参见 <cite>Greenplum 数据库工具指南</cite> 中的 <codeph>gpperfmon_install</codeph> 管理工具
+      参考手册， 查阅 gpperfmon 配置参数完整列表。</p>
     </section>
     <section>
-      <p>The following steps describe the flow of data from Greenplum Database into the
-          <codeph>gpperfmon</codeph> database when gpperfmon support is enabled.</p>
+      <p>以下步骤描述了，当 gpperfmon 支持启用时，数据从 Greenplum 数据库进入 <codeph>gpperfmon</codeph>
+      的流程。</p>
       <ol id="ol_xcd_rbv_n1b">
-        <li>While executing queries, the Greenplum Database query dispatcher and query executor
-          processes send out query status messages in UDP datagrams. The
-            <codeph>gp_gpperfmon_send_interval</codeph> server configuration variable determines how
-          frequently the database sends these messages. The default is every second. </li>
-        <li>The <codeph>gpsmon</codeph> process on each host receives the UDP packets, consolidates
-          and summarizes the data they contain, and adds additional host metrics, such as CPU and
-          memory usage.</li>
-        <li>The <codeph>gpsmon</codeph> processes continue to accumulate data until they receive a
-          dump command from <codeph>gpmmon</codeph>.</li>
-        <li>The <codeph>gpsmon</codeph> processes respond to a dump command by sending their
-          accumulated status data and log alerts to a listening <codeph>gpmmon</codeph> event
-          handler thread.</li>
-        <li>The <codeph>gpmmon</codeph> event handler saves the metrics to <codeph>.txt</codeph>
-          files in the <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph> directory on the
-          master host. </li>
+        <li>在执行查询时, Greenplum 数据库查询调度程序和查询执行程序进程以 UDP 报文形式发送查询状态消息。
+            <codeph>gp_gpperfmon_send_interval</codeph> 服务器配置变量决定数据库发送这些消息的频率。
+            默认为每秒发送一次。 </li>
+        <li>每个主机上的 <codeph>gpsmon</codeph> 进程接收 UDP 报文, 合并并汇总所包含的数据, 
+            并添加其他主机指标，例如 CPU 和内存使用率。</li>
+        <li><codeph>gpsmon</codeph> 进程继续累积数据，直到它们从 <codeph>gpmmon</codeph> 
+            接收到转储命令为止。</li>
+        <li><codeph>gpsmon</codeph> 进程通过发送其累积的状态数据和日志警报到一个 <codeph>gpmmon</codeph> 
+            事件侦听线程来响应 dump 命令。</li>
+        <li><codeph>gpmmon</codeph> 事件处理程序将指标保存到 master 主机的 <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph> 
+            目录下的 <codeph>.txt</codeph> 文件。</li>
       </ol>
-      <p>At each <codeph>quantum</codeph> interval (15 seconds by default), <codeph>gpmmon</codeph>
-        performs the following steps:</p>
+      <p>在每一个 <codeph>quantum</codeph> 间隔 (默认为 15 秒), <codeph>gpmmon</codeph>
+        执行以下步骤:</p>
       <ol id="ol_jvt_rzb_41b">
-        <li>Sends a dump command to the <codeph>gpsmon</codeph> processes.</li>
-        <li>Gathers and converts the <codeph>.txt</codeph> files saved in <codeph>the
-            $MASTER_DATA_DIRECTORY/gpperfmon/data</codeph> directory into <codeph>.dat</codeph>
-          external data files for the <codeph>_now</codeph> and <codeph>_tail</codeph> external
-          tables in the <codeph>gpperfmon</codeph> database. <p>For example, disk space metrics are
-            added to the <codeph>diskspace_now.dat</codeph> and <codeph>_diskspace_tail.dat</codeph>
-            delimited text files. These text files are accessed via the
-              <codeph>diskspace_now</codeph> and <codeph>_diskspace_tail</codeph> tables in the
-              <codeph>gpperfmon</codeph> database.</p></li>
+        <li>发送一个 dump 命令到 <codeph>gpsmon</codeph> 进程。</li>
+        <li>收集和转换 <codeph>.txt</codeph> 文件（保存在 <codeph>the
+            $MASTER_DATA_DIRECTORY/gpperfmon/data</codeph> 目录中) 为 <codeph>.dat</codeph>
+          外部数据文件, 支持通过 <codeph>gpperfmon</codeph> 数据库中的 <codeph>_now</codeph> 和
+          <codeph>_tail</codeph> 外部表访问。 <p>例如, 磁盘空间指标被添加到
+          <codeph>diskspace_now.dat</codeph> 和 <codeph>_diskspace_tail.dat</codeph>
+            带分隔符的文本文件中. 这些文本文件经由 <codeph>gpperfmon</codeph> 数据库中的
+            <codeph>diskspace_now</codeph> 和 <codeph>_diskspace_tail</codeph> 表访问.</p></li>
       </ol>
-      <p>At each <codeph>harvest_interval</codeph> (120 seconds by default), <codeph>gpmmon</codeph>
-        performs the following steps for each <codeph>_tail</codeph> file:<ol id="ol_elf_11c_41b">
-          <li>Renames the <codeph>_tail</codeph> file to a <codeph>_stage</codeph> file.</li>
-          <li>Creates a new <codeph>_tail</codeph> file.</li>
-          <li>Appends data from the <codeph>_stage</codeph> file into the <codeph>_tail</codeph>
-            file.</li>
-          <li>Runs a SQL command to insert the data from the <codeph>_tail</codeph> external table
-            into the corresponding <codeph>_history</codeph> table.<p>For example, the contents of
-              the <codeph>_database_tail</codeph> external table is inserted into the
-                <codeph>database_history</codeph> regular (heap) table.</p></li>
-          <li>Deletes the <codeph>_tail</codeph> file after its contents have been loaded into the
-            database table.</li>
-          <li>Gathers all of the <codeph>gpdb-alert-*.csv</codeph> files in the
-              <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/logs</codeph> directory (except the most
-            recent, which the syslogger has open and is writing to) into a single file,
-              <codeph>alert_log_stage</codeph>.</li>
-          <li>Loads the <codeph>alert_log_stage</codeph> file into the
-              <codeph>log_alert_history</codeph> table in the <codeph>gpperfmon</codeph>
-            database.</li>
-          <li>Truncates the <codeph>alert_log_stage</codeph> file.</li>
+      <p>在每一个 <codeph>harvest_interval</codeph> (默认为 120 秒), <codeph>gpmmon</codeph>
+        对每一个 <codeph>_tail</codeph> 文件执行以下步骤:<ol id="ol_elf_11c_41b">
+          <li>重命名 <codeph>_tail</codeph> 为一个 <codeph>_stage</codeph> 文件.</li>
+          <li>创建一个新的 <codeph>_tail</codeph> 文件.</li>
+          <li>把数据从 <codeph>_stage</codeph> 文件追加进 <codeph>_tail</codeph> 文件.</li>
+          <li>允许一个 SQL 命令吧数据从 <codeph>_tail</codeph> 外部表插入进相应的
+          <codeph>_history</codeph> 表中.<p>例如, <codeph>_database_tail</codeph> 外部表的内容被插进
+          <codeph>database_history</codeph> 常规 (内存) 表中.</p></li>
+          <li>Deletes the <codeph>_tail</codeph> file 在内容被加载进数据库表中后，删除
+          <codeph>_tail</codeph> 文件。</li>
+          <li>收集所有 <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/logs</codeph> 目录下的
+          <codeph>gpdb-alert-*.csv</codeph> 文件 (除了 syslogger 已经打开并正在写入的最新文件) 
+          到单个文件 <codeph>alert_log_stage</codeph> 中.</li>
+          <li>把 <codeph>alert_log_stage</codeph> 文件内容加载进 <codeph>gpperfmon</codeph>
+          数据库的 <codeph>log_alert_history</codeph> 表中。</li>
+          <li>清空 <codeph>alert_log_stage</codeph> 文件.</li>
         </ol></p>
     </section>
-    <p>The following topics describe the contents of the tables in the <codeph>gpperfmon</codeph>
-      database.</p>
+    <p>以下主题分别描述 <codeph>gpperfmon</codeph> 数据库每表中的内容。</p>
   </body>
 </topic>

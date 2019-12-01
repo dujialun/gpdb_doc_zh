@@ -2,43 +2,39 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="db-segment">
-   <title> segment_* </title>
+   <title> segment_* 表</title>
    <body>
-      <p>The <codeph>segment_*</codeph> tables contain memory allocation statistics for the
-         Greenplum Database segment instances. This tracks the amount of memory consumed by all
-         postgres processes of a particular segment instance, and the remaining amount of memory
-         available to a segment as per the settings configured by the currently active resource management scheme (resource group-based or resource queue-based).
-         See the <cite>Greenplum Database Administrator Guide</cite> for more
-         information about resource management schemes.</p>
-      <p>There are three segment tables, all having the same columns:</p>
+      <p>The <codeph>segment_*</codeph> 包含 Greenplum 数据库 segment 实例的内存分配统计信息。 它跟踪每个特定 segment 实例上全部 postgres 进程的内存消费数量, 以及由当前资源管理方案(基于资源组或基于资源队列)设置的每个 segment 可用的剩余内存数量.
+         参见 <cite>Greenplum 数据库管理员指南 </cite> 了解更多关于资源管理方案的详细信息.</p>
+      <p>一共有三张 segment 表, 每张表都具有相同的结构(列):</p>
       <ul>
          <li>
-            <codeph>segment_now</codeph> is an external table whose data files are stored in
-               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. Current memory allocation
-            data is stored in <codeph>segment_now</codeph> during the period between data collection
-            from the <codeph>gpperfmon</codeph> agents and automatic commitment to the segment_history
-            table.</li>
+            <codeph>segment_now</codeph> 是一个外部表, 其数据文件位于
+               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. 在数据从 <codeph>gpperfmon</codeph> 数据采集代理程序获得以后，自动提交到 segment_history 表之前，
+            当前系统使用指标数据存储在 <codeph>segment_now</codeph> 表中。</li>
          <li>
-            <codeph>segment_tail</codeph> is an external table whose data files are stored in
-               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. This is a transitional table
-            for memory allocation data that has been cleared from <codeph>segment_now</codeph> but
-            has not yet been committed to <codeph>segment_history</codeph>. It typically only
-            contains a few minutes worth of data.</li>
+            <codeph>segment_tail</codeph> 是一个外部表, 其数据文件位于
+               <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/data</codeph>. 它是一个内存分配信息的过渡表，当数据已经从 
+               <codeph>segment_now</codeph> 中清除，但还没有提交到
+               <codeph>segment_history</codeph> 
+               表中时，暂存在这里。
+               它通常仅包含数据几分钟时间。</li>
          <li>
-            <codeph>segment_history</codeph> is a regular table that stores historical memory
-            allocation metrics. It is pre-partitioned into monthly partitions. Partitions are
-            automatically added in two month increments as needed. </li>
+            <codeph>segment_history</codeph> 是一个常规表，
+            用于存储历史内存分配指标。
+            它已预先设置为按月分区。
+            分区会根据需要以两个月为增量自动添加。</li>
       </ul>
-      <p>A particular segment instance is identified by its <codeph>hostname</codeph> and
-            <codeph>dbid</codeph> (the unique segment identifier as per the
-            <codeph>gp_segment_configuration</codeph> system catalog table).</p>
+      <p>每个特定 segment 实例通过 <codeph>hostname</codeph> 
+      和
+            <codeph>dbid</codeph> (<codeph>gp_segment_configuration</codeph> 系统目录表中的 segment 唯一标识) 定义.</p>
       <table>
          <tgroup cols="2">
             <thead>
                <row>
-                  <entry>Column</entry>
-                  <entry>Type</entry>
-                  <entry>Description</entry>
+                  <entry>列</entry>
+                  <entry>类型</entry>
+                  <entry>说明</entry>
                </row>
             </thead>
             <tbody>
@@ -50,44 +46,39 @@
                      <p>timestamp(0)</p>
                      <p>(without time zone)</p>
                   </entry>
-                  <entry>The time the row was created.</entry>
+                  <entry>该行的创建时间.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>dbid</codeph>
                   </entry>
                   <entry>int</entry>
-                  <entry>The segment ID (<codeph>dbid</codeph> from
-                        <codeph>gp_segment_configuration</codeph>).</entry>
+                  <entry>segment ID (<codeph>gp_segment_configuration</codeph> 中的 <codeph>dbid</codeph>).</entry>
                </row>
                <row>
                   <entry>
                      <codeph>hostname</codeph>
                   </entry>
                   <entry>charvar(64)</entry>
-                  <entry>The segment hostname.</entry>
+                  <entry>segment 主机名称.</entry>
                </row>
                <row>
                   <entry>
                      <codeph>dynamic_memory_used</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>The amount of dynamic memory (in bytes) allocated to query processes
-                     running on this segment.</entry>
+                  <entry>当前 segment 上分配给查询进程的动态内存数量(单位: 字节).</entry>
                </row>
                <row>
                   <entry>
                      <codeph>dynamic_memory_available</codeph>
                   </entry>
                   <entry>bigint</entry>
-                  <entry>The amount of additional dynamic memory (in bytes) that the segment can
-                     request before reaching the limit set by the currently active
-                     resource management scheme (resource group-based or resource queue-based). </entry>
+                  <entry>在到达当前资源管理方案(基于资源组或基于资源队列)设置限制前，segment 上还可分配的动态内存数量(单位: 字节). </entry>
                </row>
             </tbody>
          </tgroup>
       </table>
-      <p>See also the views <codeph>memory_info</codeph> and <codeph>dynamic_memory_info</codeph>
-         for aggregated memory allocation and utilization by host.</p>
+      <p>参见 <codeph>memory_info</codeph> 视图和 <codeph>dynamic_memory_info</codeph> 视图了解更多主机上内存分配汇总和使用信息.</p>
    </body>
 </topic>

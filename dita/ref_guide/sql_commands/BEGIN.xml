@@ -4,109 +4,92 @@
 <topic id="topic1">
     <title id="be20941">BEGIN</title>
     <body>
-        <p id="sql_command_desc">Starts a transaction block.</p>
+        <p id="sql_command_desc">启动事务块。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock id="sql_command_synopsis">BEGIN [WORK | TRANSACTION] [<varname>transaction_mode</varname>]</codeblock>
-            <p>where <varname>transaction_mode</varname> is:</p>
+            <p>其中<varname>transaction_mode</varname>是：</p>
             <codeblock>   ISOLATION LEVEL {READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SERIALIZABLE}
    READ WRITE | READ ONLY
    [ NOT ] DEFERRABLE</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>BEGIN</codeph> initiates a transaction block, that is, all statements after a
-                    <codeph>BEGIN</codeph> command will be executed in a single transaction until an
-                explicit <codeph>COMMIT</codeph> or <codeph>ROLLBACK</codeph> is given. By default
-                (without <codeph>BEGIN</codeph>), Greenplum Database executes transactions in
-                autocommit mode, that is, each statement is executed in its own transaction and a
-                commit is implicitly performed at the end of the statement (if execution was
-                successful, otherwise a rollback is done). </p>
-            <p>Statements are executed more quickly in a transaction block, because transaction
-                start/commit requires significant CPU and disk activity. Execution of multiple
-                statements inside a transaction is also useful to ensure consistency when making
-                several related changes: other sessions will be unable to see the intermediate
-                states wherein not all the related updates have been done. </p>
-            <p>If the isolation level, read/write mode, or deferrable mode is specified, the new
-                transaction has those characteristics, as if <codeph><xref
-                        href="./SET_TRANSACTION.xml#topic1" type="topic" format="dita"/></codeph>
-                was executed. </p>
+            <title>描述</title>
+            <p><codeph>BEGIN</codeph>启动事务块，即<codeph>BEGIN</codeph>命令之后的所有语句将在单个事务中执行，
+                直到给出显式的<codeph>COMMIT</codeph>或<codeph>ROLLBACK</codeph>。
+                默认情况下（没有<codeph>BEGIN</codeph>），Greenplum数据库以自动提交模式执行事务，
+                即，每个语句在其自己的事务中执行，并且在语句末尾隐式执行提交（如果执行成功，否则回滚） 。
+                </p>
+            <p>在事务块中，语句的执行速度更快，因为事务启动/提交需要大量的CPU和磁盘活动。
+                在事务中执行多个语句对于确保进行一些相关更改时的一致性也很有用：
+                其他会话将无法看到中间状态，其中不是所有相关更新都完成。</p>
+            <p>如果指定了隔离级别，读/写模式或可延迟模式，则新事务具有那些特征，
+                就像执行<codeph><xref href="./SET_TRANSACTION.xml#topic1" type="topic" format="dita"/></codeph>一样。
+                </p>
         </section>
         <section id="section4">
-            <title>Parameters</title>
+            <title>参数</title>
             <parml>
                 <plentry>
                     <pt>WORK</pt>
                     <pt>TRANSACTION</pt>
-                    <pd>Optional key words. They have no effect.</pd>
+                    <pd>可选关键字。它们没有作用。</pd>
                 </plentry>
                 <plentry>
                     <pt>SERIALIZABLE</pt>
                     <pt>READ COMMITTED</pt>
                     <pt>READ UNCOMMITTED</pt>
-                    <pd>The SQL standard defines four transaction isolation levels: <codeph>READ
-                            UNCOMMITTED</codeph>, <codeph>READ COMMITTED</codeph>,
-                            <codeph>REPEATABLE READ</codeph>, and
-                        <codeph>SERIALIZABLE</codeph>.</pd>
-                    <pd><codeph>READ UNCOMMITTED</codeph> allows transactions to see changes made by
-                        uncomitted concurrent transactions. This is not possible in Greenplum
-                        Database, so <codeph>READ UNCOMMITTED</codeph> is treated the same as
-                            <codeph>READ COMMITTED</codeph>.</pd>
-                    <pd><codeph>READ COMMITTED</codeph>, the default isolation level in Greenplum
-                        Database, guarantees that a statement can only see rows committed before it
-                        began. The same statement executed twice in a transaction can produce
-                        different results if another concurrent transaction commits after the
-                        statement is executed the first time. </pd>
-                    <pd>The <codeph>REPEATABLE READ</codeph> isolation level guarantees that a
-                        transaction can only see rows committed before it began. <codeph>REPEATABLE
-                            READ</codeph> is the strictest transaction isolation level Greenplum
-                        Database supports. Applications that use the <codeph>REPEATABLE
-                            READ</codeph> isolation level must be prepared to retry transactions due
-                        to serialization failures.</pd>
-                    <pd>The <codeph>SERIALIZABLE</codeph> transaction isolation level guarantees
-                        that executing multiple concurrent transactions produces the same effects as
-                        running the same transactions one at a time. If you specify
-                            <codeph>SERIALIZABLE</codeph>, Greenplum Database falls back to
-                            <codeph>REPEATABLE READ</codeph>.</pd>
-                    <pd>Specifying <codeph>DEFERRABLE</codeph> has no effect in Greenplum Database,
-                        but the syntax is supported for compatibility with PostgreSQL. A transaction
-                        can only be deferred if it is <codeph>READ ONLY</codeph> and
-                            <codeph>SERIALIZABLE</codeph>, and Greenplum Database does not support
-                            <codeph>SERIALIAZABLE</codeph> transactions. </pd>
+                    <pd>SQL标准定义了四个事务隔离级别：
+                        <codeph>READ UNCOMMITTED</codeph>，<codeph>READ COMMITTED</codeph>，<codeph>REPEATABLE READ</codeph>和<codeph>SERIALIZABLE</codeph>。
+                        </pd>
+                    <pd><codeph>READ UNCOMMITTED</codeph>允许事务查看未提交的并发事务所做的更改。
+                        在Greenplum数据库中这是不可能的，因此<codeph>READ UNCOMMITTED</codeph>与<codeph>READ COMMITTED</codeph>相同。
+                        </pd>
+                    <pd><codeph>READ COMMITTED</codeph>是Greenplum数据库中的默认隔离级别，可确保语句只能看到在开始之前提交的行。
+                        如果在第一次执行该语句后又提交了另一个并发事务，则在一个事务中执行两次的同一条语句可能会产生不同的结果。
+                        </pd>
+                    <pd><codeph>REPEATABLE READ</codeph>隔离级别确保事务只能看到在事务开始之前提交的行。
+                        <codeph>REPEATABLE READ</codeph>是Greenplum数据库支持的最严格的事务隔离级别。
+                        由于序列化失败，必须准备使用<codeph>REPEATABLE READ</codeph>隔离级别的应用程序以重试事务。
+                        </pd>
+                    <pd><codeph>SERIALIZABLE</codeph>事务隔离级别确保执行多个并发事务与串行执行相同的事务产生的效果相同。
+                        如果指定<codeph>SERIALIZABLE</codeph>，则Greenplum数据库将退回到<codeph>REPEATABLE READ</codeph>。
+                        </pd>
+                    <pd>指定<codeph>DEFERRABLE</codeph>在Greenplum数据库中无效，但是支持语法以与PostgreSQL兼容。
+                        仅当事务为<codeph>READ ONLY</codeph>且<codeph>SERIALIZABLE</codeph>，
+                        并且Greenplum数据库不支持<codeph>SERIALIAZABLE</codeph>事务时，才可以推迟该事务。
+                        </pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Notes</title>
-            <p><codeph><xref href="./START_TRANSACTION.xml#topic1" type="topic" format="dita"
-                    /></codeph> has the same functionality as <codeph>BEGIN</codeph>. </p>
-            <p>Use <codeph><xref href="./COMMIT.xml#topic1" type="topic" format="dita"/></codeph> or
-                        <codeph><xref href="./ROLLBACK.xml#topic1" type="topic" format="dita"
-                    /></codeph> to terminate a transaction block. </p>
-            <p>Issuing <codeph>BEGIN</codeph> when already inside a transaction block will provoke a
-                warning message. The state of the transaction is not affected. To nest transactions
-                within a transaction block, use savepoints (see <codeph>SAVEPOINT</codeph>).</p>
+            <title>注解</title>
+            <p><codeph><xref href="./START_TRANSACTION.xml#topic1" type="topic" format="dita"/></codeph>具有与<codeph>BEGIN</codeph>相同的功能。</p>
+            <p>使用<codeph><xref href="./COMMIT.xml#topic1" type="topic" format="dita"/></codeph>或<codeph><xref href="./ROLLBACK.xml#topic1" type="topic" format="dita"/></codeph>终止事务块。</p>
+            <p>如果已经在事务块中，则发出<codeph>BEGIN</codeph>会引起警告消息。
+                事务状态不受影响。
+                要将事务嵌套在事务块中，请使用保存点（请参见<codeph>SAVEPOINT</codeph>）。
+                </p>
         </section>
         <section id="section6">
-            <title>Examples</title>
-            <p>To begin a transaction block: </p>
+            <title>示例</title>
+            <p>要开始事务块：</p>
             <codeblock>BEGIN;</codeblock>
-            <p>To begin a transaction block with the repeatable read isolation level:</p>
+            <p>要以可重复读隔离级别开始事务块：</p>
             <codeblock>BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;</codeblock>
         </section>
         <section id="section7">
-            <title>Compatibility</title>
-            <p><codeph>BEGIN</codeph> is a Greenplum Database language extension. It is equivalent
-                to the SQL-standard command <codeph><xref href="./START_TRANSACTION.xml#topic1"
-                        type="topic" format="dita"/></codeph>.</p>
-            <p><codeph>DEFERRABLE</codeph>
-                <varname>transaction_mode</varname> is a Greenplum Database language extension.</p>
-            <p>Incidentally, the <codeph>BEGIN</codeph> key word is used for a different purpose in
-                embedded SQL. You are advised to be careful about the transaction semantics when
-                porting database applications.</p>
+            <title>兼容性</title>
+            <p><codeph>BEGIN</codeph>是Greenplum数据库语言扩展。
+                它等效于SQL标准命令<codeph><xref href="./START_TRANSACTION.xml#topic1" type="topic" format="dita"/></codeph>。</p>
+            <p><codeph>DEFERRABLE</codeph> <varname>transaction_mode</varname>是Greenplum数据库语言的扩展。
+                </p>
+            <p>附带地，<codeph>BEGIN</codeph>关键字在嵌入式SQL中用于不同的目的。
+                建议您在移植数据库应用程序时注意事务语义。
+                </p>
         </section>
         <section id="section8">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="./COMMIT.xml#topic1" type="topic" format="dita"/></codeph>,
                         <codeph><xref href="./ROLLBACK.xml#topic1" type="topic" format="dita"
                     /></codeph>, <codeph><xref href="./START_TRANSACTION.xml#topic1" type="topic"

@@ -1,5 +1,5 @@
 ---
-title: Reading Hive Table Data
+title: 读取Hive表数据
 ---
 
 <!--
@@ -21,41 +21,41 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-Apache Hive is a distributed data warehousing infrastructure. Hive facilitates managing large data sets supporting multiple data formats, including comma-separated value (.csv) TextFile, RCFile, ORC, and Parquet. 
+Apache Hive是一个分布式数据仓库基础架构。 Hive有助于管理支持多种数据格式的大型数据集，包括逗号分隔值(.csv)、TextFile、RCFile、 ORC、和Parquet。
 
-The PXF Hive connector reads data stored in a Hive table. This section describes how to use the PXF Hive connector. 
+PXF Hive连接器读取Hive表中存储的数据。本节描述如何使用PXF Hive连接器。
 
-## <a id="prereq"></a>Prerequisites
+## <a id="prereq"></a>先决条件
 
-Before working with Hive table data using PXF, ensure that you have met the PXF Hadoop [Prerequisites](access_hdfs.html#hadoop_prereq).
+在使用PXF处理Hive表数据之前，请确保您已满足PXF Hadoop [先决条件](access_hdfs.html#hadoop_prereq)。
 
-If you plan to use PXF filter pushdown with Hive, ensure that the `hive-site.xml` configuration parameter `hive.metastore.integral.jdo.pushdown` exists and is set to `true`.
+如果您计划将PXF过滤器下推与Hive一起使用，请确保 `hive-site.xml` 配置参数 `hive.metastore.integral.jdo.pushdown` 存在并将其设置为 `true`。
 
 
-## <a id="hive_fileformats"></a>Hive Data Formats
+## <a id="hive_fileformats"></a>Hive数据格式
 
-The PXF Hive connector supports several data formats, and has defined the following profiles for accessing these formats:
+PXF Hive连接器支持多种数据格式，并定义了以下用于访问这些格式的配置文件：
 
-| File Format  | Description | Profile |
+| 文件格式| 描述| 配置文件|
 |-------|---------------------------|-------|
-| TextFile | Flat file with data in comma-, tab-, or space-separated value format or JSON notation. | Hive, HiveText |
-| SequenceFile | Flat file consisting of binary key/value pairs. | Hive |
-| RCFile | Record columnar data consisting of binary key/value pairs; high row compression rate. | Hive, HiveRC |
-| ORC | Optimized row columnar data with stripe, footer, and postscript sections; reduces data size. | Hive, HiveORC, HiveVectorizedORC |
-| Parquet | Compressed columnar data representation. | Hive |
+| TextFile | 平面文件，其数据以逗号，制表符或空格分隔的值格式或JSON表示法。 | Hive, HiveText |
+| SequenceFile | 平面文件，由二进制键/值对组成。 | Hive |
+| RCFile | 列式记录文件，由二进制键/值对组成; 高行压缩率。 | Hive, HiveRC |
+| ORC | 优化了的行列数据文件，具有stripe、footer、和postscript部分; 减少数据大小. | Hive, HiveORC, HiveVectorizedORC |
+| Parquet | 压缩的列式数据。 | Hive |
 
-**Note**: The `Hive` profile supports all file storage formats. It will use the optimal `Hive*` profile for the underlying file format type.
+**注意**: `Hive` 配置文件支持所有文件存储格式。 它将对底层文件类型使用最佳的 `Hive*` 配置文件。
 
-## <a id="hive_datatypemap"></a>Data Type Mapping
+## <a id="hive_datatypemap"></a>数据类型映射
 
-The PXF Hive connector supports primitive and complex data types.
+PXF Hive连接器支持基础和复杂数据类型。
 
-### <a id="hive_datatypemap_prim" class="no-quick-link"></a>Primitive Data Types
-To represent Hive data in Greenplum Database, map data values that use a primitive data type to Greenplum Database columns of the same type.
+### <a id="hive_datatypemap_prim" class="no-quick-link"></a>基础数据类型
+要在Greenplum数据库中展示Hive数据，请将使用基础数据类型的数据值映射到相同类型的Greenplum数据列。
 
-The following table summarizes external mapping rules for Hive primitive types.
+下表总结了Hive基本数据类型的外部映射规则。
 
-| Hive Data Type  | Greenplum Data Type |
+| Hive 数据类型  | Greenplum 数据类型 |
 |-------|---------------------------|
 | boolean    | bool |
 | int   | int4 |
@@ -69,36 +69,36 @@ The following table summarizes external mapping rules for Hive primitive types.
 | timestamp   | timestamp |
 
 
-**Note**: The `HiveVectorizedORC` profile does not support the timestamp data type.
+**注意**: `HiveVectorizedORC` 配置文件不支持 timestamp 数据类型。
 
-### <a id="hive_datatypemap_complex" class="no-quick-link"></a>Complex Data Types
+### <a id="hive_datatypemap_complex" class="no-quick-link"></a>复杂数据类型
 
-Hive supports complex data types including array, struct, map, and union. PXF maps each of these complex types to `text`. You can create Greenplum Database functions or application code to extract subcomponents of these complex data types.
+Hive支持的数据类型，包括数组(array), 结构(struct), 映射(map), 以及混合类型。 PXF 将以上复杂数据类型映射为 `text`。您可以创建Greenplum数据库函数或应用程序代码来提取这些复杂数据类型的子部分。
 
-Examples using complex data types with the `Hive` and `HiveORC` profiles are provided later in this topic.
+本章稍后提供通过 `Hive` 和 `HiveORC` 配置文件使用复杂数据类型的示例。
 
-**Note**: The `HiveVectorizedORC` profile does not support complex types.
+**注意**: `HiveVectorizedORC` 配置文件不支持复杂类型。
 
-## <a id="hive_sampledset"></a>Sample Data Set
+## <a id="hive_sampledset"></a>样本数据集
 
-Examples presented in this topic operate on a common data set. This simple data set models a retail sales operation and includes fields with the following names and data types:
+本主题中介绍的示例在公共数据集上运行。 这个简单的数据集为零售业务建模，并包含具有以下名称和数据类型的字段：
 
-| Column Name  | Data Type |
+| 字段名  | 数据类型|
 |-------|---------------------------|
 | location | text |
 | month | text |
 | number\_of\_orders | integer |
 | total\_sales | double |
 
-Prepare the sample data set for use:
+准备样本数据集以备用：
 
-1. First, create a text file:
+1. 首先，创建一个文本文件：
 
     ```
     $ vi /tmp/pxf_hive_datafile.txt
     ```
 
-2. Add the following data to `pxf_hive_datafile.txt`; notice the use of the comma `,` to separate the four field values:
+2. 将以下数据添加到 `pxf_hive_datafile.txt`; 注意使用逗号 `,` 分隔四个字段的值：
 
     ```
     Prague,Jan,101,4875.33
@@ -113,24 +113,24 @@ Prepare the sample data set for use:
     Beijing,Dec,100,4248.41
     ```
 
-Make note of the path to `pxf_hive_datafile.txt`; you will use it in later exercises.
+记住 `pxf_hive_datafile.txt` 的路径; 您将在后续的练习中使用它。
 
 
-## <a id="hive_cmdline"></a>Hive Command Line
+## <a id="hive_cmdline"></a>Hive命令行
 
-The Hive command line is a subsystem similar to that of `psql`. To start the Hive command line:
+Hive命令行是类似 `psql` 的子系统。启动Hive命令行：
 
 ``` shell
 $ HADOOP_USER_NAME=hdfs hive
 ```
 
-The default Hive database is named `default`. 
+默认的Hive数据库名为 `default`。
 
-### <a id="hive_cmdline_example" class="no-quick-link"></a>Example: Creating a Hive Table
+### <a id="hive_cmdline_example" class="no-quick-link"></a>示例：创建Hive表
 
-Create a Hive table to expose the sample data set.
+创建一个Hive表以展现示例数据集。
 
-1. Create a Hive table named `sales_info` in the `default` database:
+1. 在 `default` 数据库中创建一个名为 `sales_info` 的Hive表：
 
     ``` sql
     hive> CREATE TABLE sales_info (location string, month string,
@@ -139,28 +139,28 @@ Create a Hive table to expose the sample data set.
             STORED AS textfile;
     ```
 
-    Notice that:
-    - The `STORED AS textfile` subclause instructs Hive to create the table in Textfile (the default) format.  Hive Textfile format supports comma-, tab-, and space-separated values, as well as data specified in JSON notation.
-    - The `DELIMITED FIELDS TERMINATED BY` subclause identifies the field delimiter within a data record (line). The `sales_info` table field delimiter is a comma (`,`).
+    注意：
+    - `STORED AS textfile` 子句指示Hive以 Textfile (默认) 格式创建表。 Hive Textfile格式支持逗号、制表符和空格分隔的值， 以及用JSON表示的数据。
+    - `DELIMITED FIELDS TERMINATED BY` 子句定义数据记录(行)中的字段分隔符。 `sales_info` 表字段分隔符是逗号(`,`)。
 
-2. Load the `pxf_hive_datafile.txt` sample data file into the `sales_info` table that you just created:
+2. 将 `pxf_hive_datafile.txt` 示例数据文件加载到您刚刚创建的 `sales_info` 表中：
 
     ``` sql
     hive> LOAD DATA LOCAL INPATH '/tmp/pxf_hive_datafile.txt'
             INTO TABLE sales_info;
     ```
     
-    In examples later in this section, you will access the `sales_info` Hive table directly via PXF. You will also insert `sales_info` data into tables of other Hive file format types, and use PXF to access those directly as well.
+    在本章稍后的例子中，您将通过PXF直接访问 `sales_info` Hive 表。 另外您还将在其他Hive文件格式类型的表中插入 `sales_info` 数据，并使用PXF直接访问这些数据。
 
-3. Perform a query on `sales_info` to verify that you loaded the data successfully:
+3. 在`sales_info`上执行查询以验证是否成功加载了数据：
 
     ``` sql
     hive> SELECT * FROM sales_info;
     ```
 
-### <a id="hive_cmdline_fileloc" class="no-quick-link"></a>Determining the HDFS Location of a Hive Table
+### <a id="hive_cmdline_fileloc" class="no-quick-link"></a>确定Hive表的HDFS位置
 
-Should you need to identify the HDFS file location of a Hive managed table, reference it using its HDFS file path. You can determine a Hive table's location in HDFS using the `DESCRIBE` command. For example:
+如果需要指定Hive表的HDFS文件位置，请使用其HDFS文件路径引用它。 您可以通过 `DESCRIBE` 命令确定Hive表在HDFS中的位置。例如：
 
 ``` sql
 hive> DESCRIBE EXTENDED sales_info;
@@ -171,13 +171,13 @@ location:hdfs://<namenode>:<port>/apps/hive/warehouse/sales_info
 ```
 
 
-## <a id="hive_queryextdata"></a>Querying External Hive Data
+## <a id="hive_queryextdata"></a>查询外部Hive数据
 
-You can create a Greenplum Database external table to access Hive table data.   As described previously, the PXF Hive connector defines specific profiles to support different file formats. These profiles are named `Hive`, `HiveText`, and `HiveRC`, `HiveORC`, and `HiveVectorizedORC`. 
+您可以创建一个Greenplum数据外部表以访问Hive表中的数据。 如前所述，PXF Hive 连接器定义了特定的配置文件以支持不同的文件格式。 这些配置文件分别为 `Hive`、 `HiveText`、`HiveRC`、 `HiveORC` 和 `HiveVectorizedORC`。
 
-The `HiveText` and `HiveRC` profiles are specifically optimized for text and RCFile formats, respectively. The `HiveORC` and `HiveVectorizedORC` profiles are optimized for ORC file formats. The `Hive` profile is optimized for all file storage types; you can use the `Hive` profile when the underlying Hive table is composed of multiple partitions with differing file formats.
+`HiveText` 和 `HiveRC` 配置文件分别针对文本和RCFile格式进行了优化。 `HiveORC` 和 `HiveVectorizedORC` 配置文件针对ORC文件格式进行了优化。 `Hive` 配置文件为所有文件存储类型进行了优化。 当Hive表底层由不同文件格式的多个分区组成时，您可以使用 `Hive` 配置文件。
 
-Use the following syntax to create a Greenplum Database external table that references a Hive table:
+使用以下语法创建引用Hive表的Greenplum数据库外部表：
 
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
@@ -187,29 +187,29 @@ LOCATION ('pxf://<hive-db-name>.<hive-table-name>
 FORMAT 'CUSTOM|TEXT' (FORMATTER='pxfwritable_import' | delimiter='<delim>')
 ```
 
-Hive connector-specific keywords and values used in the [CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) call are described below.
+[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) 命令中Hive连接器使用的特定关键字和值见下表中描述。
 
-| Keyword  | Value |
+| 关键字  | 值 |
 |-------|-------------------------------------|
-| \<hive&#8209;db&#8209;name\>    | The name of the Hive database. If omitted, defaults to the Hive database named `default`. |
-| \<hive&#8209;table&#8209;name\>    | The name of the Hive table. |
-| PROFILE    | The `PROFILE` keyword must specify one of the values `Hive`, `HiveText`, `HiveRC`, `HiveORC`, or `HiveVectorizedORC`. |
-| DELIMITER    | The custom options `DELIMITER` clause is required for both the `HiveText` and `HiveRC` profiles and identifies the field delimiter used in the Hive data set.  \<delim\> must be a single ascii character or specified in hexadecimal representation. |
-| FORMAT (`Hive`, `HiveORC`, and `HiveVectorizedORC` profiles)   | The `FORMAT` clause must specify `'CUSTOM'`. The `CUSTOM` format requires the built-in `pxfwritable_import` `formatter`.   |
-| FORMAT (`HiveText` and `HiveRC` profiles) | The `FORMAT` clause must specify `TEXT`. The `delimiter` must be specified a second time in the '\<delim\>' formatting option. |
+| \<hive&#8209;db&#8209;name\>    | Hive数据库的名称。 如果省略，默认为名为 `default` 的Hive数据库 |
+| \<hive&#8209;table&#8209;name\>    | Hive表的名称 |
+| PROFILE    | `PROFILE` 关键字的值必须指定为 `Hive`, `HiveText`, `HiveRC`, `HiveORC`, 或 `HiveVectorizedORC` 之一 |
+| DELIMITER    | `HiveText` 和 `HiveRC` 配置文件都需要 `DELIMITER` 自定义选项子句， 并定义Hive数据集中使用的字段分隔符。  \<delim\> 必须为单个ASCII字符或以十六进制表示形式指定 |
+| FORMAT (`Hive`, `HiveORC`, 和 `HiveVectorizedORC` 配置文件)   | `FORMAT` 子句必须指定为 `'CUSTOM'`。 `CUSTOM` 格式需要内置的 `pxfwritable_import` `formatter`   |
+| FORMAT (`HiveText` 和 `HiveRC` 配置文件) | `FORMAT` 子句必须指定为 `TEXT`。 必须在 `delimiter` 中再次指定 '\<delim\>' 格式化选项 |
 
 
-## <a id="hive_text"></a>Accessing TextFile-Format Hive Tables
+## <a id="hive_text"></a>访问TextFile格式的Hive表
 
-You can use the `Hive` and `HiveText` profiles to access Hive table data stored in TextFile format.
+您可以使用`Hive` 和 `HiveText` 配置文件来访问以TextFile格式存储的Hive表数据。
 
-**Note**: When you use the `HiveText` profile, you **must** specify a delimiter option in both the `LOCATION` and `FORMAT` clauses.
+**注意**: 当您使用 `HiveText` 配置文件，您 **必须** 在 `LOCATION` 和 `FORMAT` 子句中都指定一个分隔符。
 
-### <a id="hive_hive_example" class="no-quick-link"></a>Example: Using the Hive Profile
+### <a id="hive_hive_example" class="no-quick-link"></a>示例: 使用Hive配置文件
 
-Use the `Hive` profile to create a readable Greenplum Database external table that references the Hive `sales_info` textfile format table that you created earlier.
+使用 `Hive` 配置文件创建一个可读的Greenplum数据库外部表，该表引用此前您创建的Hive文本格式表 `sales_info`。
 
-1. Create the external table:
+1. 创建外部表:
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE salesinfo_hiveprofile(location text, month text, num_orders int, total_sales float8)
@@ -217,7 +217,7 @@ Use the `Hive` profile to create a readable Greenplum Database external table th
               FORMAT 'custom' (FORMATTER='pxfwritable_import');
     ```
 
-2. Query the table:
+2. 查询表:
 
     ``` sql
     postgres=# SELECT * FROM salesinfo_hiveprofile;
@@ -232,11 +232,11 @@ Use the `Hive` profile to create a readable Greenplum Database external table th
      ...
     ```
 
-### <a id="hive_hivetext_example" class="no-quick-link"></a>Example: Using the HiveText Profile
+### <a id="hive_hivetext_example" class="no-quick-link"></a>示例: 使用HiveText配置文件
 
-Use the PXF `HiveText` profile to create a readable Greenplum Database external table from the Hive `sales_info` textfile format table that you created earlier.
+使用 `HiveText` 配置文件创建一个可读的Greenplum数据库外部表，该表引用此前您创建的Hive文本格式表 `sales_info`。
 
-1. Create the external table:
+1. 创建外部表:
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE salesinfo_hivetextprofile(location text, month text, num_orders int, total_sales float8)
@@ -244,11 +244,11 @@ Use the PXF `HiveText` profile to create a readable Greenplum Database external 
                FORMAT 'TEXT' (delimiter=E',');
     ```
 
-    Notice that:
-    - The `LOCATION` subclause `DELIMITER` value is specified in hexadecimal format. The `\x` prefix instructs PXF to interpret the following characters as hexadecimal. `2c` is the hex value for the comma character.
-    - The `FORMAT` subclause `delimiter` value is specified as the single ascii comma character `','`. `E` escapes the character.
+    注意:
+    - `LOCATION` 子句 `DELIMITER` 的值是以十六进制格式指定的。 `\x` 前缀指示PXF将以下字符解释为十六进制。`2c` 是逗号字符的十六进制。
+    - `FORMAT` 子句 `delimiter` 的值指定为单个ASCII逗号字符 `','`。 `E` 转义字符.
 
-2. Query the external table:
+2. 查询外部表:
 
     ``` sql
     postgres=# SELECT * FROM salesinfo_hivetextprofile WHERE location='Beijing';
@@ -263,17 +263,17 @@ Use the PXF `HiveText` profile to create a readable Greenplum Database external 
     ```
 
 
-## <a id="hive_hiverc"></a>Accessing RCFile-Format Hive Tables 
+## <a id="hive_hiverc"></a>访问RCFile格式的Hive表
 
-The RCFile Hive table format is used for row columnar formatted data. The PXF `HiveRC` profile provides access to RCFile data.
+RCFile Hive表格式用于行列格式的数据。PXF `HiveRC` 配置文件提供对RCFile数据的访问。
 
-**Note**: When you use the `HiveRC` profile, you **must** specify a delimiter option in both the `LOCATION` and `FORMAT` clauses.
+**注意**: 使用 `HiveRC` 配置文件时，**必须** 在 `LOCATION` 和 `FORMAT` 子句中都指定字段分隔符。
 
-### <a id="hive_hiverc_example" class="no-quick-link"></a>Example: Using the HiveRC Profile
+### <a id="hive_hiverc_example" class="no-quick-link"></a>示例: 使用HiveRC配置文件
 
-Use the `HiveRC` profile to query RCFile-formatted data in a Hive table.
+使用 `HiveRC` 配置文件在Hive中查询RCFile格式的数据。
 
-1. Start the `hive` command line and create a Hive table stored in RCFile format:
+1. 启动 `hive` 命令行并创建一个以RCFile格式存储的Hive表:
 
     ``` shell
     $ HADOOP_USER_NAME=hdfs hive
@@ -286,21 +286,21 @@ Use the `HiveRC` profile to query RCFile-formatted data in a Hive table.
           STORED AS rcfile;
     ```
 
-2. Insert the data from the `sales_info` table into `sales_info_rcfile`:
+2. 将 `sales_info` 表的数据写入到 `sales_info_rcfile`:
 
     ``` sql
     hive> INSERT INTO TABLE sales_info_rcfile SELECT * FROM sales_info;
     ```
 
-    A copy of the sample data set is now stored in RCFile format in the Hive `sales_info_rcfile` table. 
+    样本数据集的副本现在以RCFile格式存储在Hive `sales_info_rcfile` 表中。
     
-3. Query the `sales_info_rcfile` Hive table to verify that the data was loaded correctly:
+3. 查询 `sales_info_rcfile` Hive 表以验证数据是否正确加载:
 
     ``` sql
     hive> SELECT * FROM sales_info_rcfile;
     ```
 
-4. Use the PXF `HiveRC` profile to create a readable Greenplum Database external table that references the Hive `sales_info_rcfile` table that you created in the previous steps. You *must* specify a delimiter option in both the `LOCATION` and `FORMAT` clauses.:
+4. 使用 PXF `HiveRC` 配置文件创建Greenplum数据库可读外部表，该表引用此前步骤您创建的Hive `sales_info_rcfile` 表。您*必须* 在 `LOCATION` 和 `FORMAT` 子句中都指定分隔符:
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE salesinfo_hivercprofile(location text, month text, num_orders int, total_sales float8)
@@ -308,7 +308,7 @@ Use the `HiveRC` profile to query RCFile-formatted data in a Hive table.
                FORMAT 'TEXT' (delimiter=E',');
     ```
 
-5. Query the external table:
+5. 查询外部表:
 
     ``` sql
     postgres=# SELECT location, total_sales FROM salesinfo_hivercprofile;
@@ -324,35 +324,35 @@ Use the `HiveRC` profile to query RCFile-formatted data in a Hive table.
      ...
     ```
 
-## <a id="hive_orc"></a>Accessing ORC-Format Hive Tables
+## <a id="hive_orc"></a>访问ORC格式的Hive表
 
-The Optimized Row Columnar (ORC) file format is a columnar file format that provides a highly efficient way to both store and access HDFS data. ORC format offers improvements over text and RCFile formats in terms of both compression and performance. PXF supports ORC version 1.2.1.
+优化行列(ORC) 文件格式是一种列文件格式，提供了一种高效的方式来存储和访问HDFS数据。 ORC 格式在压缩和性能方面都优于文本和RCFile格式。 PXF 支持ORC 1.2.1版本。
 
-ORC is type-aware and specifically designed for Hadoop workloads. ORC files store both the type of and encoding information for the data in the file. All columns within a single group of row data (also known as stripe) are stored together on disk in ORC format files. The columnar nature of the ORC format type enables read projection, helping avoid accessing unnecessary columns during a query.
+ORC 具有类型感知能力，且专门针对Hadoop工作负载而设计。 ORC文件存储文件中数据的类型和编码信息。一组行数据(也称为stripe)中的所有列一起以ORC格式文件存储于磁盘上。ORC 格式类型的列性质允许进行读取投影，从而有助于避免在查询期间访问不必要的列。
 
-ORC also supports predicate pushdown with built-in indexes at the file, stripe, and row levels, moving the filter operation to the data loading phase.
+ORC 还支持在file, stripe, row 级别使用内置索引进行谓词下推，从而将过滤操作移至数据加载阶段。
 
-Refer to the [Apache orc](https://orc.apache.org/docs/) and the Apache Hive [LanguageManual ORC](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+ORC) websites for detailed information about the ORC file format.
+有关ORC文件格式的详细信息，请参考[Apache orc](https://orc.apache.org/docs/) 和 Apache Hive [LanguageManual ORC](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+ORC) 网站。
 
-### <a id="orc-profiles" class="no-quick-link"></a>Profiles Supporting the ORC File Format
+### <a id="orc-profiles" class="no-quick-link"></a>支持ORC文件格式的配置文件
 
-When choosing an ORC-supporting profile, consider the following:
+选择支持ORC的配置文件时，请考虑以下事情:
 
-- The `HiveORC` profile:
-    - Reads a single row of data at a time.
-    - Supports column projection. 
-    - Supports complex types. You can access Hive tables composed of array, map, struct, and union data types. PXF serializes each of these complex types to `text`.  
+- `HiveORC` 配置文件:
+    - 一次读取一行
+    - 支持列投影
+    - 支持复杂类型。 您可以访问由数据(array), 映射(map), 结构(struct), 和联合数据类型组成的Hive表。 PXF 将这些复杂类型序列化为 `text`。
 
-- The `HiveVectorizedORC` profile:
-    - Reads up to 1024 rows of data at once.
-    - Does not support column projection.
-    - Does not support complex types or the timestamp data type.
+- `HiveVectorizedORC` 配置文件:
+    - 一次最多读取1024行
+    - 不支持列投影
+    - 不支持复杂类型或 timestamp 数据类型
 
-### <a id="hive_hiveorc_example" class="no-quick-link"></a>Example: Using the HiveORC Profile
+### <a id="hive_hiveorc_example" class="no-quick-link"></a>示例: 使用HiveORC配置文件
 
-In the following example, you will create a Hive table stored in ORC format and use the `HiveORC` profile to query this Hive table.
+在接下来的例子中，您将创建以ORC格式存储的Hive表，并使用 `HiveORC` 配置文件查询此Hive表。
 
-1. Create a Hive table with ORC file format:
+1. 用ORC文件格式创建Hive表:
 
     ``` shell
     $ HADOOP_USER_NAME=hdfs hive
@@ -364,21 +364,21 @@ In the following example, you will create a Hive table stored in ORC format and 
           STORED AS ORC;
     ```
 
-2. Insert the data from the `sales_info` table into `sales_info_ORC`:
+2. 将 `sales_info` 表的数据写入到 `sales_info_ORC`:
 
     ``` sql
     hive> INSERT INTO TABLE sales_info_ORC SELECT * FROM sales_info;
     ```
 
-    A copy of the sample data set is now stored in ORC format in `sales_info_ORC`.
+    样本数据集的副本现在以ORC格式存储在 `sales_info_ORC` 中。
 
-3. Perform a Hive query on `sales_info_ORC` to verify that the data was loaded successfully:
+3. 在 `sales_info_ORC` 上执行Hive查询以验证数据是否正确加载:
 
     ``` sql
     hive> SELECT * FROM sales_info_ORC;
     ```
 
-4. Start the `psql` subsystem and turn on timing:
+4. 启动 `psql` 子系统并打开计时:
 
     ``` shell
     $ psql -d postgres
@@ -389,7 +389,7 @@ In the following example, you will create a Hive table stored in ORC format and 
     Timing is on.
     ```
 
-4. Use the PXF `HiveORC` profile to create a Greenplum Database external table that references the Hive table named `sales_info_ORC` you created in Step 1. The `FORMAT` clause must specify `'CUSTOM'`. The `HiveORC` `CUSTOM` format supports only the built-in `'pxfwritable_import'` `formatter`.
+4. 使用PXF `HiveORC` 配置文件创建Greenplum数据库外部表，该表引用此前您在步骤 1 创建的名为 `sales_info_ORC` 的Hive表。 `FORMAT` 子句必须指定为 `'CUSTOM'`。 `HiveORC` `CUSTOM` 格式仅支持内置的 `'pxfwritable_import'` `formatter`。
 
     ``` sql
     postgres=> CREATE EXTERNAL TABLE salesinfo_hiveORCprofile(location text, month text, num_orders int, total_sales float8)
@@ -397,7 +397,7 @@ In the following example, you will create a Hive table stored in ORC format and 
                  FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
 
-5. Query the external table:
+5. 查询外部表:
 
     ``` sql
     postgres=> SELECT * FROM salesinfo_hiveORCprofile;
@@ -415,17 +415,17 @@ In the following example, you will create a Hive table stored in ORC format and 
     ```
 
 
-### <a id="hive_hivevectorizedorc_example" class="no-quick-link"></a>Example: Using the HiveVectorizedORC Profile
+### <a id="hive_hivevectorizedorc_example" class="no-quick-link"></a>示例: 使用HiveVectorizedORC配置文件
 
-In the following example, you will use the `HiveVectorizedORC` profile to query the `sales_info_ORC` Hive table that you created in the previous example.
+在以下示例中，您将使用 `HiveVectorizedORC` 配置文件查询您在此前示例中创建的 `sales_info_ORC` Hive表。
 
-1. Start the `psql` subsystem:
+1. 启动 `psql` 子系统:
 
     ``` shell
     $ psql -d postgres
     ```
 
-2. Use the PXF `HiveVectorizedORC` profile to create a readable Greenplum Database external table that references the Hive table named `sales_info_ORC` that you created in Step 1 of the previous example. The `FORMAT` clause must specify `'CUSTOM'`. The `HiveVectorizedORC` `CUSTOM` format supports only the built-in `'pxfwritable_import'` `formatter`.
+2. 使用PXF `HiveVectorizedORC` 配置文件创建Greenplum数据库外部表， 该表引用您在此前示例步骤 1 中创建的名为 `sales_info_ORC` 的Hive表。 `FORMAT` 子句必须指定为 `'CUSTOM'`。 `HiveVectorizedORC` `CUSTOM` 格式仅支持内置的 `'pxfwritable_import'` `formatter`。
 
     ``` sql
     postgres=> CREATE EXTERNAL TABLE salesinfo_hiveVectORC(location text, month text, num_orders int, total_sales float8)
@@ -433,7 +433,7 @@ In the following example, you will use the `HiveVectorizedORC` profile to query 
                  FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
 
-3. Query the external table:
+3. 查询外部表:
 
     ``` sql
     postgres=> SELECT * FROM salesinfo_hiveVectORC;
@@ -451,9 +451,9 @@ In the following example, you will use the `HiveVectorizedORC` profile to query 
     ```
 
 
-## <a id="hive_parquet"></a>Accessing Parquet-Format Hive Tables
+## <a id="hive_parquet"></a>访问Parquet格式的Hive表
 
-The PXF `Hive` profile supports both non-partitioned and partitioned Hive tables that use the Parquet storage format. Map the table columns using equivalent Greenplum Database data types. For example, if a Hive table is created in the `default` schema using:
+PXF `Hive` 配置文件支持使用Parquet存储格式的非分区和分区Hive表。 使用等效的Greenplum数据库数据类型映射Hive表列。 例如, 如果在 `default` 模式中使用以下命令创建一个Hive表:
 
 ``` sql
 hive> CREATE TABLE hive_parquet_table (location string, month string,
@@ -461,7 +461,7 @@ hive> CREATE TABLE hive_parquet_table (location string, month string,
         STORED AS parquet;
 ```
 
-Define the Greenplum Database external table:
+定义Greenplum数据库外部表:
 
 ``` sql
 postgres=# CREATE EXTERNAL TABLE pxf_parquet_table (location text, month text, number_of_orders int, total_sales double precision)
@@ -469,36 +469,36 @@ postgres=# CREATE EXTERNAL TABLE pxf_parquet_table (location text, month text, n
     FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
-And query the table:
+查询外部表:
 
 ``` sql
 postgres=# SELECT month, number_of_orders FROM pxf_parquet_table;
 ```
 
-## <a id="hive_complex"></a>Working with Complex Data Types
+## <a id="hive_complex"></a>处理复杂数据类型
 
-### <a id="hive_complex_hive" class="no-quick-link"></a>Example: Using the Hive Profile with Complex Data Types
+### <a id="hive_complex_hive" class="no-quick-link"></a>示例: 使用Hive配置文件处理复杂数据类型
 
-This example employs the `Hive` profile and the array and map complex types, specifically an array of integers and a string key/value pair map.
+本示例中使用 `Hive` 配置文件以及数组和映射复杂数据类型，特别是整数数组和字符串键/值对。
 
-The data schema for this example includes fields with the following names and data types:
+此示例中的数据模式包含具有以下名称和数据类型的字段:
 
-| Column Name  | Data Type |
+| 字段名  | 数据类型 |
 |-------|---------------------------|
 | index | int |
 | name | string
-| intarray | array of integers |
-| propmap | map of string key and value pairs |
+| intarray | 整数数组 |
+| propmap | 字符串键/值对映射 |
 
-When you specify an array field in a Hive table, you must identify the terminator for each item in the collection. Similarly, you must also specify the map key termination character.
+当您在Hive表中指定数组字段，必须为集合中的每个项目标识终止符。 相似的，您还必须为映射键指定终止符。
 
-1. Create a text file from which you will load the data set:
+1. 创建一个文本文件，从中加载数据:
 
     ```
     $ vi /tmp/pxf_hive_complex.txt
     ```
 
-2. Add the following text to `pxf_hive_complex.txt`.  This data uses a comma `,` to separate field values, the percent symbol `%` to separate collection items, and a `:` to terminate map key values:
+2. 将以下文本添加到 `pxf_hive_complex.txt`。 此数据使用 逗号 `,` 分隔字段值，百分号 `%` 分隔集合项， 并使用 `:` 终止映射键值:
 
     ```
     3,Prague,1%2%3,zone:euro%status:up
@@ -513,7 +513,7 @@ When you specify an array field in a Hive table, you must identify the terminato
     76,Atlanta,8%9%0,zone:noam%status:down
     ```
 
-3. Create a Hive table to represent this data:
+3. 创建一个Hive表来展示此数据:
 
     ``` shell
     $ HADOOP_USER_NAME=hdfs hive
@@ -527,18 +527,18 @@ When you specify an array field in a Hive table, you must identify the terminato
              STORED AS TEXTFILE;
     ```
 
-    Notice that:
-    - `FIELDS TERMINATED BY` identifies a comma as the field terminator.
-    - The `COLLECTION ITEMS TERMINATED BY` subclause specifies the percent sign as the collection items (array item, map key/value pair) terminator.
-    - `MAP KEYS TERMINATED BY` identifies a colon as the terminator for map keys.
+    注意:
+    - `FIELDS TERMINATED BY` 将逗号标识为字段分隔符
+    - `COLLECTION ITEMS TERMINATED BY` 子句将百分号作为集合项(数组项, 映射键/值对)的终止符
+    - `MAP KEYS TERMINATED BY` 将冒号标识为映射键的终止符
 
-4. Load the `pxf_hive_complex.txt` sample data file into the `table_complextypes` table that you just created:
+4. 将 `pxf_hive_complex.txt` 示例数据文件加载到您刚刚创建的 `table_complextypes` 表中:
 
     ``` sql
     hive> LOAD DATA LOCAL INPATH '/tmp/pxf_hive_complex.txt' INTO TABLE table_complextypes;
     ```
 
-5. Perform a query on Hive table `table_complextypes` to verify that the data was loaded successfully:
+5. 在Hive表 `table_complextypes` 上执行查询以验证数据是否已成功加载:
 
     ``` sql
     hive> SELECT * FROM table_complextypes;
@@ -551,7 +551,7 @@ When you specify an array field in a Hive table, you must identify the terminato
     ...
     ```
 
-6. Use the PXF `Hive` profile to create a readable Greenplum Database external table that references the Hive table named `table_complextypes`:
+6. 使用 `Hive` 配置文件创建可读Greenplum数据库外部表，该表引用名为 `table_complextypes` 的Hive表:
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE complextypes_hiveprofile(index int, name text, intarray text, propmap text)
@@ -559,9 +559,9 @@ When you specify an array field in a Hive table, you must identify the terminato
                FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
 
-    Notice that the integer array and map complex types are mapped to Greenplum Database data type text.
+    注意整数数组和映射复杂类型已映射为Greenplum数据库文本数据类型
 
-7. Query the external table:
+7. 查询外部表:
 
     ``` sql
     postgres=# SELECT * FROM complextypes_hiveprofile;
@@ -583,13 +583,13 @@ When you specify an array field in a Hive table, you must identify the terminato
     (10 rows)
     ```
 
-    `intarray` and `propmap` are each serialized as text strings.
+    `intarray` 和 `propmap` 都被序列化为文本字符串
 
-### <a id="hive_complex_hiveorc" class="no-quick-link"></a>Example: Using the HiveORC Profile with Complex Data Types
+### <a id="hive_complex_hiveorc" class="no-quick-link"></a>示例: 使用HiveORC配置文件处理复杂数据类型
 
-In the following example, you will create and populate a Hive table stored in ORC format. You will use the `HiveORC` profile to query the complex types in this Hive table.
+在以下示例中，您将创建和填充以ORC格式存储的Hive表。 您将使用 `HiveORC` 配置文件查询此Hive表中的复杂数据类型。
 
-1. Create a Hive table with ORC storage format:
+1. 用ORC存储格式创建Hive表:
 
     ``` shell
     $ HADOOP_USER_NAME=hdfs hive
@@ -603,7 +603,7 @@ In the following example, you will create and populate a Hive table stored in OR
           STORED AS ORC;
     ```
 
-2. Insert the data from the `table_complextypes` table that you created in the previous example into `table_complextypes_ORC`:
+2. 将您在此前示例中创建的 `table_complextypes` 表的数据写入到 `table_complextypes_ORC` 表中:
 
     ``` sql
     hive> INSERT INTO TABLE table_complextypes_ORC SELECT * FROM table_complextypes;
@@ -611,7 +611,7 @@ In the following example, you will create and populate a Hive table stored in OR
 
     A copy of the sample data set is now stored in ORC format in `table_complextypes_ORC`.
 
-3. Perform a Hive query on `table_complextypes_ORC` to verify that the data was loaded successfully:
+3. 在 `table_complextypes_ORC` 上执行查询以验证数据是否成功加载:
 
     ``` sql
     hive> SELECT * FROM table_complextypes_ORC;
@@ -625,13 +625,13 @@ In the following example, you will create and populate a Hive table stored in OR
     ...
     ```
 
-4. Start the `psql` subsystem:
+4. 启动 `psql` 子系统:
 
     ``` shell
     $ psql -d postgres
     ```
 
-4. Use the PXF `HiveORC` profile to create a readable Greenplum Database external table from the Hive table named `table_complextypes_ORC` you created in Step 1. The `FORMAT` clause must specify `'CUSTOM'`. The `HiveORC` `CUSTOM` format supports only the built-in `'pxfwritable_import'` `formatter`.
+4. 使用 PXF `HiveORC` 配置文件创建可读Greenplum数据库外部表，该表引用您在步骤 1 中创建的名为 `table_complextypes_ORC` 的Hive表。 `FORMAT` 子句必须指定为 `'CUSTOM'`。 `HiveORC` `CUSTOM` 格式仅支持内置的 `'pxfwritable_import'` `formatter`。
 
     ``` sql
     postgres=> CREATE EXTERNAL TABLE complextypes_hiveorc(index int, name text, intarray text, propmap text)
@@ -639,9 +639,9 @@ In the following example, you will create and populate a Hive table stored in OR
                  FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
 
-    Notice that the integer array and map complex types are again mapped to Greenplum Database data type text.
+    注意整数数组和映射复杂类型已映射为Greenplum数据库文本数据类型
 
-5. Query the external table:
+5. 查询外部表:
 
     ``` sql
     postgres=> SELECT * FROM complextypes_hiveorc;
@@ -657,26 +657,26 @@ In the following example, you will create and populate a Hive table stored in OR
 
     ```
 
-    `intarray` and `propmap` are again serialized as text strings.
+    `intarray` 和 `propmap` 都被序列化为文本字符串
 
-## <a id="partitionfiltering"></a>Partition Filter Pushdown
+## <a id="partitionfiltering"></a>分区过滤下推
 
-The PXF Hive connector supports the Hive partitioning feature and directory structure. This enables partition exclusion on selected HDFS files comprising a Hive table. To use the partition filtering feature to reduce network traffic and I/O, run a query on a PXF external table using a `WHERE` clause that refers to a specific partition column in a partitioned Hive table.
+PXF Hive 连接器支持Hive分区功能和目录结构。 这样可以在包含Hive表的HDFS文件上排除分区。若要使用分区筛选功能来减少网络流量和I/O，请使用 `WHERE` 子句在PXF外部表上执行查询，该子句引用已分区的Hive表中的特定分区列。
 
-To take advantage of PXF partition filtering pushdown, the Hive and PXF partition field names must be the same. Otherwise, PXF ignores partition filtering and the filtering is performed on the Greenplum Database side, impacting performance.
+要利用PXF分区过滤下推功能，Hive 和 PXF 分区字段名必须一致。否则，PXF 将会忽略分区过滤，并且将在Greenplum数据库端执行过滤，从而影响性能。
 
-<div class="note">The PXF Hive connector filters only on partition columns, not on other table attributes. Additionally, filter pushdown is supported only for those data types and operators identified in <a href="filter_push.html">About Filter Pushdown</a>. Disable filter pushdown when your query includes unsupported operators and data types.</div>
+<div class="note">PXF Hive 连接器过滤仅在分区列过滤，而不在其他表属性上过滤。此外，仅对于在<a href="filter_push.html">关于过滤下推</a>中标识的那些数据乐西和运算符，才支持过滤器下推。当查询中包含不支持的数据类型和运算符时，请禁用过滤器下推。</div>
 
-To use PXF filter pushdown with Hive, the `hive-site.xml` configuration parameter `hive.metastore.integral.jdo.pushdown` must be set to `true`.
+要在Hive中使用PXF过滤器下推， `hive-site.xml` 配置参数 `hive.metastore.integral.jdo.pushdown` 必须设置为 `true`。
 
-PXF filter pushdown is enabled by default. You configure PXF filter pushdown as described in [About Filter Pushdown](filter_push.html).
+默认情况下，PXF过滤器下推处于启用状态。您可以按照如下所述配置PXF过滤器下推[关于过滤器下推](filter_push.html)。
 
 
-### <a id="hive_homog_part"></a>Example: Using the Hive Profile to Access Partitioned Homogenous Data
+### <a id="hive_homog_part"></a>示例: 使用Hive配置文件访问同构分区的数据
 
-In this example, you use the `Hive` profile to query a Hive table named `sales_part` that you partition on the `delivery_state` and `delivery_city` fields. You then create a Greenplum Database external table to query `sales_part`. The procedure includes specific examples that illustrate filter pushdown.
+在此示例中，您将使用 `Hive` 配置文件来查询名为 `sales_part` 的Hive表，该表使用 `delivery_state` 和 `delivery_city` 字段分区。 然后，您创建一个Greenplum数据库外部表以查询 `sales_part`。 该过程包括一些演示过滤器下推的特定示例。
 
-1. Create a Hive table named `sales_part` with two partition columns, `delivery_state` and `delivery_city:`
+1. 创建一个名为 `sales_part` 的Hive表，包含两个分区字段， `delivery_state` 和 `delivery_city` ：
 
     ``` sql
     hive> CREATE TABLE sales_part (name string, type string, supplier_key int, price double)
@@ -684,7 +684,7 @@ In this example, you use the `Hive` profile to query a Hive table named `sales_p
             ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
     ```
 
-2. Load data into this Hive table and add some partitions:
+2. 加载数据至Hive表并添加一些分区：
 
     ``` sql
     hive> INSERT INTO TABLE sales_part
@@ -701,15 +701,15 @@ In this example, you use the `Hive` profile to query a Hive table named `sales_p
             VALUES ('px49', 'pipe', 52, 99.82);
     ```
 
-3. Query the `sales_part` table:
+3. 查询 `sales_part` 表：
 
     ``` sql
     hive> SELECT * FROM sales_part;
     ```
 
-    A `SELECT *` statement on a Hive partitioned table shows the partition fields at the end of the record.
+    Hive分区表上的 `SELECT *` 语句显示记录末尾的分区字段。
 
-3. Examine the Hive/HDFS directory structure for the `sales_part` table:
+3. 检查 `sales_part` 表Hive/HDFS的目录结构：
 
     ``` shell
     $ sudo -u hdfs hdfs dfs -ls -R /apps/hive/warehouse/sales_part
@@ -719,7 +719,7 @@ In this example, you use the `Hive` profile to query a Hive table named `sales_p
     /apps/hive/warehouse/sales_part/delivery_state=NEVADA/delivery_city=Las Vegas/
     ```
 
-4. Create a PXF external table to read the partitioned `sales_part` Hive table.  To take advantage of partition filter push-down, define fields corresponding to the Hive partition fields at the end of the `CREATE EXTERNAL TABLE` attribute list.
+4. 创建一个PXF外部表来读取Hive分区表 `sales_part`。  要利用分区过滤器的下推功能， 请在 `CREATE EXTERNAL TABLE` 属性列表的末尾定义与Hive分区字段相同的字段。
 
     ``` shell
     $ psql -d postgres
@@ -734,37 +734,37 @@ In this example, you use the `Hive` profile to query a Hive table named `sales_p
                FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
 
-5. Query the table:
+5. 查询外部表:
 
     ``` sql
     postgres=# SELECT * FROM pxf_sales_part;
     ```
 
-6.  Perform another query (no pushdown) on `pxf_sales_part` to return records where the `delivery_city` is `Sacramento` and  `item_name` is `cube`:
+6.  在 `pxf_sales_part` 上执行另一个查询(不下推) ，以此返回 `delivery_city` 等于 `Sacramento` 和  `item_name` 等于 `cube` 的记录：
 
     ``` sql
     postgres=# SELECT * FROM pxf_sales_part WHERE delivery_city = 'Sacramento' AND item_name = 'cube';
     ```
 
-    The query filters the `delivery_city` partition `Sacramento`. The filter on  `item_name` is not pushed down, since it is not a partition column. It is performed on the Greenplum Database side after all the data in the `Sacramento` partition is transferred for processing.
+    这个查询过滤了 `delivery_city` 分区 `Sacramento`。 由于 `item_name` 字段不是分区列， 因此该列上的过滤不会被下推。 在 `Sacramento` 分区传输完成后， 在Greenplum数据库端执行此过滤操作。
 
-7. Query (with pushdown) for all records where `delivery_state` is `CALIFORNIA`:
+7. 查询(使用过滤下推)所有 `delivery_state` 等于 `CALIFORNIA` 的记录:
 
     ``` sql
     postgres=# SET gp_external_enable_filter_pushdown=on;
     postgres=# SELECT * FROM pxf_sales_part WHERE delivery_state = 'CALIFORNIA';
     ```
 
-    This query reads all of the data in the `CALIFORNIA` `delivery_state` partition, regardless of the city.
+    该查询读取位于 `CALIFORNIA` `delivery_state` 分区中的所有数据，无论城市是哪个。
 
 
-### <a id="hive_heter_part"></a>Example: Using the Hive Profile to Access Partitioned Heterogeneous Data
+### <a id="hive_heter_part"></a>示例: 使用Hive配置文件访问异构分区的数据
 
-You can use the PXF `Hive` profile with any Hive file storage types. With the `Hive` profile, you can access heterogeneous format data in a single Hive table where the partitions may be stored in different file formats.
+您可以使用PXF `Hive` 配置文件访问任何Hive文件存储类型。 使用 `Hive` 配置文件，您可以在单个Hive表中访问分区以不同文件格式存储的异构格式数据。
 
-In this example, you create a partitioned Hive external table. The table is composed of the HDFS data files associated with the `sales_info` (text format) and `sales_info_rcfile` (RC format) Hive tables that you created in previous exercises. You will partition the data by year, assigning the data from `sales_info` to the year 2013, and the data from `sales_info_rcfile` to the year 2016. (Ignore at the moment the fact that the tables contain the same data.) You will then use the PXF `Hive` profile to query this partitioned Hive external table.
+本示例中，您将创建一个分区的Hive外部表。该表由之前示例创建的 `sales_info` (文本格式) 和 `sales_info_rcfile` (RC 格式)  Hive表相关的HDFS数据文件组成。 您将按照年份对数据进行分区，将 `sales_info`  的数据分配给2013年， 而 `sales_info_rcfile` 的数据分配给2016年(这里忽略表包含相同数据的事实)。 然后，您将使用PXF `Hive` 配置文件查询这个分区的Hive外部表。
 
-1. Create a Hive external table named `hive_multiformpart` that is partitioned by a string field named `year`:
+1. 创建一个名为 `hive_multiformpart` 的Hive外部表，该表以名为 `year` 的字符串字段进行分区：
 
     ``` shell
     $ HADOOP_USER_NAME=hdfs hive
@@ -776,29 +776,29 @@ In this example, you create a partitioned Hive external table. The table is comp
             ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
     ```
 
-2. Describe the `sales_info` and `sales_info_rcfile` tables, noting the HDFS file `location` for each table:
+2. 描述 `sales_info` 和 `sales_info_rcfile` 表，注意每个表HDFS文件的 `location` 信息：
 
     ``` sql
     hive> DESCRIBE EXTENDED sales_info;
     hive> DESCRIBE EXTENDED sales_info_rcfile;
     ```
     
-3. Create partitions in the `hive_multiformpart` table for the HDFS file locations associated with each of the `sales_info` and `sales_info_rcfile` tables:
+3. 在 `hive_multiformpart` 表中为 `sales_info` 以及 `sales_info_rcfile` 表关联的HDFS文件位置创建分区：
 
     ``` sql
     hive> ALTER TABLE hive_multiformpart ADD PARTITION (year = '2013') LOCATION 'hdfs://namenode:8020/apps/hive/warehouse/sales_info';
     hive> ALTER TABLE hive_multiformpart ADD PARTITION (year = '2016') LOCATION 'hdfs://namenode:8020/apps/hive/warehouse/sales_info_rcfile';
     ```
 
-4. Explicitly identify the file format of the partition associated with the  `sales_info_rcfile` table:
+4. 明确的标识与 `sales_info_rcfile` 表关联的分区的文件格式：
 
     ``` sql
     hive> ALTER TABLE hive_multiformpart PARTITION (year='2016') SET FILEFORMAT RCFILE;
     ```
     
-    You need not specify the file format of the partition associated with the `sales_info` table, as `TEXTFILE` format is the default.
+    无需指定与 `sales_info` 表相关联分区的文件格式，因为 `TEXTFILE` 格式是默认格式。
 
-5. Query the `hive_multiformpart` table:
+5. 查询 `hive_multiformpart` 表：
 
     ``` sql
     hive> SELECT * from hive_multiformpart;
@@ -812,7 +812,7 @@ In this example, you create a partitioned Hive external table. The table is comp
     hive> SELECT * from hive_multiformpart WHERE year='2016';
     ```
 
-6. Show the partitions defined for the `hive_multiformpart` table and exit `hive`:
+6. 查询 `hive_multiformpart` 表的分区定义并退出 `hive`:
 
     ``` sql
     hive> SHOW PARTITIONS hive_multiformpart;
@@ -821,13 +821,13 @@ In this example, you create a partitioned Hive external table. The table is comp
     hive> quit;
     ```
 
-7. Start the `psql` subsystem:
+7. 启动 `psql` 子系统:
 
     ``` shell
     $ psql -d postgres
     ```
 
-8. Use the PXF `Hive` profile to create a readable Greenplum Database external table that references the Hive `hive_multiformpart` external table that you created in the previous steps:
+8. 使用PXF `Hive` 配置文件创建一个可读的Greenplum数据库外部表，该表引用此前步骤您在Hive中创建的 `hive_multiformpart` 外部表。
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE pxf_multiformpart(location text, month text, num_orders int, total_sales float8, year text)
@@ -835,7 +835,7 @@ In this example, you create a partitioned Hive external table. The table is comp
                FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
 
-9. Query the PXF external table:
+9. 查询PXF外部表：
 
     ``` sql
     postgres=# SELECT * FROM pxf_multiformpart;
@@ -854,7 +854,7 @@ In this example, you create a partitioned Hive external table. The table is comp
      ....
     ```
 
-10. Perform a second query to calculate the total number of orders for the year 2013:
+10. 执行第二个查询以计算2013年的订单总数：
 
     ``` sql
     postgres=# SELECT sum(num_orders) FROM pxf_multiformpart WHERE month='Dec' AND year='2013';
@@ -863,19 +863,19 @@ In this example, you create a partitioned Hive external table. The table is comp
      433
     ```
 
-## <a id="default_part"></a>Using PXF with Hive Default Partitions
+## <a id="default_part"></a>使用PXF访问Hive默认分区
 
-This topic describes a difference in query results between Hive and PXF queries when Hive tables use a default partition. When dynamic partitioning is enabled in Hive, a partitioned table may store data in a default partition. Hive creates a default partition when the value of a partitioning column does not match the defined type of the column (for example, when a NULL value is used for any partitioning column). In Hive, any query that includes a filter on a partition column *excludes* any data that is stored in the table's default partition.
+本主题描述了当Hive使用默认分区时，Hive和PXF在查询结果上的区别。 当Hive启用动态分区后，分区表可能会将数据存储在默认分区中。 当分区列的值与列的定义类型不匹配是时(例如，当任何分区列存在NULL值时)，Hive会创建一个默认分区。 在Hive中，任何在分区列上的过滤查询都会 *排除* 默认分区中存储的数据。
 
-Similar to Hive, PXF represents a table's partitioning columns as columns that are appended to the end of the table. However, PXF translates any column value in a default partition to a NULL value. This means that a Greenplum Database query that includes an `IS NULL` filter on a partitioning column can return different results than the same Hive query.
+与Hive类似， PXF将表的分区列表示为附加在表末尾的列。但是，PXF会将默认分区中的任何列值都转换为NULL值。这意味着在同一个Hive查询中，在分区列上包含 `IS NULL` 过滤器的Greenplum数据库查询可以返回不同结果。
 
-Consider a Hive partitioned table that is created with the statement:
+考虑使用以下语句创建的Hive分区表:
 
 ``` sql
 hive> CREATE TABLE sales (order_id bigint, order_amount float) PARTITIONED BY (xdate date);
 ```
 
-The table is loaded with five rows that contain the following data:
+该表加载了包含以下内容的五行数据：
 
 ``` pre
 1.0    1900-01-01
@@ -885,15 +885,15 @@ The table is loaded with five rows that contain the following data:
 5.0    2013-12-06
 ```
 
-Inserting row 4 creates a Hive default partition, because the partition column `xdate` contains a null value.
+插入第4行会创建一个Hive默认分区，因为分区列 `xdate` 包含NULL值。
 
-In Hive, any query that filters on the partition column omits data in the default partition. For example, the following query returns no rows:
+在Hive中，对分区列进行筛选的任何查询都将忽略默认分区中的数据。例如，以下查询不返回任何行：
 
 ``` sql
 hive> SELECT * FROM sales WHERE xdate IS null;
 ```
 
-However, if you map this Hive table to a PXF external table in Greenplum Database, all default partition values are translated into actual NULL values. In Greenplum Database, executing the same query against the PXF external table returns row 4 as the result, because the filter matches the NULL value.
+但是， 如果将此Hive表映射到Greenplum数据库中的PXF外部表，则所有默认分区列的值都将被转换为实际的NULL值。在Greenplum数据库中，对PXF外部表执行相同的查询将返回第4行作为结果，因为过滤器匹配NULL值。
 
-Keep this behavior in mind when you execute `IS NULL` queries on Hive partitioned tables.
+在Hive分区表上执行 `IS NULL` 查询时，请牢记此行为。
 

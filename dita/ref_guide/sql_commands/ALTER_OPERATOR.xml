@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="ar20941">ALTER OPERATOR</title><body><p id="sql_command_desc">Changes the definition of an operator.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">ALTER OPERATOR <varname>name</varname> ( {<varname>left_type</varname> | NONE} , {<varname>right_type</varname> | NONE} ) 
+<topic id="topic1"><title id="ar20941">ALTER OPERATOR</title><body><p id="sql_command_desc">更改操作符的定义。</p><section id="section2"><title>概要</title><codeblock id="sql_command_synopsis">ALTER OPERATOR <varname>name</varname> ( {<varname>left_type</varname> | NONE} , {<varname>right_type</varname> | NONE} ) 
    OWNER TO <varname>new_owner</varname>
 
 ALTER OPERATOR <varname>name</varname> ( {<varname>left_type</varname> | NONE} , {<varname>right_type</varname> | NONE} ) 
     SET SCHEMA <varname>new_schema</varname>
-</codeblock></section><section id="section3"><title>Description</title><p><codeph>ALTER OPERATOR</codeph> changes the definition of an operator.
-The only currently available functionality is to change the owner of
-the operator. </p><p>You must own the operator to use <codeph>ALTER OPERATOR</codeph>.
-To alter the owner, you must also be a direct or indirect member of the
-new owning role, and that role must have <codeph>CREATE</codeph> privilege
-on the operator's schema. (These restrictions enforce that altering
-the owner does not do anything you could not do by dropping and recreating
-the operator. However, a superuser can alter ownership of any operator
-anyway.) </p></section><section id="section4"><title>Parameters</title><parml><plentry><pt><varname>name</varname></pt><pd>The name (optionally schema-qualified) of an existing operator. </pd></plentry><plentry><pt><varname>left_type</varname></pt><pd>The data type of the operator's left operand; write <codeph>NONE</codeph>
-if the operator has no left operand. </pd></plentry><plentry><pt><varname>right_type</varname></pt><pd>The data type of the operator's right operand; write <codeph>NONE</codeph>
-if the operator has no right operand. </pd></plentry><plentry><pt><varname>new_owner</varname></pt><pd>The new owner of the operator. </pd></plentry>
+</codeblock></section><section id="section3"><title>描述</title><p><codeph>ALTER OPERATOR</codeph> 更改一个操作符的定义。
+目前唯一可用的功能是修改操作符的所有者。</p><p>用户必须是操作符的所有者才能使用<codeph>ALTER OPERATOR</codeph>。
+要更改所有者，用户必须是新角色的直接或间接成员，而且该角色必须在操作符
+的模式上有<codeph>CREATE</codeph> 权限。（这种限制强制要求即使更改所有者也不能做那些通过删除或重建操作符所
+不能做到的事情。然而，超级用户可以任意修改操作符的所有权。）
+</p></section><section id="section4"><title>参数</title><parml><plentry><pt><varname>name</varname></pt><pd>现有操作符的名称（可选方案限定）</pd></plentry><plentry><pt><varname>left_type</varname></pt><pd>操作符左操作数的数据类型; 记为<codeph>NONE</codeph> 如果没有左操作数。</pd></plentry><plentry><pt><varname>right_type</varname></pt><pd><codeph>NONE</codeph>操作符右操作数的数据类型； 记为 <codeph>NONE</codeph> 如果操作符没有右操作数。</pd></plentry><plentry><pt><varname>new_owner</varname></pt><pd>操作符新的所有者。 </pd></plentry>
         <plentry>
           <pt><varname>new_schema</varname></pt>
-          <pd>The new schema for the operator.</pd>
-        </plentry></parml></section><section id="section5"><title>Examples</title><p>Change the owner of a custom operator <codeph>a @@ b</codeph> for type <codeph>text</codeph>:</p><codeblock>ALTER OPERATOR @@ (text, text) OWNER TO joe;</codeblock></section><section id="section6"><title>Compatibility</title><p>There is no <codeph>ALTER</codeph><codeph>OPERATOR</codeph> statement
-in the SQL standard. </p></section><section id="section7"><title>See Also</title><p><codeph><xref href="./CREATE_OPERATOR.xml#topic1" type="topic" format="dita"/></codeph>,
+          <pd>操作符新的模式。</pd>
+        </plentry></parml></section><section id="section5"><title>示例</title><p>更改一个<codeph>text</codeph>类型的自定义操作符<codeph>a @@ b</codeph>：</p><codeblock>ALTER OPERATOR @@ (text, text) OWNER TO joe;</codeblock></section><section id="section6"><title>兼容性</title><p>在SQL标准中没有 <codeph>ALTER</codeph><codeph>OPERATOR</codeph>语句。
+in the SQL standard. </p></section><section id="section7"><title>另见</title><p><codeph><xref href="./CREATE_OPERATOR.xml#topic1" type="topic" format="dita"/></codeph>,
             <codeph><xref href="./DROP_OPERATOR.xml#topic1" type="topic" format="dita"
         /></codeph></p></section></body></topic>

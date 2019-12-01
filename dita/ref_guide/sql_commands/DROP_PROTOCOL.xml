@@ -4,47 +4,46 @@
 <topic id="topic1">
   <title id="cw20941">DROP PROTOCOL</title>
   <body>
-    <p id="sql_command_desc">Removes a external table data access protocol from a database.</p>
+    <p id="sql_command_desc">从数据库中删除外部表数据访问协议。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">DROP PROTOCOL [IF EXISTS] <varname>name</varname></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>DROP PROTOCOL</codeph> removes the specified protocol from a database. A protocol
-        name can be specified in the <codeph>CREATE EXTERNAL TABLE</codeph> command to read data
-        from or write data to an external data source.</p>
-      <p>You must be a superuser or the protocol owner to drop a protocol.</p>
-      <note type="warning">If you drop a data access prococol, external tables that have been
-        defined with the protocol will no longer be able to access the external data source.</note>
+      <title>描述</title>
+      <p><codeph>DROP PROTOCOL</codeph>从数据库中删除指定的协议。
+        可以在<codeph>CREATE EXTERNAL TABLE</codeph>命令中指定协议名称，以从外部数据源读取数据或将数据写入外部数据源。
+        </p>
+      <p>您必须是超级用户或协议所有者才能删除协议。</p>
+      <note type="warning">如果删除数据访问协议，则使用该协议定义的外部表将不再能够访问外部数据源。</note>
     </section>
     <section id="section4">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt>IF EXISTS</pt>
-          <pd>Do not throw an error if the protocol does not exist. A notice is issued in this case.
+          <pd>如果该协议不存在，请不要报错。在这种情况下会发出通知。
           </pd>
         </plentry>
         <plentry>
           <pt><varname>name</varname></pt>
-          <pd>The name of an existing data access protocol.</pd>
+          <pd>现有数据访问协议的名称。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Notes</title>
-      <p>If you drop a data access protocol, the call handlers that defined in the database that are
-        associated with the protocol are not dropped. You must drop the functions manually. </p>
-      <p>Shared libraries that were used by the protocol should also be removed from the Greenplum
-        Database hosts.</p>
+      <title>注解</title>
+      <p>如果删除数据访问协议，则不会删除数据库中与该协议相关联的调用处理程序。
+        您必须手动删除函数。</p>
+      <p>协议使用的共享库也应从Greenplum数据库主机中删除。
+        </p>
     </section>
     <section id="section6">
-      <title>Compatibility</title>
-      <p><codeph>DROP PROTOCOL</codeph> is a Greenplum Database extension. </p>
+      <title>兼容性</title>
+      <p><codeph>DROP PROTOCOL</codeph>是Greenplum数据库扩展。</p>
     </section>
     <section id="section7">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="CREATE_EXTERNAL_TABLE.xml#topic1"/></codeph>, <codeph><xref
             href="CREATE_PROTOCOL.xml#topic1"/></codeph></p>
     </section>

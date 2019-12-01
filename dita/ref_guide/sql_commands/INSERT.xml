@@ -4,169 +4,168 @@
 <topic id="topic1">
   <title id="dt20941">INSERT</title>
   <body>
-    <p id="sql_command_desc">Creates new rows in a table.</p>
+    <p id="sql_command_desc">在表中创建新行。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock id="sql_command_synopsis">[ WITH [ RECURSIVE ] <varname>with_query</varname> [, ...] ]
 INSERT INTO <varname>table</varname> [( <varname>column</varname> [, ...] )]
    {DEFAULT VALUES | VALUES ( {<varname>expression</varname> | DEFAULT} [, ...] ) [, ...] | <varname>query</varname>}
    [RETURNING * | <varname>output_expression</varname> [[AS] <varname>output_name</varname>] [, ...]]</codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>INSERT</codeph> inserts new rows into a table. One can insert one or more rows
-        specified by value expressions, or zero or more rows resulting from a query.</p>
-      <p>The target column names may be listed in any order. If no list of column names is given at
-        all, the default is the columns of the table in their declared order. The values supplied by
-        the <codeph>VALUES</codeph> clause or query are associated with the explicit or implicit
-        column list left-to-right. </p>
-      <p>Each column not present in the explicit or implicit column list will be filled with a
-        default value, either its declared default value or null if there is no default. </p>
-      <p>If the expression for any column is not of the correct data type, automatic type conversion
-        will be attempted.</p>
-      <p>The optional <codeph>RETURNING</codeph> clause causes <codeph>INSERT</codeph> to compute
-        and return value(s) based on each row actually inserted. This is primarily useful for
-        obtaining values that were supplied by defaults, such as a serial sequence number. However,
-        any expression using the table's columns is allowed. The syntax of the
-          <codeph>RETURNING</codeph> list is identical to that of the output list of
-          <codeph>SELECT</codeph>.</p>
-      <p>You must have <codeph>INSERT</codeph> privilege on a table in order to insert into it.
-        When a column list is specified, you need <codeph>INSERT</codeph> privilege only on the listed columns.
-        Use of the <codeph>RETURNING</codeph> clause requires <codeph>SELECT</codeph>
-        privilege on all columns mentioned in <codeph>RETURNING</codeph>.  If you provide
-        a <varname>query</varname> to insert rows from a query, you must have
-        <codeph>SELECT</codeph> privilege on any table or column referenced in the
-         query.</p>
+      <title>描述</title>
+      <p><codeph>INSERT</codeph>将新行插入表中。
+          可以插入由值表达式指定的一或多个行，或查询产生的零或多个行。
+        </p>
+      <p>目标列名称可以按任何顺序列出。
+          如果根本没有给出任何列名列表，则默认为表中的列按声明的顺序排列。
+          <codeph>VALUES</codeph>子句或查询提供的值与从左到右的显式或隐式列列表相关联。
+        </p>
+      <p>在显式或隐式列列表中不存在的每个列都将填充一个默认值，该默认值可以是其声明的默认值，如果没有默认值，则为null。
+        </p>
+      <p>如果任何列的表达式的数据类型都不正确，则将尝试自动类型转换。
+        </p>
+      <p>可选的<codeph>RETURNING</codeph>子句使<codeph>INSERT</codeph>根据实际插入的每一行计算并返回值。
+          这对于获取默认提供的值（例如序列号）很有用。
+          但是，允许使用表列的任何表达式。
+          <codeph>RETURNING</codeph>列表的语法与<codeph>SELECT</codeph>的输出列表的语法相同。
+        </p>
+      <p>您必须对表具有<codeph>INSERT</codeph>特权才能插入表中。
+          指定列列表后，仅需要对列出的列具有<codeph>INSERT</codeph>特权。
+          使用<codeph>RETURNING</codeph>子句需要<codeph>RETURNING</codeph>中提到的所有列都具有<codeph>SELECT</codeph>特权。
+          如果提供查询以插入查询中的行，则必须对查询中引用的任何表或列具有<codeph>SELECT</codeph>特权。
+        </p>
       <sectiondiv id="section4">
-        <b>Outputs</b>
-        <p>On successful completion, an <codeph>INSERT</codeph> command returns a command tag of the
-          form:</p><codeblock>INSERT <varname>oid</varname> <varname>count</varname></codeblock><p>The
-            <varname>count</varname> is the number of rows inserted. If count is exactly one, and
-          the target table has OIDs, then <varname>oid</varname> is the OID assigned to the inserted
-          row. Otherwise <varname>oid</varname> is zero.</p>
+        <b>输出</b>
+        <p>成功完成后，<codeph>INSERT</codeph>命令将返回以下形式的命令标记：
+            </p>
+          <codeblock>INSERT <varname>oid</varname> <varname>count</varname></codeblock>
+          <p><varname>count</varname>是插入的行数。
+              如果count恰好为1，并且目标表具有OID，则<varname>oid</varname>是分配给插入行的OID。
+              否则，<varname>oid</varname>为零。
+            </p>
       </sectiondiv>
     </section>
     <section id="section5">
-      <title>Parameters</title>
+      <title>参数</title>
       <parml>
         <plentry>
           <pt><varname>with_query</varname></pt>
-          <pd>The <codeph>WITH</codeph> clause allows you to specify one or more subqueries that can
-            be referenced by name in the <codeph>INSERT</codeph> query. </pd>
-          <pd>For an <codeph>INSERT</codeph> command that includes a <codeph>WITH</codeph> clause,
-            the clause can only contain <codeph>SELECT</codeph> statements, the
-              <codeph>WITH</codeph> clause cannot contain a data-modifying command
-              (<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, or <codeph>DELETE</codeph>). </pd>
-          <pd>It is possible for the query (<codeph>SELECT</codeph> statement) to also contain a
-              <codeph>WITH</codeph> clause. In such a case both sets of
-              <varname>with_query</varname> can be referenced within the <codeph>INSERT</codeph>
-            query, but the second one takes precedence since it is more closely nested.</pd>
-          <pd>See <xref href="../../admin_guide/query/topics/CTE-query.xml#topic_zhs_r1s_w1b"/> and
-                <codeph><xref href="SELECT.xml#topic1"/></codeph> for details. </pd>
+          <pd><codeph>WITH</codeph>子句允许您指定一个或多个子查询，这些子查询可以在<codeph>INSERT</codeph>查询中按名称引用。
+            </pd>
+          <pd>对于包含<codeph>WITH</codeph>子句的<codeph>INSERT</codeph>命令，
+              该子句只能包含<codeph>SELECT</codeph>语句，
+              而<codeph>WITH</codeph>子句不能包含数据修改命令（<codeph>INSERT</codeph>，<codeph>UPDATE</codeph>或<codeph>DELETE</codeph>）。
+            </pd>
+          <pd>查询（<codeph>SELECT</codeph>语句）也可能包含<codeph>WITH</codeph>子句。
+              在这种情况下，可以在<codeph>INSERT</codeph>查询中引用两套<varname>with_query</varname>，
+              但是第二套优先，因为它的嵌套更紧密。
+            </pd>
+          <pd>更多信息，请参考<xref href="../../admin_guide/query/topics/CTE-query.xml#topic_zhs_r1s_w1b"/>和<codeph><xref href="SELECT.xml#topic1"/></codeph>。</pd>
         </plentry>
         <plentry>
           <pt>
             <varname>table</varname>
           </pt>
-          <pd>The name (optionally schema-qualified) of an existing table.</pd>
+          <pd>现有表的名称（可以由schema限定）。</pd>
         </plentry>
         <plentry>
           <pt>
             <varname>column</varname>
           </pt>
-          <pd>The name of a column in table. The column name can be qualified with a subfield name
-            or array subscript, if needed. (Inserting into only some fields of a composite column
-            leaves the other fields null.) </pd>
+          <pd>表中列的名称。
+              如果需要，可以使用子字段名称或数组下标来限定列名称。
+              （仅插入到复合列的某些字段中，未指定的字段为空。）
+            </pd>
         </plentry>
         <plentry>
           <pt>DEFAULT VALUES</pt>
-          <pd>All columns will be filled with their default values.</pd>
+          <pd>所有列均将填充其默认值。</pd>
         </plentry>
         <plentry>
           <pt>
             <varname>expression</varname>
           </pt>
-          <pd>An expression or value to assign to the corresponding column. </pd>
+          <pd>要分配给相应列的表达式或值。</pd>
         </plentry>
         <plentry>
           <pt>DEFAULT</pt>
-          <pd>The corresponding column will be filled with its default value.</pd>
+          <pd>相应的列将填充其默认值。</pd>
         </plentry>
         <plentry>
           <pt>
             <varname>query</varname>
           </pt>
-          <pd>A query (<codeph>SELECT</codeph> statement) that supplies the rows to be inserted.
-            Refer to the <codeph>SELECT</codeph> statement for a description of the syntax.</pd>
+          <pd>提供要插入的行的查询（<codeph>SELECT</codeph>语句）。
+              有关语法的说明，请参见<codeph>SELECT</codeph>语句。
+            </pd>
         </plentry>
         <plentry>
           <pt><varname>output_expression</varname></pt>
-          <pd>An expression to be computed and returned by the <codeph>INSERT</codeph> command after
-            each row is inserted. The expression can use any column names of the table. Write * to
-            return all columns of the inserted row(s).</pd>
+          <pd>插入每行后，由<codeph>INSERT</codeph>命令计算并返回的表达式。
+              该表达式可以使用表的任何列名称。
+              写入*返回插入行的所有列。
+            </pd>
         </plentry>
         <plentry>
           <pt><varname>output_name</varname></pt>
-          <pd>A name to use for a returned column.</pd>
+          <pd>用于返回的列的名称。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section6">
-      <title>Notes</title>
-      <p>To insert data into a partitioned table, you specify the root partitioned table, the table
-        created with the <codeph>CREATE TABLE</codeph> command. You also can specify a leaf child
-        table of the partitioned table in an <codeph>INSERT</codeph> command. An error is returned
-        if the data is not valid for the specified leaf child table. Specifying a child table that
-        is not a leaf child table in the <codeph>INSERT</codeph> command is not supported. Execution
-        of other DML commands such as <codeph>UPDATE</codeph> and <codeph>DELETE</codeph> on any
-        child table of a partitioned table is not supported. These commands must be executed on the
-        root partitioned table, the table created with the <codeph>CREATE TABLE</codeph>
-        command.</p>
-      <p>For append-optimized tables, Greenplum Database supports a maximum of 127 concurrent
-          <codeph>INSERT</codeph> transactions into a single append-optimized table. </p>
-      <p>For writable S3 external tables, the <codeph>INSERT</codeph> operation uploads to one or
-        more files in the configured S3 bucket, as described in <xref
-          href="../../admin_guide/external/g-s3-protocol.xml#amazon-emr"/>. Pressing
-          <codeph>Ctrl-c</codeph> cancels the <codeph>INSERT</codeph> and stops uploading to S3. </p>
+      <title>注解</title>
+      <p>要将数据插入分区表中，请指定根分区表，即使用<codeph>CREATE TABLE</codeph>命令创建的表。
+          您还可以在<codeph>INSERT</codeph>命令中指定分区表的叶子表。
+          如果数据对于指定的叶子表无效，则返回错误。
+          不支持在<codeph>INSERT</codeph>命令中指定不是叶子表的子表。
+          不支持在分区表的任何子表上执行其他DML命令，例如<codeph>UPDATE</codeph>和<codeph>DELETE</codeph>。
+          这些命令必须在根分区表（使用<codeph>CREATE TABLE</codeph>命令创建的表）上执行。
+          </p>
+      <p>对于追加优化表，Greenplum数据库最多可将127个并发<codeph>INSERT</codeph>事务插入单个追加优化表中。
+          </p>
+      <p>对于可写的S3外部表，<codeph>INSERT</codeph>操作将上传到已配置的S3存储桶中的一个或多个文件，
+          如<xref href="../../admin_guide/external/g-s3-protocol.xml#amazon-emr"/>中所述。
+          按<codeph>Ctrl-c</codeph>取消<codeph>INSERT</codeph>，并停止上传到S3。
+        </p>
     </section>
     <section id="section7">
-      <title>Examples</title>
-      <p>Insert a single row into table <codeph>films</codeph>: </p>
+      <title>示例</title>
+      <p>在表<codeph>films</codeph>中插入一行：</p>
       <codeblock>INSERT INTO films VALUES ('UA502', 'Bananas', 105, 
 '1971-07-13', 'Comedy', '82 minutes');</codeblock>
-      <p>In this example, the <codeph>length</codeph> column is omitted and therefore it will have
-        the default value:</p>
+      <p>在此示例中，省略了<codeph>length</codeph>列，因此它将具有默认值：
+      </p>
       <codeblock>INSERT INTO films (code, title, did, date_prod, kind) VALUES 
 ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');</codeblock>
-      <p>This example uses the <codeph>DEFAULT</codeph> clause for the <codeph>date_prod</codeph>
-        column rather than specifying a value: </p>
+      <p>本示例对<codeph>date_prod</codeph>列使用<codeph>DEFAULT</codeph>子句，而不是指定值：
+        </p>
       <codeblock>INSERT INTO films VALUES ('UA502', 'Bananas', 105, DEFAULT, 
 'Comedy', '82 minutes');</codeblock>
-      <p>To insert a row consisting entirely of default values: </p>
+      <p>要插入完全由默认值组成的行：</p>
       <codeblock>INSERT INTO films DEFAULT VALUES;</codeblock>
-      <p>To insert multiple rows using the multirow <codeph>VALUES</codeph> syntax: </p>
+      <p>要使用多行<codeph>VALUES</codeph>语法插入多行：</p>
       <codeblock>INSERT INTO films (code, title, did, date_prod, kind) VALUES
     ('B6717', 'Tampopo', 110, '1985-02-10', 'Comedy'),
     ('HG120', 'The Dinner Game', 140, DEFAULT, 'Comedy');</codeblock>
-      <p>This example inserts some rows into table <codeph>films</codeph> from a table
-          <codeph>tmp_films</codeph> with the same column layout as <codeph>films</codeph>: </p>
+      <p>本示例从表<codeph>films</codeph>中向表<codeph>films</codeph>中插入一些行，其列布局与<codeph>films</codeph>相同：
+        </p>
       <codeblock>INSERT INTO films SELECT * FROM tmp_films WHERE date_prod &lt; 
 '2004-05-07';</codeblock>
-      <p>Insert a single row into table distributors, returning the sequence number generated by the
-          <varname>DEFAULT</varname>
-        clause:<codeblock>INSERT INTO distributors (did, dname) VALUES (DEFAULT, 'XYZ Widgets')
+      <p>在表distributors中插入一行，返回由<varname>DEFAULT</varname>子句生成的序列号：
+          <codeblock>INSERT INTO distributors (did, dname) VALUES (DEFAULT, 'XYZ Widgets')
    RETURNING did;</codeblock></p>
     </section>
     <section id="section8">
-      <title>Compatibility</title>
-      <p><codeph>INSERT</codeph> conforms to the SQL standard. The case in which a column name list
-        is omitted, but not all the columns are filled from the <codeph>VALUES</codeph> clause or
-        query, is disallowed by the standard. </p>
-      <p>Possible limitations of the <varname>query</varname> clause are documented under
-          <codeph>SELECT</codeph>.</p>
+      <title>兼容性</title>
+      <p><codeph>INSERT</codeph>符合SQL标准。
+          标准不允许列名列表被省略，但不是所有的列都由<codeph>VALUES</codeph>子句或查询填充的情况。
+        </p>
+      <p><codeph>SELECT</codeph>记录了<varname>query</varname>子句的可能限制。
+        </p>
     </section>
     <section id="section9">
-      <title>See Also</title>
+      <title>另见</title>
       <p><codeph><xref href="COPY.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
             href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
             href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic" format="dita"/></codeph>, <xref

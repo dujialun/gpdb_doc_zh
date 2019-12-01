@@ -1,40 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="ec20941">REVOKE</title><body><p id="sql_command_desc">Removes access privileges.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">REVOKE [GRANT OPTION FOR] { {SELECT | INSERT | UPDATE | DELETE 
-       | REFERENCES | TRIGGER | TRUNCATE } [, ...] | ALL [PRIVILEGES] }
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="ec20941">REVOKE</title>
+    <body>
+        <p id="sql_command_desc">删除访问权限。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">REVOKE [GRANT OPTION FOR] { {SELECT | INSERT | UPDATE | DELETE
+        | REFERENCES | TRIGGER | TRUNCATE } [, ...] | ALL [PRIVILEGES] }
 
-       ON { [TABLE] <varname>table_name</varname> [, ...]
+        ON { [TABLE] <varname>table_name</varname> [, ...]
             | ALL TABLES IN SCHEMA schema_name [, ...] }
-       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC} [, ...]
-       [CASCADE | RESTRICT]
+        FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC} [, ...]
+        [CASCADE | RESTRICT]
 
-REVOKE [ GRANT OPTION FOR ] { { SELECT | INSERT | UPDATE 
+REVOKE [ GRANT OPTION FOR ] { { SELECT | INSERT | UPDATE
        | REFERENCES } ( <varname>column_name</varname> [, ...] )
        [, ...] | ALL [ PRIVILEGES ] ( <varname>column_name</varname> [, ...] ) }
        ON [ TABLE ] <varname>table_name</varname> [, ...]
        FROM { [ GROUP ]  <varname>role_name</varname> | PUBLIC } [, ...]
        [ CASCADE | RESTRICT ]
 
-REVOKE [GRANT OPTION FOR] { {USAGE | SELECT | UPDATE} [,...] 
-       | ALL [PRIVILEGES] }
-       ON { SEQUENCE <varname>sequence_name</varname> [, ...]
+REVOKE [GRANT OPTION FOR] { {USAGE | SELECT | UPDATE} [,...]
+       | ALL [PRIVILEGES] }
+       ON { SEQUENCE <varname>sequence_name</varname> [, ...]
             | ALL SEQUENCES IN SCHEMA schema_name [, ...] }
-       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC } [, ...]
-       [CASCADE | RESTRICT]
+       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC } [, ...]
+       [CASCADE | RESTRICT]
 
-REVOKE [GRANT OPTION FOR] { {CREATE | CONNECT 
-       | TEMPORARY | TEMP} [, ...] | ALL [PRIVILEGES] }
-       ON DATABASE <varname>database_name</varname> [, ...]
-       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC} [, ...]
-       [CASCADE | RESTRICT]
+REVOKE [GRANT OPTION FOR] { {CREATE | CONNECT
+       | TEMPORARY | TEMP} [, ...] | ALL [PRIVILEGES] }
+       ON DATABASE <varname>database_name</varname> [, ...]
+       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC} [, ...]
+       [CASCADE | RESTRICT]
 
 REVOKE [ GRANT OPTION FOR ]
        { USAGE | ALL [ PRIVILEGES ] }
        ON DOMAIN <varname>domain_name</varname> [, ...]
        FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC } [, ...]
        [ CASCADE | RESTRICT ]
-
 
 REVOKE [ GRANT OPTION FOR ]
        { USAGE | ALL [ PRIVILEGES ] }
@@ -49,119 +54,130 @@ REVOKE [ GRANT OPTION FOR ]
        [ CASCADE | RESTRICT ]
 
 REVOKE [GRANT OPTION FOR] {EXECUTE | ALL [PRIVILEGES]}
-       ON { FUNCTION <varname>funcname</varname> ( [[<varname>argmode</varname>] [<varname>argname</varname>] <varname>argtype</varname>
-                              [, ...]] ) [, ...]
+       ON { FUNCTION <varname>funcname</varname> ( [[<varname>argmode</varname>] [<varname>argname</varname>] <varname>argtype</varname>
+                                                 [, ...]] ) [, ...]
             | ALL FUNCTIONS IN SCHEMA schema_name [, ...] }
-       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC} [, ...]
-       [CASCADE | RESTRICT]
+       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC} [, ...]
+       [CASCADE | RESTRICT]
 
 REVOKE [GRANT OPTION FOR] {USAGE | ALL [PRIVILEGES]}
-       ON LANGUAGE <varname>langname</varname> [, ...]
-       FROM { [ GROUP ]  <varname>role_name</varname> | PUBLIC} [, ...]
-       [ CASCADE | RESTRICT ]
+       ON LANGUAGE <varname>langname</varname> [, ...]
+       FROM { [ GROUP ]  <varname>role_name</varname> | PUBLIC} [, ...]
+       [ CASCADE | RESTRICT ]
 
-REVOKE [GRANT OPTION FOR] { {CREATE | USAGE} [, ...] 
-       | ALL [PRIVILEGES] }
-       ON SCHEMA <varname>schema_name</varname> [, ...]
-       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC} [, ...]
-       [CASCADE | RESTRICT]
+REVOKE [GRANT OPTION FOR] { {CREATE | USAGE} [, ...]
+       | ALL [PRIVILEGES] }
+       ON SCHEMA <varname>schema_name</varname> [, ...]
+       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC} [, ...]
+       [CASCADE | RESTRICT]
 
 REVOKE [GRANT OPTION FOR] { CREATE | ALL [PRIVILEGES] }
-       ON TABLESPACE <varname>tablespacename</varname> [, ...]
-       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC } [, ...]
-       [CASCADE | RESTRICT]
+       ON TABLESPACE <varname>tablespacename</varname> [, ...]
+       FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC } [, ...]
+       [CASCADE | RESTRICT]
 
 REVOKE [ GRANT OPTION FOR ]
        { USAGE | ALL [ PRIVILEGES ] }
        ON TYPE <varname>type_name</varname> [, ...]
        FROM { [ GROUP ] <varname>role_name</varname> | PUBLIC } [, ...]
-       [ CASCADE | RESTRICT ] 
+       [ CASCADE | RESTRICT ]
 
-REVOKE [ADMIN OPTION FOR] <varname>parent_role</varname> [, ...] 
-       FROM [ GROUP ] <varname>member_role</varname> [, ...]
-       [CASCADE | RESTRICT]</codeblock></section><section id="section3"><title>Description</title><p><codeph>REVOKE</codeph> command revokes previously granted privileges
-from one or more roles. The key word <codeph>PUBLIC</codeph> refers to
-the implicitly defined group of all roles. </p><p>See the description of the <codeph><xref href="GRANT.xml#topic1" type="topic" format="dita"
-          /></codeph> command for the meaning of the privilege types. </p><p>Note that any particular role will have the sum of privileges granted directly to it, privileges
-        granted to any role it is presently a member of, and privileges granted to
-          <codeph>PUBLIC</codeph>. Thus, for example, revoking <codeph>SELECT</codeph> privilege
-        from <codeph>PUBLIC</codeph> does not necessarily mean that all roles have lost
-          <codeph>SELECT</codeph> privilege on the object: those who have it granted directly or via
-            another role will still have it. Similarly, revoking <codeph>SELECT</codeph> from a user might not prevent that user from using <codeph>SELECT</codeph> if <codeph>PUBLIC</codeph> or another membership role still has <codeph>SELECT</codeph> rights.</p><p>If <codeph>GRANT OPTION FOR</codeph> is specified, only the grant
-option for the privilege is revoked, not the privilege itself. Otherwise,
-both the privilege and the grant option are revoked. </p><p>If a role holds a privilege with grant option and has granted it to
-other roles then the privileges held by those other roles are called
-dependent privileges. If the privilege or the grant option held by the
-first role is being revoked and dependent privileges exist, those dependent
-privileges are also revoked if <codeph>CASCADE</codeph> is specified,
-else the revoke action will fail. This recursive revocation only affects
-privileges that were granted through a chain of roles that is traceable
-to the role that is the subject of this <codeph>REVOKE</codeph> command.
-Thus, the affected roles may effectively keep the privilege if it was
-also granted through other roles. </p>
-    <p>When you revoke privileges on a table, Greenplum Database revokes the
-      corresponding column privileges (if any) on each column of the table,
-      as well. On the other hand, if a role has been granted privileges on
-      a table, then revoking the same privileges from individual columns will
-      have no effect.</p>
-    <p>When revoking membership in a role, <codeph>GRANT OPTION</codeph>
-is instead called <codeph>ADMIN OPTION</codeph>, but the behavior is
-similar.</p></section><section id="section4a"><title>Parameters</title><p>See <codeph><xref href="GRANT.xml#topic1" type="topic" format="dita"/></codeph>.</p></section>
-  <section id="section4">
-    <title>Notes</title>
-    <p>A user may revoke only those privileges directly granted by that user.
-      If, for example, user A grants a privilege with grant option to user B,
-      and user B has in turn granted it to user C, then user A cannot revoke
-      the privilege directly from C. Instead, user A could revoke the grant
-      option from user B and use the <codeph>CASCADE</codeph> option so that
-      the privilege is in turn revoked from user C. For another example, if
-      both A and B grant the same privilege to C, A can revoke his own grant
-      but not B's grant, so C effectively still has the privilege.</p>
-    <p>When a non-owner of an object attempts to <codeph>REVOKE</codeph>
-      privileges on the object, the command fails outright if the user has no
-      privileges whatsoever on the object. As long as some privilege is available,
-      the command proceeds, but it will revoke only those privileges for which
-      the user has grant options. The <codeph>REVOKE ALL PRIVILEGES</codeph>
-      forms issue a warning message if no grant options are held, while the
-      other forms issue a warning if grant options for any of the privileges
-      specifically named in the command are not held. (In principle these
-      statements apply to the object owner as well, but since Greenplum Database
-      always treats the owner as holding all grant options, the cases can never
-      occur.)</p>
-    <p>If a superuser chooses to issue a <codeph>GRANT</codeph> or
-      <codeph>REVOKE</codeph> command, Greenplum Database performs the command
-      as though it were issued by the owner of the affected object. Since all
-      privileges ultimately come from the object owner (possibly indirectly
-      via chains of grant options), it is possible for a superuser to revoke
-      all privileges, but this might require use of <codeph>CASCADE</codeph>
-      as stated above.</p>
-    <p><codeph>REVOKE</codeph> may also be invoked by a role that is not the
-      owner of the affected object, but is a member of the role that owns the
-      object, or is a member of a role that holds privileges
-      <codeph>WITH GRANT OPTION</codeph> on the object. In this case, Greenplum
-      Database performs the command as though it were issued by the containing
-      role that actually owns the object or holds the privileges 
-      <codeph>WITH GRANT OPTION</codeph>. For example, if table <codeph>t1</codeph>
-       is owned by role <codeph>g1</codeph>, of which role <codeph>u1</codeph>
-       is a member, then <codeph>u1</codeph> can revoke privileges on
-       <codeph>t1</codeph> that are recorded as being granted by <codeph>g1</codeph>.
-       This includes grants made by <codeph>u1</codeph> as well as by other
-       members of role <codeph>g1</codeph>.</p>
-    <p>If the role that executes <codeph>REVOKE</codeph> holds privileges
-      indirectly via more than one role membership path, it is unspecified
-      which containing role will be used to perform the command. In such cases
-      it is best practice to use <codeph>SET ROLE</codeph> to become the
-      specific role as which you want to do the <codeph>REVOKE</codeph>.
-      Failure to do so may lead to revoking privileges other than the ones
-      you intended, or not revoking any privileges at all.</p>
-    <p>Use <codeph>psql</codeph>'s <codeph>\dp</codeph> meta-command to obtain information about
-      existing privileges for tables and columns.  There are other <codeph>\d</codeph>
-      meta-commands that you can use to display the privileges of non-table
-      objects.</p>
-  </section>
+REVOKE [ADMIN OPTION FOR] <varname>parent_role</varname> [, ...]
+       FROM [ GROUP ] <varname>member_role</varname> [, ...]
+       [CASCADE | RESTRICT]</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>REVOKE</codeph>命令从一个或多个角色撤消先前授予的特权。
+                关键字<codeph>PUBLIC</codeph>指所有角色的隐式定义组。
+            </p>
+            <p>有关特权类型的含义，请参见<codeph><xref href="GRANT.xml#topic1" type="topic" format="dita"/></codeph>命令的描述。
+            </p>
+            <p>请注意，任何特定角色将具有直接授予它的特权，授予该角色当前成员的任何角色的特权以及授予<codeph>PUBLIC</codeph>的特权的总和。
+                因此，例如，从<codeph>PUBLIC</codeph>撤消<codeph>SELECT</codeph>特权并不一定意味着所有角色都对该对象失去<codeph>SELECT</codeph>特权：
+                直接或通过其他角色授予它的那些人仍然拥有该特权。
+                同样，如果<codeph>PUBLIC</codeph>或其他成员身份角色仍然具有<codeph>SELECT</codeph>权限，
+                则从用户撤消<codeph>SELECT</codeph>可能不会阻止该用户使用<codeph>SELECT</codeph>。
+            </p>
+            <p>如果指定了<codeph>GRANT OPTION FOR</codeph>，则仅撤销特权的授予选项，而不撤销特权本身。
+                否则，特权和授予选项都将被撤销。
+            </p>
+            <p>如果某个角色拥有带有“授予”选项的特权并将其授予其他角色，则这些其他角色所拥有的特权称为“从属特权”。
+                如果第一个角色持有的特权或授予选项被撤销，并且存在从属特权，
+                则如果指定了<codeph>CASCADE</codeph>，那些从属特权也将被撤销，否则撤销操作将失败。
+                此递归撤销仅影响通过可追溯到此<codeph>REVOKE</codeph>命令对象的角色的角色链授予的特权。
+                因此，如果还通过其他角色授予了特权，则受影响的角色可以有效地保留特权。
+            </p>
+            <p>当您撤消对表的特权时，Greenplum数据库也会撤消对表的每一列的相应列特权（如果有）。
+                另一方面，如果已授予角色某个表的特权，则从单独列中撤消相同的特权将无效。
+            </p>
+            <p>撤销角色成员身份时，<codeph>GRANT OPTION</codeph>改为<codeph>ADMIN OPTION</codeph>，但行为类似。
+            </p>
+        </section>
+        <section id="section4a">
+            <title>参数</title>
+            <p>参见<codeph><xref href="GRANT.xml#topic1" type="topic" format="dita"/></codeph>。
+            </p>
+        </section>
+        <section id="section4">
+            <title>注解</title>
+            <p>用户只能撤消该用户直接授予的那些特权。
+                例如，如果用户A向用户B授予了具有授予选项的特权，而用户B又将其授予了用户C，则用户A无法直接从C撤消该特权。
+                而是，用户A可以撤消用户B的授予选项，并使用<codeph>CASCADE</codeph>选项，以便依次从用户C撤消特权。
+                例如，如果A和B都向C授予相同的特权，则A可以撤消他自己的授予，但不能撤消B的授予，因此C实际上仍然有特权。
+            </p>
+            <p>当对象的非所有者尝试<codeph>REVOKE</codeph>对对象的特权时，如果用户对对象没有任何特权，则该命令将彻底失败。
+                只要有某些特权，该命令就会继续执行，但是它将仅撤销用户具有授予选项的那些特权。
+                如果未保留任何授予选项，则<codeph>REVOKE ALL PRIVILEGES</codeph>形式将发出警告消息，
+                而如果未保留针对命令中明确指定的任何特权的授予选项，则其他形式将发出警告。
+                （原则上，这些声明也适用于对象所有者，但是由于Greenplum数据库始终将所有者视为拥有所有授予选项的对象，因此永远不会发生这种情况。）
+            </p>
+            <p>如果超级用户选择发出<codeph>GRANT</codeph>或<codeph>REVOKE</codeph>命令，
+                则Greenplum数据库将执行该命令，就像它是由受影响对象的所有者发出的一样。
+                由于所有特权最终都来自对象所有者（可能间接地通过授予选项链），
+                因此超级用户可以撤消所有特权，但是如上所述，这可能需要使用<codeph>CASCADE</codeph>。
+            </p>
+            <p><codeph>REVOKE</codeph>也可以由不是受影响对象的所有者，但是拥有该对象的角色的成员，
+                或者是持有对该对象具有<codeph>WITH GRANT OPTION</codeph>特权的角色的成员来调用。
+                在这种情况下，Greenplum数据库将执行该命令，就像它是由实际拥有该对象或拥有<codeph>WITH GRANT OPTION</codeph>特权的用户所包含的角色发出的那样。
+                例如，如果表<codeph>t1</codeph>由角色<codeph>g1</codeph>拥有，
+                而角色<codeph>u1</codeph>是它的成员，则<codeph>u1</codeph>可以撤销<codeph>t1</codeph>上记录为由<codeph>g1</codeph>授予的特权。
+                这包括<codeph>u1</codeph>以及角色<codeph>g1</codeph>的其他成员所做的授权。
+            </p>
+            <p>如果执行<codeph>REVOKE</codeph>的角色通过多个角色成员路径间接持有特权，则未指定将使用哪个包含角色来执行命令。
+                在这种情况下，最佳实践是使用<codeph>SET ROLE</codeph>来成为要<codeph>REVOKE</codeph>的特定角色。
+                否则，可能会导致撤销您想要的特权以外的特权，或者根本不撤销任何特权。
+            </p>
+            <p>使用psql的<codeph>\dp</codeph>元命令来获取有关表和列的现有特权的信息。
+                您还可以使用其他<codeph>\d</codeph>元命令来显示非表对象的特权。
+            </p>
+        </section>
 
-<section id="section5"><title>Examples</title><p>Revoke insert privilege for the public on table <codeph>films</codeph>: </p><codeblock>REVOKE INSERT ON films FROM PUBLIC;</codeblock><p>Revoke all privileges from role <codeph>sally</codeph> on view <codeph>topten</codeph>. Note that
-        this actually means revoke all privileges that the current role granted (if not a
-        superuser).</p><codeblock>REVOKE ALL PRIVILEGES ON topten FROM sally;</codeblock><p>Revoke membership in role <codeph>admins</codeph> from user <codeph>joe</codeph>: </p><codeblock>REVOKE admins FROM joe;</codeblock></section><section id="section6"><title>Compatibility</title><p>The compatibility notes of the <codeph><xref href="GRANT.xml#topic1" type="topic" format="dita"
-          /></codeph> command also apply to <codeph>REVOKE</codeph>. </p><p>Either <codeph>RESTRICT</codeph> or <codeph>CASCADE</codeph> is required according to the
-        standard, but Greenplum Database assumes <codeph>RESTRICT</codeph> by default.</p></section><section id="section7"><title>See Also</title><p><codeph><xref href="GRANT.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+        <section id="section5">
+            <title>示例</title>
+            <p>撤销public对表<codeph>films</codeph>的插入特权：
+            </p>
+            <codeblock>REVOKE INSERT ON films FROM PUBLIC;</codeblock>
+            <p>从<codeph>topten</codeph>视图中的角色<codeph>sally</codeph>撤消所有特权。
+                请注意，这实际上意味着撤销当前角色（如果不是超级用户）授予的所有特权。
+            </p>
+            <codeblock>REVOKE ALL PRIVILEGES ON topten FROM sally;</codeblock>
+            <p>从用户<codeph>joe</codeph>撤消角色<codeph>admins</codeph>的成员资格：
+            </p>
+            <codeblock>REVOKE admins FROM joe;</codeblock>
+        </section>
+        <section id="section6">
+            <title>兼容性</title>
+            <p><codeph><xref href="GRANT.xml#topic1" type="topic" format="dita"/></codeph>命令的兼容性说明也适用于<codeph>REVOKE</codeph>。
+            </p>
+            <p>根据标准，需要<codeph>RESTRICT</codeph>或<codeph>CASCADE</codeph>，
+                但是默认情况下Greenplum数据库假定<codeph>RESTRICT</codeph>。
+            </p>
+        </section>
+        <section id="section7">
+            <title>另见</title>
+            <p><codeph><xref href="GRANT.xml#topic1" type="topic" format="dita"/></codeph>
+            </p>
+        </section>
+    </body>
+</topic>

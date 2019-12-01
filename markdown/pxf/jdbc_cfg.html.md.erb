@@ -1,51 +1,51 @@
 ---
-title: Configuring the JDBC Connector (Optional)
+title: 配置JDBC连接器（可选）
 ---
 
-You can use PXF to access an external SQL database including MySQL, ORACLE, PostgreSQL, Apache Ignite, and Hive. This topic describes how to configure the PXF JDBC Connector to access these external data sources.
+您可以使用PXF访问包括MySQL，ORACLE，PostgreSQL，Apache Ignite和Hive在内的外部SQL数据库。本主题描述如何配置PXF JDBC连接器以访问这些外部数据源。
 
-*If you do not plan to use the PXF JDBC Connector, then you do not need to perform this procedure.*
+*如果您不打算使用PXF JDBC连接器，则不需要执行此过程。*
 
-## <a id="about_cfg"></a>About JDBC Configuration
+## <a id="about_cfg"></a>JDBC配置
 
-To access data in an external SQL database with the PXF JDBC Connector, you must:
+要使用PXF JDBC连接器访问外部SQL数据库中的数据，您必须:
 
-- Register a compatible JDBC driver JAR file
-- Specify the JDBC driver class name, database URL, and client credentials
+- 注册兼容的JDBC驱动程序JAR文件
+- 指定JDBC驱动程序类名称，数据库URL和客户端凭据
 
-In previous releases of Greenplum Database, you may have specified the JDBC driver class name, database URL, and client credentials via options in the `CREATE EXTERNAL TABLE` command. PXF now supports file-based server configuration for the JDBC Connector. This configuration, described below, allows you to specify these options and credentials in a file.
+在以前的Greenplum数据库版本中，需要通过在`CREATE EXTERNAL TABLE`命令中指定JDBC驱动程序类名称，数据库URL和客户端凭据。现在PXF支持JDBC连接器的基于文件的服务器配置。如下所述，此配置使您可以在文件中指定这些选项和凭据。
 
-**Note**: PXF external tables that you previously created that directly specified the JDBC connection options will continue to work. If you want to move these tables to use JDBC file-based server configuration, you must create a server configuration, drop the external tables, and then recreate the tables specifying an appropriate `SERVER=<servercfg>` clause.
+**Note**: 先前创建的通过直接指定JDBC连接选项的PXF外部表将继续起作用。如果要修改这些表基于JDBC文件的服务器配置，则必须创建服务器配置，删除外部表，然后重新创建表，并指定适当的SERVER = <servercfg>子句。
 
-### <a id="cfg_jar"></a>JDBC Driver JAR Registration
+### <a id="cfg_jar"></a>注册JDBC驱动程序JAR
 
-The PXF JDBC connector is installed with the `postgresql-8.4-702.jdbc4.jar` JAR file. If you require a different JDBC driver, ensure that you install the JDBC driver JAR file for the external SQL database in the `$PXF_CONF/lib` directory on each segment host. Be sure to install JDBC driver JAR files that are compatible with your JRE version. See [Registering PXF JAR Dependencies](reg_jar_depend.html) for additional information.
+PXF JDBC连接器与`postgresql-8.4-702.jdbc4.jar` JAR文件一起安装。如果需要其他JDBC驱动程序，请确保在每个segment主机的`$PXF_CONF/lib`目录中为外部SQL数据库安装JDBC驱动程序JAR文件。确保安装与您的JRE版本兼容的JDBC驱动程序JAR文件。更多参阅[Registering PXF JAR Dependencies](reg_jar_depend.html)
 
-### <a id="cfg_server"></a>JDBC Server Configuration
+### <a id="cfg_server"></a>JDBC服务配置
 
-PXF provides a template configuration file for the JDBC Connector. This server template configuration file, located in `$PXF_CONF/templates/jdbc-site.xml`, identifies the minimum set of properties that you must configure to use the PXF JDBC Connector.
+PXF提供了JDBC连接器的模板配置文件。该服务器模板配置文件位于`$PXF_CONF/templates/jdbc-site.xml`中，标识了必须配置才能使用PXF JDBC连接器的最小属性集。
 
-The properties in the `jdbc-site.xml` server template file follow:
+`jdbc-site.xml`服务器模板文件中的属性如下:
 
-| Property       | Description                                | Value |
-|----------------|--------------------------------------------|-------|
-| jdbc.driver | Class name of the JDBC driver. | The JDBC driver Java class name; for example `org.postgresql.Driver`. |
-| jdbc.url | The URL that the JDBC driver uses to connect to the database. | The database connection URL (database-specific); for example `jdbc:postgresql://phost:pport/pdatabase`. |
-| jdbc.user | The database user name. | The user name for connecting to the database. |
-| jdbc.password | The password for `jdbc.user`. | The password for connecting to the database. |
+| Property       | Description      | Value |
+|----------------|------------------|----------------------------------|
+| jdbc.driver    | JDBC驱动类名称   | JDBC驱动程序Java类名； 例如org.postgresql.Driver |
+| jdbc.url | JDBC驱动程序用于连接数据库的URL | 数据库连接URL(特定于数据库)，例如：`jdbc:postgresql://phost:pport/pdatabase` |
+| jdbc.user |  数据库用户名| 连接数据库的用户名 |
+| jdbc.password | `jdbc.user`的密码 | 连接数据库的密码 |
 
-<div class="note">When you configure a PXF JDBC server, you specify the external database user credentials to PXF in clear text in a configuration file.</div>
+<div class="note">配置PXF JDBC服务器时，可以在配置文件中以明文形式为PXF指定外部数据库用户凭据</div>
 
-When you configure the PXF JDBC Connector to access an external SQL database, you add at least one named PXF server configuration for the connector. You:
+在配置PXF JDBC连接器以访问外部SQL数据库时，请为连接器至少添加一个名为PXF的服务器配置。你
 
-1. Choose a name for the server configuration.
-2. Create the directory `$PXF_CONF/servers/<server_name>`.
-3. Copy the PXF `jdbc-site.xml` template configuration file to the new server directory.
-4. Fill in appropriate values for the properties in the template file.
-6. Synchronize the server configuration to each Greenplum Database segment host.
-7. Publish the PXF server name(s) to your Greenplum Database end users as appropriate.
+1. 选择服务器配置的名称
+2. 创建目录`$PXF_CONF/servers/<server_name>`.
+3. 拷贝`jdbc-site.xml`模板配置文件到新的服务器目录
+4. 为模板文件中的属性填写适当的值
+5. 将服务器配置同步到每个Greenplum数据库segment主机
+6. 将PXF服务器名称发布给Greenplum数据库最终用户
 
-The Greenplum Database user specifies the `<server_name>` in the `CREATE EXTERNAL TABLE` `LOCATION` clause `SERVER` option to access the external SQL database. For example, if you created a server configuration and named the server directory `pgsrvcfg`:
+Greenplum数据库用户在`CREATE EXTERNAL TABLE`的`LOCATION`子句`SERVER`选项中指定了`<server_name>`，以访问外部SQL数据库。例如，如果您创建了服务器配置并将服务器目录命名为`pgsrvcfg`：
 
 <pre>
 CREATE EXTERNAL TABLE pxf_ext_tbl(name text, orders int)
@@ -53,39 +53,39 @@ CREATE EXTERNAL TABLE pxf_ext_tbl(name text, orders int)
 FORMAT 'TEXT' (delimiter=E',');
 </pre>
 
-<div class="note info">A Greenplum Database user who queries or writes to an external table that specifies a server name accesses the external SQL database with the credentials configured for that server.</div>
+<div class="note info">通过查询或写入指定服务器名称的外部表的Greenplum数据库用户，可以使用为该服务器配置的凭据访问外部SQL数据库。</div>
 
-While not recommended, you can override a JDBC server configuration by directly specifying the driver, database URL, and/or user credentials via custom options in the `CREATE EXTERNAL TABLE` command `LOCATION` clause. Refer to [Accessing an SQL Database with JDBC](jdbc_pxf.html) for additional information.
+尽管不建议这样做，但是你还是可以通过`CREATE EXTERNAL TABLE`命令`LOCATION`子句中的自定义选项直接指定驱动程序，数据库URL(和/或)用户凭据，从而覆盖JDBC服务器配置。参阅[Accessing an SQL Database with JDBC](jdbc_pxf.html)
 
-## <a id="cfg_proc"></a>Example Configuration Procedure
+## <a id="cfg_proc"></a>配置过程示例
 
-Ensure that you have initialized PXF before you configure a JDBC Connector server.
+在配置JDBC连接器服务器之前，请确保已初始化PXF。
 
-In this procedure, you name and add a PXF JDBC server configuration for a PostgreSQL database and synchronize the server configuration(s) to all segment hosts.
+在此过程中，您将为PostgreSQL数据库命名并添加PXF JDBC服务器配置，并将该服务器配置同步到所有Segment主机。
 
-1. Log in to your Greenplum Database master node:
+1. 登录到GPDB的master节点
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. Choose a name for the JDBC server. You will provide the name to Greenplum users that you choose to allow to reference tables in the external SQL database as the configured user.
+2. 选择JDBC服务器名称,您将名称提供给您选择的Greenplum用户，以允许他们作为配置用户引用外部SQL数据库中的表。
 
-    **Note**: The server name `default` is reserved.
+    **Note**: `default`为保留服务名。
 
-3. Create the `$PXF_HOME/servers/<server_name>` directory. For example, use the following command to create a JDBC server configuration named `pg_user1_testdb`:
+3. 创建`$PXF_HOME/servers/<server_name>`目录。例如，使用以下命令创建名为`pg_user1_testdb`的JDBC服务配置。
 
     ``` shell
     gpadmin@gpmaster$ mkdir $PXF_CONF/servers/pg_user1_testdb
     ````
 
-4. Copy the PXF JDBC server template file to the server configuration directory. For example:
+4. 将PXF JDBC服务器模板文件复制到服务器配置目录。 例如：
 
     ``` shell
     gpadmin@gpmaster$ cp $PXF_CONF/templates/jdbc-site.xml $PXF_CONF/servers/pg_user1_testdb/
     ```
-        
-5. Open the template server configuration file in the editor of your choice, and provide appropriate property values for your environment. For example, if you are configuring access to a PostgreSQL database named `testdb` on a PostgreSQL instance running on the host named `pgserverhost` for the user named `user1`:
+
+5. 使用编辑器中打开模板服务器配置文件，并为您的环境提供适当的属性值。例如，如果要在名为`pgserverhost`的主机上运行的PostgreSQL实例上为名为`user1`的用户配置对名为`testdb`的PostgreSQL数据库的访问:
 
     ``` xml
     <?xml version="1.0" encoding="UTF-8"?>
@@ -108,19 +108,18 @@ In this procedure, you name and add a PXF JDBC server configuration for a Postgr
         </property>
     </configuration>
     ```
-6. Save your changes and exit the editor.
+6. 保存修改并退出
 
-7. Use the `pxf cluster sync` command to copy the new server configurations to each Greenplum Database segment host. For example:
-    
+7. 使用`pxf cluster sync`命令将新的服务器配置复制到每个Greenplum数据库segment主机。例如：
+
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
     ```
 
-## <a id="client-cfg-update"></a>Adding or Updating JDBC Server Configuration
+## <a id="client-cfg-update"></a>添加或更新JDBC服务配置
 
-If you add a new, or update an existing, JDBC server configuration on the Greenplum Database master host, you must re-sync the PXF configuration to the Greenplum Database cluster:
+如果要在Greenplum数据库master主机上添加新的JDBC服务配置或更新现有的JDBC服务配置，则必须将PXF配置重新同步到Greenplum数据库集群的各个segment
 
 ``` shell
 gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
 ```
-

@@ -1,73 +1,205 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
-  PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="dr20941">FETCH</title><body><p id="sql_command_desc">Retrieves rows from a query using a cursor.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">FETCH [ <varname>forward_direction</varname> { FROM | IN } ] <varname>cursor_name</varname></codeblock><p>where <varname>forward_direction</varname> can be empty or one of:</p><codeblock>    NEXT
-    FIRST
-    LAST
-    ABSOLUTE <varname>count</varname>
-    RELATIVE <varname>count</varname>
-    <varname>count</varname>
-    ALL
-    FORWARD
-    FORWARD <varname>count</varname>
-    FORWARD ALL</codeblock></section><section id="section3"><title>Description</title><p><codeph>FETCH</codeph> retrieves rows using a previously-created cursor.
-</p>
-<note>This page describes usage of cursors at the SQL command level. If you are
-trying to use cursors inside a PL/pgSQL function, the rules are different. See
-<xref href="../extensions/pl_sql.xml#topic1"/>.</note><p>A cursor has an associated position, which is used by <codeph>FETCH</codeph>.
-The cursor position can be before the first row of the query result,
-on any particular row of the result, or after the last row of the result.
-When created, a cursor is positioned before the first row. After fetching
-some rows, the cursor is positioned on the row most recently retrieved.
-If <codeph>FETCH</codeph> runs off the end of the available rows then
-the cursor is left positioned after the last row. <codeph>FETCH ALL</codeph>
-will always leave the cursor positioned after the last row. </p><p>The forms <codeph>NEXT</codeph>, <codeph>FIRST</codeph>, <codeph>LAST</codeph>,
-<codeph>ABSOLUTE</codeph>, <codeph>RELATIVE</codeph> fetch a single row
-after moving the cursor appropriately. If there is no such row, an empty
-result is returned, and the cursor is left positioned before the first
-row or after the last row as appropriate. </p><p>The forms using <codeph>FORWARD</codeph> retrieve the indicated number
-of rows moving in the forward direction, leaving the cursor positioned
-on the last-returned row (or after all rows, if the count exceeds the
-number of rows available). Note that it is not possible to move a cursor
-position backwards in Greenplum Database, since scrollable cursors are
-not supported. You can only move a cursor forward in position using <codeph>FETCH</codeph>.</p><p><codeph>RELATIVE 0</codeph> and <codeph>FORWARD 0</codeph> request
-fetching the current row without moving the cursor, that is, re-fetching
-the most recently fetched row. This will succeed unless the cursor is
-positioned before the first row or after the last row, in which case
-no row is returned.</p><sectiondiv id="section4"><b>Outputs</b><p>On successful completion, a <codeph>FETCH</codeph> command returns a
-command tag of the form</p><codeblock>FETCH <varname>count</varname></codeblock><p>The count is the number of rows fetched (possibly zero). Note that in
-<codeph>psql</codeph>, the command tag will not actually be displayed,
-since <codeph>psql</codeph> displays the fetched rows instead.</p></sectiondiv></section><section id="section5"><title>Parameters</title><parml><plentry><pt><varname>forward_direction</varname></pt><pd>Defines the fetch direction and number of rows to fetch. Only forward
-fetches are allowed in Greenplum Database. It can be one of the following:</pd></plentry><plentry><pt>NEXT</pt><pd>Fetch the next row. This is the default if direction is omitted.</pd></plentry><plentry><pt>FIRST</pt><pd>Fetch the first row of the query (same as <codeph>ABSOLUTE 1</codeph>).
-Only allowed if it is the first <codeph>FETCH</codeph> operation using
-this cursor.</pd></plentry><plentry><pt>LAST</pt><pd>Fetch the last row of the query (same as <codeph>ABSOLUTE -1</codeph>).
-</pd></plentry><plentry><pt>ABSOLUTE <varname>count</varname></pt><pd>Fetch the specified row of the query. Position after last row if
-count is out of range. Only allowed if the row specified by <varname>count</varname>
-moves the cursor position forward.</pd></plentry><plentry><pt>RELATIVE <varname>count</varname></pt><pd>Fetch the specified row of the query <varname>count</varname> rows ahead of the
-current cursor position. <codeph>RELATIVE 0</codeph> re-fetches the current
-row, if any. Only allowed if <varname>count</varname> moves the cursor position forward.</pd></plentry><plentry><pt><varname>count</varname></pt><pd>Fetch the next <varname>count</varname> number of rows (same as <codeph>FORWARD <varname>count</varname></codeph>). </pd></plentry><plentry><pt>ALL</pt><pd>Fetch all remaining rows (same as <codeph>FORWARD ALL</codeph>).
-</pd></plentry><plentry><pt>FORWARD</pt><pd>Fetch the next row (same as <codeph>NEXT</codeph>). </pd></plentry><plentry><pt>FORWARD <varname>count</varname></pt><pd>Fetch the next <varname>count</varname> number of rows. <codeph>FORWARD 0</codeph>
-re-fetches the current row. </pd></plentry><plentry><pt>FORWARD ALL</pt><pd>Fetch all remaining rows. </pd></plentry><plentry><pt><varname>cursor_name</varname></pt><pd>The name of an open cursor. </pd></plentry></parml></section><section id="section6"><title>Notes</title><p>Greenplum Database does not support scrollable cursors, so you can only
-use <codeph>FETCH</codeph> to move the cursor position forward.</p><p><codeph>ABSOLUTE</codeph> fetches are not any faster than navigating
-to the desired row with a relative move: the underlying implementation
-must traverse all the intermediate rows anyway.</p><p><codeph>DECLARE</codeph> is used to define a cursor. Use <codeph>MOVE</codeph>
-to change cursor position without retrieving data.</p></section><section id="section7"><title>Examples</title><p>-- Start the transaction:</p><codeblock>BEGIN;</codeblock><p>-- Set up a cursor:</p><codeblock>DECLARE mycursor CURSOR FOR SELECT * FROM films;</codeblock><p>-- Fetch the first 5 rows in the cursor <codeph>mycursor</codeph>:</p><codeblock>FETCH FORWARD 5 FROM mycursor;
- code  |          title          | did | date_prod  |   kind   |  len
+        PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<topic id="topic1">
+    <title id="dr20941">FETCH</title>
+    <body>
+        <p id="sql_command_desc">使用游标从查询中检索行。</p>
+        <section id="section2">
+            <title>概要</title>
+            <codeblock id="sql_command_synopsis">FETCH [ <varname>forward_direction</varname> { FROM | IN } ]
+                <varname>cursor_name</varname>
+            </codeblock>
+            <p>其中<varname>forward_direction</varname>可以为空或以下之一：
+            </p>
+            <codeblock>    NEXT
+    FIRST
+    LAST
+    ABSOLUTE <varname>count</varname>
+    RELATIVE <varname>count</varname>
+    <varname>count</varname>
+    ALL
+    FORWARD
+    FORWARD <varname>count</varname>
+    FORWARD ALL</codeblock>
+        </section>
+        <section id="section3">
+            <title>描述</title>
+            <p><codeph>FETCH</codeph>使用先前创建的游标检索行。
+            </p>
+            <note>本页在SQL命令级别描述游标的用法。
+                如果试图在PL/pgSQL函数中使用游标，则规则是不同的。
+                参见<xref href="../extensions/pl_sql.xml#topic1"/>。
+            </note>
+            <p>游标具有关联的位置，该位置由<codeph>FETCH</codeph>使用。
+                光标位置可以在查询结果的第一行之前，结果的任何特定行上，或者在结果的最后一行之后。
+                创建后，光标将位于第一行之前。
+                在获取了一些行之后，将光标定位在最近检索到的行上。
+                如果<codeph>FETCH</codeph>在可用行的末尾运行，则光标将位于最后一行之后。
+                <codeph>FETCH ALL</codeph>将始终使光标位于最后一行之后。
+            </p>
+            <p><codeph>NEXT</codeph>，<codeph>FIRST</codeph>，<codeph>LAST</codeph>，<codeph>ABSOLUTE</codeph>，
+                <codeph>RELATIVE</codeph>形式在适当移动光标后获取单行。
+                如果没有这样的行，则返回空结果，并且光标将视情况放在第一行之前或最后一行之后。
+            </p>
+            <p>使用<codeph>FORWARD</codeph>的表单将检索指示的向前行的行数，将光标留在最后返回的行上（如果计数超过可用行数，则在所有行之后）。
+                请注意，由于不支持可滚动光标，因此无法在Greenplum数据库中后向移动光标位置。
+                您只能使用<codeph>FETCH</codeph>向前移动光标。
+            </p>
+            <p><codeph>RELATIVE 0</codeph>和<codeph>FORWARD 0</codeph>在不移动光标的情况下请求获取当前行，即重新获取最近获取的行。
+                除非光标位于第一行之前或最后一行之后，否则此操作将成功，在这种情况下不会返回任何行。
+            </p>
+            <sectiondiv id="section4">
+                <b>输出</b>
+                <p>成功完成后，<codeph>FETCH</codeph>命令将返回以下形式的命令标签：
+                </p>
+                <codeblock>FETCH <varname>count</varname></codeblock>
+                <p>该计数是获取的行数（可能为零）。
+                    请注意，在<codeph>psql</codeph>中，实际上不会显示command标记，因为<codeph>psql</codeph>只是显示提取的行。
+                </p>
+            </sectiondiv>
+        </section>
+        <section id="section5">
+            <title>参数</title>
+            <parml>
+                <plentry>
+                    <pt>
+                        <varname>forward_direction</varname>
+                    </pt>
+                    <pd>定义获取方向和要获取的行数。Greenplum数据库中仅允许前向提取。可以是以下之一：
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>NEXT</pt>
+                    <pd>获取下一行。如果省略了方向，则为默认设置。</pd>
+                </plentry>
+                <plentry>
+                    <pt>FIRST</pt>
+                    <pd>提取查询的第一行（与<codeph>ABSOLUTE 1</codeph>相同）。
+                        仅当它是使用此光标的第一个<codeph>FETCH</codeph>操作时才允许。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>LAST</pt>
+                    <pd>获取查询的最后一行（与<codeph>ABSOLUTE -1</codeph>相同）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>ABSOLUTE <varname>count</varname>
+                    </pt>
+                    <pd>获取查询的指定行。
+                        如果计数超出范围，则在最后一行之后定位。
+                        只有在被指定了<varname>count</varname>的行向前移动游标位置才能使用。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>RELATIVE <varname>count</varname>
+                    </pt>
+                    <pd>在当前光标位置之前获取查询<varname>count</varname>行的指定行。
+                        <codeph>RELATIVE 0</codeph>重新获取当前行（如果有）。
+                        仅当<varname>count</varname>向前移动光标位置时才允许。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>count</varname>
+                    </pt>
+                    <pd>获取下一个<varname>count</varname>行数（与<codeph>FORWARD <varname>count</varname></codeph>相同）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>ALL</pt>
+                    <pd>提取所有剩余的行（与<codeph>FORWARD ALL</codeph>相同）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>FORWARD</pt>
+                    <pd>获取下一行（与<codeph>NEXT</codeph>相同）。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>FORWARD <varname>count</varname>
+                    </pt>
+                    <pd>获取下一个<varname>count</varname>行数。
+                        <codeph>FORWARD 0</codeph>重新获取当前行。
+                    </pd>
+                </plentry>
+                <plentry>
+                    <pt>FORWARD ALL</pt>
+                    <pd>提取所有剩余的行。</pd>
+                </plentry>
+                <plentry>
+                    <pt>
+                        <varname>cursor_name</varname>
+                    </pt>
+                    <pd>打开的游标的名称。</pd>
+                </plentry>
+            </parml>
+        </section>
+        <section id="section6">
+            <title>注解</title>
+            <p>Greenplum数据库不支持可滚动光标，因此只能使用<codeph>FETCH</codeph>向前移动光标位置。
+            </p>
+            <p><codeph>ABSOLUTE</codeph>获取并不比通过相对移动导航到所需行更快：底层实现无论如何都必须遍历所有中间行。
+            </p>
+            <p><codeph>DECLARE</codeph>用于定义游标。使用<codeph>MOVE</codeph>更改光标位置而不检索数据。
+            </p>
+        </section>
+        <section id="section7">
+            <title>示例</title>
+            <p>-- 开始事务：</p>
+            <codeblock>BEGIN;</codeblock>
+            <p>-- 设置游标：</p>
+            <codeblock>DECLARE mycursor CURSOR FOR SELECT * FROM films;</codeblock>
+            <p>-- 获取游标<codeph>mycursor</codeph>中的前5行：
+            </p>
+            <codeblock>FETCH FORWARD 5 FROM mycursor;
+code | title | did | date_prod | kind | len
 -------+-------------------------+-----+------------+----------+-------
- BL101 | The Third Man           | 101 | 1949-12-23 | Drama    | 01:44
- BL102 | The African Queen       | 101 | 1951-08-11 | Romantic | 01:43
- JL201 | Une Femme est une Femme | 102 | 1961-03-12 | Romantic | 01:25
- P_301 | Vertigo                 | 103 | 1958-11-14 | Action   | 02:08
- P_302 | Becket                  | 103 | 1964-02-03 | Drama    | 02:28</codeblock><p>-- Close the cursor and end the transaction:</p><codeblock>CLOSE mycursor;
-COMMIT;</codeblock><p>Change the <codeph>kind</codeph> column of the table <codeph>films</codeph> in the row at the <codeph>c_films</codeph> cursor's current position:</p>
-<codeblock>UPDATE films SET kind = 'Dramatic' WHERE CURRENT OF c_films;</codeblock>
-</section><section id="section8"><title>Compatibility</title><p>SQL standard allows cursors only in embedded SQL and in modules. Greenplum
-Database permits cursors to be used interactively. </p><p>The variant of <codeph>FETCH</codeph> described here returns the data
-as if it were a <codeph>SELECT</codeph> result rather than placing it
-in host variables. Other than this point, <codeph>FETCH</codeph> is fully
-upward-compatible with the SQL standard. </p><p>The <codeph>FETCH</codeph> forms involving <codeph>FORWARD</codeph>,
-as well as the forms <codeph>FETCH</codeph> count and <codeph>FETCH</codeph><codeph>ALL</codeph>, in which <codeph>FORWARD</codeph> is implicit,
-are Greenplum Database extensions. <codeph>BACKWARD</codeph> is not supported.</p><p>The SQL standard allows only <codeph>FROM</codeph> preceding the cursor name; the option to use
-          <codeph>IN</codeph>, or to leave them out altogether, is an extension.</p></section><section id="section9"><title>See Also</title><p><codeph><xref href="DECLARE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="CLOSE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="./MOVE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+BL101 | The Third Man | 101 | 1949-12-23 | Drama | 01:44
+BL102 | The African Queen | 101 | 1951-08-11 | Romantic | 01:43
+JL201 | Une Femme est une Femme | 102 | 1961-03-12 | Romantic | 01:25
+P_301 | Vertigo | 103 | 1958-11-14 | Action | 02:08
+P_302 | Becket | 103 | 1964-02-03 | Drama | 02:28</codeblock>
+            <p>-- 关闭游标并提交事务：</p>
+            <codeblock>CLOSE mycursor;
+COMMIT;</codeblock>
+            <p>在<codeph>c_films</codeph>光标当前位置的行中更改表<codeph>films</codeph>的<codeph>kind</codeph>列：
+            </p>
+            <codeblock>UPDATE films SET kind = 'Dramatic' WHERE CURRENT OF c_films;</codeblock>
+        </section>
+        <section id="section8">
+            <title>兼容性</title>
+            <p>SQL标准仅允许在嵌入式SQL和模块中使用游标。
+                Greenplum数据库允许以交互方式使用游标。
+            </p>
+            <p>这里描述的<codeph>FETCH</codeph>的变量将数据作为<codeph>SELECT</codeph>结果返回，而不是将其放在主机变量中。
+                除此之外，<codeph>FETCH</codeph>与SQL标准完全向上兼容。
+            </p>
+            <p>涉及<codeph>FORWARD</codeph>的<codeph>FETCH</codeph>形式以及其中隐含<codeph>FORWARD</codeph>的<codeph>FETCH count</codeph>和<codeph>FETCH ALL</codeph>形式都是Greenplum数据库扩展。
+                不支持<codeph>BACKWARD</codeph>。
+            </p>
+            <p>SQL标准只允许在游标名称之前使用<codeph>FROM</codeph>。
+                使用<codeph>IN</codeph>或完全不使用它们的选项是扩展。
+            </p>
+        </section>
+        <section id="section9">
+            <title>另见</title>
+            <p>
+                <codeph>
+                    <xref href="DECLARE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="CLOSE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+                ,
+                <codeph>
+                    <xref
+                            href="./MOVE.xml#topic1" type="topic" format="dita"/>
+                </codeph>
+            </p>
+        </section>
+    </body>
+</topic>
