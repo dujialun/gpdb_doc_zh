@@ -5,143 +5,124 @@
     <!--install_guide/refs/gpseginstall.xml has a conref to this topic. -->
     <title id="jv133181">gpseginstall</title>
     <body>
-        <p>Installs Greenplum Database on segment hosts.</p>
+        <p>在Segment主机上安装Greenplum数据库。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpseginstall</b> <b>-f</b> <varname>hostfile</varname> [<b>-u</b> <varname>gpdb_admin_user</varname>] [<b>-p</b> <varname>password</varname>] 
-             [<b>-c</b> u|p|c|s|E|e|l|v]
-
-<b>gpseginstall</b> --help</codeblock>
+                             [<b>-c</b> u|p|c|s|E|e|l|v]
+                
+                <b>gpseginstall</b> --help</codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpseginstall</codeph> utility provides a simple way to quickly install
-                Greenplum Database on segment hosts that you specify in a host list file. The
-                utility does not install or update Greenplum Database on the master host. You can
-                run <codeph>gpseginstall</codeph> as <codeph>root</codeph> or as a non-root user.
-                    <codeph>gpseginstall</codeph> does not perform database initialization. See
-                    <codeph>gpinitsystem</codeph> for more information about initializing Greenplum
-                Database.</p>
-            <p>When run as root, <codeph>gpseginstall</codeph> default actions are to add a system
-                user (default is <codeph>gpadmin</codeph>), create a password (default is
-                    <codeph>changeme</codeph>), and deploy and install Greenplum Database on segment
-                hosts. To do this, <codeph>gpseginstall</codeph> locates the current Greenplum
-                Database binaries on the master from the installation path in the current user's
-                environment variables (<codeph>$GPHOME</codeph>). It compresses Greenplum Database
-                software into a <codeph>tar.gz</codeph> file and performs an MD5 checksum to verify
-                file integrity. </p>
-            <p>Then, it copies Greenplum Database to the segment hosts, installs (decompresses)
-                Greenplum Database, and changes the ownership of the Greenplum Database installation
-                to the system user you specify with the <codeph>-u</codeph> option. Lastly, it
-                exchanges keys between all Greenplum Database hosts as both root and as the system
-                user you specify with the -u option. gpseginstall also perform a user limit check
-                and verifies the version number of Greenplum Database on all the segments.</p>
-            <p>If you run gpseginstall as a non-root user, gpseginstall only compresses, copies, and
-                installs Greenplum Database on segment hosts. It can also exchanges keys between
-                Greenplum Database hosts for the current system user, and verifies the version
-                number of Greenplum Database on all the segments.</p>
+            <title>描述</title>
+            <p><codeph>gpseginstall</codeph>工具提供了一种在主机列表文件中指定的Segment主机上快速安装
+                Greenplum数据库的简单方法。该工具不会在Master主机上安装或更新Greenplum数据库。用户可以以
+                <codeph>root</codeph>身份或以非root用户身份运行<codeph>gpseginstall</codeph>。
+                <codeph>gpseginstall</codeph>不执行数据库初始化。有关初始化数据库的更多信息，请参阅
+                <codeph>gpinitsystem</codeph>。</p>
+            <p>以root身份运行时，<codeph>gpseginstall</codeph>默认操作是添加一个系统用户
+                （默认是<codeph>gpadmin</codeph>），创建口令（默认是<codeph>changeme</codeph>），
+                并在部分主机上部署和安装Greenplum数据库。为此，<codeph>gpseginstall</codeph>从当前
+                用户的环境变量（<codeph>$GPHOME</codeph>）中的安装路径下查找Master上的当前Greenplum
+                数据库二进制文件。它将Greenplum数据库软件压缩成<codeph>tar.gz</codeph>文件并执行MD5
+                校验和以验证文件完整性。</p>
+            <p>然后，它将Greenplum数据库拷贝到Segment主机，安装（解压缩）Greenplum数据库，并将
+                Greenplum数据库安装的所有权更改为用户使用<codeph>-u</codeph>选项指定的系统用户。
+                最后，它将作为根用户以及用-u选项指定的系统用户在所有Greenplum数据库主机之间进行密钥交换。
+                gpseginstall还会执行用户限制检查并验证所有Segment上的Greenplum数据库的版本号。
+            </p>
+            <p>如果以非root用户的身份运行gpseginstall，则gpseginstall仅会在Segment主机上压缩、复制并
+                安装Greenplum数据库。它还可以为当前系统用户在Greenplum数据库主机之间交换密钥，并验证所有
+                Segment上的Greenplum数据库的版本号。</p>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
                     <pt>-c | --commands <varname>option_list</varname></pt>
-                    <pd>Optional. This allows you to customize <codeph>gpseginstall</codeph>
-                        actions. Note that these command options are executed by default if you do
-                        not specify the <codeph>-c</codeph> option in the
-                            <codeph>gpseginstall</codeph> syntax.<ul id="ul_vby_bnk_44">
-                            <li id="jv144166"><codeph>u</codeph>: Adds a system user.
-                                    (<codeph>root</codeph> only)</li>
-                            <li id="jv144168"><codeph>p</codeph>: Changes the password for a system
-                                user. (<codeph>root</codeph> only)</li>
-                            <li id="jv144170"><codeph>s</codeph>: Compresses, copies, decompresses
-                                (installs) Greenplum Database on all segments.</li>
-                            <li id="jv144173"><codeph>c</codeph>: Changes the ownership of the
-                                Greenplum Database installation directory on the segment hosts.
-                                    (<codeph>root</codeph> only)</li>
-                            <li id="jv144176"><codeph>E</codeph>: Exchange keys between Greenplum
-                                Database master and segment hosts for the root user.
-                                    (<codeph>root</codeph> only)</li>
-                            <li id="jv144179"><codeph>e</codeph>: Exchange keys between Greenplum
-                                Database master and segment hosts for the non-root system user. </li>
-                            <li id="jv144182"><codeph>l</codeph>: (Linux only) Checks and modifies
-                                the user limits configuration file
-                                    (<codeph>/etc/security/limits.conf</codeph> file) when adding a
-                                new user to segment hosts. (<codeph>root</codeph> only)</li>
-                            <li id="jv144186"><codeph>v</codeph>: Verifies the version of Greenplum
-                                Database running on all segments. <codeph>gpseginstall</codeph>
-                                checks the version number of the Greenplum Database installation
-                                referenced by the <codeph>$GPHOME</codeph> environment variable and
-                                symbolic link to the installation directory. An error occurs if
-                                there is a version number mismatch or the Greenplum Database
-                                installation directory cannot be found.</li>
+                    <pd>可选。这使用户可以自定义<codeph>gpseginstall</codeph>操作。请注意，如果不在
+                        <codeph>gpseginstall</codeph>语法中指定<codeph>-c</codeph>选项，则默认
+                        执行这些命令选项。
+                        <ul id="ul_vby_bnk_44">
+                            <li id="jv144166"><codeph>u</codeph>: 添加系统用户（仅限<codeph>root</codeph>使用）。
+                            </li>
+                            <li id="jv144168"><codeph>p</codeph>: 为系统用户更改口令（仅限<codeph>root</codeph>使用）。
+                            </li>
+                            <li id="jv144170"><codeph>s</codeph>: 将Greenplum数据库压缩、复制、解压（安装到）所有Segment。</li>
+                            <li id="jv144173"><codeph>c</codeph>: 更改Segment主机上的Greenplum数据库安装
+                                目录的所有权（仅限<codeph>root</codeph>使用）。</li>
+                            <li id="jv144176"><codeph>E</codeph>: 为root用户在Greenplum数据库的Master主机和Segment
+                                主机之间进行密钥交换（仅限<codeph>root</codeph>使用）。</li>
+                            <li id="jv144179"><codeph>e</codeph>: 为非root系统用户在Greenplum数据库的Master主机和
+                                Segment主机之间进行密钥交换。</li>
+                            <li id="jv144182"><codeph>l</codeph>: （仅适用于Linux）将新用户添加到Segment主机时，
+                                检查并修改用户限制配置文件（<codeph>/etc/security/limits.conf</codeph>）
+                                （仅限<codeph>root</codeph>使用）。</li>
+                            <li id="jv144186"><codeph>v</codeph>: 验证在所有Segment上运行的Greenplum数据库的版本。
+                                <codeph>gpseginstall</codeph>检查由<codeph>$GPHOME</codeph>环境变量引用的Greenplum
+                                数据库安装的版本号以及到安装目录的符号链接。如果存在版本号不匹配或者无法找到Greenplum数据库
+                                安装目录，则会发生错误。
+                            </li>
                         </ul></pd>
                 </plentry>
                 <plentry>
                     <pt>-f | --file <varname>hostfile</varname></pt>
-                    <pd>Required. This specifies the file that lists the segment hosts onto which
-                        you want to install Greenplum Database.</pd>
-                    <pd>The host list file must have one host name per line and includes a host name
-                        for each segment host in your Greenplum system. Make sure there are no blank
-                        lines or extra spaces. If a host has multiple configured host names, use
-                        only one host name per host. For example:</pd>
+                    <pd>必需。指定包含要安装Greenplum数据库的Segment主机的文件。</pd>
+                    <pd>主机列表文件的每行必须包含一个主机名，并包含Greenplum系统中每个主机的主机名。确保没有空行或多余的空格。
+                        如果主机有多个配置的主机名，则每个主机只能使用一个主机名。例如：</pd>
                     <pd>
                         <codeblock>sdw1-1
-sdw2-1
-sdw3-1
-sdw4-1</codeblock>
+                            sdw2-1
+                            sdw3-1
+                            sdw4-1</codeblock>
                     </pd>
-                    <pd>If available, you can use the same <codeph>gpssh-exkeys</codeph> host list
-                        file you used to exchange keys between Greenplum Database hosts.</pd>
+                    <pd>如果可用，用户可以使用在Greenplum数据库主机间交换密钥时使用的同一个
+                        <codeph>gpssh-exkeys</codeph>主机列表。</pd>
                 </plentry>
                 <plentry>
                     <pt>-p | --password <varname>password</varname></pt>
-                    <pd>Optional. Sets the password for the user you specify with the
-                            <codeph>-u</codeph> option. The default password is
-                            <codeph>changeme</codeph>. This option is only available when you run
-                            <codeph>gpsetinstall</codeph> as root.</pd>
-                    <pd>Recommended security best practices:<ul id="ul_zwv_fnk_44">
-                            <li id="jv143869">Always use passwords.</li>
-                            <li id="jv144536">Do not use default passwords.</li>
-                            <li id="jv143870">Change default passwords immediately after
-                                installation.</li>
-                        </ul></pd>
+                    <pd>可选。使用<codeph>-u</codeph>选项设置用户指定用户的口令。默认口令是
+                        <codeph>changeme</codeph>。此选项仅在以root用户身份运行<codeph>gpsetinstall</codeph>
+                        时使用。</pd>
+                    <pd>推荐的安全最佳实践：<ul id="ul_zwv_fnk_44">
+                        <li id="jv143869">一直使用口令。</li>
+                        <li id="jv144536">不要使用默认口令。</li>
+                        <li id="jv143870">安装后立即更改默认口令。</li>
+                    </ul></pd>
                 </plentry>
                 <plentry>
                     <pt>-u | --user <varname>user</varname></pt>
-                    <pd>Optional. This specifies the system user. This user is also the Greenplum
-                        Database administrative user. This user owns Greenplum Database installation
-                        and administers the database. This is also the user under which Greenplum
-                        Database is started/initialized. This option is only available when you run
-                            <codeph>gpseginstall</codeph> as <codeph>root</codeph>. The default is
-                            <codeph>gpadmin</codeph>. </pd>
+                    <pd>可选。指定系统用户。此用户也是Greenplum数据库管理用户。此用户拥有Greenplum数据库安装
+                        并且管理数据库。这也是Greenplum数据库启动/初始化的用户。此选项仅在以<codeph>root</codeph>
+                        身份运行<codeph>gpseginstall</codeph>时可用。默认是<codeph>gpadmin</codeph>。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt>--help (help)</pt>
-                    <pd>Displays the online help.</pd>
+                    <pt>--help（帮助）</pt>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>As <codeph>root</codeph>, install a Greenplum Database on all segments, leave the
-                system user as the default (<codeph>gpadmin</codeph>) and set the
-                    <codeph>gpadmin</codeph> password to <codeph>secret123</codeph>:</p>
+            <title>示例</title>
+            <p>以<codeph>root</codeph>身份，在所有Segment上安装Greenplum数据库，将系统用户保留为
+                默认值（<codeph>gpadmin</codeph>）并将<codeph>gpadmin</codeph>的口令设置为
+                <codeph>secret123</codeph>：
+            </p>
             <codeblock># gpseginstall -f my_host_list_file -p secret123</codeblock>
-            <p>As a non-root user, compress and copy Greenplum Database binaries to all segments (as
-                    <codeph>gpadmin</codeph>):</p>
+            <p>作为非root用户，将Greenplum数据库二进制文件压缩并复制到所有Segment
+                （作为<codeph>gpadmin</codeph>）：</p>
             <codeblock>$ gpseginstall -f host_file</codeblock>
-            <p>As root, add a user (<codeph>gpadmin2</codeph>), set the password for the user
-                    (<codeph>secret1234</codeph>), exchange keys between hosts as the new user,
-                check user limits, and verify version numbers, but do not change ownership of
-                Greenplum binaries, compress/copy/ install Greenplum Database on segments, or
-                exchange keys as <codeph>root</codeph>.</p>
+            <p>以root身份，添加用户（<codeph>gpadmin2</codeph>），为该用户设置口令（<codeph>secret1234</codeph>），
+                作为新用户在主机之间交换密钥，检查用户限制，验证版本号，但不要更改Greenplum二进制文件的所有权，
+                压缩/复制/在Segment上安装Greenplum数据库，或者以<codeph>root</codeph>身份交换密钥。
+            </p>
             <codeblock>$ gpseginstall -f host_file -u gpadmin2 -p secret1234 -c upelv</codeblock>
         </section>
         <section>
-            <title>See Also</title>
-            <p><codeph><xref href="gpinitsystem.xml#topic1"/></codeph>, <codeph><xref
-                        href="gpssh-exkeys.xml#topic1"/></codeph></p>
+            <title>另见</title>
+            <p><codeph><xref href="gpinitsystem.xml#topic1"/></codeph>、<codeph><xref
+                href="gpssh-exkeys.xml#topic1"/></codeph></p>
         </section>
     </body>
 </topic>
