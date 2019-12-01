@@ -5,125 +5,111 @@
     <!-- install_guide/refs/gpactivatestandby.xml has a conref to this topic. -->
     <title id="jo20941">gpactivatestandby</title>
     <body>
-        <p>Activates a standby master host and makes it the active master for the Greenplum Database
-            system.</p>
+        <p>激活备机并使其成为Greenplum数据库系统的活动主机。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpactivatestandby</b> [<b>-d</b> <varname>standby_master_datadir</varname>] [<b>-f</b>] [<b>-a</b>] [<b>-q</b>] 
-    [<b>-l</b> <varname>logfile_directory</varname>]
-
-<b>gpactivatestandby</b> <b>-v</b> 
-
-<b>gpactivatestandby</b> <b>-?</b> | <b>-h</b> | <b>--help</b></codeblock>
+                [<b>-l</b> <varname>logfile_directory</varname>]
+                
+                <b>gpactivatestandby</b> <b>-v</b> 
+                
+                <b>gpactivatestandby</b> <b>-?</b> | <b>-h</b> | <b>--help</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpactivatestandby</codeph> utility activates a backup, standby master
-                host and brings it into operation as the active master instance for a Greenplum
-                Database system. The activated standby master effectively becomes the Greenplum
-                Database master, accepting client connections on the master port. </p>
-            <p>When you initialize a standby master, the default is to use the same port as the
-                active master. For information about the master port for the standby master, see
-                        <codeph><xref href="./gpinitstandby.xml#topic1" type="topic" format="dita"
-                    /></codeph>. </p>
-            <p>You must run this utility from the master host you are activating, not the failed
-                master host you are disabling. Running this utility assumes you have a standby
-                master host configured for the system (see <codeph><xref
-                        href="./gpinitstandby.xml#topic1" type="topic" format="dita"
-                /></codeph>).</p>
-            <p>The utility will perform the following steps:</p>
+            <title>描述</title>
+            <p><codeph>gpactivatestandby</codeph>工具激活了一台备份主机上的后备Master实例，
+                并将其作为Greenplum数据库系统的活动Master实例运行。被激活的后备Master节点有效
+                地成为Greenplum数据库的Master来接受端口上的客户端连接。
+            </p>
+            <p>在初始化后备Master时，默认情况下使用与活动Master相同的端口。有关后备Master端口的信息，
+                请参考<codeph><xref href="./gpinitstandby.xml#topic1" type="topic" format="dita"
+                /></codeph>。</p>
+            <p>用户必须从正在激活的Master主机上运行此工具，而不是在被停用的故障Master主机上运行。
+                运行此工具时候假设用户为系统配置了一台后备Master主机。
+                （参见<codeph><xref
+                    href="./gpinitstandby.xml#topic1" type="topic" format="dita"
+                /></codeph>）。</p>
+            <p>该工具执行以下步骤：</p>
             <ul>
-                <li id="jo140686">Stops the synchronization process (<codeph>walreceiver</codeph>)
-                    on the standby master</li>
-                <li id="jo140687">Updates the system catalog tables of the standby master using the
-                    logs</li>
-                <li id="jo140409">Activates the standby master to be the new active master for the
-                    system</li>
-                <li id="jo141105">Restarts the Greenplum Database system with the new master
-                    host</li>
+                <li id="jo140686">停止后备Master上的同步进程 (<codeph>walreceiver</codeph>)
+                </li>
+                <li id="jo140687">使用日志更新后备Master的系统目录表</li>
+                <li id="jo140409">激活后备Master成为系统中新的活动Master</li>
+                <li id="jo141105">重启带有新Master主机的Greenplum数据库系统</li>
             </ul>
-            <p>A backup, standby Greenplum master host serves as a 'warm standby' in the event of
-                the primary Greenplum master host becoming non-operational. The standby master is
-                kept up to date by transaction log replication processes (the
-                    <codeph>walsender</codeph> and <codeph>walreceiver</codeph>), which run on the
-                primary master and standby master hosts and keep the data between the primary and
-                standby master hosts synchronized. </p>
-            <p>If the primary master fails, the log replication process is shutdown, and the standby
-                master can be activated in its place by using the <codeph>gpactivatestandby</codeph>
-                utility. Upon activation of the standby master, the replicated logs are used to
-                reconstruct the state of the Greenplum master host at the time of the last
-                successfully committed transaction. </p>
-            <p>In order to use <codeph>gpactivatestandby</codeph> to activate a new primary master
-                host, the master host that was previously serving as the primary master cannot be
-                running. The utility checks for a <codeph>postmaster.pid</codeph> file in the data
-                directory of the disabled master host, and if it finds it there, it will assume the
-                old master host is still active. In some cases, you may need to remove the
-                    <codeph>postmaster.pid</codeph> file from the disabled master host data
-                directory before running <codeph>gpactivatestandby</codeph> (for example, if the
-                disabled master host process was terminated unexpectedly).</p>
-            <p>After activating a standby master, run <codeph>ANALYZE</codeph> to update the
-                database query statistics. For example:</p>
+            <p>在Greenplum的主Master主机变得不可操作时，备份的后备Master主机充当“温备份”的角色。
+                后备Master通过事务日志复制进程（<codeph>walsender</codeph>和<codeph>walreceiver</codeph>）
+                保持最新状态，这两个进程一个运行在主Master，一个运行在后备Master，并使得主Master和
+                后备Master之间保持数据同步。
+            </p>
+            <p>如果主Master出现故障，日志复制进程将关闭，后备Master可以通过使用<codeph>gpactivatestandby</codeph>
+                工具在其位置激活。一旦后备Master激活，复制的日志将用于重建最后一次成功提交事务之后
+                Greenplum中Master主机的状态。</p>
+            <p>为了使用<codeph>gpactivatestandby</codeph>来激活一个新的主Master主机，之前充当主Master的Master主机
+                则不能再运行。该工具会检查已被禁用的Master主机的数据目录中的<codeph>postmaster.pid</codeph>文件，如果发现该文件，
+                则会假定旧的Master机仍处于活动状态。在某些情况下，在运行<codeph>gpactivatestandby</codeph>（例如，
+                如果被禁用的Master主机进程被意外终止）之前，用户可能需要从被禁用的Master主机的数据目录中删除
+                <codeph>postmaster.pid</codeph>。</p>
+            <p>激活后备Master之后，运行<codeph>ANALYZE</codeph>来更新数据库查询统计信息。例如：
+            </p>
             <codeblock>psql <varname>dbname</varname> -c 'ANALYZE;'</codeblock>
-            <p>After you activate the standby master as the primary master, the Greenplum Database
-                system no longer has a standby master configured. You might want to specify another
-                host to be the new standby with the <codeph><xref href="./gpinitstandby.xml#topic1"
-                        type="topic" format="dita"/></codeph> utility. </p>
+            <p>将后备的Master激活成为主Master之后，该Greenplum数据库系统将不再配置有后备Master。用户可能想要用
+                <codeph><xref href="./gpinitstandby.xml#topic1"
+                    type="topic" format="dita"/></codeph>工具指定另外一台主机作为新的后备。
+            </p>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
-                    <pt>-a (do not prompt)</pt>
-                    <pd>Do not prompt the user for confirmation.</pd>
+                    <pt>-a（不要提示）</pt>
+                    <pd>不要提示用户确认。</pd>
                 </plentry>
                 <plentry>
                     <pt>-d <varname>standby_master_datadir</varname></pt>
-                    <pd>The absolute path of the data directory for the master host you are
-                        activating.</pd>
-                    <pd>If this option is not specified, <codeph>gpactivatestandby</codeph> uses the
-                        value of the 
-                            <codeph>MASTER_DATA_DIRECTORY</codeph> environment variable setting on the master host you are
-                        activating. If this option is specified, it overrides any setting of <codeph>MASTER_DATA_DIRECTORY</codeph>. </pd>
-                    <pd>If a directory cannot be determined, the utility returns an error. </pd>
+                    <pd>用户正在激活的Master主机的数据目录的绝对路径。
+                    </pd>
+                    <pd>如果未指定此选项，<codeph>gpactivatestandby</codeph>将使用用户正在激活的Master主机上的
+                        <codeph>MASTER_DATA_DIRECTORY</codeph>环境变量设置。如果指定了这一选项，它会覆盖
+                        <codeph>MASTER_DATA_DIRECTORY</codeph>的设置。</pd>
+                    <pd>如果无法确定目录，则该工具将返回错误。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-f (force activation)</pt>
-                    <pd>Use this option to force activation of the backup master host. Use this
-                        option only if you are sure that the standby and primary master hosts are
-                        consistent.</pd>
+                    <pt>-f（强制激活）</pt>
+                    <pd>使用此选项强制激活备份的Master主机。只有在确定后备Master主机和主Master主机一致的
+                        情况下，才能使用此选项。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-l <varname>logfile_directory</varname></pt>
-                    <pd>The directory to write the log file. Defaults to
-                            <codeph>~/gpAdminLogs</codeph>.</pd>
+                    <pd>写入日志文件的目录。默认为<codeph>~/gpAdminLogs</codeph>。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt>-q (no screen output)</pt>
-                    <pd>Run in quiet mode. Command output is not displayed on the screen, but is
-                        still written to the log file.</pd>
+                    <pt>-q（没有屏幕输出）</pt>
+                    <pd>以静默模式运行。命令输出不会显示在屏幕上，但是仍然会写入日志文件。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-v (show utility version)</pt>
-                    <pd>Displays the version, status, last updated date, and check sum of this
-                        utility.</pd>
+                    <pt>-v（显示工具的版本）</pt>
+                    <pd>显示这一工具的版本、状态、上次更新的日期和校验和。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-? | -h | --help (help)</pt>
-                    <pd>Displays the online help.</pd>
+                    <pt>-? | -h | --help（帮助）</pt>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Example</title>
-            <p>Activate the standby master host and make it the active master instance for a
-                Greenplum Database system (run from backup master host you are activating):</p>
+            <title>示例</title>
+            <p>激活后备Master主机并使其成为Greenplum数据库系统的活动Master实例（从正在激活的备份Master主机运行）：
+            </p>
             <codeblock>gpactivatestandby -d /gpdata</codeblock>
         </section>
         <section id="section6">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="./gpinitsystem.xml#topic1" type="topic" format="dita"/></codeph>,
-                        <codeph><xref href="./gpinitstandby.xml#topic1" type="topic" format="dita"
-                    /></codeph></p>
+                <codeph><xref href="./gpinitstandby.xml#topic1" type="topic" format="dita"
+                /></codeph></p>
         </section>
     </body>
 </topic>
