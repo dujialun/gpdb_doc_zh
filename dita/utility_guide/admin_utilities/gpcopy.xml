@@ -5,8 +5,8 @@
     <!--install_guide has a link to this topic. -->
     <title id="pk138417">gpcopy</title>
     <body>
-        <p>The <codeph>gpcopy</codeph> utility copies objects from databases in a source Greenplum
-            Database system to databases in a destination Greenplum Database system. </p>
+        <p><codeph>gpcopy</codeph>工具从源端Greenplum数据库复制Greenplum数据库对象到目标端
+            Greenplum数据库系统。</p>
         <note> The <codeph>gpcopy</codeph> utility is available only in the commercial release of
             Pivotal Greenplum Database.</note>
         <section id="section2">
