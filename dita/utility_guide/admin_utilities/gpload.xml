@@ -4,9 +4,9 @@
 <topic id="topic1">
     <title id="ke20941">gpload</title>
     <body>
-        <p>Runs a load job as defined in a YAML formatted control file.</p>
+        <p>按照一个YAML格式的控制文件的定义运行一个装载作业。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpload</b> <b>-f</b> <varname>control_file</varname> [<b>-l</b> <varname>log_file</varname>] [<b>-h</b> <varname>hostname</varname>] [<b>-p</b> <varname>port</varname>] 
    [<b>-U</b> <varname>username</varname>] [<b>-d</b> <varname>database</varname>] [<b>-W</b>] [<b>--gpfdist_timeout</b> <varname>seconds</varname>] 
    [<b>--no_auto_trans</b>] [[<b>-v</b> | <b>-V</b>] [<b>-q</b>]] [<b>-D</b>]
@@ -16,166 +16,143 @@
 <b>gpload</b> <b>--version</b></codeblock>
         </section>
         <section id="section3">
-            <title id="ke141293">Prerequisites</title>
-            <p>The client machine where <codeph>gpload</codeph> is executed must have the
-                following:</p>
+            <title id="ke141293">先决条件</title>
+            <p>要执行<codeph>gpload</codeph>命令的客户机必须具有下列要求：</p>
             <ul>
-                <li id="ke147914">Python 2.6.2 or later, <codeph>pygresql</codeph> (the Python
-                    interface to PostgreSQL), and <codeph>pyyaml</codeph>. Note that Python and the
-                    required Python libraries are included with the Greenplum Database server
-                    installation, so if you have Greenplum Database installed on the machine where
-                        <codeph>gpload</codeph> is running, you do not need a separate Python
-                        installation.<note>Greenplum Database Loaders for Windows supports only
-                        Python 2.5 (available from <xref href="https://www.python.org"
+                <li id="ke147914">Python 2.6.2或更新版本，装有<codeph>pygresql</codeph> (Python的PostgreSQL接口包
+                    )，和<codeph>pyyaml</codeph>。注意Python及所需的Python库被包含在Greenplum数据库安装包中，
+                    因此如果在<codeph>gpload</codeph>运行的机器上安装有Greenplum数据库，用户就不需要单独安装Python。
+                    <note>Greenplum数据库的Windows装载客户端仅支持Python 2.5(您可以从<xref href="https://www.python.org"
                             scope="external" format="html"
-                    >https://www.python.org</xref>).</note></li>
-                <li id="ke147925">The <codeph><xref href="gpfdist.xml#topic1" type="topic"
-                            format="dita"/></codeph> parallel file distribution program installed
-                    and in your <codeph>$PATH</codeph>. This program is located in
-                        <codeph>$GPHOME/bin</codeph> of your Greenplum Database server
-                    installation.</li>
-                <li id="ke144650">Network access to and from all hosts in your Greenplum Database
-                    array (master and segments).</li>
-                <li id="ke145550">Network access to and from the hosts where the data to be loaded
-                    resides (ETL servers).</li>
+                    >https://www.python.org</xref>获取)</note>。</li>
+                <li id="ke147925"><codeph><xref href="gpfdist.xml#topic1" type="topic"
+                    format="dita"/></codeph>并行文件分发程序被安装在<codeph>$PATH</codeph>中。这个程序位于Greenplum
+                        数据库的<codeph>$GPHOME/bin</codeph>目录下。
+                    </li>
+                <li id="ke144650">gpload客户机可以访问（被访问）Greenplum数据库集群（Master和Segments）中所有主机。</li>
+                <li id="ke145550">gpload客户及可以访问（被访问）所有可能用来装载数据的主机（ETL服务器）。</li>
             </ul>
         </section>
         <section id="section4">
-            <title>Description</title>
-            <p><codeph>gpload</codeph> is a data loading utility that acts as an interface to the
-                Greenplum Database external table parallel loading feature. Using a load
-                specification defined in a YAML formatted control file, <codeph>gpload</codeph>
-                executes a load by invoking the Greenplum Database parallel file server
-                        (<codeph><xref href="gpfdist.xml" type="topic" format="dita"/></codeph>),
-                creating an external table definition based on the source data defined, and
-                executing an <codeph>INSERT</codeph>, <codeph>UPDATE</codeph> or
-                    <codeph>MERGE</codeph> operation to load the source data into the target table
-                in the database.<note><codeph>gpfdist</codeph> and <codeph>gpload</codeph> are
-                    compatible only with the Greenplum Database major version in which they are
-                    shipped. For example, a <codeph>gpfdist</codeph> utility that is installed with
-                    Greenplum Database 4.x cannot be used with Greenplum Database 5.x or
-                    6.x.</note><note id="gpload-limitation"><codeph>MERGE</codeph> and
-                        <codeph>UPDATE</codeph> operations are not supported if the target table
-                    column name is a reserved keyword, has capital letters, or includes any
-                    character that requires quotes (" ") to identify the column.</note></p>
-            <p>The operation, including any SQL commands specified in the <codeph>SQL</codeph>
-                collection of the YAML control file (see <xref href="#topic1/section7"
-                    type="section" format="dita"/>), are performed as a single transaction to
-                prevent inconsistent data when performing multiple, simultaneous load operations on
-                a target table. </p>
+            <title>描述</title>
+            <p><codeph>gpload</codeph>是一个数据装载工具，它扮演着Greenplum数据库外部表并行装载
+                特性的接口的角色。通过一个用YAML格式控制文件定义的装载说明，<codeph>gpload</codeph>
+                调用Greenplum数据库的并行文件服务器
+                (<codeph><xref href="gpfdist.xml" type="topic" format="dita"/></codeph>)执行
+                文件装载，基于源数据的定义创建一个外部表定义，并且指定<codeph>INSERT</codeph>、
+                <codeph>UPDATE</codeph>或<codeph>MERGE</codeph>操作把源数据装载到数据库中的目标表中。
+                <note><codeph>gpfdist</codeph>和<codeph>gpload</codeph>是在Greenplum的主版本级别有效的。
+                    例如，Greenplum 4.x版本的<codeph>gpfdist</codeph>不能用于Greenplum 5.x或6.x版本。
+                </note>
+                <note id="gpload-limitation">如果目标表的列名为保留关键字、有大写字母或包含任何双引号，
+                    那么<codeph>MERGE</codeph>和<codeph>UPDATE</codeph>操作不被支持。
+                </note></p>
+            <p>在目标表上指定多个同时的装载操作时，操作包括在YAML控制文件(控制文件格式见<xref href="#topic1/section7"
+                type="section" format="dita"/>)的<codeph>SQL</codeph>集合中指定的任何SQL命令会在单个事务中
+                执行以防止数据不一致。
+                </p>
         </section>
         <section id="section5">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
                     <pt>-f <varname>control_file</varname></pt>
-                    <pd><b>Required. </b>A YAML file that contains the load specification details.
-                        See <xref href="#topic1/section7" type="section" format="dita"/>.</pd>
+                    <pd><b>必选项。</b>包含装载说明详情的YAML文件。请见
+                        <xref href="#topic1/section7" type="section" format="dita"/>。</pd>
                 </plentry>
                 <plentry>
                     <pt>--gpfdist_timeout <varname>seconds</varname></pt>
-                    <pd>Sets the timeout for the <codeph>gpfdist</codeph> parallel file distribution
-                        program to send a response. Enter a value from <codeph>0</codeph> to
-                            <codeph>30</codeph> seconds (entering "<codeph>0</codeph>" to disables
-                        timeouts). Note that you might need to increase this value when operating on
-                        high-traffic networks.</pd>
+                    <pd>为<codeph>gpfdist</codeph>并行文件分发程序发送响应设置超时时间。
+                        输入一个从<codeph>0</codeph>到<codeph>30</codeph>秒的值（输入"<codeph>0</codeph>"会禁用超时）。
+                        注意在高流量网络上可能需要增加这个值。</pd>
                 </plentry>
                 <plentry>
                     <pt>-l <varname>log_file</varname></pt>
-                    <pd>Specifies where to write the log file. Defaults to
-                                <codeph>~/gpAdminLogs/gpload_<varname>YYYYMMDD</varname></codeph>.
-                        For more information about the log file, see <xref href="#topic1/section9"
-                            type="section" format="dita"/>.</pd>
+                    <pd>指定在哪里写日志文件。默认是<codeph>~/gpAdminLogs/gpload_<varname>YYYYMMDD</varname></codeph>。
+                        有关日志文件的更多信息请见<xref href="#topic1/section9"
+                            type="section" format="dita"/>。</pd>
                 </plentry>
                 <plentry>
                     <pt>--no_auto_trans</pt>
-                    <pd>Specify <codeph>--no_auto_trans</codeph> to disable processing the load
-                        operation as a single transaction if you are performing a single load
-                        operation on the target table.</pd>
-                    <pd>By default, <codeph>gpload</codeph> processes each load operation as a
-                        single transaction to prevent inconsistent data when performing multiple,
-                        simultaneous operations on a target table. </pd>
+                    <pd>如果用户在目标表上执行单个装载操作，可指定<codeph>--no_auto_trans</codeph>
+                        禁用把装载操作作为单个事务处理的特性。
+                        </pd>
+                    <pd>默认情况下，在一个目标表上执行多个同时的操作时，<codeph>gpload</codeph>把每个装载操作处理为
+                        单个事务以防止不一致的数据。
+                        </pd>
                 </plentry>
                 <plentry>
-                    <pt>-q (no screen output)</pt>
-                    <pd>Run in quiet mode. Command output is not displayed on the screen, but is
-                        still written to the log file.</pd>
+                    <pt>-q (无屏幕输出)</pt>
+                    <pd>运行在静默模式中。命令输出不会被显示在屏幕上，但仍将被写入到日志文件。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-D (debug mode)</pt>
-                    <pd>Check for error conditions, but do not execute the load. </pd>
+                    <pt>-D (调试模式)</pt>
+                    <pd>检查错误情况，但是不执行装载。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-v (verbose mode)</pt>
-                    <pd>Show verbose output of the load steps as they are executed.</pd>
+                    <pt>-v (详细模式)</pt>
+                    <pd>在装载步骤被执行时，显示它们的详细输出。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-V (very verbose mode)</pt>
-                    <pd>Shows very verbose output.</pd>
+                    <pt>-V (非常详细模式)</pt>
+                    <pd>显示非常详细的输出。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-? (show help)</pt>
-                    <pd>Show help, then exit.</pd>
+                    <pt>-? (显示帮助)</pt>
+                    <pd>显示帮助，然后退出。</pd>
                 </plentry>
                 <plentry>
                     <pt>--version</pt>
-                    <pd>Show the version of this utility, then exit.</pd>
+                    <pd>显示这个工具的版本，然后退出。</pd>
                 </plentry>
             </parml>
             <sectiondiv id="section6">
-                <b>Connection Options</b>
+                <b>连接选项</b>
                 <parml>
                     <plentry>
                         <pt>-d <varname>database</varname></pt>
-                        <pd>The database to load into. If not specified, reads from the load control
-                            file, the environment variable <codeph>$PGDATABASE</codeph> or defaults
-                            to the current system user name.</pd>
+                        <pd>要装载到的数据库。如果没有指定，则从装载控制文件、环境变量<codeph>$PGDATABASE</codeph>
+                            读取或者默认为当前系统用户名。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-h <varname>hostname</varname></pt>
-                        <pd>Specifies the host name of the machine on which the Greenplum Database
-                            master database server is running. If not specified, reads from the load
-                            control file, the environment variable <codeph>$PGHOST</codeph> or
-                            defaults to <codeph>localhost</codeph>.</pd>
+                        <pd>指定Greenplum的Master数据库服务器在其上运行的机器的主机名。如果没有指定，
+                            会从装载控制文件、环境变量<codeph>$PGHOST</codeph>读取或者默认为
+                            <codeph>localhost</codeph>。
+                            </pd>
                     </plentry>
                     <plentry>
                         <pt>-p <varname>port</varname></pt>
-                        <pd>Specifies the TCP port on which the Greenplum Database master database
-                            server is listening for connections. If not specified, reads from the
-                            load control file, the environment variable <codeph>$PGPORT</codeph> or
-                            defaults to 5432.</pd>
+                        <pd>指定Greenplum的Master数据库服务器在其上监听连接的TCP端口。如果没有指定，
+                            会从装载控制文件、环境变量<codeph>$PGPORT</codeph>读取或者默认为5432。</pd>
                     </plentry>
                     <plentry>
                         <pt>-U <varname>username</varname></pt>
-                        <pd>The database role name to connect as. If not specified, reads from the
-                            load control file, the environment variable <codeph>$PGUSER</codeph> or
-                            defaults to the current system user name.</pd>
+                        <pd>要用其进行连接的数据库角色名。如果没有指定，会从装载控制文件、环境变量<codeph>$PGUSER</codeph>
+                            读取或者默认为当前系统用户名。</pd>
                     </plentry>
                     <plentry>
-                        <pt>-W (force password prompt)</pt>
-                        <pd>Force a password prompt. If not specified, reads the password from the
-                            environment variable <codeph>$PGPASSWORD</codeph> or from a password
-                            file specified by <codeph>$PGPASSFILE</codeph> or in
-                                <codeph>~/.pgpass</codeph>. If these are not set, then
-                                <codeph>gpload</codeph> will prompt for a password even if
-                                <codeph>-W</codeph> is not supplied.</pd>
+                        <pt>-W (强制口令提示)</pt>
+                        <pd>强制口令提示。如果没有指定，会从环境变量<codeph>$PGPASSWORD</codeph>、
+                            <codeph>$PGPASSFILE</codeph>指定的口令文件或<codeph>~/.pgpass</codeph>
+                            中的口令文件中读取口令。如果这些都没有设置，即使没有提供<codeph>-W</codeph>，
+                            <codeph>gpload</codeph>也将提示要求一个口令。</pd>
                     </plentry>
                 </parml>
             </sectiondiv>
         </section>
         <section id="section7">
-            <title id="ke142495">Control File Format</title>
-            <p>The <codeph>gpload</codeph> control file uses the <xref
+            <title id="ke142495">控制文件格式</title>
+            <p><codeph>gpload</codeph>控制文件使用
+                <xref
                     href="http://yaml.org/spec/1.1/" scope="external" format="html">YAML 1.1</xref>
-                document format and then implements its own schema for defining the various steps of
-                a Greenplum Database load operation. The control file must be a valid YAML
-                document.</p>
-            <p>The <codeph>gpload</codeph> program processes the control file document in order and
-                uses indentation (spaces) to determine the document hierarchy and the relationships
-                of the sections to one another. The use of white space is significant. White space
-                should not be used simply for formatting purposes, and tabs should not be used at
-                all.</p>
-            <p>The basic structure of a load control file is:</p>
+                文档格式，然后为定义Greenplum数据库装载操作的多个步骤实现了其自身的模式。
+                该控制文件必须是一个有效的YAML文档。</p>
+            <p><codeph>gpload</codeph>程序按顺序处理控制文件文档并且使用缩进（空格）来判断文档层次以及
+                各个部分之间的关系。空格的使用是有意义的。不能把空格简单地用于格式化目的，并且不能使用制表符。
+               </p>
+            <p>一个装载控制文件的基础结构是：</p>
             <codeblock>---
 <xref href="#topic1/cfversion" format="dita">VERSION</xref>: 1.0.0.1
 <xref href="#topic1/cfdatabase" format="dita">DATABASE</xref>: <varname>db_name</varname>
@@ -232,408 +209,300 @@
             <parml>
                 <plentry>
                     <pt id="cfversion">VERSION</pt>
-                    <pd>Optional. The version of the <codeph>gpload</codeph> control file schema.
-                        The current version is 1.0.0.1. </pd>
+                    <pd>可选。<codeph>gpload</codeph>控制文件模式的版本。当前版本是1.0.0.1。</pd>
                 </plentry>
                 <plentry>
                     <pt id="cfdatabase">DATABASE</pt>
-                    <pd>Optional. Specifies which database in the Greenplum Database system to
-                        connect to. If not specified, defaults to <codeph>$PGDATABASE</codeph> if
-                        set or the current system user name. You can also specify the database on
-                        the command line using the <codeph>-d</codeph> option. </pd>
+                    <pd>可选。指定Greenplum数据库系统要连接到哪个数据库。如果没有指定则默认为<codeph>$PGDATABASE</codeph>。
+                        如果<codeph>$PGDATABASE</codeph>也没有设置，则默认为当前系统用户名。用户还可以在命令行上用
+                        <codeph>-d</codeph>选项指定数据库。</pd>
                 </plentry>
                 <plentry>
                     <pt id="cfuser">USER</pt>
-                    <pd>Optional. Specifies which database role to use to connect. If not specified,
-                        defaults to the current user or <codeph>$PGUSER</codeph> if set. You can
-                        also specify the database role on the command line using the
-                            <codeph>-U</codeph> option. </pd>
-                    <pd>If the user running <codeph>gpload</codeph> is not a Greenplum Database
-                        superuser, then the appropriate rights must be granted to the user for the
-                        load to be processed. See the <cite>Greenplum Database Reference
-                            Guide</cite> for more information.</pd>
+                    <pd>可选。指定用于连接的数据库角色。如果没有指定，默认为当前用户或者<codeph>$PGUSER</codeph>
+                        （如果设置）。用户还可以在命令行上用<codeph>-U</codeph>选项指定数据库角色。
+                        </pd>
+                    <pd>如果运行<codeph>gpload</codeph>的用户不是Greenplum数据库的超级用户，
+                        那么必须为该用户授予适当的权限。更多信息请见<cite>Greenplum数据库参考指南</cite>。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt id="cfhost">HOST</pt>
-                    <pd>Optional. Specifies Greenplum Database master host name. If not specified,
-                        defaults to localhost or <codeph>$PGHOST</codeph> if set. You can also
-                        specify the master host name on the command line using the
-                            <codeph>-h</codeph> option.</pd>
+                    <pd>可选。指定Greenplum数据库的Master主机名。如果没有指定，默认为localhost或者
+                        <codeph>$PGHOST</codeph>（如果设置）。用户还可以在命令行上用<codeph>-h</codeph>
+                        选项指定Master主机名。</pd>
                 </plentry>
                 <plentry>
                     <pt id="cfport">PORT</pt>
-                    <pd>Optional. Specifies Greenplum Database master port. If not specified,
-                        defaults to 5432 or <codeph>$PGPORT</codeph> if set. You can also specify
-                        the master port on the command line using the <codeph>-p</codeph>
-                        option.</pd>
+                    <pd>可选。指定Greenplum数据库的Master端口。如果没有指定，默认为5432或者
+                        <codeph>$PGPORT</codeph>（如果设置）。用户还可以在命令行上用<codeph>-p</codeph>
+                        选项指定Master端口。</pd>
                 </plentry>
                 <plentry>
                     <pt id="cfgpload">GPLOAD</pt>
-                    <pd>Required. Begins the load specification section. A <codeph>GPLOAD</codeph>
-                        specification must have an <codeph>INPUT</codeph> and an
-                            <codeph>OUTPUT</codeph> section defined. <parml>
+                    <pd>必需。开始装载说明部分。<codeph>GPLOAD</codeph>说明必须定义有一个<codeph>INPUT</codeph>
+                        小节和一个<codeph>OUTPUT</codeph>小节。
+                        <parml>
                             <plentry>
                                 <pt id="cfinput">INPUT</pt>
-                                <pd>Required. Defines the location and the format of the input data
-                                    to be loaded. <codeph>gpload</codeph> will start one or more
-                                    instances of the <codeph><xref href="gpfdist.xml#topic1"
-                                            type="topic" format="dita"/></codeph> file distribution
-                                    program on the current host and create the required external
-                                    table definition(s) in Greenplum Database that point to the
-                                    source data. Note that the host from which you run
-                                        <codeph>gpload</codeph> must be accessible over the network
-                                    by all Greenplum Database hosts (master and segments).<parml>
+                                <pd>必需。定义要装载的输入数据的位置和格式。<codeph>gpload</codeph>
+                                    将在当前主机上启动<codeph><xref href="gpfdist.xml#topic1"
+                                        type="topic" format="dita"/></codeph>文件分布程序的一个或者更多
+                                    实例并且在Greenplum数据库中创建指向源数据的外部表定义。注意在其上运行
+                                    <codeph>gpload</codeph>的主机必须对所有的Greenplum数据库主机（Master和Segment）
+                                    通过网络可访问。
+                                    <parml>
                                         <plentry>
                                             <pt id="cfsource">SOURCE</pt>
-                                            <pd>Required. The <codeph>SOURCE</codeph> block of an
-                                                  <codeph>INPUT</codeph> specification defines the
-                                                location of a source file. An <codeph>INPUT</codeph>
-                                                section can have more than one
-                                                  <codeph>SOURCE</codeph> block defined. Each
-                                                  <codeph>SOURCE</codeph> block defined corresponds
-                                                to one instance of the <codeph><xref
-                                                  href="gpfdist.xml#topic1" type="topic"
-                                                  format="dita"/></codeph> file distribution program
-                                                that will be started on the local machine. Each
-                                                  <codeph>SOURCE</codeph> block defined must have a
-                                                  <codeph>FILE</codeph> specification. <p>For more
-                                                  information about using the
-                                                  <codeph>gpfdist</codeph> parallel file server and
-                                                  single and multiple <codeph>gpfdist</codeph>
-                                                  instances, see "Loading and Unloading Data" in the
-                                                  <cite>Greenplum Database Administrator
-                                                  Guide</cite>.</p><parml>
+                                            <pd>必需。<codeph>INPUT</codeph>说明的<codeph>SOURCE</codeph>块定义源文件的位置。
+                                                一个<codeph>INPUT</codeph>小节可以定义多个<codeph>SOURCE</codeph>块。每个定义
+                                                的<codeph>SOURCE</codeph>块对应于将在本地机器上启动的一个<codeph><xref
+                                                    href="gpfdist.xml#topic1" type="topic"
+                                                    format="dita"/></codeph>文件分布程序的实例。
+                                                每个定义的<codeph>SOURCE</codeph>块必须有一个<codeph>FILE</codeph>说明。
+                                                <p>
+                                                    更多关于使用<codeph>gpfdist</codeph>并行文件服务器和单个以及多个
+                                                    <codeph>gpfdist</codeph>实例的信息，请见<cite>Greenplum数据库管理员指南</cite>
+                                                    中的“装载和卸载数据”部分。
+                                                  </p><parml>
                                                   <plentry>
                                                   <pt id="cfsourcelocalname">LOCAL_HOSTNAME</pt>
-                                                  <pd>Optional. Specifies the host name or IP
-                                                  address of the local machine on which
-                                                  <codeph>gpload</codeph> is running. If this
-                                                  machine is configured with multiple network
-                                                  interface cards (NICs), you can specify the host
-                                                  name or IP of each individual NIC to allow network
-                                                  traffic to use all NICs simultaneously. The
-                                                  default is to use the local machine's primary host
-                                                  name or IP only. </pd>
+                                                      <pd>可选。指定<codeph>gpload</codeph>运行其上的本地机器
+                                                  的主机名或者IP地址。如果这个机器被配置有多个网络接口卡（NICs），
+                                                  用户可以指定每块NIC的主机名或者IP，以便允许网络流量同时使用所有的NIC。
+                                                  默认是仅使用本地机器的主要主机名或者IP。
+                                                 </pd>
                                                   </plentry>
                                                   <plentry>
                                                   <pt id="cfsourceport">PORT</pt>
-                                                  <pd>Optional. Specifies the specific port number
-                                                  that the <codeph><xref href="gpfdist.xml#topic1"
-                                                  type="topic" format="dita"/></codeph> file
-                                                  distribution program should use. You can also
-                                                  supply a <codeph>PORT_RANGE</codeph> to select an
-                                                  available port from the specified range. If both
-                                                  <codeph>PORT</codeph> and
-                                                  <codeph>PORT_RANGE</codeph> are defined, then
-                                                  <codeph>PORT</codeph> takes precedence. If neither
-                                                  <codeph>PORT</codeph> or
-                                                  <codeph>PORT_RANGE</codeph> are defined, the
-                                                  default is to select an available port between
-                                                  8000 and 9000. <p>If multiple host names are
-                                                  declared in <codeph>LOCAL_HOSTNAME</codeph>, this
-                                                  port number is used for all hosts. This
-                                                  configuration is desired if you want to use all
-                                                  NICs to load the same file or set of files in a
-                                                  given directory location.</p></pd>
+                                                  <pd>
+                                                      可选。指定<codeph><xref href="gpfdist.xml#topic1"
+                                                          type="topic" format="dita"/></codeph>
+                                                      文件分布程序应该使用的特定端口号。用户还可以提供一个<codeph>PORT_RANGE</codeph>
+                                                      来从指定的范围中选择可用的端口。如果<codeph>PORT</codeph>和
+                                                      <codeph>PORT_RANGE</codeph>同时被定义，那么<codeph>PORT</codeph>优先。
+                                                      如果<codeph>PORT</codeph>和<codeph>PORT_RANGE</codeph>都没有定义，
+                                                      默认为在8000和9000之间选择一个可用端口。
+                                                 <p>
+                                                     如果在<codeph>LOCAL_HOSTNAME</codeph>中声明多个主机名，
+                                                     这个端口号被用于所有主机。如果用户想要使用所有的NICs装载一个给定目录位置的同一个
+                                                     文件或者文件集合，这种配置就是用户想要的。
+                                                  </p></pd>
                                                   </plentry>
                                                   <plentry>
                                                   <pt id="cfsourceportrange">PORT_RANGE</pt>
-                                                  <pd>Optional. Can be used instead of
-                                                  <codeph>PORT</codeph> to supply a range of port
-                                                  numbers from which <codeph>gpload</codeph> can
-                                                  choose an available port for this instance of the
-                                                  <codeph><xref href="gpfdist.xml#topic1"
-                                                  type="topic" format="dita"/></codeph> file
-                                                  distribution program.</pd>
+                                                      <pd>可选。可被用来代替<codeph>PORT</codeph>提供一个端口号范围，
+                                                          <codeph>gpload</codeph>可以从其中为这个<codeph><xref href="gpfdist.xml#topic1"
+                                                              type="topic" format="dita"/></codeph>
+                                                          文件分布程序实例选择一个可用的端口。
+                                                      </pd>
                                                   </plentry>
                                                   <plentry>
                                                   <pt id="cfsourcefile">FILE</pt>
-                                                  <pd>Required. Specifies the location of a file,
-                                                  named pipe, or directory location on the local
-                                                  file system that contains data to be loaded. You
-                                                  can declare more than one file so long as the data
-                                                  is of the same format in all files specified.
-                                                  <p>If the files are compressed using
-                                                  <codeph>gzip</codeph> or <codeph>bzip2</codeph>
-                                                  (have a <codeph>.gz</codeph> or
-                                                  <codeph>.bz2</codeph> file extension), the files
-                                                  will be uncompressed automatically (provided that
-                                                  <codeph>gunzip</codeph> or
-                                                  <codeph>bunzip2</codeph> is in your
-                                                  path).</p><p>When specifying which source files to
-                                                  load, you can use the wildcard character
-                                                  (<codeph>*</codeph>) or other C-style pattern
-                                                  matching to denote multiple files. The files
-                                                  specified are assumed to be relative to the
-                                                  current directory from which
-                                                  <codeph>gpload</codeph> is executed (or you can
-                                                  declare an absolute path).</p></pd>
+                                                      <pd>必需。指定本地文件系统上的一个文件位置、命名管道或者目录位置，
+                                                          其中包含要被装载的数据。用户可以声明多于一个文件，
+                                                          只要所有指定文件中数据的格式相同。
+                                                  <p>如果这些文件被使用<codeph>gzip</codeph>或者<codeph>bzip2</codeph>
+                                                      （有<codeph>.gz</codeph>或者<codeph>.bz2</codeph>文件扩展名）压缩，
+                                                      这些文件将被自动解压缩（在用户路径中有<codeph>gunzip</codeph>或者
+                                                      <codeph>bunzip2</codeph>）。
+                                                  </p>
+                                                  <p>
+                                                      在指定要装载哪些源文件时，用户可以使用通配符（<codeph>*</codeph>）
+                                                      或其他C风格的模式匹配来指示多个文件。被指定的文件假定在相对于<codeph>gpload</codeph>
+                                                      被执行的当前目录的位置（或者用户可以声明绝对路径）。
+                                                  </p></pd>
                                                   </plentry>
                                                   <plentry>
                                                   <pt id="cfsourcessl">SSL</pt>
-                                                  <pd>Optional. Specifies usage of SSL encryption.
-                                                  If <codeph>SSL</codeph> is set to true,
-                                                  <codeph>gpload</codeph> starts the
-                                                  <codeph>gpfdist</codeph> server with the
-                                                  <codeph>--ssl</codeph> option and uses the
-                                                  <codeph>gpfdists://</codeph> protocol.</pd>
+                                                      <pd>可选。指定<codeph>SSL</codeph>加密的使用。
+                                                          如果<codeph>SSL</codeph>被设置为true，<codeph>gpload</codeph>
+                                                          用<codeph>--ssl</codeph>启动<codeph>gpfdist</codeph>
+                                                          服务器并且使用<codeph>gpfdists://</codeph>协议。
+                                                   </pd>
                                                   </plentry>
                                                   <plentry>
                                                   <pt id="cfsourcecertificatespath"
                                                   >CERTIFICATES_PATH</pt>
-                                                  <pd>Required when SSL is <codeph>true</codeph>;
-                                                  cannot be specified when SSL is
-                                                  <codeph>false</codeph> or unspecified. The
-                                                  location specified in
-                                                  <codeph>CERTIFICATES_PATH</codeph> must contain
-                                                  the following files: <ul id="ul_azs_eau_mo">
-                                                  <li id="ke148142">The server certificate file,
+                                                      <pd>当SSL为<codeph>true</codeph>时必需；
+                                                          当SSL为<codeph>false</codeph>或者没有指定时
+                                                          不能指定这个参数。<codeph>CERTIFICATES_PATH</codeph>
+                                                          中指定的位置必须包含下列文件：
+                                                     
+                                                 <ul id="ul_azs_eau_mo">
+                                                     <li id="ke148142">服务器证书文件
                                                   <codeph>server.crt</codeph></li>
-                                                  <li id="ke148143">The server private key file,
+                                                     <li id="ke148143">服务器私钥文件
                                                   <codeph>server.key</codeph></li>
-                                                  <li id="ke148144">The trusted certificate
-                                                  authorities, <codeph>root.crt</codeph></li>
-                                                  </ul><p>The root directory (<codeph>/</codeph>)
-                                                  cannot be specified as
-                                                  <codeph>CERTIFICATES_PATH</codeph>.</p></pd>
+                                                     <li id="ke148144">可信证书授权
+                                                         <codeph>root.crt</codeph></li>
+                                                 </ul><p>根目录(<codeph>/</codeph>)
+                                                     不能被指定为
+                                                  <codeph>CERTIFICATES_PATH</codeph>。</p></pd>
                                                   </plentry>
                                                 </parml></pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="fqdn">FULLY_QUALIFIED_DOMAIN_NAME</pt>
-                                            <pd>Optional. Specifies whether <codeph>gpload</codeph>
-                                                resolve hostnames to the fully qualified domain name
-                                                (FQDN) or the local hostname. If the value is set to
-                                                  <codeph>true</codeph>, names are resolved to the
-                                                FQDN. If the value is set to <codeph>false</codeph>,
-                                                resolution is to the local hostname. The default is
-                                                  <codeph>false</codeph>.<p>A fully qualified domain
-                                                  name might be required in some situations. For
-                                                  example, if the Greenplum Database system is in a
-                                                  different domain than an ETL application that is
-                                                  being accessed by
-                                                <codeph>gpload</codeph>.</p></pd>
+                                            <pd>可选。指定<codeph>gpload</codeph>是否把主机名解析成完全限定的域名
+                                                （FQDN）或者本地主机名。如果值被设置为<codeph>true</codeph>，
+                                                名称会被解析到FQDN。如果该值被设置为<codeph>false</codeph>，
+                                                则解析到本地主机名。默认是<codeph>false</codeph>。
+                                                <p>在某些情况下可能要求一个完全限定的域名。例如，如果Greenplum
+                                                    数据库系统在与ETL应用不同的域且该域能够被<codeph>gpload</codeph>访问。
+                                                 </p></pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfcolumns">COLUMNS</pt>
-                                            <pd>Optional. Specifies the schema of the source data
-                                                file(s) in the format of
-                                                  <codeph><varname>field_name</varname>:<varname>data_type</varname></codeph>.
-                                                The <codeph>DELIMITER</codeph> character in the
-                                                source file is what separates two data value fields
-                                                (columns). A row is determined by a line feed
-                                                character (<codeph>0x0a</codeph>). <p>If the input
-                                                  <codeph>COLUMNS</codeph> are not specified, then
-                                                  the schema of the output <codeph>TABLE</codeph> is
-                                                  implied, meaning that the source data must have
-                                                  the same column order, number of columns, and data
-                                                  format as the target table.</p><p>The default
-                                                  source-to-target mapping is based on a match of
-                                                  column names as defined in this section and the
-                                                  column names in the target <codeph>TABLE</codeph>.
-                                                  This default mapping can be overridden using the
-                                                  <codeph>MAPPING</codeph> section.</p></pd>
+                                            <pd>可选。以<codeph><varname>field_name</varname>:<varname>data_type</varname></codeph>
+                                                这样的格式指定源数据文件的模式。源文件中的<codeph>DELIMITER</codeph>
+                                                字符是分隔两个数据值域（列）的东西。一行由一个换行字符（<codeph>0x0a</codeph>决定）。
+                                                <p>如果输入<codeph>COLUMNS</codeph>没有指定，则使用输出<codeph>TABLE</codeph>的模式，
+                                                    意味着源数据必须与目标表具有相同的列序、列数以及数据格式。
+                                                </p><p>默认的source-to-target映射基于这一节定义的列名与目标<codeph>TABLE</codeph>
+                                                    中列名之间的匹配。默认映射可以使用<codeph>MAPPING</codeph>小节覆盖。
+                                                    </p></pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cftransform">TRANSFORM</pt>
-                                            <pd>Optional. Specifies the name of the input
-                                                transformation passed to <codeph>gpload</codeph>.
-                                                For information about XML transformations, see
-                                                "Loading and Unloading Data" in the <cite>Greenplum
-                                                  Database Administrator Guide</cite>.</pd>
+                                            <pd>可选。指定传递给<codeph>gpload</codeph>的输入转换的名字。
+                                                有关XML转换的信息，请见<cite>Greenplum数据库管理员指南</cite>
+                                                中的“装载和卸载数据”。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cftransformconfig">TRANSFORM_CONFIG</pt>
-                                            <pd>Required when <codeph>TRANSFORM</codeph> is
-                                                specified. Specifies the location of the
-                                                transformation configuration file that is specified
-                                                in the <codeph>TRANSFORM</codeph> parameter,
-                                                above.</pd>
+                                            <pd>当<codeph>TRANSFORM</codeph>被指定时，这个元素是必需的。
+                                                指定在上面<codeph>TRANSFORM</codeph>参数中指定的转换的
+                                                配置文件位置。
+                                            </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfmaxlinelength">MAX_LINE_LENGTH</pt>
-                                            <pd>Optional. An integer that specifies the maximum
-                                                length of a line in the XML transformation data
-                                                passed to <codeph>gpload</codeph>.</pd>
+                                            <pd>可选。一个整数，指定传递给<codeph>gpload</codeph>
+                                                的XML转换数据中一行的最大长度。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfformat">FORMAT</pt>
-                                            <pd>Optional. Specifies the format of the source data
-                                                file(s) - either plain text (<codeph>TEXT</codeph>)
-                                                or comma separated values (<codeph>CSV</codeph>)
-                                                format. Defaults to <codeph>TEXT</codeph> if not
-                                                specified. For more information about the format of
-                                                the source data, see "Loading and Unloading Data" in
-                                                the <cite>Greenplum Database Administrator
-                                                  Guide</cite>.</pd>
+                                            <pd>可选。指定源数据文件的格式：纯文本（<codeph>TEXT</codeph>）格式，
+                                                逗号分隔值（<codeph>CSV</codeph>）格式。如果没有指定，这个默认为
+                                                <codeph>TEXT</codeph>。更多有关源数据格式的信息，请见<cite>
+                                                    Greenplum数据库管理员指南</cite>中的“装载和卸载数据”。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfdelimiter">DELIMITER</pt>
-                                            <pd>Optional. Specifies a single ASCII character that
-                                                separates columns within each row (line) of data.
-                                                The default is a tab character in TEXT mode, a comma
-                                                in CSV mode. You can also specify a non- printable
-                                                ASCII character or a non-printable unicode
-                                                character, for example: <codeph>"\x1B"</codeph> or
-                                                  <codeph> "\u001B"</codeph>. The escape string
-                                                syntax,
-                                                  <codeph>E'<varname>character-code</varname>'</codeph>,
-                                                is also supported for non-printable characters. The
-                                                ASCII or unicode character must be enclosed in
-                                                single quotes. For example: <codeph>E'\x1B'</codeph>
-                                                or <codeph>E'\u001B'</codeph>. </pd>
+                                            <pd>可选。指定在每行数据内分隔列的单个ASCII字符。在TEXT模式中默认是一个制表符，
+                                                在CSV模式中默认是一个逗号。用户还可以指定一个非可打印ASCII字符或者非可打印
+                                                Unicode字符，例如：<codeph>"\x1B"</codeph>或者<codeph> "\u001B"</codeph>。
+                                                对于非可打印字符也支持转义字符串语法<codeph>E'<varname>character-code</varname>'</codeph>。
+                                                ASCII或Unicode字符必须被封闭在单引号中。例如：<codeph>E'\x1B'</codeph>或者
+                                                <codeph>E'\u001B'</codeph>。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfescape">ESCAPE</pt>
-                                            <pd>Specifies the single character that is used for C
-                                                escape sequences (such as <codeph>\n</codeph>,
-                                                  <codeph>\t</codeph>, <codeph>\100</codeph>, and so
-                                                on) and for escaping data characters that might
-                                                otherwise be taken as row or column delimiters. Make
-                                                sure to choose an escape character that is not used
-                                                anywhere in your actual column data. The default
-                                                escape character is a \ (backslash) for
-                                                text-formatted files and a <codeph>"</codeph>
-                                                (double quote) for csv-formatted files, however it
-                                                is possible to specify another character to
-                                                represent an escape. It is also possible to disable
-                                                escaping in text-formatted files by specifying the
-                                                value <codeph>'OFF'</codeph> as the escape value.
-                                                This is very useful for data such as text-formatted
-                                                web log data that has many embedded backslashes that
-                                                are not intended to be escapes.</pd>
+                                            <pd>指定用于C转义序列（例如<codeph>\n</codeph>、<codeph>\t</codeph>、
+                                                <codeph>\100</codeph>等等）以及转义可能被当作行列定界符的数据字符的
+                                                单个字符。确保选择一个在实际列数据中任何地方都没有使用的转义字符。文本
+                                                格式文件的默认转义字符是一个\（反斜线），csv格式文件的默认转义字符是
+                                                一个<codeph>"</codeph>（双引号）。不过可以指定另一个字符来表示转义。
+                                                还可以在文本格式文件中通过指定<codeph>'OFF'</codeph>值作为转义值来
+                                                禁用转义。这对于其中嵌有很多不准备作为转义字符的反斜线的文本格式的Web
+                                                日志数据非常有用。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfnullas">NULL_AS</pt>
-                                            <pd>Optional. Specifies the string that represents a
-                                                null value. The default is <codeph>\N</codeph>
-                                                (backslash-N) in <codeph>TEXT</codeph> mode, and an
-                                                empty value with no quotations in
-                                                  <codeph>CSV</codeph> mode. You might prefer an
-                                                empty string even in <codeph>TEXT</codeph> mode for
-                                                cases where you do not want to distinguish nulls
-                                                from empty strings. Any source data item that
-                                                matches this string will be considered a null
-                                                value.</pd>
+                                            <pd>可选。指定表示空值的字符串。TEXT模式中默认是<codeph>\N</codeph>
+                                                （反斜线-N），<codeph>CSV</codeph>模式中默认是没有引用的空的值。
+                                                即便在<codeph>TEXT</codeph>模式中，对于想要把空值与空字符串区分
+                                                开来的情况，用户也可以使用空字符串。任何匹配这个字符串的源数据项将
+                                                被认为是一个空值。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfforcenotnull">FORCE_NOT_NULL</pt>
-                                            <pd>Optional. In CSV mode, processes each specified
-                                                column as though it were quoted and hence not a NULL
-                                                value. For the default null string in CSV mode
-                                                (nothing between two delimiters), this causes
-                                                missing values to be evaluated as zero-length
-                                                strings.</pd>
+                                            <pd>可选。在CSV模式中，处理每个被指定的列，仿佛它被引用并且因此
+                                                不是一个NULL值。对于CSV模式中的默认空值字符串（两个定界符之
+                                                间什么都没有），这导致缺失的值被计算为长度为零的字符串。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfquote">QUOTE</pt>
-                                            <pd>Required when <codeph>FORMAT</codeph> is
-                                                  <codeph>CSV</codeph>. Specifies the quotation
-                                                character for <codeph>CSV</codeph> mode. The default
-                                                is double-quote (<codeph>"</codeph>).</pd>
+                                            <pd>当<codeph>FORMAT</codeph>是<codeph>CSV</codeph>时，
+                                                这个元素是必需的。为<codeph>CSV</codeph>模式指定引用
+                                                字符。默认是双引号（<codeph>"</codeph>）。
+                                            </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfheader">HEADER</pt>
-                                            <pd>Optional. Specifies that the first line in the data
-                                                file(s) is a header row (contains the names of the
-                                                columns) and should not be included as data to be
-                                                loaded. If using multiple data source files, all
-                                                files must have a header row. The default is to
-                                                assume that the input files do not have a header
-                                                row.</pd>
+                                            <pd>可选。指定数据文件中的第一行是一个头部行（包含列名）并且不
+                                                应被包括在要被装载的数据中。如果使用多个数据源文件，所有的
+                                                文件必须有一个头部行。默认是假定输入文件没有头部行。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfencoding">ENCODING</pt>
-                                            <pd>Optional. Character set encoding of the source data.
-                                                Specify a string constant (such as
-                                                  <codeph>'SQL_ASCII'</codeph>), an integer encoding
-                                                number, or <codeph>'DEFAULT'</codeph> to use the
-                                                default client encoding. If not specified, the
-                                                default client encoding is used. For information
-                                                about supported character sets, see the
-                                                  <cite>Greenplum Database Reference
-                                                Guide</cite>.</pd>
+                                            <pd>可选。源数据的字符集编码。可指定一个字符串常量（例如<codeph>'SQL_ASCII'</codeph>）、
+                                                一个整数编码编号，或者指定<codeph>'DEFAULT'</codeph>以使用默认客户端编码。
+                                                如果没有指定，默认的客户端编码会被使用。有关支持的字符集的信息，
+                                                请见<cite>Greenplum数据库参考指南</cite>。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cferrorlimit">ERROR_LIMIT</pt>
-                                            <pd>Optional. Enables single row error isolation mode
-                                                for this load operation. When enabled, input rows
-                                                that have format errors will be discarded provided
-                                                that the error limit count is not reached on any
-                                                Greenplum Database segment instance during input
-                                                processing. If the error limit is not reached, all
-                                                good rows will be loaded and any error rows will
-                                                either be discarded or captured as part of error log
-                                                information. The default is to abort the load
-                                                operation on the first error encountered. Note that
-                                                single row error isolation only applies to data rows
-                                                with format errors; for example, extra or missing
-                                                attributes, attributes of a wrong data type, or
-                                                invalid client encoding sequences. Constraint
-                                                errors, such as primary key violations, will still
-                                                cause the load operation to abort if encountered.
-                                                For information about handling load errors, see
-                                                "Loading and Unloading Data" in the <cite>Greenplum
-                                                  Database Administrator Guide.</cite></pd>
+                                            <pd>可选。为这个装载操作启用单行错误隔离模式。当被启用时，
+                                                在输入被处理期间只要没有达到错误限制计数，任何Greenplum数据库
+                                                Segment会抛弃有格式错误的输入行。如果错误限制没有达到，所有
+                                                好的行将会被装载并且任何错误行都将被抛弃或者被捕捉在错误日志
+                                                信息中。默认是在遇到第一个错误时中止装载操作。注意单行错误隔离
+                                                只适用于有格式错误的数据行，例如有额外或者缺失的属性、有错误
+                                                数据类型的属性或者有无效的客户端编码序列。如果遇到约束错误
+                                                （例如主键约束）仍将导致装载操作中止。有关处理装载错误的信息，
+                                                请见<cite>Greenplum数据库管理员指南</cite>中的“装载和卸载数据”。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cferrorlog">LOG_ERRORS</pt>
-                                            <pd>Optional when <codeph>ERROR_LIMIT</codeph> is
-                                                declared. Value is either <codeph>true</codeph> or
-                                                  <codeph>false</codeph>. The default value is
-                                                  <codeph>false</codeph>. If the value is
-                                                  <codeph>true</codeph>, rows with formatting errors
-                                                are logged internally when running in single row
-                                                error isolation mode. You can examine formatting
-                                                errors with the Greenplum Database built-in SQL
-                                                function
-                                                  <codeph>gp_read_error_log('<varname>table_name</varname>')</codeph>.
-                                                If formatting errors are detected when loading data,
-                                                  <codeph>gpload</codeph> generates a warning
-                                                message with the name of the table that contains the
-                                                error information similar to this message.
+                                            <pd>当<codeph>ERROR_LIMIT</codeph>被声明时，这个元素是可选的。
+                                                值可以是<codeph>true</codeph>或者<codeph>false</codeph>。
+                                                默认值是<codeph>false</codeph>。如果值是<codeph>true</codeph>，
+                                                当运行在单行错误隔离模式中时，格式错误的行会被内部记录下来。
+                                                用户可以用Greenplum数据库的内建SQL函数<codeph>gp_read_error_log('<varname>table_name</varname>')</codeph>
+                                                检查格式错误。如果在装载数据时检测到格式错误，<codeph>gpload</codeph>
+                                                会用包含错误信息的表的名字生成一个警告消息，看起来类似于这个消息。
                                                 <codeblock><varname>timestamp</varname>|WARN|1 bad row, please use GPDB built-in function gp_read_error_log('<parmname>table-name</parmname>') 
    to access the detailed error row</codeblock></pd>
-                                            <pd>If <codeph>LOG_ERRORS: true</codeph> is specified,
-                                                  <codeph>REUSE_TABLES: true</codeph> must be
-                                                specified to retain the formatting errors in
-                                                Greenplum Database error logs. If
-                                                  <codeph>REUSE_TABLES: true</codeph> is not
-                                                specified, the error information is deleted after
-                                                the <codeph>gpload</codeph> operation. Only summary
-                                                information about formatting errors is returned. You
-                                                can delete the formatting errors from the error logs
-                                                with the Greenplum Database function
-                                                  <codeph>gp_truncate_error_log()</codeph>.</pd>
-                                            <pd>For more information about handling load errors, see
-                                                "Loading and Unloading Data" in the <cite>Greenplum
-                                                  Database Administrator Guide</cite>. For
-                                                information about the
-                                                  <codeph>gp_read_error_log()</codeph> function, see
-                                                the <codeph>CREATE EXTERNAL TABLE</codeph> command
-                                                in the <cite>Greenplum Database Reference
-                                                  Guide</cite></pd>
+                                            <pd>如果<codeph>LOG_ERRORS: true</codeph>被指定，必须指定<codeph>REUSE_TABLES: true</codeph>
+                                                以便在Greenplum数据库的错误日志中保留格式错误。如果没有指定<codeph>REUSE_TABLES: true</codeph>，
+                                                错误信息会在<codeph>gpload</codeph>操作后被删除。只有关于格式错误的总结信息会被返回。
+                                                用户可以用Greenplum数据库的函数<codeph>gp_truncate_error_log()</codeph>从错误日志
+                                                中删除格式错误。</pd>
+                                            <pd>更多有关处理装载错误的信息，请见<cite>Greenplum数据库管理员指南</cite>中的“装载和卸载数据”。
+                                                有关<codeph>gp_read_error_log()</codeph>函数的信息，请见<cite>Greenplum数据库参考指南</cite>
+                                                中的<codeph>CREATE EXTERNAL TABLE</codeph>命令。
+                                              </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfexternal">EXTERNAL</pt>
-                                            <pd>Optional. Defines the schema of the external table
-                                                database objects created by <codeph>gpload</codeph>. </pd>
-                                            <pd>The default is to use the Greenplum Database
-                                                  <codeph>search_path</codeph>. </pd>
+                                            <pd>可选。定义<codeph>gpload</codeph>创建的外部表数据库对象所属的方案。
+                                                </pd>
+                                            <pd>默认是使用Greenplum数据库的<codeph>search_path</codeph>。
+                                                  </pd>
                                             <pd>
                                                 <parml>
                                                   <plentry>
                                                   <pt id="cfschema">SCHEMA</pt>
-                                                  <pd>Required when <codeph>EXTERNAL</codeph> is
-                                                  declared. The name of the schema of the external
-                                                  table. If the schema does not exist, an error is
-                                                  returned. </pd>
-                                                  <pd>If <codeph>%</codeph> (percent character) is
-                                                  specified, the schema of the table name specified
-                                                  by <codeph>TABLE</codeph> in the
-                                                  <codeph>OUTPUT</codeph> section is used. If the
-                                                  table name does not specify a schema, the default
-                                                  schema is used.</pd>
+                                                      <pd>当<codeph>EXTERNAL</codeph>被声明时，这个元素是必需的。
+                                                          外部表所在的方案的名称。如果该方案不存在，会返回一个错误。
+                                                     </pd>
+                                                      <pd>
+                                                          如果<codeph>%</codeph>（百分号字符）被指定，
+                                                          会使用<codeph>OUTPUT</codeph>小节中<codeph>TABLE</codeph>
+                                                          指定的表名的方案。如果这个表名没有指定一个方案，则会使用默认方案。
+                                                     </pd>
                                                   </plentry>
                                                 </parml>
                                             </pd>
@@ -642,100 +511,74 @@
                             </plentry>
                             <plentry>
                                 <pt id="cfoutput">OUTPUT</pt>
-                                <pd>Required. Defines the target table and final data column values
-                                    that are to be loaded into the database.<parml>
+                                <pd>必需。定义要被装载到数据库中的目标表和最终数据列值。
+                                    <parml>
                                         <plentry>
                                             <pt id="cftable">TABLE</pt>
-                                            <pd>Required. The name of the target table to load
-                                                into.</pd>
+                                            <pd>必需。要装载到其中的目标表名。</pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfmode">MODE</pt>
-                                            <pd>Optional. Defaults to <codeph>INSERT</codeph> if not
-                                                specified. There are three available load
-                                                modes:</pd>
-                                            <pd><option>INSERT</option> - Loads data into the target
-                                                table using the following method:
+                                            <pd>可选。如果没有指定，则默认为<codeph>INSERT</codeph>。
+                                                有三种可用的装载模式：
+                                               </pd>
+                                            <pd><option>INSERT</option> - 使用下列方法装载数据到目标表中：
                                                 <codeblock>INSERT INTO <varname>target_table</varname> SELECT * FROM <varname>input_data</varname>;</codeblock></pd>
-                                            <pd><option>UPDATE</option> - Updates the
-                                                  <codeph>UPDATE_COLUMNS</codeph> of the target
-                                                table where the rows have
-                                                  <codeph>MATCH_COLUMNS</codeph> attribute values
-                                                equal to those of the input data, and the optional
-                                                  <codeph>UPDATE_CONDITION</codeph> is true.
-                                                  <codeph>UPDATE</codeph> is not supported if the
-                                                target table column name is a reserved keyword, has
-                                                capital letters, or includes any character that
-                                                requires quotes (" ") to identify the column.</pd>
-                                            <pd><option>MERGE</option> - Inserts new rows and
-                                                updates the <codeph>UPDATE_COLUMNS</codeph> of
-                                                existing rows where <codeph>FOOBAR</codeph>
-                                                attribute values are equal to those of the input
-                                                data, and the optional
-                                                  <codeph>MATCH_COLUMNS</codeph> is true. New rows
-                                                are identified when the
-                                                  <codeph>MATCH_COLUMNS</codeph> value in the source
-                                                data does not have a corresponding value in the
-                                                existing data of the target table. In those cases,
-                                                the <b>entire row</b> from the source file is
-                                                inserted, not only the <codeph>MATCH</codeph> and
-                                                  <codeph>UPDATE</codeph> columns. If there are
-                                                multiple new <codeph>MATCH_COLUMNS</codeph> values
-                                                that are the same, only one new row for that value
-                                                will be inserted. Use
-                                                  <codeph>UPDATE_CONDITION</codeph> to filter out
-                                                the rows to discard. <codeph>MERGE</codeph> is not
-                                                supported if the target table column name is a
-                                                reserved keyword, has capital letters, or includes
-                                                any character that requires quotes (" ") to identify
-                                                the column.</pd>
+                                            <pd><option>UPDATE</option> - 更新目标表中<codeph>MATCH_COLUMNS</codeph>
+                                                属性值等于输入数据并且<codeph>UPDATE_CONDITION</codeph>为true（可选条件）
+                                                的行的<codeph>UPDATE_COLUMNS</codeph>。如果目标表的列名为保留关键字、
+                                                有大写字母或包含双引号（" "），那么不支持<codeph>UPDATE</codeph>。
+                                                 </pd>
+                                            <pd><option>MERGE</option> - 插入新行并且更新<codeph>FOOBAR</codeph>
+                                                属性值等于相应输入数据而且<codeph>MATCH_COLUMNS</codeph>为true
+                                                （可选条件）的已有行的<codeph>UPDATE_COLUMNS</codeph>。当源数据
+                                                中的<codeph>MATCH_COLUMNS</codeph>值在目标表数据中没有相应值时会
+                                                被标识成新行。在那种情况下，源文件中的<b>整个行</b>会被插入，而不仅仅
+                                                是<codeph>MATCH</codeph>和<codeph>UPDATE</codeph>列。如果有多个
+                                                相等的新<codeph>MATCH_COLUMNS</codeph>值，只有其中一个新行将被插入。
+                                                使用<codeph>UPDATE_CONDITION</codeph>可过滤掉要抛弃的行。
+                                                如果目标表的列名为保留关键字、
+                                                有大写字母或包含双引号（" "），那么不支持<codeph>MERGE</codeph>。
+                                                 </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfmatchcolumns">MATCH_COLUMNS</pt>
-                                            <pd>Required if <codeph>MODE</codeph> is
-                                                  <codeph>UPDATE</codeph> or <codeph>MERGE</codeph>.
-                                                Specifies the column(s) to use as the join condition
-                                                for the update. The attribute value in the specified
-                                                target column(s) must be equal to that of the
-                                                corresponding source data column(s) in order for the
-                                                row to be updated in the target table.</pd>
+                                            <pd>如果<codeph>MODE</codeph>为<codeph>UPDATE</codeph>或者
+                                                <codeph>MERGE</codeph>，则这个元素是必需的。指定被用作更新
+                                                的连接条件的列。对于要在目标表中更新的行，指定目标列中的属性值
+                                                必须等于相应的源数据列值。
+                                                </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfupdatecolumns">UPDATE_COLUMNS</pt>
-                                            <pd>Required if <codeph>MODE</codeph> is
-                                                  <codeph>UPDATE</codeph> or <codeph>MERGE</codeph>.
-                                                Specifies the column(s) to update for the rows that
-                                                meet the <codeph>MATCH_COLUMNS</codeph> criteria and
-                                                the optional <codeph>UPDATE_CONDITION</codeph>.
+                                            <pd>如果<codeph>MODE</codeph>为<codeph>UPDATE</codeph>
+                                                或者<codeph>MERGE</codeph>，则这个元素是必需的。指定对
+                                                符合<codeph>MATCH_COLUMNS</codeph>条件和可选
+                                                <codeph>UPDATE_CONDITION</codeph>的行要更新的列。
                                             </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfupdatecondition">UPDATE_CONDITION</pt>
-                                            <pd>Optional. Specifies a Boolean condition (similar to
-                                                what you would declare in a <codeph>WHERE</codeph>
-                                                clause) that must be met in order for a row in the
-                                                target table to be updated (or inserted in the case
-                                                of a <codeph>MERGE</codeph>).</pd>
+                                            <pd>可选。指定目标表中要被更新的行（在<codeph>MERGE</codeph>
+                                                情况下是要被插入的行）必须满足的一个布尔条件（类似于在
+                                                <codeph>WHERE</codeph>子句中声明的那样）。
+                                               </pd>
                                         </plentry>
                                         <plentry>
                                             <pt id="cfmapping">MAPPING</pt>
-                                            <pd>Optional. If a mapping is specified, it overrides
-                                                the default source-to-target column mapping. The
-                                                default source-to-target mapping is based on a match
-                                                of column names as defined in the source
-                                                  <codeph>COLUMNS</codeph> section and the column
-                                                names of the target <codeph>TABLE</codeph>. A
-                                                mapping is specified as either:</pd>
+                                            <pd>可选。如果指定一个映射，它会覆盖默认的source-to-target列映射。
+                                                默认的source-to-target映射基于源<codeph>COLUMNS</codeph>
+                                                小节定义的列名与目标<codeph>TABLE</codeph>中列名之间的匹配。
+                                                映射可以被指定为：
+                                                </pd>
                                             <pd><codeph><varname>target_column_name</varname>:
                                                   <varname>source_column_name</varname></codeph></pd>
-                                            <pd>or</pd>
+                                            <pd>或者</pd>
                                             <pd><codeph><varname>target_column_name</varname>:
                                                   '<varname>expression</varname>'</codeph></pd>
-                                            <pd>Where <varname>expression</varname> is any
-                                                expression that you would specify in the
-                                                  <codeph>SELECT</codeph> list of a query, such as a
-                                                constant value, a column reference, an operator
-                                                invocation, a function call, and so on.</pd>
+                                            <pd>其中<varname>expression</varname>是在查询的<codeph>SELECT</codeph>
+                                                列表中指定的任意表达式，例如常量值、列引用、操作符调用、函数调用等等。
+                                                </pd>
                                         </plentry>
                                     </parml></pd>
                             </plentry>
@@ -743,117 +586,96 @@
                 </plentry>
                 <plentry>
                     <pt id="cfpreload">PRELOAD</pt>
-                    <pd>Optional. Specifies operations to run prior to the load operation. Right now
-                        the only preload operation is <codeph>TRUNCATE</codeph>.<parml>
+                    <pd>可选。指定在装载操作之前运行的操作。目前唯一的预装载操作是<codeph>TRUNCATE</codeph>。
+                        <parml>
                             <plentry>
                                 <pt id="cftruncate">TRUNCATE</pt>
-                                <pd>Optional. If set to true, <codeph>gpload</codeph> will remove
-                                    all rows in the target table prior to loading it. Default is
-                                    false.</pd>
+                                <pd>可选。如果设置为true，<codeph>gpload</codeph>将在装载目标表之前
+                                    移除其中所有的行。</pd>
                             </plentry>
                             <plentry>
                                 <pt id="cfreusetables">REUSE_TABLES</pt>
-                                <pd>Optional. If set to true, <codeph>gpload</codeph> will not drop
-                                    the external table objects and staging table objects it creates.
-                                    These objects will be reused for future load operations that use
-                                    the same load specifications. This improves performance of
-                                    trickle loads (ongoing small loads to the same target
-                                    table).</pd>
-                                <pd>If <codeph>LOG_ERRORS: true</codeph> is specified,
-                                        <codeph>REUSE_TABLES: true</codeph> must be specified to
-                                    retain the formatting errors in Greenplum Database error logs.
-                                    If <codeph>REUSE_TABLES: true</codeph> is not specified,
-                                    formatting error information is deleted after the
-                                        <codeph>gpload</codeph> operation.</pd>
-                                <pd>If the <varname>external_table_name</varname> exists, the
-                                    utility uses the existing table. The utility returns an error if
-                                    the table schema does not match the <codeph>OUTPUT</codeph>
-                                    table schema.</pd>
+                                <pd>可选。如果设置为true，<codeph>gpload</codeph>将不会删除它创建的外部表
+                                    对象和阶段性对象。这些对象将被重用于未来使用同一装载说明的装载操作。这会
+                                    提高小型装载的性能（正在进行的到同一目标表的小型装载）。
+                                    </pd>
+                                <pd>如果<codeph>LOG_ERRORS: true</codeph>被指定，<codeph>REUSE_TABLES: true</codeph>
+                                    必须被指定以保留Greenplum数据库错误日志中的格式错误。如果<codeph>REUSE_TABLES: true</codeph>
+                                    没有被指定，格式错误信息会在<codeph>gpload</codeph>操作之后被删除。</pd>
+                                <pd>如果<varname>external_table_name</varname>存在，工具会使用存在的表。
+                                    如果<codeph>OUTPUT</codeph>表结构与数据库中表结构不吻合，工具会返回错误。
+                                </pd>
                             </plentry>
                             <plentry>
                                 <pt id="cfstagetbl">STAGING_TABLE</pt>
-                                <pd>Optional. Specify the name of the temporary external table that
-                                    is created during a <codeph>gpload</codeph> operation. The
-                                    external table is used by <codeph>gpfdist</codeph>.
-                                        <codeph>REUSE_TABLES: true</codeph> must also specified. If
-                                        <codeph>REUSE_TABLES</codeph> is false or not specified,
-                                        <codeph>STAGING_TABLE</codeph> is ignored. By default,
-                                        <codeph>gpload</codeph> creates a temporary external table
-                                    with a randomly generated name.</pd>
-                                <pd>If <varname>external_table_name</varname> contains a period (.),
-                                        <codeph>gpload</codeph> returns an error. If the table
-                                    exists, the utility uses the table. The utility returns an error
-                                    if the existing table schema does not match the
-                                        <codeph>OUTPUT</codeph> table schema.</pd>
-                                <pd>The utility uses the value of <codeph><xref
+                                <pd>可选。指定<codeph>gpload</codeph>操作过程中创建的临时外部表的名称。
+                                    该外部表会被<codeph>gpfdist</codeph>使用。
+                                        <codeph>REUSE_TABLES: true</codeph>必须被指定。如果
+                                        <codeph>REUSE_TABLES</codeph>为false或没有指定，
+                                        <codeph>STAGING_TABLE</codeph>会被忽略。默认情况下，
+                                        <codeph>gpload</codeph>会采用随机名称创建一个临时外部表。</pd>
+                                <pd>如果<varname>external_table_name</varname>包含点号(.)，
+                                        <codeph>gpload</codeph>会返回错误。如果表已经存在，工具会使用该表。
+                                    如果表的结构与<codeph>OUTPUT</codeph>表定义的结构不匹配，工具会返回错误。
+                                </pd>
+                                <pd>工具会使用<codeph>EXTERNAL</codeph>部分定义的<codeph><xref
                                             href="#topic1/cfschema" format="dita"
-                                        >SCHEMA</xref></codeph> in the <codeph>EXTERNAL</codeph>
-                                    section as the schema for
-                                    <varname>external_table_name</varname>. If the
-                                        <codeph>SCHEMA</codeph> value is <codeph>%</codeph>, the
-                                    schema for <varname>external_table_name</varname> is the same as
-                                    the schema of the target table, the schema of <codeph><xref
+                                        >SCHEMA</xref></codeph>值作为
+                                    <varname>external_table_name</varname>。如果
+                                        <codeph>SCHEMA</codeph>的值为<codeph>%</codeph>，
+                                    <varname>external_table_name</varname>的名字会和目标表相同，
+                                    <codeph><xref
                                             href="#topic1/cftable" format="dita"
-                                        >TABLE</xref></codeph> in the <codeph>OUTPUT</codeph>
-                                    section. </pd>
-                                <pd>If <codeph>SCHEMA</codeph> is not set, the utility searches for
-                                    the table (using the schemas in the database
-                                        <codeph>search_path</codeph>). If the table is not found,
-                                        <varname>external_table_name</varname> is created in the
-                                    default <codeph>PUBLIC</codeph> schema. </pd>
+                                        >TABLE</xref></codeph>的表结构与<codeph>OUTPUT</codeph>
+                                    部分定义的相同。</pd>
+                                <pd>如果没有设置<codeph>SCHEMA</codeph>，工具会在数据库中搜索表
+                                    (在<codeph>search_path</codeph>中定义的模式下)，如果找不到该表
+                                    ，<varname>external_table_name</varname>表会在<codeph>PUBLIC</codeph>
+                                    模式下被创建。</pd>
                             </plentry>
                             <plentry>
                                 <pt id="cffastmatch">FAST_MATCH</pt>
-                                <pd>Optional. If set to true, <codeph>gpload</codeph> only searches
-                                    the database for matching external table objects when reusing
-                                    external tables. The utility does not check the external table
-                                    column names and column types in the catalog table
-                                        <codeph>pg_attribute</codeph> to ensure that the table can
-                                    be used for a <codeph>gpload</codeph> operation. Set the value
-                                    to true to improve <codeph>gpload</codeph> performance when
-                                    reusing external table objects and the database catalog table
-                                        <codeph>pg_attribute</codeph> contains a large number of
-                                    rows. The utility returns an error and quits if the column
-                                    definitions are not compatible.</pd>
-                                <pd>The default value is false, the utility checks the external
-                                    table definition column names and column types. </pd>
-                                <pd><codeph>REUSE_TABLES: true</codeph> must also specified. If
-                                        <codeph>REUSE_TABLES</codeph> is false or not specified and
-                                        <codeph>FAST_MATCH: true</codeph> is specified,
-                                        <codeph>gpload</codeph> returns a warning message. </pd>
+                                <pd>可选项。如果设置为true，在重用外部表时，<codeph>gpload</codeph>仅
+                                    搜索匹配外部表对象的数据库。工具不会从<codeph>pg_attribute</codeph>
+                                    检查外部表的列名和列类型。设置该值可以在重用外部表的前提下提高，
+                                    <codeph>gpload</codeph>性能。但是如果实际的列不匹配，该工具会在实际执行
+                                    时返回错误</pd>
+                                <pd>默认值为false，工具会去预先检查外部表定义的列名和列类型。</pd>
+                                <pd><codeph>REUSE_TABLES: true</codeph>也必须被定义。如果
+                                        <codeph>REUSE_TABLES</codeph>为false或者没定义，并且
+                                        <codeph>FAST_MATCH: true</codeph>被指定，
+                                        <codeph>gpload</codeph>会返回告警信息。</pd>
                             </plentry>
                         </parml></pd>
                 </plentry>
                 <plentry>
                     <pt id="cfsql">SQL</pt>
-                    <pd>Optional. Defines SQL commands to run before and/or after the load
-                        operation. You can specify multiple <codeph>BEFORE</codeph> and/or
-                            <codeph>AFTER</codeph> commands. List commands in the order of desired execution.<parml>
+                    <pd>可选。定义在装载操作之前或者之后要运行的SQL命令。用户可以指定多个<codeph>BEFORE</codeph>
+                        或者<codeph>AFTER</codeph>命令。按照想要的执行顺序列出命令。<parml>
                             <plentry>
                                 <pt id="cfbefore">BEFORE</pt>
-                                <pd>Optional. An SQL command to run before the load operation
-                                    starts. Enclose commands in quotes.</pd>
+                                <pd>可选。在装载操作开始之前要运行的一个SQL命令。将命令封闭在引号中。</pd>
                             </plentry>
                             <plentry>
                                 <pt id="cfafter">AFTER</pt>
-                                <pd>Optional. An SQL command to run after the load operation
-                                    completes. Enclose commands in quotes.</pd>
+                                <pd>可选。在装载操作完成之后要运行的一个SQL命令。将命令封闭在引号中。</pd>
                             </plentry>
                         </parml></pd>
                 </plentry>
             </parml>
         </section>
         <section id="section9">
-            <title id="ke146419">Log File Format</title>
-            <p>Log files output by <codeph>gpload</codeph> have the following format:</p>
+            <title id="ke146419">日志文件格式</title>
+            <p><codeph>gpload</codeph>输出的日志文件具有下面的格式：</p>
             <codeblock><varname>timestamp</varname>|<varname>level</varname>|<varname>message</varname></codeblock>
-            <p>Where <varname>timestamp</varname> takes the form: <codeph>YYYY-MM-DD
-                    HH:MM:SS</codeph>, <varname>level</varname> is one of <codeph>DEBUG</codeph>,
-                    <codeph>LOG</codeph>, <codeph>INFO</codeph>, <codeph>ERROR</codeph>, and
-                    <varname>message</varname> is a normal text message.</p>
-            <p>Some <codeph>INFO</codeph> messages that may be of interest in the log files are
-                (where <varname>#</varname> corresponds to the actual number of seconds, units of
-                data, or failed rows):</p>
+            <p>其中<varname>timestamp</varname>的形式是：<codeph>YYYY-MM-DD
+                HH:MM:SS</codeph>，<varname>level</varname>是<codeph>DEBUG</codeph>、
+                <codeph>LOG</codeph>、<codeph>INFO</codeph>、<codeph>ERROR</codeph>中间的一个，
+                而<varname>message</varname>是普通文本消息。
+            </p>
+            <p>日志文件中可能让人感兴趣的一些<codeph>INFO</codeph>消息是（其中<varname>#</varname>
+                对应于实际的秒数、数据的单位或者失败的行）：
+            </p>
             <codeblock>INFO|running time: <varname>#.##</varname> seconds
 INFO|transferred <varname>#.#</varname> kB of <varname>#.#</varname> kB.
 INFO|gpload succeeded
@@ -863,30 +685,28 @@ INFO|1 bad row
 INFO|<varname>#</varname> bad rows</codeblock>
         </section>
         <section id="section8">
-            <title>Notes</title>
-            <p>If your database object names were created using a double-quoted identifier
-                (delimited identifier), you must specify the delimited name within single quotes in
-                the <codeph>gpload</codeph> control file. For example, if you create a table as
-                follows:</p>
+            <title>注解</title>
+            <p>如果用户的数据库对象名使用双引号标识符（定界的标识符）创建，用户必须在<codeph>gpload</codeph>
+                控制文件中用单引号指定定界的名称。例如，如果用户这样创建一个表：
+                </p>
             <codeblock>CREATE TABLE "MyTable" ("MyColumn" text);</codeblock>
-            <p>Your YAML-formatted <codeph>gpload</codeph> control file would refer to the above
-                table and column names as follows:</p>
+            <p>用户的YAML格式的<codeph>gpload</codeph>控制文件应该按如下方式引用上述表和列名：
+                </p>
             <codeblock>- COLUMNS:
    - '"MyColumn"': text
 OUTPUT:
    - TABLE: public.'"MyTable"'</codeblock>
-            <p>If the YAML control file contains the <codeph>ERROR_TABLE</codeph> element that was
-                available in Greenplum Database 4.3.x, <codeph>gpload</codeph> logs a warning
-                stating that <codeph>ERROR_TABLE</codeph> is not supported, and load errors are
-                handled as if the <codeph>LOG_ERRORS</codeph> and <codeph>REUSE_TABLE</codeph>
-                elements were set to <codeph>true</codeph>. Rows with formatting errors are logged
-                internally when running in single row error isolation mode.</p>
+            <p>如果YAML控制文件包含Greenplum数据库4.3.x的<codeph>ERROR_TABLE</codeph>元素，
+                <codeph>gpload</codeph>会提示一个告警，显示表明<codeph>ERROR_TABLE</codeph>
+                是不支持的，如果<codeph>LOG_ERRORS</codeph>和<codeph>REUSE_TABLE</codeph>
+                被设置为<codeph>true</codeph>，加载错误信息会被正常处理。当运行在单行事务处理模式时，
+                格式错误的行会被记录到内部数据库日志。</p>
         </section>
         <section id="section10">
-            <title>Examples</title>
-            <p>Run a load job as defined in <codeph>my_load.yml</codeph>:</p>
+            <title>示例</title>
+            <p>按<codeph>my_load.yml</codeph>中的定义运行一个装载作业：</p>
             <codeblock>gpload -f my_load.yml</codeblock>
-            <p>Example load control file:</p>
+            <p>装载控制文件的例子：</p>
             <codeblock>---
 VERSION: 1.0.0.1
 DATABASE: ops
@@ -924,10 +744,9 @@ GPLOAD:
    - AFTER: "INSERT INTO audit VALUES('end', current_timestamp)"</codeblock>
         </section>
         <section id="section11">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="gpfdist.xml#topic1" type="topic" format="dita"/></codeph>,
-                    <codeph>CREATE EXTERNAL TABLE</codeph> in the <cite>Greenplum Database Reference
-                    Guide</cite></p>
+                <cite>Greenplum数据库参考指南</cite>中的<codeph>CREATE EXTERNAL TABLE</codeph>。</p>
         </section>
     </body>
 </topic>
