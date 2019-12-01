@@ -5,150 +5,130 @@
     <!--install_guide/refs/gpinitstandby.xml has a conref to this topic. -->
     <title id="js140845">gpinitstandby</title>
     <body>
-        <p>Adds and/or initializes a standby master host for a Greenplum Database system.</p>
+        <p>为Greenplum数据库系统添加或初始化后备Master主机。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpinitstandby</b> { <b>-s</b> <varname>standby_hostname</varname> [<b>-P</b> port] | <b>-r</b> | <b>-n</b> } [<b>-a</b>] [<b>-q</b>] 
-    [<b>-D</b>] [<b>-S</b> <varname>standby_data_directory</varname>] [<b>-l</b> <varname>logfile_directory</varname>]
-
-<b>gpinitstandby</b> <b>-v</b> 
-
-<b>gpinitstandby</b> <b>-?</b></codeblock>
+                [<b>-D</b>] [<b>-S</b> <varname>standby_data_directory</varname>] [<b>-l</b> <varname>logfile_directory</varname>]
+                
+                <b>gpinitstandby</b> <b>-v</b> 
+                
+                <b>gpinitstandby</b> <b>-?</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpinitstandby</codeph> utility adds a backup, standby master instance to
-                your Greenplum Database system. If your system has an existing standby master
-                instance configured, use the <codeph>-r</codeph> option to remove it before adding
-                the new standby master instance. </p>
-            <p>Before running this utility, make sure that the Greenplum Database software is
-                installed on the standby master host and that you have exchanged SSH keys between
-                the hosts. It is recommended that the master port is set to the same port number on
-                the master host and the standby master host. </p>
-            <p>This utility should be run on the currently active <i>primary</i> master host.<ph>
-                    See the <i>Greenplum Database Installation Guide</i> for instructions.</ph></p>
-            <p>The utility performs the following steps:</p>
+            <title>描述</title>
+            <p><codeph>gpinitstandby</codeph>工具为用户的Greenplum数据库系统添加一个备份的后备Master主机。
+                如果用户的系统已经配置了后备Master主机，请在添加新的后备Master主机之前使用<codeph>-r</codeph>
+                选项将其删除。</p>
+            <p>在运行此工具之前，请确保Greenplum数据库软件已安装在后备Master主机上，并且用户已在主机之间交换了
+                SSH密钥。推荐在Master主机和后备Master主机上将主端口设置为相同的端口号。
+            </p>
+            <p>此工具应该在当前活动的<i>主</i>Master主机上运行。<ph>方法请参见<i>Greenplum数据库安装指南</i></ph>。
+            </p>
+            <p>该工具执行以下的步骤：</p>
             <ul>
-                <li id="js138559">Updates the Greenplum Database system catalog to remove the
-                    existing standby master information (if the <codeph>-r</codeph> option is
-                    supplied) </li>
-                <li id="js138555">Updates the Greenplum Database system catalog to add the new
-                    standby master instance information </li>
-                <li id="js138431">Edits the <codeph>pg_hba.conf</codeph> file of the Greenplum
-                    Database master to allow access from the newly added standby master</li>
-                <li id="js137684">Sets up the standby master instance on the alternate master
-                    host</li>
-                <li id="js137686">Starts the synchronization process</li>
+                <li id="js138559">更新该Greenplum数据库系统目录来删除现有的后备Master主机信息
+                    （如果指定了<codeph>-r</codeph>）</li>
+                <li id="js138555">更新该Greenplum数据库系统 目录来添加新的后备Master主机信息
+                </li>
+                <li id="js138431">编辑Greenplum数据库Master的<codeph>pg_hba.conf</codeph>
+                    来允许从新添加的后备Master主机进行访问。</li>
+                <li id="js137684">在后补Master主机上设置后备Master实例。</li>
+                <li id="js137686">开始同步进程。</li>
             </ul>
-            <p>A backup, standby master instance serves as a 'warm standby' in the event of the
-                primary master becoming non-operational. The standby master is kept up to date by
-                transaction log replication processes (the <codeph>walsender</codeph> and
-                    <codeph>walreceiver</codeph>), which run on the primary master and standby
-                master hosts and keep the data between the primary and standby master instances
-                synchronized. If the primary master fails, the log replication process is shut down,
-                and the standby master can be activated in its place by using the
-                    <codeph>gpactivatestandby</codeph> utility. Upon activation of the standby
-                master, the replicated logs are used to reconstruct the state of the master instance
-                at the time of the last successfully committed transaction.</p>
-            <p>The activated standby master effectively becomes the Greenplum Database master,
-                accepting client connections on the master port and performing normal master
-                operations such as SQL command processing and resource management. </p>
-            <note type="important">If the <codeph>gpinitstandby</codeph> utility previously failed
-                to initialize the standby master, you must delete the files in the standby master
-                data directory before running <codeph>gpinitstandby</codeph> again. The standby
-                master data directory is not cleaned up after an initialization failure because it
-                contains log files that can help in determining the reason for the failure.<p>If an
-                    initialization failure occurs, a summary report file is generated in the standby
-                    host directory <codeph>/tmp</codeph>. The report file lists the directories on
-                    the standby host that require clean up.</p></note>
+            <p>如果主Master主机变为不可操作，后备Master主机将作为“热备用”。后备Master通过事务日志
+                复制进程（<codeph>walsender</codeph>和<codeph>walreceiver</codeph>）保持最新
+                状态，这些进程在主Master主机和后备Master主机上运行，并使两者的数据保持同步。如果主
+                Master失效，日志复制过程将关闭，后备Master可以使用<codeph>gpactivatestandby</codeph>
+                工具在其位置激活。一旦后备Master激活，复制日志将用于重建最后一次成功提交事务时Master
+                主机的状态。
+            </p>
+            <p>激活的后备Master实际上成为Greenplum数据库的Master，在主端口上接受客户端连接并执行正常的
+                Master操作，例如SQL命令处理和负载管理。</p>
+            <note type="important">如果<codeph>gpinitstandby</codeph>工具之前初始化后备Master失败，
+                则必须显示删除后备Master数据目录中的文件，然后再次运行<codeph>gpinitstandby</codeph>。
+                后备Master数据目录在初始化失败后不会被清理，因为它包含可帮助确定失败原因的日志文件。<p>
+                    如果发生初始化失败，则会在后备主机目录<codeph>/tmp</codeph>中生成摘要报告文件。
+                    该报告列出了后备主机上需要清理的目录。</p></note>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
-                    <pt>-a (do not prompt)</pt>
-                    <pd>Do not prompt the user for confirmation.</pd>
+                    <pt>-a（不提示）</pt>
+                    <pd>不要提示用户确认。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-D (debug)</pt>
-                    <pd>Sets logging level to debug.</pd>
+                    <pt>-D（调试）</pt>
+                    <pd>设置日志级别为debug。</pd>
                 </plentry>
                 <plentry>
                     <pt>-l <varname>logfile_directory</varname></pt>
-                    <pd>The directory to write the log file. Defaults to
-                            <codeph>~/gpAdminLogs</codeph>.</pd>
+                    <pd>写入日志的目录，默认为<codeph>~/gpAdminLogs</codeph>。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-n (restart standby master)</pt>
-                    <pd>Specify this option to start a Greenplum Database standby master that has
-                        been configured but has stopped for some reason.</pd>
+                    <pt>-n（重启被主机）</pt>
+                    <pd>指定此选项以启动已配置但由于某种原因已停止的Greenplum数据库的后备Master。</pd>
                 </plentry>
                 <plentry>
                     <pt>-P <varname>port</varname></pt>
-                    <pd>This option specifies the port that is used by the Greenplum Database
-                        standby master. The default is the same port used by the active Greenplum
-                        Database master. </pd>
-                    <pd>If the Greenplum Database standby master is on the same host as the active
-                        master, the ports must be different. If the ports are the same for the
-                        active and standby master and the host is the same, the utility returns an
-                        error. </pd>
+                    <pd>此选项指定Greenplum数据库的后备Master使用的端口。默认值是Greenplum数据库的活动
+                        Master使用的端口。
+                    </pd>
+                    <pd>如果Greenplum数据库的后备Master和活动Master在同一台主机上，则端口必须不同。
+                        如果活动Master和后备Master的端口相同，并且所在的主机也相同，则该工具将返回错误。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-q (no screen output)</pt>
-                    <pd>Run in quiet mode. Command output is not displayed on the screen, but is
-                        still written to the log file.</pd>
+                    <pt>-q（无屏幕输出）</pt>
+                    <pd>以静默模式运行。命令输出不显示在屏幕上，但是仍然写入日志文件。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-r (remove standby master)</pt>
-                    <pd>Removes the currently configured standby master instance from your Greenplum
-                        Database system.</pd>
+                    <pt>-r（移除后备Master）</pt>
+                    <pd>从Greenplum数据库系统中删除当前已配置的后备Master。</pd>
                 </plentry>
                 <plentry>
                     <pt>-s standby_hostname</pt>
-                    <pd>The host name of the standby master host.</pd>
+                    <pd>后备Master的主机名。</pd>
                 </plentry>
                 <plentry>
                     <pt>-S <varname>standby_data_directory</varname></pt>
-                    <pd>The data directory to use for a new standby master. The default is the same
-                        directory used by the active master.</pd>
-                    <pd>If the standby master is on the same host as the active master, a different
-                        directory must be specified using this option.</pd>
+                    <pd>新备用Master主机使用的数据目录。默认为和活动Master相同的路径。</pd>
+                    <pd>如果备用Master和活动Master在同一台主机上，必须使用该选项定义一个不同的路径。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-v (show utility version)</pt>
-                    <pd>Displays the version, status, last updated date, and checksum of this
-                        utility.</pd>
+                    <pt>-v（显示工具版本）</pt>
+                    <pd>显示该工具的版本、状态、上次更新的日期和校验和。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-? (help)</pt>
-                    <pd>Displays the online help.</pd>
+                    <pt>-?（帮助）</pt>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>Add a standby master instance to your Greenplum Database system and start the
-                synchronization process:</p>
+            <title>示例</title>
+            <p>添加一个后备Master到用户的Greenplum数据库系统，并重启同步进程：</p>
             <codeblock>gpinitstandby -s host09</codeblock>
-            <p>Start an existing standby master instance and synchronize the data with the current
-                primary master instance:</p>
+            <p>开启一个存在的后备Master主机，并且和当前的主Master主机同步：
+            </p>
             <codeblock>gpinitstandby -n</codeblock>
-            <note type="note">Do not specify the -n and -s options in the same command.</note>
-            <p>Add a standby master instance to your Greenplum Database system specifying a
-                different port:</p>
+            <note type="note">不要在同一命令指定-n和-s选项。</note>
+            <p>指定一个不同的端口向Greenplum数据库系统添加一台后备Master主机：</p>
             <codeblock>gpinitstandby -s myhost -P 2222</codeblock>
-            <p>If you specify the same host name as the active Greenplum Database master, you must
-                also specify a different port number with the <codeph>-P</codeph> option and a
-                standby data directory with the <codeph>-S</codeph> option. </p>
-            <p>Remove the existing standby master from your Greenplum system configuration:</p>
+            <p>如果指定的主机名与Greenplum数据库的活动Master相同，则用作后备Master的Greenplum数据库软件必须
+                用<codeph>-P</codeph>参数指定
+                与Greenplum数据库的活动Master的软件位于不同位置。 另外，后备Master使用的文件空间位置必须与
+                Greenplum数据库的活动Master不同。
+            </p>
+            <p>从Greenplum系统配置中删除现有的后备Master：</p>
             <codeblock>gpinitstandby -r</codeblock>
         </section>
         <section id="section6">
-            <title>See Also</title>
-            <p><codeph><xref href="./gpinitsystem.xml#topic1" type="topic" format="dita"/></codeph>,
-                        <codeph><xref href="gpaddmirrors.xml#topic1" type="topic" format="dita"
-                    /></codeph>, <codeph><xref href="gpactivatestandby.xml#topic1" type="topic"
-                        format="dita"/></codeph></p>
+            <title>另见</title>
+            <p><codeph><xref href="./gpinitsystem.xml#topic1" type="topic" format="dita"/></codeph>、
+                <codeph><xref href="gpaddmirrors.xml#topic1" type="topic" format="dita"
+                /></codeph>、<codeph><xref href="gpactivatestandby.xml#topic1" type="topic"
+                    format="dita"/></codeph></p>
         </section>
     </body>
 </topic>
