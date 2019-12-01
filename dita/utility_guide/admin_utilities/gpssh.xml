@@ -5,206 +5,175 @@
     <!--install_guide/refs/gpssh.xml has a conref to this topic. -->
     <title id="jx138388">gpssh</title>
     <body>
-        <p>Provides SSH access to multiple hosts at once.</p>
+        <p>一次提供对多台主机的SSH访问。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpssh</b> { <b>-f</b> <varname>hostfile_gpssh</varname> | <b>- h</b> <varname>hostname</varname> [<b>-h</b> <varname>hostname</varname> ...] } <ph>[<b>-s</b>] </ph>[<b>-e</b>]
-      [<b>-d</b> <varname>seconds</varname>] [<b>-t</b> <varname>multiplier</varname>] [<b>-v</b>]
-      [<varname>bash_command</varname>]
-
-<b>gpssh</b> <b>-?</b> 
-
-<b>gpssh</b> <b>--version</b></codeblock>
+                [<b>-d</b> <varname>seconds</varname>] [<b>-t</b> <varname>multiplier</varname>] [<b>-v</b>]
+                [<varname>bash_command</varname>]
+                
+                <b>gpssh</b> <b>-?</b> 
+                
+                <b>gpssh</b> <b>--version</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpssh</codeph> utility allows you to run bash shell commands on multiple
-                hosts at once using SSH (secure shell). You can execute a single command by
-                specifying it on the command-line, or omit the command to enter into an interactive
-                command-line session. </p>
-            <p>To specify the hosts involved in the SSH session, use the <codeph>-f</codeph> option
-                to specify a file containing a list of host names, or use the <codeph>-h</codeph>
-                option to name single host names on the command-line. At least one host name
-                    (<codeph>-h</codeph>) or a host file (<codeph>-f</codeph>) is required. Note
-                that the current host is <b><i>not</i></b> included in the session by default — to
-                include the local host, you must explicitly declare it in the list of hosts involved
-                in the session.</p>
-            <p>Before using <codeph>gpssh</codeph>, you must have a trusted host setup between the
-                hosts involved in the SSH session. You can use the utility
-                    <codeph>gpssh-exkeys</codeph> to update the known host files and exchange public
-                keys between hosts if you have not done so already.</p>
-            <p>If you do not specify a command on the command-line, <codeph>gpssh</codeph> will go
-                into interactive mode. At the <codeph>gpssh</codeph> command prompt
-                    (<codeph>=&gt;</codeph>), you can enter a command as you would in a regular bash
-                terminal command-line, and the command will be executed on all hosts involved in the
-                session. To end an interactive session, press
-                    <codeph>CTRL</codeph>+<codeph>D</codeph> on the keyboard or type
-                    <codeph>exit</codeph> or <codeph>quit</codeph>.</p>
-            <p>If a user name is not specified in the host file, <codeph>gpssh</codeph> will execute
-                commands as the currently logged in user. To determine the currently logged in user,
-                do a <codeph>whoami</codeph> command. By default, <codeph>gpssh</codeph> goes to
-                    <codeph>$HOME</codeph> of the session user on the remote hosts after login. To
-                ensure commands are executed correctly on all remote hosts, you should always enter
-                absolute paths.</p>
-            <p>If you encounter network timeout problems when using <codeph>gpssh</codeph>, you can
-                use <codeph>-d</codeph> and <codeph>-t</codeph> options or set parameters in the
-                    <codeph>gpssh.conf</codeph> file to control the timing that
-                    <codeph>gpssh</codeph> uses when validating the initial <codeph>ssh</codeph>
-                connection. For information about the configuration file, see <xref
-                    href="#topic1/section6" format="dita"/>.</p>
+            <title>描述</title>
+            <p><codeph>gpssh</codeph>工具允许用户使用SSH（安全shell）一次在多台主机上运行bash shell命令。
+                用户可以通过在命令行上指定一个命令来执行单个命令，也可以省略该命令以进入交互式命令行会话。
+            </p>
+            <p>要指定参与SSH会话的主机，请使用<codeph>-f</codeph>选项指定包含主机名列表的文件，或使用
+                <codeph>-h</codeph>选项在命令行上指明单个主机名。至少需要一个主机名（<codeph>-h</codeph>）
+                或主机文件（<codeph>-f</codeph>）。请注意，当前主机默认<b><i>不</i></b>包含在会话中 — 要
+                包含本地主机，用户必须在会话中涉及的主机列表中明确声明它。
+            </p>
+            <p>在使用<codeph>gpssh</codeph>之前，用户必须在涉及SSH会话的主机之间建立可信的主机设置。 
+                用户可以使用工具<codeph>gpssh-exkeys</codeph>更新已知的主机文件并在主机之间交换
+                公钥（如果尚未这样做的话）。
+            </p>
+            <p>如果用户没有在命令行上指定命令，<codeph>gpssh</codeph>将进入交互模式。在<codeph>gpssh</codeph>
+                命令提示符（<codeph>=&gt;</codeph>）处，用户可以像在常规bash终端命令行中那样输入命令，
+                并且该命令将在会话涉及的所有主机上执行。要结束交互式会话，请按键盘上的<codeph>CTRL</codeph>+<codeph>D</codeph>
+                或键入<codeph>exit</codeph>或<codeph>quit</codeph>。
+            </p>
+            <p>如果主机文件中没有指定用户名，则<codeph>gpssh</codeph>将以当前登录的用户身份执行命令。
+                要确定当前登录的用户，请执行<codeph>whoami</codeph>命令。默认情况下，登录后
+                <codeph>gpssh</codeph>将转到远程主机上的会话用户的<codeph>$HOME</codeph>。
+                为确保所有远程主机上的命令都能正确执行，应始终输入绝对路径。
+            </p>
+            <p>如果在使用<codeph>gpssh</codeph>时遇到网络超时问题，可以使用<codeph>-d</codeph>和
+                <codeph>-t</codeph>选项或者在<codeph>gpssh.conf</codeph>文件中设置参数来控制
+                <codeph>gpssh</codeph>在验证初始<codeph>ssh</codeph>连接时使用的时间。有关配置
+                文件的信息，请参阅gpssh配置文件<xref
+                    href="#topic1/section6" format="dita"/>。</p>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
                     <pt>
                         <varname>bash_command</varname>
                     </pt>
-                    <pd>A bash shell command to execute on all hosts involved in this session
-                        (optionally enclosed in quotes). If not specified, <codeph>gpssh</codeph>
-                        starts an interactive session.</pd>
+                    <pd>在此会话中涉及的所有主机上执行的bash shell命令（可选择封闭在引号中）。
+                        如果未指定，则<codeph>gpssh</codeph>启动交互式会话。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-d (delay) <varname>seconds</varname></pt>
-                    <pd>Optional. Specifies the time, in seconds, to wait at the start of a
-                            <codeph>gpssh</codeph> interaction with <codeph>ssh</codeph>. Default is
-                            <codeph>0.05</codeph>. This option overrides the
-                            <codeph>delaybeforesend</codeph> value that is specified in the
-                            <codeph>gpssh.conf</codeph> configuration file.</pd>
-                    <pd>Increasing this value can cause a long wait time during
-                            <codeph>gpssh</codeph> startup. </pd>
+                    <pt>-d（延迟）<varname>seconds</varname></pt>
+                    <pd>可选。指定用<codeph>ssh</codeph>开始<codeph>gpssh</codeph>交互开始时等待
+                        的时间（以秒为单位）。默认值是<codeph>0.05</codeph>。此选项将覆盖<codeph>gpssh.conf</codeph>
+                        配置文件中指定的<codeph>delaybeforesend</codeph>的值。</pd>
+                    <pd>增加此值可能会导致在<codeph>gpssh</codeph>启动过程中等待很长时间。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-e (echo)</pt>
-                    <pd>Optional. Echoes the commands passed to each host and their resulting output
-                        while running in non-interactive mode.</pd>
+                    <pt>-e（回显）</pt>
+                    <pd>可选。以非交互模式运行时，回显传递给每个主机的命令及其结果输出。</pd>
                 </plentry>
                 <plentry>
                     <pt>-f <varname>hostfile_gpssh</varname></pt>
-                    <pd>Specifies the name of a file that contains a list of hosts that will
-                        participate in this SSH session. The syntax of the host file is one host
-                        per line.</pd>
+                    <pd>指定包含将参与此SSH会话的主机列表的文件的名称。主机文件的语法是每行一个主机。</pd>
                 </plentry>
                 <plentry>
                     <pt>-h <varname>hostname</varname></pt>
-                    <pd>Specifies a single host name that will participate in this SSH session. You
-                        can use the <codeph>-h</codeph> option multiple times to specify multiple
-                        host names.</pd>
+                    <pd>指定将参与此SSH会话的单个主机名。用户可以多次使用<codeph>-h</codeph>
+                        选项来指定多个主机名。</pd>
                 </plentry>
                 <plentry>
                     <pt>-s</pt>
-                    <pd>Optional. If specified, before executing any commands on the target host,
-                            <codeph>gpssh</codeph> sources the file
-                            <codeph>greenplum_path.sh</codeph> in the directory specified by the
-                            <codeph>$GPHOME</codeph> environment variable. </pd>
-                    <pd>This option is valid for both interactive mode and single command mode.</pd>
+                    <pd>可选。如果指定，则在执行目标主机上的任何命令之前，<codeph>gpssh</codeph>将在
+                        <codeph>$GPHOME</codeph>环境变量指定的目录中引用文件<codeph>greenplum_path.sh</codeph>。
+                    </pd>
+                    <pd>该选项对交互模式和单命令模式都有效。</pd>
                 </plentry>
                 <plentry>
                     <pt>-t <varname>multiplier</varname>
                     </pt>
-                    <pd>Optional. A decimal number greater than 0 (zero) that is the multiplier for
-                        the timeout that <codeph>gpssh</codeph> uses when validating the
-                            <codeph>ssh</codeph> prompt. Default is <codeph>1</codeph>. This option
-                        overrides the <codeph>prompt_validation_timeout</codeph> value that is
-                        specified in the <codeph>gpssh.conf</codeph> configuration file.</pd>
-                    <pd>Increasing this value has a small impact during <codeph>gpssh</codeph>
-                        startup. </pd>
+                    <pd>可选。大于0的十进制数，它是<codeph>gpssh</codeph>在验证<codeph>ssh</codeph>
+                        提示时使用的超时的倍数。默认值为<codeph>1</codeph>。此选项将覆盖<codeph>gpssh.conf</codeph>
+                        配置文件中的<codeph>prompt_validation_timeout</codeph>值。
+                    </pd>
+                    <pd>增加此值对<codeph>gpssh</codeph>启动过程影响不大。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-v (verbose mode)</pt>
-                    <pd>Optional. Reports additional messages in addition to the command output when
-                        running in non-interactive mode.</pd>
+                    <pt>-v（详细模式）</pt>
+                    <pd>可选。在非交互模式下运行时，除了输出命令外，还会报告其他消息。</pd>
                 </plentry>
                 <plentry>
                     <pt>--version</pt>
-                    <pd>Displays the version of this utility.</pd>
+                    <pd>显示此工具的版本。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-? (help)</pt>
-                    <pd>Displays the online help.</pd>
+                    <pt>-?（帮助）</pt>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section6">
-            <title>gpssh Configuration File</title>
-            <p>The <codeph>gpssh.conf</codeph> file contains parameters that let you adjust the
-                timing that <codeph>gpssh</codeph> uses when validating the initial
-                    <codeph>ssh</codeph> connection. These parameters affect the network connection
-                before the <codeph>gpssh</codeph> session executes commands with
-                    <codeph>ssh</codeph>. The location of the file is specified by the environment
-                variable <codeph>MASTER_DATA_DIRECTORY</codeph>. If the environment variable is not
-                defined or the <codeph>gpssh.conf</codeph> file does not exist,
-                    <codeph>gpssh</codeph> uses the default values or the values set with the
-                    <codeph>-d</codeph> and <codeph>-t</codeph> options. For information about the
-                environment variable, see the <cite>Greenplum Database Reference Guide</cite>. </p>
-            <p>The <codeph>gpssh.conf</codeph> file is a text file that consists of a
-                    <codeph>[gpssh]</codeph> section and parameters. On a line, the
-                    <codeph>#</codeph> (pound sign) indicates the start of a comment. This is an
-                example <codeph>gpssh.conf</codeph> file.</p>
+            <title>gpssh配置文件</title>
+            <p><codeph>gpssh.conf</codeph>文件包含的参数可让用户调整<codeph>gpssh</codeph>在验证初始
+                <codeph>ssh</codeph>连接时使用的时间。<codeph>gpssh</codeph>会话使用<codeph>ssh</codeph>
+                执行命令之前，这些参数会影响网络连接。该文件的位置由环境<codeph>MASTER_DATA_DIRECTORY</codeph>
+                指定。如果未定义环境变量或<codeph>gpssh.conf</codeph>文件不存在，<codeph>gpssh</codeph>将
+                使用默认值或使用<codeph>-d</codeph>和<codeph>-t</codeph>选项设置的值。有关环境变量的信息，
+                请参考<cite>Greenplum数据库参考指南</cite>。
+            </p>
+            <p><codeph>gpssh.conf</codeph>文件是由<codeph>[gpssh]</codeph>部分和参数组成的文本文件。
+                <codeph>#</codeph>（井号）代表注释的开始。这是一个<codeph>gpssh.conf</codeph>文件的例子。
+            </p>
             <codeblock>[gpssh]
-delaybeforesend = 0.05
-prompt_validation_timeout = 1.0
-sync_retries = 5</codeblock>
-            <p>These are the <codeph>gpssh.conf</codeph> parameters.</p>
+                delaybeforesend = 0.05
+                prompt_validation_timeout = 1.0
+                sync_retries = 5</codeblock>
+            <p>这些是<codeph>gpssh.conf</codeph>参数。</p>
             <parml>
                 <plentry>
                     <pt>delaybeforesend = <varname>seconds</varname></pt>
-                    <pd>Specifies the time, in seconds, to wait at the start of a
-                            <codeph>gpssh</codeph> interaction with <codeph>ssh</codeph>. Default is
-                        0.05. Increasing this value can cause a long wait time during
-                            <codeph>gpssh</codeph> startup. The <codeph>-d</codeph> option overrides
-                        this parameter.</pd>
+                    <pd>指定用<codeph>ssh</codeph>启动<codeph>gpssh</codeph>交互时等待的时间（以秒为单位）。
+                        默认是0.05。增加此值可能会导致<codeph>gpssh</codeph>启动过程中等待很长时间。
+                        <codeph>-d</codeph>选项覆盖此参数。</pd>
                 </plentry>
                 <plentry>
                     <pt>prompt_validation_timeout = <varname>multiplier</varname></pt>
-                    <pd>A decimal number greater than 0 (zero) that is the multiplier for the
-                        timeout that <codeph>gpssh</codeph> uses when validating the
-                            <codeph>ssh</codeph> prompt. Increasing this value has a small impact
-                        during <codeph>gpssh</codeph> startup. Default is <codeph>1</codeph>. The
-                            <codeph>-t</codeph> option overrides this parameter.</pd>
+                    <pd>大于0的十进制数，它是<codeph>gpssh</codeph>在验证<codeph>ssh</codeph>
+                        提示时使用的超时的倍数。增加这个值对<codeph>gpssh</codeph>启动过程影响不大。
+                        默认值是<codeph>1</codeph>。<codeph>-t</codeph>选项覆盖此参数。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>sync_retries = <varname>attempts</varname></pt>
-                    <pd>A non-negative integer that specifies the maximum number of times that
-                            <codeph>gpssh</codeph> attempts to connect to a remote Greenplum
-                        Database host. The default is 3. If the value is 0, <codeph>gpssh</codeph>
-                        returns an error if the initial connection attempt fails. Increasing the
-                        number of attempts also increases the time between retry attempts. This
-                        parameter cannot be configured with a command-line option. </pd>
-                    <pd>The <codeph>-t</codeph> option also affects the time between retry
-                        attempts.</pd>
-                    <pd>Increasing this value can compensate for slow network performance or segment
-                        host performance issues such as heavy CPU or I/O load. However, when a
-                        connection cannot be established, an increased value also increases the
-                        delay when an error is returned.</pd>
+                    <pd>一个非负整数，指定<codeph>gpssh</codeph>尝试连接远程Greenplum数据库主机的最大次数。
+                        缺省值为3。如果值为0，则如果初始连接尝试失败，<codeph>gpssh</codeph>将返回错误。
+                        增加尝试次数也增加了重试次数之间的时间。此参数不能使用命令行选项进行配置。</pd>
+                    <pd><codeph>-t</codeph>选项也影响重试尝试之间的时间。
+                    </pd>
+                    <pd>增加此值可以弥补网络性能下降或部分主机性能问题，例如繁重的CPU或I/O负载。但是，
+                        当无法建立连接时，增加的值也会增加错误被返回时的延迟。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>Start an interactive group SSH session with all hosts listed in the file
-                    <codeph>hostfile_gpssh</codeph>:</p>
+            <title>示例</title>
+            <p>与文件<codeph>hostfile_gpssh</codeph>中列出的所有主机启动交互式SSH会话组：
+            </p>
             <codeblock>$ gpssh -f hostfile_gpssh</codeblock>
-            <p>At the <codeph>gpssh</codeph> interactive command prompt, run a shell command on all
-                the hosts involved in this session.</p>
+            <p>在<codeph>gpssh</codeph>交互式命令提示符处，在此会话中涉及的所有主机上运行shell命令。
+            </p>
             <codeblock>=&gt; ls -a /data/primary/*</codeblock>
-            <p>Exit an interactive session:</p>
+            <p>退出交互式会话：</p>
             <codeblock>=&gt; exit
-=&gt; quit</codeblock>
-            <p>Start a non-interactive group SSH session with the hosts named <codeph>sdw1</codeph>
-                and <codeph>sdw2</codeph> and pass a file containing several commands named
-                    <codeph>command_file</codeph> to <codeph>gpssh</codeph>:</p>
+                =&gt; quit</codeblock>
+            <p>使用名为<codeph>sdw1</codeph>和<codeph>sdw2</codeph>的主机启动非交互式SSH会话组，
+                并将包含多个名为<codeph>command_file</codeph>的命令的文件传递给<codeph>gpssh</codeph>：
+            </p>
             <codeblock>$ gpssh -h sdw1 -h sdw2 -v -e &lt; command_file</codeblock>
-            <p>Execute single commands in non-interactive mode on hosts <codeph>sdw2</codeph> and
-                    <codeph>localhost</codeph>:</p>
+            <p>在主机<codeph>sdw2</codeph>和<codeph>localhost</codeph>上以非交互模式执行单个命令：
+            </p>
             <codeblock>$ gpssh -h sdw2 -h localhost -v -e 'ls -a /data/primary/*'
-$ gpssh -h sdw2 -h localhost -v -e 'echo $GPHOME'
-$ gpssh -h sdw2 -h localhost -v -e 'ls -1 | wc -l'</codeblock>
+                $ gpssh -h sdw2 -h localhost -v -e 'echo $GPHOME'
+                $ gpssh -h sdw2 -h localhost -v -e 'ls -1 | wc -l'</codeblock>
         </section>
         <section>
-            <title>See Also</title>
-            <p><codeph><xref href="gpssh-exkeys.xml#topic1"/></codeph>, <codeph><xref
-                        href="gpscp.xml#topic1"/></codeph></p>
+            <title>另见</title>
+            <p><codeph><xref href="gpssh-exkeys.xml#topic1"/></codeph>、<codeph><xref
+                href="gpscp.xml#topic1"/></codeph></p>
         </section>
     </body>
 </topic>
