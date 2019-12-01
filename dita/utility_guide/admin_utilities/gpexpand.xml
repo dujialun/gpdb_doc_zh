@@ -4,45 +4,43 @@
 <topic id="topic1">
   <title id="kt20941">gpexpand</title>
   <body>
-    <p>Expands an existing Greenplum Database across new hosts in the system.</p>
+    <p>在阵列中的新主机上扩展现有的Greenplum数据库。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><b>gpexpand</b> [{<b>-f</b>|<b>--hosts-file</b>} <varname>hosts_file</varname>]
-        | {<b>-i</b>|<b>--input</b>} <varname>input_file</varname> [<b>-B</b> <varname>batch_size</varname>]
-        | [{<b>-d</b> | <b>--duration</b>} <varname>hh:mm:ss</varname> | {<b>-e</b>|<b>--end</b>} '<varname>YYYY-MM-DD hh:mm:ss</varname>'] 
-          [<b>-a</b>|<b>-analyze</b>] 
-          [<b>-n </b> <varname>parallel_processes</varname>]
-        | {<b>-r</b>|<b>--rollback</b>}
-        | {<b>-c</b>|<b>--clean</b>}
+                | {<b>-i</b>|<b>--input</b>} <varname>input_file</varname> [<b>-B</b> <varname>batch_size</varname>]
+                | [{<b>-d</b> | <b>--duration</b>} <varname>hh:mm:ss</varname> | {<b>-e</b>|<b>--end</b>} '<varname>YYYY-MM-DD hh:mm:ss</varname>'] 
+        [<b>-a</b>|<b>-analyze</b>] 
+                  [<b>-n </b> <varname>parallel_processes</varname>]
+                | {<b>-r</b>|<b>--rollback</b>}
+                | {<b>-c</b>|<b>--clean</b>}
         [<b>-v</b>|<b>--verbose</b>] [<b>-s</b>|<b>--silent</b>]
         [{<b>-t</b>|<b>--tardir</b>} <varname>directory </varname>]
         [<b>-S</b>|<b>--simple-progress </b>]
-
-<b>gpexpand -?</b> | <b>-h</b> | <b>--help</b> 
-
-<b>gpexpand --version</b></codeblock>
+        
+        <b>gpexpand -?</b> | <b>-h</b> | <b>--help</b> 
+        
+        <b>gpexpand --version</b></codeblock>
     </section>
     <section id="section3">
-      <title>Prerequisites</title>
+      <title>先决条件</title>
       <ul>
-        <li id="kt137989">You are logged in as the Greenplum Database superuser
-            (<codeph>gpadmin</codeph>).</li>
-        <li id="kt136978">The new segment hosts have been installed and configured as per the
-          existing segment hosts. This involves:<ul id="ul_att_m1q_n4">
-            <li id="kt138636">Configuring the hardware and OS</li>
-            <li id="kt138640">Installing the Greenplum software</li>
-            <li id="kt138641">Creating the <codeph>gpadmin</codeph> user account</li>
-            <li id="kt138642">Exchanging SSH keys. </li>
+        <li id="kt137989">用户作为Greenplum数据库超级用户（<codeph>gpadmin</codeph>）登录。
+        </li>
+        <li id="kt136978">新的Segment主机已被根据现有的Segment主机安装和配置。这包括：
+          <ul id="ul_att_m1q_n4">
+            <li id="kt138636">配置硬件和操作系统</li>
+            <li id="kt138640">安装Greenplum软件</li>
+            <li id="kt138641">创建<codeph>gpadmin</codeph>用户帐户</li>
+            <li id="kt138642">交换SSH密钥</li>
           </ul></li>
-        <li id="kt137052">Enough disk space on your segment hosts to temporarily hold a copy of your
-          largest table. </li>
-        <li>When redistributing data, Greenplum Database must be running in production mode.
-          Greenplum Database cannot be running in restricted mode or in master mode. The
-            <codeph>gpstart</codeph> options <codeph>-R</codeph> or <codeph>-m</codeph> cannot be
-          specified to start Greenplum Database. </li>      
+        <li id="kt137052">用户的Segment主机上有足够的磁盘空间来临时保存最大表的副本。</li>
+        <li>重新分布数据时，Greenplum数据库必须以生产模式运行。Greenplum数据库不能是受限模式或
+          Master模式。不能指定<codeph>gpstart</codeph>的选项<codeph>-R</codeph>或者<codeph>-m</codeph>
+          启动Greenplum数据库。
+        </li>      
       </ul>
-      <note>These utilities cannot be run while <codeph>gpexpand</codeph> is performing segment
-        initialization.
+      <note>当<codeph>gpexpand</codeph>正在执行segment初始化是，以下工具不能被运行。
         <ul id="ul_c3w_wdp_lgb">
           <li><codeph>gpbackup</codeph></li>
           <li><codeph>gpcheck</codeph></li>
@@ -51,171 +49,149 @@
           <li><codeph>gppkg</codeph></li>
           <li><codeph>gprestore</codeph></li>
         </ul></note>
-      <p>For information about preparing a system for expansion, see <xref
-          href="../../admin_guide/expand/expand-main.xml" scope="peer">Expanding a Greenplum
-          System</xref><ph otherprops="op-print"> in the <cite>Greenplum Database Administrator
-            Guide</cite></ph>.</p>
+      <p>有关扩展Greenplum系统的更多信息，请见<cite>Greenplum数据库管理员手册</cite>的<xref
+        href="../../admin_guide/expand/expand-main.xml" scope="peer">扩展Greenplum
+        数据库系统</xref><ph otherprops="op-print">部分</ph>。</p>
     </section>
     <section id="section4">
-      <title>Description</title>
-      <p>The <codeph>gpexpand</codeph> utility performs system expansion in two phases: segment
-        instance initialization and then table data redistribution. </p>
-      <p>In the initialization phase, <codeph>gpexpand</codeph> runs with an input file that
-        specifies data directories, <varname>dbid</varname> values, and other characteristics of the
-        new segment instances. You can create the input file manually, or by following the prompts
-        in an interactive interview.</p>
-      <p>If you choose to create the input file using the interactive interview, you can optionally
-        specify a file containing a list of expansion system hosts. If your platform or command
-        shell limits the length of the list of hostnames that you can type when prompted in the
-        interview, specifying the hosts with <codeph>-f</codeph> may be mandatory. </p>
-      <p>In addition to initializing the segment instances, the initialization phase performs these
-        actions:</p>
+      <title>描述</title>
+      <p><codeph>gpexpand</codeph>工具分两个阶段执行系统扩展：Segment初始化和表重新分布。
+      </p>
+      <p>在初始化阶段，<codeph>gpexpand</codeph>用一个输入文件运行，该文件指定新Segment的数据目录、
+        <varname>dbid</varname>值和其他特征。用户可以手动创建输入文件，也可以在交互式对话中
+        按照提示进行操作。
+      </p>
+      <p>如果用户选择使用交互式对话创建输入文件，则可以选择指定包含扩展主机列表的文件。在提示输入信息时，
+        如果用户的平台或命令shell限制可键入的主机名列表的长度，则可能不得不用<codeph>-f</codeph>指定主机。
+      </p>
+      <p>除了初始化Segment，初始化阶段还执行这些操作：</p>
       <ul>
-        <li id="kt138259">Creates an expansion schema named <i>gpexpand</i> in the postgres database
-          to store the status of the expansion operation, including detailed status for tables.</li>
+        <li id="kt138259">创建扩展模式<i>gpexpand</i>以存储扩展操作的状态，包括表的详细状态。
+        </li>
       </ul>
-      <p>In the table data redistribution phase, <codeph>gpexpand</codeph> redistributes table data
-        to rebalance the data across the old and new segment instances.</p>
-      <note>Data redistribution should be performed during low-use hours. Redistribution can be divided
-        into batches over an extended period.</note>
-      <p>To begin the redistribution phase, run <codeph>gpexpand</codeph> with either the
-          <codeph>-d</codeph> (duration) or <codeph>-e</codeph> (end time) options, or with no
-        options. If you specify an end time or duration, then the utility redistributes tables in
-        the expansion schema until the specified end time or duration is reached. If you specify no
-        options, then the utility redistribution phase continues until all tables in the expansion
-        schema are reorganized. Each table is reorganized using <codeph>ALTER TABLE</codeph>
-        commands to rebalance the tables across new segments, and to set tables to their original
-        distribution policy. If <codeph>gpexpand</codeph> completes the reorganization of all
-        tables, it displays a success message and ends.</p>
-      <note>This utility uses secure shell (SSH) connections between systems to perform its tasks.
-        In large Greenplum Database deployments, cloud deployments, or deployments with a large
-        number of segments per host, this utility may exceed the host's maximum threshold for
-        unauthenticated connections. Consider updating the SSH <codeph>MaxStartups</codeph>
-        configuration parameter to increase this threshold. For more information about SSH
-        configuration options, refer to the SSH documentation for your Linux distribution.</note>
+      <p>在表数据重分布阶段，<codeph>gpexpand</codeph>会重分布表的数据，使数据在新旧segment
+        实例之间平衡。</p>
+      <note>数据重新分布应该在低峰（相对高峰期）时段进行。重新分布可以在很长时间内分批次进行。</note>
+      <p>要开始重分布阶段，可以通过运行<codeph>gpexpand</codeph>并指定<codeph>-d</codeph>（运行时间周期）
+        或<codeph>-e</codeph>（结束时间）选项，或者不指定任何选项。如果客户指定了结束时间或运行周期，工具会在
+        扩展模式下重分布表，直到达到设定的结束时间或执行周期。如果没指定任何选项，工具会继续处理直到扩展模式的表
+        全部完成重分布。每张表都会通过<codeph>ALTER TABLE</codeph>命令来在所有的节点包括新增加的segment实例
+        上进行重分布，并设置表的分布策略为其原始策略。如果<codeph>gpexpand</codeph>完成所有表的重分布，它会
+        显示成功信息并退出。</p>
+      <note>该工具在系统内部采用SSH连接执行各项操作任务。在大型Greenplum集群、云部署或每台主机部署了大量的
+        segment实例时，可能会遇到超过主机最大授权连接数限制的情况。此时需要考虑更新SSH配置参数<codeph>MaxStartups</codeph>
+        以提高该限制。更多关于SSH配置的选项，请参考您的Linux分发版的SSH文档。</note>
     </section>
     <section id="section5">
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
           <pt>-a | --analyze</pt>
-          <pd>Run <codeph>ANALYZE</codeph> to update the table statistics after expansion. The
-            default is to not run <codeph>ANALYZE</codeph>.</pd>
+          <pd>在扩展后运行<codeph>ANALYZE</codeph>更新表的统计信息，默认是不运行<codeph>ANALYZE</codeph>。
+          </pd>
         </plentry>
         <plentry>
           <pt>-B <varname>batch_size</varname></pt>
-          <pd>Batch size of remote commands to send to a given host before making a one-second
-            pause. Default is <codeph>16</codeph>. Valid values are 1-128.</pd>
-          <pd>The <codeph>gpexpand</codeph> utility issues a number of setup commands that may
-            exceed the host's maximum threshold for unauthenticated connections as defined by
-              <codeph>MaxStartups</codeph> in the SSH daemon configuration. The one-second pause
-            allows authentications to be completed before <codeph>gpexpand</codeph> issues any more
-            commands. </pd>
-          <pd>The default value does not normally need to be changed. However, it may be necessary
-            to reduce the maximum number of commands if <codeph>gpexpand</codeph> fails with
-            connection errors such as <codeph>'ssh_exchange_identification: Connection closed by
-              remote host.'</codeph></pd>
+          <pd>在暂停一秒钟之前发送给给定主机的远程命令的批量大小。默认值是<codeph>16</codeph>，
+            有效值是1-128。</pd>
+          <pd><codeph>gpexpand</codeph>工具会发出许多设置命令，这些命令可能会超出主机的已验证
+            连接的最大阈值（由SSH守护进程配置中的<codeph>MaxStartups</codeph>定义）。该一秒钟
+            的暂停允许在<codeph>gpexpand</codeph>发出更多命令之前完成认证。
+          </pd>
+          <pd>默认值通常不需要改变。但是，如果<codeph>gpexpand</codeph>由于连接错误
+            （例如<codeph>'ssh_exchange_identification: Connection closed by
+              remote host.'</codeph>）而失败，则可能需要减少命令的最大数量。</pd>
         </plentry>
         <plentry>
           <pt>-c | --clean</pt>
-          <pd>Remove the expansion schema.</pd>
+          <pd>删除扩展模式。</pd>
         </plentry>
         <plentry>
           <pt>-d | --duration <varname>hh:mm:ss</varname></pt>
-          <pd>Duration of the expansion session from beginning to end.</pd>
+          <pd>扩展会话的持续时间。</pd>
         </plentry>
         <plentry>
           <pt>-e | --end '<varname>YYYY-MM-DD hh:mm:ss</varname>'</pt>
-          <pd>Ending date and time for the expansion session.</pd>
+          <pd>扩展会话的结束日期及时间。</pd>
         </plentry>
         <plentry>
           <pt>-f | --hosts-file <varname>filename</varname></pt>
-          <pd>Specifies the name of a file that contains a list of new hosts for system expansion.
-            Each line of the file must contain a single host name. </pd>
-          <pd>This file can contain hostnames with or without network interfaces specified. The
-              <codeph>gpexpand</codeph> utility handles either case, adding interface numbers to end
-            of the hostname if the original nodes are configured with multiple network interfaces.
-            <note>The Greenplum Database segment host naming convention is <codeph>sdwN</codeph>
-              where <codeph>sdw</codeph> is a prefix and <codeph>N</codeph> is an integer. For
-              example, <codeph>sdw1</codeph>, <codeph>sdw2</codeph> and so on. For hosts with
-              multiple interfaces, the convention is to append a dash (<codeph>-</codeph>) and
-              number to the host name. For example, <codeph>sdw1-1</codeph> and
-                <codeph>sdw1-2</codeph> are the two interface names for host <codeph>sdw1</codeph>.
+          <pd>指定包含用于系统扩展的新主机列表的文件的名称。文件的每一行都必须包含一个主机名。
+          </pd>
+          <pd>该文件可以包含指定或不指定网络接口的主机名。<codeph>gpexpand</codeph>工具处理这两种情况，
+            如果原始节点配置了多个网络接口，则将接口号添加到主机名的末尾。
+            <note>Greenplum数据库Segment主机的命名习惯是<codeph>sdwN</codeph>，其中<codeph>sdw</codeph>
+              是前缀并且<codeph>N</codeph>是数字。例如，<codeph>sdw1</codeph>、<codeph>sdw2</codeph>等等。
+              对于具有多个接口的主机，约定是在主机名后面添加破折号（<codeph>-</codeph>）和数字。例如<codeph>sdw1-1</codeph>
+              和<codeph>sdw1-2</codeph>是主机<codeph>sdw1</codeph>的两个接口名称。
             </note></pd>
         </plentry>
         <plentry>
           <pt>-i | --input <varname>input_file</varname></pt>
-          <pd>Specifies the name of the expansion configuration file, which contains one line for
-            each segment to be added in the format of:</pd>
+          <pd>指定扩展配置文件的名称，其中为每个要添加的Segment包含一行，格式为：</pd>
           <pd>
             <varname>hostname:address:port:datadir:dbid:content:preferred_role</varname>
           </pd>
         </plentry>
         <plentry>
           <pt>-n <varname>parallel_processes</varname></pt>
-          <pd>The number of tables to redistribute simultaneously. Valid values are 1 - 96.</pd>
-          <pd>Each table redistribution process requires two database connections: one to alter the
-            table, and another to update the table's status in the expansion schema. Before
-            increasing <codeph>-n</codeph>, check the current value of the server configuration
-            parameter <codeph>max_connections</codeph> and make sure the maximum connection limit is
-            not exceeded.</pd>
+          <pd>要同时重新分布的表的数量。有效值是1 - 96。</pd>
+          <pd>每个表重新分布过程都需要两个数据库连接：一个用于更改表，另一个用于在扩展方案中更新表的状态。
+            在增加<codeph>-n</codeph>之前，检查服务器配置参数<codeph>max_connections</codeph>的当前值，
+            并确保不超过最大连接限制。
+          </pd>
         </plentry>
         <plentry>
           <pt>-r | --rollback</pt>
-          <pd>Roll back a failed expansion setup operation. </pd>
+          <pd>回滚失败的扩展设置操作。</pd>
         </plentry>
         <plentry>
           <pt>-s | --silent</pt>
-          <pd>Runs in silent mode. Does not prompt for confirmation to proceed on warnings.</pd>
+          <pd>以静默模式运行。在警告时，不提示确认就可继续。</pd>
         </plentry>
         <plentry>
           <pt>-S | --simple-progress</pt>
-          <pd>If specified, the <codeph>gpexpand</codeph> utility records only the minimum progress
-            information in the Greenplum Database table <i>gpexpand.expansion_progress</i>. The
-            utility does not record the relation size information and status information in the
-            table <i>gpexpand.status_detail</i>. </pd>
-          <pd>Specifying this option can improve performance by reducing the amount of progress
-            information written to the <i>gpexpand</i> tables.</pd>
+          <pd>如果指定，<codeph>gpexpand</codeph>工具仅在Greenplum数据库表
+            <i>gpexpand.expansion_progress</i>中记录最少的进度信息。该工具不在表
+            <i>gpexpand.status_detail</i>中记录关系大小信息和状态信息。</pd>
+          <pd>指定此选项可通过减少写入<i>gpexpand</i>表的进度信息量来提高性能。</pd>
         </plentry>
         <plentry>
           <pt>[-t | --tardir] <varname>directory</varname></pt>
-          <pd>The fully qualified path to a <varname>directory</varname> on segment hosts where the
-              <codeph>gpexpand</codeph> utility copies a temporary tar file. The file contains
-            Greenplum Database files that are used to create segment instances. The default
-            directory is the user home directory.</pd>
+          <pd>Segment主机上一个目录的完全限定<varname>directory</varname>，<codeph>gpexpand</codeph>
+            工具会在其中拷贝一个临时的tar文件。该文件包含用于创建Segment实例的Greenplum数据库文件。
+            默认目录是用户主目录。
+          </pd>
         </plentry>
         <plentry>
           <pt>-v | --verbose</pt>
-          <pd>Verbose debugging output. With this option, the utility will output all DDL and DML
-            used to expand the database.</pd>
+          <pd>详细调试输出。使用此选项，该工具将输出用于扩展数据库的所有DDL和DML。</pd>
         </plentry>
         <plentry>
           <pt>--version</pt>
-          <pd>Display the utility's version number and exit.</pd>
+          <pd>显示工具的版本号并退出。</pd>
         </plentry>
         <plentry>
           <pt>-? | -h | --help</pt>
-          <pd>Displays the online help.</pd>
+          <pd>显示在线帮助。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>Run <codeph>gpexpand</codeph> with an input file to initialize new segments and create the
-        expansion schema in the postgres database:</p>
+      <title>示例</title>
+      <p>使用输入文件运行<codeph>gpexpand</codeph>以初始化新Segment，并在postgres数据库中创建扩展模式：
+      </p>
       <codeblock>$ gpexpand -i input_file</codeblock>
-      <p>Run <codeph>gpexpand</codeph> for sixty hours maximum duration to redistribute tables to
-        new segments:</p>
+      <p>运行<codeph>gpexpand</codeph>最长持续60小时，以将表重新分布给新的Segment：
+      </p>
       <codeblock>$ gpexpand -d 60:00:00</codeblock>
     </section>
     <section id="section7">
-      <title>See Also</title>
+      <title>另见</title>
       <p>
-        <codeph><xref href="gpssh-exkeys.xml#topic1"/></codeph>, <xref
-          href="../../admin_guide/expand/expand-main.xml" scope="peer">Expanding a Greenplum
-          System</xref>
-        <ph otherprops="op-print">in the <cite>Greenplum Database Administrator
-        Guide</cite></ph></p>
+        <codeph><cite>Greenplum数据库管理员手册</cite>中的<xref href="gpssh-exkeys.xml#topic1"/></codeph><xref
+          href="../../admin_guide/expand/expand-main.xml" scope="peer">扩展Greenplum系统</xref>
+        <ph otherprops="op-print">部分</ph>。</p>
     </section>
   </body>
 </topic>
