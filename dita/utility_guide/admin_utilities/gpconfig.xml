@@ -4,48 +4,45 @@
 <topic id="topic1">
   <title id="kq139596">gpconfig</title>
   <body>
-    <p>Sets server configuration parameters on all segments within a Greenplum Database system.</p>
+    <p>在Greenplum数据库系统中所有的Segment上设置服务器配置参数。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><b>gpconfig</b> <b>-c</b> <varname>param_name</varname> <b>-v</b> <varname>value</varname> [<b>-m</b> <varname>master_value</varname> | <b>--masteronly</b>]
-       | <b>-r</b> <varname>param_name</varname> [<b>--masteronly</b> | <b>-l</b>
-       [<b>--skipvalidation</b>] [<b>--verbose</b>] [<b>--debug</b>]
-
-<b>gpconfig</b> <b>-s</b> <varname>param_name</varname> [<b>--file</b> | <b>--file-compare</b>] [<b>--verbose</b>] [<b>--debug</b>]
-
-<b>gpconfig</b> <b>--help</b></codeblock>
+               | <b>-r</b> <varname>param_name</varname> [<b>--masteronly</b> | <b>-l</b>
+               [<b>--skipvalidation</b>] [<b>--verbose</b>] [<b>--debug</b>]
+        
+        <b>gpconfig</b> <b>-s</b> <varname>param_name</varname> [<b>--file</b> | <b>--file-compare</b>] [<b>--verbose</b>] [<b>--debug</b>]
+        
+        <b>gpconfig</b> <b>--help</b></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>The <codeph>gpconfig</codeph> utility allows you to set, unset, or view configuration
-        parameters from the <codeph>postgresql.conf</codeph> files of all instances (master,
-        segments, and mirrors) in your Greenplum Database system. When setting a parameter, you can
-        also specify a different value for the master if necessary. For example, parameters such as
-          <codeph>max_connections</codeph> require a different setting on the master than what is
-        used for the segments. If you want to set or unset a global or master only parameter, use
-        the <codeph>--masteronly</codeph> option.</p>
-      <p><codeph>gpconfig</codeph> can only be used to manage certain parameters. For example, you
-        cannot use it to set parameters such as <codeph>port</codeph>, which is required to be
-        distinct for every segment instance. Use the <codeph>-l</codeph> (list) option to see a
-        complete list of configuration parameters supported by <codeph>gpconfig</codeph>.</p>
-      <p>When <codeph>gpconfig</codeph> sets a configuration parameter in a segment
-          <codeph>postgresql.conf</codeph> file, the new parameter setting always displays at the
-        bottom of the file. When you use <codeph>gpconfig</codeph> to remove a configuration
-        parameter setting, <codeph>gpconfig</codeph> comments out the parameter in all segment
-          <codeph>postgresql.conf</codeph> files, thereby restoring the system default setting. For
-        example, if you use <codeph>gpconfig </codeph>to remove (comment out) a parameter and later
-        add it back (set a new value), there will be two instances of the parameter; one that is
-        commented out, and one that is enabled and inserted at the bottom of the
-          <codeph>postgresql.conf</codeph> file.</p>
-      <p>After setting a parameter, you must restart your Greenplum Database system or reload the
-          <codeph>postgresql.conf</codeph> files in order for the change to take effect. Whether you
-        require a restart or a reload depends on the parameter. </p>
-      <p>For more information about the server configuration parameters, see the <i>Greenplum
-          Database Reference Guide</i>.</p>
-      <p>To show the currently set values for a parameter across the system, use the
-          <codeph>-s</codeph> option.</p>
-      <p><codeph>gpconfig</codeph> uses the following environment variables to connect to the
-        Greenplum Database master instance and obtain system configuration information: </p>
+      <title>描述</title>
+      <p><codeph>gpconfig</codeph>工具允许用户在Greenplum数据库系统中所有实例
+        （Master、Segment和镜像）的<codeph>postgresql.conf</codeph>文件中设置、
+        复原或查看配置参数。设置参数时，如果需要，还可以为Master指定一个不同的值。
+        例如，诸如<codeph>max_connections</codeph>之类的参数要求Master的设置
+        不同于Segment的设置。如果要设置或复原全局参数或仅可对Master设置的参数，
+        请使用<codeph>--masteronly</codeph>选项。</p>
+      <p><codeph>gpconfig</codeph>只能用来管理某些参数。例如，用户不能使用它来设置
+        <codeph>port</codeph>等参数，这些参数对每个Segment实例都不同。使用<codeph>-l</codeph>
+        （list）选项查看<codeph>gpconfig</codeph>支持的配置参数的完整列表。</p>
+      <p>当<codeph>gpconfig</codeph>在Segment的<codeph>postgresql.conf</codeph>
+        文件中设置配置参数时，新的参数设置将总是显示在该文件的底部。当用户使用
+        <codeph>gpconfig</codeph>移除配置参数时，<codeph>gpconfig</codeph>会在所有
+        Segment的<codeph>postgresql.conf</codeph>文件中把该参数注释掉，从而恢复系统
+        默认设置。例如，如果使用<codeph>gpconfig </codeph>删除（注释掉）一个参数，并且
+        稍后把它添加回来（设置新值），则该参数会有两个实例，一个被注释掉，另一个被启用并
+        添加到<codeph>postgresql.conf</codeph>文件的底部。
+      </p>
+      <p>设置参数之后，用户必须重新启动其Greenplum数据库系统，或者重新加载<codeph>postgresql.conf</codeph>
+        文件以使得更改生效。是否需要重新启动或者加载取决于被设置的参数。
+      </p>
+      <p>有关服务器配置参数的更多信息，请参阅<i>Greenplum数据库参考指南</i>。
+      </p>
+      <p>要显示系统中当前参数的设置值，请使用<codeph>-s</codeph>选项。</p>
+      <p><codeph>gpconfig</codeph>使用以下环境变量连接到Greenplum数据库的
+        Master实例并获取系统配置信息：
+      </p>
       <ul>
         <li id="kq141888">
           <codeph>PGHOST</codeph>
@@ -65,128 +62,113 @@
       </ul>
     </section>
     <section id="section4">
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
           <pt>-c | --change <varname>param_name</varname></pt>
-          <pd>Changes a configuration parameter setting by adding the new setting to the bottom of
-            the <codeph>postgresql.conf</codeph> files.</pd>
+          <pd>通过在<codeph>postgresql.conf</codeph>文件的底部添加新的设置来改变配置参数的设置。</pd>
         </plentry>
         <plentry>
           <pt>-v | --value <varname>value</varname></pt>
-          <pd>The value to use for the configuration parameter you specified with the
-              <codeph>-c</codeph> option. By default, this value is applied to all segments, their
-            mirrors, the master, and the standby master.</pd>
-          <pd>Parameter values that are not simple identifiers or numbers must be enclosed in single
-            quotes (<codeph>'</codeph>). For example, values that contain spaces or special
-            characters must be enclosed in single quotes. To embed a single quote in a parameter
-            value, enter either two single quotes or backslash and quote (<codeph>\'</codeph>).</pd>
-          <pd>The utility encloses the value in single quotes when adding the setting to the
-              <codeph>postgresql.conf</codeph> files.</pd>
+          <pd>用于由<codeph>-c</codeph>选项指定的配置参数的值。默认情况下，此值将应用于所有
+            Segment及其镜像、Master和后备Master。</pd>
+          <pd>非单个字符或数字的参数值必须用单引号包裹（<codeph>'</codeph>）。例如，包括空格或特殊字符的字符串
+            必须用单引号包裹。如果要在字符串参数重嵌入单引号，需要用2个单引号或反斜杠进行转移（<codeph>\'</codeph>）。
+          </pd>
+          <pd>工具会在将值写入<codeph>postgresql.conf</codeph>时带着单引号。</pd>
         </plentry>
         <plentry>
           <pt>-m | --mastervalue <varname>master_value</varname></pt>
-          <pd>The master value to use for the configuration parameter you specified with the
-              <codeph>-c</codeph> option. If specified, this value only applies to the master and
-            standby master. This option can only be used with <codeph>-v</codeph>. </pd>
+          <pd>用于由<codeph>-c</codeph>选项指定的配置参数的Master值。如果指定，则该值仅适用于Master
+            和后备Master。该选项只能与<codeph>-v</codeph>一起使用。</pd>
         </plentry>
         <plentry>
           <pt>--masteronly</pt>
-          <pd>When specified, <codeph>gpconfig</codeph> will only edit the master
-              <codeph>postgresql.conf</codeph> file.</pd>
+          <pd>当被指定时，<codeph>gpconfig</codeph>将仅编辑Master的<codeph>postgresql.conf</codeph>文件。
+          </pd>
         </plentry>
         <plentry>
           <pt>-r | --remove <varname>param_name</varname></pt>
-          <pd>Removes a configuration parameter setting by commenting out the entry in the
-              <codeph>postgresql.conf</codeph> files.</pd>
+          <pd>通过注释掉<codeph>postgresql.conf</codeph>文件中的项删除配置参数。
+          </pd>
         </plentry>
         <plentry>
           <pt>-l | --list</pt>
-          <pd>Lists all configuration parameters supported by the <codeph>gpconfig</codeph>
-            utility.</pd>
+          <pd>列出所有被<codeph>gpconfig</codeph>工具支持的配置参数。
+          </pd>
         </plentry>
         <plentry>
           <pt>-s | --show <varname>param_name</varname></pt>
-          <pd>Shows the value for a configuration parameter used on all instances (master and
-            segments) in the Greenplum Database system. If there is a difference in a parameter
-            value among the instances, the utility displays an error message. Running
-              <codeph>gpconfig</codeph> with the <codeph>-s</codeph> option reads parameter values
-            directly from the database, and not the <codeph>postgresql.conf</codeph> file. If you
-            are using <codeph>gpconfig</codeph> to set configuration parameters across all segments,
-            then running <codeph>gpconfig -s</codeph> to verify the changes, you might still see the
-            previous (old) values. You must reload the configuration files (<codeph>gpstop
-              -u</codeph>) or restart the system (<codeph>gpstop -r</codeph>) for changes to take
-            effect.</pd>
+          <pd>显示在Greenplum数据库系统中所有实例（Master和Segment）上使用的配置参数的值。
+            如果实例中参数值存在差异，则工具将显示错误消息。使用<codeph>-s</codeph>选项运行
+            <codeph>gpconfig</codeph>将直接从数据库中读取参数值，而不是从<codeph>postgresql.conf</codeph>
+            文件中读取。如果用户使用<codeph>gpconfig</codeph>在所有Segment中设置配置参数，
+            然后运行<codeph>gpconfig -s</codeph>来验证更改，用户仍可能会看到以前的（旧）值。
+            用户必须重新加载配置文件（<codeph>gpstop -u</codeph>）或重新启动系统（<codeph>gpstop -r</codeph>）
+            以使更改生效。
+          </pd>
         </plentry>
         <plentry>
           <pt>--file</pt>
-          <pd>For a configuration parameter, shows the value from the
-              <codeph>postgresql.conf</codeph> file on all instances (master and segments) in the
-            Greenplum Database system. If there is a difference in a parameter value among the
-            instances, the utility displays a message. Must be specified with the
-              <codeph>-s</codeph> option.</pd>
-          <pd>For example, the configuration parameter <codeph>statement_mem</codeph> is set to 64MB
-            for a user with the <codeph>ALTER ROLE</codeph> command, and the value in the
-              <codeph>postgresql.conf</codeph> file is 128MB. Running the command <codeph>gpconfig
-              -s statement_mem --file</codeph> displays 128MB. The command <codeph>gpconfig -s
-              statement_mem</codeph> run by the user displays 64MB. </pd>
-          <pd>Not valid with the <codeph>--file-compare</codeph> option.</pd>
+          <pd>对于配置参数，显示在Greenplum数据库系统中的所有Segment（Master和Segment）上的<codeph>postgresql.conf</codeph>
+            文件中的值。如果实例中的参数值存在差异，则工具会显示一个消息。必须与<codeph>-s</codeph>选项一起指定。
+          </pd>
+          <pd>例如，使用<codeph>ALTER ROLE</codeph>为用户设置配置参数<codeph>statement_mem</codeph>为64MB，
+            而<codeph>postgresql.conf</codeph>文件中的值为128MB。运行命令<codeph>gpconfig -s statement_mem --file</codeph>显示
+            128MB。用户运行的命令<codeph>gpconfig -s
+              statement_mem</codeph>显示64MB。</pd>
+          <pd>与<codeph>--file-compare</codeph>选项一起指定时无效。</pd>
         </plentry>
         <plentry>
           <pt>--file-compare</pt>
-          <pd>For a configuration parameter, compares the current Greenplum Database value with the
-            value in the <codeph>postgresql.conf</codeph> files on hosts (master and segments). The
-            values in the <codeph>postgresql.conf files</codeph> represent the value when Greenplum
-            Database is restarted. </pd>
-          <pd>If the values are not the same, the utility displays the values from all hosts. If all
-            hosts have the same value, the utility displays a summary report.</pd>
-          <pd>Not valid with the <codeph>--file</codeph> option.</pd>
+          <pd>对于配置参数，将当前Greenplum数据库值与主机（Master和Segment）上<codeph>postgresql.conf</codeph>
+            文件中的值进行比较。<codeph>postgresql.conf files</codeph>文件中的值表示重新启动Greenplum数据库时的值。
+          </pd>
+          <pd>如果值不一样，该工具显示来自所有主机的值，如果所有主机的值一样，则该程序显示摘要报告。</pd>
+          <pd>与<codeph>--file</codeph>选项一起指定时无效。</pd>
         </plentry>
         <plentry>
           <pt>--skipvalidation</pt>
-          <pd>Overrides the system validation checks of <codeph>gpconfig</codeph> and allows you to
-            operate on any server configuration parameter, including hidden parameters and
-            restricted parameters that cannot be changed by <codeph>gpconfig</codeph>. When used
-            with the <codeph>-l</codeph> option (list), it shows the list of restricted parameters.
-              <note type="warning">Use extreme caution when setting configuration parameters with
-              this option. </note></pd>
+          <pd>覆盖<codeph>gpconfig</codeph>的系统验证检查，并允许用户对任何服务器配置参数进行操作，
+            包括隐藏参数和<codeph>gpconfig</codeph>无法更改的受限参数。当与<codeph>-l</codeph>选项
+            （列表）一起使用时，它显示受限参数的列表。
+            <note type="warning">使用此选项设置配置参数时要格外小心。</note></pd>
         </plentry>
         <plentry>
           <pt>--verbose </pt>
-          <pd>Displays additional log information during <codeph>gpconfig</codeph> command
-            execution.</pd>
+          <pd>在<codeph>gpconfig</codeph>命令执行期间显示额外的日志信息。</pd>
         </plentry>
         <plentry>
           <pt>--debug</pt>
-          <pd>Sets logging output to debug level. </pd>
+          <pd>设置日志输出级别为调试级别。</pd>
         </plentry>
         <plentry>
           <pt>-? | -h | --help</pt>
-          <pd>Displays the online help.</pd>
+          <pd>显示在线帮助。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Examples</title>
-      <p>Set the <codeph>max_connections</codeph> setting to 100 on all segments and 10 on the
-        master:</p>
+      <title>示例</title>
+      <p>设置所有Segment上的<codeph>max_connections</codeph>为100，而Master上为10。
+      </p>
       <codeblock>gpconfig -c max_connections -v 100 -m 10</codeblock>
-      <p>These examples shows the syntax required due to bash shell string processing.</p>
+      <p>该示例展示bash shell字符串处理的语法要求。</p>
       <codeblock>gpconfig -c search_path -v '"\$user",public'
-gpconfig -c dynamic_library_path -v '\$libdir'</codeblock>
-      <p>The configuration parameters are added to the <codeph>postgresql.conf</codeph> file.</p>
+        gpconfig -c dynamic_library_path -v '\$libdir'</codeblock>
+      <p>配置参数增加到<codeph>postgresql.conf</codeph>文件的格式如下。</p>
       <codeblock>search_path='"$user",public'
-dynamic_library_path='$libdir'</codeblock>
-      <p>Comment out all instances of the <codeph>default_statistics_target</codeph> configuration
-        parameter, and restore the system default:</p>
+        dynamic_library_path='$libdir'</codeblock>
+      <p>注释掉<codeph>default_statistics_target</codeph>配置参数的所有实例，并恢复系统默认值：
+      </p>
       <codeblock>gpconfig -r default_statistics_target</codeblock>
-      <p>List all configuration parameters supported by <codeph>gpconfig</codeph>:</p>
+      <p>列出所有<codeph>gpconfig</codeph>支持的配置参数：</p>
       <codeblock>gpconfig -l</codeblock>
-      <p>Show the values of a particular configuration parameter across the system:</p>
+      <p>显示系统中一个特定配置参数的值：</p>
       <codeblock>gpconfig -s max_connections</codeblock>
     </section>
     <section id="section6">
-      <title>See Also</title>
+      <title>另见</title>
       <p>
         <codeph>
           <xref href="./gpstop.xml#topic1" type="topic" format="dita"/>
