@@ -4,237 +4,212 @@
 <topic id="topic1">
   <title id="ku137116">gpfdist</title>
   <body>
-    <p>Serves data files to or writes data files out from Greenplum Database segments.</p>
+    <p>将数据文件载入Greenplum数据库Segment或从其中写出数据文件到文件系统。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><b>gpfdist</b> [<b>-d</b> <varname>directory</varname>] [<b>-p</b> <varname>http_port</varname>] [<b>-P</b> <varname>last_http_port</varname>] [<b>-l</b> <varname>log_file</varname>]
-   [<b>-t</b> <varname>timeout</varname>] [<b>-S</b>] [<b>-w</b> <varname>time</varname>] [<b>-v</b> | <b>-V</b>] [<b>-s</b>] [<b>-m</b> <varname>max_length</varname>]
-   [<b>--ssl</b> <varname>certificate_path</varname> [<b>--sslclean</b> <varname>wait_time</varname>] ]
-   [<b>-c</b> <varname>config.yml</varname>]
-
-<b>gpfdist -?</b> | <b>--help</b> 
-
-<b>gpfdist --version</b></codeblock>
+        [<b>-t</b> <varname>timeout</varname>] [<b>-S</b>] [<b>-w</b> <varname>time</varname>] [<b>-v</b> | <b>-V</b>] [<b>-s</b>] [<b>-m</b> <varname>max_length</varname>]
+        [<b>--ssl</b> <varname>certificate_path</varname> [<b>--sslclean</b> <varname>wait_time</varname>] ]
+        [<b>-c</b> <varname>config.yml</varname>]
+        
+        <b>gpfdist -?</b> | <b>--help</b> 
+        
+        <b>gpfdist --version</b></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p><codeph>gpfdist</codeph> is Greenplum Database parallel file distribution program. It is
-        used by readable external tables and <codeph>gpload</codeph> to serve external table files
-        to all Greenplum Database segments in parallel. It is used by writable external tables to
-        accept output streams from Greenplum Database segments in parallel and write them out to a
-        file.</p>
-      <note><codeph>gpfdist</codeph> and <codeph>gpload</codeph> are compatible only with the
-        Greenplum Database major version in which they are shipped. For example, a
-          <codeph>gpfdist</codeph> utility that is installed with Greenplum Database 4.x cannot be
-        used with Greenplum Database 5.x or 6.x.</note>
-      <p>In order for <codeph>gpfdist</codeph> to be used by an external table, the
-          <codeph>LOCATION</codeph> clause of the external table definition must specify the
-        external table data using the <codeph>gpfdist://</codeph> protocol (see the Greenplum
-        Database command <codeph>CREATE EXTERNAL TABLE</codeph>). </p>
-      <note>If the <codeph>--ssl</codeph> option is specified to enable SSL security, create the
-        external table with the <codeph>gpfdists://</codeph> protocol.</note>
-      <p>The benefit of using <codeph>gpfdist</codeph> is that you are guaranteed maximum
-        parallelism while reading from or writing to external tables, thereby offering the best
-        performance as well as easier administration of external tables.</p>
-      <p>For readable external tables, <codeph>gpfdist</codeph> parses and serves data files evenly
-        to all the segment instances in the Greenplum Database system when users
-          <codeph>SELECT</codeph> from the external table. For writable external tables,
-          <codeph>gpfdist</codeph> accepts parallel output streams from the segments when users
-          <codeph>INSERT</codeph> into the external table, and writes to an output file.</p>
-      <p>For readable external tables, if load files are compressed using <codeph>gzip</codeph> or
-          <codeph>bzip2</codeph> (have a <codeph>.gz</codeph> or <codeph>.bz2</codeph> file
-        extension), <codeph>gpfdist</codeph> uncompresses the files automatically before loading
-        provided that <codeph>gunzip</codeph> or <codeph>bunzip2</codeph> is in your path. </p>
-      <note type="note">Currently, readable external tables do not support compression on Windows
-        platforms, and writable external tables do not support compression on any platforms.</note>
-      <p>When reading or writing data with the <codeph>gpfdist</codeph> or <codeph>gpfdists</codeph>
-        protocol, Greenplum Database includes <codeph>X-GP-PROTO</codeph> in the HTTP request header
-        to indicate that the request is from Greenplum Database. The utility rejects HTTP requests
-        that do not include <codeph>X-GP-PROTO</codeph> in the request header.</p>
-      <p>Most likely, you will want to run <codeph>gpfdist</codeph> on your ETL machines rather than
-        the hosts where Greenplum Database is installed. To install <codeph>gpfdist</codeph> on
-        another host, simply copy the utility over to that host and add <codeph>gpfdist</codeph> to
-        your <codeph>$PATH</codeph>.</p>
-      <note type="note">When using IPv6, always enclose the numeric IP address in brackets.</note>
+      <title>描述</title>
+      <p><codeph>gpfdist</codeph>是Greenplum数据库并行文件分发程序。它可以被外部表和<codeph>gpload</codeph>
+        用来并行地将外部表文件提供给所有的Greenplum数据库Segment。它由可写外部表使用，并行接受来自Greenplum数据库
+        Segment的输出流，并将它们写出到文件中。</p>
+      <note><codeph>gpfdist</codeph>和<codeph>gpload</codeph>是在Greenplum的主版本级别有效的。
+        例如，Greenplum 4.x版本的<codeph>gpfdist</codeph>不能用于Greenplum 5.x或6.x版本。</note>
+      <p>为了使外部表使用<codeph>gpfdist</codeph>，外部表定义的<codeph>LOCATION</codeph>子句必须使用
+        <codeph>gpfdist://</codeph>协议（参见Greenplum数据库命令<codeph>CREATE EXTERNAL TABLE</codeph>）。
+      </p>
+      <note> 如果<codeph>--ssl</codeph>选项被指定来启用SSL安全性，请使用<codeph>gpfdists://</codeph>协议创建外部表。
+      </note>
+      <p>使用<codeph>gpfdist</codeph>的好处是在读取或写入外部表时可以保证最大的并行性，从而提供最佳的性能，
+        并且更容易管理外部表。
+      </p>
+      <p>对于只读外部表，当用户在外部表中<codeph>SELECT</codeph>时，<codeph>gpfdist</codeph>
+        将数据文件均匀地分析并提供给Greenplum数据库系统的所有Segment实例。对于可写的外部表，
+        <codeph>gpfdist</codeph>在用户<codeph>INSERT</codeph>外部表时接受来自Segment的
+        并行输出流，并写入输出文件。</p>
+      <p>对于可读外部表，如果被加载的文件使用<codeph>gzip</codeph>或<codeph>bzip2</codeph>
+        （具有<codeph>.gz</codeph>或<codeph>.bz2</codeph>的文件扩展名），<codeph>gpfdist</codeph>
+        会在装载之前自动解压文件，前提是<codeph>gunzip</codeph>或<codeph>bunzip2</codeph>在用户的
+        可执行文件路径中。</p>
+      <note type="note">目前，可读外部表不支持在Windows平台上的压缩，可写外部表不支持任何平台上的压缩。
+      </note>
+      <p>当使用<codeph>gpfdist</codeph>或<codeph>gpfdists</codeph>协议读写数据时，Greenplum数据库
+        在HTTP请求头部中包含<codeph>X-GP-PROTO</codeph>，以指示该请求来自Greenplum数据库。该工具拒绝
+        请求头部中不包含<codeph>X-GP-PROTO</codeph>的HTTP请求。</p>
+      <p>大多数情况下，用户很可能希望在ETL机器而不是安装Greenplum数据库的主机上运行<codeph>gpfdist</codeph>。
+        要在其他主机上安装<codeph>gpfdist</codeph>，只需简单的将该程序复制到该主机上，然后将<codeph>gpfdist</codeph>
+        添加到用户的<codeph>$PATH</codeph>路径中。</p>
+      <note type="note">使用IPv6时，请始终将数字IP地址包裹在括号内。</note>
     </section>
     <section id="section4">
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
           <pt>-d <varname>directory</varname></pt>
-          <pd>The directory from which <codeph>gpfdist</codeph> will serve files for readable
-            external tables or create output files for writable external tables. If not specified,
-            defaults to the current directory.</pd>
+          <pd>指定一个目录，<codeph>gpfdist</codeph>将从该目录中为可读外部表提供文件，或为可写外部表创建
+            输出文件。如果没有指定，默认为当前目录。
+          </pd>
         </plentry>
         <plentry>
           <pt>-l <varname>log_file</varname></pt>
-          <pd>The fully qualified path and log file name where standard output messages are to be
-            logged.</pd>
+          <pd>要记录标准输出消息的完全限定路径和日志文件名称。</pd>
         </plentry>
         <plentry>
           <pt>-p <varname>http_port</varname></pt>
-          <pd>The HTTP port on which <codeph>gpfdist</codeph> will serve files. Defaults to
-            8080.</pd>
+          <pd><codeph>gpfdist</codeph>提供文件要使用的HTTP端口。默认为8080。
+          </pd>
         </plentry>
         <plentry>
           <pt>-P <varname>last_http_port</varname></pt>
-          <pd>The last port number in a range of HTTP port numbers (<varname>http_port</varname> to
-              <varname>last_http_port</varname>, inclusive) on which <codeph>gpfdist</codeph> will
-            attempt to serve files. <codeph>gpfdist</codeph> serves the files on the first port
-            number in the range to which it successfully binds.</pd>
+          <pd><codeph>gpfdist</codeph>将会提供文件服务的端口号范围
+            （<varname>http_port</varname>到<varname>last_http_port</varname>
+            包含岂止号码）中最后一个HTTP端口号号码。<codeph>gpfdist</codeph>会
+            以端口号设定范围内第一个成功绑定的端口号作为服务端口。</pd>
         </plentry>
         <plentry>
           <pt>-t <varname>timeout</varname></pt>
-          <pd>Sets the time allowed for Greenplum Database to establish a connection to a
-              <codeph>gpfdist</codeph> process. Default is 5 seconds. Allowed values are 2 to 7200
-            seconds (2 hours). May need to be increased on systems with a lot of network
-            traffic.</pd>
+          <pd>设置Greenplum数据库建立与<codeph>gpfdist</codeph>进程的连接所允许的时间。默认值是5秒。
+            允许的值是2到7200秒（2小时）。在网络流量大的系统上可能要增加。</pd>
         </plentry>
         <plentry>
           <pt>-m <varname>max_length</varname></pt>
-          <pd>Sets the maximum allowed data row length in bytes. Default is 32768. Should be used
-            when user data includes very wide rows (or when <codeph>line too long</codeph> error
-            message occurs). Should not be used otherwise as it increases resource allocation. Valid
-            range is 32K to 256MB. (The upper limit is 1MB on Windows systems.)</pd>
+          <pd>设置以字节为单位的最大数据行长度。默认值是32768。当用户数据包含非常宽的行时
+            （或者当<codeph>line too long</codeph>错误消息发生时）应该使用，否则不应该使用，
+            因为它会增加资源分配。有效范围是32K到256MB（Windows系统上限为1MB）。
+          </pd>
           <pd>
-            <note>Memory issues might occur if you specify a large maximum row length and run a
-              large number of <codeph>gpfdist</codeph> concurrent connections. For example, setting
-              this value to the maximum of 256MB with 96 concurrent <codeph>gpfdist</codeph>
-              processes requires approximately 24GB of memory (<codeph>(96 + 1) x
-              246MB</codeph>).</note>
+            <note>如果用户指定较大的最大行长度并运行大量的<codeph>gpfdist</codeph>并发连接，
+              则可能会发生内存问题。例如，使用96个并行<codeph>gpfdist</codeph>进程需要大约
+              24GB的内存（<codeph>(96 + 1) x
+                246MB</codeph>）。</note>
           </pd>
         </plentry>
         <plentry>
           <pt>-s</pt>
           <pd>
-            <p>Enables simplified logging. When this option is specified, only messages with
-                <codeph>WARN</codeph> level and higher are written to the <codeph>gpfdist</codeph>
-              log file. <codeph>INFO</codeph> level messages are not written to the log file. If
-              this option is not specified, all <codeph>gpfdist</codeph> messages are written to the
-              log file. </p>
+            <p>启用简化的日志记录。指定此选项时，只有具有<codeph>WARN</codeph>级别或者更高级别的消息才
+              会写入<codeph>gpfdist</codeph>日志文件。<codeph>INFO</codeph>级别的消息不写入日志文件。
+              如果未指定这一选项，则所有<codeph>gpfdist</codeph>消息都写入日志文件。</p>
           </pd>
-          <pd>You can specify this option to reduce the information written to the log file. </pd>
+          <pd>用户可以指定此选项以减少写入日志文件的信息。</pd>
         </plentry>
         <plentry>
           <pt>-S (use O_SYNC)</pt>
-          <pd>Opens the file for synchronous I/O with the <codeph>O_SYNC</codeph> flag. Any writes
-            to the resulting file descriptor block <codeph>gpfdist</codeph> until the data is
-            physically written to the underlying hardware.</pd>
+          <pd>使用<codeph>O_SYNC</codeph>标志打开同步I/O的文件。任何对结果文件描述的写都会阻塞<codeph>gpfdist</codeph>，
+            直到数据被物理地写到底层硬件。
+          </pd>
         </plentry>
         <plentry>
           <pt>-w <varname>time</varname></pt>
-          <pd>Sets the number of seconds that Greenplum Database delays before closing a target file
-            such as a named pipe. The default value is 0, no delay. The maximum value is 7200
-            seconds (2 hours). </pd>
-          <pd>For a Greenplum Database with multiple segments, there might be a delay between
-            segments when writing data from different segments to the file. You can specify a time
-            to wait before Greenplum Database closes the file to ensure all the data is written to
-            the file. </pd>
+          <pd>设置关闭目标文件（如命名管道）之前Greenplum数据库延迟的秒数。 默认值是0，没有延迟。最大值是7200秒（2小时）。
+          </pd>
+          <pd>对于具有多个Segment的Greenplum数据库，在将不同Segment中的数据写入文件时，Segment之间可能会有延迟。
+            用户可以指定Greenplum数据库关闭文件之前要等待的时间，以确保所有数据都被写入文件。
+          </pd>
         </plentry>
         <plentry>
           <pt>--ssl <varname>certificate_path</varname></pt>
-          <pd>Adds SSL encryption to data transferred with <codeph>gpfdist</codeph>. After executing
-              <codeph>gpfdist</codeph> with the <codeph>--ssl
-              <varname>certificate_path</varname></codeph> option, the only way to load data from
-            this file server is with the <codeph>gpfdist://</codeph> protocol. <ph>For information
-              on the <codeph>gpfdist://</codeph> protocol, see "Loading and Unloading Data" in the
-                <i>Greenplum Database Administrator Guide</i>.</ph></pd>
-          <pd>The location specified in <varname>certificate_path</varname> must contain the
-            following files:<ul id="ul_dyp_eqt_mo">
-              <li id="ku140282">The server certificate file, <codeph>server.crt</codeph></li>
-              <li id="ku140283">The server private key file, <codeph>server.key</codeph></li>
-              <li id="ku140284">The trusted certificate authorities, <codeph>root.crt</codeph></li>
-            </ul><p>The root directory (<codeph>/</codeph>) cannot be specified as
-                <varname>certificate_path</varname>.</p></pd>
+          <pd>将SSL加密添加到使用<codeph>gpfdist</codeph>传输的数据。使用<codeph>--ssl
+            <varname>certificate_path</varname></codeph>选项执行<codeph>gpfdist</codeph>之后，
+            从此文件服务器加载数据的唯一方法是使用<codeph>gpfdist://</codeph>协议。<ph>
+              有关<codeph>gpfdist://</codeph>
+              协议的信息，请参阅<i>Greenplum数据库管理员指南</i>中的“装载和卸载数据”部分。
+            </ph></pd>
+          <pd>在<varname>certificate_path</varname>中指定的位置必须包含以下文件：
+            <ul id="ul_dyp_eqt_mo">
+              <li id="ku140282">服务器证书文件，<codeph>server.crt</codeph></li>
+              <li id="ku140283">服务器私钥文件，<codeph>server.key</codeph></li>
+              <li id="ku140284">可信证书机构，<codeph>root.crt</codeph></li>
+            </ul><p>根目录（<codeph>/</codeph>）不能指定为<varname>certificate_path</varname>。
+            </p></pd>
         </plentry>
         <plentry>
           <pt>--sslclean <varname>wait_time</varname></pt>
-          <pd>When the utility is run with the <codeph>--ssl</codeph> option, sets the number of
-            seconds that the utility delays before closing an SSL session and cleaning up the SSL
-            resources after it completes writing data to or from a Greenplum Database segment. The
-            default value is 0, no delay. The maximum value is 500 seconds. If the delay is
-            increased, the transfer speed decreases.</pd>
-          <pd>In some cases, this error might occur when copying large amounts of data:
-              <codeph>gpfdist server closed connection</codeph>. To avoid the error, you can add a
-            delay, for example <codeph>--sslclean 5</codeph>. </pd>
+          <pd>使用<codeph>--ssl</codeph>选项运行该工具时，设置该工具完成向Greenplum数据库Segment读写数据
+            后关闭SSL会话和清除SSL资源之前要延迟的秒数。默认值是0，没有延迟。最大值是500秒。如果延迟增加，
+            传输速度降低。
+          </pd>
+          <pd>在某些情况下，复制大量数据时可能会发生此错误：<codeph>gpfdist server closed connection</codeph>。
+            为了避免这类错误，用户可以增加一个延迟，例如<codeph>--sslclean 5</codeph>。
+          </pd>
         </plentry>
         <plentry>
           <pt>-c <varname>config.yaml</varname></pt>
-          <pd>Specifies rules that <codeph>gpfdist</codeph> uses to select a transform to apply when
-            loading or extracting data. The <codeph>gpfdist</codeph> configuration file is a YAML
-            1.1 document. </pd>
-          <pd>For information about the file format, see <xref
-              href="../../admin_guide/load/topics/transforming-xml-data.xml#topic83"/> in the
-              <cite>Greenplum Database Administrator Guide</cite>. For information about configuring
-            data transformation with <codeph>gpfdist</codeph>, see <xref
-              href="../../admin_guide/load/topics/transforming-xml-data.xml#topic75"/> in the
-              <cite>Greenplum Database Administrator Guide</cite>.</pd>
-          <pd>This option is not available on Windows platforms.</pd>
+          <pd>指定<codeph>gpfdist</codeph>在装载或抽取数据时，用来选择要应用的转换的规则。
+            <codeph>gpfdist</codeph>配置文件是一个YAML1.1文档。
+          </pd>
+          <pd>有关文件格式的信息，请参阅<cite>Greenplum数据库管理员指南</cite>中的<xref
+            href="../../admin_guide/load/topics/transforming-xml-data.xml#topic83"/>配置件格式。
+            有关用<codeph>gpfdist</codeph>配置数据转换的信息，请参阅<cite>Greenplum数据库管理员指南</cite>
+            中的<xref
+              href="../../admin_guide/load/topics/transforming-xml-data.xml#topic75"/>转换XML数据。
+          </pd>
+          <pd>该选项在windows平台中不可用。</pd>
         </plentry>
         <plentry>
-          <pt>-v (verbose)</pt>
-          <pd>Verbose mode shows progress and status messages.</pd>
+          <pt>-v（详细模式）</pt>
+          <pd>显示进度和状态信息的详细模式。</pd>
         </plentry>
         <plentry>
-          <pt>-V (very verbose)</pt>
-          <pd>Verbose mode shows all output messages generated by this utility.</pd>
+          <pt>-V（非常详细模式）</pt>
+          <pd>显示由该工具生成的所有输出信息的详细模式。</pd>
         </plentry>
         <plentry>
-          <pt>-? (help)</pt>
-          <pd>Displays the online help.</pd>
+          <pt>-?（帮助）</pt>
+          <pd>显示在线帮助。</pd>
         </plentry>
         <plentry>
           <pt>--version</pt>
-          <pd>Displays the version of this utility.</pd>
+          <pd>显示该工具的版本。</pd>
         </plentry>
       </parml>
     </section>
     <section>
-      <title>Notes</title>
-      <p>The server configuration parameter <codeph><xref
-            href="../../ref_guide/config_params/guc-list.xml#verify_gpfdists_cert"
-            >verify_gpfdists_cert</xref></codeph> controls whether SSL certificate authentication is
-        enabled when Greenplum Database communicates with the <codeph>gpfdist</codeph> utility to
-        either read data from or write data to an external data source. You can set the parameter
-        value to <codeph>false</codeph> to disable authentication when testing the communication
-        between the Greenplum Database external table and the <codeph>gpfdist</codeph> utility that
-        is serving the external data. If the value is <codeph>false</codeph>, these SSL exceptions
-        are ignored:<ul id="ul_vvb_5lj_mdb">
-          <li>The self-signed SSL certificate that is used by <codeph>gpfdist</codeph> is not
-            trusted by Greenplum Database.</li>
-          <li>The host name contained in the SSL certificate does not match the host name that is
-            running <codeph>gpfdist</codeph>.</li>
-        </ul><note type="warning">Disabling SSL certificate authentication exposes a security risk
-          by not validating the <codeph>gpfdists</codeph> SSL certificate. </note></p>
-      <p>If the <codeph>gpfdist</codeph> utility hangs with no read or write activity occurring, you
-        can generate a core dump the next time a hang occurs to help debug the issue. Set the
-        environment variable <codeph>GPFDIST_WATCHDOG_TIMER</codeph> to the number of seconds of no
-        activity to wait before <codeph>gpfdist</codeph> is forced to exit. When the environment
-        variable is set and <codeph>gpfdist</codeph> hangs, the utility aborts after the specified
-        number of seconds, creates a core dump, and sends abort information to the log file.</p>
-      <p>This example sets the environment variable on a Linux system so that
-          <codeph>gpfdist</codeph> exits after 300 seconds (5 minutes) of no
-        activity.<codeblock>export GPFDIST_WATCHDOG_TIMER=300</codeblock></p>
+      <title>注解</title>
+      <p>服务器配置文件<codeph><xref
+        href="../../ref_guide/config_params/guc-list.xml#verify_gpfdists_cert"
+        >verify_gpfdists_cert</xref></codeph>用来控制Greenplum数据库与<codeph>gpfdist</codeph>
+        工具沟通进行读写数据时是否启用SSL授权。当在进行Greenplum数据库外部表与<codeph>gpfdist</codeph>
+        工具测试时，客户可以设置该参数值为<codeph>false</codeph>来禁用授权。如果参数设置为<codeph>false</codeph>，
+        以下SSL异常会被忽略：
+        <ul id="ul_vvb_5lj_mdb">
+          <li><codeph>gpfdist</codeph>使用的自有签名SSL证书授权不被Greenplum信任。</li>
+          <li>SSL证书中包含的主机名与<codeph>gpfdist</codeph>主机名不匹配。</li>
+        </ul><note type="warning">禁用SSL证书授权会暴露安全风险，因为<codeph>gpfdist</codeph>
+          SSL不会再进行验证。</note></p>
+      <p>如果<codeph>gpfdist</codeph>工具在读写操作中hang住，客户可以在下次hang住时生成一个
+        core dump文件来帮助调试问题原因。在<codeph>gpfdist</codeph>强制退出之前，
+        设置环境变量<codeph>GPFDIST_WATCHDOG_TIMER</codeph>为异常时间段的秒数。
+        当客户设置了该环境变量，并且<codeph>gpfdist</codeph> hang住时，工具会在特定秒数后停止并创建
+        core dump文件，发送相关信息到日志文件。</p>
+      <p>例子中设置的Linux系统环境变量为<codeph>gpfdist</codeph>在无活动操作后300秒（5分钟）退出。
+        <codeblock>export GPFDIST_WATCHDOG_TIMER=300</codeblock></p>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>To serve files from a specified directory using port 8081 (and start
-          <codeph>gpfdist</codeph> in the background):</p>
+      <title>示例</title>
+      <p>使用端口8081从指定目录提供文件（并在后台启动<codeph>gpfdist</codeph>）：</p>
       <codeblock>gpfdist -d /var/load_files -p 8081 &amp;</codeblock>
-      <p>To start <codeph>gpfdist</codeph> in the background and redirect output and errors to a log
-        file:</p>
+      <p>在后台启动<codeph>gpfdist</codeph>并将输出和错误重定向到日志文件：</p>
       <codeblock>gpfdist -d /var/load_files -p 8081 -l /home/gpadmin/log &amp;</codeblock>
-      <p>To stop <codeph>gpfdist</codeph> when it is running in the background:</p>
-      <p>--First find its process id:</p>
+      <p>停止在后台运行的<codeph>gpfdist</codeph>：
+      </p>
+      <p>--首先找到它的进程ID：</p>
       <codeblock>ps ax | grep gpfdist</codeblock>
-      <p>--Then kill the process, for example:</p>
+      <p>--然后杀死该进程，例如：</p>
       <codeblock>kill 3456</codeblock>
     </section>
     <section id="section7">
-      <title>See Also</title>
-      <p><codeph><xref href="./gpload.xml#topic1" type="topic" format="dita"/></codeph>,
-          <codeph>CREATE EXTERNAL TABLE</codeph><ph> in the <i>Greenplum Database Reference
-            Guide</i></ph></p>
+      <title>另见</title>
+      <p><codeph><xref href="./gpload.xml#topic1" type="topic" format="dita"/></codeph>、
+        <ph><i>Greenplum数据库管理员指南</i></ph>中的<codeph>CREATE EXTERNAL TABLE</codeph></p>
     </section>
   </body>
 </topic>
