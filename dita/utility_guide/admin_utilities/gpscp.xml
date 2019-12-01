@@ -5,117 +5,104 @@
     <!--install_guide/refs/gpscp.xml has a conref to this topic. -->
     <title id="ju137116">gpscp</title>
     <body>
-        <p>Copies files between multiple hosts at once.</p>
+        <p>一次在多个主机之间复制文件。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpscp</b> { <b>-f</b> <varname>hostfile_gpssh</varname> | <b>-h</b> <varname>hostname</varname> [<b>-h</b> <varname>hostname</varname> ...] } 
-      [<b>-J</b> <varname>character</varname>] [<b>-v</b>] [[<varname>user</varname>@]<varname>hostname</varname>:]<varname>file_to_copy</varname> [...]
-      [[<varname>user</varname>@]<varname>hostname</varname>:]<varname>copy_to_path</varname>
-
-<b>gpscp</b> <b>-?</b> 
-
-<b>gpscp</b> <b>--version</b></codeblock>
+                [<b>-J</b> <varname>character</varname>] [<b>-v</b>] [[<varname>user</varname>@]<varname>hostname</varname>:]<varname>file_to_copy</varname> [...]
+                [[<varname>user</varname>@]<varname>hostname</varname>:]<varname>copy_to_path</varname>
+                
+                <b>gpscp</b> <b>-?</b> 
+                
+                <b>gpscp</b> <b>--version</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpscp</codeph> utility allows you to copy one or more files from the
-                specified hosts to other specified hosts in one command using SCP (secure copy). For
-                example, you can copy a file from the Greenplum Database master host
-                to all of the segment hosts at the same time.</p>
-            <p>To specify the hosts involved in the SCP session, use the <codeph>-f</codeph> option
-                to specify a file containing a list of host names, or use the <codeph>-h</codeph>
-                option to name single host names on the command-line. At least one host name
-                    (<codeph>-h</codeph>) or a host file (<codeph>-f</codeph>) is required. The
-                    <codeph>-J</codeph> option allows you to specify a single character to
-                substitute for the <varname>hostname</varname> in the <codeph>copy from</codeph> and
-                    <codeph>copy to</codeph> destination strings. If <codeph>-J</codeph> is not
-                specified, the default substitution character is an equal sign (<codeph>=</codeph>).
-                For example, the following command will copy <codeph>.bashrc</codeph> from the local
-                host to <codeph>/home/gpadmin</codeph> on all hosts named in
-                    <codeph>hostfile_gpssh</codeph>:</p>
+            <title>描述</title>
+            <p><codeph>gpscp</codeph>工具允许用户使用SCP（安全复制）在一个命令中将一个或多个文件从指定的主机
+                复制到其他指定的主机。例如，用户可以同时将文件从Greenplum数据库的Master主机复制到所有的
+                Segment主机。</p>
+            <p>要指定SCP会话中涉及的主机，请使用<codeph>-f</codeph>选项指定包含主机名列表的文件，或使用
+                <codeph>-h</codeph>选项在命令行上命名单个主机名。至少需要一个主机名（<codeph>-h</codeph>）
+                或主机文件（<codeph>-f</codeph>）。<codeph>-J</codeph>选项允许用户指定单个字符来替代
+                <codeph>copy from</codeph>和<codeph>copy to</codeph>的目标字符串中的<varname>hostname</varname>。
+                如果未指定<codeph>-J</codeph>，则默认的替代字符是等号(<codeph>=</codeph>)。例如，以下命令
+                将从本地主机将<codeph>.bashrc</codeph>复制到<codeph>hostfile_gpssh</codeph>中指定的
+                所有主机上的<codeph>/home/gpadmin</codeph>：</p>
             <codeblock>gpscp -f hostfile_gpssh .bashrc =:/home/gpadmin</codeblock>
-            <p>If a user name is not specified in the host list or with
-                    <varname>user</varname><codeph>@</codeph> in the file path,
-                    <codeph>gpscp</codeph> will copy files as the currently logged in user. To
-                determine the currently logged in user, do a <codeph>whoami</codeph> command. By
-                default, <codeph>gpscp</codeph> goes to <codeph>$HOME</codeph> of the session user
-                on the remote hosts after login. To ensure the file is copied to the correct
-                location on the remote hosts, it is recommended that you use absolute paths.</p>
-            <p>Before using <codeph>gpscp</codeph>, you must have a trusted host setup between the
-                hosts involved in the SCP session. You can use the utility
-                    <codeph>gpssh-exkeys</codeph> to update the known host files and exchange public
-                keys between hosts if you have not done so already.</p>
+            <p>如果未在主机列表中指定用户名，或者在文件路径中指定了<varname>user</varname><codeph>@</codeph>，
+                则<codeph>gpscp</codeph>将以当前登录用户的身份复制文件。要确定当前登录的用户，请执行
+                <codeph>whoami</codeph>命令。默认情况下，登录后<codeph>gpscp</codeph>将转到远程
+                主机上会话用户的<codeph>$HOME</codeph>。为确保将文件复制到远程主机上的正确位置，
+                建议使用绝对路径。
+            </p>
+            <p>在使用<codeph>gpscp</codeph>之前，用户必须在涉及SCP会话的主机之间建立可信的主机设置。
+                用户可以使用工具<codeph>gpssh-exkeys</codeph>更新已知的主机文件并在主机之间交换公钥
+                （如果尚未这样做的话）。</p>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
                     <pt>-f <varname>hostfile_gpssh</varname></pt>
-                    <pd>Specifies the name of a file that contains a list of hosts that will
-                        participate in this SCP session. The syntax of the host file is one host per
-                        line as follows:</pd>
+                    <pd>指定包含将参与此SCP会话的主机列表的文件的名称。主机文件的语法是每行一台主机，
+                        如下所示：</pd>
                     <pd>
                         <codeblock>&lt;<varname>hostname</varname>&gt;</codeblock>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>-h <varname>hostname</varname></pt>
-                    <pd>Specifies a single host name that will participate in this SCP session. You
-                        can use the <codeph>-h</codeph> option multiple times to specify multiple
-                        host names.</pd>
+                    <pd>指定将参与此SCP会话的单个主机名。用户可以多次使用<codeph>-h</codeph>选项来指定多个主机名。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-J <varname>character</varname></pt>
-                    <pd>The <codeph>-J</codeph> option allows you to specify a single character to
-                        substitute for the <varname>hostname</varname> in the <codeph>copy
-                            from</codeph> and <codeph>copy to</codeph> destination strings. If
-                            <codeph>-J</codeph> is not specified, the default substitution character
-                        is an equal sign (<codeph>=</codeph>).</pd>
+                    <pd><codeph>-J</codeph>选项允许用户指定单个字符来替代<codeph>copy
+                        from</codeph>和<codeph>copy to</codeph>目标字符串中的<varname>hostname</varname>。
+                        如果未指定<codeph>-J</codeph>，则默认的替代字符是等号（<codeph>=</codeph>）。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt>-v (verbose mode)</pt>
-                    <pd>Optional. Reports additional messages in addition to the SCP command
-                        output.</pd>
+                    <pt>-v（详细模式）</pt>
+                    <pd>可选。除SCP命令输出外还报告其他消息。</pd>
                 </plentry>
                 <plentry>
                     <pt><varname>file_to_copy</varname></pt>
-                    <pd>Required. The file name (or absolute path) of a file that you want to copy
-                        to other hosts (or file locations). This can be either a file on the local
-                        host or on another named host.</pd>
+                    <pd>必需。要复制到其他主机（或文件位置）的文件的文件名（或绝对路径）。这可以是本地主机上的
+                        文件或另一台被提及主机上的文件。</pd>
                 </plentry>
                 <plentry>
                     <pt><varname>copy_to_path</varname></pt>
-                    <pd>Required. The path where you want the file(s) to be copied on the named
-                        hosts. If an absolute path is not used, the file will be copied relative to
-                            <codeph>$HOME</codeph> of the session user. You can also use the equal
-                        sign '<codeph>=</codeph>' (or another character that you specify with the
-                            <codeph>-J</codeph> option) in place of a <varname>hostname</varname>.
-                        This will then substitute in each host name as specified in the supplied
-                        host file (<codeph>-f</codeph>) or with the <codeph>-h</codeph> option.</pd>
+                    <pd>必需。用户希望将文件复制到指定主机上的路径。如果没有使用绝对路径，文件将被复制到相对
+                        于会话用户的<codeph>$HOME</codeph>的位置。用户也可以使用等号'<codeph>=</codeph>'
+                        （或使用<codeph>-J</codeph>选项）指定的另一个字符代替<varname>hostname</varname>。这将随后在所提供
+                        的主机文件（<codeph>-f</codeph>）或<codeph>-h</codeph>选项中指定的每个主机名中进行替换。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt>-? (help)</pt>
-                    <pd>Displays the online help.</pd>
+                    <pt>-?（帮助）</pt>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
                 <plentry>
                     <pt>--version</pt>
-                    <pd>Displays the version of this utility.</pd>
+                    <pd>显示此工具的版本。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>Copy the file named <codeph>installer.tar</codeph> to <codeph>/</codeph> on all the
-                hosts in the file <codeph>hostfile_gpssh</codeph>.</p>
+            <title>示例</title>
+            <p>将名为<codeph>installer.tar</codeph>的文件复制到文件<codeph>hostfile_gpssh</codeph>
+                中的所有主机上的<codeph>/</codeph>路径下。
+            </p>
             <codeblock>gpscp -f hostfile_gpssh installer.tar =:/</codeblock>
-            <p>Copy the file named <varname>myfuncs.so</varname> to the specified location on the
-                hosts named <codeph>sdw1</codeph> and <codeph>sdw2</codeph>:</p>
+            <p>将名为<varname>myfuncs.so</varname>的文件复制到名为<codeph>sdw1</codeph>和
+                <codeph>sdw2</codeph>的主机上的指定位置：</p>
             <codeblock>gpscp -h sdw1 -h sdw2 myfuncs.so =:/usr/local/greenplum-db/lib</codeblock>
         </section>
         <section>
-            <title>See Also</title>
-            <p><codeph><xref href="gpssh.xml#topic1"/></codeph>, <codeph><xref
-                        href="gpssh-exkeys.xml#topic1"/></codeph></p>
+            <title>另见</title>
+            <p><codeph><xref href="gpssh.xml#topic1"/></codeph>、<codeph><xref
+                href="gpssh-exkeys.xml#topic1"/></codeph></p>
         </section>
     </body>
 </topic>
