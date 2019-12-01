@@ -4,259 +4,232 @@
 <topic id="topic1">
   <title>gpperfmon_install</title>
   <body>
-    <p>Installs the <codeph>gpperfmon</codeph> database, which is used by Greenplum Command Center,
-      and optionally enables the data collection agents.</p>
+    <p>安装Greenplum Command Center使用的<codeph>gpperfmon</codeph>数据库，
+      并可选择启用数据收集代理。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><b>gpperfmon_install --port <varname>gpdb_port</varname> </b>
-      [<b>--enable</b> <b>--password</b> <varname>gpmon_password</varname> [<b>--pgpass</b> <varname>path_to_file</varname>]]
-      [<b>--verbose</b>]
-
-<b>gpperfmon_install</b> <b>--help</b> | <b>-h</b> | <b>-?</b></codeblock>
+              [<b>--enable</b> <b>--password</b> <varname>gpmon_password</varname> [<b>--pgpass</b> <varname>path_to_file</varname>]]
+              [<b>--verbose</b>]
+        
+        <b>gpperfmon_install</b> <b>--help</b> | <b>-h</b> | <b>-?</b></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>The <codeph>gpperfmon_install</codeph> utility automates the steps required to enable the
-        data collection agents. You must be the Greenplum Database system user
-          (<codeph>gpadmin</codeph>) to run this utility. The <codeph>--port</codeph> option is
-        required. When using the <codeph>--enable</codeph> option, the <codeph>--password</codeph>
-        option is also required. Use the <codeph>--port</codeph> option to supply the port of the
-        Greenplum Database master instance. If using the <codeph>--enable</codeph> option, Greenplum
-        Database must be restarted after the utility completes.</p>
-      <p>When run without the <codeph>--enable</codeph> option, the utility just creates the
-          <codeph>gpperfmon</codeph> database (the database used to store system metrics collected
-        by the data collection agents). When run with the <codeph>--enable</codeph> option, the
-        utility also runs the following additional tasks necessary to enable the performance monitor
-        data collection agents:</p>
+      <title>描述</title>
+      <p><codeph>gpperfmon_install</codeph>工具自动执行启用数据收集代理程序所需的步骤。
+        用户必须是Greenplum数据库系统用户（<codeph>gpadmin</codeph>）才能运行此工具。
+        <codeph>--port</codeph>选项是必须的。使用<codeph>--enable</codeph>选项时，
+        还需要<codeph>--password</codeph>选项。使用<codeph>--port</codeph>选项来
+        提供Greenplum数据库的Master实例的端口。如果使用<codeph>--enable</codeph>选项，
+        必须在工具完成后重新启动Greenplum数据库。</p>
+      <p>在没有<codeph>--enable</codeph>选项时，此工具只创建<codeph>gpperfmon</codeph>
+        数据库（用于存储由数据收集代理收集的系统度量的数据库）。在使用<codeph>--enable</codeph>
+        选项运行时，该工具还会运行启用性能监视器数据收集代理所需的以下附加任务：</p>
       <ol>
-        <li id="ou143278">Creates the <codeph>gpmon</codeph> superuser role in Greenplum Database.
-          The data collection agents require this role to connect to the database and write their
-          data. The <codeph>gpmon</codeph> superuser role uses MD5-encrypted password authentication
-          by default. Use the <codeph>--password</codeph> option to set the <codeph>gpmon</codeph>
-          superuser's password.</li>
-        <li id="ou143437">Updates the <codeph>$MASTER_DATA_DIRECTORY/pg_hba.conf</codeph> file. The
-          utility adds these lines to the host-based authentication file
-            (<codeph>pg_hba.conf</codeph>):<codeblock>local      gpperfmon     gpmon                 md5
-host       all           gpmon  127.0.0.1/28   md5
-host       all           gpmon  ::1/128        md5</codeblock><p>The
-            second and third lines, the <codeph>host</codeph> entries, give <codeph>gpmon</codeph>
-            access to all Greenplum Database databases.</p><note>It might be necessary to edit the
-            lines in the <codeph>pg_hba.conf</codeph> file after running the
-              <codeph>gpperfmon_install</codeph> utility to limit the <codeph>gpmon</codeph> role's
-            access to databases or to change the authentication method. After you edit the file, run
-              <codeph>gpstop -u</codeph> to reload the file in Greenplum Database.<ul
+        <li id="ou143278">在Greenplum数据库中创建<codeph>gpmon</codeph>超级用户角色。 
+          数据收集代理需要连接到数据库并写入数据。<codeph>gpmon</codeph>超级用户角色默认
+          使用MD5加密口令认证。 使用<codeph>--password</codeph>选项来设置<codeph>gpmon</codeph>
+          超级用户的口令。</li>
+        <li id="ou143437">更新<codeph>$MASTER_DATA_DIRECTORY/pg_hba.conf</codeph>文件。
+          该工具将这些行添加到基于主机的认证文件（<codeph>pg_hba.conf</codeph>）中：
+          <codeblock>local      gpperfmon     gpmon                 md5
+            host       all           gpmon  127.0.0.1/28   md5
+            host       all           gpmon  ::1/128        md5</codeblock>
+          <p>第二和第三行的<codeph>host</codeph>项，让<codeph>gpmon</codeph>能访问
+            所有Greenplum数据库。</p>
+          <note>可能有必要在运行<codeph>gpperfmon_install</codeph>工具以限制
+            <codeph>gpmon</codeph>角色访问数据库或更改身份验证方法之后再编辑
+            <codeph>pg_hba.conf</codeph>文件中的行。运行<codeph>gpstop -u</codeph>重新加载
+            Greenplum数据库的pg_hba.conf文件。<ul
               id="ul_ffm_ysw_k5">
-              <li>To limit <codeph>gpmon</codeph> access to just the <codeph>gpperfmon</codeph>
-                database, edit the <codeph>host</codeph> entries in the<codeph>pg_hba.conf</codeph>
-                file. For the <codeph>gpmon</codeph> user change the second field from
-                  <codeph>all</codeph> to
-                <codeph>gpperfmon</codeph>:<codeblock>local      gpperfmon     gpmon                  md5
-host       <b>gpperfmon</b>     gpmon    127.0.0.1/28  md5
-host       <b>gpperfmon</b>     gpmon    ::1/128       md5</codeblock></li>
+              <li>要将<codeph>gpmon</codeph>的访问限制为仅访问<codeph>gpperfmon</codeph>数据库，
+                编辑<codeph>pg_hba.conf</codeph>文件中<codeph>host</codeph>项。对于
+                <codeph>gpmon</codeph>用户，将第二个字段从<codeph>all</codeph>更改为
+                <codeph>gpperfmon</codeph>：
+                <codeblock>local      gpperfmon     gpmon                  md5
+                  host       <b>gpperfmon</b>     gpmon    127.0.0.1/28  md5
+                  host       <b>gpperfmon</b>     gpmon    ::1/128       md5</codeblock></li>
               <li>
-                <p>The <codeph>gpperfmon_install</codeph> utility assumes the default MD5
-                  authentication method. Greenplum Database can optionally be configured to use the
-                  SHA-256 hash algorithm to compute the password hashes saved in the system catalog.
-                  This is incompatible with the MD5 authentication method, which expects an MD5 hash
-                  or clear text password in the system catalog. Because of this, if you have enabled
-                  the SHA-256 hash algorithm in the database, you must edit the
-                    <codeph>pg_hba.conf</codeph> file after running the
-                    <codeph>gpperfmon_install</codeph> utility. For the <codeph>host</codeph>
-                  entries, change the authentication method for the <codeph>gpmon</codeph> role from
-                    <codeph>md5</codeph> to
-                  <codeph>password</codeph>:<codeblock>local      gpperfmon     gpmon                 md5 
-host       all           gpmon  127.0.0.1/28   <b>password</b>
-host       all           gpmon  ::1/128        <b>password</b></codeblock></p>
-                <p>The <codeph>password</codeph> authentication method submits the user's clear text
-                  password for authentication and should not be used on an untrusted network. See
-                  "Protecting Passwords in Greenplum Database" in the <i>Greenplum Database
-                    Administrator Guide</i> for more information about configuring password
-                  hashing.</p>
+                <p><codeph>gpperfmon_install</codeph>工具采用默认的MD5认证方法。Greenplum数据库可以
+                  选择性地配置为使用SHA-256哈希算法来计算保存在系统目录中的口令哈希值。这与MD5认证方法
+                  不兼容，MD5认证方法在系统目录中需要MD5哈希或明文口令。
+                  因此，如果在数据库中启用了SHA-256哈希算法，则必须在运行<codeph>gpperfmon_install</codeph>
+                  工具后编辑<codeph>pg_hba.conf</codeph>文件。对于<codeph>host</codeph>项，将
+                  <codeph>gpmon</codeph>角色的身份认证从<codeph>md5</codeph>改为
+                  <codeph>password</codeph>：
+                  <codeblock>local      gpperfmon     gpmon                 md5 
+                    host       all           gpmon  127.0.0.1/28   <b>password</b>
+                    host       all           gpmon  ::1/128        <b>password</b></codeblock></p>
+                <p><codeph>password</codeph>认证方法提交用户的明文口令进行验证，不应在不可信的网络上使用。
+                  请参阅<i>Greenplum数据库管理员指南</i>中的“保护Greenplum数据库中的密码”。</p>
               </li>
             </ul></note></li>
-        <li id="ou143384">Updates the password file (<codeph>.pgpass</codeph>). In order to allow
-          the data collection agents to connect as the <codeph>gpmon</codeph> role without a
-          password prompt, you must have a password file that has an entry for the
-            <codeph>gpmon</codeph> user. The utility adds the following entry to your password file
-          (if the file does not exist, the utility will create
-          it):<codeblock>*:5432:gpperfmon:gpmon:<varname>gpmon_password</varname></codeblock> If
-          your password file is not located in the default location (<codeph>~/.pgpass</codeph>),
-          use the <codeph>--pgpass</codeph> option to specify the file location.</li>
-        <li id="ou140687">Sets the server configuration parameters for Greenplum Command Center. The
-          following parameters must be enabled for the data collection agents to begin collecting
-          data. The utility sets the following parameters in the Greenplum Database
-            <codeph>postgresql.conf</codeph> configuration files:<ul id="ul_wrp_dtx_wr">
-            <li><codeph>gp_enable_gpperfmon=on</codeph> (in all <codeph>postgresql.conf</codeph>
-              files)</li>
-            <li><codeph>gpperfmon_port=8888</codeph> (in all <codeph>postgresql.conf</codeph> files) </li>
-            <li><codeph>gp_external_enable_exec=on</codeph> (in the master
-                <codeph>postgresql.conf</codeph> file)</li>
-          </ul><p>Data collection agents can be configured by setting parameters in the
-              <codeph>gpperfmon.conf</codeph> configuration file. See <xref
-              href="#topic1/section_p51_bxc_wz" format="dita"/> for details.</p><p
-            otherprops="pivotal">For information about Greenplum Command Center, see the <xref
-              href="https://gpcc.docs.pivotal.io" format="html" scope="external">Greenplum Command
-              Center Documentation</xref>.</p></li>
+        <li id="ou143384">更新口令文件(<codeph>.pgpass</codeph>)。为了允许数据收集代理作为
+          <codeph>gpmon</codeph>角色进行连接而无需口令提示，用户必须拥有一个包含<codeph>gpmon</codeph>
+          用户项的口令文件。该工具将以下项添加到用户的口令文件（如果该文件不存在，该工具将创建它）：
+          <codeblock>*:5432:gpperfmon:gpmon:<varname>gpmon_password</varname></codeblock> 
+          如果用户的口令文件不在默认位置(<codeph>~/.pgpass</codeph>)，使用<codeph>--pgpass</codeph>
+          选项指定文件位置。</li>
+        <li id="ou140687">设置Greenplum Command Center的服务器配置参数。数据收集代理必须启用
+          以下参数才能开始收集数据。该工具在Greenplum数据库的<codeph>postgresql.conf</codeph>
+          配置文件中设置以下参数：
+          <ul id="ul_wrp_dtx_wr">
+            <li><codeph>gp_enable_gpperfmon=on</codeph> (在集群中所有的<codeph>postgresql.conf</codeph>
+              文件中)</li>
+            <li><codeph>gpperfmon_port=8888</codeph> (在集群中所有的<codeph>postgresql.conf</codeph>文件中) </li>
+            <li><codeph>gp_external_enable_exec=on</codeph> (在Master的
+              <codeph>postgresql.conf</codeph>文件中)</li>
+          </ul>
+          <p>数据收集代理可以通过在<codeph>gpperfmon.conf</codeph>配置文件中设置参数进行配置。
+            参阅<xref
+              href="#topic1/section_p51_bxc_wz" format="dita"/>获取更多详细信息。</p><p
+                otherprops="pivotal">更多有关Greenplum Command Center的信息，请见<xref
+                  href="https://gpcc.docs.pivotal.io" format="html" scope="external">Greenplum Command
+                  Center Documentation</xref>。</p></li>
       </ol>
     </section>
     <section id="section4">
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
           <pt>--enable</pt>
-          <pd>In addition to creating the <codeph>gpperfmon</codeph> database, performs the
-            additional steps required to enable the data collection agents. When
-              <codeph>--enable</codeph> is specified the utility will also create and configure the
-              <codeph>gpmon</codeph> superuser account and set the Command Center server
-            configuration parameters in the <codeph>postgresql.conf</codeph> files.</pd>
+          <pd>除了创建<codeph>gpperfmon</codeph>数据库外，还执行启用数据收集代理所需的附加步骤。
+            指定<codeph>--enable</codeph>时，工具还将创建并配置<codeph>gpmon</codeph>超级用户帐户，
+            并在<codeph>postgresql.conf</codeph>文件中设置Command Center服务器配置参数。
+          </pd>
         </plentry>
         <plentry>
           <pt>--password <varname>gpmon_password</varname></pt>
-          <pd>Required if <codeph>--enable</codeph> is specified. Sets the password of the
-              <codeph>gpmon</codeph> superuser. Disallowed if <codeph>--enable</codeph> is not
-            specified.</pd>
+          <pd>如果必须指定了<codeph>--enable</codeph>。设置<codeph>gpmon</codeph>超级用户的口令。
+            如果未指定<codeph>--enable</codeph>则不允许使用。</pd>
         </plentry>
         <plentry>
           <pt>--port <varname>gpdb_port</varname></pt>
-          <pd>Required. Specifies the connection port of the Greenplum Database master.</pd>
+          <pd>必需。指定Greenplum数据库Master的连接端口。</pd>
         </plentry>
         <plentry>
           <pt>--pgpass <varname>path_to_file</varname></pt>
-          <pd>Optional if <codeph>--enable</codeph> is specified. If the password file is not in the
-            default location of <codeph>~/.pgpass</codeph>, specifies the location of the password
-            file.</pd>
+          <pd>在<codeph>--enable</codeph>选项被指定时可选。如果口令文件不在<codeph>~/.pgpass</codeph>
+            的默认位置，则这个选项指定口令文件的位置。</pd>
         </plentry>
         <plentry>
           <pt>--verbose</pt>
-          <pd>Sets the logging level to verbose.</pd>
+          <pd>将日志记录级别设置为详细。</pd>
         </plentry>
         <plentry>
           <pt>--help | -h | -?</pt>
-          <pd>Displays the online help.</pd>
+          <pd>显示在线帮助。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section_p51_bxc_wz">
-      <title>Data Collection Agent Configuration</title>
-      <p>The <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/conf/gpperfmon.conf</codeph> file stores
-        configuration parameters for the data collection agents. For configuration changes to these
-        options to take effect, you must save <codeph>gpperfmon.conf</codeph> and then restart
-        Greenplum Database server (<codeph>gpstop -r</codeph>).</p>
-      <p>The <codeph>gpperfmon.conf</codeph> file contains the following configuration
-        parameters.</p>
+      <title>数据收集代理配置</title>
+      <p><codeph>$MASTER_DATA_DIRECTORY/gpperfmon/conf/gpperfmon.conf</codeph>文件存储数据收集代理的配置
+        参数。要使这些选项的配置更改生效，必须保存<codeph>gpperfmon.conf</codeph>然后重新启动Greenplum数据库
+        服务器（<codeph>gpstop -r</codeph>)。</p>
+      <p><codeph>gpperfmon.conf</codeph>文件包含以下配置参数。</p>
       <simpletable frame="all" id="simpletable_xhc_qtc_wz">
         <sthead>
-          <stentry>Parameter</stentry>
-          <stentry>Description</stentry>
+          <stentry>参数</stentry>
+          <stentry>描述</stentry>
         </sthead>
         <strow>
           <stentry>log_location</stentry>
-          <stentry>Specifies a directory location for gpperfmon log files. Default is
-              <codeph>$MASTER_DATA_DIRECTORY/gpperfmon/logs</codeph>.</stentry>
+          <stentry>指定gpperfmon日志文件的目录位置。默认是<codeph>$MASTER_DATA_DIRECTORY/gpperfmon/logs</codeph>。
+          </stentry>
         </strow>
         <strow>
           <stentry>min_query_time</stentry>
           <stentry>
-            <p>Specifies the minimum query run time in seconds for statistics collection. All
-              queries that run longer than this value are logged in the
-                <codeph>queries_history</codeph> table. For queries with shorter run times, no
-              historical data is collected. Defaults to 20 seconds.</p>
-            <p>If you know that you want to collect data for all queries, you can set this parameter
-              to a low value. Setting the minimum query run time to zero, however, collects data
-              even for the numerous queries run by Greenplum Command Center, creating a large amount
-              of data that may not be useful.</p>
+            <p>指定统计信息收集的最短查询运行时间（秒）。所有运行时间超过此值的查询都将记录在<codeph>queries_history</codeph>
+              表中。对于运行时间较短的查询，不收集历史数据。默认为20秒。</p>
+            <p>如果用户知道要为所有查询收集数据，则可以将此参数设置为较低值。但是，如果将最小查询运行时间设置为零，
+              即使对于Greenplum Command Center运行的大量查询也会收集数据，从而创建大量可能无用的数据。</p>
           </stentry>
         </strow>
         <strow>
           <stentry>max_log_size</stentry>
           <stentry>
-            <p>This parameter is not included in <codeph>gpperfmon.conf</codeph>, but it may be
-              added to this file.</p>
-            <p>To prevent the log files from growing to excessive size, you can add the
-                <codeph>max_log_size</codeph> parameter to <codeph>gpperfmon.conf</codeph>. The
-              value of this parameter is measured in bytes. For example:</p>
+            <p>这个参数不包含在<codeph>gpperfmon.conf</codeph>中，但是它可能被添加到这个文件中。</p>
+            <p>为防止日志文件增长过大，可以将<codeph>max_log_size</codeph>参数添加到<codeph>gpperfmon.conf</codeph>
+              中。该参数的值以字节为单位。例如：</p>
             <codeblock>max_log_size = 10485760</codeblock>
-            <p>With this setting, the log files will grow to 10MB before the system rolls over to a
-              new log file.</p>
+            <p>使用此设置，日志文件将在系统转到新的日志文件之前增长到10MB。</p>
           </stentry>
         </strow>
         <strow>
           <stentry>partition_age</stentry>
-          <stentry>The number of months that gpperfmon statistics data will be retained. The default
-            value is 0, which means that partitions are never dropped automatically.</stentry>
+          <stentry>gperfmon统计数据将被保留的月数。它的默认值是0，这意味着我们不会丢失任何数据。</stentry>
         </strow>
         <strow>
           <stentry>quantum</stentry>
-          <stentry>Specifies the time in seconds between updates from data collection agents on all
-            segments. Valid values are 10, 15, 20, 30, and 60. Defaults to 15 seconds.<p>If you
-              prefer a less granular view of performance, or want to collect and analyze minimal
-              amounts of data for system metrics, choose a higher quantum. To collect data more
-              frequently, choose a lower value.</p></stentry>
+          <stentry>指定所有Segment上的数据收集代理更新之间的时间（以秒为单位）。有效值为10、15、20、30和60。
+            缺省值为15秒。
+            <p>如果用户偏好较低粒度的性能视图，或者想要收集和分析系统度量的最小量，请选择较高的quantum。
+              要更频繁地收集数据，请选择一个较低的值。</p></stentry>
         </strow>
         <strow>
           <stentry>harvest_interval</stentry>
-          <stentry>The time, in seconds, between data harvests. A data harvest moves recent data
-            from the <codeph>gpperfmon</codeph> external (<codeph>_tail</codeph>) tables to their
-            corresponding history files. The default is 120. The minimum value is 30. </stentry>
+          <stentry>数据捕获时间段，以秒为单位。一次数据捕获会将<codeph>gpperfmon</codeph>外部表
+            （<codeph>_tail</codeph>）的近期数据移动到对应的历史文件。默认为120。最小值为30。
+          </stentry>
         </strow>
         <strow>
           <stentry>ignore_qexec_packet</stentry>
-          <stentry>(Deprecated) When set to true, data collection agents do not collect performance
-            data in the <codeph>gpperfmon</codeph> database <codeph>queries_*</codeph> tables:
-              <codeph>rows_out</codeph>, <codeph>cpu_elapsed</codeph>, <codeph>cpu_currpct</codeph>,
-              <codeph>skew_cpu</codeph>, and <codeph>skew_rows</codeph>. The default setting, true,
-            reduces the amount of memory consumed by the <codeph>gpmmon</codeph> process. Set this
-            parameter to false if you require this additional performance data.</stentry>
+          <stentry>（弃用）。设置为true时，数据收集代理不会收集<codeph>gpperfmon</codeph>数据库的
+            <codeph>queries_*</codeph>表中的性能数据：
+            <codeph>rows_out</codeph>、<codeph>cpu_elapsed</codeph>、<codeph>cpu_currpct</codeph>、
+            <codeph>skew_cpu</codeph>和<codeph>skew_rows</codeph>
+            缺省设置true可以减少<codeph>gpmmon</codeph>进程所消耗的内存量。如果用户需要这些额外的性能数据，
+            请将此参数设置为false。
+          </stentry>
         </strow>
         <strow>
           <stentry>smdw_aliases</stentry>
-          <stentry>This parameter allows you to specify additional host names for the standby
-            master. For example, if the standby master has two NICs, you can
-              enter:<codeblock>smdw_aliases=smdw-1,smdw-2</codeblock><p>This optional fault
-              tolerance parameter is useful if the Greenplum Command Center loses connectivity with
-              the standby master. Instead of continuously retrying to connect to host smdw, it will
-              try to connect to the NIC-based aliases of <codeph>smdw-1</codeph> and/or
-                <codeph>smdw-2</codeph>. This ensures that the Command Center Console can
-              continuously poll and monitor the standby master.</p></stentry>
+          <stentry>此参数允许用户为后备Master指定额外的主机名。例如，如果后备Master有两个NIC，则可以输入：
+            <codeblock>smdw_aliases=smdw-1,smdw-2</codeblock>
+            <p>如果Greenplum Command Center失去与后备Master的连接，则这个可选的容错参数非常有用。
+              它不会持续重试连接到主机smdw，而是尝试连接到基于NIC的别名<codeph>smdw-1</codeph>或
+              <codeph>smdw-2</codeph>。这确保了Command Center控制台可以持续调查和监控后备Master。
+            </p></stentry>
         </strow>
       </simpletable>
     </section>
     <section>
-      <title>Notes</title>
-      <p>The <codeph>gpperfmon</codeph> database and Greenplum Command Center require the
-          <codeph>gpmon</codeph> role. After the <codeph>gpperfmon</codeph> database and
-          <codeph>gpmon</codeph> role have been created, you can change the password for the
-          <codeph>gpmon</codeph> role and update the information that Greenplum Command Center uses
-        to connect to the <codeph>gpperfmon</codeph> database: </p>
+      <title>注解</title>
+      <p><codeph>gpperfmon</codeph>数据库和Greenplum Command Center需要<codeph>gpmon</codeph>角色。
+        在创建<codeph>gpperfmon</codeph>数据库和<codeph>gpmon</codeph>角色后，用户可以更改
+        <codeph>gpmon</codeph>角色的口令并更新Greenplum Command Center信息用来连接到<codeph>gpperfmon</codeph>
+        数据库：
+      </p>
       <ol id="ol_wss_knp_wr">
-        <li>Log in to Greenplum Database as a superuser and change the <codeph>gpmon</codeph>
-          password with the <codeph>ALTER ROLE</codeph>
-          command.<codeblock># ALTER ROLE gpmon WITH PASSWORD '<varname>new_password</varname>' ;</codeblock></li>
-        <li>Update the password in <codeph>.pgpass</codeph> file that is used by Greenplum Command
-          Center. The default file location is the <codeph>gpadmin</codeph> home directory
-            (<codeph>~/.pgpass</codeph>). The <codeph>.pgpass</codeph> file contains a line with the
-            <codeph>gpmon</codeph>
-          password.<codeblock>*:5432:gpperfmon:gpmon:<varname>new_password</varname></codeblock></li>
-        <li>Restart the Greenplum Command Center with the Command Center <codeph>gpcmdr</codeph>
-          utility. <codeblock>$ gpcmdr --restart</codeblock></li>
+        <li>以超级用户身份登录到Greenplum数据库，并使用<codeph>ALTER ROLE</codeph>命令更改
+          <codeph>gpmon</codeph>的口令。
+          <codeblock># ALTER ROLE gpmon WITH PASSWORD '<varname>new_password</varname>' ;</codeblock></li>
+        <li>更新Greenplum Command Center使用的<codeph>.pgpass</codeph>文件中的口令。默认文件位置是<codeph>gpadmin</codeph>
+          的主目录（<codeph>~/.pgpass</codeph>）。<codeph>.pgpass</codeph>文件包含一行<codeph>gpmon</codeph>口令。
+          <codeblock>*:5432:gpperfmon:gpmon:<varname>new_password</varname></codeblock></li>
+        <li>使用Command Center的<codeph>gpcmdr</codeph>工具重新启动Greenplum Command Center。
+          <codeblock>$ gpcmdr --restart</codeblock></li>
       </ol>
-      <p>The gpperfmon monitoring system requires some initialization after startup. Monitoring
-        information appears after a few minutes have passed, and not immediately after installation
-        and startup of the gpperfmon system.</p>
+      <p>gpperfmon监控系统在启动后需要一些初始化。监控信息在几分钟后出现，
+        而不是在安装和启动gpperfmon系统之后立即出现。
+      </p>
     </section>
     <section id="section5">
-      <title>Examples</title>
-      <p>Create the <codeph>gpperfmon</codeph> database only:</p>
+      <title>示例</title>
+      <p>只创建<codeph>gpperfmon</codeph>数据库：
+      </p>
       <codeblock>$ su - gpadmin
-$ gpperfmon_install --port 5432</codeblock>
-      <p>Create the <codeph>gpperfmon</codeph> database, create the <codeph>gpmon</codeph>
-        superuser, and enable the data collection agents:</p>
+        $ gpperfmon_install --port 5432</codeblock>
+      <p>创建<codeph>gpperfmon</codeph>数据库，创建<codeph>gpmon</codeph>超级用户，
+        并启用数据收集代理：</p>
       <codeblock>$ su - gpadmin
-$ gpperfmon_install --enable --password changeme --port 5432
-$ gpstop -r</codeblock>
+        $ gpperfmon_install --enable --password changeme --port 5432
+        $ gpstop -r</codeblock>
     </section>
     <section id="section6">
-      <title>See Also</title>
+      <title>另见</title>
       <p>
         <codeph>
           <xref href="./gpstop.xml#topic1" type="topic" format="dita"/>
