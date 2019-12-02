@@ -32,7 +32,8 @@
     - Demo: [http://47.92.231.67:8080/6-0/security-guide/](http://47.92.231.67:8080/6-0/security-guide/)
 - Best Practices Guide （完成：苑泽福）
     - Demo: [http://47.92.231.67:8080/6-0/best_practices/](http://47.92.231.67:8080/6-0/best_practices/)
-- Utility Guide （翻译中：苑泽福，进度：28/53）
+- Utility Guide （完成：苑泽福、杜佳伦）
+    - Demo: [http://47.92.231.67:8080/6-0/utility_guide/](http://47.92.231.67:8080/6-0/utility_guide/)
 - Reference Guide 完成（参与者：肖磊、杜佳伦、何江、李想）
     - Demo: [http://47.92.231.67:8080/6-0/ref_guide/](http://47.92.231.67:8080/6-0/ref_guide/)
     - SQL Command Reference（完成：肖磊，杜佳伦）
