@@ -4,55 +4,52 @@
 <topic id="topic1">
     <title id="ow138313">gpsys1</title>
     <body>
-        <p>Displays information about your operating system.</p>
+        <p>显示有关操作系统的信息。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpsys1</b> [ <b>-a</b> | <b>-m</b> | <b>-p</b> ]
-
-<b>gpsys1</b> <b>-?</b> 
-
-<b>gpsys1</b> <b>--version</b></codeblock>
+                
+                <b>gpsys1</b> <b>-?</b> 
+                
+                <b>gpsys1</b> <b>--version</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p><codeph>gpsys1</codeph> displays the platform and installed memory (in bytes) of the
-                current host. For example:</p>
+            <title>描述</title>
+            <p><codeph>gpsys1</codeph>显示当前主机的平台和安装的内存（以字节为单位）。例如：</p>
             <codeblock>linux 1073741824</codeblock>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
-                    <pt>-a (show all)</pt>
-                    <pd>Shows both platform and memory information for the current host. This is the
-                        default.</pd>
+                    <pt>-a（显示所有）</pt>
+                    <pd>显示当前主机的平台和内存信息。这是默认选项。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-m (show memory only)</pt>
-                    <pd>Shows system memory installed in bytes.</pd>
+                    <pt>-m（仅显示内存）</pt>
+                    <pd>以字节为单位显示安装的系统内存。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-p (show platform only)</pt>
-                    <pd>Shows the OS platform. Platform can be <codeph>linux</codeph>,
-                            <codeph>darwin</codeph> or <codeph>sunos5</codeph>.</pd>
+                    <pt>-p（仅显示平台）</pt>
+                    <pd>显示操作系统平台。可以是<codeph>linux</codeph>、<codeph>darwin</codeph>或<codeph>sunos5</codeph>。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-? (help)</pt>
-                    <pd>Displays the online help.</pd>
+                    <pt>-?（帮助）</pt>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
                 <plentry>
                     <pt>--version</pt>
-                    <pd>Displays the version of this utility.</pd>
+                    <pd>显示此工具的版本。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>Show information about the current host operating system:</p>
+            <title>示例</title>
+            <p>显示有关当前主机操作系统的信息：</p>
             <codeblock>gpsys1</codeblock>
         </section>
         <section id="section6">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="gpcheckperf.xml#topic1">gpcheckperf</xref></codeph></p>
         </section>
     </body>

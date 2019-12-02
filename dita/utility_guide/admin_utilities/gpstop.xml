@@ -5,60 +5,53 @@
     <!--install_guide/refs/gpstop.xml has a conref to this topic. -->
     <title id="jz143120">gpstop</title>
     <body>
-        <p>Stops or restarts a Greenplum Database system.</p>
+        <p>停止或者重启Greenplum数据库系统。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpstop</b> [<b>-d</b> <varname>master_data_directory</varname>] [<b>-B</b> <varname>parallel_processes</varname>] 
-       [<b>-M</b> smart | fast | immediate] [<b>-t</b> <varname>timeout_seconds</varname>] [<b>-r</b>] [<b>-y</b>] [<b>-a</b>] 
-       [<b>-l</b> <varname>logfile_directory</varname>] [<b>-v</b> | <b>-q</b>]
-
-<b>gpstop</b> <b>-m</b> [<b>-d</b> <varname>master_data_directory</varname>] [<b>-y</b>] [<b>-l</b> <varname>logfile_directory</varname>] [<b>-v</b> | <b>-q</b>]
-
-<b>gpstop</b> <b>-u</b> [<b>-d</b> <varname>master_data_directory</varname>] [<b>-l</b> <varname>logfile_directory</varname>] [<b>-v</b> | <b>-q</b>]
- 
-<b>gpstop</b> <b>--host</b> <varname>host_name</varname> [<b>-d</b> <varname>master_data_directory</varname>] [<b>-l</b> <varname>logfile_directory</varname>]
-       [<b>-t</b> <varname>timeout_seconds</varname>] [<b>-a</b>] [<b>-v</b> | <b>-q</b>]
-
-<b>gpstop</b> <b>--version</b> 
-
-<b>gpstop</b> <b>-?</b> | <b>-h</b> | <b>--help</b></codeblock>
+                [<b>-M</b> smart | fast | immediate] [<b>-t</b> <varname>timeout_seconds</varname>] [<b>-r</b>] [<b>-y</b>] [<b>-a</b>] 
+                [<b>-l</b> <varname>logfile_directory</varname>] [<b>-v</b> | <b>-q</b>]
+                
+                <b>gpstop</b> <b>-m</b> [<b>-d</b> <varname>master_data_directory</varname>] [<b>-y</b>] [<b>-l</b> <varname>logfile_directory</varname>] [<b>-v</b> | <b>-q</b>]
+                
+                <b>gpstop</b> <b>-u</b> [<b>-d</b> <varname>master_data_directory</varname>] [<b>-l</b> <varname>logfile_directory</varname>] [<b>-v</b> | <b>-q</b>]
+                
+                <b>gpstop</b> <b>--host</b> <varname>host_name</varname> [<b>-d</b> <varname>master_data_directory</varname>] [<b>-l</b> <varname>logfile_directory</varname>]
+                [<b>-t</b> <varname>timeout_seconds</varname>] [<b>-a</b>] [<b>-v</b> | <b>-q</b>]
+                
+                <b>gpstop</b> <b>--version</b> 
+                
+                <b>gpstop</b> <b>-?</b> | <b>-h</b> | <b>--help</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpstop</codeph> utility is used to stop the database servers that
-                comprise a Greenplum Database system. When you stop a Greenplum Database system, you
-                are actually stopping several <codeph>postgres</codeph> database server processes at
-                once (the master and all of the segment instances). The <codeph>gpstop</codeph>
-                utility handles the shutdown of the individual instances. Each instance is shutdown
-                in parallel. </p>
-            <p>By default, you are not allowed to shut down Greenplum Database if there are any
-                client connections to the database. Use the <codeph>-M fast</codeph> option to roll
-                back all in progress transactions and terminate any connections before shutting
-                down. If there are any transactions in progress, the default behavior is to wait for
-                them to commit before shutting down.</p>
-            <p>With the <codeph>-u</codeph> option, the utility uploads changes made to the master
-                    <codeph>pg_hba.conf</codeph> file or to <i>runtime</i> configuration parameters
-                in the master <codeph>postgresql.conf</codeph> file without interruption of service.
-                Note that any active sessions will not pickup the changes until they reconnect to
-                the database.</p>
+            <title>描述</title>
+            <p><codeph>gpstop</codeph>工具用于停止构成Greenplum数据库系统的数据库服务器。当用户停止一个
+                Greenplum数据库系统时，用户实际上是一次停止几个<codeph>postgres</codeph>数据库服务器进程
+                （Master和所有的Segment实例）。<codeph>gpstop</codeph>工具处理个别实例的关闭。每个实例
+                被并行地关闭。</p>
+            <p>默认情况下，如果有任何客户端连接到数据库，则不允许关闭Greenplum数据库。使用<codeph>-M fast</codeph>
+                选项来回滚所有正在进行的事务，并在关闭之前终止所有连接。如果有任何事务正在进行，则默认行为是
+                在关闭之前等待它们提交。</p>
+            <p>使用<codeph>-u</codeph>选项时, 该工具会上传对主<codeph>pg_hba.conf</codeph>文件所做的更改，
+                或者在<codeph>postgresql.conf</codeph>文件中将<i>运行时</i>配置参数上载到服务中。请注意，
+                任何活动的会话在重新连接到数据库之前都不会获取更改。</p>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
                     <pt>-a</pt>
-                    <pd>Do not prompt the user for confirmation.</pd>
+                    <pd>不要提示用户确认。</pd>
                 </plentry>
                 <plentry>
                     <pt>-B <varname>parallel_processes</varname></pt>
-                    <pd>The number of segments to stop in parallel. If not specified, the utility
-                        will start up to 64 parallel processes depending on how many segment
-                        instances it needs to stop.</pd>
+                    <pd>并行停止的Segment数。如果未指定，则工具将启动最多64个并行进程，具体取决于需要停止
+                        多少个Segment实例。</pd>
                 </plentry>
                 <plentry>
                     <pt>-d <varname>master_data_directory</varname></pt>
-                    <pd>Optional. The master host data directory. If not specified, the value set
-                        for <codeph>$MASTER_DATA_DIRECTORY</codeph> will be used.</pd>
+                    <pd>可选。Master主机的数据目录。如果未指定，则使用为<codeph>$MASTER_DATA_DIRECTORY</codeph>
+                        设置的值。</pd>
                 </plentry>
                 <plentry>
                     <pt>--host <varname>host_name</varname></pt>
@@ -74,107 +67,92 @@
                             <li>Both a primary segment instance and its mirror are on the host.</li>
                         </ul></pd>
                     <pd>This option cannot be specified with the <codeph>-m</codeph>,
-                            <codeph>-r</codeph>, <codeph>-u</codeph>, or <codeph>-y</codeph>
-                            options.<note>The <codeph>gprecoverseg</codeph> utility restores segment
+                        <codeph>-r</codeph>, <codeph>-u</codeph>, or <codeph>-y</codeph>
+                        options.<note>The <codeph>gprecoverseg</codeph> utility restores segment
                             instances. Run <codeph>gprecoverseg</codeph> commands to start the
                             segments as mirrors and then to return the segments to their preferred
                             role (primary segments). </note></pd>
                 </plentry>
                 <plentry>
                     <pt>-l <varname>logfile_directory</varname></pt>
-                    <pd>The directory to write the log file. Defaults to
-                            <codeph>~/gpAdminLogs</codeph>.</pd>
+                    <pd>写入日志文件的目录。默认为<codeph>~/gpAdminLogs</codeph>。</pd>
                 </plentry>
                 <plentry>
                     <pt>-m</pt>
-                    <pd>Optional. Shuts down a Greenplum master instance that was started in
-                        maintenance mode.</pd>
+                    <pd>可选。关闭在维护模式下启动的Greenplum主实例。</pd>
                 </plentry>
                 <plentry>
                     <pt>-M fast</pt>
-                    <pd>Fast shut down. Any transactions in progress are interrupted and rolled
-                        back.</pd>
+                    <pd>快速关闭。任何正在进行的事务都会中断并回滚。</pd>
                 </plentry>
                 <plentry>
                     <pt>-M immediate</pt>
-                    <pd>Immediate shut down. Any transactions in progress are aborted. </pd>
-                    <pd>This mode kills all <codeph>postgres</codeph> processes without allowing the
-                        database server to complete transaction processing or clean up any temporary
-                        or in-process work files.</pd>
+                    <pd>立即关闭。任何正在进行的事务都会中止。</pd>
+                    <pd>该模式杀死所有<codeph>postgres</codeph>进程，而不允许数据库服务器完成事务处理
+                        或清理任何临时或进程内工作文件。</pd>
                 </plentry>
                 <plentry>
                     <pt>-M smart</pt>
-                    <pd>Smart shut down. If there are active connections, this command fails with a
-                        warning. This is the default shutdown mode.</pd>
+                    <pd>智能关闭。如果存在活动连接，则此命令将失败并显示警告。这是默认的关闭模式。</pd>
                 </plentry>
                 <plentry>
                     <pt>-q</pt>
-                    <pd>Run in quiet mode. Command output is not displayed on the screen, but is
-                        still written to the log file.</pd>
+                    <pd>以静默模式运行。命令输出不显示在屏幕上，但仍然写入日志文件。</pd>
                 </plentry>
                 <plentry>
                     <pt>-r</pt>
-                    <pd>Restart after shutdown is complete.</pd>
+                    <pd>关机完成后重新启动。</pd>
                 </plentry>
                 <plentry>
                     <pt>-t <varname>timeout_seconds</varname></pt>
-                    <pd>Specifies a timeout threshold (in seconds) to wait for a segment instance to
-                        shutdown. If a segment instance does not shutdown in the specified number of
-                        seconds, <codeph>gpstop</codeph> displays a message indicating that one or
-                        more segments are still in the process of shutting down and that you cannot
-                        restart Greenplum Database until the segment instance(s) are stopped. This
-                        option is useful in situations where <codeph>gpstop</codeph> is executed and
-                        there are very large transactions that need to rollback. These large
-                        transactions can take over a minute to rollback and surpass the default
-                        timeout period of 600 seconds.</pd>
+                    <pd>指定等待Segment实例关闭的超时阈值（以秒为单位）。如果Segment实例没有在指定的秒数内关闭，
+                        <codeph>gpstop</codeph>将显示一条消息，指示一个或多个Segment仍处于关闭过程中，并且
+                        直到Segment实例停止后才能重新启动Greenplum数据库。这个选项在<codeph>gpstop</codeph>
+                        被执行且有非常大的事务需要回滚的情况下非常有用。这些大型事务可能需要一分钟才能回滚，并超过
+                        600秒的默认超时时间。</pd>
                 </plentry>
                 <plentry>
                     <pt>-u</pt>
-                    <pd>This option reloads the <codeph>pg_hba.conf</codeph> files of the master and
-                        segments and the runtime parameters of the <codeph>postgresql.conf</codeph>
-                        files but does not shutdown the Greenplum Database array. Use this option to
-                        make new configuration settings active after editing
-                            <codeph>postgresql.conf</codeph> or <codeph>pg_hba.conf</codeph>. Note
-                        that this only applies to configuration parameters that are designated as
-                            <i>runtime</i> parameters.</pd>
+                    <pd>此选项将重新加载Master和Segment的<codeph>pg_hba.conf</codeph>文件以及
+                        <codeph>postgresql.conf</codeph>文件的运行时参数，但不会关闭数据库阵列。
+                        编辑<codeph>postgresql.conf</codeph>或<codeph>pg_hba.conf</codeph>
+                        之后，使用此选项可使新的配置设置处于活动状态。请注意，这仅适用于设计为<i>运行时</i>
+                        的配置参数。</pd>
                 </plentry>
                 <plentry>
                     <pt>-v</pt>
-                    <pd>Displays detailed status, progress and error messages output by the
-                        utility.</pd>
+                    <pd>显示工具输出的详细状态，进度和错误消息。</pd>
                 </plentry>
                 <plentry>
                     <pt>-y</pt>
-                    <pd>Do not stop the standby master process. The default is to stop the standby
-                        master.</pd>
+                    <pd>不要停止后备Master进程。默认是停止后备Master。</pd>
                 </plentry>
                 <plentry>
                     <pt>-? | -h | --help</pt>
-                    <pd>Displays the online help.</pd>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
                 <plentry>
                     <pt>--version</pt>
-                    <pd>Displays the version of this utility.</pd>
+                    <pd>显示工具的版本。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>Stop a Greenplum Database system in smart mode:</p>
+            <title>示例</title>
+            <p>在智能模式下关闭Greenplum数据库系统：</p>
             <codeblock>gpstop</codeblock>
-            <p>Stop a Greenplum Database system in fast mode:</p>
+            <p>在快速模式下关闭Greenplum数据库系统：</p>
             <codeblock>gpstop -M fast</codeblock>
-            <p>Stop all segment instances and then restart the system:</p>
+            <p>停止所有的Segment实例，然后重新启动系统：</p>
             <codeblock>gpstop -r</codeblock>
-            <p>Stop a master instance that was started in maintenance mode:</p>
+            <p>停止在维护模式下启动的Master实例：</p>
             <codeblock>gpstop -m</codeblock>
-            <p>Reload the <codeph>postgresql.conf</codeph> and <codeph>pg_hba.conf</codeph> files
-                after making configuration changes but do not shutdown the Greenplum Database
-                array:</p>
+            <p>在进行配置更改后重新加载<codeph>postgresql.conf</codeph>和<codeph>pg_hba.conf</codeph>
+                文件，但不要关闭Greenplum数据库阵列：</p>
             <codeblock>gpstop -u</codeblock>
         </section>
         <section id="section6">
-            <title>See Also</title>
+            <title>另见</title>
             <p>
                 <codeph>
                     <xref href="gpstart.xml#topic1">gpstart</xref>

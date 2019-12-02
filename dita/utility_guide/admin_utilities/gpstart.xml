@@ -5,144 +5,126 @@
     <!--install_guide/refs/gpstart.xml has a conref to this topic. -->
     <title id="jy143030">gpstart</title>
     <body>
-        <p>Starts a Greenplum Database system.</p>
+        <p>启动一个Greenplum数据库系统。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpstart</b> [<b>-d</b> <varname>master_data_directory</varname>] [<b>-B</b> <varname>parallel_processes</varname>] [<b>-R</b>]
-        [<b>-m</b>] [<b>-y</b>] [<b>-a</b>] [<b>-t</b> <varname>timeout_seconds</varname>] [<b>-l</b> <varname>logfile_directory</varname>] 
-        [<b>--skip-heap-checksum-validation</b>]
-        [<b>-v</b> | <b>-q</b>]
-
-<b>gpstart</b> <b>-?</b> | <b>-h</b> | <b>--help</b> 
-
-<b>gpstart</b> <b>--version</b></codeblock>
+                [<b>-m</b>] [<b>-y</b>] [<b>-a</b>] [<b>-t</b> <varname>timeout_seconds</varname>] [<b>-l</b> <varname>logfile_directory</varname>] 
+                [<b>--skip-heap-checksum-validation</b>]
+                [<b>-v</b> | <b>-q</b>]
+                
+                <b>gpstart</b> <b>-?</b> | <b>-h</b> | <b>--help</b> 
+                
+                <b>gpstart</b> <b>--version</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpstart</codeph> utility is used to start the Greenplum Database server
-                processes. When you start a Greenplum Database system, you are actually starting
-                several <codeph>postgres</codeph> database server listener processes at once (the
-                master and all of the segment instances). The <codeph>gpstart</codeph> utility
-                handles the startup of the individual instances. Each instance is started in
-                parallel.</p>
-            <p>The first time an administrator runs <codeph>gpstart</codeph>, the utility creates a
-                hosts cache file named <codeph>.gphostcache</codeph> in the user's home directory.
-                Subsequently, the utility uses this list of hosts to start the system more
-                efficiently. If new hosts are added to the system, you must manually remove this
-                file from the <codeph>gpadmin</codeph> user's home directory. The utility will
-                create a new hosts cache file at the next startup.</p>
-            <p>As part of the startup process, the utility checks the consistency of heap checksum
-                setting among the Greenplum Database master and segment instances, either enabled or
-                disabled on all instances. If the heap checksum setting is different among the
-                instances, an error is returned and Greenplum Database does not start. The
-                validation can be disabled by specifying the option
-                    <codeph>--skip-heap-checksum-validation</codeph>. For more information about
-                heap checksums, see <xref
+            <title>描述</title>
+            <p><codeph>gpstart</codeph>工具用于启动Greenplum数据库服务器进程。当用户启动一个Greenplum
+                数据库系统时，用户实际上是同时启动了几个<codeph>postgres</codeph>数据库服务器监听器进程
+                （Master和所有的Segment实例）。<codeph>gpstart</codeph>工具处理各个实例的启动。每个实例
+                都是并行启动的。</p>
+            <p>管理员第一次运行<codeph>gpstart</codeph>时，该工具将在用户的主目录中创建一个名为
+                <codeph>.gphostcache</codeph>的主缓存文件。随后，该工具使用此主机列表更有效地启动系统。
+                如果将新主机添加到系统中，则必须手动从<codeph>gpadmin</codeph>用户的主目录中删除此文件。
+                该工具将在下次启动时创建一个新的主机缓存文件。
+            </p>
+            <p>作为启动过程的一部分，该工具会检查堆表checksum设置是否在集群上启用。如果堆表checksum启用情况
+                在各个实例之间不同，Greenplum数据库不会启动，会返回一个错误信息。该验证选项可以通过指定选项
+                <codeph>--skip-heap-checksum-validation</codeph>来停用。更多关于堆表checksum的情况，
+                请见<cite>Greenplum数据库管理员指南</cite>中的<xref
                     href="../../admin_guide/highavail/topics/g-enabling-high-availability-features.xml"
-                    format="dita" scope="peer">Enabling High Availability and Data Consistency
-                    Features</xref> in the <cite>Greenplum Database Admininstartor Guide</cite>.</p>
-            <note>Before you can start a Greenplum Database system, you must have initialized the
-                system using <codeph>gpinitsystem</codeph>. Enabling or disabing heap checksums is
-                set when you initialize the system and cannot be changed after initialization.</note>
+                    format="dita" scope="peer">启用高可用和数据一致性特性</xref>部分。</p>
+            <note>在启动Greenplum数据库系统之前，用户必须首先使用<codeph>gpinitsystem</codeph>初始化系统。
+                堆表checksum特性在系统初始化时配置启用和禁用，系统初始化后不能修改。</note>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
                     <pt>-a</pt>
-                    <pd>Do not prompt the user for confirmation.</pd>
+                    <pd>不要提示用户确认。</pd>
                 </plentry>
                 <plentry>
                     <pt>-B <varname>parallel_processes</varname></pt>
-                    <pd>The number of segments to start in parallel. If not specified, the utility
-                        will start up to 64 parallel processes depending on how many segment
-                        instances it needs to start.</pd>
+                    <pd>并行启动的Segment数。如果未指定，则该工具将启动最多64个并行进程，具体取决于需要启动
+                        多少个Segment实例。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-d <varname>master_data_directory</varname></pt>
-                    <pd>Optional. The master host data directory. If not specified, the value set
-                        for <codeph>$MASTER_DATA_DIRECTORY</codeph> will be used.</pd>
+                    <pd>可选。Master主机的数据目录。如果未指定，则使用为<codeph>$MASTER_DATA_DIRECTORY</codeph>
+                        设置的值。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-l <varname>logfile_directory</varname></pt>
-                    <pd>The directory to write the log file. Defaults to
-                            <codeph>~/gpAdminLogs</codeph>.</pd>
+                    <pd>写入日志文件的目录。默认为<codeph>~/gpAdminLogs</codeph>。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-m</pt>
-                    <pd>Optional. Starts the master instance only, which may be useful for
-                        maintenance tasks. This mode only allows connections to the master in
-                        utility mode. For example:</pd>
+                    <pd>可选。仅启动Master实例，这可能对维护任务有用。该模式只允许连接到utility
+                        模式下的Master。例如：</pd>
                     <pd>
                         <codeblock>PGOPTIONS='-c gp_session_role=utility' psql</codeblock>
                     </pd>
-                    <pd>The consistency of the heap checksum setting on master and segment instances
-                        is not checked.</pd>
+                    <pd>此模式下不检查Master和Segment实例的堆表checksum设置一致性。</pd>
                 </plentry>
                 <plentry>
                     <pt>-q</pt>
-                    <pd>Run in quiet mode. Command output is not displayed on the screen, but is
-                        still written to the log file.</pd>
+                    <pd>以静默模式运行。命令输出不显示在屏幕上，但仍然写入日志文件。</pd>
                 </plentry>
                 <plentry>
                     <pt>-R</pt>
-                    <pd>Starts Greenplum Database in restricted mode (only database superusers are
-                        allowed to connect).</pd>
+                    <pd>以受限模式启动Greenplum数据库（只允许数据库超级用户连接）。</pd>
                 </plentry>
                 <plentry>
                     <pt>--skip-heap-checksum-validation</pt>
-                    <pd>During startup, the utility does not validate the consistency of the heap
-                        checksum setting among the Greenplum Database master and segment instances.
-                        The default is to ensure that the heap checksum setting is the same on all
-                        instances, either enabled or disabled. <note type="warning">Starting
-                            Greenplum Database without this validation could lead to data loss. Use
-                            this option to start Greenplum Database only when it is necessary to
-                            ignore the heap checksum verification errors to recover data or to
-                            troubleshoot the errors.</note></pd>
+                    <pd>启动时指定该选项，该工具不检查Master和Segment之间的堆表checksum一致性。
+                        默认情况下该设置在所有实例上是一样的，或者启用或者禁用。
+                        <note type="warning">不进行该项验证启动Greenplum数据库会导致数据丢失。
+                            只有在必须要忽略堆表checksum验证错误以恢复数据或进行错误调试时，才能
+                            使用该选项。
+                        </note></pd>
                 </plentry>
                 <plentry>
                     <pt>-t <varname>timeout_seconds</varname></pt>
-                    <pd>Specifies a timeout in seconds to wait for a segment instance to start up.
-                        If a segment instance was shutdown abnormally (due to power failure or
-                        killing its <codeph>postgres</codeph> database listener process, for
-                        example), it may take longer to start up due to the database recovery and
-                        validation process. If not specified, the default timeout is 60
-                        seconds.</pd>
+                    <pd>指定等待Segment实例启动的超时时间（秒）。如果某个Segment实例异常关闭
+                        （例如由于电源故障或终止其<codeph>postgres</codeph>数据库监听器进程），
+                        由于数据库恢复和验证过程，启动可能需要较长的时间。如果未指定，则默认超时
+                        时间为60秒。</pd>
                 </plentry>
                 <plentry>
                     <pt>-v</pt>
-                    <pd>Displays detailed status, progress and error messages output by the
-                        utility.</pd>
+                    <pd>显示工具输出的详细状态，进度和错误消息。</pd>
                 </plentry>
                 <plentry>
                     <pt>-y</pt>
-                    <pd>Optional. Do not start the standby master host. The default is to start the
-                        standby master host and synchronization process.</pd>
+                    <pd>可选。不启动后备Master主机。默认是启动后备Master主机和同步过程。</pd>
                 </plentry>
                 <plentry>
                     <pt>-? | -h | --help</pt>
-                    <pd>Displays the online help.</pd>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
                 <plentry>
                     <pt>--version</pt>
-                    <pd>Displays the version of this utility.</pd>
+                    <pd>显示工具的版本。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>Start a Greenplum Database system:</p>
+            <title>示例</title>
+            <p>启动Greenplum数据库系统：</p>
             <codeblock>gpstart</codeblock>
-            <p>Start a Greenplum Database system in restricted mode (only allow superuser
-                connections):</p>
+            <p>以受限模式启动Greenplum数据库系统（仅允许超级用户连接）：</p>
             <codeblock>gpstart -R</codeblock>
-            <p>Start the Greenplum master instance only and connect in utility mode:</p>
+            <p>仅启动Greenplum主实例并以utility模式连接：</p>
             <codeblock>gpstart -m PGOPTIONS='-c gp_session_role=utility' psql</codeblock>
         </section>
         <section id="section6">
-            <title>See Also</title>
-            <p><codeph><xref href="gpstop.xml#topic1">gpstop</xref></codeph>, <codeph><xref
-                        href="gpinitsystem.xml#topic1"/></codeph></p>
+            <title>另见</title>
+            <p><codeph><xref href="gpstop.xml#topic1">gpstop</xref></codeph>、<codeph><xref
+                href="gpinitsystem.xml#topic1"/></codeph></p>
         </section>
     </body>
 </topic>

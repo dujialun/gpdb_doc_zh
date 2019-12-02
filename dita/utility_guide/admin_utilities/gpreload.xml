@@ -4,90 +4,90 @@
 <topic id="topic1">
   <title id="pj138418">gpreload</title>
   <body>
-    <p>Reloads Greenplum Database table data sorting the data based on specified columns. </p>
+    <p>重新装载Greenplum数据库表数据，根据指定的列对数据进行排序。</p>
     <section id="section2"
-      ><title>Synopsis</title><codeblock><b>gpreload</b> <b>-d</b> <varname>database</varname> [<b>-p</b> <varname>port</varname>] {<b>-t</b> | <b>--table-file</b>} <varname>path_to_file</varname> [<b>-a</b>]
-
-<b>gpreload</b> <b>-h</b> 
-
-<b>gpreload</b> <b>--version</b></codeblock></section>
-    <section id="section3"><title>Description</title><p>The <codeph>gpreload</codeph> utility reloads table data with column data sorted. For tables that
-        were created with the table storage option <codeph>appendoptimized=TRUE</codeph> and compression
-        enabled, reloading the data with sorted data can improve table compression. You specify a
-        list of tables to be reloaded and the table columns to be sorted in a text file. </p><p>Compression is improved by sorting data
-        when the data in the column has a relatively low number of distinct values when compared to
-        the total number of rows.</p><p>For a table being reloaded, the order of the columns to be sorted might affect compression. The
-        columns with the fewest distinct values should be listed first. For example, listing state
-        then city would generally result in better compression than listing city then state. </p><codeblock>public.cust_table: state, city
-public.cust_table: city, state</codeblock><p>For
-        information about the format of the file used with <codeph>gpreload</codeph>, see the
-          <codeph>--table-file</codeph> option.</p></section>
-    <section id="section4"><title>Notes</title><p>To improve reload performance, indexes on tables
-        being reloaded should be removed before reloading the data. </p><p>Running the
-          <codeph>ANALYZE</codeph> command after reloading table data might query performance
-        because of a change in the data distribution of the reloaded data. </p>
-      <p>For each table, the utility copies table data to a temporary table, truncates the existing
-        table data, and inserts data from the temporary table to the table in the specified sort
-        order. Each table reload is performed in a single transaction.</p>
-      <p>For a partitioned table, you can reload the data of a leaf child partition. However, data
-        is inserted from the root partition table, which acquires a <codeph>ROW EXCLUSIVE</codeph>
-        lock on the entire table.</p></section>
-    <section id="section5"><title>Options</title><parml>
-        <plentry>
-          <pt>-a (do not prompt)</pt>
-          <pd>Optional. If specified, the <codeph>gpreload</codeph> utility does not prompt the user
-            for confirmation. </pd>
-        </plentry>
-        <plentry>
-          <pt>-d <varname>database</varname></pt>
-          <pd>The database that contains the tables to be reloaded. The <codeph>gpreload</codeph>
-            utility connects to the database as the user running the utility. </pd>
-        </plentry>
-        <plentry>
-          <pt>-p <varname>port</varname></pt>
-          <pd>The Greenplum Database master port. If not specified, the value of the
-              <codeph>PGPORT</codeph> environment variable is used. If the value is not available,
-            an error is returned. </pd>
-        </plentry>
-        <plentry>
-          <pt>{-t | --table-file } <varname>path_to_file</varname></pt>
-          <pd>The location and name of file containing list of schema qualified table names to
-            reload and the column names to reorder from the Greenplum Database. Only user defined
-            tables are supported. Views or system catalog tables are not supported.</pd>
-          <pd>If indexes are defined on table listed in the file, <codeph>gpreload</codeph> prompts
-            to continue.</pd>
-          <pd>Each line specifies a table name and the list of columns to sort. This is the format
-            of each line in the file:</pd>
-          <pd><codeblock>schema.table_name: column [desc] [, column2 [desc] ... ]</codeblock></pd>
-          <pd>The table name is followed by a colon ( : ) and then at least one column name. If you
-            specify more than one column, separate the column names with a comma. The columns are
-            sorted in ascending order. Specify the keyword <codeph>desc</codeph> after the column
-            name to sort the column in descending order. </pd>
-          <pd>Wildcard characters are not supported.</pd>
-          <pd>If there are errors in the file, <codeph>gpreload</codeph> reports the first error and
-            exits. No data is reloaded. </pd>
-          <pd>The following example reloads three
-            tables:<codeblock>public.clients: region, state, rep_id desc
-public.merchants: region, state
-test.lineitem: group, assy, whse </codeblock></pd>
-          <pd>In the first table <codeph>public.clients</codeph>, the data in the
-              <codeph>rep_id</codeph> column is sorted in descending order. The data in the other
-            columns are sorted in ascending order. </pd>
-        </plentry>
-        <plentry>
-          <pt>--version (show utility version)</pt>
-          <pd>Displays the version of this utility.</pd>
-        </plentry>
-        <plentry>
-          <pt>-? (help)</pt>
-          <pd>Displays the online help.</pd>
-        </plentry>
-      </parml></section>
-    <section id="section6"><title>Example</title><p>This example command reloads the tables in the
-        database <codeph>mytest</codeph> that are listed in the file
-          <codeph>data-tables.txt</codeph>.
+      ><title>概要</title><codeblock><b>gpreload</b> <b>-d</b> <varname>database</varname> [<b>-p</b> <varname>port</varname>] {<b>-t</b> | <b>--table-file</b>} <varname>path_to_file</varname> [<b>-a</b>]
+        
+        <b>gpreload</b> <b>-h</b> 
+        
+        <b>gpreload</b> <b>--version</b></codeblock></section>
+    <section id="section3">
+      <title>描述</title>
+      <p><codeph>gpreload</codeph>工具重新装载列数据被排序过的表数据。对于使用表存储选项
+        <codeph>appendoptimized=TRUE</codeph>并启用压缩创建的表，使用排序数据重新装载数据
+        可以改善表压缩。用户在一个文本文件中指定要重新装载的表要排序的表列列表。
+      </p>
+      <p>当列中的数据的不同值与行总数相比来说相对较小时，压缩可以通过对数据进行排序来改进。
+      </p>
+      <p>对于正在重新装载的表，要排序的列顺序可能会影响压缩。具有最少不同值的列应该首先列出。
+        例如，列出州和城市一般会获得比列出城市和州更好的压缩。</p>
+      <codeblock>public.cust_table: state, city
+        public.cust_table: city, state</codeblock>
+      <p>有关<codeph>gpreload</codeph>使用的文件格式的信息，请参阅<codeph>--table-file</codeph>选项。</p>
+    </section>
+    <section id="section4">
+      <title>注解</title>
+      <p>为了提高重载性能，在重载数据之前，应该删除正在重载的表上的索引。</p>
+      <p>重新装载表数据后运行<codeph>ANALYZE</codeph>命令可能会因为重新装载
+        数据的数据分布发生更改而查询性能。</p>
+      <p>对所有的表，该工具都会将数据复制到临时表，然后将实际表清空，再从临时表按照指定顺序插入到实际表。
+        每个表的重载操作都在一个单一的事务中处理。</p>
+      <p>对于分区表来说，可以单独重载子分区的数据。但是无论如何，数据都会从根分区表插入，这会在整个表上产生
+        <codeph>ROW EXCLUSIVE</codeph>锁。
+      </p></section>
+    <section id="section5"><title>选项</title><parml>
+      <plentry>
+        <pt>-a（不提示）</pt>
+        <pd>可选。如果指定，则<codeph>gpreload</codeph>工具不会提示用户进行确认。</pd>
+      </plentry>
+      <plentry>
+        <pt>-d <varname>database</varname></pt>
+        <pd>包含要重新装载的表的数据库。<codeph>gpreload</codeph>工具以运行该工具的用户的身份连接到数据库。
+        </pd>
+      </plentry>
+      <plentry>
+        <pt>-p <varname>port</varname></pt>
+        <pd>Greenplum数据库的Master端口。如果未指定，则使用<codeph>PGPORT</codeph>环境变量的值。
+          如果该值不可用，则返回错误。</pd>
+      </plentry>
+      <plentry>
+        <pt>{-t | --table-file } <varname>path_to_file</varname></pt>
+        <pd>包含要重新装载的方案限定的表名列表的文件位置和名称，该文件中还有要从Greenplum数据库重新排序的列名。
+          仅支持用户定义的表。视图或系统目录表不受支持。
+        </pd>
+        <pd>如果在文件中列出的表上定义有索引，<codeph>gpreload</codeph>会提示继续。
+        </pd>
+        <pd>每一行都指定一个表名和要排序的列的列表。这是文件中每一行的格式：</pd>
+        <pd><codeblock>schema.table_name: column [desc] [, column2 [desc] ... ]</codeblock></pd>
+        <pd>表名后跟一个冒号（:），然后至少一个列名。如果指定多个列，请使用逗号分隔列名称。列按升序排序。
+          在列名后面指定关键字<codeph>desc</codeph>以降序对列进行排序。</pd>
+        <pd>通配符不受支持。</pd>
+        <pd>如果文件中有错误，<codeph>gpreload</codeph>会报告第一个错误并退出。
+        </pd>
+        <pd>以下例子展示了重载三个表：
+          <codeblock>public.clients: region, state, rep_id desc
+            public.merchants: region, state
+            test.lineitem: group, assy, whse </codeblock></pd>
+        <pd>在第一个表<codeph>public.clients</codeph>中，<codeph>rep_id</codeph>列中的数据
+          被按照降序排序。其他列中的数据被按照升序排序。
+        </pd>
+      </plentry>
+      <plentry>
+        <pt>--version（显示工具版本）</pt>
+        <pd>列出工具版本。</pd>
+      </plentry>
+      <plentry>
+        <pt>-?（帮助）</pt>
+        <pd>提供在线帮助。</pd>
+      </plentry>
+    </parml></section>
+    <section id="section6">
+      <title>示例</title>
+      <p>此示例命令将重新装载文件<codeph>data-tables.txt</codeph>中列出的数据库
+        <codeph>mytest</codeph>中的表。
       </p><codeblock>gpreload -d mytest --table-file data-tables.txt</codeblock></section>
-    <section id="section7"><title>See Also</title><p><codeph>CREATE TABLE</codeph> in the
-          <i>Greenplum Database Reference Guide</i></p></section>
+    <section id="section7">
+      <title>另见</title><p>
+        <i>Greenplum数据库参考指南</i>中的<codeph>CREATE TABLE</codeph>。</p></section>
   </body>
 </topic>

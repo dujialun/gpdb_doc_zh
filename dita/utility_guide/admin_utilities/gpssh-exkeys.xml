@@ -5,146 +5,127 @@
     <!--install_guide/refs/gpssh-exkeys.xml has a conref to this topic. -->
     <title id="jw137116">gpssh-exkeys</title>
     <body>
-        <p>Exchanges SSH public keys between hosts.</p>
+        <p>在主机之间交换SSH公钥。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpssh-exkeys</b> <b>-f</b> <varname>hostfile_exkeys</varname> | <b>- h</b> <varname>hostname</varname> [<b>-h</b> <varname>hostname</varname> ...]
-
-<b>gpssh-exkeys</b> <b>-e</b> <varname>hostfile_exkeys</varname> <b>-x</b> <varname>hostfile_gpexpand</varname>
-
-<b>gpssh-exkeys</b> <b>-?</b> 
-
-<b>gpssh-exkeys</b> <b>--version</b></codeblock>
+                
+                <b>gpssh-exkeys</b> <b>-e</b> <varname>hostfile_exkeys</varname> <b>-x</b> <varname>hostfile_gpexpand</varname>
+                
+                <b>gpssh-exkeys</b> <b>-?</b> 
+                
+                <b>gpssh-exkeys</b> <b>--version</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpssh-exkeys</codeph> utility exchanges SSH keys between the specified
-                host names (or host addresses). This allows SSH connections between Greenplum hosts
-                and network interfaces without a password prompt. The utility is used to initially
-                prepare a Greenplum Database system for password-free SSH access, and also to add
-                additional ssh keys when expanding a Greenplum Database system. </p>
-            <p>To specify the hosts involved in an initial SSH key exchange, use the
-                    <codeph>-f</codeph> option to specify a file containing a list of host names
-                (recommended), or use the <codeph>-h</codeph> option to name single host names on
-                the command-line. At least one host name (<codeph>-h</codeph>) or a host file is
-                required. Note that the local host is included in the key exchange by default.</p>
-            <p>To specify new expansion hosts to be added to an existing Greenplum Database system,
-                use the <codeph>-e</codeph> and <codeph>-x</codeph> options. The <codeph>-e</codeph>
-                option specifies a file containing a list of existing hosts in the system that
-                already have SSH keys. The <codeph>-x</codeph> option specifies a file containing a
-                list of new hosts that need to participate in the SSH key exchange. </p>
-            <p>Keys are exchanged as the currently logged in user. You should perform
-                the key exchange process twice: once as <codeph>root</codeph> and once as the
-                    <codeph>gpadmin</codeph> user (the user designated to own your Greenplum
-                Database installation). The Greenplum Database management utilities require that the
-                same non-root user be created on all hosts in the Greenplum Database system, and the
-                utilities must be able to connect as that user to all hosts without a password
-                prompt.</p>
-            <p>The <codeph>gpssh-exkeys</codeph> utility performs key exchange using the following
-                steps:</p>
+            <title>描述</title>
+            <p><codeph>gpssh-exkeys</codeph>工具在指定的主机名（或主机地址）之间交换SSH密钥。这允许
+                Greenplum主机和网络接口之间的SSH连接，而不需要口令提示。该工具用于最初将Greenplum数据库
+                系统准备好用于无口令的SSH访问，以及在扩展Greenplum数据库系统时添加额外的ssh密钥。
+            </p>
+            <p>要指定参与初始SSH密钥交换的主机，请使用<codeph>-f</codeph>选项指定包含主机名列表的文件
+                （推荐），或使用<codeph>-h</codeph>选项在命令行上指出单个主机名。至少需要一个主机名
+                （<codeph>-h</codeph>）或主机文件。请注意，本地主机默认包含在密钥交换中。</p>
+            <p>指定要添加到现有Greenplum数据库系统的新扩展主机，请使用<codeph>-e</codeph>和<codeph>-x</codeph>
+                选项。<codeph>-e</codeph>选项指定一个文件，其中包含系统中已有SSH密钥的现有主机列表。
+                <codeph>-x</codeph>选项指定一个文件，其中包含需要参与SSH密钥交换的新主机列表。
+            </p>
+            <p>密钥要作为当前登录的用户交换。用户应该执行两次密钥交换过程：一次作为<codeph>root</codeph>用户，
+                一次作为<codeph>gpadmin</codeph>用户（拥有Greenplum数据库安装的用户）。Greenplum数据库管理
+                要求在Greenplum数据库系统的所有主机上创建相同的非root用户，并且这些工具必须能够以该用户的身份
+                连接到所有主机而无需口令。
+            </p>
+            <p><codeph>gpssh-exkeys</codeph>工具使用以下步骤执行密钥交换：</p>
             <ul>
-                <li id="jw140375">Creates an RSA identification key pair for the current user if one
-                    does not already exist. The public key of this pair is added to the
-                        <codeph>authorized_keys</codeph> file of the current user.</li>
-                <li id="jw140376">Updates the <codeph>known_hosts</codeph> file of the current user
-                    with the host key of each host specified using the <codeph>-h</codeph>,
-                        <codeph>-f</codeph>, <codeph>-e</codeph>, and <codeph>-x</codeph>
-                    options.</li>
-                <li id="jw140377">Connects to each host using <codeph>ssh</codeph> and obtains the
-                        <codeph>authorized_keys</codeph>, <codeph>known_hosts</codeph>, and
-                        <codeph>id_rsa.pub</codeph> files to set up password-free access.</li>
-                <li id="jw140378">Adds keys from the <codeph>id_rsa.pub</codeph> files obtained from
-                    each host to the <codeph>authorized_keys</codeph> file of the current user.</li>
-                <li id="jw140379">Updates the <codeph>authorized_keys</codeph>,
-                        <codeph>known_hosts</codeph>, and <codeph>id_rsa.pub</codeph> files on all
-                    hosts with new host information (if any).</li>
+                <li id="jw140375">为当前用户创建一个RSA标识密钥对（如果尚不存在）。该密钥对中的
+                    公钥被添加到当前用户的<codeph>authorized_keys</codeph>文件中。</li>
+                <li id="jw140376">使用<codeph>-h</codeph>、<codeph>-f</codeph>、<codeph>-e</codeph>
+                    以及<codeph>-x</codeph>选项指定的每台主机的主机密钥更新当前用户的
+                    <codeph>known_hosts</codeph>文件。</li>
+                <li id="jw140377">使用<codeph>ssh</codeph>连接到每个主机，并获取<codeph>authorized_keys</codeph>、
+                    <codeph>known_hosts</codeph>和<codeph>id_rsa.pub</codeph>文件以设置无口令访问。</li>
+                <li id="jw140378">将从每个主机获取的<codeph>id_rsa.pub</codeph>文件中的密钥添加到当前用户
+                    的<codeph>authorized_keys</codeph>文件中。</li>
+                <li id="jw140379">使用新的主机信息（如果有）更新所有主机上的<codeph>authorized_keys</codeph>、
+                    <codeph>known_hosts</codeph>和<codeph>id_rsa.pub</codeph>文件。
+                </li>
             </ul>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
                     <pt>-e <varname>hostfile_exkeys</varname></pt>
-                    <pd>When doing a system expansion, this is the name and location of a file
-                        containing all configured host names and host addresses (interface names)
-                        for each host in your <varname>current</varname> Greenplum system (master,
-                        standby master and segments), one name per line without blank lines or extra
-                        spaces. Hosts specified in this file cannot be specified in the host file
-                        used with <codeph>-x</codeph>. </pd>
+                    <pd>进行系统扩展时，这个选项指定包含<varname>当前</varname>Greenplum系统中每台主机
+                        （Master、后备Master和Segment）的所有已配置主机名和主机地址（接口名称）的文件的
+                        名称和位置，每行一个名称，其中没有空行或额外的空格。这个文件中指定的主机不能出现在
+                        <codeph>-x</codeph>使用的主机文件中。</pd>
                 </plentry>
                 <plentry>
                     <pt>-f <varname>hostfile_exkeys</varname></pt>
-                    <pd>Specifies the name and location of a file containing all configured host
-                        names and host addresses (interface names) for each host in your Greenplum
-                        system (master, standby master and segments), one name per line without
-                        blank lines or extra spaces.</pd>
+                    <pd>指定包含Greenplum系统中每台主机（Master、后备Master和Segment）的所有已配置主机名
+                        和主机地址（接口名称）的文件的名称和位置，每行一个名称，其中没有空行或额外的空格。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-h <varname>hostname</varname></pt>
-                    <pd>Specifies a single host name (or host address) that will participate in the
-                        SSH key exchange. You can use the <codeph>-h</codeph> option multiple times
-                        to specify multiple host names and host addresses.</pd>
+                    <pd>指定将参与SSH密钥交换的单个主机名（或主机地址）。用户可以多次使用<codeph>-h</codeph>
+                        选项来指定多个主机名和主机地址。</pd>
                 </plentry>
                 <plentry>
                     <pt>--version</pt>
-                    <pd>Displays the version of this utility.</pd>
+                    <pd>显示此工具的版本。</pd>
                 </plentry>
                 <plentry>
                     <pt>-x <varname>hostfile_gpexpand</varname></pt>
-                    <pd>When doing a system expansion, this is the name and location of a file
-                        containing all configured host names and host addresses (interface names)
-                        for each <varname>new segment host</varname> you are adding to your
-                        Greenplum system, one name per line without blank lines or extra spaces.
-                        Hosts specified in this file cannot be specified in the host file used with
-                            <codeph>-e</codeph>.</pd>
+                    <pd>进行系统扩展时，这是一个文件的名称和位置，该文件包含要添加到Greenplum系统的
+                        每台<varname>新Segment主机</varname>的所有已配置主机名和主机地址（接口名称），
+                        每行一个名称，其中没有空行或额外的空格。这个文件中指定的主机不能出现在
+                        <codeph>-e</codeph>使用的主机文件中。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-? (help)</pt>
-                    <pd>Displays the online help.</pd>
+                    <pt>-?（帮助）</pt>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>Exchange SSH keys between all host names and addresses listed in the file
-                    <codeph>hostfile_exkeys</codeph>:</p>
+            <title>示例</title>
+            <p>在文件<codeph>hostfile_exkeys</codeph>中列出的所有主机名和地址之间交换SSH密钥：</p>
             <codeblock>$ gpssh-exkeys -f hostfile_exkeys</codeblock>
-            <p>Exchange SSH keys between the hosts <codeph>sdw1</codeph>, <codeph>sdw2</codeph>, and
-                    <codeph>sdw3</codeph>:</p>
+            <p>在主机<codeph>sdw1</codeph>、<codeph>sdw2</codeph>和<codeph>sdw3</codeph>
+                之间交换SSH密钥：</p>
             <codeblock>$ gpssh-exkeys -h sdw1 -h sdw2 -h sdw3</codeblock>
-            <p>Exchange SSH keys between existing hosts <codeph>sdw1</codeph>,
-                <codeph>sdw2</codeph>, and <codeph>sdw3</codeph>, and new hosts
-                    <codeph>sdw4</codeph> and <codeph>sdw5</codeph> as part of a system expansion
-                operation:</p>
+            <p>在现有主机<codeph>sdw1</codeph>、<codeph>sdw2</codeph>和<codeph>sdw3</codeph>，
+                新主机<codeph>sdw4</codeph>和<codeph>sdw5</codeph>作为系统扩展操作的一部分：</p>
             <codeblock>$ cat hostfile_exkeys
-mdw
-mdw-1
-mdw-2
-smdw
-smdw-1
-smdw-2
-sdw1
-sdw1-1
-sdw1-2
-sdw2
-sdw2-1
-sdw2-2
-sdw3
-sdw3-1
-sdw3-2
-$ cat hostfile_gpexpand
-sdw4
-sdw4-1
-sdw4-2
-sdw5
-sdw5-1
-sdw5-2
-$ gpssh-exkeys -e hostfile_exkeys -x hostfile_gpexpand</codeblock>
+                mdw
+                mdw-1
+                mdw-2
+                smdw
+                smdw-1
+                smdw-2
+                sdw1
+                sdw1-1
+                sdw1-2
+                sdw2
+                sdw2-1
+                sdw2-2
+                sdw3
+                sdw3-1
+                sdw3-2
+                $ cat hostfile_gpexpand
+                sdw4
+                sdw4-1
+                sdw4-2
+                sdw5
+                sdw5-1
+                sdw5-2
+                $ gpssh-exkeys -e hostfile_exkeys -x hostfile_gpexpand</codeblock>
         </section>
         <section id="section6">
-            <title>See Also</title>
-            <p><codeph><xref href="gpssh.xml#topic1">gpssh</xref></codeph>, <codeph><xref
-                        href="gpscp.xml#topic1">gpscp</xref></codeph></p>
+            <title>另见</title>
+            <p><codeph><xref href="gpssh.xml#topic1">gpssh</xref></codeph>、<codeph><xref
+                href="gpscp.xml#topic1">gpscp</xref></codeph></p>
         </section>
     </body>
 </topic>

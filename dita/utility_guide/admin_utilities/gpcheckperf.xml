@@ -5,225 +5,196 @@
     <!-- install_guide/refs/gpactivatestandby.xml has a conref to this topic. -->
     <title id="jq20941">gpcheckperf</title>
     <body>
-        <p>Verifies the baseline hardware performance of the specified hosts.</p>
+        <p>验证指定主机的基准硬件性能。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpcheckperf</b> <b>-d</b> <varname>test_directory</varname> [<b>-d</b> <varname>test_directory</varname> ...] 
-    {<b>-f</b> <varname>hostfile_gpcheckperf</varname> | <b>- h</b> <varname>hostname</varname> [<b>-h</b> <varname>hostname</varname> ...]} 
-    [<b>-r</b> ds] [<b>-B</b> <varname>block_size</varname>] [<b>-S</b> <varname>file_size</varname>] [<b>-D</b>] [<b>-v</b>|<b>-V</b>]
-
-<b>gpcheckperf</b> <b>-d</b> <varname>temp_directory</varname>
-    {<b>-f</b> <varname>hostfile_gpchecknet</varname> | <b>- h</b> <varname>hostname</varname> [<b>-h</b> <varname>hostname</varname> ...]} 
-    [ <b>-r</b> n|N|M [<b>--duration</b> <varname>time</varname>] [<b>--netperf</b>] ] [<b>-D</b>] [<b>-v</b> | <b>-V</b>]
-
-<b>gpcheckperf</b> <b>-?</b>
-
-<b>gpcheckperf</b> <b>--version</b></codeblock>
+                    {<b>-f</b> <varname>hostfile_gpcheckperf</varname> | <b>- h</b> <varname>hostname</varname> [<b>-h</b> <varname>hostname</varname> ...]} 
+                    [<b>-r</b> ds] [<b>-B</b> <varname>block_size</varname>] [<b>-S</b> <varname>file_size</varname>] [<b>-D</b>] [<b>-v</b>|<b>-V</b>]
+                
+                <b>gpcheckperf</b> <b>-d</b> <varname>temp_directory</varname>
+                    {<b>-f</b> <varname>hostfile_gpchecknet</varname> | <b>- h</b> <varname>hostname</varname> [<b>-h</b> <varname>hostname</varname> ...]} 
+                    [ <b>-r</b> n|N|M [<b>--duration</b> <varname>time</varname>] [<b>--netperf</b>] ] [<b>-D</b>] [<b>-v</b> | <b>-V</b>]
+                
+                <b>gpcheckperf</b> <b>-?</b>
+                
+                <b>gpcheckperf</b> <b>--version</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpcheckperf</codeph> utility starts a session on the specified hosts and
-                runs the following performance tests:</p>
+            <title>描述</title>
+            <p><codeph>gpcheckperf</codeph>工具在指定的主机上启动会话并运行以下性能测试：
+            </p>
             <ul>
-                <li id="jq141274"><b>Disk I/O Test (dd test)</b> — To test the sequential throughput
-                    performance of a logical disk or file system, the utility uses the <b>dd</b>
-                    command, which is a standard UNIX utility. It times how long it takes to write
-                    and read a large file to and from disk and calculates your disk I/O performance
-                    in megabytes (MB) per second. By default, the file size that is used for the
-                    test is calculated at two times the total random access memory (RAM) on the
-                    host. This ensures that the test is truly testing disk I/O and not using the
-                    memory cache.</li>
-                <li id="jq141275"><b>Memory Bandwidth Test (stream)</b> — To test memory bandwidth,
-                    the utility uses the STREAM benchmark program to measure sustainable memory
-                    bandwidth (in MB/s). This tests that your system is not limited in performance
-                    by the memory bandwidth of the system in relation to the computational
-                    performance of the CPU. In applications where the data set is large (as in
-                    Greenplum Database), low memory bandwidth is a major performance issue. If
-                    memory bandwidth is significantly lower than the theoretical bandwidth of the
-                    CPU, then it can cause the CPU to spend significant amounts of time waiting for
-                    data to arrive from system memory.</li>
-                <li id="jq141279"><b>Network Performance Test (gpnetbench*)</b> — To test network
-                    performance (and thereby the performance of the Greenplum Database
-                    interconnect), the utility runs a network benchmark program that transfers a 5
-                    second stream of data from the current host to each remote host included in the
-                    test. The data is transferred in parallel to each remote host and the minimum,
-                    maximum, average and median network transfer rates are reported in megabytes
-                    (MB) per second. If the summary transfer rate is slower than expected (less than
-                    100 MB/s), you can run the network test serially using the <codeph>-r n</codeph>
-                    option to obtain per-host results. To run a full-matrix bandwidth test, you can
-                    specify <codeph>-r M</codeph> which will cause every host to send and receive
-                    data from every other host specified. This test is best used to validate if the
-                    switch fabric can tolerate a full-matrix workload.</li>
+                <li id="jq141274"><b>磁盘I/O测试（dd测试）</b> — 要测试逻辑磁盘或文件系统的顺序吞吐性能，
+                    该工具使用<b>dd</b>命令，该命令是一个标准的UNIX工具。它记录花费多长时间在磁盘上读写一个
+                    大文件，并以兆字节（MB）每秒为单位计算磁盘I/O性能。默认情况下，用于测试的文件尺寸按照主机
+                    上的总随机访问内存（RAM）的两倍计算。这确保了测试是真正地测试磁盘I/O而不是使用内存缓存。
+                </li>
+                <li id="jq141275"><b>内存带宽测试（流）</b> — 为了测试内存带宽，该工具使用STREAM基准程序来
+                    测量可持续的内存带宽（以MB/s为单位）。这测试用户的系统在不涉及CPU计算性能情况下是否受系统
+                    内存带宽的限制。在数据集较大的应用程序中（如在Greenplum数据库中），低内存带宽是一个主要的
+                    性能问题。如果内存带宽明显低于CPU的理论带宽，则会导致CPU花费大量的时间等待数据从系统内存到达。</li>
+                <li id="jq141279"><b>网络性能测试（gpnetbench*）</b> — 为了测试网络性能（以及Greenplum
+                    数据库Interconnect的性能），该工具运行一种网络基准测试程序，该程序当前主机发送5秒钟的数据流
+                    到测试中包含的每台远程主机。数据被并行传输到每台远程主机，并以兆字节（MB）每秒报告最小、最大、
+                    平均和中位网络传输速率。如果汇总的传输速率比预期慢（小于100MB/s），则可以使用<codeph>-r n</codeph>
+                    选项串行地运行该网络测试以获取每台主机的结果。要运行全矩阵带宽测试，用户可以指定<codeph>-r M</codeph>，
+                    这将导致每台主机都发送和接收来自指定的每台其他主机的数据。该测试最适用于验证交换结构是否可以承受全矩阵负载。
+                </li>
             </ul>
-            <p>To specify the hosts to test, use the <codeph>-f</codeph> option to specify a file
-                containing a list of host names, or use the <codeph>-h</codeph> option to name
-                single host names on the command-line. If running the network performance test, all
-                entries in the host file must be for network interfaces within the same subnet. If
-                your segment hosts have multiple network interfaces configured on different subnets,
-                run the network test once for each subnet.</p>
-            <p>You must also specify at least one test directory (with <codeph>-d</codeph>). The
-                user who runs <codeph>gpcheckperf</codeph> must have write access to the specified
-                test directories on all remote hosts. For the disk I/O test, the test directories
-                should correspond to your segment data directories (primary and/or mirrors). For the
-                memory bandwidth and network tests, a temporary directory is required for the test
-                program files.</p>
-            <p>Before using <codeph>gpcheckperf</codeph>, you must have a trusted host setup between
-                the hosts involved in the performance test. You can use the utility
-                    <codeph>gpssh-exkeys</codeph> to update the known host files and exchange public
-                keys between hosts if you have not done so already. Note that
-                    <codeph>gpcheckperf</codeph> calls to <codeph>gpssh</codeph> and
-                    <codeph>gpscp</codeph>, so these Greenplum utilities must also be in your
-                    <codeph>$PATH</codeph>.</p>
+            <p>为了指定要测试的主机，请使用<codeph>-f</codeph>选项指定包含主机名列表的文件，或使用
+                <codeph>-h</codeph>选项在命令行上指名单个主机名。如果运行网络性能测试，主机文件中
+                的所有项必须是同一子网内的网络接口。如果用户的Segment主机具有在不同子网上配置的多个
+                网络接口，请为每个子网运行一次网络测试。
+            </p>
+            <p>用户还必须指定至少一个测试目录（使用<codeph>-d</codeph>）。运行<codeph>gpcheckperf</codeph>
+                的用户必须具有对所有远程主机上指定测试目录的写入权限。对于磁盘I/O测试，测试目录应与用户的
+                Segment数据目录（主Segment和/或镜像Segment）相对应。对于内存带宽和网络测试，测试程序文件
+                需要临时目录。
+            </p>
+            <p>在使用<codeph>gpcheckperf</codeph>之前，用户必须在涉及性能测试的主机之间建立可信的主机设置。
+                用户可以使用<codeph>gpssh-exkeys</codeph>工具更新已知主机文件并在主机之间交换公钥
+                （如果尚未这样做的话）。请注意，<codeph>gpcheckperf</codeph>调用<codeph>gpssh</codeph>
+                和<codeph>gpscp</codeph>，这些Greenplum工具也必须在<codeph>$PATH</codeph>中。</p>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
                     <pt>-B <varname>block_size</varname></pt>
-                    <pd>Specifies the block size (in KB or MB) to use for disk I/O test. The default
-                        is 32KB, which is the same as the Greenplum Database page size. The maximum
-                        block size is 1 MB.</pd>
+                    <pd>指定用于磁盘I/O测试的块大小（以KB或MB为单位）。缺省值是32KB，与Greenplum数据库页面大小相同。
+                        最大块大小是1 MB。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-d <varname>test_directory</varname></pt>
-                    <pd>For the disk I/O test, specifies the file system directory locations to
-                        test. You must have write access to the test directory on all hosts involved
-                        in the performance test. You can use the <codeph>-d</codeph> option multiple
-                        times to specify multiple test directories (for example, to test disk I/O of
-                        your primary and mirror data directories).</pd>
+                    <pd>对于磁盘I/O测试，指定要测试的文件系统目录位置。用户必须具有对性能测试中涉及的所有主机上
+                        测试目录的写入权限。用户可以多次使用<codeph>-d</codeph>选项指定多个测试目录
+                        （例如，测试主数据目录和镜像数据目录的磁盘I/O）。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-d <varname>temp_directory</varname></pt>
-                    <pd>For the network and stream tests, specifies a single directory where the
-                        test program files will be copied for the duration of the test. You must
-                        have write access to this directory on all hosts involved in the test.</pd>
+                    <pd>对于网络和流测试，指定单个目录，测试程序文件在测试期间将被复制到该目录。用户必须具有
+                        对测试中涉及的所有主机上该目录的写入权限。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-D (display per-host results)</pt>
-                    <pd>Reports performance results for each host for the disk I/O tests. The
-                        default is to report results for just the hosts with the minimum and maximum
-                        performance, as well as the total and average performance of all hosts.</pd>
+                    <pt>-D（显示每台主机的结果）</pt>
+                    <pd>报告每个主机的磁盘I/O测试的性能结果。缺省情况下，仅报告具有最低和最高性能的主机的结果，
+                        以及所有主机的总体和平均性能。</pd>
                 </plentry>
                 <plentry>
                     <pt>--duration <varname>time</varname></pt>
-                    <pd>Specifies the duration of the network test in seconds (s), minutes (m),
-                        hours (h), or days (d). The default is 15 seconds.</pd>
+                    <pd>以秒（s）、分钟（m）、小时（h）或天数（d）指定网络测试的持续时间。默认值是15秒。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-f <varname>hostfile_gpcheckperf</varname></pt>
-                    <pd>For the disk I/O and stream tests, specifies the name of a file that
-                        contains one host name per host that will participate in the performance
-                        test. The host name is required, and you can optionally specify an alternate
-                        user name and/or SSH port number per host. The syntax of the host file is
-                        one host per line as follows:</pd>
+                    <pd>对于磁盘I/O和流测试，请指定一个包含将参与性能测试的主机名的文件名称。主机名是必需的，
+                        用户可以选择指定每个主机的后补用户名和/或SSH端口号。主机文件的语法是每行一台主机，
+                        如下所示：
+                    </pd>
                     <pd>
                         <codeblock>[<varname>username</varname>@]<varname>hostname</varname>[:<varname>ssh_port</varname>]</codeblock>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>-f <varname>hostfile_gpchecknet</varname></pt>
-                    <pd>For the network performance test, all entries in the host file must be for
-                        host addresses within the same subnet. If your segment hosts have multiple
-                        network interfaces configured on different subnets, run the network test
-                        once for each subnet. For example (a host file containing segment host
-                        address names for interconnect subnet 1):</pd>
+                    <pd>对于网络性能测试，主机文件中的所有项都必须是同一子网内的主机地址。如果用户的Segment
+                        主机在不同子网上配置有多个网络接口，请为每个子网运行一次网络测试。例如（包含互连子网1
+                        的Segment主机地址名的主机文件）：
+                    </pd>
                     <pd>
                         <codeblock>sdw1-1
-sdw2-1
-sdw3-1</codeblock>
+                            sdw2-1
+                            sdw3-1</codeblock>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>-h <varname>hostname</varname></pt>
-                    <pd>Specifies a single host name (or host address) that will participate in the
-                        performance test. You can use the <codeph>-h</codeph> option multiple times
-                        to specify multiple host names.</pd>
+                    <pd>指定将参与性能测试的单个主机名（或主机地址）。用户可以多次使用<codeph>-h</codeph>
+                        选项来指定多个主机名。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>--netperf</pt>
-                    <pd>Specifies that the <codeph>netperf</codeph> binary should be used to perform
-                        the network test instead of the Greenplum network test. To use this option,
-                        you must download <codeph>netperf</codeph> from <xref
-                            href="http://www.netperf.org" format="html" scope="external"/> and
-                        install it into <codeph>$GPHOME/bin/lib</codeph> on all Greenplum hosts
-                        (master and segments).</pd>
+                    <pd>指定应该用<codeph>netperf</codeph>二进制文件来执行网络测试，而不是Greenplum网络测试。
+                        要使用此选项，用户必须从<xref
+                            href="http://www.netperf.org" format="html" scope="external"/>下载
+                        <codeph>netperf</codeph>并且安装到所有Greenplum主机（Master和Segment）的
+                        <codeph>$GPHOME/bin/lib</codeph>目录中。</pd>
                 </plentry>
                 <plentry>
                     <pt>-r ds{n|N|M}</pt>
-                    <pd>Specifies which performance tests to run. The default is
-                            <codeph>dsn</codeph>:<ul id="ul_jjn_vvt_mo">
-                            <li id="jq141318">Disk I/O test (<codeph>d</codeph>)</li>
-                            <li id="jq141319">Stream test (<codeph>s</codeph>)</li>
-                            <li id="jq141320">Network performance test in sequential
-                                    (<codeph>n</codeph>), parallel (<codeph>N</codeph>), or
-                                full-matrix (<codeph>M</codeph>) mode. The optional
-                                    <codeph>--duration</codeph> option specifies how long (in
-                                seconds) to run the network test. To use the parallel
-                                    (<codeph>N</codeph>) mode, you must run the test on an
-                                    <varname>even</varname> number of hosts.<p>If you would rather
-                                    use <codeph>netperf</codeph> (<xref
-                                        href="http://www.netperf.org" format="html" scope="external"
-                                    />) instead of the Greenplum network test, you can download it
-                                    and install it into <codeph>$GPHOME/bin/lib</codeph> on all
-                                    Greenplum hosts (master and segments). You would then specify
-                                    the optional <codeph>--netperf</codeph> option to use the
-                                        <codeph>netperf</codeph> binary instead of the default
-                                        <codeph>gpnetbench*</codeph> utilities.</p></li>
+                    <pd>指定要运行的性能测试，默认是<codeph>dsn</codeph>：
+                        <ul id="ul_jjn_vvt_mo">
+                            <li id="jq141318">磁盘I/O测试（<codeph>d</codeph>）</li>
+                            <li id="jq141319">流测试（<codeph>s</codeph>）</li>
+                            <li id="jq141320">网络性能测试，串行（<codeph>n</codeph>）、
+                                并行（<codeph>N</codeph>）或全矩阵（<codeph>M</codeph>）模式。
+                                可选的<codeph>--duration</codeph>选项指定了运行网络测试的时间
+                                （以秒为单位）。要使用并行（<codeph>N</codeph>）模式，用户必须在
+                                <varname>偶数</varname>台主机上运行测试。
+                                <p>如果用户宁愿使用netperf<codeph>netperf</codeph>（<xref
+                                    href="http://www.netperf.org" format="html" scope="external"
+                                />）而不是Greenplum网络测试，用户必须下载它并安装到所有Greenplum主机
+                                    （Master和Segment）的<codeph>$GPHOME/bin/lib</codeph>目录中。
+                                    然后，用户可以指定可选的<codeph>--netperf</codeph>选项来使用
+                                    <codeph>netperf</codeph>二进制文件而不是默认的<codeph>gpnetbench*</codeph>工具。
+                                </p></li>
                         </ul></pd>
                 </plentry>
                 <plentry>
                     <pt>-S <varname>file_size</varname></pt>
-                    <pd>Specifies the total file size to be used for the disk I/O test for all
-                        directories specified with <codeph>-d</codeph>. <varname>file_size</varname>
-                        should equal two times total RAM on the host. If not specified, the default
-                        is calculated at two times the total RAM on the host where
-                            <codeph>gpcheckperf</codeph> is executed. This ensures that the test is
-                        truly testing disk I/O and not using the memory cache. You can specify
-                        sizing in KB, MB, or GB.</pd>
+                    <pd>指定用于<codeph>-d</codeph>所指定的所有目录的磁盘I/O测试的总文件尺寸。
+                        <varname>file_size</varname>应该等于主机上总RAM的两倍。如果未指定，则默认值是
+                        在执行<codeph>gpcheckperf</codeph>的主机上的总RAM的两倍，这确保了测试是真正地
+                        测试磁盘I/O而不是使用内存缓存。用户可以以KB、MB或GB为单位指定尺寸。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt>-v (verbose) | -V (very verbose)</pt>
-                    <pd>Verbose mode shows progress and status messages of the performance tests as
-                        they are run. Very verbose mode shows all output messages generated by this
-                        utility.</pd>
+                    <pt>-v（详细模式）| -V（非常详细模式）</pt>
+                    <pd>详细（Verbose）模式显示性能测试运行时的进度和状态信息。非常详细（Very Verbose）
+                        模式显示该工具生成的所有输出消息。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>--version</pt>
-                    <pd>Displays the version of this utility.</pd>
+                    <pd>显示该工具的版本。</pd>
                 </plentry>
                 <plentry>
-                    <pt>-? (help)</pt>
-                    <pd>Displays the online help.</pd>
+                    <pt>-?（帮助）</pt>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>Run the disk I/O and memory bandwidth tests on all the hosts in the file
-                    <varname>host_file</varname> using the test directory of
-                    <varname>/data1</varname> and <varname>/data2</varname>:</p>
+            <title>示例</title>
+            <p>使用<varname>/data1</varname>和<varname>/data2</varname>作为测试目录在文件
+                <varname>host_file</varname>中的所有主机上运行磁盘I/O和内存带宽测试：</p>
             <codeblock>$ gpcheckperf -f hostfile_gpcheckperf -d /data1 -d /data2 -r ds</codeblock>
-            <p>Run only the disk I/O test on the hosts named <varname>sdw1</varname> and
-                    <varname>sdw2 </varname>using the test directory of <varname>/data1</varname>.
-                Show individual host results and run in verbose mode:</p>
+            <p>在名为<varname>sdw1</varname>和<varname>sdw2 </varname>的主机上只使用测试目录
+                <varname>/data1</varname>运行磁盘I/O测试。显示单个主机结果并以详细模式运行：
+            </p>
             <codeblock>$ gpcheckperf -h sdw1 -h sdw2 -d /data1 -r d -D -v</codeblock>
-            <p>Run the parallel network test using the test directory of <varname>/tmp,</varname>
-                where <varname>hostfile_gpcheck_ic*</varname> specifies all network interface host
-                address names within the same interconnect subnet:</p>
+            <p>使用测试目录<varname>/tmp,</varname>运行并行网络测试，其中<varname>hostfile_gpcheck_ic*</varname>
+                指定同一Interconnect子网内的所有网络接口的主机地址名称：
+            </p>
             <codeblock>$ gpcheckperf -f hostfile_gpchecknet_ic1 -r N -d /tmp
-$ gpcheckperf -f hostfile_gpchecknet_ic2 -r N -d /tmp</codeblock>
-            <p>Run the same test as above, but use <codeph>netperf</codeph> instead of the Greenplum
-                network test (note that <codeph>netperf</codeph> must be installed in
-                    <codeph>$GPHOME/bin/lib</codeph> on all Greenplum hosts):</p>
+                $ gpcheckperf -f hostfile_gpchecknet_ic2 -r N -d /tmp</codeblock>
+            <p>运行与上面相同的测试，但使用<codeph>netperf</codeph>而不是Greenplum网络测试
+                （注意，<codeph>netperf</codeph>必须安装在所有Greenplum主机上的
+                <codeph>$GPHOME/bin/lib</codeph>中）：
+            </p>
             <codeblock>$ gpcheckperf -f hostfile_gpchecknet_ic1 -r N --netperf -d /tmp
-$ gpcheckperf -f hostfile_gpchecknet_ic2 -r N --netperf -d /tmp</codeblock>
+                $ gpcheckperf -f hostfile_gpchecknet_ic2 -r N --netperf -d /tmp</codeblock>
         </section>
         <section id="section6">
-            <title>See Also</title>
-            <p><codeph><xref href="./gpssh.xml#topic1" type="topic" format="dita"/></codeph>,
-                        <codeph><xref href="./gpscp.xml#topic1" type="topic" format="dita"
-                    /></codeph>, <codeph><xref href="gpcheck.xml#topic1" type="topic" format="dita"
-                    /></codeph></p>
+            <title>另见</title>
+            <p><codeph><xref href="./gpssh.xml#topic1" type="topic" format="dita"/></codeph>、
+                <codeph><xref href="./gpscp.xml#topic1" type="topic" format="dita"
+                /></codeph>、<codeph><xref href="gpcheck.xml#topic1" type="topic" format="dita"
+                /></codeph></p>
         </section>
     </body>
 </topic>

@@ -4,9 +4,9 @@
 <topic id="topic1">
   <title id="ot133181">gpmovemirrors</title>
   <body>
-    <p>Moves mirror segment instances to new locations.</p>
+    <p>移动镜像实例到新位置</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><b>gpmovemirrors</b> <b>-i</b> <varname>move_config_file</varname> [<b>-d</b> <varname>master_data_directory</varname>] 
           [<b>-l</b> <varname>logfile_directory</varname>] 
           [<b>-B</b> <varname>parallel_processes</varname>] [<b>-v</b>]
@@ -16,71 +16,67 @@
 <b>gpmovemirrors</b> <b>--version</b></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>The <codeph>gpmovemirrors</codeph> utility moves mirror segment instances to new locations.
-        You may want to move mirrors to new locations to optimize distribution or data storage.</p>
-      <p>Before moving segments, the utility verifies that they are mirrors, and that their
-        corresponding primary segments are up and are in synchronizing or resynchronizing mode.</p>
-      <p>By default, the utility will prompt you for the file system location(s) where it will move
-        the mirror segment data directories.</p>
-      <p>You must make sure that the user who runs <codeph>gpmovemirrors</codeph> (the
-          <codeph>gpadmin</codeph> user) has permissions to write to the data directory locations
-        specified. You may want to create these directories on the segment hosts and
-          <codeph>chown</codeph> them to the appropriate user before running
-          <codeph>gpmovemirrors</codeph>.</p>
+      <title>描述</title>
+      <p><codeph>gpmovemirrors</codeph>工具将镜像实例移动到新位置。客户可能会想移动镜像到新位置以优化分布
+        和数据存储</p>
+      <p>在移动Segment之前，该工具会验证Mirror是否存在，他们对应的主节点是否在线和目前同步状态在同步还是
+        异步模式。</p>
+      <p>默认情况下，工具会提示您输入所有镜像要移动到的文件系统路径。</p>
+      <p>客户必须保证运行<codeph>gpmovemirrors</codeph>的用户（<codeph>gpadmin</codeph>用户）
+        拥有该位置的访问权限。所以最好在运行<codeph>gpmovemirrors</codeph>工具之前在各个Segment主机
+        上创建好对应的路径，并使用<codeph>chown</codeph>命令付给指定用户相应的权限。
+        </p>
     </section>
     <section id="section4">
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
           <pt>-B <varname>parallel_processes</varname></pt>
-          <pd>The number of mirror segments to move in parallel. If not specified, the utility will
-            start up to 4 parallel processes depending on how many mirror segment instances it needs
-            to move.</pd>
+          <pd>要并行移动的镜像Segment数量。如果不指定，工具默认启动4个并行进程，具体数量与
+            要移动多少镜像实例数量有关。</pd>
         </plentry>
         <plentry>
           <pt>-d <varname>master_data_directory</varname></pt>
-          <pd>The master data directory. If not specified, the value set for
-              <codeph>$MASTER_DATA_DIRECTORY</codeph> will be used.</pd>
+          <pd>主机数据目录。如果不指定，默认使用<codeph>$MASTER_DATA_DIRECTORY</codeph>
+            的值。</pd>
         </plentry>
         <plentry>
           <pt>-i <varname>move_config_file</varname></pt>
-          <pd>A configuration file containing information about which mirror segments to move, and
-            where to move them. </pd>
-          <pd>You must have one mirror segment listed for each primary segment in the system. Each
-            line inside the configuration file has the following format (as per attributes in the
-              <codeph>gp_segment_configuration</codeph> catalog table):</pd>
+          <pd>包含哪些镜像要被移动，被移动到哪里等信息的配置文件。
+            </pd>
+          <pd>每一个主Segment必须有一个对应的镜像Segment列出。配置文件中的每行都用以下格式
+            （就像<codeph>gp_segment_configuration</codeph>元数据表中的信息一样）：</pd>
           <pd>
             <codeblock><varname>contentID</varname>:<varname>address</varname>:<varname>port</varname>:<varname>data_dir</varname> <varname>new_address</varname>:<varname>port</varname>:<varname>data_dir</varname></codeblock>
           </pd>
-          <pd>Where <varname>contentID</varname> is the segment instance content ID,
-              <varname>address</varname> is the host name or IP address of the segment host,
-              <varname>port</varname> is the communication port, and <codeph>data_dir</codeph> is
-            the segment instance data directory.</pd>
+          <pd><varname>contentID</varname>是Segment实例的content ID，
+            <varname>address</varname>是Segment主机的主机名或IP地址，
+            <varname>port</varname>是沟通端口，<codeph>data_dir</codeph>是Segment
+            实例的数据目录。</pd>
         </plentry>
         <plentry>
           <pt>-l <varname>logfile_directory</varname></pt>
-          <pd>The directory to write the log file. Defaults to <codeph>~/gpAdminLogs</codeph>.</pd>
+          <pd>日志写入路径。默认为<codeph>~/gpAdminLogs</codeph>。</pd>
         </plentry>
         <plentry>
-          <pt>-v (verbose)</pt>
-          <pd>Sets logging output to verbose.</pd>
+          <pt>-v（详细日志）</pt>
+          <pd>设置日志输出为详细级别。</pd>
         </plentry>
         <plentry>
-          <pt>--version (show utility version)</pt>
-          <pd>Displays the version of this utility.</pd>
+          <pt>--version（显示工具版本）</pt>
+          <pd>显示工具的版本信息。</pd>
         </plentry>
         <plentry>
-          <pt>-? (help)</pt>
-          <pd>Displays the online help.</pd>
+          <pt>-?（帮助）</pt>
+          <pd>显示在线帮助信息。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Examples</title>
-      <p>Moves mirrors from an existing Greenplum Database system to a different set of hosts:</p>
+      <title>示例</title>
+      <p>将Greenplum数据库系统移动到一个不同的主机集合：</p>
       <codeblock>$ gpmovemirrors -i move_config_file</codeblock>
-      <p>Where the <codeph>move_config_file</codeph> looks something like this:</p>
+      <p>此处<codeph>move_config_file</codeph>的配置信息如下：</p>
       <codeblock>1:sdw2:50001:/data2/mirror/gpseg1 sdw3:50001:/data/mirror/gpseg1
 2:sdw2:50001:/data2/mirror/gpseg2 sdw4:50001:/data/mirror/gpseg2
 3:sdw3:50001:/data2/mirror/gpseg3 sdw1:50001:/data/mirror/gpseg3

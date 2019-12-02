@@ -3,12 +3,11 @@
 <topic id="topic1">
   <title>gprestore</title>
   <body>
-    <p>Restore a Greenplum Database backup that was created using the <codeph>gpbackup</codeph>
-      utility. By default <codeph>gprestore</codeph> uses backed up metadata files and DDL files
-      located in the Greenplum Database master host data directory, with table data stored locally
-      on segment hosts in CSV data files.</p>
+    <p>恢复由<codeph>gpbackup</codeph>创建的Greenplum数据库备份。默认<codeph>gprestore</codeph>
+      使用位于Greenplum Master主机数据目录下的元数据文件和DDL文件，使用存储于Segment主机上的表数据CSV
+      文件。</p>
     <section>
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><b>gprestore --timestamp</b> <varname>YYYYMMDDHHMMSS</varname>
    [<b>--backup-dir</b> <varname>directory</varname>]
    [<b>--create-db</b>]
@@ -33,330 +32,266 @@
 <b>gprestore --help</b></codeblock>
     </section>
     <section>
-      <title>Description</title>
-      <p>To use <codeph>gprestore</codeph> to restore from a backup set, you must include the
-          <codeph>--timestamp</codeph> option to specify the exact timestamp value
-          (<codeph>YYYYMMDDHHMMSS</codeph>) of the backup set to restore. If you specified a custom
-          <codeph>--backup-dir</codeph> to consolidate the backup files, include the same
-          <codeph>--backup-dir</codeph> option with <codeph>gprestore</codeph> to locate the backup
-        files.</p>
-      <p>If the backup you specify is an incremental backup, you need a complete set of backup files
-        (a full backup and any required incremental backups). <codeph>gprestore</codeph> ensures
-        that the complete backup set is available before attempting to restore a backup.
-        <note type="important">For incremental backup sets, the backups must be on a single device.
-          For example, a backup set must all be on a Data Domain system. </note></p>
-      <p>For information about incremental backups, see <xref
-          href="../../admin_guide/managing/backup-gpbackup-incremental.xml"/>.</p>
-      <p>When restoring from a backup set, <codeph>gprestore</codeph> restores to a database with
-        the same name as the name specified when creating the backup set. If the target database
-        exists and a table being restored exists in the database, the restore operation fails.
-        Include the <codeph>--create-db</codeph> option if the target database does not exist in the
-        cluster. You can optionally restore a backup set to a different database by using the
-          <codeph>--redirect-db</codeph> option.</p>
-      <p>When restoring a backup set that contains data from some leaf partitions of a partitioned
-        tables, the partitioned table is restored along with the data for the leaf partitions. For
-        example, you create a backup with the <codeph>gpbackup</codeph> option
-          <codeph>--include-table-file</codeph> and the text file lists some leaf partitions of a
-        partitioned table. Restoring the backup creates the partitioned table and restores the data
-        only for the leaf partitions listed in the file. </p>
-      <p>Greenplum Database system objects are automatically included in a <codeph>gpbackup</codeph>
-        backup set, but these objects are only restored if you include the
-          <codeph>--with-globals</codeph> option to <codeph>gprestore</codeph>. Similarly, if you
-        backed up query plan statistics using the <codeph>--with-stats</codeph> option, you can
-        restore those statistics by providing <codeph>--with-stats</codeph> to
-          <codeph>gprestore</codeph>. By default, only database objects in the backup set are
-        restored.</p>
-      <p>Performance of restore operations can be improved by creating multiple parallel connections
-        to restore table data and metadata. By default <codeph>gprestore</codeph> uses 1 connection,
-        but you can increase this number with the <codeph>--jobs</codeph> option for large restore
-        operations.</p>
-      <p>When a restore operation completes, <codeph>gprestore</codeph> returns a status code. See
-          <xref href="#topic1/return_codes" format="dita"/>.</p>
-      <p><codeph>gprestore</codeph> can send status email notifications after a back up operation
-        completes. You specify when the utility sends the mail and the email recipients in a
-        configuration file. See <xref
+      <title>描述</title>
+      <p>使用<codeph>gprestore</codeph>从备份集恢复时，必须包含<codeph>--timestamp</codeph>选项来指定
+        确切一个来自备份集的恢复时间值（<codeph>YYYYMMDDHHMMSS</codeph>）。如果在备份时指定了<codeph>--backup-dir</codeph>，
+        那么<codeph>gprestore</codeph>同样要指定<codeph>--backup-dir</codeph>来获取备份文件。</p>
+      <p>如果指定的是增量备份，那么还需要一个完全备份的文件集合（一个全备和所有需要的增量备份）。
+        <codeph>gprestore</codeph>会在开始恢复之前验证备份集合是可用的。
+        <note type="important">对于增量备份集，备份必须在单独设备上。例如，备份集的所有文件必须全部在
+          Data Domain系统。</note></p>
+      <p>有关增量备份的详细信息，请见<xref
+          href="../../admin_guide/managing/backup-gpbackup-incremental.xml"/>。</p>
+      <p>当从备份集恢复时，<codeph>gprestore</codeph>会将数据恢复到创建备份时指定的数据库。
+        如果目标数据库存在，并且数据库中存在该表，恢复操作会失败。如果目标数据库不存在，可以通过指定
+        <codeph>--create-db</codeph>选项来创建数据库。也可以通过指定<codeph>--redirect-db</codeph>
+        选项来将数据恢复到不同的数据库。</p>
+      <p>当恢复分区表的子分区时，分区表和数据会一同被恢复。例如，使用<codeph>gpbackup</codeph>的
+        <codeph>--include-table-file</codeph>选项创建了一个备份。恢复数据时会恢复创建分区表并
+        只将数据恢复到列表文件中指定的分区。</p>
+      <p>Greenplum数据库系统对象会自动包含在<codeph>gpbackup</codeph>备份集中，但是只有在用
+        <codeph>gprestore</codeph>进行恢复时指定<codeph>--with-globals</codeph>选项才会
+        进行恢复。相似的情况还有，如果备份时使用<codeph>--with-stats</codeph>选项备份了查询计划
+        统计信息，那么在使用<codeph>gprestore</codeph>进行恢复时必须指定<codeph>--with-stats</codeph>
+        才能对这部分数据进行恢复。默认情况下，只有备份集中的数据库对象会被恢复。</p>
+      <p>恢复操作的性能可以通过提高创建多个并行连接的方式来同时恢复多个表和元数据。默认<codeph>gprestore</codeph>
+        使用1个连接，但是我们可以通过<codeph>--jobs</codeph>选项来为大的恢复过程增加处理进程数。
+      </p>
+      <p>当一个操作完成后，<codeph>gprestore</codeph>会返回一个状态码。详见
+          <xref href="#topic1/return_codes" format="dita"/>。</p>
+      <p><codeph>gprestore</codeph>在恢复操作完成后可以发送邮件通知。可以指定发送邮件和接收邮件的
+        配置文件。详见<xref
           href="../../admin_guide/managing/backup-gpbackup.xml#topic_qwd_d5d_tbb" format="dita"
-        />.</p>
+        />。</p>
     </section>
-    <note>This utility uses secure shell (SSH) connections between systems to perform its tasks. In
-      large Greenplum Database deployments, cloud deployments, or deployments with a large number of
-      segments per host, this utility may exceed the host's maximum threshold for unauthenticated
-      connections. Consider updating the SSH <codeph>MaxStartups</codeph> configuration parameter to
-      increase this threshold. For more information about SSH configuration options, refer to the
-      SSH documentation for your Linux distribution.</note>
+    <note>该工具在系统内部采用SSH连接执行各项操作任务。在大型Greenplum集群、云部署或每台主机部署了大量的
+      segment实例时，可能会遇到超过主机最大授权连接数限制的情况。此时需要考虑更新SSH配置参数<codeph>MaxStartups</codeph>
+      以提高该限制。更多关于SSH配置的选项，请参考您的Linux分发版的SSH文档。</note>
     <section>
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
           <pt><b>--timestamp</b>
             <varname>YYYYMMDDHHMMSS</varname></pt>
-          <pd>Required. Specifies the timestamp of the <codeph>gpbackup</codeph> backup set to
-            restore. By default <codeph>gprestore</codeph> tries to locate metadata files for the
-            timestamp on the Greenplum Database master host in the
-              <filepath>$MASTER_DATA_DIRECTORY/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath>
-            directory, and CSV data files in the
-              <filepath>&lt;seg_dir>/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath> directory of each
-            segment host.</pd>
+          <pd>必须。指定一个用来恢复<codeph>gpbackup</codeph>备份集的时间戳。默认<codeph>gprestore</codeph>
+            会尝试从Master主机的<filepath>$MASTER_DATA_DIRECTORY/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath>
+            路径下定位时间戳对应的元数据文件，从每个Segment主机的<filepath>&lt;seg_dir>/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath>
+            路径下定位CSV数据文件。</pd>
         </plentry>
         <plentry>
           <pt><b>--backup-dir</b>
             <varname>directory</varname></pt>
-          <pd>Optional. Sources all backup files (metadata files and data files) from the specified
-            directory. You must specify <varname>directory</varname> as an absolute path (not
-            relative). If you do not supply this option, <codeph>gprestore</codeph> tries to locate
-            metadata files for the timestamp on the Greenplum Database master host in the
-              <filepath>$MASTER_DATA_DIRECTORY/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath>
-            directory. CSV data files must be available on each segment in the
-              <filepath>&lt;seg_dir>/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath> directory. Include
-            this option when you specify a custom backup directory with
-            <codeph>gpbackup</codeph>.</pd>
-          <pd>You cannot combine this option with the option <codeph>--plugin-config</codeph>.</pd>
+          <pd>可选。从指定的路径下找所有备份文件（元数据文件和数据文件）。必须指定<varname>directory</varname>
+            为一个绝对路径（不能是相对路径）。如果没有指定该选项，<codeph>gprestore</codeph>会尝试从Master主机的
+            <filepath>$MASTER_DATA_DIRECTORY/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath>
+            路径下定位时间戳对应的元数据文件，从每个Segment主机的<filepath>&lt;seg_dir>/backups/YYYYMMDD/YYYYMMDDhhmmss/</filepath>
+            路径下定位CSV数据文件。如果<codeph>gpbackup</codeph>操作指定了该选项，那么恢复时请同时指定该选项。
+          </pd>
+          <pd>该选项不能和<codeph>--plugin-config</codeph>选项一起使用。</pd>
         </plentry>
         <plentry>
           <pt><b>--create-db</b></pt>
-          <pd>Optional. Creates the database before restoring the database object metadata.</pd>
-          <pd>The database is created by cloning the empty standard system database
-              <codeph>template0</codeph>.</pd>
+          <pd>可选。在恢复数据库对象元数据之前先创建数据库。</pd>
+          <pd>通过复制空的系统标准数据库<codeph>template0</codeph>来创建指定的数据库。</pd>
         </plentry>
         <plentry id="data_only">
           <pt><b>--data-only</b></pt>
-          <pd>Optional. Restores table data from a backup created with the <codeph>gpbackup</codeph>
-            utility, without creating the database tables. This option assumes the tables exist in
-            the target database. To restore data for a specific set of tables from a backup set, you
-            can specify an option to include tables or schemas or exclude tables or schemas. Specify
-            the <codeph>--with-stats</codeph> option to restore table statistics from the
-            backup.</pd>
-          <pd>The backup set must contain the table data to be restored. For example, a backup
-            created with the <codeph>gpbackup</codeph> option <codeph>--metadata-only</codeph> does
-            not contain table data.</pd>
-          <pd>To restore only database tables, without restoring the table data, see the option
+          <pd>可选。仅恢复<codeph>gpbackup</codeph>创建的表数据，不恢复创建数据库表的操作。该选项假定
+            数据库中已经存在对应的表。如果要恢复指定的集合，可以通过指定选项来包含表/模式或排除表/模式。
+            指定<codeph>--with-stats</codeph>选项来从备份集恢复表的统计信息。</pd>
+          <pd>备份集必须包含要被恢复的表数据。例如，<codeph>gpbackup</codeph>采用选项
+            <codeph>--metadata-only</codeph>备份的备份集不包含表数据，不能用来恢复数据。
+          </pd>
+          <pd>如果要仅恢复数据库表，不恢复表里的数据，参见选项
                 <codeph><xref href="#topic1/metadata_only" format="dita"
-              >--metadata-only</xref></codeph>.</pd>
+              >--metadata-only</xref></codeph>。</pd>
         </plentry>
         <plentry>
           <pt><b>--debug</b></pt>
-          <pd>Optional. Displays verbose and debug log messages during a restore operation.</pd>
+          <pd>可选。显示操作期间的详细信息和调试日志。</pd>
         </plentry>
         <plentry>
           <pt><b>--exclude-schema</b>
             <varname>schema_name</varname></pt>
-          <pd>Optional. Specifies a database schema to exclude from the restore operation. You can
-            specify this option multiple times to exclude multiple schemas. You cannot combine this
-            option with the option <codeph>--include-schema</codeph>, or a table filtering option
-            such as <codeph>--include-table</codeph>. </pd>
+          <pd>可选。指定恢复操作期间要排除的数据库模式。可以多次指定以排除多个模式。该选项不能和
+            <codeph>--include-schema</codeph>或表过滤选项（例如：<codeph>--include-table</codeph>）
+            一起使用。</pd>
         </plentry>
         <plentry>
           <pt><b>--exclude-table</b>
             <varname>schema.table</varname></pt>
-          <pd>Optional. Specifies a table to exclude from the restore operation. The table must be
-            in the format <codeph>&lt;schema-name>.&lt;table-name></codeph>. If a table or schema
-            name uses any character other than a lowercase letter, number, or an underscore
-            character, then you must include that name in double quotes. You can specify this option
-            multiple times. If the table is not in the backup set, the restore operation fails. You
-            cannot specify a leaf partition of a partitioned table.</pd>
-          <pd>You cannot combine this option with the option <codeph>--exclude-schema</codeph>, or
-            another a table filtering option such as <codeph>--include-table</codeph>.</pd>
+          <pd>可选。指定恢复操作期间要排除的表。指定的格式必须为<codeph>&lt;schema-name>.&lt;table-name></codeph>。
+           如果表名或模式名使用了非小写字母、数字或下划线，那改名字可以用双引号包裹。客户可以多次指定该选项。
+           如果表不在备份集中，恢复操作会失败。不能指定分区表的子分区。</pd>
+          <pd>该选项不能与<codeph>--exclude-schema</codeph>或表过滤选项（例如：<codeph>--include-table</codeph>）
+            一起使用。</pd>
         </plentry>
         <plentry>
           <pt><b>--exclude-table-file</b>
             <varname>file_name</varname></pt>
-          <pd>Optional. Specifies a text file containing a list of tables to exclude from the
-            restore operation. Each line in the text file must define a single table using the
-            format <codeph>&lt;schema-name>.&lt;table-name></codeph>. The file must not include
-            trailing lines. If a table or schema name uses any character other than a lowercase
-            letter, number, or an underscore character, then you must include that name in double
-            quotes. If a table is not in the backup set, the restore operation fails. You cannot
-            specify a leaf partition of a partitioned table.</pd>
-          <pd>You cannot combine this option with the option <codeph>--exclude-schema</codeph>, or
-            another a table filtering option such as <codeph>--include-table</codeph>.</pd>
+          <pd>可选。指定恢复期间要排除的表的列表文件。文件为text格式，并且每行都必须定义一个单独的表，格式为
+            <codeph>&lt;schema-name>.&lt;table-name></codeph>。文件不能包含多余的行。
+            如果表名或模式名使用了非小写字母、数字或下划线，那改名字可以用双引号包裹。客户可以多次指定该选项。
+            如果表不在备份集中，恢复操作会失败。不能指定分区表的子分区。</pd>
+          <pd>该选项不能与<codeph>--exclude-schema</codeph>或表过滤选项（例如：<codeph>--include-table</codeph>）
+            一起使用。</pd>
         </plentry>
         <plentry>
           <pt><b>--include-schema</b>
             <varname>schema_name</varname></pt>
-          <pd>Optional. Specifies a database schema to restore. You can specify this option multiple
-            times to include multiple schemas. If you specify this option, any schemas that you
-            specify must be available in the backup set. Any schemas that are not included in
-            subsequent <codeph>--include-schema</codeph> options are omitted from the restore
-            operation. </pd>
-          <pd>If a schema that you specify for inclusion exists in the database, the utility issues
-            an error and continues the operation. The utility fails if a table being restored exists
-            in the database. </pd>
-          <pd>You cannot use this option if objects in the backup set have dependencies on multiple
-            schemas.</pd>
-          <pd>See <xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"
-              >Filtering the Contents of a Backup or Restore</xref> for more information.</pd>
+          <pd>可选。指定要恢复的数据库模式。可以多次指定该选项以包含多个模式。如果指定了该选项，那定义的任何
+            模式都必须在备份集中。没在<codeph>--include-schema</codeph>选项中指定的所有模式都会被忽略。
+          </pd>
+          <pd>如果指定的模式在目标数据库中存在，该工具会产生一个错误然后继续操作。如果被恢复的表在数据库中存在，
+            该工具会失败。
+          </pd>
+          <pd>如果备份集在多个模式下存在依赖关系，那不能使用该选项。</pd>
+          <pd>更多信息请见<xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"
+              >过滤备份和恢复的内容</xref>。</pd>
         </plentry>
         <plentry>
           <pt><b>--include-table</b>
             <varname>schema.table</varname></pt>
-          <pd>Optional. Specifies a table to restore. The table must be in the format
-              <codeph>&lt;schema-name>.&lt;table-name></codeph>. If a table or schema name uses any
-            character other than a lowercase letter, number, or an underscore character, then you
-            must include that name in double quotes. You can specify this option multiple times. You
-            cannot specify a leaf partition of a partitioned table.</pd>
-          <pd>You can also specify the qualified name of a sequence or a view. </pd>
-          <pd>If you specify this option, the utility does not automatically restore dependent
-            objects. You must also explicitly specify the dependent objects that are required. For
-            example if you restore a view, you must also restore the tables that the view uses. If
-            you restore a table that uses a sequence, you must also restore the sequence. The
-            dependent objects must exist in the backup set.</pd>
-          <pd>You cannot combine this option with a schema filtering option such as
-              <codeph>--include-schema</codeph>, or another table filtering option such as
-              <codeph>--exclude-table-file</codeph>.</pd>
+          <pd>可选。指定一个要恢复的表。格式必须为<codeph>&lt;schema-name>.&lt;table-name></codeph>。
+            如果任何表名或模式名使用非小写字母、数字或下划线，那么可以用双引号包裹名字。该选项可以多次指定。
+            不能指定分区表的子分区。</pd>
+          <pd>也可以指定一个有效的模式或视图。</pd>
+          <pd>如果指定了该选项，工具不会自动恢复依赖对象。必须指定需要的依赖对象。例如，如果恢复一个视图，
+            那么必须也恢复它对应的表。如果恢复的表使用到了一个序列，那么也必须恢复该序列。这些对应的对象
+            也必须都在备份集中存在。</pd>
+          <pd>不能将该选项与<codeph>--include-schema</codeph>或表过滤选项
+            （例如<codeph>--exclude-table-file</codeph>）一起使用。
+              </pd>
         </plentry>
         <plentry>
           <pt><b>--include-table-file</b>
             <varname>file_name</varname></pt>
-          <pd>Optional. Specifies a text file containing a list of tables to restore. Each line in
-            the text file must define a single table using the format
-              <codeph>&lt;schema-name>.&lt;table-name></codeph>. The file must not include trailing
-            lines. If a table or schema name uses any character other than a lowercase letter,
-            number, or an underscore character, then you must include that name in double quotes.
-            Any tables not listed in this file are omitted from the restore operation. You cannot
-            specify a leaf partition of a partitioned table.</pd>
-          <pd>You can also specify the qualified name of a sequence or a view. </pd>
-          <pd>If you specify this option, the utility does not automatically restore dependent
-            objects. You must also explicitly specify dependent objects that are required. For
-            example if you restore a view, you must also specify the tables that the view uses. If
-            you specify a table that uses a sequence, you must also specify the sequence. The
-            dependent objects must exist in the backup set.</pd>
-          <pd>If you use the <codeph>--include-table-file</codeph> option,
-              <codeph>gprestore</codeph> does not create roles or set the owner of the tables. The
-            utility restores table indexes and rules. Triggers are also restored but are not
-            supported in Greenplum Database.</pd>
-          <pd>See <xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>
-            for more information.</pd>
+          <pd>可选。指定一个包含恢复表名的列表文件。每行代表一张单独的表，格式必须为
+              <codeph>&lt;schema-name>.&lt;table-name></codeph>。该文件不能包含多余的行。
+            如果表名或模式名使用了非小写字母、数字或下划线，那改名字可以用双引号包裹。客户可以多次指定该选项。
+            如果表不在备份集中，恢复操作会失败。不能指定分区表的子分区。
+            </pd>
+          <pd>也可以指定一个有效的模式或视图。</pd>
+          <pd>如果指定了该选项，工具不会自动恢复依赖对象。必须指定需要的依赖对象。例如，如果恢复一个视图，
+            那么必须也恢复它对应的表。如果恢复的表使用到了一个序列，那么也必须恢复该序列。这些对应的对象
+            也必须都在备份集中存在。</pd>
+          <pd>如果使用<codeph>--include-table-file</codeph>选项，<codeph>gprestore</codeph>
+            不会创建表的角色或用户集合。工具会恢复表的索引和规则。触发器也会被恢复，但是Greenplum
+            目前不支持触发器。</pd>
+          <pd>更多信息请见<xref href="../../admin_guide/managing/backup-gpbackup.xml#topic_et4_b5d_tbb"/>
+            。</pd>
         </plentry>
         <plentry>
           <pt><b>--jobs</b>
             <varname>int</varname></pt>
-          <pd>Optional. Specifies the number of parallel connections to use when restoring table
-            data and metadata. By default, <codeph>gprestore</codeph> uses 1 connection. Increasing
-            this number can improve the speed of restoring data.
-            <note>If you used the <codeph>gpbackup --single-data-file</codeph> option to combine
-              table backups into a single file per segment, you cannot set <codeph>--jobs</codeph>
-              to a value higher than 1 to perform a parallel restore operation.</note></pd>
+          <pd>可选。指定恢复表数据和元数据的并行连接的数量。默认<codeph>gprestore</codeph>使用1个连接。
+            增加该参数会提高数据恢复的速度。
+            <note>如果使用<codeph>gpbackup --single-data-file</codeph>选项合并表备份为每个Segment
+              节点1个单独的文件，那么不能在恢复过程中指定<codeph>--jobs</codeph>超过1来进行并行恢复。
+            </note></pd>
         </plentry>
         <plentry id="metadata_only">
           <pt><b>--metadata-only</b></pt>
-          <pd>Optional. Creates database tables from a backup created with the
-              <codeph>gpbackup</codeph> utility, but does not restore the table data. This option
-            assumes the tables do not exist in the target database. To create a specific set of
-            tables from a backup set, you can specify an option to include tables or schemas or
-            exclude tables or schemas. Specify the option <codeph>--with-globals</codeph> to restore
-            the Greenplum Database system objects.</pd>
-          <pd>The backup set must contain the DDL for tables to be restored. For example, a backup
-            created with the <codeph>gpbackup</codeph> option <codeph>--data-only</codeph> does not
-            contain the DDL for tables. </pd>
-          <pd>To restore table data after you create the database tables, see the option
+          <pd>可选。从一个<codeph>gpbackup</codeph>创建的备份集中创建数据库表，不恢复数据。该选项
+            假设目标数据库中不存在这些表。要从备份集创建指定的表集合，可以通过指定对应的选项来选择或
+            排除相应的表或模式。指定选项<codeph>--with-globals</codeph>来恢复Greenplum数据库
+            系统对象。</pd>
+          <pd>备份集必须包含要恢复的表的DDL数据。例如，<codeph>gpbackup</codeph>选项<codeph>--data-only</codeph> 
+            生成的备份集就不包含表的DDL信息。</pd>
+          <pd>创建完数据库表后再恢复表数据，请见选项
                 <codeph><xref href="#topic1/data_only" format="dita"
-            >--data-only</xref></codeph>.</pd>
+            >--data-only</xref></codeph>。</pd>
         </plentry>
         <plentry>
           <pt><b>--on-error-continue</b></pt>
-          <pd>Optional. Specify this option to continue the restore operation if an SQL error occurs
-            when creating database metadata (such as tables, roles, or functions) or restoring data.
-            If another type of error occurs, the utility exits. The utility displays an error
-            summary and writes error information to the <codeph>gprestore</codeph> log file and
-            continues the restore operation. </pd>
-          <pd>The default is to exit on the first error.</pd>
+          <pd>可选。指定该选项以在创建数据库元数据（例如表、对象或函数）或恢复数据过程中出现SQL错误时，
+            忽略错误继续执行。如果有其他类型错误出现，工具会退出。工具会显示错误信息汇总并将错误信息写入到
+            <codeph>gprestore</codeph>日志文件，并继续恢复操作。</pd>
+          <pd>默认为第一次出现错误即退出。</pd>
         </plentry>
         <plentry>
           <pt><b>--plugin-config</b>
             <varname>config-file_location</varname></pt>
-          <pd>Specify the location of the <codeph>gpbackup</codeph> plugin configuration file, a
-            YAML-formatted text file. The file contains configuration information for the plugin
-            application that <codeph>gprestore</codeph> uses during the restore operation.</pd>
-          <pd>If you specify the <codeph>--plugin-config</codeph> option when you back up a
-            database, you must specify this option with configuration information for a
-            corresponding plugin application when you restore the database from the backup.</pd>
-          <pd>You cannot combine this option with the option <codeph>--backup-dir</codeph>.</pd>
-          <pd>For information about using storage plugin applications, see <xref
-              href="../../admin_guide/managing/backup-plugins.xml">Using gpbackup Storage
-              Plugins</xref>.</pd>
+          <pd>指定<codeph>gpbackup</codeph>插件配置文件位置，它是一个YAML格式的文本文件。该文件包含
+            <codeph>gprestore</codeph>在恢复操作期间使用的插件的配置信息。</pd>
+          <pd>如果备份数据库时指定了<codeph>--plugin-config</codeph>选项，那么在从该备份集恢复
+            数据时也必须指定该配置文件。</pd>
+          <pd>该选项不能与<codeph>--backup-dir</codeph>同时使用。</pd>
+          <pd>有关存储插件应用的详细信息，请见
+            <xref
+              href="../../admin_guide/managing/backup-plugins.xml">使用gpbackup存储插件</xref>。</pd>
         </plentry>
         <plentry>
           <pt><b>--quiet</b></pt>
-          <pd>Optional. Suppress all non-warning, non-error log messages.</pd>
+          <pd>可选。禁止任何非告警、非错误日志输出。</pd>
         </plentry>
         <plentry>
           <pt><b>--redirect-db</b>
             <varname>database_name</varname></pt>
-          <pd>Optional. Restore to the specified <varname>database_name</varname> instead of to the
-            database that was backed up.</pd>
+          <pd>可选。恢复到指定的<varname>database_name</varname>，而不是备份时的默认数据库名。</pd>
         </plentry>
         <plentry>
           <pt><b>--verbose</b></pt>
-          <pd>Optional. Displays verbose log messages during a restore operation.</pd>
+          <pd>可选。显示恢复操作期间的详细日志信息。</pd>
         </plentry>
         <plentry>
           <pt><b>--version</b></pt>
-          <pd>Optional. Print the version number and exit.</pd>
+          <pd>可选。打印版本号并退出。</pd>
         </plentry>
         <plentry>
           <pt><b>--with-globals</b></pt>
-          <pd>Optional. Restores Greenplum Database system objects in the backup set, in addition to
-            database objects. See <xref
-              href="../../admin_guide/managing/backup-gpbackup.xml#topic_x3s_lqj_tbb"/>.</pd>
+          <pd>可选。恢复备份集合中的Greenplum数据库系统对象，和其余数据库对象。详见<xref
+              href="../../admin_guide/managing/backup-gpbackup.xml#topic_x3s_lqj_tbb"/>。</pd>
         </plentry>
         <plentry>
           <pt><b>--with-stats</b></pt>
-          <pd>Optional. Restore query plan statistics from the backup set.</pd>
+          <pd>可选。从备份集合恢复查询计划统计信息。</pd>
         </plentry>
         <plentry>
           <pt>--help</pt>
-          <pd>Displays the online help.</pd>
+          <pd>显示在线帮助信息。</pd>
         </plentry>
       </parml>
     </section>
     <section id="return_codes">
       <title>Return Codes</title>
-      <p>One of these codes is returned after <codeph>gprestore</codeph> completes.<ul
+      <p><codeph>gprestore</codeph>完成后会返回如下返回码之一<ul
           id="ul_hhb_sqp_n4">
-          <li><b>0</b> – Restore completed with no problems.</li>
-          <li><b>1</b> – Restore completed with non-fatal errors. See log file for more
-            information.</li>
-          <li><b>2</b> – Restore failed with a fatal error. See log file for more information.</li>
+        <li><b>0</b> – 成功完成恢复。</li>
+        <li><b>1</b> – 恢复完成，没有严重错误。具体信息见日志文件。</li>
+        <li><b>2</b> – 恢复失败，有严重错误。具体信息见日志文件。</li>
         </ul></p>
     </section>
     <section>
-      <title>Examples</title>
-      <p>Create the demo database and restore all schemas and tables in the backup set for the
-        indicated
-        timestamp:<codeblock>$ dropdb demo
+      <title>示例</title>
+      <p>创建demo数据库并恢复备份集合中指定时间的所有表名和模式名：<codeblock>$ dropdb demo
 $ gprestore --timestamp 20171103152558 --create-db</codeblock></p>
-      <p>Restore the backup set to the "demo2" database instead of the "demo" database that was
-        backed
-        up:<codeblock>$ createdb demo2
+      <p>恢复备份集到"demo2"数据库而不是默认备份的"demo"数据库：
+        <codeblock>$ createdb demo2
 $ gprestore --timestamp 20171103152558 --redirect-db demo2</codeblock></p>
-      <p>Restore global Greenplum Database metadata and query plan statistics in addition to the
-        database
-        objects:<codeblock>$ gprestore --timestamp 20171103152558 --create-db --with-globals --with-stats</codeblock></p>
-      <p>Restore, using backup files that were created in the
-          <filepath>/home/gpadmin/backup</filepath> directory, creating 8 parallel
-        connections:<codeblock>$ gprestore --backup-dir /home/gpadmin/backups/ --timestamp 20171103153156 --create-db --jobs 8</codeblock></p>
-      <p>Restore only the "wikipedia" schema included in the backup
-        set:<codeblock>$ dropdb demo
+      <p>恢复数据库全局对象和查询计划统计信息，而不是默认的全部数据：
+        <codeblock>$ gprestore --timestamp 20171103152558 --create-db --with-globals --with-stats</codeblock></p>
+      <p>使用创建在<filepath>/home/gpadmin/backup</filepath>下的文件恢复数据，创建8个并行连接：
+        <codeblock>$ gprestore --backup-dir /home/gpadmin/backups/ --timestamp 20171103153156 --create-db --jobs 8</codeblock></p>
+      <p>仅恢复备份集中的"wikipedia"模式：
+        <codeblock>$ dropdb demo
 $ gprestore --include-schema wikipedia --backup-dir /home/gpadmin/backups/ --timestamp 20171103153156 --create-db</codeblock></p>
-      <p>If you restore from an incremental backup set, all the required files in the backup set
-        must be available to <codeph>gprestore</codeph>. For example, the following timestamp keys
-        specify an incremental backup set. 20170514054532 is the full backup and the others are
-        incremental backups.</p>
+      <p>如果从增量备份集中恢复，所有需要的备份文件都必须对<codeph>gprestore</codeph>可用。例如，
+        以下时间戳指定增量备份集。20170514054532时增量备份集合的全备份。</p>
       <pre>20170514054532 (full backup)
 20170714095512 
 20170914081205 
 20171114064330 
 20180114051246</pre>
-      <p>The following <codeph>gprestore</codeph> command specifies the timestamp 20121114064330.
-        The incremental backup with the timestamps 20120714095512 and 20120914081205 and the full
-        backup must be available to perform a restore.</p>
+      <p>以下<codeph>gprestore</codeph>命令指定时间戳20121114064330。时间戳为20120714095512和
+        20120914081205的增量备份和全量备份必须都能被恢复程序访问。</p>
       <codeblock>gprestore --timestamp 20121114064330 --redirect-db mystest --create-db</codeblock>
     </section>
     <section id="section9">
-      <title>See Also</title>
+      <title>另见</title>
       <p>
-        <codeph><xref href="./gpbackup.xml" type="topic" format="dita"/></codeph>, <xref
-          href="../../admin_guide/managing/backup-gpbackup.xml" format="dita"/> and <xref
+        <codeph><xref href="./gpbackup.xml" type="topic" format="dita"/></codeph>、<xref
+          href="../../admin_guide/managing/backup-gpbackup.xml" format="dita"/>和<xref
           href="../../admin_guide/managing/backup-s3-plugin.xml"/></p>
     </section>
   </body>

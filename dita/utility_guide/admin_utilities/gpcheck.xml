@@ -5,119 +5,108 @@
     <!-- install_guide/refs/gpcheck.xml has a conref to this topic. -->
     <title id="is142464">gpcheck</title>
     <body>
-        <p>Verifies and validates Greenplum Database platform settings.</p>
+        <p>检查和验证Greenplum数据库平台的设置。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpcheck</b> {{<b>-f</b> | <b>--file</b>} <varname>hostfile_gpcheck</varname> | {<b>-h</b> | <b>--host</b>} <varname>host_ID</varname>| <b>--local</b> } 
-   [<b>-m</b> <varname>master_host</varname>] [<b>-s</b> <varname>standby_master_host</varname>] [<b>--stdout</b> | <b>--zipout</b>] 
-   [<b>--config</b> <varname>config_file</varname>]
-
-<b>gpcheck</b> <b>--zipin</b> <varname>gpcheck_zipfile</varname>
-
-<b>gpcheck</b> <b>-?</b> 
-
-<b>gpcheck</b> <b>--version</b></codeblock>
+                [<b>-m</b> <varname>master_host</varname>] [<b>-s</b> <varname>standby_master_host</varname>] [<b>--stdout</b> | <b>--zipout</b>] 
+                [<b>--config</b> <varname>config_file</varname>]
+                
+                <b>gpcheck</b> <b>--zipin</b> <varname>gpcheck_zipfile</varname>
+                
+                <b>gpcheck</b> <b>-?</b> 
+                
+                <b>gpcheck</b> <b>--version</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpcheck</codeph> utility determines the platform on which you are running
-                Greenplum Database and validates various platform-specific configuration settings.
-                    <codeph>gpcheck</codeph> can use a host file or a file previously created with
-                the <codeph>--zipout</codeph> option to validate platform settings. At the end of a
-                successful validation process, <codeph>GPCHECK_NORMAL</codeph> message displays. If
-                    <codeph>GPCHECK_ERROR</codeph> displays, one or more validation checks failed.
-                You can use also <codeph>gpcheck</codeph> to gather and view platform settings on
-                hosts without running validation checks.</p>
-            <p>You should run <codeph>gpcheck</codeph> as <codeph>root</codeph>.
-                If you do not run <codeph>gpcheck</codeph> as <codeph>root</codeph>, the utility
-                displays a warning message and will not be able to validate all configuration
-                settings; Only some of these settings will be validated.</p>
+            <title>描述</title>
+            <p><codeph>gpcheck</codeph>工具确定用户正在运行Greenplum数据库的平台，并且验证各种平台相关的配置设置。
+                <codeph>gpcheck</codeph>可以使用一个主机文件或者之前由<codeph>--zipout</codeph>选项创建的文件
+                来验证平台设置。在成功的验证过程结束时，将显示<codeph>GPCHECK_NORMAL</codeph>消息。如果显示
+                <codeph>GPCHECK_ERROR</codeph>，则一个或多个验证检查失败。用户也可以使用<codeph>gpcheck</codeph>
+                来收集和查看主机上的平台设置，而不运行验证检查。
+            </p>
+            <p>用户应该以<codeph>root</codeph>用户运行<codeph>gpcheck</codeph>。如果用户没有以<codeph>root</codeph>
+                用户运行<codeph>gpcheck</codeph>，该工具将显示一条警告消息，并且将无法验证所有的配置设置；只有其中的
+                一部分设置将被验证。
+            </p>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
                     <pt>--config <varname>config_file</varname></pt>
-                    <pd>The name of a configuration file to use instead of the default file
-                            <codeph>$GPHOME/etc/gpcheck.cnf</codeph> (or
-                            <codeph>~/gpconfigs/gpcheck_dca_config</codeph> on the Dell EMC Greenplum
-                        Data Computing Appliance). This file specifies the OS-specific checks to
-                        run.</pd>
+                    <pd>替代默认配置文件<codeph>$GPHOME/etc/gpcheck.cnf</codeph>（或者Dell EMC Greenplum Data Computing Appliance
+                        上的<codeph>~/gpconfigs/gpcheck_dca_config</codeph>）配置文件的名字。该文件指定要运行的OS相关的检查。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>{-f | --file} <varname>hostfile_gpcheck</varname></pt>
-                    <pd>The name of a file that contains a list of hosts that <codeph>gpcheck
-                        </codeph>uses to validate platform-specific settings. This file should
-                        contain a single host name for all hosts in your Greenplum Database system
-                        (master, standby master, and segments). <codeph>gpcheck</codeph> uses SSH to
-                        connect to the hosts.</pd>
+                    <pd>包含被<codeph>gpcheck</codeph>用来验证平台相关设置的主机列表的文件名称。该文件应包含
+                        Greenplum数据库系统中所有主机（Master、后备Master和Segment）的单一主机名。
+                        <codeph>gpcheck</codeph>使用SSH连接到这些主机。</pd>
                 </plentry>
                 <plentry>
                     <pt>{--h | --host} <varname>host_ID</varname></pt>
-                    <pd>Checks platform-specific settings on the host in your Greenplum Database
-                        system specified by <varname>host_ID</varname>. <codeph>gpcheck</codeph>
-                        uses SSH to connect to the host. </pd>
+                    <pd>在由<varname>host_ID</varname>指定的Greenplum数据库系统中的主机上检查平台相关的设置。
+                        <codeph>gpcheck</codeph>使用SSH连接到该主机。</pd>
                 </plentry>
                 <plentry>
                     <pt>--local</pt>
-                    <pd>Checks platform-specific settings on the segment host where
-                            <codeph>gpcheck</codeph> is run. This option does not require SSH
-                        authentication. </pd>
+                    <pd>检查运行<codeph>gpcheck</codeph>的Segment主机上的平台相关设置。 这一选项不需要SSH认证。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-m <varname>master_host</varname></pt>
-                    <pd>This option is deprecated and will be removed in a future release.</pd>
+                    <pd>此选项已弃用，将在以后的版本中删除。</pd>
                 </plentry>
                 <plentry>
                     <pt>-s <varname>standby_master_host</varname></pt>
-                    <pd>This option is deprecated and will be removed in a future release.</pd>
+                    <pd>此选项已弃用，将在以后的版本中删除。</pd>
                 </plentry>
                 <plentry>
                     <pt>--stdout</pt>
-                    <pd>Display collected host information from gpcheck. No checks or validations
-                        are performed.</pd>
+                    <pd>显示从gpcheck收集的主机信息。不执行检查或验证。</pd>
                 </plentry>
                 <plentry>
                     <pt>--zipout</pt>
-                    <pd>Save all collected data to a <codeph>.zip</codeph> file in the current
-                        working directory. <codeph>gpcheck</codeph> automatically creates the
-                            <codeph>.zip</codeph> file and names it gpcheck_timestamp.tar.gz. No
-                        checks or validations are performed.</pd>
+                    <pd>将所有收集的数据保存到当前工作目录中的一个<codeph>.zip</codeph>文件中。
+                        <codeph>gpcheck</codeph>会自动创建<codeph>.zip</codeph>文件并将其命名为
+                        gpcheck_timestamp.tar.gz。不执行检查或验证。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>--zipin <varname>gpcheck_zipfile</varname></pt>
-                    <pd>Use this option to decompress and check a <codeph>.zip</codeph> file created
-                        with the <codeph>--zipout</codeph> option. <codeph>gpcheck</codeph> performs
-                        validation tasks against the file you specify in this option.</pd>
+                    <pd>使用此选项解压缩并检查<codeph>--zipout</codeph>选项创建的<codeph>.zip</codeph>文件。
+                        <codeph>gpcheck</codeph>根据用户在此选项中指定的文件执行验证任务。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-? (help)</pt>
-                    <pd>Displays the online help.</pd>
+                    <pd>展示在线帮助。</pd>
                 </plentry>
                 <plentry>
                     <pt>--version</pt>
-                    <pd>Displays the version of this utility.</pd>
+                    <pd>显示工具的版本。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>Verify and validate the Greenplum Database platform settings by entering a host
-                file:</p>
+            <title>示例</title>
+            <p>通过输入主机文件验证Greenplum数据库平台设置：</p>
             <codeblock># gpcheck -f hostfile_gpcheck </codeblock>
-            <p>Save Greenplum Database platform settings to a zip file:</p>
+            <p>将Greenplum数据库平台设置保存到一个zip文件：</p>
             <codeblock># gpcheck -f hostfile_gpcheck --zipout</codeblock>
-            <p>Verify and validate the Greenplum Database platform settings using a zip file created
-                with the <codeph>--zipout</codeph> option:</p>
+            <p>使用<codeph>--zipin</codeph>选项创建的zip文件验证Greenplum数据库平台设置：</p>
             <codeblock># gpcheck --zipin gpcheck_timestamp.tar.gz</codeblock>
-            <p>View collected Greenplum Database platform settings:</p>
+            <p>查看收集的Greenplum数据库平台设置：</p>
             <codeblock># gpcheck -f hostfile_gpcheck --stdout</codeblock>
         </section>
         <section id="section6">
-            <title>See Also</title>
-            <p><codeph><xref href="gpssh.xml#topic1"/></codeph>, <codeph><xref
-                        href="gpscp.xml#topic1"/></codeph>, <codeph><xref
-                        href="./gpcheckperf.xml#topic1" type="topic" format="dita"/></codeph></p>
+            <title>另见</title>
+            <p><codeph><xref href="gpssh.xml#topic1"/></codeph>、<codeph><xref
+                href="gpscp.xml#topic1"/></codeph>、<codeph><xref
+                    href="./gpcheckperf.xml#topic1" type="topic" format="dita"/></codeph></p>
         </section>
     </body>
 </topic>

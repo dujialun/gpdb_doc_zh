@@ -4,187 +4,164 @@
 <topic id="topic1">
   <title id="jr20941">gpcheckcat</title>
   <body>
-    <p>The <codeph>gpcheckcat</codeph> utility tests Greenplum Database catalog tables for
-      inconsistencies. </p>
-    <p>The utility is in <codeph>$GPHOME/bin/lib</codeph>.</p>
+    <p><codeph>gpcheckcat</codeph>gpcheckcat工具测试Greenplum数据库目录表的不一致性。</p>
+    <p>该工具在<codeph>$GPHOME/bin/lib</codeph>中。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><b>gpcheckcat</b> [ <varname>options</varname>] [ <varname>dbname</varname>] 
-
-  <b>Options:</b>
-     <b>-g</b> <varname>dir</varname>
-     <b>-p</b> <varname>port</varname>
-     <b>-P</b> <varname>password</varname>
-     <b>-U</b> <varname>user_name</varname>
-     <b>-S</b> {none | only}
-     <b>-O</b>
-     <b>-R</b> <varname>test_name</varname> 
-     <b>-C</b> <varname>catalog_name</varname>
-     <b>-B</b> <varname>parallel_processes</varname>
-     <b>-v</b>
-     <b>-A</b>
-
-<b>gpcheckcat</b>  <b>-l</b> 
-
-<b>gpcheckcat</b> <b>-?</b> 
-</codeblock>
+        
+        <b>Options:</b>
+        <b>-g</b> <varname>dir</varname>
+        <b>-p</b> <varname>port</varname>
+        <b>-P</b> <varname>password</varname>
+        <b>-U</b> <varname>user_name</varname>
+        <b>-S</b> {none | only}
+        <b>-O</b>
+        <b>-R</b> <varname>test_name</varname> 
+        <b>-C</b> <varname>catalog_name</varname>
+        <b>-B</b> <varname>parallel_processes</varname>
+        <b>-v</b>
+        <b>-A</b>
+        
+        <b>gpcheckcat</b>  <b>-l</b> 
+        
+        <b>gpcheckcat</b> <b>-?</b> 
+      </codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>The <codeph>gpcheckcat</codeph> utility runs multiple tests that check for database catalog
-        inconsistencies. Some of the tests cannot be run concurrently with other workload statements
-        or the results will not be usable. Restart the database in restricted mode when running
-          <codeph>gpcheckcat</codeph>, otherwise <codeph>gpcheckcat</codeph> might report
-        inconsistencies due to ongoing database operations rather than the actual number of
-        inconsistencies. If you run <codeph>gpcheckcat</codeph> without stopping database activity,
-        run it with <codeph>-O</codeph> option. </p>
-      <note>Any time you run the utility, it checks for and deletes orphaned, temporary database
-        schemas (temporary schemas without a session ID) in the specified databases. The utility
-        displays the results of the orphaned, temporary schema check on the command line and also
-        logs the results.</note>
-      <p>Catalog inconsistencies are inconsistencies that occur between Greenplum Database system
-        tables. In general, there are three types of inconsistencies:<ul id="ul_jry_gmh_mp">
-          <li>Inconsistencies in system tables at the segment level. For example, an inconsistency
-            between a system table that contains table data and a system table that contains column
-            data. As another, a system table that contains duplicates in a column that should to be
-            unique.</li>
-        </ul><ul id="ul_smw_hmh_mp">
-          <li>Inconsistencies between same system table across segments. For example, a system table
-            is missing row on one segment, but other segments have this row. As another example, the
-            values of specific row column data are different across segments, such as table owner or
-            table access privileges.</li>
-          <li>Inconsistency between a catalog table and the filesystem. For example, a file exists
-            in database directory, but there is no entry for it in the pg_class table.</li>
-        </ul></p>
+      <title>描述</title>
+      <p><codeph>gpcheckcat</codeph>工具运行多种测试检查数据库目录的不一致。 某些测试不能与其他负载语句同时运行，
+        否则结果将不可用。运行<codeph>gpcheckcat</codeph>时，要以受限模式重新启动数据库，否则，<codeph>gpcheckcat</codeph>
+        可能会由于正在进行的数据库操作而报告不一致，这会与实际的不一致数量不同。如果用户在不停止数据库活动的情况下运行
+        <codeph>gpcheckcat</codeph>，请使用<codeph>-O</codeph>选项运行它。</p>
+      <note>每当用户运行该工具时，它都会检查并删除指定数据库中的孤立的临时数据库方案（没有会话ID的临时方案）。
+        该工具在命令行上显示孤立临时模式检查的结果，并在日志中记录该结果。
+      </note>
+      <p>目录不一致是Greenplum数据库系统表之间发生的不一致。一般来说，有三种不一致：<ul id="ul_jry_gmh_mp">
+        <li>Segment级的系统表不一致。例如，包含表数据的系统表与包含列数据的系统表之间的不一致。另一个例子是一个
+          系统表在本该唯一的列中包含重复。
+        </li>
+      </ul><ul id="ul_smw_hmh_mp">
+        <li>Segment之间相同系统表之间的不一致。例如，一个系统表在一个Segment上缺少一行，但其他Segment具有这一行。
+          作为另一个例子，特定的行列数据的值在不同的Segment之间不同，例如表所有者或表访问特权。
+        </li>
+        <li>持久化系统表对象状态和文件系统对象间的不一致。例如，一个文件在数据库目录中存在，但数据库系统表中
+          不存在相应的对象。
+        </li>
+      </ul></p>
     </section>
     <section id="section4">
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
           <pt>-A</pt>
-          <pd>Run <codeph>gpcheckcat</codeph> on all databases in the Greenplum Database
-            installation.</pd>
+          <pd>在Greenplum数据库安装的所有数据库上运行<codeph>gpcheckcat</codeph>。
+          </pd>
         </plentry>
         <plentry>
           <pt>-B <varname>parallel_processes</varname></pt>
-          <pd>The number of processes to run in parallel. </pd>
+          <pd>并行运行的进程数量。</pd>
           <pd>
-            <p>The <codeph>gpcheckcat</codeph> utility attempts to determine the number of
-              simultaneous processes (the batch size) to use. The utility assumes it can use a
-              buffer with a minimum of 20MB for each process. The maximum number of parallel
-              processes is the number of Greenplum Database segment instances. The utility displays
-              the number of parallel processes that it uses when it starts checking the catalog.
-              <note>The utility might run out of memory if the number of errors returned exceeds the
-                buffer size. If an out of memory error occurs, you can lower the batch size with the
-                  <codeph>-B</codeph> option. For example, if the utility displays a batch size of
-                936 and runs out of memory, you can specify <codeph>-B 468</codeph> to run 468
-                processes in parallel. </note></p>
+            <p><codeph>gpcheckcat</codeph>工具尝试确定要同时使用的进程数（批尺寸）。该工具假定它可以为
+              每个进程使用最小为20MB的缓冲区。并行进程的最大数量是Greenplum数据库Segment实例的数量。
+              当该工具开始检查目录时，它会显示所使用的并行进程的数量。
+              <note>如果返回的错误数量超过缓冲区大小，则该工具可能会耗尽内存。如果发生内存不足错误，可以使用
+                <codeph>-B</codeph>选项降低批尺寸。例如，如果该工具显示批尺寸为936并且内存不足，则可以指定
+                <codeph>-B 468</codeph>并行运行468个进程。
+              </note></p>
           </pd>
         </plentry>
         <plentry>
           <pt>-C <varname>catalog_table</varname></pt>
-          <pd>Run cross consistency, foreign key, and ACL tests for the specified catalog
-            table.</pd>
+          <pd>对指定的目录表运行交叉一致性、外键和ACL测试。</pd>
         </plentry>
         <plentry>
           <pt>-g <varname>data_directory</varname></pt>
-          <pd>Generate SQL scripts to fix catalog inconsistencies. The scripts are placed in
-              <varname>data_directory</varname>.</pd>
+          <pd>生成SQL脚本来修复目录不一致。脚本被放置在<varname>data_directory</varname>中。
+          </pd>
         </plentry>
         <plentry>
           <pt>-l</pt>
-          <pd>List the <codeph>gpcheckcat</codeph> tests.</pd>
+          <pd>列出<codeph>gpcheckcat</codeph>测试。</pd>
         </plentry>
         <plentry>
           <pt>-O</pt>
-          <pd>Run only the <codeph>gpcheckcat</codeph> tests that can be run in online (not
-            restricted) mode. </pd>
+          <pd>只运行可以在线（不受限）模式运行的<codeph>gpcheckcat</codeph>测试。
+          </pd>
         </plentry>
         <plentry>
           <pt>-p <varname>port</varname></pt>
-          <pd>This option specifies the port that is used by the Greenplum Database.</pd>
+          <pd>这一选项指定Greenplum数据库使用的端口。</pd>
         </plentry>
         <plentry>
           <pt>-P <varname>password</varname></pt>
-          <pd>The password of the user connecting to Greenplum Database.</pd>
+          <pd>连接到Greenplum数据库的用户的密码。</pd>
         </plentry>
         <plentry>
           <pt>-R <varname>test_name</varname>
           </pt>
-          <pd>Specify a test to run. Some tests can be run only when Greenplum Database is in
-            restricted mode.</pd>
-          <pd>These are the tests that can be performed: <p><codeph>acl</codeph> - Cross consistency
-              check for access control privileges</p>
-            <p><codeph>duplicate</codeph> - Check for duplicate entries</p>
-            <p><codeph>foreign_key</codeph> - Check foreign keys</p>
-            <p><codeph>inconsistent</codeph> - Cross consistency check for master segment
-              inconsistency</p>
-            <p><codeph>missing_extraneous</codeph> - Cross consistency check for missing or
-              extraneous entries</p>
-            <p><codeph>owner</codeph> - Check table ownership that is inconsistent with the master
-              database</p>
-
-            <p><codeph>orphaned_toast_tables</codeph> - Check for orphaned TOAST tables. 
-              <note>There are several ways a TOAST table can become orphaned where a repair script
-                cannot be generated and a manual catalog change is required. One way is if the
-                  <codeph>reltoastrelid</codeph> entry in <i>pg_class</i> points to an incorrect
-                TOAST table (a TOAST table mismatch). Another way is if both the
-                  <codeph>reltoastrelid</codeph> in <i>pg_class</i> is missing and the
-                  <codeph>pg_depend</codeph> entry is missing (a double orphan TOAST table). If a
-                manual catalog change is needed, <codeph>gpcheckcat</codeph> will display detailed
-                steps you can follow to update the catalog. <ph otherprops="pivotal">Contact Pivotal
-                  Support if you need help with the catalog change.</ph></note></p>
-            <p><codeph>part_integrity</codeph> - Check <i>pg_partition</i> branch integrity,
-              partition with OIDs, partition distribution policy</p>
-            <p><codeph>part_constraint</codeph> - Check constraints on partitioned tables</p>
-            <p><codeph>unique_index_violation</codeph> - Check tables that have columns with the
-              unique index constraint for duplicate entries</p>
-            <p><codeph>dependency</codeph> - Check for dependency on non-existent objects
-              (restricted mode only)</p>
-            <p><codeph>distribution_policy</codeph> - Check constraints on randomly distributed
-              tables (restricted mode only)</p>
-            <p><codeph>namespace</codeph> - Check for schemas with a missing schema definition
-              (restricted mode only)</p>
-            <p><codeph>pgclass</codeph> - Check <i>pg_class</i> entry that does not have any
-              corresponding <i>pg_attribute</i> entry (restricted mode only)</p>
+          <pd>指定要运行的测试。某些测试只有当Greenplum数据库处于受限模式时才能运行。
+          </pd>
+          <pd>这些是可以执行的测试：<p><codeph>acl</codeph> - 对访问控制特权的交叉一致性检查</p>
+            <p><codeph>duplicate</codeph> - 检查重复项</p>
+            <p><codeph>foreign_key</codeph> - 检查外键</p>
+            <p><codeph>inconsistent</codeph> - 对Master和Segment不一致性的交叉一致性检查</p>
+            <p><codeph>missing_extraneous</codeph> - 对缺少的或无关的项的交叉一致性检查</p>
+            <p><codeph>owner</codeph> - 检查表的拥有关系是否与Master数据库不一致</p>
+            <p><codeph>orphaned_toast_tables</codeph> -检查孤立的TOAST表 
+              <note>有很多种情况都会导致TOAST表变成孤立表，此时不会生成修复脚本，要求进行手工元数据维护。
+                其中一种情况是<i>pg_class</i>中的<codeph>reltoastrelid</codeph>指向一个不正确的TOAST
+                表（不能匹配到TOAST表）。另外一种情况可能是<i>pg_class</i>表的<codeph>reltoastrelid</codeph>
+                和<codeph>pg_depend</codeph>丢失（双孤立TOAST表）。如果需要手工修复元数据，
+                <codeph>gpcheckcat</codeph>会显示详细的元数据更新步骤。
+                <ph otherprops="pivotal">如果您需要元数据修复，请联系Pivotal Support。</ph></note></p>
+            <p><codeph>part_integrity</codeph> - 检查<i>pg_partition</i>分支的完整性、带OID的分区、
+              分区分布策略</p>
+            <p><codeph>part_constraint</codeph> - 检查分区表上的约束</p>
+            <p><codeph>unique_index_violation</codeph> - 检查有唯一索引约束的列的表中是否有重复项</p>
+            <p><codeph>dependency</codeph> - 检查不存在对象的依赖关系（仅限于受限模式）</p>
+            <p><codeph>distribution_policy</codeph> - 检查随机分布表上的约束（仅限于受限模式）</p>
+            <p><codeph>namespace</codeph> - 检查缺少方案定义的方案（仅限于受限模式）</p>
+            <p><codeph>pgclass</codeph> - 检查没有任何对应的<i>pg_attribute</i>项的（仅限于受限模式）
+              <i>pg_class</i>项。</p>
           </pd>
         </plentry>
         <plentry>
           <pt>-S {none | only}</pt>
-          <pd>Specify this option to control the testing of catalog tables that are shared across
-            all databases in the Greenplum Database installation, such as <i>pg_database</i>. </pd>
-          <pd>The value <codeph>none</codeph> disables testing of shared catalog tables. The value
-              <codeph>only</codeph> tests only the shared catalog tables.</pd>
+          <pd>指定这一选项以控制对Greenplum数据库安装中所有数据库（如<i>pg_database</i>）上共享的目录表的测试。
+          </pd>
+          <pd>值<codeph>none</codeph>禁用对共享目录表的测试。值<codeph>only</codeph>仅测试共享目录表。</pd>
         </plentry>
         <plentry>
           <pt>-U <varname>user_name</varname></pt>
-          <pd>The user connecting to Greenplum Database.</pd>
+          <pd>连接到Greenplum数据库的用户。</pd>
         </plentry>
         <plentry>
-          <pt>-? (help)</pt>
-          <pd>Displays the online help.</pd>
+          <pt>-?（帮助）</pt>
+          <pd>显示在线帮助。</pd>
         </plentry>
         <plentry>
-          <pt>-v (verbose)</pt>
-          <pd>Displays detailed information about the tests that are performed.</pd>
+          <pt>-v（详细模式）</pt>
+          <pd>显示所执行测试的详细信息。</pd>
         </plentry>
       </parml>
     </section>
-    <section><title>Notes</title>The utility identifies tables with missing attributes and displays
-      them in various locations in the output and in a non-standardized format. The utility also
-      displays a summary list of tables with missing attributes in the format
-          <codeph><varname>database</varname>.<varname>schema</varname>.<varname>table</varname>.<varname>segment_id</varname></codeph>
-      after the output information is displayed.<p>If <codeph>gpcheckcat</codeph> detects
-        inconsistent OID (Object ID) information, it generates one or more verification files that
-        contain an SQL query. You can run the SQL query to see details about the OID inconsistencies
-        and investigate the inconsistencies. The files are generated in the directory where
-          <codeph>gpcheckcat</codeph> is invoked. </p><p>This is the format of the
-        file:</p><pre>gpcheckcat.verify.<varname>dbname</varname>.<varname>catalog_table_name</varname>.<varname>test_name</varname>.<varname>TIMESTAMP</varname>.sql</pre><p>This
-        is an example verification filename created by <codeph>gpcheckcat</codeph> when it detects
-        inconsistent OID (Object ID) information in the catalog table <i>pg_type</i> in the database
-          <codeph>mydb</codeph>:<codeblock>gpcheckcat.verify.mydb.pg_type.missing_extraneous.20150420102715.sql</codeblock></p><p>This
-        is an example query from a verification
-      file:</p><pre>SELECT *
+    <section><title>注解</title>
+      该工具可识别缺少属性的表，并将其以非标准格式显示在输出中的各个位置。在显示输出信息之后，该工具还会以格式
+      <codeph><varname>database</varname>.<varname>schema</varname>.<varname>table</varname>.<varname>segment_id</varname></codeph>
+      显示缺少属性的表的摘要列表。
+      <p>如果<codeph>gpcheckcat</codeph>检测到不一致的OID（对象ID）信息，它将生成一个或者多个包含SQL查询的验证文件。
+        用户可以运行SQL查询来查看有关OID不一致的详细信息，并调查不一致之处。这些文件在<codeph>gpcheckcat</codeph>
+        被调用的目录中生成。
+      </p>
+      <p>这是该文件的格式：
+      </p><pre>gpcheckcat.verify.<varname>dbname</varname>.<varname>catalog_table_name</varname>.<varname>test_name</varname>.<varname>TIMESTAMP</varname>.sql</pre>
+      <p>这是当<codeph>gpcheckcat</codeph>检测到数据库<codeph>mydb</codeph>中的目录表<i>pg_type</i>中的不一致OID
+        （对象ID）信息时，它创建的验证文件名示例：
+        <codeblock>gpcheckcat.verify.mydb.pg_type.missing_extraneous.20150420102715.sql</codeblock>
+      </p>
+      <p>这是验证文件中查询的一个示例：
+      </p><pre>SELECT *
   FROM (
        SELECT relname, oid FROM pg_class WHERE reltype 
          IN (1305822,1301043,1301069,1301095)

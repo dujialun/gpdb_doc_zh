@@ -3,9 +3,9 @@
 <topic id="topic1">
   <title>pgbouncer.ini</title>
   <body>
-    <p>PgBouncer configuration file.</p>
+    <p>PgBouncer的配置文件。</p>
     <section>
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock>[databases]
 db = ...
 
@@ -16,20 +16,19 @@ db = ...
 ...</codeblock>
     </section>
     <section>
-      <title>Description</title>
-      <p>You specify PgBouncer configuration parameters and identify user-specific configuration parameters in the <codeph>pgbouncer.ini</codeph> configuration file.</p>
-      <p>The PgBouncer configuration file (typically named <codeph>pgbouncer.ini</codeph>)
-        is specified in <codeph>.ini</codeph> format. Files in <codeph>.ini</codeph> format are composed of
-        sections, parameters, and values. Section names are enclosed in square brackets,
-        for example, <codeph>[<varname>section_name</varname>]</codeph>. Parameters and values are
-        specified in <codeph><varname>key</varname>=<varname>value</varname></codeph>
-        format. Lines beginning with a semicolon (<codeph>;</codeph>) or pound sign
-        (<codeph>#</codeph>) are considered comment lines
-        and are ignored.</p>
-      <p>The PgBouncer configuration file can contain <codeph>%include</codeph> directives,
-        which specify another file to read and process. This enables you to split the configuration
-        file into separate parts. For example:<codeblock>%include filename</codeblock></p><p>If the filename provided is not an absolute path, the file system location is taken as relative to the current working directory.</p>
-      <p>The PgBouncer configuration file includes the following sections, described in detail below:<ul id="ul_kwg_vll_gs">
+      <title>描述</title>
+      <p>可以在配置文件<codeph>pgbouncer.ini</codeph>中指定PgBouncer配置参数并指定用户相关的配置参数。</p>
+      <p>PgBouncer的配置文件（通常是<codeph>pgbouncer.ini</codeph>）是<codeph>.ini</codeph>格式。
+        <codeph>.ini</codeph>格式的文件通常由小节、参数和参数值组成。小节名称封闭在方括号中，
+        例如，<codeph>[<varname>section_name</varname>]</codeph>。参数和值通常以
+        <codeph><varname>key</varname>=<varname>value</varname></codeph>的方式展示。
+        以";"或"#"开头的行被注释或者忽略。当该";"和"#" 字符出现在行后面时候不被识别。
+        </p>
+      <p>PgBouncer配置文件包含<codeph>%include</codeph>路由符，它指定了用来读取和处理的其他文件。
+        这让我们可以将配置文件拆分为多个部分。例如：
+       <codeblock>%include filename</codeblock></p>
+      <p>如果提供的文件名不是绝对路径，当前操作系统工作路径被作为相对路径。</p>
+      <p>PgBouncer的配置文件包括以下小节，详细信息如下：<ul id="ul_kwg_vll_gs">
         <li><xref href="#topic_fmd_ckd_gs" format="dita"/></li>
         <li><xref href="#topic_orc_gkd_gs" format="dita"/></li>
         <li><xref href="#topic_lzk_zjd_gs" format="dita"/></li>
@@ -38,103 +37,94 @@ db = ...
   </body>
 
   <topic id="topic_fmd_ckd_gs">
-    <title>[databases] Section</title>
+    <title>[databases]小节</title>
     <body>
-      <p>The <codeph>[databases]</codeph> section contains <codeph><varname>key</varname>=<varname>value</varname></codeph> pairs, where the <codeph><varname>key</varname></codeph> is a database name and
-        the <codeph><varname>value</varname></codeph> is a <codeph>libpq</codeph> connect-string list of <codeph><varname>key</varname></codeph>=<codeph><varname>value</varname></codeph> pairs. </p>
-      <p>A database name can contain characters <codeph>[0-9A-Za-z_.-]</codeph> without quoting.
-        Names that contain other characters must be quoted with standard SQL identifier quoting:<ul
+      <p><codeph>[databases]</codeph>小节包含<codeph><varname>key</varname>=<varname>value</varname></codeph>
+        键值对，其中键（<codeph><varname>key</varname></codeph>）是数据库名称，值（<codeph><varname>value</varname></codeph>）
+        是<codeph><varname>key</varname></codeph>=<codeph><varname>value</varname></codeph>对的<codeph>libpq</codeph>连接字符串列表。
+        </p>
+      <p>数据库名称可以包含不带引号的字符<codeph>[0-9A-Za-z_.-]</codeph>。包含其他字符的名称必须使用标准SQL标识符引用：
+       <ul
           id="ul_wzm_b4p_ts">
-          <li>Enclose names in double quotes (<codeph>" "</codeph>).</li>
-          <li>Represent a double-quote within an identifier with two consecutive double quote
-            characters.</li>
+         <li>名字用双引号括起来（<codeph>" "</codeph>）。</li>
+         <li>用两个连续的双引号字符在一个标识符内表示一个双引号。</li>
         </ul></p>
-      <p>The database name <codeph>*</codeph> is the fallback database. PgBouncer uses the
-        value for this key as a connect string for the requested database. Automatically-created database entries
-        such as these are cleaned up if they remain idle longer than the time specified in
-          <codeph>autodb_idle_timeout</codeph> parameter.</p>
+      <p>数据库名<codeph>*</codeph>是回退数据库。此键的值是所请求数据库的连接字符串。
+        如果自动创建的数据库项的空闲时间超过<codeph>autodb_idle_timeout</codeph>参数中指定的时间，
+        则会自动清理这些数据库项。
+        </p>
       <section>
-        <title>Database Connection Parameters</title>
-        <p>The following parameters may be included in the <codeph><varname>value</varname></codeph> to specify the location of the
-          database. </p>
+        <title>数据库连接参数</title>
+        <p>该值中可能包含以下参数以指定数据库的位置。</p>
         <parml>
           <plentry>
             <pt>dbname</pt>
-            <pd>The destination database name.<p>Default: the client-specified database
-                name</p></pd>
+            <pd>目标数据库名称。<p>默认值：与客户端数据库名称相同。</p></pd>
           </plentry>
           <plentry>
             <pt>host</pt>
-            <pd>The name or IP address of the Greenplum master host. Host names are resolved at
-              connect time. If DNS returns several results, they are used in a round-robin
-              manner. The DNS result is cached and the <codeph>dns_max_ttl</codeph> parameter
-              determines when the cache entry expires. </pd>
+            <pd>Greenplum的Master主机的名称或IP地址。主机名在连接时被解析。如果DNS返回多个结果，
+              则以循环方式使用它们。DNS结果会被缓存，并且<codeph>dns_max_ttl</codeph>参数确定
+              缓存项何时过期。</pd>
             <pd>
-              <p>Default: not set; the connection is made through a Unix socket</p>
+              <p>默认值：未设置，表示通过Unix套接字进行连接。</p>
             </pd>
           </plentry>
           <plentry>
             <pt>port</pt>
-            <pd>The Greenplum Database master port.</pd>
-            <pd><p>Default: 5432</p></pd>
+            <pd>Greenplum数据库的Master端口。</pd>
+            <pd><p>默认：5432</p></pd>
           </plentry>
           <plentry>
             <pt>user, password</pt>
-            <pd>If <codeph>user=</codeph> is set, all connections to the destination database
-              are initiated as the specified user, resulting in a single connection pool for
-               the database.<p>If the <codeph>user=</codeph> parameter is not set, PgBouncer
-                attempts to log in to the destination database with the user name passed by the
-                client. In this situation, there will be one pool for each user who connects to the
-                database.</p></pd>
+            <pd>如果设置了<codeph>user=</codeph>，则用指定的用户建立到目标数据库的所有连接。
+              这意味着数据库将只有一个池。
+              <p>如果未设置<codeph>user=</codeph>参数，将尝试使用客户端传递的用户名登录到目标数据库。
+                这意味着每个连接到数据库的用户都会有一个池。
+                </p></pd>
           </plentry>
           <plentry>
             <pt>auth_user</pt>
-            <pd>If <codeph>auth_user</codeph> is set, any user who is not specified in
-                <codeph>auth_file</codeph> is authenticated by querying the
-                <codeph>pg_shadow</codeph> database view. PgBouncer performs this
-                query as the
-                <codeph>auth_user</codeph> Greenplum Database user. <codeph>auth_user</codeph>'s password must be set
-              in the <codeph>auth_file</codeph>.</pd>
+            <pd>如果设置了<codeph>auth_user</codeph>，任何未在<codeph>auth_file</codeph>文件中指定的用户，
+              通过以<codeph>auth_user</codeph>身份查询数据库中的<codeph>pg_shadow</codeph>表来认证。
+              <codeph>auth_user</codeph>的口令必须在<codeph>auth_file</codeph>中设置。
+             </pd>
           </plentry>
           <plentry>
             <pt>client_encoding</pt>
-            <pd>Ask for specific <codeph>client_encoding</codeph> from server.</pd>
+            <pd>从服务器要求特定的<codeph>client_encoding</codeph>。</pd>
           </plentry>
           <plentry>
             <pt>datestyle</pt>
-            <pd>Ask for specific <codeph>datestyle</codeph> from server.</pd>
+            <pd>从服务器要求特定的<codeph>datestyle</codeph>。</pd>
           </plentry>
           <plentry>
             <pt>timezone</pt>
-            <pd>Ask for specific <codeph>timezone</codeph> from server.</pd>
+            <pd>从服务器要求特定的<codeph>timezone</codeph>。</pd>
           </plentry>
         </parml>
       </section>
       <section>
-        <title>Pool Configuration</title>
-        <p>You can use the following parameters for database-specific pool configuration.</p>
+        <title>连接池配置</title>
+        <p>可以使用以下数据库连接池配置</p>
         <parml>
           <plentry>
             <pt>pool_size</pt>
-            <pd>Set the maximum size of pools for this database. If not set, the
-                <codeph>default_pool_size</codeph> is used.</pd>
+            <pd>设置该数据库的最大池数。如果没有设置，则使用<codeph>default_pool_size</codeph>。
+                 </pd>
           </plentry>
           <plentry>
             <pt>connect_query</pt>
-            <pd>Query to be executed after a connection is established, but before allowing the
-              connection to be used by any clients. If the query raises errors, they are logged
-              but ignored otherwise.</pd>
+            <pd>在任何用户连接建立之后，允许执行查询。如果查询引发错误，则会被记录，否则将被忽略。</pd>
           </plentry>
           <plentry>
             <pt>pool_mode</pt>
-            <pd>Set the pool mode for this database. If not set, the default
-                <codeph>pool_mode</codeph> is used.</pd>
+            <pd>为此数据库设置池模式。如果未设置，则使用默认的<codeph>pool_mode</codeph>。
+                 </pd>
           </plentry>
           <plentry>
             <pt>max_db_connections</pt>
-            <pd>Set a database-wide maximum number of PgBouncer connections for this
-              database. The total number of connections for all pools for this database
-              will not exceed this value.
+            <pd>为此数据库设置数据库范围内的最大连接数。此数据库的所有池连接总数不会超过此值。
             </pd>
           </plentry>
         </parml>
@@ -143,527 +133,533 @@ db = ...
   </topic>
 
   <topic id="topic_orc_gkd_gs">
-    <title>[pgbouncer] Section</title>
+    <title>[pgbouncer]小节</title>
     <body>
       <section>
-        <title>Generic Settings</title>
+        <title>一般设置</title>
         <parml>
           <plentry>
             <pt>logfile</pt>
-            <pd>The location of the log file. The log file is kept open. After log
-              rotation, execute <codeph>kill -HUP pgbouncer</codeph> or run the <codeph>RELOAD;</codeph>
-              command in the PgBouncer Administration Console. <p>Default: not set</p></pd>
+            <pd>指定日志文件的位置。日志文件保持打开状态。日志轮转后在PgBouncer管理控制台中执行
+              <codeph>kill -HUP pgbouncer</codeph>或运行<codeph>RELOAD;</codeph>命令。
+              <p>默认：未设置。</p></pd>
           </plentry>
           <plentry>
             <pt>pidfile</pt>
-            <pd>The name of the pid file. Without a pidfile, you cannot run PgBouncer as a
-              background (daemon) process.<p>Default: not set</p></pd>
+            <pd>pid文件的名字。没有pid文件，PgBouncer不能作为后台进程（守护进程）运行。
+              <p>默认：未设置。</p></pd>
           </plentry>
           <plentry>
             <pt>listen_addr</pt>
-            <pd>A list of interface addresses where PgBouncer listens for TCP connections. You
-              may also use <codeph>*</codeph>, which means to listen on all interfaces. If not
-              set, only Unix socket connections are allowed.<p>Specify addresses
-                numerically (IPv4/IPv6) or by name.</p><p>Default: not set</p></pd>
+            <pd>PgBouncer侦听TCP连接的接口地址列表。用户也可以使用<codeph>*</codeph>，
+              表示在所有接口上进行监听。如果没有设置，则仅允许Unix套接字连接。
+              <p>地址可以用数字（IPv4/IPv6）或名称来指定。
+              </p>
+              <p>默认：未设置。</p></pd>
           </plentry>
           <plentry>
             <pt>listen_port</pt>
-            <pd>The port PgBouncer listens on. Applies to both TCP and Unix sockets.<p>Default:
-                6432</p></pd>
+            <pd>要监听的端口。应用到TCP和UNIX套接字。<p>默认：6432</p></pd>
           </plentry>
           <plentry>
             <pt>unix_socket_dir</pt>
-            <pd>Specifies the location for the Unix sockets. Applies to both listening socket and server
-              connections. If set to an empty string, Unix sockets are disabled. Required for
-              online restart (<codeph>-R</codeph> option) to work.
-              <p>Default: <codeph>/tmp</codeph></p></pd>
+            <pd>指定Unix套接字的位置。适用于监听套接字和服务器连接。如果设置为空字符串，
+              则禁用Unix套接字。在线重新启动（<codeph>-R</codeph>选项）才能正常工作。
+              <p>默认值：<codeph>/tmp</codeph></p></pd>
           </plentry>
           <plentry>
             <pt>unix_socket_mode</pt>
-            <pd>Filesystem mode for the Unix socket.<p>Default: 0777</p></pd>
+            <pd>Unix套接字的文件系统模式。<p>默认为：0777</p></pd>
           </plentry>
           <plentry>
             <pt>unix_socket_group</pt>
-            <pd>Group name to use for Unix socket.<p>Default: not set</p></pd>
+            <pd>用于Unix套接字的组名。<p>默认：未设置。</p></pd>
           </plentry>
           <plentry>
             <pt>user</pt>
-            <pd>If set, specifies the Unix user to change to after startup. This works only if
-              PgBouncer is started as root or if <codeph>user</codeph> is the same as the
-              current user.<p>Default: not set</p></pd>
+            <pd>如果设置，则指定启动后要更改的Unix用户。这只有在PgBouncer作为root启动或
+              <codeph>user</codeph>与当前用户相同时才有效。
+              <p>默认：未设置。</p></pd>
           </plentry>
           <plentry>
             <pt>auth_file</pt>
-            <pd>The name of the file containing the user names and passwords to load. The file
-              format is the same as the Greenplum Database <filepath>pg_auth</filepath>
-              file.<p>Default: not set</p></pd>
+            <pd>包含要加载的用户名和口令的文件的名称。文件格式与Greenplum数据库的
+              <filepath>pg_auth</filepath>文件相同，因此可以将此参数设置为其中一个后端文件。
+              <p>默认：未设置</p></pd>
           </plentry>
           <plentry>
             <pt>auth_hba_file</pt>
-            <pd>HBA configuration file to use when <codeph>auth_type</codeph> is <codeph>hba</codeph>. Refer to the <xref href="https://pgbouncer.github.io/config.html#hba-file-format" format="html" scope="external">HBA file format
-          </xref> discussion in the PgBouncer documentation for information about PgBouncer support of the HBA authentication file format.<p>Default: not set</p></pd>
+            <pd>当<codeph>auth_type</codeph>为<codeph>hba</codeph>时使用的HBA配置文件。
+             HBA文件格式请参阅<xref href="https://pgbouncer.github.io/config.html#hba-file-format" format="html" scope="external">
+             </xref>PgBouncer文档中PgBouncer支持的HBA授权文件格式的讨论部分。<p>默认：未设置</p></pd>
           </plentry>
           <plentry>
             <pt>auth_type</pt>
-            <pd>How to authenticate users.<parml>
+            <pd>如何认证用户<parml>
                 <plentry>
                   <pt>pam</pt>
-                  <pd>Use PAM to authenticate users. <codeph>auth_file</codeph> is ignored.
-                    This method is not compatible with databases using the <codeph>auth_user</codeph> option. The service name reported to PAM is “pgbouncer”. PAM is not supported in the HBA configuration file.
+                  <pd>使用PAM作为客户授权。<codeph>auth_file</codeph>被忽略。
+                    该方法与<codeph>auth_user</codeph>选项一起使用。
+                    报告给PAM的服务名为“pgbouncer”。PAM在HBA配置文件中不支持。
                     </pd>
                 </plentry>
                 <plentry>
                   <pt>hba</pt>
-                  <pd>The actual authentication type is loaded from the <codeph>auth_hba_file</codeph>. This setting allows different authentication methods different access paths.
+                  <pd>实际授权类型从<codeph>auth_hba_file</codeph>文件中加载。
+                    该设置允许不同的访问方法访问不同的路径。
                     </pd>
                 </plentry>
                 <plentry>
                   <pt>cert</pt>
-                  <pd>Clients must connect with TLS using a valid client certificate. The
-                    client's username is taken from CommonName field in the certificate.</pd>
+                  <pd>客户端必须使用有效的客户端证书连接到TLS。客户端的用户名取自证书中的CommonName字段。</pd>
                 </plentry>
                 <plentry>
                   <pt>md5</pt>
-                  <pd>Use MD5-based password check. <codeph>auth_file</codeph> may contain both
-                    MD5-encrypted or plain-text passwords. This is the default authentication
-                    method.</pd>
+                  <pd>使用基于MD5的口令检查。<codeph>auth_file</codeph>可能包含MD5加密或纯文本的口令。
+                    这是默认的身份认证方法。
+                     </pd>
                 </plentry>
                 <plentry>
                   <pt>plain</pt>
-                  <pd>Clear-text password is sent over wire. <i>Deprecated</i>.</pd>
+                  <pd>通过网络发送明文口令。<i>已废弃</i>。</pd>
                 </plentry>
                 <plentry>
                   <pt>trust</pt>
-                  <pd>No authentication is performed. The username must still exist in the
-                      <codeph>auth_file</codeph>.</pd>
+                  <pd>不做认证。用户名仍然必须存在于<codeph>auth_file</codeph>中。
+                      </pd>
                 </plentry>
                 <plentry>
                   <pt>any</pt>
-                  <pd>Like the <codeph>trust</codeph> method, but the username supplied is
-                    ignored. Requires that all databases are configured to log in with a
-                    specific user. Additionally, the console database allows any user to log in
-                    as admin.</pd>
+                  <pd>像<codeph>trust</codeph>方法一样，但提供的用户名被忽略。要求将所有数据库配置为使
+                    用特定用户登录。另外，控制台数据库允许任何用户以admin登录。</pd>
                 </plentry>
               </parml></pd>
           </plentry>
           <plentry>
             <pt>auth_query</pt>
-            <pd>Query to load a user's password from the database. If a user does not exist in the
-                <codeph>auth_file</codeph> and the database entry includes an
-                <codeph>auth_user</codeph>, this query is run in the database as
-                <codeph>auth_user</codeph> to lookup up the user.<p>Note that the query is run inside target database, so if a function is used it needs to be installed into each database.</p><p>Default: <codeph>SELECT
+            <pd>从数据库加载用户口令的查询。如果用户不存在于<codeph>auth_file</codeph>中并且数据库项包含
+              <codeph>auth_user</codeph>，则该查询作为<codeph>auth_user</codeph>在数据库中运行以查找用户。
+              <p>注意查询会在每个数据库中都执行，如果要运行函数，那么该函数需要在每个数据库中都安装。</p>
+              <p>默认值：<codeph>SELECT
                   usename, passwd FROM pg_shadow WHERE usename=$1</codeph></p></pd>
           </plentry>
           <plentry>
             <pt>auth_user</pt>
-            <pd>If <codeph>auth_user</codeph> is set, any user who is not specified in
-                <codeph>auth_file</codeph> is authenticated through the 
-                <codeph>auth_query</codeph> query from the <codeph>pg_shadow</codeph> database view. PgBouncer performs this
-                query as the
-                <codeph>auth_user</codeph> Greenplum Database user. <codeph>auth_user</codeph>'s password must be set
-              in the <codeph>auth_file</codeph>.<p>Direct access to <codeph>pg_shadow</codeph> requires Greenplum Database administrative privileges. It is preferable to use a non-admin user that calls <codeph>SECURITY DEFINER</codeph> function instead.</p></pd>
+            <pd>如果设置了<codeph>auth_user</codeph>，任何未在<codeph>auth_file</codeph>文件中指定的用户，
+              通过以<codeph>auth_user</codeph>身份查询数据库中的<codeph>pg_shadow</codeph>表来认证。
+              <codeph>auth_user</codeph>的口令必须在<codeph>auth_file</codeph>中设置。
+              <p>直接访问<codeph>pg_shadow</codeph>要求有Greenplum数据库的管理员权限。
+                推荐使用非管理员用户并调用函数来代替。</p></pd>
           </plentry>
           <plentry>
             <pt>pool_mode</pt>
-            <pd>Specifies when a server connection can be reused by other clients.<parml>
+            <pd>指定服务器连接何时可以被其他客户端重用。<parml>
                 <plentry>
                   <pt>session</pt>
-                  <pd>Connection is returned to the pool when the client disconnects.
-                    Default.</pd>
+                  <pd>当客户端断开连接时，连接返回到池。默认。</pd>
                 </plentry>
                 <plentry>
                   <pt>transaction</pt>
-                  <pd>Connection is returned to the pool when the transaction finishes.</pd>
+                  <pd>事务结束后，连接返回到池。</pd>
                 </plentry>
                 <plentry>
                   <pt>statement</pt>
-                  <pd>Connection is returned to the pool when the current query finishes. Long
-                    transactions with multiple statements are disallowed in this mode.</pd>
+                  <pd>当前查询完成后，连接返回到池。具有多个语句的长事务在此模式下被禁止。</pd>
                 </plentry>
               </parml></pd>
           </plentry>
           <plentry>
             <pt>max_client_conn</pt>
-            <pd>Maximum number of client connections allowed. When increased, you should also increase the file
-              descriptor limits. The actual number of file descriptors
-              used is more than <codeph>max_client_conn</codeph>. The theoretical maximum used,
-              when each user connects with its own username to the server
-                is:<codeblock>max_client_conn + (max_pool_size * total_databases * total_users)</codeblock><p>
-                If a database user is specified in the connect string, all users connect using
-                the same username. Then the theoretical maximum connections
-                is:</p><codeblock>max_client_conn + (max_pool_size * total_databases)</codeblock><p>(The
-                theoretical maximum should be never reached, unless someone deliberately crafts a
-                load for it. Still, it means you should set the number of file descriptors to a
-                safely high number. Search for <codeph>ulimit</codeph> in your operating system
-                documentation.)</p><p>Default: 100</p></pd>
+            <pd>允许的最大客户端连接数。当增加时，文件描述符限制也应该增加。使用的文件描述符的实际数量大于
+              <codeph>max_client_conn</codeph>。当每个用户使用自己的用户名连接到服务器时，
+              使用的理论最大值是：
+             <codeblock>max_client_conn + (max_pool_size * total_databases * total_users)</codeblock><p>
+               如果在连接字符串中指定了数据库用户，则所有用户使用相同的用户名连接。那么理论上的最大连接是：
+             </p><codeblock>max_client_conn + (max_pool_size * total_databases)</codeblock>
+              <p>（应该永远不要达到理论上的最大值，除非有人刻意为它加上负荷。但是，这意味着用户应该将文件
+                描述符的数量设置为一个安全的较高数字。在用户的操作系统文档中搜索<codeph>ulimit</codeph>。）
+              </p><p>默认：100</p></pd>
           </plentry>
           <plentry>
             <pt>default_pool_size</pt>
-            <pd>The number of server connections to allow per user/database pair. This can be
-              overridden in the per-database configuration.<p>Default: 20</p></pd>
+            <pd>允许每个用户/数据库对的服务器连接数量。这可以在每个数据库配置中被覆盖。
+              <p>默认：20</p></pd>
           </plentry>
           <plentry>
             <pt>min_pool_size</pt>
-            <pd>Add more server connections to the pool when it is lower than this number. This
-              improves behavior when the usual load drops and then returns suddenly after a
-              period of total inactivity.<p>Default: 0 (disabled)</p></pd>
+            <pd>当池中连接数低于这个数字时，将更多的服务器连接添加到池中。当平常的负载下降然后在一段时间
+              的不活跃期之后突然恢复到平常的负载时，这会改善行为。
+              <p>默认值：0（禁用）</p></pd>
           </plentry>
           <plentry>
             <pt>reserve_pool_size</pt>
-            <pd>The number of additional connections to allow for a pool. 0 disables.<p>Default:
-                0 (disabled)</p></pd>
+            <pd>对池允许的额外连接的数量。0 禁用。
+              <p>默认： 0（禁用）</p></pd>
           </plentry>
           <plentry>
             <pt>reserve_pool_timeout</pt>
-            <pd>If a client has not been serviced in this many seconds, PgBouncer enables use of
-              additional connections from the reserve pool. 0 disables.<p>Default: 5.0</p></pd>
+            <pd>如果客户端在这段时间内没有被服务，PgBouncer允许使用来自保留池的额外连接。0禁用。
+              <p>默认值：5.0</p></pd>
           </plentry>
           <plentry>
             <pt>max_db_connections</pt>
-            <pd>The maximum number of connections per database. If you hit the limit, closing a
-              client connection to one pool does not immediately allow a server connection to be
-              established for another pool, because the server connection for the first pool is
-              still open. Once the server connection closes (due to idle timeout), a new server
-              connection will be opened for the waiting pool.<p>Default: unlimited</p></pd>
+            <pd>每个数据库的最大连接数。如果达到限制，关闭到池的客户端连接不会立即允许对另一个池建立服务器连接，
+              因为第一个池的服务器连接仍处于打开状态。一旦服务器连接关闭（由于空闲超时），
+              将为等待池打开一个新的服务器连接。
+              <p>默认：没限制</p></pd>
           </plentry>
           <plentry>
             <pt>max_user_connections</pt>
-            <pd>The maximum number of connections per-user. When you hit the limit, closing a
-              client connection to one pool does not immediately allow a connection to be
-              established for another pool, because the connection for the first pool is still
-              open. After the connection for the first pool has closed (due to idle timeout), a
-              new server connection is opened for the waiting pool.</pd>
+            <pd>每个用户的最大连接数。当用户达到限制时，关闭到池的客户端连接不会立即允许对另一个池建立服务器连接，
+              因为第一个池的服务器连接仍处于打开状态。一旦服务器连接关闭（由于空闲超时），
+              将为等待池打开一个新的服务器连接。</pd>
           </plentry>
           <plentry>
             <pt>server_round_robin</pt>
-            <pd>By default, PgBouncer reuses server connections in LIFO (last-in, first-out)
-              order, so that a few connections get the most load. This provides the best
-              performance when a single server serves a database. But if there is TCP
-              round-robin behind a database IP, then it is better if PgBouncer also uses
-              connections in that manner to achieve uniform load.<p>Default: 0</p></pd>
+            <pd>默认情况下，PgBouncer以LIFO（后进先出）顺序重用服务器连接，这样少数连接获得最大的负载。
+              这在单个服务器提供数据库时提供最佳性能。但是如果数据库IP后面有TCP循环，那么最好是PgBouncer
+              也以这种方式使用连接来实现均衡的负载。
+              <p>默认值：0</p></pd>
           </plentry>
           <plentry>
             <pt>ignore_startup_parameters</pt>
-            <pd>By default, PgBouncer allows only parameters it can keep track of in startup
-              packets: <codeph>client_encoding</codeph>, <codeph>datestyle</codeph>,
-                <codeph>timezone</codeph>, and
-                <codeph>standard_conforming_strings</codeph>.<p>All others parameters raise an
-                error. To allow other parameters, specify them here so that PgBouncer can ignore
-                them.</p><p>Default: empty</p></pd>
+            <pd>默认情况下，PgBouncer只允许它在启动包中可以跟踪的参数：
+              <codeph>client_encoding</codeph>、<codeph>datestyle</codeph>、
+                <codeph>timezone</codeph>和
+              <codeph>standard_conforming_strings</codeph>。<p>所有其他参数都会产生错误。
+                要允许其他参数，在这里指定它们，这样PgBouncer可以忽略它们。</p>
+              <p>默认值：空</p></pd>
           </plentry>
           <plentry>
             <pt>disable_pqexec</pt>
-            <pd>Disable Simple Query protocol (PQexec). Unlike Extended Query protocol, Simple
-              Query protocol allows multiple queries in one packet, which allows some classes of
-              SQL-injection attacks. Disabling it can improve security. This means that only
-              clients that exclusively use Extended Query protocol will work.<p>Default:
-              0</p></pd>
+            <pd>禁用简单查询协议（PQexec）。与扩展查询协议不同，简单查询协议允许在一个数据包中进行多个查询，
+              这允许某些种类的SQL注入攻击。禁用它可以提高安全性。这意味着只有专门使用扩展查询协议的客户端
+              才能工作。<p>默认值：0</p></pd>
           </plentry>
           <plentry>
             <pt>application_name_add_host</pt>
-            <pd>Add the client host address and port to the application name setting set on
-              connection start. This helps in identifying the source of bad queries. The setting
-              is overwritten without detection if the application executes <codeph>SET
-                application_name</codeph> after connecting. <p>Default: 0</p></pd>
+            <pd>将客户端主机地址和端口添加到连接启动时设置的应用程序名称设置。这有助于识别不良查询的来源。
+              如果应用程序在连接后执行了<codeph>SET application_name</codeph>，则设置将被覆盖而不被检测到。
+              <p>默认值：1</p></pd>
           </plentry>
           <plentry>
             <pt>conffile</pt>
-            <pd>Show location of the current configuration file. Changing this parameter will result in PgBouncer using another config file for next RELOAD / SIGHUP.
-                <p>Default: file from command line</p></pd>
+            <pd>显示当前配置文件位置。改变该参数会导致PgBouncer在下次RELOAD/SIGHUP后使用另外的配置文件。
+                <p>默认值：文件来自命令行</p></pd>
           </plentry>
           <plentry>
             <pt>service_name</pt>
-            <pd>Used during win32 service registration.
-                <p>Default: pgbouncer</p></pd>
+            <pd>仅在win32服务注册时使用。
+                <p>默认值：pgbouncer</p></pd>
           </plentry>
           <plentry>
             <pt>job_name</pt>
-            <pd>Alias for <codeph>service_name</codeph>.</pd>
+            <pd><codeph>service_name</codeph>的代称。</pd>
           </plentry>
         </parml>
       </section>
       <section>
-        <title>Log Settings</title>
+        <title>日志设置</title>
         <parml>
           <plentry>
             <pt>syslog</pt>
-            <pd>Toggles syslog on and off.<p>Default:
-                0</p></pd>
+            <pd>切换syslog开启和关闭。<p>默认值：0</p></pd>
           </plentry>
           <plentry>
             <pt>syslog_ident</pt>
-            <pd>Under what name to send logs to syslog.<p>Default:
+            <pd>以什么名字发送日志到syslog。<p>默认值：
                 <codeph>pgbouncer</codeph></p></pd>
           </plentry>
           <plentry>
             <pt>syslog_facility</pt>
-            <pd>Under what facility to send logs to syslog. Some possibilities are:
-                <codeph>auth</codeph>, <codeph>authpriv</codeph>, <codeph>daemon</codeph>,
-                <codeph>user</codeph>, <codeph>local0-7</codeph><p>Default:
+            <pd>在什么设施下发送日志到系统日志。一些可能是：
+                <codeph>auth</codeph>、<codeph>authpriv</codeph>、<codeph>daemon</codeph>、
+                <codeph>user</codeph>、<codeph>local0-7</codeph>
+              <p>默认值：
                   <codeph>daemon</codeph></p></pd>
           </plentry>
           <plentry>
             <pt>log_connections</pt>
-            <pd>Log successful logins.<p>Default: 1</p></pd>
+            <pd>记录成功的登陆。<p>默认值：1</p></pd>
           </plentry>
           <plentry>
             <pt>log_disconnections</pt>
-            <pd>Log disconnections, with reasons.<p>Default: 1</p></pd>
+            <pd>记录连接失败的原因。<p>默认值：1</p></pd>
           </plentry>
           <plentry>
             <pt>log_pooler_errors</pt>
-            <pd>Log error messages that the pooler sends to clients.<p>Default: 1</p></pd>
+            <pd>记录池中发送给客户端的错误消息。<p>默认值：1</p></pd>
           </plentry>
           <plentry>
             <pt>stats_period</pt>
-            <pd>How often to write aggregated statistics to the log. <p>Default: 60</p></pd>
+            <pd>将汇总的统计信息写入日志的频率。<p>默认值：60</p></pd>
           </plentry>
         </parml>
       </section>
       <section>
-        <title>Console Access Control</title>
+        <title>控制台访问控制</title>
         <parml>
           <plentry>
             <pt>admin_users</pt>
-            <pd>Comma-separated list of database users that are allowed to connect and run all
-              commands on the PgBouncer Administration Console. Ignored when <codeph>auth_type=any</codeph>, in which case
-              any username is allowed in as admin.<p>Default: empty</p></pd>
+            <pd>允许连接并在控制台上运行所有命令的数据库用户列表，用逗号分隔。
+              当<codeph>auth_type=any</codeph>时候，忽略该列表。在这种情况下，任何用户名都被允许作为admin。
+              <p>默认值：空</p></pd>
           </plentry>
           <plentry>
             <pt>stats_users</pt>
-            <pd>Comma-separated list of database users that are allowed to connect and run
-              read-only queries on the console. This includes all <codeph>SHOW</codeph> commands except <codeph>SHOW
-                FDS</codeph>.<p>Default: empty</p></pd>
+            <pd>逗号分隔的数据库用户列表，允许它们在控制台上连接并运行只读查询。这意味着除了<codeph>SHOW FDS</codeph>
+              之外的所有<codeph>SHOW</codeph>命令。
+              <p>默认值：空</p></pd>
           </plentry>
         </parml>
       </section>
       <section>
-        <title>Connection Sanity Checks, Timeouts</title>
+        <title>C连接健康检查、超时</title>
         <parml>
           <plentry>
             <pt>server_reset_query</pt>
-            <pd>Query sent to server on connection release, before making it available to other
-              clients. At that moment no transaction is in progress so it should not include
-                <codeph>ABORT</codeph> or <codeph>ROLLBACK</codeph>.<p>The query should clean any changes made to a database session so that the next client gets a connection in a well-defined state. Default is <codeph>DISCARD ALL</codeph> which cleans everything, but that leaves the next client no pre-cached state.</p> <p>When
-                transaction pooling is used, the <codeph>server_reset_query</codeph> should be
-                empty, as clients should not use any session features. If clients do use session
-                features, they will be broken because transaction pooling does not guarantee
-                that the next query will run on the same connection.</p><p>Default:
+            <pd>在连接释放时且没有对其他客户端可用之前，发送到服务器的查询。在那一刻没有事务正在进行，
+              所以它不应该包括<codeph>ABORT</codeph>或<codeph>ROLLBACK</codeph>。
+              <p>该查询会清理任何改变模式为数据库会话，以保证下一个客户端连接获取更好的状态。默认为
+                <codeph>DISCARD ALL</codeph></p> 
+              <p>当使用事务池时，<codeph>server_reset_query</codeph>应该是空的，
+                因为客户端不能使用任何事务特性。如果客户端使用了事务特性，操作将会失败，因为事务池
+                不能保证下次运行相同的连接。</p><p>默认为：
                   <codeph>DISCARD ALL;</codeph></p></pd>
           </plentry>
           <plentry>
             <pt>server_reset_query_always</pt>
             <pd>
-              <p>Whether <codeph>server_reset_query</codeph> should be run in all pooling modes.
-                When this setting is off (default), the <codeph>server_reset_query</codeph> will
-                be run only in pools that are in sessions pooling mode. Connections in
-                transaction pooling mode should not have any need for reset query.</p>
-              <p>Default: 0</p>
+              <p><codeph>server_reset_query</codeph>是否应该在所有池模式下运行。如果此设置处于关闭状态
+                （默认），则<codeph>server_reset_query</codeph>将仅在处于会话池模式的池中运行。
+                事务池模式下的连接不应该有任何重置查询的需要。
+                </p>
+              <p>默认值：0</p>
             </pd>
           </plentry>
           <plentry>
             <pt>server_check_delay</pt>
-            <pd>How long to keep released connections available for re-use without running
-              sanity-check queries on it. If 0, then the query is run always.<p>Default:
-              30.0</p></pd>
+            <pd>保持被释放连接可重用而不运行健康检查查询的时间。如果为0，则查询始终运行。
+              <p>默认值：30.0</p></pd>
           </plentry>
           <plentry>
             <pt>server_check_query</pt>
-            <pd>A simple do-nothing query to test the server connection.<p>If an empty string,
-                then sanity checking is disabled.</p><p>Default: SELECT 1;</p></pd>
+            <pd>用来测试服务器连接的一个简单的无所作为的查询。<p>如果是一个空字符串，则禁用健康检查。
+            </p><p>默认值：SELECT 1;</p></pd>
           </plentry>
           <plentry>
             <pt>server_lifetime</pt>
-            <pd>The pooler tries to close server connections that have been connected longer
-              than this number of seconds. Setting it to 0 means the connection is to be used
-              only once, then closed.<p>Default: 3600.0</p></pd>
+            <pd>池会尝试关闭连接时间超过这个秒数的服务器连接。将其设置为0意味着连接只能使用一次，
+              然后关闭。<p>默认值：3600.0</p></pd>
           </plentry>
           <plentry>
             <pt>server_idle_timeout</pt>
-            <pd>If a server connection has been idle more than this many seconds it is dropped.
-              If this parameter is set to 0, timeout is disabled. [seconds]<p>Default:
+            <pd>如果服务器连接闲置超过这么多秒钟，它将被丢弃。如果此参数设置为0，则禁用超时。
+              <p>默认值：
               600.0</p></pd>
           </plentry>
           <plentry>
             <pt>server_connect_timeout</pt>
-            <pd>If connection and login will not finish in this number of seconds, the
-              connection will be closed. <p>Default: 15.0</p></pd>
+            <pd>如果在此秒数内连接和登录无法完成，则连接将被关闭。<p>默认值：15.0</p></pd>
           </plentry>
           <plentry>
             <pt>server_login_retry</pt>
-            <pd>If a login fails due to failure from <codeph>connect()</codeph> or
-              authentication, the pooler waits this many seconds before retrying to connect.
-                <p>Default: 15.0</p></pd>
+            <pd>如果登陆由于<codeph>connect()</codeph>或认证失败而失败，则在重新尝试连接之前，
+              池会等待几秒钟。
+              <p>默认值：15.0</p></pd>
           </plentry>
           <plentry>
             <pt>client_login_timeout</pt>
-            <pd>If a client connects but does not manage to login in this number of seconds, it
-              is disconnected. This is needed to avoid dead connections stalling
-                <codeph>SUSPEND</codeph> and thus online restart.<p>Default: 60.0</p></pd>
+            <pd>如果客户端在此秒数内连接但无法登录，则会断开连接。需要这来避免死连接卡住
+              <codeph>SUSPEND</codeph>，从而导致在线重新启动。<p>默认值：60.0</p></pd>
           </plentry>
           <plentry>
             <pt>autodb_idle_timeout</pt>
-            <pd>If database pools created automatically (via <codeph>*</codeph>) have been unused this many
-              seconds, they are freed. Their statistics are also forgotten. <p>Default:
-                3600.0</p></pd>
+            <pd>如果（通过<codeph>*</codeph>）自动创建的数据库池已经有这么多秒没有使用，
+              则它们将被释放。并且也放弃对它们的统计。
+              <p>默认值： 3600.0</p></pd>
           </plentry>
           <plentry>
             <pt>dns_max_ttl</pt>
-            <pd>How long to cache DNS lookups, in seconds. If a DNS lookup returns several
-              answers, PgBouncer round-robins between them in the meantime. The actual DNS TTL
-              is ignored. <p>Default: 15.0</p></pd>
+            <pd>缓存DNS查找结果多少秒。如果一个DNS查找返回几个答案，那么PgBouncer会在它们之间循环往复。实际的DNS TTL被忽略。
+              <p>默认值：15.0</p></pd>
           </plentry>
           <plentry>
             <pt>dns_nxdomain_ttl</pt>
-            <pd>How long error and NXDOMAIN DNS lookups can be cached, in seconds.<p>Default:
-                15.0</p></pd>
+            <pd>可以缓存错误和NXDOMAIN DNS查找多长时间。以秒为单位。
+              <p>默认值：15.0</p></pd>
           </plentry>
           <plentry>
             <pt>dns_zone_check_period</pt>
-            <pd>Period to check if zone serial numbers have changed.<p>PgBouncer can collect DNS
-                zones from hostnames (everything after first dot) and then periodically check if
-                the zone serial numbers change. If changes are detected, all hostnames in that
-                zone are looked up again. If any host IP changes, its connections are
-                invalidated.</p><p>Works only with UDNS and c-ares backend (<codeph>--with-udns</codeph> or <codeph>--with-cares</codeph> to
-                configure).</p><p>Default: 0.0 (disabled)</p></pd>
+            <pd>检查区域序列号是否改变的周期。
+              <p>PgBouncer可以从主机名（第一个点之后的所有内容）收集DNS区域，然后定期检查区域序列号是否更改。
+                如果检测到更改，则会再次查找该区域中的所有主机名。如果任何主机IP发生更改，则其连接将失效。
+              </p><p>只适用于UDNS后端（用<codeph>--with-udns</codeph>或<codeph>--with-cares</codeph>配置）。
+              </p><p>默认值：0.0（禁用）</p></pd>
           </plentry>
         </parml>
       </section>
       <section>
-        <title>TLS settings</title>
+        <title>TLS设置</title>
         <parml>
-          <plentry><pt>client_tls_sslmode</pt><pd>TLS mode to use for connections from clients. TLS connections are disabled by default. When enabled, <codeph>client_tls_key_file</codeph> and <codeph>client_tls_cert_file</codeph> must be also configured to set up the key and certificate PgBouncer uses to accept client connections.<ul id="ul_dgn_drd_bt">
-            <li><codeph>disable</codeph>: Plain TCP. If client requests TLS, it’s ignored. Default.</li>
-            <li><codeph>allow</codeph>: If client requests TLS, it is used. If not, plain TCP is used. If client uses client-certificate, it is not validated.</li>
-            <li><codeph>prefer</codeph>: Same as <codeph>allow</codeph>.</li>
-            <li><codeph>require</codeph>: Client must use TLS. If not, client connection is rejected. If client uses client-certificate, it is not validated.</li>
-            <li><codeph>verify-ca</codeph>: Client must use TLS with valid client certificate.</li>
-            <li><codeph>verify-full</codeph>: Same as <codeph>verify-ca</codeph>.</li></ul></pd>
+          <plentry><pt>client_tls_sslmode</pt>
+            <pd>TLS模式主要给客户端连接使用。TLS连接默认不启用。当启用时，必须同时配置
+              <codeph>client_tls_key_file</codeph>和<codeph>client_tls_cert_file</codeph>
+              参数，以使PgBouncer能够接受客户端连接。<ul id="ul_dgn_drd_bt">
+            <li><codeph>disable</codeph>: plain TCP。如果客户端请求TLS。他会被忽略。默认配置。</li>
+            <li><codeph>allow</codeph>: 如果客户端请求TLS，他被使用。如果没请求，使用plain TCP。
+              如果客户端使用client-certificate，不会验证改值。</li>
+            <li><codeph>prefer</codeph>: 与<codeph>allow</codeph>相同</li>
+            <li><codeph>require</codeph>: 客户端必须使用TLS。如果不使用，客户端连接被拒绝。
+              如果客户端使用client-certificate，他不被验证。</li>
+            <li><codeph>verify-ca</codeph>: 客户端必须使用TLS并验证客户端授权。</li>
+            <li><codeph>verify-full</codeph>: 与<codeph>verify-ca</codeph>相同。</li></ul></pd>
           </plentry>
-          <plentry><pt>client_tls_key_file</pt><pd>Private key for PgBouncer to accept client connections.</pd><pd><p>Default: not set</p></pd>
+          <plentry><pt>client_tls_key_file</pt>
+            <pd>PgBouncer使用私有密钥接受客户端连接</pd><pd><p>默认值：不设置。</p></pd>
           </plentry>
-          <plentry><pt>client_tls_cert_file</pt><pd>Root certificate file to validate client certificates.</pd><pd><p>Default: unset</p></pd>
+          <plentry><pt>client_tls_cert_file</pt>
+            <pd>根证书授权验证客户端授权。</pd><pd><p>默认值：未设置。</p></pd>
           </plentry>
-          <plentry><pt>client_tls_ca_file</pt><pd>Root certificate to validate client certificates.</pd><pd><p>Default: unset</p></pd></plentry>
-          <plentry><pt>client_tls_protocols</pt><pd>Which TLS protocol versions are allowed. </pd><pd>Valid values: are <codeph>tlsv1.0</codeph>, <codeph>tlsv1.1</codeph>, <codeph>tlsv1.2</codeph>. </pd><pd>Shortcuts: <codeph>all</codeph> (<codeph>tlsv1.0</codeph>,<codeph>tlsv1.1</codeph>,<codeph>tlsv1.2</codeph>), <codeph>secure</codeph> (<codeph>tlsv1.2</codeph>), <codeph>legacy</codeph> (<codeph>all</codeph>).</pd><pd><p>Default: <codeph>all</codeph></p></pd>
+          <plentry><pt>client_tls_ca_file</pt>
+            <pd>根证书授权验证客户端授权。</pd><pd><p>默认值：未设置。</p></pd></plentry>
+          <plentry><pt>client_tls_protocols</pt>
+            <pd>那种TLS协议被允许。</pd><pd>有效值为：<codeph>tlsv1.0</codeph>、<codeph>tlsv1.1</codeph>
+              、<codeph>tlsv1.2</codeph>。</pd>
+            <pd>快捷方式：<codeph>all</codeph>（<codeph>tlsv1.0</codeph>、<codeph>tlsv1.1</codeph>、<codeph>tlsv1.2</codeph>）、<codeph>secure</codeph>（<codeph>tlsv1.2</codeph>）、<codeph>legacy</codeph>（<codeph>all</codeph>）。</pd><pd>
+              <p>默认值：<codeph>all</codeph></p></pd>
           </plentry>
-          <plentry><pt>client_tls_ciphers</pt><pd><p>Default: <codeph>fast</codeph></p></pd>
+          <plentry><pt>client_tls_ciphers</pt><pd><p>默认值：<codeph>fast</codeph></p></pd>
           </plentry>
-          <plentry><pt>client_tls_ecdhcurve</pt><pd>Elliptic Curve name to use for ECDH key exchanges.</pd><pd>Allowed values: <codeph>none</codeph> (DH is disabled), <codeph>auto</codeph> (256-bit ECDH), curve name.</pd><pd><p>Default: <codeph>auto</codeph></p></pd>
+          <plentry><pt>client_tls_ecdhcurve</pt>
+            <pd>ECDH key交换使用的Elliptic Curve名称。</pd>
+            <pd>可用值：<codeph>none</codeph>（DH禁用）、<codeph>auto</codeph>（256-bit ECDH）、curve name。</pd><pd>
+              <p>默认值：<codeph>auto</codeph></p></pd>
           </plentry>
-          <plentry><pt>client_tls_dheparams</pt><pd>DHE key exchange type.</pd><pd>Allowed values: <codeph>none</codeph> (DH is disabled), <codeph>auto</codeph> (2048-bit DH), <codeph>legacy</codeph> (1024-bit DH).</pd><pd><p>Default: <codeph>auto</codeph></p></pd>
+          <plentry><pt>client_tls_dheparams</pt>
+            <pd>DHE key交换类型。</pd>
+            <pd>可用值：<codeph>none</codeph>（DH禁用）、<codeph>auto</codeph>（2048-bit ECDH）、 <codeph>legacy</codeph>（1024-bit ECDH）。
+            </pd><pd><p>默认值：<codeph>auto</codeph></p></pd>
           </plentry>
-          <plentry><pt>server_tls_sslmode</pt><pd>TLS mode to use for connections to Greenplum Database and PostgreSQL servers. TLS connections are disabled by default.<ul id="ul_hyh_1td_bt">
-            <li><codeph>disabled</codeph>: Plain TCP. TLS is not requested from the server. Default.</li>
-            <li><codeph>allow</codeph>: If server rejects plain, try TLS. (<i>PgBouncer Documentation is speculative on this..</i>)</li>
-            <li><codeph>prefer</codeph>: TLS connection is always requested first. When connection is refused, plain TPC is used. Server certificate is not validated.</li>
-            <li><codeph>require</codeph>: Connection must use TLS. If server rejects it, plain TCP is not attempted. Server certificate is not validated.</li>
-            <li><codeph>verify-ca</codeph>: Connection must use TLS and server certificate must be valid according to <codeph>server_tls_ca_file</codeph>. The server hostname is not verfied against the certificate.</li>
-            <li><codeph>verify-full</codeph>: Connection must use TLS and the server certificate must be valid according to <codeph>server_tls_ca_file</codeph>. The server hostname must match the hostname in the certificate.</li></ul></pd>
+          <plentry><pt>server_tls_sslmode</pt>
+            <pd>连接到Greenplum数据库和PostgreSQL数据库的TLS模式。TLS连接默认被禁用。<ul id="ul_hyh_1td_bt">
+              <li><codeph>disable</codeph>: plain TCP。如果客户端请求TLS。他会被忽略。默认配置。</li>
+              <li><codeph>allow</codeph>: 如果客户端请求TLS，他被使用。如果没请求，使用plain TCP。
+                如果客户端使用client-certificate，不会验证改值。</li>
+              <li><codeph>prefer</codeph>: 与<codeph>allow</codeph>相同</li>
+              <li><codeph>require</codeph>: 客户端必须使用TLS。如果不使用，客户端连接被拒绝。
+                如果客户端使用client-certificate，他不被验证。</li>
+              <li><codeph>verify-ca</codeph>: 客户端必须使用TLS并验证客户端授权。</li>
+              <li><codeph>verify-full</codeph>: 与<codeph>verify-ca</codeph>相同。</li></ul></pd>
           </plentry>
-          <plentry><pt>server_tls_ca_file</pt><pd>Path to the root certificate file used to validate Greenplum Database and PostgreSQL server certificates.</pd><pd><p>Default: unset</p></pd>
+          <plentry><pt>server_tls_ca_file</pt>
+            <pd>用于验证Greenplum和PostgreSQL数据库服务证书的证书验证文件。
+            </pd><pd><p>默认值：不设置。</p></pd>
           </plentry>
-          <plentry><pt>server_tls_key_file</pt><pd>The private key for PgBouncer to authenticate against Greenplum Database or PostgreSQL server.</pd><pd><p>Default: not set</p></pd>
+          <plentry><pt>server_tls_key_file</pt>
+            <pd>依赖于Greenplum或PostgreSQL的PgBouncer私有密钥。</pd><pd><p>默认值：不设置。</p></pd>
           </plentry>
-          <plentry><pt>server_tls_cert_file</pt><pd>Certificate for private key. Greenplum Database or PostgreSQL servers can validate it.</pd><pd><p>Default: not set</p></pd>
+          <plentry><pt>server_tls_cert_file</pt>
+            <pd>私有密钥证书。Greenplum或PostgreSQL数据库会验证它。 
+              </pd><pd><p>默认值：不设置。</p></pd>
           </plentry>
-          <plentry><pt>server_tls_protocols</pt><pd>Which TLS protocol versions are allowed. </pd><pd>Valid values are: <codeph>tlsv1.0</codeph>, <codeph>tlsv1.1</codeph>, <codeph>tlsv1.2</codeph>. </pd><pd>Shortcuts: <codeph>all</codeph> (<codeph>tlsv1.0</codeph>, <codeph>tlsv1.1</codeph>, <codeph>tlsv1.2</codeph>); <codeph>secure</codeph> (<codeph>tlsv1.2</codeph>); <codeph>legacy</codeph> (<codeph>all</codeph>).</pd><pd><p>Default: <codeph>all</codeph></p></pd>
+          <plentry><pt>server_tls_protocols</pt>
+            <pd>允许使用的TLS协议版本。</pd>
+            <pd>有效值为：<codeph>tlsv1.0</codeph>、<codeph>tlsv1.1</codeph>、
+              <codeph>tlsv1.2</codeph>。</pd>
+            <pd>快捷方式：<codeph>all</codeph>（<codeph>tlsv1.0</codeph>、<codeph>tlsv1.1</codeph>、<codeph>tlsv1.2</codeph>）、<codeph>secure</codeph>（<codeph>tlsv1.2</codeph>）、<codeph>legacy</codeph>（<codeph>all</codeph>）。</pd>
           </plentry>
-          <plentry><pt>server_tls_ciphers</pt><pd><p>Default: <codeph>fast</codeph></p></pd>
+          <plentry><pt>server_tls_ciphers</pt>
+            <pd><p>默认值：<codeph>fast</codeph></p></pd>
           </plentry>
         </parml>
       </section>
       <section>
-        <title>Dangerous Timeouts</title>
-        <p>Setting the following timeouts can cause unexpected errors.</p>
+        <title>危险超时</title>
+        <p>设置以下超时可能会导致意外的错误。</p>
         <parml>
           <plentry>
             <pt>query_timeout</pt>
-            <pd>Queries running longer than this (seconds) are canceled. This parameter should
-              be used only with a slightly smaller server-side
-                <codeph>statement_timeout</codeph>, to trap queries with network problems.
-                [seconds]<p>Default: 0.0 (disabled)</p></pd>
+            <pd>运行时间超过这个秒数的查询被取消。此参数只能与较小的服务器端
+              <codeph>statement_timeout</codeph>一起使用，以捕获出现网络问题的查询。
+              <p>默认值：0.0（禁用）</p></pd>
           </plentry>
           <plentry>
             <pt>query_wait_timeout</pt>
-            <pd>The maximum time, in seconds, queries are allowed to wait for execution. If the
-              query is not assigned a connection during that time, the client is disconnected.
-              This is used to prevent unresponsive servers from grabbing up
-                connections.<p>Default: 120</p></pd>
+            <pd>允许查询等待执行的最长时间（以秒为单位）。如果在此期间查询未分配连接，
+              则客户端将断开连接。 这用于防止无响应的服务器强占连接。
+              <p>默认值：0.0（禁用）</p></pd>
           </plentry>
           <plentry>
             <pt>client_idle_timeout</pt>
-            <pd>Client connections idling longer than this many seconds are closed. This should
-              be larger than the client-side connection lifetime settings, and only used for
-              network problems.<p>Default: 0.0 (disabled)</p></pd>
+            <pd>客户端连接空闲的时间超过了这么多秒钟就会被关闭。 这应该大于客户端连接的生命周期设置，
+              并且仅用于网络问题。<p>默认值：0.0（禁用）</p></pd>
           </plentry>
           <plentry>
             <pt>idle_transaction_timeout</pt>
-            <pd>If client has been in "idle in transaction" state longer than this (seconds), it
-              is disconnected. <p>Default: 0.0 (disabled)</p></pd>
+            <pd>如果客户端处于“事务空闲”状态的时间超过这个秒数，则它被断开。
+              <p>默认值：0.0（禁用）</p></pd>
           </plentry>
         </parml>
       </section>
       <section>
-        <title>Low-level Network Settings</title>
+        <title>低层网络设置</title>
         <parml>
           <plentry>
             <pt>pkt_buf</pt>
-            <pd>Internal buffer size for packets. Affects the size of TCP packets sent and
-              general memory usage. Actual <codeph>libpq</codeph> packets can be larger than this so there is no
-              need to set it large.<p>Default: 4096</p></pd>
+            <pd>包的内部缓冲区大小。影响发送的TCP包的尺寸和一般内存使用情况。 
+              实际的<codeph>libpq</codeph>包可能比这个大，所以没有必要把它设置的很大。
+              <p>默认值：4096</p></pd>
               </plentry>
           <plentry>
             <pt>max_packet_size</pt>
-            <pd>Maximum size for packets that PgBouncer accepts. One packet is either one query
-              or one result set row. A full result set can be larger.<p>Default:
+            <pd>PgBouncer接受的包的最大尺寸。包是一个查询或一个结果集行。完整的结果集可以更大。
+              <p>默认值：
               2147483647</p></pd>
           </plentry>
           <plentry>
             <pt>listen_backlog</pt>
-            <pd>Backlog argument for the <codeph>listen(2)</codeph> system call. It determines how many new
-              unanswered connection attempts are kept in queue. When the queue is full, further
-              new connection attempts are dropped.<p>Default: 128</p></pd>
+            <pd><codeph>listen(2)</codeph>系统调用的backlog参数。它表示有多少新的未答复的连接尝试被保留在队列中。
+              当队列已满时，进一步的新连接尝试被丢弃。<p>默认值：128</p></pd>
           </plentry>
           <plentry>
             <pt>sbuf_loopcnt</pt>
-            <pd>How many times to process data on one connection, before proceeding. Without
-              this limit, one connection with a big result set can stall PgBouncer for a long
-              time. One loop processes one <codeph>pkt_buf</codeph> amount of data. 0 means no
-                limit.<p>Default: 5</p></pd>
+            <pd>在继续之前，在一个连接上处理数据多少次。没有这个限制，一个大的结果集的连接可能会使
+              PgBouncer停顿很长时间。一个循环处理一个<codeph>pkt_buf</codeph>数量的数据。0表示没有限制。
+              <p>默认值：5</p></pd>
           </plentry>
           <plentry>
             <pt>suspend_timeout</pt>
-            <pd>How many seconds to wait for buffer flush during <codeph>SUSPEND</codeph> or
-              restart (<codeph>-R</codeph>). Connection is dropped if flush does not
-                succeed.<p>Default: 10</p></pd>
+            <pd>等待<codeph>SUSPEND</codeph>或reboot（<codeph>-R</codeph>）期间的缓冲区刷写多少秒钟。
+              如果刷写不成功，连接将被丢弃。<p>默认值：10</p></pd>
           </plentry>
           <plentry>
             <pt>tcp_defer_accept</pt>
-            <pd>For details on this and other TCP options, please see the tcp(7) man
-                page.<p>Default: 45 on Linux, otherwise 0</p></pd>
+            <pd>有关此选项和其他TCP选项的详细信息，请参阅tcp（7）手册页。
+              <p>默认值：Linux上是45，其他为0</p></pd>
           </plentry>
           <plentry>
             <pt>tcp_socket_buffer</pt>
-            <pd><p>Default: not set</p></pd>
+            <pd><p>默认值：不设置</p></pd>
           </plentry>
           <plentry>
             <pt>tcp_keepalive</pt>
-            <pd>Turns on basic keepalive with OS defaults.<p>On Linux, the system defaults are
-                  <codeph>tcp_keepidle=7200</codeph>, <codeph>tcp_keepintvl=75</codeph>,
-                  <codeph>tcp_keepcnt=9</codeph>. </p><p>Default: 1</p></pd>
+            <pd>用OS默认值启用基本的keepalive。<p>Linux上，系统默认为 
+                  <codeph>tcp_keepidle=7200</codeph>、<codeph>tcp_keepintvl=75</codeph>、
+                  <codeph>tcp_keepcnt=9</codeph>。
+            </p><p>默认值：1</p></pd>
           </plentry>
           <plentry>
             <pt>tcp_keepcnt</pt>
-            <pd><p>Default: not set</p></pd>
+            <pd><p>默认值：未设置</p></pd>
           </plentry>
           <plentry>
             <pt>tcp_keepidle</pt>
-            <pd><p>Default: not set</p></pd>
+            <pd><p>默认值：未设置</p></pd>
           </plentry>
           <plentry>
             <pt>tcp_keepintvl</pt>
-            <pd><p>Default: not set</p></pd>
+            <pd><p>默认值：未设置</p></pd>
           </plentry>
         </parml>
       </section>
@@ -671,28 +667,30 @@ db = ...
   </topic>
 
   <topic id="topic_lzk_zjd_gs">
-    <title>[users] Section</title>
+    <title>[users]小节</title>
     <body>
-      <p>This section contains <codeph><varname>key</varname></codeph>=<codeph><varname>value</varname></codeph> pairs, where the <codeph><varname>key</varname></codeph> is a user name and the
-        <codeph><varname>value</varname></codeph> is a <codeph>libpq</codeph> connect-string list of <codeph><varname>key</varname></codeph>=<codeph><varname>value</varname></codeph> pairs. </p>
+      <p>这部分包含<codeph><varname>key</varname></codeph>=<codeph><varname>value</varname></codeph>对，
+        其中<codeph><varname>key</varname></codeph>是用户名，<codeph><varname>value</varname></codeph>是
+        <codeph><varname>key</varname></codeph>=<codeph><varname>value</varname></codeph>对的
+        <codeph>libpq</codeph>连接字符串列表。</p>
       <p>
-        <b>Pool configuration</b>
+        <b>池配置</b>
       </p>
       <parml>
         <plentry>
           <pt>pool_mode</pt>
-          <pd>Set the pool mode for all connections from this user. If not set, the
-            database or default <codeph>pool_mode</codeph> is used.</pd>
+          <pd>设置池模式用于来自此用户的所有连接。如果未设置，则使用数据库或默认<codeph>pool_mode</codeph>。
+            </pd>
         </plentry>
       </parml>
     </body>
   </topic>
 
   <topic id="topic_xw4_dtc_gs">
-    <title>Example Configuration Files</title>
+    <title>示例配置文件</title>
     <body>
       <p>
-        <b>Minimal Configuration</b>
+        <b>最小配置</b>
       </p>
       <codeblock>[databases]
 postgres = host=127.0.0.1 dbname=postgres auth_user=gpadmin
@@ -708,7 +706,7 @@ pidfile = pgbouncer.pid
 admin_users = someuser
 stats_users = stat_collector
 </codeblock>
-        <p>Use connection parameters passed by the client:</p>
+      <p>使用客户端传递的连接参数：</p>
         <codeblock>[databases]
 * =
 
@@ -721,7 +719,7 @@ logfile = pgbouncer.log
 pidfile = pgbouncer.pid
 ignore_startup_parameters=options</codeblock>
         <p>
-          <b>Database Defaults</b>
+          <b>数据库默认</b>
         </p>
         <codeblock>[databases]
 
@@ -737,10 +735,11 @@ forcedb = host=127.0.0.1 port=300 user=baz password=foo client_encoding=UNICODE 
     </body>
   </topic>
   <topic id="seealso">
-    <title>See Also</title>
+    <title>另见</title>
     <body>
-      <p><codeph><xref href="pgbouncer.xml#topic1" type="topic" format="dita"/></codeph>,
-          <codeph><xref href="pgbouncer-admin.xml#topic1" type="topic" format="dita"/></codeph>, <xref href="https://pgbouncer.github.io/config.html" format="html" scope="external">PgBouncer Configuration Page</xref></p>
+      <p><codeph><xref href="pgbouncer.xml#topic1" type="topic" format="dita"/></codeph>、
+          <codeph><xref href="pgbouncer-admin.xml#topic1" type="topic" format="dita"/></codeph>、
+        <xref href="https://pgbouncer.github.io/config.html" format="html" scope="external">PgBouncer配置页面</xref></p>
       </body>
   </topic>
 

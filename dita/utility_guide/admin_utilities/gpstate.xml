@@ -4,9 +4,9 @@
 <topic id="topic1">
   <title id="md20941">gpstate</title>
   <body>
-    <p>Shows the status of a running Greenplum Database system.</p>
+    <p>显示正在运行的Greenplum数据库系统的状态。</p>
     <section id="section2">
-      <title>Synopsis</title>
+      <title>概要</title>
       <codeblock><b>gpstate</b> [<b>-d</b> <varname>master_data_directory</varname>] [<b>-B</b> <varname>parallel_processes</varname>] 
           [<b>-s</b> | <b>-b</b> | <b>-Q</b><ph> | <b>-e</b>] [<b>-m</b> | <b>-c</b></ph>] [<b>-p</b>] [<b>-i</b>] [<b>-f</b>] [<b>-v</b> | <b>-q</b>] | <b>-x</b> 
           [<b>-l</b> <varname>log_directory</varname>]
@@ -14,94 +14,81 @@
 <b>gpstate</b> <b>-?</b> | <b>-h</b> | <b>--help</b></codeblock>
     </section>
     <section id="section3">
-      <title>Description</title>
-      <p>The <codeph>gpstate</codeph> utility displays information about a running Greenplum Database instance. There is additional information you may want to know
-        about a Greenplum Database system, since it is comprised of multiple
-        PostgreSQL database instances (segments) spanning multiple machines. The
-          <codeph>gpstate</codeph> utility provides additional status information for a Greenplum Database system, such as:</p>
+      <title>描述</title>
+      <p><codeph>gpstate</codeph>工具显示有关正在运行的Greenplum数据库实例的信息。
+        由于Greenplum数据库系统由跨多台机器的多个PostgreSQL数据库实例（Segment）组成，
+        因此用户可能需要了解关于Greenplum数据库系统的额外信息。<codeph>gpstate</codeph>
+        工具为Greenplum数据库系统提供了额外的状态信息，例如：</p>
       <ul>
-        <li id="md136156">Which segments are down.</li>
-        <li id="md136689">Master and segment configuration information (hosts, data directories,
-          etc.).</li>
-        <li id="md136182">The ports used by the system.</li>
-        <li id="md136189">A mapping of primary segments to their corresponding mirror segments.</li>
+        <li id="md136156">哪台Segment主机已被关闭？</li>
+        <li id="md136689">Master和Segment配置信息（主机、数据目录等）。</li>
+        <li id="md136182">系统使用的端口。</li>
+        <li id="md136189">主Segment到其相应的镜像Segment的映射。</li>
       </ul>
     </section>
     <section id="section4">
-      <title>Options</title>
+      <title>选项</title>
       <parml>
         <plentry>
-          <pt>-b (brief status)</pt>
-          <pd>Optional. Display a brief summary of the state of the Greenplum Database
-            system. This is the default option.</pd>
+          <pt>-b（简要状态）</pt>
+          <pd>可选。显示Greenplum数据库系统状态的简要概述。这是默认选项。</pd>
         </plentry>
         <plentry>
           <pt>-B <varname>parallel_processes</varname></pt>
-          <pd>The number of segments to check in parallel. If not specified, the utility will start
-            up to 60 parallel processes depending on how many segment instances it needs to
-            check.</pd>
+          <pd>并行检查的Segment数。如果未指定，则工具将根据需要检查多少个Segment实例启动最多60个并行进程。</pd>
         </plentry>
         <plentry>
-          <pt>-c (show primary to mirror mappings)</pt>
-          <pd>Optional. Display mapping of primary segments to their corresponding mirror
-            segments.</pd>
+          <pt>-c（显示主Segment到镜像Segment的映射）</pt>
+          <pd>可选。显示主Segment到镜像Segment的映射。</pd>
         </plentry>
         <plentry>
           <pt>-d <varname>master_data_directory</varname></pt>
-          <pd>Optional. The master data directory. If not specified, the value set for
-              <codeph>$MASTER_DATA_DIRECTORY</codeph> will be used.</pd>
+          <pd>可选。Master的数据目录。如果未指定，则使用为<codeph>$MASTER_DATA_DIRECTORY</codeph>
+            设置的值。</pd>
         </plentry>
         <plentry>
-          <pt>-e (show segments with mirror status issues)</pt>
-          <pd>Show details on primary/mirror segment pairs that have potential issues such as 1) the
-            active segment is running in change tracking mode, meaning a segment is down 2) the
-            active segment is in resynchronization mode, meaning it is catching up changes to the
-            mirror 3) a segment is not in its preferred role, for example a segment that was a
-            primary at system initialization time is now acting as a mirror, meaning you may have
-            one or more segment hosts with unbalanced processing load.</pd>
+          <pt>-e（显示镜像状态出问题的Segment）</pt>
+          <pd>显示具有潜在问题的主要/镜像Master对的详细信息，例如1）活动Segment正在Change Tracking模式下运行，
+            表示Segment处于关闭状态；2）活动Segment处于重新同步模式，这意味着它正在赶上对镜像的更改；3）
+            一个Segment不是它的首选角色，例如在系统初始化时作为一个主Segment的现在作为一个镜像Segment，
+            这意味着用户可能有一台或多台Segment主机的处理负载不平衡。</pd>
         </plentry>
         <plentry>
-          <pt>-f (show standby master details)</pt>
-          <pd>Display details of the standby master host if configured.</pd>
+          <pt>-f（显示后备Master的详情）</pt>
+          <pd>显示后备Master主机的详细信息（如果配置）。</pd>
         </plentry>
         <plentry>
-          <pt>-i (show Greenplum Database version)</pt>
-          <pd>Display the Greenplum Database software version information for each
-            instance.</pd>
+          <pt>-i（显示Greenplum数据库的版本）</pt>
+          <pd>显示每个实例的Greenplum数据库软件版本信息。</pd>
         </plentry>
         <plentry>
           <pt>-l <varname>logfile_directory</varname></pt>
-          <pd>The directory to write the log file. Defaults to <codeph>~/gpAdminLogs</codeph>.</pd>
+          <pd>写入日志文件的目录。默认为<codeph>~/gpAdminLogs</codeph>。</pd>
         </plentry>
         <plentry>
-          <pt>-m (list mirrors)</pt>
-          <pd>Optional. List the mirror segment instances in the system, their current role, and
-            synchronization status.</pd>
+          <pt>-m（列出镜像）</pt>
+          <pd>可选。列出系统中的镜像Segment实例及其当前角色和同步状态。</pd>
         </plentry>
         <plentry>
-          <pt>-p (show ports)</pt>
-          <pd>List the port numbers used throughout the Greenplum Database
-            system.</pd>
+          <pt>-p（显示端口）</pt>
+          <pd>列出整个Greenplum数据库系统使用的端口号。</pd>
         </plentry>
         <plentry>
-          <pt>-q (no screen output)</pt>
-          <pd>Optional. Run in quiet mode. Except for warning messages, command output is not
-            displayed on the screen. However, this information is still written to the log
-            file.</pd>
+          <pt>-q（没有屏幕输出）</pt>
+          <pd>可选。以静默模式运行。除了警告信息之外，屏幕上不显示命令输出。但是，
+            这些信息仍然写入到日志文件中。</pd>
         </plentry>
         <plentry>
-          <pt>-Q (quick status)</pt>
-          <pd>Optional. Checks segment status in the system catalog on the master host. Does not
-            poll the segments for status.</pd>
+          <pt>-Q（快速状态）</pt>
+          <pd>可选。在Master主机上的系统目录中检查Segment的状态。不直接向Segment征询状态。</pd>
         </plentry>
         <plentry>
-          <pt>-s (detailed status)</pt>
-          <pd>Optional. Displays detailed status information for the Greenplum Database system.</pd>
+          <pt>-s（详细状态）</pt>
+          <pd>可选。显示Greenplum数据库系统的详细状态信息.</pd>
         </plentry>
         <plentry>
-          <pt>-v (verbose output)</pt>
-          <pd>Optional. Displays error messages and outputs detailed status and progress
-            information.</pd>
+          <pt>-v（详细输出）</pt>
+          <pd>可选。显示错误消息并输出详细的状态和进度信息。</pd>
         </plentry>
         <plentry>
           <pt>-x (expand)</pt>
@@ -110,273 +97,265 @@
         </plentry>
         <plentry>
           <pt>-? | -h | --help (help)</pt>
-          <pd>Displays the online help.</pd>
+          <pd>显示在线帮助。</pd>
         </plentry>
       </parml>
     </section>
     <section id="section5">
-      <title>Output Field Definitions</title>
-      <p>The following output fields are reported by <codeph>gpstate -s</codeph> for the master:</p>
+      <title>输出字段定义</title>
+      <p>以下输出字段由主机的<codeph>gpstate -s</codeph>报告：</p>
       <table id="md138854">
-        <title>gpstate output data for the master</title>
+        <title>gpstate为Master给出的输出数据</title>
         <tgroup cols="2">
           <colspec colnum="1" colname="col1" colwidth="166pt"/>
           <colspec colnum="2" colname="col2" colwidth="208pt"/>
           <thead>
             <row>
-              <entry colname="col1">Output Data</entry>
-              <entry colname="col2">Description</entry>
+              <entry colname="col1">输出数据</entry>
+              <entry colname="col2">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">Master host</entry>
-              <entry colname="col2">host name of the master</entry>
+              <entry colname="col2">Master的主机名</entry>
             </row>
             <row>
               <entry colname="col1">Master postgres process ID</entry>
-              <entry colname="col2">PID of the master database listener process</entry>
+              <entry colname="col2">主数据库侦听进程的PID</entry>
             </row>
             <row>
               <entry colname="col1">Master data directory</entry>
-              <entry colname="col2">file system location of the master data directory</entry>
+              <entry colname="col2">主数据目录的文件系统位置</entry>
             </row>
             <row>
               <entry colname="col1">Master port</entry>
-              <entry colname="col2">port of the master <codeph>postgres</codeph> database listener
-                process</entry>
+              <entry colname="col2">Master上<codeph>postgres</codeph>数据库监听器进程的端口</entry>
             </row>
             <row>
               <entry colname="col1">Master current role</entry>
-              <entry colname="col2">dispatch = regular operating mode<p>utility = maintenance mode
+              <entry colname="col2">dispatch = 常规操作模式<p>utility = 维护模式
                 </p></entry>
             </row>
             <row>
               <entry colname="col1">Greenplum array configuration
                 type</entry>
-              <entry colname="col2">Standard = one NIC per host <p>Multi-Home = multiple NICs per
-                  host</p></entry>
+              <entry colname="col2">Standard = 每台主机一个NIC<p>Multi-Home = 每台主机多个NIC</p></entry>
             </row>
             <row>
               <entry colname="col1">Greenplum initsystem
                 version</entry>
-              <entry colname="col2">version of Greenplum Database when system was
-                first initialized</entry>
+              <entry colname="col2">系统第一次初始化时的Greenplum数据库版本</entry>
             </row>
             <row>
               <entry colname="col1">Greenplum current version</entry>
-              <entry colname="col2">current version of Greenplum Database</entry>
+              <entry colname="col2">Greenplum数据库当前的版本</entry>
             </row>
             <row>
               <entry colname="col1">Postgres version</entry>
-              <entry colname="col2">version of PostgreSQL that Greenplum Database is
-                based on</entry>
+              <entry colname="col2">Greenplum数据库基于的PostgreSQL版本</entry>
             </row>
             <row>
               <entry colname="col1">Greenplum mirroring status</entry>
-              <entry colname="col2">physical mirroring or none</entry>
+              <entry colname="col2">物理镜像或无镜像</entry>
             </row>
             <row>
               <entry colname="col1">Master standby</entry>
-              <entry colname="col2">host name of the standby master</entry>
+              <entry colname="col2">后备Master的主机名</entry>
             </row>
             <row>
               <entry colname="col1">Standby master state</entry>
-              <entry colname="col2">status of the standby master: active or passive</entry>
+              <entry colname="col2">后备Master的状态：活跃或被动</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
-      <p>The following output fields are reported by <codeph>gpstate -s</codeph> for each
-        segment:</p>
+      <p>以下输出字段由<codeph>gpstate -s</codeph>为每个Segment报告：</p>
       <table id="md138181">
-        <title>gpstate output data for segments</title>
+        <title>gpstate为Segment给出的输出数据</title>
         <tgroup cols="2">
           <colspec colnum="1" colname="col1" colwidth="165pt"/>
           <colspec colnum="2" colname="col2" colwidth="209.25pt"/>
           <thead>
             <row>
-              <entry colname="col1">Output Data</entry>
-              <entry colname="col2">Description</entry>
+              <entry colname="col1">输出数据</entry>
+              <entry colname="col2">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">Hostname</entry>
-              <entry colname="col2">system-configured host name</entry>
+              <entry colname="col2">系统配置的主机名</entry>
             </row>
             <row>
               <entry colname="col1">Address</entry>
-              <entry colname="col2">network address host name (NIC name)</entry>
+              <entry colname="col2">网络地址主机名（NIC名称）</entry>
             </row>
             <row>
               <entry colname="col1">Datadir</entry>
-              <entry colname="col2">file system location of segment data directory</entry>
+              <entry colname="col2">Segment数据目录的文件系统位置</entry>
             </row>
             <row>
               <entry colname="col1">Port</entry>
-              <entry colname="col2">port number of segment <codeph>postgres</codeph> database
-                listener process</entry>
+              <entry colname="col2">Segment的<codeph>postgres</codeph>数据库监听器进程的端口号</entry>
             </row>
             <row>
               <entry colname="col1">Current Role</entry>
-              <entry colname="col2">current role of a segment: <varname>Mirror</varname> or
+              <entry colname="col2">Segment的当前角色：<varname>Mirror</varname>或
                   <varname>Primary</varname></entry>
             </row>
             <row>
               <entry colname="col1">Preferred Role</entry>
-              <entry colname="col2">role at system initialization time: <varname>Mirror</varname> or
+              <entry colname="col2">系统初始化时的角色：<varname>Mirror</varname>或
                   <varname>Primary</varname></entry>
             </row>
             <row>
               <entry colname="col1">Mirror Status</entry>
-              <entry colname="col2">status of a primary/mirror segment
-                    pair:<p><varname>Synchronized</varname> = data is up to date on both
-                    </p><p><varname>Resynchronization</varname> = data is currently being copied
-                  from one to the other</p><p><varname>Change Tracking</varname> = segment down and
-                  active segment is logging changes</p></entry>
+              <entry colname="col2">主/镜像Segment对的状态：
+                <p><varname>Synchronized</varname> = 两者上的数据都是最新
+                </p><p><varname>Resynchronization</varname> = 数据当前正被从一个拷贝到另一个</p>
+                <p><varname>Change Tracking</varname> = Segment停止并且活动Segment正在记录更改</p></entry>
             </row>
             <row>
               <entry colname="col1">Change tracking data size</entry>
-              <entry colname="col2">when in <varname>Change Tracking</varname> mode, the size of the
-                change log file (may grow and shrink as compression is applied)</entry>
+              <entry colname="col2">当处于<varname>Change Tracking</varname>模式中时，
+                更改日志文件的尺寸（如果应用压缩，尺寸可能增长或者收缩）</entry>
             </row>
             <row>
               <entry colname="col1">Estimated total data to synchronize</entry>
-              <entry colname="col2">when in <varname>Resynchronization</varname> mode, the estimated
-                size of data left to synchronize</entry>
+              <entry colname="col2">当处于<varname>Resynchronization</varname>模式中时，
+                剩下要同步的数据的估计尺寸</entry>
             </row>
             <row>
               <entry colname="col1">Data synchronized</entry>
-              <entry colname="col2">when in <varname>Resynchronization</varname> mode, the estimated
-                size of data that has already been synchronized</entry>
+              <entry colname="col2">当处于<varname>Resynchronization</varname>模式中时，
+                已经被同步的数据的估计尺寸
+                </entry>
             </row>
             <row>
               <entry colname="col1">Estimated resync progress with mirror</entry>
-              <entry colname="col2">When in <varname>Resynchronization</varname> mode, the estimated
-                percentage of completion</entry>
+              <entry colname="col2">当处于<varname>Resynchronization</varname>模式中时，
+                完成百分比的估计值</entry>
             </row>
             <row>
               <entry colname="col1">Estimated resync end time</entry>
-              <entry colname="col2">when in <varname>Resynchronization</varname> mode, the estimated
-                time to complete</entry>
+              <entry colname="col2">当处于<varname>Resynchronization</varname>模式中时，
+                完成时间的估计</entry>
             </row>
             <row>
               <entry colname="col1">File <codeph>postmaster.pid</codeph></entry>
-              <entry colname="col2">status of <codeph>postmaster.pid</codeph> lock file:
-                  <varname>Found</varname> or <varname>Missing</varname></entry>
+              <entry colname="col2"><codeph>postmaster.pid</codeph>锁文件的状态：
+                <varname>Found</varname>或<varname>Missing</varname>
+                  </entry>
             </row>
             <row>
               <entry colname="col1">PID from <codeph>postmaster.pid</codeph> file</entry>
-              <entry colname="col2">PID found in the <codeph>postmaster.pid</codeph> file</entry>
+              <entry colname="col2"><codeph>postmaster.pid</codeph>文件中找到的PID
+                </entry>
             </row>
             <row>
               <entry colname="col1">Lock files in <codeph>/tmp</codeph></entry>
-              <entry colname="col2">a segment port lock file for its <codeph>postgres</codeph>
-                process is created in <codeph>/tmp</codeph> (file is removed when a segment shuts
-                down)</entry>
+              <entry colname="col2">为Segment的<codeph>postgres</codeph>会在
+                <codeph>/tmp</codeph>中创建Segment端口锁文件（当Segment关闭时会移除该文件）
+                </entry>
             </row>
             <row>
               <entry colname="col1">Active PID</entry>
-              <entry colname="col2">active process ID of a segment</entry>
+              <entry colname="col2">Segment的活动进程ID</entry>
             </row>
             <row>
               <entry colname="col1">Master reports status as</entry>
-              <entry colname="col2">segment status as reported in the system catalog:
-                  <varname>Up</varname> or <varname>Down</varname></entry>
+              <entry colname="col2">系统目录中报告的Segment状态：
+                  <varname>Up</varname>或<varname>Down</varname></entry>
             </row>
             <row>
               <entry colname="col1">Database status</entry>
-              <entry colname="col2">status of Greenplum Database to incoming requests:
-                  <varname>Up</varname>, <varname>Down</varname>, or <varname>Suspended</varname>. A
-                  <varname>Suspended</varname> state means database activity is temporarily paused
-                while a segment transitions from one state to another.</entry>
+              <entry colname="col2">Greenplum数据库对进入请求的状态：
+                <varname>Up</varname>、<varname>Down</varname>或<varname>Suspended</varname>。
+                <varname>Suspended</varname>状态意味着当Segment正从一种状态转移到另一种状态时，
+                数据库活动被临时暂停。</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
-      <p>The following output fields are reported by <codeph>gpstate -f</codeph> for standby master
-        replication status:</p>
+      <p>以下输出字段由<codeph>gpstate -f</codeph>为每个后备Master复制状态报告：</p>
       <table id="table_vt5_rvm_ht">
-        <title>gpstate output data for master replication</title>
+        <title>gpstate对Master复制给出的输出数据</title>
         <tgroup cols="2">
           <colspec colnum="1" colname="col1" colwidth="165pt"/>
           <colspec colnum="2" colname="col2" colwidth="209.25pt"/>
           <thead>
             <row>
-              <entry colname="col1">Output Data</entry>
-              <entry colname="col2">Description</entry>
+              <entry colname="col1">输出数据</entry>
+              <entry colname="col2">描述</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry colname="col1">Standby address</entry>
-              <entry colname="col2">hostname of the standby master</entry>
+              <entry colname="col2">后备Master的主机名</entry>
             </row>
             <row>
               <entry colname="col1">Standby data dir</entry>
-              <entry colname="col2">file system location of the standby master data
-                directory</entry>
+              <entry colname="col2">后备Master的数据目录的文件系统位置</entry>
             </row>
             <row>
               <entry colname="col1">Standby port</entry>
-              <entry colname="col2">port of the standby master <codeph>postgres</codeph> database
-                listener process</entry>
+              <entry colname="col2">后备Master的postgres数据库监听器进程的端口</entry>
             </row>
             <row>
               <entry colname="col1">Standby PID</entry>
-              <entry colname="col2">process ID of the standby master </entry>
+              <entry colname="col2">后备Master的进程ID</entry>
             </row>
             <row>
               <entry colname="col1">Standby status</entry>
-              <entry colname="col2">status of the standby master: <varname>Standby host
+              <entry colname="col2">后备Master的状态：<varname>Standby host
                   passive</varname>
               </entry>
             </row>
 
             <row>
               <entry colname="col1">WAL Sender State</entry>
-              <entry colname="col2">write-ahead log (WAL) streaming state:
-                  <varname>streaming</varname>,
-                <varname>startup</varname>,<varname>backup</varname>, <varname>catchup</varname>
+              <entry colname="col2">预写式日志（WAL）流状态：
+                  <varname>streaming</varname>、
+                <varname>startup</varname>、<varname>backup</varname>、<varname>catchup</varname>
               </entry>
             </row>
             <row>
               <entry colname="col1">Sync state</entry>
-              <entry colname="col2">WAL sender synchronization state: <varname>sync</varname></entry>
+              <entry colname="col2">WAL发送者同步状态：<varname>sync</varname></entry>
             </row>
             <row>
               <entry colname="col1">Sent Location</entry>
-              <entry colname="col2">WAL sender transaction log (xlog) record sent location</entry>
+              <entry colname="col2">WAL发送者事务日志（xlog）记录发送位置</entry>
             </row>
             <row>
               <entry colname="col1">Flush Location</entry>
-              <entry colname="col2">WAL receiver xlog record flush location</entry>
+              <entry colname="col2">WAL接收者xlog记录刷入位置</entry>
             </row>
             <row>
               <entry colname="col1">Replay Location</entry>
-              <entry colname="col2">standby xlog record replay location</entry>
+              <entry colname="col2">后备上xlog记录重放位置</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
     </section>
     <section id="section6">
-      <title>Examples</title>
-      <p>Show detailed status information of a Greenplum Database system:</p>
+      <title>示例</title>
+      <p>显示Greenplum数据库系统的详细信息：</p>
       <codeblock>gpstate -s</codeblock>
-      <p>Do a quick check for down segments in the master host system catalog:</p>
+      <p>在Master主机系统目录中快速检查下游Segment：</p>
       <codeblock>gpstate -Q</codeblock>
-      <p>Show information about mirror segment
-        instances:<codeblock>gpstate -m</codeblock></p>
-      <p>Show information about the standby master configuration:</p>
+      <p>显示关于镜像Segment实例的信息：<codeblock>gpstate -m</codeblock></p>
+      <p>显示关于后备Master配置的信息：</p>
       <codeblock>gpstate -f</codeblock>
-      <p>Display the Greenplum software version information:</p>
+      <p>显示Greenplum软件版本信息：</p>
       <codeblock>gpstate -i</codeblock>
     </section>
     <section id="section7">
-      <title>See Also</title>
-      <p><codeph><xref href="gpstart.xml#topic1" type="topic" format="dita"/></codeph>,
+      <title>另见</title>
+      <p><codeph><xref href="gpstart.xml#topic1" type="topic" format="dita"/></codeph>、
             <codeph><xref href="gpexpand.xml#topic1"/></codeph><codeph><xref
             href="gplogfilter.xml#topic1" type="topic" format="dita"/></codeph></p>
     </section>

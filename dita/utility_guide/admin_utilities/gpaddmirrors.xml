@@ -5,205 +5,180 @@
     <!-- install_guide/refs/gpaddmirrors.xml has a conref to this topic. -->
     <title id="jp20941">gpaddmirrors</title>
     <body>
-        <p>Adds mirror segments to a Greenplum Database system that was initially configured without
-            mirroring.</p>
+        <p>将镜像Segment添加到最初没有配置镜像的Greenplum数据库系统。</p>
         <section id="section2">
-            <title>Synopsis</title>
+            <title>概要</title>
             <codeblock><b>gpaddmirrors</b> [<b>-p</b> <varname>port_offset</varname>] [<b>-m</b> <varname>datadir_config_file </varname>[<b>-a</b>]] [<b>-s</b>] 
-   [<b>-d</b> <varname>master_data_directory</varname>] [<b>-B</b> <varname>parallel_processes</varname>] [<b>-l</b> <varname>logfile_directory</varname>]
-   [<b>-v</b>]
-
-<b>gpaddmirrors</b> <b>-i</b> <varname>mirror_config_file</varname> [<b>-a</b>] [<b>-d</b> <varname>master_data_directory</varname>]
-   [<b>-B</b> <varname>parallel_processes</varname>] [<b>-l</b> <varname>logfile_directory</varname>] [<b>-v</b>]
-
-<b>gpaddmirrors</b> <b>-o</b> <varname>output_sample_mirror_config</varname> [<b>-s</b>] [<b>-m</b> <varname>datadir_config_file</varname>]
-
-<b>gpaddmirrors</b> <b>-?</b> 
-
-<b>gpaddmirrors</b> <b>--version</b></codeblock>
+                [<b>-d</b> <varname>master_data_directory</varname>] [<b>-B</b> <varname>parallel_processes</varname>] [<b>-l</b> <varname>logfile_directory</varname>]
+                [<b>-v</b>]
+                
+                <b>gpaddmirrors</b> <b>-i</b> <varname>mirror_config_file</varname> [<b>-a</b>] [<b>-d</b> <varname>master_data_directory</varname>]
+                [<b>-B</b> <varname>parallel_processes</varname>] [<b>-l</b> <varname>logfile_directory</varname>] [<b>-v</b>]
+                
+                <b>gpaddmirrors</b> <b>-o</b> <varname>output_sample_mirror_config</varname> [<b>-s</b>] [<b>-m</b> <varname>datadir_config_file</varname>]
+                
+                <b>gpaddmirrors</b> <b>-?</b> 
+                
+                <b>gpaddmirrors</b> <b>--version</b></codeblock>
         </section>
         <section id="section3">
-            <title>Description</title>
-            <p>The <codeph>gpaddmirrors</codeph> utility configures mirror segment instances for an
-                existing Greenplum Database system that was initially configured with primary
-                segment instances only. The utility will create the mirror instances and begin the
-                online replication process between the primary and mirror segment instances. Once
-                all mirrors are synchronized with their primaries, your Greenplum Database system is
-                fully data redundant.</p>
-            <note type="important">During the online replication process, Greenplum Database should
-                be in a quiescent state, workloads and other queries should not be running.</note>
-            <p>By default, the utility will prompt you for the file system location(s) where it will
-                create the mirror segment data directories. If you do not want to be prompted, you
-                can pass in a file containing the file system locations using the
-                    <codeph>-m</codeph> option.</p>
-            <p>The mirror locations and ports must be different than your primary segment data
-                locations and ports.</p>
-            <p>The utility creates a unique data directory for each mirror segment instance in the
-                specified location using the predefined naming convention. There must be the same
-                number of file system locations declared for mirror segment instances as for primary
-                segment instances. It is OK to specify the same directory name multiple times if you
-                want your mirror data directories created in the same location, or you can enter a
-                different data location for each mirror. Enter the absolute path. For example:</p>
+            <title>描述</title>
+            <p><codeph>gpaddmirrors</codeph>工具为初始仅配置了主Segment实例的现有Greenplum数据库系统配置镜像
+                Segment实例。该工具创建镜像实例并开始主Segment实例和镜像Segment实例之间的在线复制进程。一旦所有
+                的镜像与其主Segment同步好，用户的Greenplum数据库系统就建立了完全的数据冗余。
+            </p>
+            <note type="important">在在线复制进程中，Greenplum数据库应处于静止状态，负载和其他查询不应该运行。</note>
+            <p>默认情况下，该工具将提示用户输入将创建镜像Segment数据目录的文件系统位置。如果用户不想被提示，
+                可以使用<codeph>-m</codeph>选项传递包含文件系统位置的文件。</p>
+            <p>镜像位置和端口必须与用户的主Segment数据位置和端口不同。如果用户创建了额外的文件空间，则还将提示用户
+                为每个文件空间提供镜像位置。
+            </p>
+            <p>该工具使用预定义的命名习惯在指定位置中为每个镜像Segment实例创建唯一的数据目录。必须为镜像Segment
+                实例声明与主Segment实例相同数量的文件系统位置。如果用户希望在同一位置创建镜像数据目录，可以多次
+                指定同样的目录名称，或者可以为每个镜像输入不同的数据位置。对于文件系统位置，请输入绝对路径。例如：
+            </p>
             <codeblock>Enter mirror segment data directory location 1 of 2 &gt; /gpdb/mirror
-Enter mirror segment data directory location 2 of 2 &gt; /gpdb/mirror</codeblock>
-            <p>OR</p>
+                Enter mirror segment data directory location 2 of 2 &gt; /gpdb/mirror</codeblock>
+            <p>或</p>
             <codeblock>Enter mirror segment data directory location 1 of 2 &gt; /gpdb/m1
-Enter mirror segment data directory location 2 of 2 &gt; /gpdb/m2</codeblock>
-            <p>Alternatively, you can run the <codeph>gpaddmirrors</codeph> utility and supply a
-                detailed configuration file using the <codeph>-i</codeph> option. This is useful if
-                you want your mirror segments on a completely different set of hosts than your
-                primary segments. The format of the mirror configuration file is:</p>
+                Enter mirror segment data directory location 2 of 2 &gt; /gpdb/m2</codeblock>
+            <p>还有，用户可以运行<codeph>gpaddmirrors</codeph>工具，并使用<codeph>-i</codeph>选项提供详细的
+                配置文件。如果用户希望镜像Segment位于完全不同于主Segment的主机集合上，这非常有用。镜像配置文件的
+                格式是：
+            </p>
             <codeblock>mirror<varname>&lt;row_id></varname>=<varname>&lt;contentID></varname>:<varname>&lt;address></varname>:<varname>&lt;port></varname>:<varname>&lt;data_dir></varname></codeblock>
-            <p>Where <codeph>row_id</codeph> is the row in the file, <varname>contentID</varname> is
-                the segment instance content ID, <varname>address</varname> is the host name or IP
-                address of the segment host, <varname>port</varname> is the communication port, and
-                    <codeph>data_dir</codeph> is the segment instance data directory.</p>
-            <p>For
-                example:<codeblock>mirror0=0:sdw1-1:60000:/gpdata/mir1/gp0
-mirror1=1:sdw1-1:60001:/gpdata/mir2/gp1</codeblock></p>
-            <p>The <codeph>gp_segment_configuration</codeph> system catalog table can help you
-                determine your current primary segment configuration so that you can plan your
-                mirror segment configuration. For example, run the following query:</p>
+            <p>此处<codeph>row_id</codeph>是文件中的行号，<varname>contentID</varname>是segment实例的content_id,
+                <varname>address</varname>是segment所在的主机名或IP地址，<varname>port</varname>是交互端口，
+                <codeph>data_dir</codeph>是segment实例数据目录。</p>
+            <p>例如：
+                <codeblock>mirror0=0:sdw1-1:60000:/gpdata/mir1/gp0
+                    mirror1=1:sdw1-1:60001:/gpdata/mir2/gp1</codeblock></p>
+            <p><codeph>gp_segment_configuration</codeph>系统目录表可以帮助用户确定当前的主Segment配置，
+                以便用户可以规划镜像Segment配置。例如，运行以下的查询：</p>
             <codeblock>=# SELECT dbid, content, address as host_address, port, datadir 
-   FROM gp_segment_configuration
-   ORDER BY dbid;</codeblock>
-            <p>If creating your mirrors on alternate mirror hosts, the new mirror segment hosts must
-                be pre-installed with the Greenplum Database software and configured exactly the
-                same as the existing primary segment hosts. </p>
-            <p>You must make sure that the user who runs <codeph>gpaddmirrors</codeph> (the
-                    <codeph>gpadmin</codeph> user) has permissions to write to the data directory
-                locations specified. You may want to create these directories on the segment hosts
-                and <codeph>chown</codeph> them to the appropriate user before running
-                    <codeph>gpaddmirrors</codeph>.</p>
-            <note>This utility uses secure shell (SSH) connections between systems to perform its
-                tasks. In large Greenplum Database deployments, cloud deployments, or deployments
-                with a large number of segments per host, this utility may exceed the host's maximum
-                threshold for unauthenticated connections. Consider updating the SSH
-                    <codeph>MaxStartups</codeph> configuration parameter to increase this threshold.
-                For more information about SSH configuration options, refer to the SSH documentation
-                for your Linux distribution.</note>
+                   FROM gp_segment_configuration
+                   ORDER BY dbid;</codeblock>
+            <p>如果在后补的镜像主机上创建镜像，则新的镜像Segment主机必须预先安装Greenplum数据库软件，并且被配置为
+                与现有的主Segment主机完全相同。</p>
+            <p>用户必须确保运行<codeph>gpaddmirrors</codeph>的用户（<codeph>gpadmin</codeph>用户）有权在指定
+                的数据目录位置写入。用户可能想要在Segment主机上创建这些目录并且在运行<codeph>gpaddmirrors</codeph>
+                之前将这些目录的拥有者改为（<codeph>chown</codeph>）适当的用户。
+            </p>
+            <note>该工具在系统内部采用SSH连接执行各项操作任务。在大型Greenplum集群、云部署或每台主机部署了大量的
+                segment实例时，可能会遇到超过主机最大授权连接数限制的情况。此时需要考虑更新SSH配置参数<codeph>MaxStartups</codeph>
+                以提高该限制。更多关于SSH配置的选项，请参考您的Linux分发版的SSH文档。</note>
         </section>
         <section id="section4">
-            <title>Options</title>
+            <title>选项</title>
             <parml>
                 <plentry>
-                    <pt>-a (do not prompt)</pt>
-                    <pd>Run in quiet mode - do not prompt for information. Must supply a
-                        configuration file with either <codeph>-m</codeph> or <codeph>-i</codeph> if
-                        this option is used.</pd>
+                    <pt>-a（不提示）</pt>
+                    <pd>以静默模式运行 - 不提示输入信息。如果使用这一选项，必须使用-m或-i提供一个配置文件。</pd>
                 </plentry>
                 <plentry>
                     <pt>-B <varname>parallel_processes</varname></pt>
-                    <pd>The number of mirror setup processes to start in parallel. If not specified,
-                        the utility will start up to 10 parallel processes depending on how many
-                        mirror segment instances it needs to set up.</pd>
+                    <pd>并行启动的镜像设置进程的数量。如果未指定，则该工具将启动最多10个并行进程，具体取决于需要
+                        设置多少个镜像Segment实例。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-d <varname>master_data_directory</varname></pt>
-                    <pd>The master data directory. If not specified, the value set for
-                            <codeph>$MASTER_DATA_DIRECTORY</codeph> will be used.</pd>
+                    <pd>主数据目录。如果没有指定，将使用为<codeph>$MASTER_DATA_DIRECTORY</codeph>设置的值。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-i <varname>mirror_config_file</varname></pt>
-                    <pd>A configuration file containing one line for each mirror segment you want to
-                        create. You must have one mirror segment listed for each primary segment in
-                        the system. The format of this file is as follows (as per attributes in the
-                            <codeph>gp_segment_configuration</codeph> catalog table):</pd>
+                    <pd>一个配置文件，每个要创建的镜像Segment对应一行。用户必须为系统中的每个主Segment都在该
+                        文件中列出一个镜像Segment。该文件格式如下（如<codeph>gp_segment_configuration</codeph>
+                        目录表中的每个属性）：
+                    </pd>
                     <pd>
                         <codeblock>mirror<varname>&lt;row_id></varname>=<varname>&lt;contentID></varname>:<varname>&lt;address></varname>:<varname>&lt;port></varname>:<varname>&lt;data_dir></varname></codeblock>
                     </pd>
                     <pd>
-                        <p>Where <codeph>row_id</codeph> is the row in the file,
-                                <varname>contentID</varname> is the segment instance content ID,
-                                <varname>address</varname> is the host name or IP address of the
-                            segment host, <varname>port</varname> is the communication port, and
-                                <codeph>data_dir</codeph> is the segment instance data
-                            directory.</p>
+                        <p>此处<codeph>row_id</codeph>是文件中的行号，<varname>contentID</varname>是segment实例的content_id,
+                            <varname>address</varname>是segment所在的主机名或IP地址，<varname>port</varname>是交互端口，
+                            <codeph>data_dir</codeph>是segment实例数据目录。</p>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>-l <varname>logfile_directory</varname></pt>
-                    <pd>The directory to write the log file. Defaults to
-                            <codeph>~/gpAdminLogs</codeph>.</pd>
+                    <pd>用来写日志的目录，默认为<codeph>~/gpAdminLogs</codeph>。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-m <varname>datadir_config_file</varname></pt>
-                    <pd>A configuration file containing a list of file system locations where the
-                        mirror data directories will be created. If not supplied, the utility
-                        prompts you for locations. Each line in the file specifies a mirror data
-                        directory location. For example:</pd>
+                    <pd>包含将创建镜像数据目录的文件系统位置列表的配置文件。如果未提供，该工具将提示用户输入位置。
+                        文件中的每一行都指定一个镜像数据目录位置。例如：
+                    </pd>
                     <pd>
                         <codeblock>/gpdata/m1
-/gpdata/m2
-/gpdata/m3
-/gpdata/m4</codeblock>
+                            /gpdata/m2
+                            /gpdata/m3
+                            /gpdata/m4</codeblock>
                     </pd>
                 </plentry>
                 <plentry>
                     <pt>-o <varname>output_sample_mirror_config</varname></pt>
-                    <pd>If you are not sure how to lay out the mirror configuration file used by the
-                            <codeph>-i</codeph> option, you can run <codeph>gpaddmirrors</codeph>
-                        with this option to generate a sample mirror configuration file based on
-                        your primary segment configuration. The utility will prompt you for your
-                        mirror segment data directory locations (unless you provide these in a file
-                        using <codeph>-m</codeph>). You can then edit this file to change the host
-                        names to alternate mirror hosts if necessary.</pd>
+                    <pd>如果用户不确定如何布置<codeph>-i</codeph>选项使用的镜像配置文件，用户使用这一选项运行
+                        <codeph>gpaddmirrors</codeph>来生成一个基于主Segment配置的镜像配置文件示例。该工具
+                        将提示用户输入用户的镜像Segment数据目录位置（除非用户使用<codeph>-m</codeph>在一个文件
+                        中提供了这些位置）。然后，用户可以编辑此文件根据需要将主机名更改为后补的镜像主机。
+                    </pd>
                 </plentry>
                 <plentry>
                     <pt>-p <varname>port_offset</varname></pt>
-                    <pd>Optional. This number is used to calculate the database ports used for
-                        mirror segments. The default offset is 1000. Mirror port assignments are
-                        calculated as follows: </pd>
-                    <pd>primary port + offset = mirror database port</pd>
-                    <pd>For example, if a primary segment has port 50001, then its mirror will use a
-                        database port of 51001, by default.</pd>
+                    <pd>
+                        可选。这个数字被用于计算用于镜像Segment的数据库端口和复制端口。默认偏移量为1000。
+                        镜像端口分配计算如下：</pd>
+                    <pd>主机端口 + 偏移量 = 镜像数据库端口</pd>
+                    <pd>例如，如果主Segment的端口为50001，则默认情况下，其镜像将使用数据库端口51001。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt>-s (spread mirrors)</pt>
-                    <pd>Spreads the mirror segments across the available hosts. The default is to
-                        group a set of mirror segments together on an alternate host from their
-                        primary segment set. Mirror spreading will place each mirror on a different
-                        host within the Greenplum Database array. Spreading is only allowed if there
-                        is a sufficient number of hosts in the array (number of hosts is greater
-                        than the number of segment instances per host).</pd>
+                    <pt>-s（散布镜像）</pt>
+                    <pd>在可用主机上散布镜像Segment。默认情况下，将把一组镜像Segment集合在一起放在不同于其
+                        主Segment集合的后补主机上。镜像散布将把每个镜像放置在Greenplum数据库阵列中的不同主机上。
+                        只有在阵列中有足够数量的主机（主机数大于每个主机的Segment实例数）时，才允许使用散布镜像方式。
+                    </pd>
                 </plentry>
                 <plentry>
-                    <pt>-v (verbose)</pt>
-                    <pd>Sets logging output to verbose.</pd>
+                    <pt>-v（详细模式）</pt>
+                    <pd>将日志记录输出设置为详细。</pd>
                 </plentry>
                 <plentry>
-                    <pt>--version (show utility version)</pt>
-                    <pd>Displays the version of this utility.</pd>
+                    <pt>--version（显示工具版本）</pt>
+                    <pd>显示该工具的版本。</pd>
                 </plentry>
                 <plentry>
                     <pt>-? (help)</pt>
-                    <pd>Displays the online help.</pd>
+                    <pd>显示在线帮助。</pd>
                 </plentry>
             </parml>
         </section>
         <section id="section5">
-            <title>Examples</title>
-            <p>Add mirroring to an existing Greenplum Database system using the same set of hosts as
-                your primary data. Calculate the mirror database ports by adding 100 to the current
-                primary segment port numbers:</p>
+            <title>示例</title>
+            <p>使用和主要数据相同的一组主机向现有的Greenplum数据库系统添加镜像。通过在当前主Segment端口号上加上
+                100来计算镜像数据库端口和复制端口：
+            </p>
             <codeblock>$ gpaddmirrors -p 100</codeblock>
-            <p>Add mirroring to an existing Greenplum Database system using a different set of hosts
-                from your primary data:</p>
+            <p>使用和主要数据不同的一组主机向现有的Greenplum数据库系统添加镜像：</p>
             <codeblock>$ gpaddmirrors -i mirror_config_file</codeblock>
-            <p>Where <codeph>mirror_config_file</codeph> looks something like this:</p>
+            <p>其中<codeph>mirror_config_file</codeph>看起来像这样：
+            </p>
             <codeblock>mirror0=0:sdw1-1:52001:/gpdata/mir1/gp0
-mirror1=1:sdw1-2:52002:/gpdata/mir2/gp1
-mirror2=2:sdw2-1:52001:/gpdata/mir1/gp2
-mirror3=3:sdw2-2:52002:/gpdata/mir2/gp3</codeblock>
-            <p>Generate a sample mirror configuration file with the <codeph>-o</codeph> option to
-                use with <codeph>gpaddmirrors -i</codeph>:</p>
+                mirror1=1:sdw1-2:52002:/gpdata/mir2/gp1
+                mirror2=2:sdw2-1:52001:/gpdata/mir1/gp2
+                mirror3=3:sdw2-2:52002:/gpdata/mir2/gp3</codeblock>
+            <p>使用gpaddmirrors -o输出一个要使用的镜像配置文件样例：
+            </p>
             <codeblock>$ gpaddmirrors -o /home/gpadmin/sample_mirror_config</codeblock>
         </section>
         <section id="section6">
-            <title>See Also</title>
+            <title>另见</title>
             <p><codeph><xref href="./gpinitsystem.xml#topic1" type="topic" format="dita"/></codeph>,
-                        <codeph><xref href="./gpinitstandby.xml#topic1" type="topic" format="dita"
-                    /></codeph>, <codeph><xref href="gpactivatestandby.xml#topic1"/></codeph></p>
+                <codeph><xref href="./gpinitstandby.xml#topic1" type="topic" format="dita"
+                /></codeph>, <codeph><xref href="gpactivatestandby.xml#topic1"/></codeph></p>
         </section>
     </body>
 </topic>
