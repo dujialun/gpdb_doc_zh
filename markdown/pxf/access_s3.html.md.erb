@@ -1,0 +1,33 @@
+---
+title: 关于访问S3对象存储
+---
+
+PXF安装了与S3对象库的连接器。PXF通过此连接器支持以下其他运行时特性：
+
+- 通过在`CREATE EXTERNAL TABLE`命令DDL中提供它们来覆盖服务器配置中指定的S3凭据。
+- 使用Amazon S3 Select服务从S3读取某些CSV和Parquet数据。
+
+## <a id="s3_override"></a>用DDL覆盖S3服务器配置
+
+如果您访问兼容S3的对象库, 可以通过 `CREATE EXTERNAL TABLE` `LOCATION` 子句中的以下自定义选项直接指定S3访问ID和密钥，从而覆盖S3服务配置：
+
+| 自定义选项  | 值描述 |
+|-------|-------------------------------------|
+| accesskey    | AWS账户访问密钥ID |
+| secretkey    | 与AWS访问密钥ID关联的密钥 |
+
+例如：
+<pre>CREATE EXTERNAL TABLE pxf_ext_tbl(name text, orders int)
+  LOCATION ('pxf://S3_BUCKET/dir/file.txt?PROFILE=s3:text&SERVER=s3srvcfg<b>&accesskey=YOURKEY&secretkey=YOURSECRET</b>')
+FORMAT 'TEXT' (delimiter=E',');</pre>
+
+<div class="note warning">已这种方式提供的凭据在外部表定义中可见。不要在生产环境中使用这种传递凭据的方法。</div>
+
+PXF目前不支持以这种方式覆盖Azure，Google Cloud Storage和Minio服务器凭据。
+
+有关PXF用于获取Greenplum数据库用户的配置属性设置的优先级规则的详细信息，请参考[配置属性优先级](cfg_server.html#override)。
+
+
+## <a id="s3_select"></a>使用Amazon S3 Select服务
+
+请参阅[使用S3 Select从S3读取CSV和Parquet数据](read_s3_s3select.html)，了解有关PXF如何使用Amazon S3 Select服务读取S3上存储的CSV和Parquet文件的特定信息。

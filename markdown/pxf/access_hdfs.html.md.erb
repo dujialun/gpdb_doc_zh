@@ -46,8 +46,8 @@ PXF代理调用HDFS Java API来读取数据并将其传递给segment实例。 se
 
 在使用PXF处理Hadoop数据之前，请确保：
 
-- 您已在Greenplum数据库segment主机上配置并初始化PXF, 并且PXF正在每台segment主机上运行. 更多详情，请参阅[配置 PXF](instcfg_pxf.html)。
-- 您已配置计划在每个Greenplum数据库segment主机上使用的XPF Hadoop连接器。有关说明，请参阅[配置PXF Hadoop 连接器](client_instcfg.html)。 如果您计划访问存储在Cloudera Hadoop集群中的JSON格式数据， 则PXF需要Cloudera 5.8或者更高的Hadoop发行版。
+- 您已经配置并初始化PXF, 并且PXF正在每台segment主机上运行. 更多详情，请参阅[配置 PXF](instcfg_pxf.html)。
+- 您已经配置了计划使用的PXF Hadoop连接器。有关说明，请参阅[配置PXF Hadoop 连接器](client_instcfg.html)。 如果您计划访问存储在Cloudera Hadoop集群中的JSON格式数据， 则PXF需要Cloudera 5.8或者更高的Hadoop发行版。
 - 如果开启了用户模拟(默认), 确保您已将Greenplum数据库外部表需要访问到的HDFS文件及目录的读取(并根据需要写入) 权限，授予给了每个需要访问这些文件和目录的Greenplum数据库用户/角色的名称。 如果未开启用户模拟，您必须要将权限授予给`gpadmin`用户。
 - Greenplum数据库segment主机和外部Hadoop系统之间的时间是同步的。
 
@@ -118,7 +118,7 @@ PXF Hadoop连接器公开以下配置文件以读取这些支持的数据格式�
 | [Hive](hive_pxf.html) | Parquet 存储格式 | Hive | n/a |
 | [HBase](hbase_pxf.html) | 任意存储格式 | HBase | n/a |
 
-使用`CREATE EXTERNAL TABLE`命令指定`pxf`协议时，提供配置文件名称，以创建引用Hadoop文件、目录或表的Greenplum数据库外部表。例如, 以下命令创建了一个配置文件名为`hdfs:text`的外部表:
+使用`CREATE EXTERNAL TABLE`命令指定`pxf`协议时，提供配置文件名称，以创建引用Hadoop文件、目录或表的Greenplum数据库外部表。例如，以下命令创建一个使用默认服务器的外部表，并指定名为`hdfs:text`的配置文件：
 
 ``` sql
 CREATE EXTERNAL TABLE pxf_hdfs_text(location text, month text, num_orders int, total_sales float8)

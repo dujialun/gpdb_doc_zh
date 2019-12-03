@@ -2,90 +2,284 @@
 title: 配置JDBC连接器（可选）
 ---
 
-您可以使用PXF访问包括MySQL，ORACLE，PostgreSQL，Apache Ignite和Hive在内的外部SQL数据库。本主题描述如何配置PXF JDBC连接器以访问这些外部数据源。
+您可以使用PXF访问外部SQL数据库，包括MySQL，ORACLE，PostgreSQL，Hive和Apache Ignite。本主题描述如何配置PXF JDBC连接器以访问这些外部数据源。
 
 *如果您不打算使用PXF JDBC连接器，则不需要执行此过程。*
 
-## <a id="about_cfg"></a>JDBC配置
+## <a id="about_cfg"></a>关于JDBC配置
 
-要使用PXF JDBC连接器访问外部SQL数据库中的数据，您必须:
+要使用PXF JDBC连接器访问外部SQL数据库中的数据，您必须：
 
 - 注册兼容的JDBC驱动程序JAR文件
 - 指定JDBC驱动程序类名称，数据库URL和客户端凭据
 
-在以前的Greenplum数据库版本中，需要通过在`CREATE EXTERNAL TABLE`命令中指定JDBC驱动程序类名称，数据库URL和客户端凭据。现在PXF支持JDBC连接器的基于文件的服务器配置。如下所述，此配置使您可以在文件中指定这些选项和凭据。
+在以前的Greenplum数据库版本中，您可能已通过`CREATE EXTERNAL TABLE`命令中的选项指定了JDBC驱动程序类名称，数据库URL和客户端凭据。PXF现在支持JDBC连接器的基于文件的服务器配置。如下所述，此配置使您可以在文件中指定这些选项和凭据。
 
-**Note**: 先前创建的通过直接指定JDBC连接选项的PXF外部表将继续起作用。如果要修改这些表基于JDBC文件的服务器配置，则必须创建服务器配置，删除外部表，然后重新创建表，并指定适当的SERVER = <servercfg>子句。
+**注意**: 您先前创建的直接指定JDBC连接选项的PXF外部表将继续起作用。如果要移动这些表以使用基于JDBC文件的服务器配置，则必须创建服务器配置，删除外部表，然后重新创建表，并指定适当的`SERVER=<server_name>`子句。
 
-### <a id="cfg_jar"></a>注册JDBC驱动程序JAR
+## <a id="cfg_jar"></a>JDBC驱动程序JAR注册
 
-PXF JDBC连接器与`postgresql-8.4-702.jdbc4.jar` JAR文件一起安装。如果需要其他JDBC驱动程序，请确保在每个segment主机的`$PXF_CONF/lib`目录中为外部SQL数据库安装JDBC驱动程序JAR文件。确保安装与您的JRE版本兼容的JDBC驱动程序JAR文件。更多参阅[Registering PXF JAR Dependencies](reg_jar_depend.html)
+PXF JDBC连接器随`postgresql-42.2.5.jar` JAR文件一起安装。如果您需要其他JDBC驱动程序，请确保在每个segment主机的`$PXF_CONF/lib`目录中为外部SQL数据库安装JDBC驱动程序JAR文件。确保安装与您的JRE版本兼容的JDBC驱动程序JAR文件。有关更多信息，请参见[注册PXF JAR依赖项](reg_jar_depend.html)。
 
-### <a id="cfg_server"></a>JDBC服务配置
+## <a id="cfg_server"></a>JDBC服务器配置
 
-PXF提供了JDBC连接器的模板配置文件。该服务器模板配置文件位于`$PXF_CONF/templates/jdbc-site.xml`中，标识了必须配置才能使用PXF JDBC连接器的最小属性集。
+配置PXF JDBC连接器时，请为连接器添加至少一个名为PXF服务器的配置，如[配置PXF服务器](cfg_server.html)中所述。您还可以配置一个或多个静态定义的查询以对远程SQL数据库运行。
 
-`jdbc-site.xml`服务器模板文件中的属性如下:
+PXF提供了JDBC连接器的模板配置文件。该服务器模板配置文件位于`$PXF_CONF/templates/jdbc-site.xml`中，标识可以配置以建立与外部SQL数据库的连接的属性。该模板还包括可选属性，您可以在执行查询或在外部数据库会话中插入命令之前设置这些可选属性。
 
-| Property       | Description      | Value |
-|----------------|------------------|----------------------------------|
-| jdbc.driver    | JDBC驱动类名称   | JDBC驱动程序Java类名； 例如org.postgresql.Driver |
-| jdbc.url | JDBC驱动程序用于连接数据库的URL | 数据库连接URL(特定于数据库)，例如：`jdbc:postgresql://phost:pport/pdatabase` |
-| jdbc.user |  数据库用户名| 连接数据库的用户名 |
-| jdbc.password | `jdbc.user`的密码 | 连接数据库的密码 |
+服务器模板文件`jdbc-site.xml`中的必需属性如下：
 
-<div class="note">配置PXF JDBC服务器时，可以在配置文件中以明文形式为PXF指定外部数据库用户凭据</div>
+| 属性       | 描述                                | 值 |
+|----------------|--------------------------------------------|-------|
+| jdbc.driver | JDBC驱动类名称 | JDBC驱动程序Java类名；例如`org.postgresql.Driver`。 |
+| jdbc.url | JDBC驱动程序用于连接数据库的URL | 数据库连接URL(特定于数据库)，例如：`jdbc:postgresql://phost:pport/pdatabase`。 |
+| jdbc.user | 数据库用户名 | 连接数据库的用户名。 |
+| jdbc.password | `jdbc.user`的密码 | 连接数据库的密码。 |
 
-在配置PXF JDBC连接器以访问外部SQL数据库时，请为连接器至少添加一个名为PXF的服务器配置。你
+<div class="note">配置PXF JDBC服务器时，可以在配置文件中以明文形式为PXF指定外部数据库用户凭据。</div>
 
-1. 选择服务器配置的名称
-2. 创建目录`$PXF_CONF/servers/<server_name>`.
-3. 拷贝`jdbc-site.xml`模板配置文件到新的服务器目录
-4. 为模板文件中的属性填写适当的值
-5. 将服务器配置同步到每个Greenplum数据库segment主机
-6. 将PXF服务器名称发布给Greenplum数据库最终用户
+### <a id="connprop"></a>连接级属性
 
-Greenplum数据库用户在`CREATE EXTERNAL TABLE`的`LOCATION`子句`SERVER`选项中指定了`<server_name>`，以访问外部SQL数据库。例如，如果您创建了服务器配置并将服务器目录命名为`pgsrvcfg`：
+要设置其他JDBC连接级别的属性，请将`jdbc.connection.property.<CPROP_NAME>`属性添加到`jdbc-site.xml`中。当PXF建立到外部SQL数据库（`DriverManager.getConnection()`）的连接时，会将这些属性传递给JDBC驱动程序。
 
-<pre>
-CREATE EXTERNAL TABLE pxf_ext_tbl(name text, orders int)
-  LOCATION ('pxf://schema.tblname?PROFILE=Jdbc&<b>SERVER=pgsrvcfg</b>')
-FORMAT 'TEXT' (delimiter=E',');
-</pre>
+将`<CPROP_NAME>`替换为连接属性名称，并指定其值：
 
-<div class="note info">通过查询或写入指定服务器名称的外部表的Greenplum数据库用户，可以使用为该服务器配置的凭据访问外部SQL数据库。</div>
+| 属性       | 描述                                | 值 |
+|----------------|--------------------------------------------|-------|
+| jdbc.connection.property.\<CPROP_NAME\> | 当PXF建立与外部SQL数据库的连接时，传递给JDBC驱动程序的属性名称(\<CPROP_NAME\>)。 | \<CPROP_NAME\>属性的值。 |
 
-尽管不建议这样做，但是你还是可以通过`CREATE EXTERNAL TABLE`命令`LOCATION`子句中的自定义选项直接指定驱动程序，数据库URL(和/或)用户凭据，从而覆盖JDBC服务器配置。参阅[Accessing an SQL Database with JDBC](jdbc_pxf.html)
+示例：要在与PostgreSQL数据库的JDBC连接上设置`createDatabaseIfNotExist`连接属性，请在`jdbc-site.xml`中包含以下属性块：
 
-## <a id="cfg_proc"></a>配置过程示例
+``` xml
+<property>
+    <name>jdbc.connection.property.createDatabaseIfNotExist</name>
+    <value>true</value>
+ </property>
+```
+
+确保外部SQL数据库的JDBC驱动程序支持您指定的任何连接级属性。
+
+### <a id="conntransiso"></a>连接事务隔离属性
+
+SQL标准定义了四个事务隔离级别。您为与外部SQL数据库的给定连接指定的级别决定了对另一连接如何和何时可见在该连接上执行的一个事务所做的更改。
+
+PXF JDBC连接器公开了一个名为`jdbc.connection.transactionIsolation`的可选服务器配置属性，该属性使您可以指定事务隔离级别。建立与外部SQL数据库的连接后，PXF会设置级别（`setTransactionIsolation()`）。
+
+JDBC连接器支持以下`jdbc.connection.transactionIsolation`属性值：
+
+
+| SQL 级别      | PXF属性值      |
+|----------------|-------------------------|
+| 未提交读 | READ_UNCOMMITTED |
+| 已提交读 | READ_COMMITTED |
+| 可重复读 | REPEATABLE_READ |
+| 可串行化 | SERIALIZABLE |
+
+例如，要将事务隔离级别设置为*未提交读*，请将以下属性块添加到`jdbc-site.xml`文件中：
+
+``` xml
+<property>
+    <name>jdbc.connection.transactionIsolation</name>
+    <value>READ_UNCOMMITTED</value>
+</property>
+```
+
+不同的SQL数据库支持不同的事务隔离级别。确保外部数据库支持您指定的级别。
+
+### <a id="stateprop"></a>语句级属性
+
+PXF JDBC连接器通过*语句*在外部SQL数据库表上执行查询或插入命令。连接器公开的属性使您可以在外部数据库中执行命令之前配置语句的某些方面。连接器支持以下语句级属性：
+
+| 属性       | 描述                                | 值 |
+|----------------|--------------------------------------------|-------|
+| jdbc.statement.batchSize | 批量写入外部数据库表的行数。 | 行数。默认的写入批处理大小为100。 |
+| jdbc.statement.fetchSize | 从外部数据库表读取时要提取/缓冲的行数。 | 行数。默认读取大小为1000。 |
+| jdbc.statement.queryTimeout | JDBC驱动程序等待语句执行的时间（以秒为单位）。此超时适用于为读取和写入操作创建的语句。 | 超时时间（以秒为单位）。默认等待时间是无限的。 |
+
+对于您未明确配置的任何语句级属性，PXF使用默认值。
+
+示例：要将读取获取大小设置为5000，请将以下属性块添加到`jdbc-site.xml`中：
+
+``` xml
+<property>
+    <name>jdbc.statement.fetchSize</name>
+    <value>5000</value>
+</property>
+```
+
+确保外部SQL数据库的JDBC驱动程序支持您指定的任何语句级属性。
+
+### <a id="sessprop"></a>会话级属性
+
+要设置会话级别的属性，请在`jdbc-site.xml`中添加`jdbc.session.property。<SPROP_NAME>`属性。在执行查询之前，PXF将在外部数据库中`SET`这些属性。
+
+ 将`<SPROP_NAME>`替换为会话属性名称，并指定其值：
+
+| 属性       | 描述                                | 值 |
+|----------------|--------------------------------------------|-------|
+| jdbc.session.property.\<SPROP_NAME\> | 在执行查询之前要设置的会话属性的名称(\<SPROP_NAME\>)。 | \<SPROP_NAME\>属性的值。 |
+
+**注意**: PXF JDBC连接器完全按照`jdbc-site.xml`服务器配置文件中的指定，将会话属性名和属性值都传递给外部SQL数据库。为了限制SQL注入的潜在威胁，连接器拒绝包含`;`, `\n`, `\b`, 或 `\0`字符的任何属性名称或值。
+
+PXF JDBC连接器为所有支持的外部SQL数据库处理会话属性`SET`语法。
+
+示例：要在PostgreSQL数据库中运行查询之前设置`search_path`参数，请将以下属性块添加到`jdbc-site.xml`中：
+
+``` xml
+<property>
+    <name>jdbc.session.property.search_path</name>
+    <value>public</value>
+</property>
+```
+
+确保外部SQL数据库的JDBC驱动程序支持您指定的任何属性。
+
+### <a id="jdbcimpers"></a>关于JDBC用户模拟
+
+PXF JDBC连接器使用`jdbc.user`设置或`jdbc.url`中的信息来确定连接到外部数据存储的用户身份。禁用PXF JDBC用户模拟时（默认设置），JDBC连接器的行为进一步取决于外部数据存储。例如，如果您使用JDBC连接器访问Hive，则连接器将使用某些Hive身份验证和模拟属性的设置来确定用户。您可能需要提供`jdbc.user`设置，或在服务器`jdbc-site.xml`文件中的`jdbc.url`设置中添加属性。
+
+启用PXF JDBC用户模拟时，PXF JDBC连接器代表Greenplum数据库最终用户访问外部数据存储。连接器使用访问PXF外部表的Greenplum数据库用户的名称来尝试连接到外部数据存储。
+
+`pxf.impersonation.jdbc`属性控制JDBC用户模拟。默认情况下，禁用JDBC用户模拟。要为服务器配置启用JDBC用户模拟，请将属性设置为true：
+
+``` xml
+<property>
+    <name>pxf.impersonation.jdbc</name>
+    <value>true</value>
+</property>
+```
+
+为PXF服务器启用JDBC用户模拟时，PXF会覆盖在`jdbc-site.xml`或`<greenplum_user_name>-user.xml`中定义或在外部表DDL中指定的`jdbc.user`属性设置的值，以及Greenplum数据库用户名。为了在外部数据存储区需要密码来验证连接用户的身份时有效地模拟用户，必须为可以模拟在该用户的`<greenplum_user_name>-user.xml`属性覆盖文件中的每个用户指定`jdbc.password`设置。有关每个服务器，每个Greenplum用户配置的更多信息，请参考[配置PXF用户](cfg_server.html#usercfg)。
+
+### <a id="jdbcconpool"></a>关于JDBC连接池
+
+PXF JDBC连接器使用由[HikariCP]（https://github.com/brettwooldridge/HikariCP）实现的JDBC连接池。当用户查询或写入外部表时，连接器在首次遇到`jdbc.url`, `jdbc.user`, `jdbc.password`，连接属性和池属性设置的唯一组合时，将为关联的服务器配置建立连接池。连接器会根据某些连接和超时设置重用池中的连接。
+
+对于给定的服务器配置，可能存在一个或多个连接池，并且用户访问指定同一服务器的不同外部表可能会共享一个连接池。
+
+**注意**: 如果在服务器配置中启用了JDBC用户模拟，则JDBC连接器将为每个Greenplum数据库用户创建一个单独的连接池，该用户访问指定该服务器配置的任何外部表。
+
+`jdbc.pool.enabled`属性控制着服务器配置的JDBC连接池。默认情况下启用连接池。要为服务器配置禁用JDBC连接池，请将属性设置为false：
+
+``` xml
+<property>
+    <name>jdbc.pool.enabled</name>
+    <value>false</value>
+</property>
+```
+
+如果为服务器配置禁用JDBC连接池，则PXF不会为该服务器重用JDBC连接。PXF为每个分区的查询创建到远程数据库的连接，并在该分区的查询完成时关闭该连接。
+
+PXF公开了可以在JDBC服务器定义中配置的连接池属性。这些属性以`jdbc.pool.property.`前缀命名，并且*应用于每个PXF JVM*。JDBC连接器自动设置以下连接池属性和默认值：
+
+| 属性       | 描述                                | 默认值 |
+|----------------|--------------------------------------------|-------|
+| jdbc.pool.property.maximumPoolSize | 与数据库后端的最大连接数。 | 5 |
+| jdbc.pool.property.connectionTimeout | 等待来自池的连接的最长时间（以毫秒为单位）。 | 30000 |
+| jdbc.pool.property.idleTimeout | 最长时间（以毫秒为单位），在此时间之后，不活动的连接被视为空闲。 | 30000 |
+| jdbc.pool.property.minimumIdle | 连接池中维护的最小空闲连接数。 | 0 |
+
+您可以通过指定`jdbc.pool.property。<HIKARICP_PROP_NAME>`以及服务器的`jdbc-site.xml`配置文件中的所需值来为服务器配置设置其他HikariCP特定的连接池属性。还要注意，当JDBC连接器请求来自JDBC`DriverManager`的连接时，它会传递您用`jdbc.connection.property.`前缀指定的任何属性。请参考上面的[连接级属性](#connprop)。
+
+#### <a id="jdbcconpool_tune"></a>调整最大连接池大小
+
+为了不超过目标数据库所允许的最大连接数，并同时确保每个PXF JVM服务公平共享的JDBC连接，请根据Greenplum数据库集群的大小确定`maxPoolSize`的最大值。如下：
+
+``` pre
+max_conns_allowed_by_remote_db / #_greenplum_segment_hosts
+```
+
+例如，如果您的Greenplum数据库集群具有16个segment主机，并且目标数据库允许160个并发连接，则按以下方式计算`maxPoolSize`：
+
+``` pre
+160 / 16 = 10
+```
+
+实际上，您可以选择将`maxPoolSize`设置为较低的值，因为每个JDBC查询的并发连接数取决于查询中使用的分区数。当查询不使用分区时，单个PXF JVM将为查询提供服务。如果查询使用12个分区，则PXF将建立与远程数据库的12个并发JDBC连接。理想情况下，这些连接在PXF JVM之间平均分配，但这不能保证。
+
+
+## <a id="namedquery"></a>JDBC命名查询配置
+
+PXF*命名查询*是您配置的静态查询，并且PXF在远程SQL数据库中运行。
+
+要配置和使用PXF JDBC命名查询：
+
+1. 您[定义查询](#namedquery_define)在文本文件中。
+2. 您向Greenplum数据库用户提供[查询名称](#namedquery_pub)。
+3. Greenplum数据库用户在Greenplum数据库外部表定义中[引用查询](#namedquery_ref)。
+
+每当用户在Greenplum数据库外部表上调用`SELECT`命令时，PXF都会运行查询。
+
+
+### <a id="namedquery_define"></a>定义命名查询
+
+通过将查询语句添加到具有以下命名格式的文本文件中来创建命名查询：`<query_name>.sql`。您可以为JDBC服务器配置定义一个或多个命名查询。每个查询必须驻留在单独的文本文件中。
+
+您必须将查询文本文件放置在PXF JDBC服务器配置目录中，从该目录可以访问该查询文本文件。如果要使查询可用于多个JDBC服务器配置，则必须将查询文本文件复制到每个JDBC服务器的配置目录中。
+
+查询文本文件必须包含要在远程SQL数据库中运行的单个查询。您必须根据数据库支持的语法来构造查询。
+
+例如，如果一个MySQL数据库有一个`customers`表和一个`orders`表，则可以在查询文本文件中包含以下SQL语句：
+
+``` sql
+SELECT c.name, c.city, sum(o.amount) AS total, o.month
+  FROM customers c JOIN orders o ON c.id = o.customer_id
+  WHERE c.state = 'CO'
+GROUP BY c.name, c.city, o.month
+```
+
+您可以选择为SQL语句提供结尾分号(`;`)。
+
+### <a id="namedquery_pub"></a>查询命名
+
+Greenplum数据库用户通过指定不带扩展名的查询文件名来引用命名查询。例如，如果您在名为`report.sql`的文件中定义查询，则该查询的名称为`report`。
+
+命名查询与特定的JDBC服务器配置相关联。您将向Greenplum数据库用户提供可用的查询名称，允许您使用服务器配置创建外部表。
+
+#### <a id="namedquery_ref"></a>引用命名查询
+
+当创建外部表时，Greenplum数据库用户指定`query:<query_name>`而不是远程SQL数据库表的名称。例如，如果查询在文件`$PXF_CONF/servers/mydb/report.sql`中定义，则`CREATE EXTERNAL TABLE` `LOCATION`子句将包含以下组件：
+
+``` sql
+LOCATION ('pxf://query:report?PROFILE=JDBC&SERVER=mydb ...')
+```
+
+有关使用PXF JDBC命名查询的信息，请参考[关于使用命名查询](jdbc_pxf.html#about_nq)。
+
+## <a id="cfg_override"></a>覆盖JDBC服务器配置
+
+您可以通过在`CREATE EXTERNAL TABLE`命令`LOCATION`子句中通过自定义选项直接指定某些JDBC属性来覆盖JDBC服务器配置。有关其他信息，请参考[通过DDL覆盖JDBC服务器配置](jdbc_pxf.html#jdbc_override)。
+
+
+## <a id="cfg_proc"></a>示例配置过程
 
 在配置JDBC连接器服务器之前，请确保已初始化PXF。
 
-在此过程中，您将为PostgreSQL数据库命名并添加PXF JDBC服务器配置，并将该服务器配置同步到所有Segment主机。
+在此过程中，您将命名并添加PostgreSQL数据库的PXF JDBC服务器配置，并将服务器配置同步到Greenplum数据库集群。
 
-1. 登录到GPDB的master节点
+1. 登录到您的Greenplum数据库主节点：
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. 选择JDBC服务器名称,您将名称提供给您选择的Greenplum用户，以允许他们作为配置用户引用外部SQL数据库中的表。
+2. 选择JDBC服务器的名称。您将名称提供给Greenplum用户，您可以选择这些用户允许其以配置用户身份引用外部SQL数据库中的表。
 
-    **Note**: `default`为保留服务名。
+    **注意**: 服务器名称`default`已保留。
 
-3. 创建`$PXF_HOME/servers/<server_name>`目录。例如，使用以下命令创建名为`pg_user1_testdb`的JDBC服务配置。
+3. 创建`$PXF_HOME/servers/<server_name>`目录。例如，使用以下命令来创建名为`pg_user1_testdb`的JDBC服务器配置：
 
     ``` shell
     gpadmin@gpmaster$ mkdir $PXF_CONF/servers/pg_user1_testdb
-    ````
+    ```
 
-4. 将PXF JDBC服务器模板文件复制到服务器配置目录。 例如：
+4. 将PXF JDBC服务器模板文件复制到服务器配置目录。例如：
 
     ``` shell
     gpadmin@gpmaster$ cp $PXF_CONF/templates/jdbc-site.xml $PXF_CONF/servers/pg_user1_testdb/
     ```
-
-5. 使用编辑器中打开模板服务器配置文件，并为您的环境提供适当的属性值。例如，如果要在名为`pgserverhost`的主机上运行的PostgreSQL实例上为名为`user1`的用户配置对名为`testdb`的PostgreSQL数据库的访问:
+        
+5. 在您选择的编辑器中打开模板服务器配置文件，并为您的环境提供适当的属性值。例如，如果要在名为`pgserverhost`的主机上运行的PostgreSQL实例上为名为`user1`的用户配置对名为`testdb`的PostgreSQL数据库的访问：
 
     ``` xml
     <?xml version="1.0" encoding="UTF-8"?>
@@ -108,18 +302,185 @@ FORMAT 'TEXT' (delimiter=E',');
         </property>
     </configuration>
     ```
-6. 保存修改并退出
+6. 保存更改并退出编辑器。
 
-7. 使用`pxf cluster sync`命令将新的服务器配置复制到每个Greenplum数据库segment主机。例如：
-
+7. 使用`pxf cluster sync`命令将新的服务器配置复制到Greenplum数据库集群。例如：
+    
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
     ```
 
-## <a id="client-cfg-update"></a>添加或更新JDBC服务配置
+## <a id="hive_cfg"></a>配置Hive访问
 
-如果要在Greenplum数据库master主机上添加新的JDBC服务配置或更新现有的JDBC服务配置，则必须将PXF配置重新同步到Greenplum数据库集群的各个segment
+您可以使用PXF JDBC连接器从Hive检索数据。您还可以使用JDBC命名查询向Hive提交自定义SQL查询，并使用JDBC连接器检索结果。
 
-``` shell
-gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
-```
+本主题描述如何配置PXF JDBC连接器以访问Hive。使用JDBC配置Hive访问时，必须考虑Hive用户模拟设置，以及是否使用Kerberos保护Hadoop群集。
+
+
+### <a id="hive_cfg_server"></a>JDBC服务器配置
+
+PXF JDBC连接器安装了通过JDBC访问Hive所需的JAR文件，`hive-jdbc-<version>.jar`和`hive-service-<version>.jar`，并自动注册了这些JAR。
+
+为Hive访问配置PXF JDBC服务器时，必须像配置与SQL数据库的客户端连接时一样指定JDBC驱动程序类名称，数据库URL和客户端凭据。
+
+要通过JDBC访问Hive，您必须在`jdbc-site.xml`服务器配置文件中指定以下属性和值：
+
+| 属性       |  值 |
+|----------------|--------|
+| jdbc.driver | org.apache.hive.jdbc.HiveDriver |
+| jdbc.url | jdbc:hive2://\<hiveserver2_host>:\<hiveserver2_port>/\<database> |
+
+HiveServer2身份验证(`hive.server2.authentication`)和模拟(`hive.server2.enable.doAs`)属性的值以及Hive服务是否正在使用Kerberos身份验证将通知其他JDBC服务器的设置配置属性。这些属性在Hadoop集群的`hive-site.xml`配置文件中定义。您将需要获取这些属性的值。
+
+下表枚举了PXF JDBC连接器支持的Hive2身份验证和模拟组合。它标识可能的Hive用户身份以及每个身份所需的JDBC服务器配置。
+
+表标题键：
+
+- *authentication* -> Hive hive.server2.authentication设置
+- *enable.doAs* -> Hive hive.server2.enable.doAs设置
+- *User Identity* -> HiveServer2将用于访问数据的身份
+- *Configuration Required* -> *User Identity*需要的PXF JDBC连接器或Hive配置
+
+| authentication  |  enable.doAs | User Identity | Configuration Required |
+|------------------|---------------|----------------|-------------------|
+| `NOSASL` | n/a | 无认证 | 必须设置成 `jdbc.connection.property.auth` = `noSasl`  |
+| `NONE`, 或未指定 | `TRUE` | 您提供的用户名 | 设置 `jdbc.user` |
+| `NONE`, 或未指定 | `TRUE` | Greenplum用户名 | 设置 `pxf.impersonation.jdbc` = `true` |
+| `NONE`, 或未指定 | `FALSE` | 启动Hive的用户名，通常是`hive`  | None |
+| `KERBEROS` | `TRUE` | PXF Kerberos主体中提供的身份，通常是`gpadmin` | None |
+| `KERBEROS` | `TRUE` | 您提供的用户名  | 设置 `hive.server2.proxy.user` 中的 `jdbc.url`  |
+| `KERBEROS` | `TRUE` | Greenplum用户名  | 设置 `pxf.impersonation.jdbc` = `true` |
+| `KERBEROS` | `FALSE` | PXF Kerberos主体中提供的身份，通常是`gpadmin` |  None |
+
+**注意**: Hive利用Kerberos身份验证时，还需要其他配置步骤。
+
+### <a id="hive_cfg_server_proc"></a>示例配置步骤
+
+执行以下过程为Hive配置PXF JDBC服务器：
+
+1. 登录到您的Greenplum数据库主节点：
+
+    ``` shell
+    $ ssh gpadmin@<gpmaster>
+    ```
+
+2. 选择JDBC服务器的名称。
+
+3. 创建`$PXF_HOME/servers/<server_name>`目录。例如，使用以下命令创建名为`hivejdbc1`的JDBC服务器配置：
+
+    ``` shell
+    gpadmin@gpmaster$ mkdir $PXF_CONF/servers/hivejdbc1
+    ```
+
+4. 将PXF JDBC服务器模板文件复制到服务器配置目录。例如：
+
+    ``` shell
+    gpadmin@gpmaster$ cp $PXF_CONF/templates/jdbc-site.xml $PXF_CONF/servers/hivejdbc1/
+    ```
+        
+5. 在您选择的编辑器中打开`jdbc-site.xml`文件，并设置`jdbc.driver`和`jdbc.url`属性。确保指定您的Hive主机，端口和数据库名称：
+
+    ``` xml
+    <property>
+        <name>jdbc.driver</name>
+        <value>org.apache.hive.jdbc.HiveDriver</value>
+    </property>
+    <property>
+        <name>jdbc.url</name>
+        <value>jdbc:hive2://<hiveserver2_host>:<hiveserver2_port>/<database></value>
+    </property>
+    ```
+
+6. 从Hadoop群集中获取`hive-site.xml`文件并检查该文件。
+
+7. 如果`hive-site.xml`中的`hive.server2.authentication`属性设置为`NOSASL`，则HiveServer2不执行身份验证。将以下连接级别属性添加到`jdbc-site.xml`中：
+
+    ``` xml
+    <property>
+        <name>jdbc.connection.property.auth</name>
+        <value>noSasl</value>
+    </property>
+    ```
+    或者，您可以选择将`;auth=noSasl`添加到`jdbc.url`中。
+
+8. 如果`hive-site.xml`中的`hive.server2.authentication`属性设置为`NONE`，或者未指定该属性，则必须设置`jdbc.user`属性。设置`jdbc.user`属性的值取决于`hive-site.xml`中的`hive.server2.enable.doAs`模拟设置：
+
+    1. 如果将`hive.server2.enable.doAs`设置为`TRUE`（默认值），则Hive代表连接到Hive的用户运行Hadoop操作。*选择/执行以下选项之一*：
+
+        **设置**`jdbc.user`以指定对Greenplum数据库访问的所有Hive数据具有读取权限的用户。例如，要连接到Hive并以`gpadmin`用户身份运行所有请求：
+
+        ``` xml
+        <property>
+            <name>jdbc.user</name>
+            <value>gpadmin</value>
+        </property>
+        ```
+        **或**，打开JDBC级用户模拟，以便PXF自动使用Greenplum数据库用户名连接到Hive：
+
+        ``` xml
+        <property>
+            <name>pxf.impersonation.jdbc</name>
+            <value>true</value>
+        </property>
+        ```
+        如果以这种方式启用JDBC模拟，则既不能指定`jdbc.user`也不能在`jdbc.url`中包含设置。
+
+    2. 如果需要，创建一个PXF用户配置文件来管理密码设置。
+    3. 如果将`hive.server2.enable.doAs`设置为`FALSE`，则Hive将以启动HiveServer2进程的用户（通常是用户`hive`）运行Hadoop操作。在这种情况下，PXF会忽略`jdbc.user`设置。
+
+9. 如果`hive-site.xml`中的`hive.server2.authentication`属性设置为`KERBEROS`：
+    1. 确保按照[为安全HDFS配置PXF](pxf_kerbhdfs.html)中的说明为PXF启用了Kerberos身份验证。
+    2. 确保已将Hadoop集群配置为`default`PXF服务器。
+    3. 确保`$PXF_CONF/servers/default/core-site.xml`文件包含以下设置：
+
+        ``` xml
+        <property>
+            <name>hadoop.security.authentication</name>
+            <value>kerberos</value>
+        </property>
+        ```
+    4. 在`jdbc.url`中添加`saslQop`属性，并将其设置为与`hive-site.xml`中的`hive.server2.thrift.sasl.qop`属性设置匹配。例如，如果`hive-site.xml`文件包含以下属性设置：
+
+        ``` xml
+        <property>
+            <name>hive.server2.thrift.sasl.qop</name>
+            <value>auth-conf</value>
+        </property>
+        ```
+        你可以将`;saslQop=auth-conf`添加到`jdbc.url`。
+       
+    5. 将HiverServer2 `principal`名称添加到`jdbc.url`中。例如：
+
+        <pre>
+        jdbc:hive2://hs2server:10000/default;<b>principal=hive/hs2server@REALM</b>;saslQop=auth-conf
+        </pre>
+    6. 如果将`hive.server2.enable.doAs`设置为`TRUE`（默认值），则Hive代表连接到Hive的用户运行Hadoop操作。*选择/执行以下选项之一*：
+
+        **不要**指定任何其他属性。在这种情况下，PXF使用PXF Kerberos主体（通常是`gpadmin`）中提供的身份来启动所有Hadoop访问。
+
+        **或**，在`jdbc.url`中设置`hive.server2.proxy.user`属性，以指定对所有Hive数据具有读取权限的用户。例如，要连接到Hive并以名为`integration`的用户身份运行所有请求，请使用以下`jdbc.url`：
+
+        <pre>
+        jdbc:hive2://hs2server:10000/default;principal=hive/hs2server@REALM;saslQop=auth-conf;<b>hive.server2.proxy.user=integration</b>
+        </pre>
+
+        **或**，在`jdbc-site.xml`文件中启用PXF JDBC模拟，以便PXF自动使用Greenplum数据库用户名连接到Hive。例如：
+
+        ``` xml
+        <property>
+            <name>pxf.impersonation.jdbc</name>
+            <value>true</value>
+        </property>
+        ```
+        如果启用JDBC模拟，则不得在`jdbc.url`中显式指定`hive.server2.proxy.user`。
+    6. 如果需要，创建一个PXF用户配置文件来管理密码设置。
+    7. 如果将`hive.server2.enable.doAs`设置为`FALSE`，则Hive将使用PXF Kerberos主体提供的身份（通常为`gpadmin`）运行Hadoop操作。
+
+10. 保存更改并退出编辑器。
+
+11. 使用`pxf cluster sync`命令将新的服务器配置复制到Greenplum数据库集群。例如：
+    
+    ``` shell
+    gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
+    ```
+

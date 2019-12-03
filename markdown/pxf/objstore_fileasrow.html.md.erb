@@ -1,0 +1,67 @@
+---
+title: 将多行文本文件读入单个表行
+---
+
+PXF对象存储连接器支持将多行文本文件读取为单个表行。 本节介绍如何使用PXF读取对象存储中的多行文本和JSON数据文件，包括如何创建引用存储中多个文件的外部表。
+
+PXF支持以这种方式仅读取文本和JSON文件。
+
+**注意**: 从对象存储访问多行文件与访问HDFS中的多行文件非常相似。 本主题标识读取这些文件所需的特定于对象存储的信息。 有关更多信息，请参考[PXF HDFS文档](hdfs_fileasrow.html)。
+
+## <a id="prereq"></a>先决条件
+
+在尝试从驻留在对象存储中的多个文件中读取数据之前，请确保已满足PXF对象存储的[先决条件](access_objstore.html#objstore_prereq)。
+
+## <a id="objmulti_cet"></a>创建外部表
+
+使用`<objstore>:hdfs:multi`配置文件将对象存储中的多个文件读入单个表行。 PXF支持以下`<objstore>`配置文件前缀：
+
+| 对象存储  | 配置文件前缀 |
+|-------|-------------------------------------|
+| Azure Blob Storage   | wasbs |
+| Azure Data Lake    | adl |
+| Google Cloud Storage    | gs |
+| Minio    | s3 |
+| S3    | s3 |
+
+以下语法创建了Greenplum数据库可读的外部表，该表引用对象存储中的一个或多个文本文件：
+
+``` sql
+CREATE EXTERNAL TABLE <table_name>
+    ( <column_name> text|json | LIKE <other_table> )
+  LOCATION ('pxf://<path-to-files>?PROFILE=<objstore>:text:multi[&SERVER=<server_name>]&FILE_AS_ROW=true')
+  FORMAT 'CSV');
+```
+
+下表描述了[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的特定关键字和值。
+
+| 关键字  | 值 |
+|-------|-------------------------------------|
+| \<path&#8209;to&#8209;files\>    | 对象存储中目录或文件的绝对路径。 |
+| PROFILE=\<objstore\>:text:multi    | `PROFILE`关键字必须标识特定的对象存储。 例如，`s3：text：multi`。 |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
+| FILE\_AS\_ROW=true    | 指示PXF将每个文件读入单个表行的必需选项。 |
+| FORMAT | `FORMAT`必须指定`'CSV'`。  |
+
+如果要访问S3对象存储，则可以通过`CREATE EXTERNAL TABLE`命令中的自定义选项提供S3凭据，如[使用DDL覆盖S3服务器配置](access_s3.html#s3_override)中所述。
+
+## <a id="example"></a>示例
+
+有关示例，请参阅PXF HDFS文档中的[示例：将HDFS文本文件读入单个表行](hdfs_fileasrow.html#example_fileasrow)。 您必须对使用对象库运行示例进行的修改包括：
+
+- 将文件复制到对象存储而不是HDFS。 例如，要将文件复制到S3：
+
+    ``` shell
+    $ aws s3 cp /tmp/file1.txt s3://BUCKET/pxf_examples/tdir
+    $ aws s3 cp /tmp/file2.txt s3://BUCKET/pxf_examples/tdir
+    $ aws s3 cp /tmp/file3.txt s3://BUCKET/pxf_examples/tdir
+    ```
+
+- 使用上述的`CREATE EXTERNAL TABLE`语法和`LOCATION`关键字和设置。 例如，如果您的服务器名称是`s3srvcfg`：
+
+    ``` sql
+    CREATE EXTERNAL TABLE pxf_readfileasrow_s3( c1 text )
+      LOCATION('pxf://BUCKET/pxf_examples/tdir?PROFILE=s3:text:multi&SERVER=s3srvcfg&FILE_AS_ROW=true')
+    FORMAT 'CSV'
+    ```
+

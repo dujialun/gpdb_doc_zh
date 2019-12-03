@@ -16,15 +16,17 @@ GPDB集群包含一个master节点(master node)和多个segment主机(segment ho
 
 连接器是一个通用的术语,他封装了读取和写入外部数据存储所需要的实现细节。PXF提供创建了与Hadoop (HDFS,Hive,Hbase),对象存储(Azure,Google Cloud Storage, Minio, S3)和sql数据库(通过jdbc)的连接器。
 
-PXF服务是连接器的命名配置，他定义提供PXF访问外部数据源所需要的信息，此类配置信息是特定于数据存储的，并且可以包含服务器位置,访问凭证和其他属性。
+PXF服务器是连接器的命名配置。服务器定义提供PXF访问外部数据源所需的信息。此配置信息是特定于数据存储的，并且可以包括服务器位置，访问凭据和其他相关属性。
 
-<div class="note">PXF目前支持以明文形式在配置文件中存储对象存储凭证。</div>
+Greenplum数据库管理员将为每个允许Greenplum数据库用户访问的外部数据存储配置至少一个服务器定义，并在适当时发布可用的服务器名称。
 
 默认的PXF服务是default(保留)，在没有配置SERVER=<server_name>时提供外部数据源的位置和访问信息。
+创建外部表时，可以指定`SERVER=<server_name>`设置，以标识从中获取配置的服务器配置和访问外部数据存储的凭据。
 
 GPDB数据库管理员将为每个允许GPDB用户访问的外部数据存储配置至少一个服务定义,并将根据需求发布可用的服务名。
+默认的PXF服务器名为`default`（保留），在配置后，如果没有`SERVER=<server_name>`设置，则将提供外部数据源的位置和访问信息。
 
-最后,PXF配置文件是一个命名映射，用于指定特定的外部数据存储支持的特定数据格式和协议。PXF支持text,Avro,JSON,RCFile,Parquet,SequenceFile和ORC数据格式以及JDBC协议，并且提供了几个内置的配置文件。
+最后，PXF配置文件是一个命名映射，用于标识特定外部数据存储支持的特定数据格式或协议。PXF支持text，Avro，JSON，RCFile，Parquet，SequenceFile和ORC数据格式以及JDBC协议，并提供了一些内置配置文件，如以下部分所述。
 
 ## <a id="create_external_table"></a> 创建一个外部表
 
@@ -51,7 +53,7 @@ PXF可能需要额外的信息来读取和写入某些数据格式，可以使�
 |-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | \<path&#8209;to&#8209;data\>        | 目录，文件名，通配符模式，表名等。<path-to-data>的语法取决于外部数据源    |
 | PROFILE=\<profile_name\>  | PXF用于访问数据的配置文件。 PXF支持[Hadoop services](access_hdfs.html), [object stores](access_objstore.html), and [other SQL databases](jdbc_pxf.html).  |
-| SERVER=\<server_name\>   | PXF用于访问数据的命名服务器配置。 可选的; 如果未指定，PXF将使用default服务 |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | \<custom&#8209;option\>=\<value\> | 配置文件或服务器支持的其他选项及其值 |
 | FORMAT&nbsp;\<value\>| PXF支持`TEXT`,`CSV`和`CUSTOM`格式  |
 | \<formatting&#8209;properties\> | 格式化配置文件支持的属性; 例如, `FORMATTER`或`delimiter` |

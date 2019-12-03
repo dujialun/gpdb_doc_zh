@@ -178,7 +178,7 @@ $ hdfs dfs -put multiline.json /data/pxf_examples
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
-LOCATION ('pxf://<path-to-hdfs-file>?PROFILE=hdfs:json[&<custom-option>=<value>[...]]')
+LOCATION ('pxf://<path-to-hdfs-file>?PROFILE=hdfs:json[&SERVER=<server_name>][&<custom-option>=<value>[...]]')
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
@@ -188,6 +188,7 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径 |
 | PROFILE    | `PROFILE`关键字必须指定为`hdfs:json` |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | \<custom&#8209;option\>  | \<custom-option\>描述见下方|
 | FORMAT 'CUSTOM' | 在 `hdfs:json`配置文件中使用 `FORMAT` `'CUSTOM'` 。 `CUSTOM` `FORMAT` 要求您指定为 `(FORMATTER='pxfwritable_import')`。 |
 
@@ -201,7 +202,7 @@ PXF支持单行和多行JSON记录。当您想读取多行JSON记录时，必须
 
 ## <a id="jsonexample1"></a>示例：读取单行记录的JSON文件
 
-使用以下[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html) SQL命令创建一个引用每条记录单行的JSON数据文件的可读外部表。
+使用以下[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)SQL命令来创建可读的外部表，该表引用每条记录单行JSON数据文件并使用PXF默认服务器。
 
 ``` sql 
 CREATE EXTERNAL TABLE singleline_json_tbl(

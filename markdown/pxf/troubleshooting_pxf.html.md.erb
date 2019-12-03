@@ -27,13 +27,13 @@ under the License.
 
 | Error Message                 | Discussion                     |
 |-------------------------------|---------------------------------|
-| Protocol "pxf" does not exist | **Cause**: pxf扩展名未注册。<br>**Solution**: 按照PXF启用过程中的说明为[Enable Procedure](using_pxf.html#enable-pxf-ext) 为数据库创建（启用）PXF扩展 |
+| Protocol "pxf" does not exist | **Cause**: pxf扩展名未注册。<br>**Solution**: 按照PXF启用过程中的说明为[Enable Procedure](using_pxf.html#enable-pxf-ext) 为数据库创建(启用)PXF扩展 |
 | Invalid URI pxf://\<path-to-data\>: missing options section | **Cause**: `LOCATION` URI配置项不包括配置或其他需要的信息。<br>**Solution**:在URI中提供配置和必需的选项。|
 | org.apache.hadoop.mapred.InvalidInputException: Input path does not exist: hdfs://\<namenode\>:8020/\<path-to-file\> | **Cause**: 在\<path-to-file\>中指定的HDFS文件不存在。<br>**Solution**: 指定现有HDFS文件的路径|
 | NoSuchObjectException(message:\<schema\>.\<hivetable\> table not found) | **Cause**: \<schema\>.\<hivetable\>指定的Hive表不存在。<br>**Solution**: 提供存在的Hive表的名称。|
 | Failed to connect to \<segment-host\> port 5888: Connection refused (libchurl.c:944)  (\<segment-id\> slice\<N\> \<segment-host\>:40000 pid=\<process-id\>)<br> ... |**Cause**: 在\<segment-host\>主机上PXF未运行。 <br>**Solution**: \<segment-host\>主机上重启PXF|
 | *ERROR*: failed to acquire resources on one or more segments<br>*DETAIL*:  could not connect to server: Connection refused<br>&nbsp;&nbsp;&nbsp;&nbsp;Is the server running on host "\<segment-host\>" and accepting<br>&nbsp;&nbsp;&nbsp;&nbsp;TCP/IP connections on port 40000?(seg\<N\> \<segment-host\>:40000) | **Cause**: GPDB集群 \<segment-host\> 节点down |
-| org.apache.hadoop.security.AccessControlException: Permission denied: user=<user>, access=READ, inode=&quot;<filepath>&quot;:<user>:<group>:-rw------- | **Cause**: 执行PXF操作的Greenplum数据库用户无权访问基础Hadoop服务（HDFS或Hive）。参阅[Configuring User Impersonation and Proxying](pxfuserimpers.html). |
+| org.apache.hadoop.security.AccessControlException: Permission denied: user=<user>, access=READ, inode=&quot;<filepath>&quot;:<user>:<group>:-rw------- | **Cause**: 执行PXF操作的Greenplum数据库用户无权访问基础Hadoop服务(HDFS或Hive)。参阅[Configuring User Impersonation and Proxying](pxfuserimpers.html). |
 
 ## <a id="pxf-logging"></a>PXF日志
 
@@ -57,7 +57,7 @@ PXF利用`log4j`进行服务级别的日志记录。PXF-service-related日志消
     #log4j.logger.org.greenplum.pxf=DEBUG
     ```
 
-2. 使用 `pxf cluster sync` 命令拷贝更新的文件 `pxf-log4j.properties` 到每个segment主机。例如：
+2. 使用 `pxf cluster sync` 命令拷贝更新的文件 `pxf-log4j.properties` 到Greenplum数据库集群。例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
@@ -123,11 +123,106 @@ dbname=# SET client_min_messages=NOTICE;
 
 ## <a id="pxf-memcfg"></a>解决PXF内存问题
 
-因为单个PXF客户端服务（JVM）为segment主机上的多个segment实例提供服务，所以PXF堆大小可能是限制运行的瓶颈。在并发工作负载时针对大文件的查询，影响更加明显。您可能会遇到由于内存不足或Java垃圾收集器影响响应时间而导致查询挂起或失败的情况。要避免或纠正这些情况，请首先尝试增加Java最大堆大小或减少Tomcat最大线程数，这取决于最适合您系统配置的方式。
+因为单个PXF客户端服务(JVM)为segment主机上的多个segment实例提供服务，所以PXF堆大小可能是限制运行的瓶颈。在并发工作负载时针对大文件的查询，影响更加明显。您可能会遇到由于内存不足或Java垃圾收集器影响响应时间而导致查询挂起或失败的情况。要避免或纠正这些情况，请首先尝试增加Java最大堆大小或减少Tomcat最大线程数，这取决于最适合您系统配置的方式。您还可以选择将PXF配置为在检测到内存不足情况时执行特定的操作。
 
-**Note**: 本主题中描述的配置更改需要在Greenplum数据库集群中的每个segment节点上修改配置文件。执行更新后，请确保将PXF配置同步到群集中的每个segment主机。
+**Note**: 本主题中描述的配置更改需要在Greenplum数据库集群的*每个*节点上修改配置文件。 在主服务器上执行更新后，请确保将PXF配置同步到Greenplum数据库集群。
 
-在任何PXF版本升级之后，您将需要重新加载这些配置更改。
+### <a id="pxf-cfgoom"></a>配置内存不足条件操作
+
+在内存不足（OOM）的情况下，PXF返回以下错误以响应查询：
+
+``` pre
+java.lang.OutOfMemoryError: Java heap space
+```
+
+您可以将PXF JVM配置为在检测到OOM条件时启用/禁用以下操作：
+
+- 自动杀死PXF服务器（默认情况下启用）。
+- 转储Java堆（默认情况下禁用）。
+
+#### <a id="pxf-cfgoom-autokill"></a>自动杀死PXF服务器
+
+默认情况下，对PXF进行了配置，以便当PXF JVM在segment主机上检测到内存不足情况时，它将自动运行一个脚本，该脚本将杀死主机上运行的PXF服务器。 `PXF_OOM_KILL`配置属性控制此自动终止行为。
+
+启用自动终止功能后，PXF JVM检测到OOM条件并终止segment主机上的PXF服务器：
+
+- PXF将以下消息记录到segment主机上的`$PXF_CONF/logs/catalina.out`中：
+
+    ``` shell
+    =====> <date> PXF Out of memory detected <======
+    =====> <date> PXF shutdown scheduled <======
+    ```
+
+- 在PXF外部表上运行的任何查询都将失败，并显示以下错误，直到您在segment主机上重新启动PXF服务器为止：
+
+    ``` shell
+    ... Failed to connect to <host> port 5888: Connection refused
+    ```
+
+**当以这种方式关闭segment主机上的PXF服务器时，必须显式重新启动主机上的PXF服务器。** 有关`pxf start`命令的更多信息，请参见[pxf](ref/pxf.html)参考页。
+
+有关禁用/启用此PXF配置属性的说明，请参考下面的配置[procedure](#pxf-cfgoom_proc)。
+
+#### <a id="pxf-cfgoom-heapdump"></a>转储Java堆
+
+在内存不足的情况下，捕获Java堆转储以帮助确定导致资源耗尽的因素可能很有用。 您可以使用`PXF_OOM_DUMP_PATH`属性来配置PXF在检测到OOM条件时将堆转储写入文件。 默认情况下，PXF不会在OOM上转储Java堆。
+
+如果选择在OOM上启用堆转储，则必须将`PXF_OOM_DUMP_PATH`设置为文件或目录的绝对路径：
+
+- 如果指定目录，则PXF JVM将堆转储写入文件`<directory>/java_pid<pid>.hprof`，其中`<pid>`标识PXF服务器实例的进程ID。 每次JVM进行OOM操作时，PXF JVM都会将新文件写入目录。
+- 如果指定文件，但该文件不存在，则PXF JVM在检测到OOM时会将堆转储写入文件。 如果文件已经存在，则JVM将不会转储堆。
+
+确保`gpadmin`用户对转储文件或目录具有写权限。
+
+**Note**: 堆转储文件通常很大。 如果在OOM上为PXF启用堆转储，并为`PXF_OOM_DUMP_PATH`指定一个目录，则多个OOM将在该目录中生成多个文件，并可能消耗大量磁盘空间。 如果为`PXF_OOM_DUMP_PATH`指定文件，则在文件名不变的情况下磁盘使用率是恒定的。 您必须重命名转储文件或配置其他`PXF_OOM_DUMP_PATH`才能生成后续的堆转储。
+
+有关启用/禁用此PXF配置属性的说明，请参阅下面的配置[步骤](#pxf-cfgoom_proc)。
+
+#### <a id="pxf-cfgoom_proc"></a>步骤
+
+默认情况下，将启用OOM上PXF服务器的自动终止功能。 默认情况下，在OOM上禁用堆转储生成。 要配置这些属性之一或全部，请执行以下步骤：
+
+1. 登录到您的Greenplum数据库主节点：
+
+    ``` shell
+    $ ssh gpadmin@<gpmaster>
+    ```
+
+2. 编辑`$PXF_CONF/conf/pxf-env.sh`文件。 例如：
+
+    ``` shell
+    gpadmin@gpmaster$ vi $PXF_CONF/conf/pxf-env.sh
+    ```
+
+3. 如果您想在OOM上配置（即关闭或重新打开）PXF服务器自动关闭功能，请在`pxf-env.sh`文件中找到`PXF_OOM_KILL`属性。 如果该设置已被注释掉，请取消注释它，然后更新该值。 例如，要关闭此行为，请将值设置为`false`：
+
+    ``` shell
+    export PXF_OOM_KILL=false
+    ```
+
+4. 如果您要在PXF服务器达到OOM条件时配置（即打开或关闭）自动堆转储，请在`pxf-env.sh`文件中找到`PXF_OOM_DUMP_PATH`设置。
+
+    1. 要打开此行为，请将`PXF_OOM_DUMP_PATH`属性值设置为您希望PXF JVM将Java堆转储到的文件系统位置。 例如，要转储到名为`/home/gpadmin/pxfoom_segh1`的文件：
+
+        ``` shell
+        export PXF_OOM_DUMP_PATH=/home/pxfoom_segh1
+        ```
+
+    2. 要在打开堆转储后将其关闭，请注释掉`PXF_OOM_DUMP_PATH`属性设置：
+
+        ``` shell
+        #export PXF_OOM_DUMP_PATH=/home/pxfoom_segh1
+        ```
+
+5. 保存`pxf-enf.sh`文件并退出编辑器。
+
+6. 使用`pxf cluster sync`命令将更新的`pxf-env.sh`文件复制到Greenplum数据库集群。 例如：
+
+    ``` shell
+    gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
+    ```
+
+7. 如[重新启动PXF](cfginitstart_pxf.html#restart_pxf)中所述，在每个Greenplum数据库segment主机上重新启动PXF。
 
 ### <a id="pxf-heapcfg"></a>为PXF增加JVM内存
 
@@ -141,19 +236,20 @@ dbname=# SET client_min_messages=NOTICE;
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. 重新进入PXF用户配置目录的位置（$ PXF_CONF）。编辑`$PXF_CONF/conf/pxf-env.sh`文件。 例如：
+2. 编辑`$PXF_CONF/conf/pxf-env.sh`文件。 例如：
 
     ``` shell
     gpadmin@gpmaster$ vi $PXF_CONF/conf/pxf-env.sh
     ```
 
-3. 在p`xf-env.sh`文件中找到`PXF_JVM_OPTS`设置，然后将 `-Xmx` 和/或 `-Xms` 选项更新为所需的值。 例如：
+3. 在`pxf-env.sh`文件中找到`PXF_JVM_OPTS`设置，然后将 `-Xmx` 和/或 `-Xms` 选项更新为所需的值。 例如：
 
     ``` shell
     PXF_JVM_OPTS="-Xmx3g -Xms3g"
     ```
 
-4. 使用`pxf cluster sync` 命令将更新的`pxf-env.sh`文件复制到每个Greenplum数据库segment主机。 例如：
+3. 保存文件并退出编辑器。
+4. 使用`pxf cluster sync` 命令将更新的`pxf-env.sh`文件复制到Greenplum数据库集群。 例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
@@ -163,11 +259,15 @@ dbname=# SET client_min_messages=NOTICE;
 
 ### <a id="pxf-threadcfg"></a>资源受限的PXF segment主机的另一种选择
 
-如果增加最大堆大小不适合您的Greenplum数据库部署，请尝试减少PXF的的并发工作线程数。正在运行的线程数量的减少将防止任何PXF节点耗尽其内存，同时确保当前查询运行完毕（尽管速度稍慢）。 Tomcat的默认行为是将请求排队，直到线程空闲或队列耗尽为止。
+如果增加最大堆大小不适合您的Greenplum数据库部署，请尝试减少PXF的的并发工作线程数。正在运行的线程数量的减少将防止任何PXF节点耗尽其内存，同时确保当前查询运行完毕(尽管速度稍慢)。 Tomcat的默认行为是将请求排队，直到线程空闲或队列耗尽为止。
 
-Tomcat的默认最大线程数为300。将最大线程数减少为最适合您的Greenplum数据库部署的值。（如果计划在外部Hive数据存储中的大量文件上运行大型工作负载，请指定一个更低的值。）
+PXF的Tomcat线程的默认最大数量为200。`PXF_MAX_THREADS`配置属性控制此设置。
 
-执行以下过程，以减少在Greenplum数据库部署中每个segment主机上运行的PXF代理的Tomcat线程的最大数量。
+PXF线程容量由配置文件以及是否压缩数据确定。 如果计划在外部Hive数据存储中的大量文件上运行大型工作负载，或者正在读取压缩的ORC或Parquet数据，请考虑指定较低的`PXF_MAX_THREADS`值。
+
+**Note**: 请记住，线程数用完后，线程数的增加与内存消耗的增加相关。
+
+执行以下过程，以设置在Greenplum数据库部署中每个segment主机上运行的PXF代理的Tomcat线程的最大数量。
 
 1. 登录到gpdb集群的master节点
 
@@ -175,25 +275,23 @@ Tomcat的默认最大线程数为300。将最大线程数减少为最适合您�
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. 编辑`$GPHOME/pxf/pxf-service/conf/server.xml`。例如:
+2. 编辑`$PXF_CONF/conf/pxf-env.sh`。例如:
 
     ``` shell
-    gpadmin@gpmaster$ vi $GPHOME/pxf/pxf-service/conf/server.xml
+    gpadmin@gpmaster$ vi $PXF_CONF/conf/pxf-env.sh
     ```
 
-3. 找到`Catalina` `Executor`区域，并将`maxThreads`设置更新为所需值。 例如：
-
-    ``` xml
-    <Executor maxThreads="100"
-              minSpareThreads="50"
-              name="tomcatThreadPool"
-              namePrefix="tomcat-http--"/>
-    ```
-
-4. 将更新的`server.xml`文件复制到每个Greenplum数据库segment主机。 例如，如果`seghostfile`包含Greenplum数据库集群中seg主机的列表：
+3. 在`pxf-env.sh`文件中找到`PXF_MAX_THREADS`设置。 取消注释设置，并将其更新为所需的值。 例如，要将Tomcat线程的最大数量设置为100：
 
     ``` shell
-    gpadmin@gpmaster$ gpscp -v -f seghostfile $GPHOME/pxf/pxf-service/conf/server.xml =:/usr/local/greenplum-db/pxf/pxf-service/conf/server.xml
+    export PXF_MAX_THREADS=100
+    ```
+
+3. 保存文件并退出编辑器。
+4. 使用`pxf cluster sync`命令将更新的`pxf-env.sh`文件复制到Greenplum数据库集群。 例如：
+
+    ``` shell
+    gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
     ```
 
 5. 依照[Restarting PXF](cfginitstart_pxf.html#restart_pxf)描述重启PXF服务
@@ -218,5 +316,38 @@ export PXF_JVM_OPTS="<current_settings> -Duser.timezone=America/Chicago"
 
 您也可以使用`PXF_JVM_OPTS`属性来设置其他Java选项。
 
-如前几节所述，您必须将更新的PXF配置同步到每个Greenplum数据库segment主机，然后在每个主机上重新启动PXF服务。
+如前几节所述，您必须将更新的PXF配置同步到Greenplum数据库集群，然后在每个segment主机上重新启动PXF服务器。
 
+## <a id="pxf-fragcache"></a>PXF片段元数据缓存
+
+PXF连接器*Fragmenter*使用来自外部数据源的元数据将数据拆分为可并行读取的片段列表（块，文件等）。 PXF在每个查询的基础上缓存片段元数据：访问片段元数据的第一个线程将信息存储在缓存中，其他线程重用此缓存的元数据。 这种性质的缓存减少了具有大量片段的外部数据源对查询内存的需求。
+
+默认情况下，PXF片段元数据缓存处于启用状态。 要关闭片段元数据缓存，或在关闭后重新启用片段元数据缓存，请执行以下过程：
+
+1. 登录到您的Greenplum数据库主节点：
+
+    ``` shell
+    $ ssh gpadmin@<gpmaster>
+    ```
+
+2. 编辑`$PXF_CONF/conf/pxf-env.sh`文件。 例如：
+
+    ``` shell
+    gpadmin@gpmaster$ vi $PXF_CONF/conf/pxf-env.sh
+    ```
+
+3. 在`pxf-env.sh`文件中找到`PXF_FRAGMENTER_CACHE`设置。 如果该设置已被注释掉，请取消注释它，然后更新该值。 例如，要关闭片段元数据缓存，请将值设置为`false`：
+
+    ``` shell
+    export PXF_FRAGMENTER_CACHE=false
+    ```
+
+3. 保存文件并退出编辑器。
+
+4. 使用`pxf cluster sync`命令将更新的`pxf-env.sh`文件复制到Greenplum数据库集群。 例如：
+
+    ``` shell
+    gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
+    ```
+
+5. 如[重新启动PXF](cfginitstart_pxf.html#restart_pxf)中所述，在每个Greenplum数据库segment主机上重新启动PXF。

@@ -22,10 +22,11 @@ under the License.
 -->
 
 要显示PXF状态，必须在Greenplum数据库集群中的每个segment主机上显式请求PXF服务实例的状态。
+`pxf cluster status`命令可显示Greenplum数据库集群中所有segment主机上PXF服务实例的状态。`pxf status`显示本地(segment)主机上PXF服务实例的状态。
 
 只有`gpadmin`用户可以请求PXF服务的状态。
 
-执行以下步骤，可以以在Greenplum数据库集群中的每个segment主机上请求PXF状态。
+执行以下步骤哦，以请求Greenplum数据库集群的PXF状态。
 
 1. 登录gpdb集群的master主机
 
@@ -33,8 +34,8 @@ under the License.
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. 使用`gpssh`命令和`seghostfile`在每个segment主机上运行`pxf status`命令：
+2. 运行`pxf cluster status`命令：
 
     ```shell
-    gpadmin@gpmaster$ gpssh -e -v -f seghostfile "/usr/local/greenplum-db/pxf/bin/pxf status"
+    gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster status
     ```

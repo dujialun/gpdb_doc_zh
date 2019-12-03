@@ -82,6 +82,7 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径 |
 | PROFILE    | `PROFILE`关键字必须指定为`hdfs:avro`. |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | \<custom&#8209;option\>  | \<custom-option\>描述见下方|
 | FORMAT 'CUSTOM' | 在 `hdfs:avro`配置文件中使用`FORMAT` `'CUSTOM'` 。`CUSTOM` `FORMAT` 要求您指定为 `(FORMATTER='pxfwritable_import')`。 |
 
@@ -201,7 +202,7 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 
 执行以下来创建和查询引用您在上一节添加到HDFS的`pxf_avro.avro`文件。创建表时：
 
--  使用PXF默认服务
+-  使用PXF默认服务器。
 -  将顶层原生字段`id` (长整型)和`username`(字符串类型)映射到其等效的Greenplum的数据库类型(bigint和text)。
 -  将剩下的复杂类型映射为text类型
 -  使用`hdfs:avro`配置文件的自定义选项设置记录(record)、映射(map)和集合(collection)的分隔符

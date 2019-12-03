@@ -29,6 +29,8 @@ PXF提供了两个你可以在初始化时候使用的管理命令
 - [`pxf cluster init`](ref/pxf-cluster.html) - 初始化所有在GP集群中的pxf服务实例
 - [`pxf init`](ref/pxf.html) - 初始化当前节点上的pxf服务实例
 
+PXF还提供了类似的`reset`命令，可用于重置PXF配置。
+
 ## <a id="init_pxf"></a> PXF配置属性
 
 PXF同时支持内部的和用户自定义的配置属性。初始化PXF会生成PXF内部配置文件，并设置特定于您的配置的默认属性。初始化PXF还会为用户自定义设置生成配置文件模板，例如自定义配置文件和PXF运行时间和日志记录设置。
@@ -47,7 +49,7 @@ GPDB实例初始化PXF之前，请确保:
 - GPDB集群是启动并且运行的
 - 可以通过`$PXF_CONF`指定PXF用户配置目录的文件位置，并且`gpadmin`用户也需要对这个目录有写权限
 
-### <a id="init-pxf-steps" class="no-quick-link"></a>过程
+### <a id="init-pxf-steps"></a>过程
 
 执行一下流程确保在你的GPDB集群的每个节点初始化PXF。
 
@@ -57,12 +59,50 @@ GPDB实例初始化PXF之前，请确保:
     $ ssh gpadmin@<gpmaster>
     ```
 
-4. 运行`pxf cluster init`命令会在master节点和所有的segment节点主机上初始化PXF服务。如下命令指定`/usr/local/greenplum-pxf`作为pxf初始化的用户配置目录
+4. 运行`pxf cluster init`命令会在master,standby节点和所有的segment节点主机上初始化PXF服务。如下命令指定`/usr/local/greenplum-pxf`作为pxf初始化的用户配置目录
 
     ``` shell
     gpadmin@gpmaster$ PXF_CONF=/usr/local/greenplum-pxf $GPHOME/pxf/bin/pxf cluster init
     ```
 
-    `init`命令创建了pxf网页应用和pxf内部配置。init命令也创建了`$PXF_CONF`用户配置目录（如果目录不存在）并使用用户可自定义的配置模板填充目录。
+    `init`命令创建了pxf网页应用和pxf内部配置。init命令也创建了`$PXF_CONF`用户配置目录(如果目录不存在)并使用用户可自定义的配置模板填充`conf`和`templates`目录。如果`$PXF_CONF`存在，则PXF仅更新`templates`目录。
 
-    **Note**:PXF服务只运行在segment主机上，然而`pxf cluster init`命令也会安装在GPDB的master主机上创建PXF用户配置目录。
+    **Note**:PXF服务只运行在segment主机上，然而`pxf cluster init`命令也会安装在GPDB的master和standby主机上创建PXF用户配置目录。
+
+## <a id="pxf-reset"></a>重置PXF
+
+如果需要，可以将PXF重置为其未初始化状态。如果您指定了错误的`PXF_CONF`目录，或者您想从头开始初始化过程，则可以选择重置PXF。
+
+重置PXF时，PXF会提示您确认操作。如果确认，PXF将删除以下运行时文件和目录（其中`PXF_HOME=$GPHOME/pxf`）：
+
+- `$PXF_HOME/conf/pxf-private.classpath`
+- `$PXF_HOME/pxf-service`
+- `$PXF_HOME/run`
+
+重置操作期间PXF不会删除`$PXF_CONF`目录。
+
+必须先在segment主机上停止PXF服务实例，然后才能在主机上重置PXF。
+
+### <a id="reset-pxf-steps"></a>步骤
+
+执行以下过程在Greenplum数据库集群中的每个segment主机上重置PXF。
+
+1. 登录到Greenplum数据库master节点：
+
+    ``` shell
+    $ ssh gpadmin@<gpmaster>
+    ```
+
+2. 在每个segment主机上停止PXF服务实例。例如：
+
+    ``` shell
+    gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster stop
+    ```
+
+3. 在所有Greenplum主机上重置PXF服务实例。例如：
+
+    ``` shell
+    gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster reset
+    ```
+
+**注意**: 重置PXF之后，必须初始化并启动PXF才能再次使用该服务。

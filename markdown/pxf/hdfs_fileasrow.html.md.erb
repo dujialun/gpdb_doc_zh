@@ -1,0 +1,181 @@
+---
+title: 将多行文本文件读入单个表行
+---
+
+您可以使用PXF HDFS连接器以单个表行的形式读取HDFS中的一个或多个多行文本文件。当您想将多个文件读入同一Greenplum数据库外部表时，例如当每个JSON文件各自包含单独的记录时，这可能很有用。
+
+PXF支持以这种方式仅读取文本和JSON文件。
+
+**Note**: 如果要使用PXF读取包含多个记录的JSON文件，请参考[从HDFS读取JSON数据](hdfs_json.html)主题。
+
+
+## <a id="prereq"></a>前提条件
+
+尝试从HDFS读取文件之前，请确保已满足PXF Hadoop [前提条件](access_hdfs.html#hadoop_prereq)。
+
+
+## <a id="fileasrow"></a>读取多行文本和JSON文件
+
+您可以将单行和多行文件读取到单个表行中，包括具有嵌入式换行符的文件。如果要读取多个JSON文件，则每个文件必须是完整的记录，并且每个文件必须包含相同的记录类型。
+
+PXF将完整的文件数据读取到单个行和列中。创建外部表以读取多个文件时，必须确保要读取的所有文件都具有相同的类型（文本或JSON）。您还必须指定一个`text`或`json`列，具体取决于文件类型。
+
+以下语法创建了Greenplum数据库可读的外部表，该表引用HDFS上的一个或多个文本或JSON文件：
+
+``` sql
+CREATE EXTERNAL TABLE <table_name>
+    ( <column_name> text|json | LIKE <other_table> )
+  LOCATION ('pxf://<path-to-files>?PROFILE=hdfs:text:multi[&SERVER=<server_name>]&FILE_AS_ROW=true')
+FORMAT 'CSV');
+```
+
+下表描述了此[CREATE EXTERNAL TABLE](../ref_guide/sql_commands/CREATE_EXTERNAL_TABLE.html)命令中使用的关键字和值。
+
+| 关键词  | 值 |
+|-------|-------------------------------------|
+| \<path&#8209;to&#8209;files\>    | HDFS数据存储中目录或文件的绝对路径。 |
+| PROFILE    | `PROFILE`关键字必须指定`hdfs:text:multi`。 |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
+| FILE\_AS\_ROW=true    | 指示PXF将每个文件读入单个表行的必需选项。 |
+| FORMAT | `FORMAT`必须指定为`'CSV'`。  |
+
+**Note**: 当您指定`FILE_AS_ROW=true`选项时，`hdfs:text:multi`配置文件不支持其他格式选项。
+
+例如，如果`/data/pxf_examples/jdir`标识了包含多个JSON文件的HDFS目录，则以下语句将创建一个Greenplum数据库外部表，该表引用该目录中的所有文件：
+
+``` sql
+CREATE EXTERNAL TABLE pxf_readjfiles(j1 json)
+  LOCATION ('pxf://data/pxf_examples/jdir?PROFILE=hdfs:text:multi&FILE_AS_ROW=true')
+FORMAT 'CSV';
+```
+
+当您使用`SELECT`语句查询`pxf_readjfiles`表时，PXF将`jdir/`中的每个JSON文件的内容作为外部表中的单独行返回。
+
+读取JSON文件时，可以使用Greenplum数据库中提供的JSON函数来访问JSON记录中的各个数据字段。例如，如果上面的`pxf_readjfiles`外部表读取包含此JSON记录的JSON文件：
+
+``` json
+{
+  "root":[
+    {
+      "record_obj":{
+        "created_at":"MonSep3004:04:53+00002013",
+        "id_str":"384529256681725952",
+        "user":{
+          "id":31424214,
+          "location":"COLUMBUS"
+        },
+        "coordinates":null
+      }
+    }
+  ]
+}
+```
+
+您可以使用`json_array_elements()`函数从表行中提取特定的JSON字段。例如，以下命令显示`user->id`字段：
+
+``` sql
+SELECT json_array_elements(j1->'root')->'record_obj'->'user'->'id'
+  AS userid FROM pxf_readjfiles;
+
+  userid  
+----------
+ 31424214
+(1 rows)
+```
+
+有关使用Greenplum数据库操作JSON数据的特定信息，请参考[使用JSON数据](../admin_guide/query/topics/json-data.html)。
+
+
+### <a id="example_fileasrow"></a>示例：将HDFS文本文件读入单个表行
+
+执行以下过程在HDFS目录中创建3个示例文本文件，并使用PXF`hdfs:text:multi`配置文件和默认的PXF服务器在单个外部表查询中读取所有这些文本文件。
+
+
+1. 为文本文件创建一个HDFS目录。例如：
+
+    ``` shell
+    $ hdfs dfs -mkdir -p /data/pxf_examples/tdir
+    ```
+
+2. 创建一个名为`file1.txt`的文本数据文件：
+
+    ``` shell
+    $ echo 'text file with only one line' > /tmp/file1.txt
+    ```
+
+3. 创建另一个名为`file2.txt`的文本数据文件：
+
+    ``` shell
+    $ echo 'Prague,Jan,101,4875.33
+Rome,Mar,87,1557.39
+Bangalore,May,317,8936.99
+Beijing,Jul,411,11600.67' > /tmp/file2.txt
+    ```
+
+    这个文件有多行。
+
+4. 创建一个名为`/tmp/file3.txt`的第三个文本文件：
+
+    ``` shell
+    $ echo '"4627 Star Rd.
+San Francisco, CA  94107":Sept:2017
+"113 Moon St.
+San Diego, CA  92093":Jan:2018
+"51 Belt Ct.
+Denver, CO  90123":Dec:2016
+"93114 Radial Rd.
+Chicago, IL  60605":Jul:2017
+"7301 Brookview Ave.
+Columbus, OH  43213":Dec:2018' > /tmp/file3.txt
+    ```
+
+    该文件包括嵌入式换行符。
+
+5. 保存文件并退出编辑器。
+
+6. 将文本文件复制到HDFS：
+
+    ``` shell
+    $ hdfs dfs -put /tmp/file1.txt /data/pxf_examples/tdir
+    $ hdfs dfs -put /tmp/file2.txt /data/pxf_examples/tdir
+    $ hdfs dfs -put /tmp/file3.txt /data/pxf_examples/tdir
+    ```
+
+7. 登录到Greenplum数据库系统并启动`psql`子系统。
+
+8. 使用`hdfs:text:multi`配置文件来创建引用`tdir` HDFS目录的外部表。例如：
+
+    ``` sql
+    CREATE EXTERNAL TABLE pxf_readfileasrow(c1 text)
+      LOCATION ('pxf://data/pxf_examples/tdir?PROFILE=hdfs:text:multi&FILE_AS_ROW=true')
+    FORMAT 'CSV';
+    ```
+    
+9. 打开扩展显示并查询`pxf_readfileasrow`表：
+
+    ``` sql
+    postgres=# \x on
+    postgres=# SELECT * FROM pxf_readfileasrow;
+    ```
+
+    ``` pre
+    -[ RECORD 1 ]---------------------------
+    c1 | Prague,Jan,101,4875.33
+       | Rome,Mar,87,1557.39
+       | Bangalore,May,317,8936.99
+       | Beijing,Jul,411,11600.67
+    -[ RECORD 2 ]---------------------------
+    c1 | text file with only one line
+    -[ RECORD 3 ]---------------------------
+    c1 | "4627 Star Rd.
+       | San Francisco, CA  94107":Sept:2017
+       | "113 Moon St.
+       | San Diego, CA  92093":Jan:2018
+       | "51 Belt Ct.
+       | Denver, CO  90123":Dec:2016
+       | "93114 Radial Rd.
+       | Chicago, IL  60605":Jul:2017
+       | "7301 Brookview Ave.
+       | Columbus, OH  43213":Dec:2018
+    ```
+

@@ -2,7 +2,7 @@
 title: PXF安装和配置目录
 ---
 
-在你安装Greenplum数据库时，PXF被安装在master节点。在调用gpseginstall命令时会安装PXF到GPDB的各个节点的主机上。
+在你安装Greenplum数据库时，PXF被安装在master和segment节点上。
 
 ## <a id="installed"></a>PXF安装目录
 
@@ -36,7 +36,7 @@ title: PXF安装和配置目录
 | keytabs/  | PXF服务Kerberos秘钥文件的默认位置 |
 | lib/      | 默认的PXF用户运行库目录 |
 | logs/     | PXF运行时间日志文件目录，包括`pxf-service.log`和`Tomcat`相关日志`catalina.out`. logs目录和日志文件都是`gpadmin`用户创建的只读文件 |
-| servers/  | 服务配置目录，每一个子目录标识服务名称。PXF支持默认的hadoop服务配置`default`。数据库管理员也可以配置其他服务 |
-| templates/ | hadoop和对象存储的配置目录 |
+| servers/  | 服务配置目录，每一个子目录标识服务名称。默认服务器名为`default`。数据库管理员也可以配置其他服务 |
+| templates/ | 连接器服务器模板文件的配置目录 |
 
 参数 [初始化PXF](init_pxf.html) and [启动PXF](cfginitstart_pxf.html#start_pxf) 了解PXF初始化和启动命令和过程的详细信息

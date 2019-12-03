@@ -29,7 +29,7 @@ PXF Hive连接器读取Hive表中存储的数据。本节描述如何使用PXF H
 
 在使用PXF处理Hive表数据之前，请确保您已满足PXF Hadoop [先决条件](access_hdfs.html#hadoop_prereq)。
 
-如果您计划将PXF过滤器下推与Hive一起使用，请确保 `hive-site.xml` 配置参数 `hive.metastore.integral.jdo.pushdown` 存在并将其设置为 `true`。
+*如果您打算将PXF过滤器下推与Hive整数类型一起使用*，请确保配置参数`hive.metastore.integral.jdo.pushdown`存在，并且在两个配置文件中的`hive-site.xml`中均设置为`true`。Hadoop集群**和** `$PXF_CONF/servers/default/hive-site.xml`。 有关更多信息，请参考[更新Hadoop配置](client_instcfg.html#client-cfg-update)。
 
 
 ## <a id="hive_fileformats"></a>Hive数据格式
@@ -183,7 +183,7 @@ location:hdfs://<namenode>:<port>/apps/hive/warehouse/sales_info
 CREATE EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
 LOCATION ('pxf://<hive-db-name>.<hive-table-name>
-    ?PROFILE=Hive|HiveText|HiveRC|HiveORC|HiveVectorizedORC[&DELIMITER=<delim>'])
+    ?PROFILE=Hive|HiveText|HiveRC|HiveORC|HiveVectorizedORC[&SERVER=<server_name>]'])
 FORMAT 'CUSTOM|TEXT' (FORMATTER='pxfwritable_import' | delimiter='<delim>')
 ```
 
@@ -194,16 +194,14 @@ FORMAT 'CUSTOM|TEXT' (FORMATTER='pxfwritable_import' | delimiter='<delim>')
 | \<hive&#8209;db&#8209;name\>    | Hive数据库的名称。 如果省略，默认为名为 `default` 的Hive数据库 |
 | \<hive&#8209;table&#8209;name\>    | Hive表的名称 |
 | PROFILE    | `PROFILE` 关键字的值必须指定为 `Hive`, `HiveText`, `HiveRC`, `HiveORC`, 或 `HiveVectorizedORC` 之一 |
-| DELIMITER    | `HiveText` 和 `HiveRC` 配置文件都需要 `DELIMITER` 自定义选项子句， 并定义Hive数据集中使用的字段分隔符。  \<delim\> 必须为单个ASCII字符或以十六进制表示形式指定 |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | FORMAT (`Hive`, `HiveORC`, 和 `HiveVectorizedORC` 配置文件)   | `FORMAT` 子句必须指定为 `'CUSTOM'`。 `CUSTOM` 格式需要内置的 `pxfwritable_import` `formatter`   |
-| FORMAT (`HiveText` 和 `HiveRC` 配置文件) | `FORMAT` 子句必须指定为 `TEXT`。 必须在 `delimiter` 中再次指定 '\<delim\>' 格式化选项 |
+| FORMAT (`HiveText` 和 `HiveRC` 配置文件) | `FORMAT` 子句必须指定为 `TEXT`。 在`delimiter ='<delim>'`格式选项中指定单个ascii字符字段定界符。 |
 
 
 ## <a id="hive_text"></a>访问TextFile格式的Hive表
 
 您可以使用`Hive` 和 `HiveText` 配置文件来访问以TextFile格式存储的Hive表数据。
-
-**注意**: 当您使用 `HiveText` 配置文件，您 **必须** 在 `LOCATION` 和 `FORMAT` 子句中都指定一个分隔符。
 
 ### <a id="hive_hive_example" class="no-quick-link"></a>示例: 使用Hive配置文件
 
@@ -240,13 +238,11 @@ FORMAT 'CUSTOM|TEXT' (FORMATTER='pxfwritable_import' | delimiter='<delim>')
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE salesinfo_hivetextprofile(location text, month text, num_orders int, total_sales float8)
-                 LOCATION ('pxf://default.sales_info?PROFILE=HiveText&DELIMITER=\x2c')
+                 LOCATION ('pxf://default.sales_info?PROFILE=HiveText')
                FORMAT 'TEXT' (delimiter=E',');
     ```
 
-    注意:
-    - `LOCATION` 子句 `DELIMITER` 的值是以十六进制格式指定的。 `\x` 前缀指示PXF将以下字符解释为十六进制。`2c` 是逗号字符的十六进制。
-    - `FORMAT` 子句 `delimiter` 的值指定为单个ASCII逗号字符 `','`。 `E` 转义字符.
+    注意，`FORMAT`子句`delimiter`值指定为单个ASCII逗号字符`','`。`E`转义字符。
 
 2. 查询外部表:
 
@@ -267,7 +263,6 @@ FORMAT 'CUSTOM|TEXT' (FORMATTER='pxfwritable_import' | delimiter='<delim>')
 
 RCFile Hive表格式用于行列格式的数据。PXF `HiveRC` 配置文件提供对RCFile数据的访问。
 
-**注意**: 使用 `HiveRC` 配置文件时，**必须** 在 `LOCATION` 和 `FORMAT` 子句中都指定字段分隔符。
 
 ### <a id="hive_hiverc_example" class="no-quick-link"></a>示例: 使用HiveRC配置文件
 
@@ -300,11 +295,11 @@ RCFile Hive表格式用于行列格式的数据。PXF `HiveRC` 配置文件提�
     hive> SELECT * FROM sales_info_rcfile;
     ```
 
-4. 使用 PXF `HiveRC` 配置文件创建Greenplum数据库可读外部表，该表引用此前步骤您创建的Hive `sales_info_rcfile` 表。您*必须* 在 `LOCATION` 和 `FORMAT` 子句中都指定分隔符:
+4. 使用 PXF `HiveRC` 配置文件创建Greenplum数据库可读外部表，该表引用此前步骤您创建的Hive `sales_info_rcfile` 表。例如:
 
     ``` sql
     postgres=# CREATE EXTERNAL TABLE salesinfo_hivercprofile(location text, month text, num_orders int, total_sales float8)
-                 LOCATION ('pxf://default.sales_info_rcfile?PROFILE=HiveRC&DELIMITER=\x2c')
+                 LOCATION ('pxf://default.sales_info_rcfile?PROFILE=HiveRC')
                FORMAT 'TEXT' (delimiter=E',');
     ```
 
@@ -661,13 +656,18 @@ postgres=# SELECT month, number_of_orders FROM pxf_parquet_table;
 
 ## <a id="partitionfiltering"></a>分区过滤下推
 
-PXF Hive 连接器支持Hive分区功能和目录结构。 这样可以在包含Hive表的HDFS文件上排除分区。若要使用分区筛选功能来减少网络流量和I/O，请使用 `WHERE` 子句在PXF外部表上执行查询，该子句引用已分区的Hive表中的特定分区列。
+PXF Hive连接器支持Hive分区修剪和Hive分区目录结构。这样可以在包含Hive表的选定HDFS文件上排除分区。要使用分区筛选功能来减少网络流量和I/O，请使用`WHERE`子句在PXF外部表上运行查询，该子句引用已分区的Hive表中的特定分区列。
 
-要利用PXF分区过滤下推功能，Hive 和 PXF 分区字段名必须一致。否则，PXF 将会忽略分区过滤，并且将在Greenplum数据库端执行过滤，从而影响性能。
+下面介绍了对Hive字符串和整数类型的PXF Hive连接器分区过滤支持：
 
-<div class="note">PXF Hive 连接器过滤仅在分区列过滤，而不在其他表属性上过滤。此外，仅对于在<a href="filter_push.html">关于过滤下推</a>中标识的那些数据乐西和运算符，才支持过滤器下推。当查询中包含不支持的数据类型和运算符时，请禁用过滤器下推。</div>
+- 字符串类型支持关系运算符`=`，`<<，`<=`，`>，`>=`和`<>`。
+- 整数类型支持关系运算符`=`和`<>`(要对Hive整数类型使用分区过滤，必须按照[前提条件](#prereq)中所述更新Hive配置)。
+- 与上述关系运算符一起使用时，支持逻辑运算符`AND`和`OR`。
+- 不支持`LIKE`字符串运算符。
 
-要在Hive中使用PXF过滤器下推， `hive-site.xml` 配置参数 `hive.metastore.integral.jdo.pushdown` 必须设置为 `true`。
+要利用PXF分区过滤下推功能，Hive和PXF分区字段名称必须相同。否则，PXF将忽略分区过滤，并且过滤将在Greenplum数据库端执行，从而影响性能。
+
+<div class="note">PXF Hive连接器仅在分区列上过滤，而不在其他表属性上过滤。此外，仅以上确定的那些数据类型和运算符支持过滤器下推。</div>
 
 默认情况下，PXF过滤器下推处于启用状态。您可以按照如下所述配置PXF过滤器下推[关于过滤器下推](filter_push.html)。
 

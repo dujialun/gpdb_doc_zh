@@ -34,7 +34,7 @@ PXF HDFS连接器支持纯分隔和逗号分隔的值表单文本数据。 本�
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
-LOCATION ('pxf://<path-to-hdfs-file>?PROFILE=hdfs:text')
+LOCATION ('pxf://<path-to-hdfs-file>?PROFILE=hdfs:text[&SERVER=<server_name>]')
 FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 ```
 
@@ -44,12 +44,13 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径 |
 | PROFILE    | `PROFILE`关键字必须指定为`hdfs:text` |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | FORMAT | 当\<path-to-hdfs-file\>引用纯文本分隔数据时，请使用`FORMAT` `'TEXT'`。<br> 当\<path-to-hdfs-file\>引用逗号分隔值数据时，请使用`FORMAT` `'CSV'`。|
 | delimiter    | 数据中的分隔符。对于`FORMAT` `'CSV'`，默认的\<delim_value\> 是逗号`,`。 当分隔符为转义序列时，在\<delim_value\> 前面加上`E`。示例：`(delimiter=E'\t')`, `(delimiter ':')`。 |
 
 ### <a id="profile_text_query"></a>示例：读取HDFS中的文本数据
 
-执行以下步骤以创建示例文本文件、将文件复制到HDFS，并使用PXF `hdfs:text`配置文件创建两个PXF外部表来查询数据：
+执行以下过程来创建示例文本文件，将文件复制到HDFS，然后使用`hdfs:text`配置文件和默认的PXF服务器创建两个PXF外部表来查询数据：
 
 1. 为PXF示例数据文件创建HDFS目录。例如：
 
@@ -128,7 +129,7 @@ Beijing,Jul,411,11600.67' > /tmp/pxf_hdfs_simple.txt
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
-LOCATION ('pxf://<path-to-hdfs-file>?PROFILE=hdfs:text:multi')
+LOCATION ('pxf://<path-to-hdfs-file>?PROFILE=hdfs:text:multi[&SERVER=<server_name>]')
 FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 ```
 
@@ -138,12 +139,13 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径|
 | PROFILE    | `PROFILE`关键字必须指定为`hdfs:text:multi` |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | FORMAT | 当\<path-to-hdfs-file\>引用纯文本分隔数据时，请使用`FORMAT` `'TEXT'`。<br> 当\<path-to-hdfs-file\>引用逗号分隔值数据时，请使用`FORMAT` `'CSV'`。  |
 | delimiter    | 数据中的分隔符。对于`FORMAT` `'CSV'`，默认的\<delim_value\> 是逗号`,`。 当分隔符为转义序列时，在\<delim_value\> 前面加上`E`。示例：`(delimiter=E'\t')`, `(delimiter ':')`。 |
 
 ### <a id="profile_textmulti_query"></a>示例：在HDFS上读取多行文本数据
 
-执行以下步骤以创建示例文本文件、将文件复制到HDFS, ，并使用PXF `hdfs:text:multi` 配置文件创建一个可读外部表用来查询数据：
+执行以下步骤来创建示例文本文件，将文件复制到HDFS，然后使用PXF`hdfs：text：multi`配置文件和默认的PXF服务器创建Greenplum数据库可读的外部表来查询数据：
 
 1. 创建第二个分隔的纯文本文件：
 
@@ -166,7 +168,7 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
     Columbus, OH  43213":Dec:2018
     ```
 
-    注意使用冒号 `:` 分隔三个字段。 另外请注意第一个（地址）字段周围的引号。这个字段包含了一个嵌入的换行符，用于将街道地址与城市和州分开。
+    注意使用冒号 `:` 分隔三个字段。 另外请注意第一个(地址)字段周围的引号。这个字段包含了一个嵌入的换行符，用于将街道地址与城市和州分开。
 
 3. 将文本文件复制到HDFS：
 
@@ -218,7 +220,7 @@ PXF HDFS连接器 "hdfs:text" 配置文件支持将单行纯文本数据写入HD
 CREATE WRITABLE EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
 LOCATION ('pxf://<path-to-hdfs-dir>
-    ?PROFILE=hdfs:text[&<custom-option>=<value>[...]]')
+    ?PROFILE=hdfs:text[&SERVER=<server_name>][&<custom-option>=<value>[...]]')
 FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 [DISTRIBUTED BY (<column_name> [, ... ] ) | DISTRIBUTED RANDOMLY];
 ```
@@ -229,6 +231,7 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;hdfs&#8209;dir\>    | HDFS数据存储中目录的绝对路径 |
 | PROFILE    | `PROFILE`关键字必须指定为`hdfs:text` |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | \<custom&#8209;option\>  | \<custom-option\>描述见下方|
 | FORMAT | 当\<path-to-hdfs-file\>引用纯文本分隔数据时，请使用`FORMAT` `'TEXT'`。<br> 当\<path-to-hdfs-file\>引用逗号分隔值数据时，请使用`FORMAT` `'CSV'`。 |
 | delimiter    | 数据中的分隔符。对于`FORMAT` `'CSV'`，默认的\<delim_value\> 是逗号`,`。 当分隔符为转义序列时，在\<delim_value\> 前面加上`E`。示例：`(delimiter=E'\t')`, `(delimiter ':')`。 |
@@ -263,7 +266,7 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 
 #### <a id="write_hdfstextsimple_proc" class="no-quick-link"></a>步骤
 
-执行以下步骤以使用与上述相同的数据格式创建Greenplum数据库可写外部表，其中一个表将采用压缩。 您将使用PXF `hdfs:text` 配置文件将数据写入HDFS底层目录。您还将创建另外一个可读外部表来读取您写入HDFS目录中的数据。
+执行以下步骤，使用与上述相同的数据模式创建Greenplum数据库可写外部表，其中一个表将使用压缩。您将使用PXF`hdfs：text`配置文件和默认的PXF服务器将数据写入基础HDFS目录。您还将创建一个单独的可读外部表，以读取您写入HDFS目录的数据。
 
 1. 使用上述数据格式创建Greenplum数据库可写外部表。 写入HDFS目录`/data/pxf_examples/pxfwritable_hdfs_textsimple1`。 使用逗号`,`作为分隔符创建表:
 

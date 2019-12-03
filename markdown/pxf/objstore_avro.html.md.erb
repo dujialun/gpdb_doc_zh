@@ -51,7 +51,7 @@ PXF 对象存储连接器支持读取Avro格式数据。 本节描述如何使�
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
-LOCATION ('pxf://<path-to-file>?PROFILE=<objstore>:avro&SERVER=<server_name>[&<custom-option>=<value>[...]]')
+LOCATION ('pxf://<path-to-file>?PROFILE=<objstore>:avro[&SERVER=<server_name>][&<custom-option>=<value>[...]]')
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 ```
 
@@ -61,11 +61,11 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;file\>    |  对象存储中文件或目录的绝对路径 |
 | PROFILE=\<objstore\>:avro    | `PROFILE` 必须指定为特定的对象存储。例如， `s3:avro` |
-| SERVER=\<server_name\>    | PXF 访问数据时使用的服务配置 |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | \<custom&#8209;option\>=\<value\> | 特定于Avro的自定义选项描述见 [PXF HDFS Avro 文档](hdfs_avro.html#customopts) |
 | FORMAT 'CUSTOM' |  在 `<objstore>:avro` 配置文件中使用 `FORMAT` `'CUSTOM'`。`CUSTOM` `FORMAT` 要求您指定为 `(FORMATTER='pxfwritable_import')`。|
 
-如果要访问S3 对象存储，则可以如 [覆盖S3服务配置](access_objstore.html#s3_override) 中所述直接在 `CREATE EXTERNAL TABLE` 命令中提供S3凭据。
+如果要访问S3对象存储，则可以通过[CREATE EXTERNAL TABLE]命令中的自定义选项提供S3凭据，如[使用DDL覆盖S3服务器配置](access_objstore.html#s3_override)中所述。
 
 ## <a id="example"></a>示例
 

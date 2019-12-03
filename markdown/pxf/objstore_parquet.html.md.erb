@@ -55,7 +55,7 @@ PXF `<objstore>:parquet` 配置文件支持读取和写入Parquet格式数据。
 CREATE [WRITABLE] EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
 LOCATION ('pxf://<path-to-dir>
-    ?PROFILE=<objstore>:parquet&SERVER=<server_name>[&<custom-option>=<value>[...]]')
+    ?PROFILE=<objstore>:parquet[&SERVER=<server_name>][&<custom-option>=<value>[...]]')
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 [DISTRIBUTED BY (<column_name> [, ... ] ) | DISTRIBUTED RANDOMLY];
 ```
@@ -66,12 +66,15 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;dir\>    | 对象存储中文件或目录的绝对路径 |
 | PROFILE=\<objstore\>:parquet    | `PROFILE` 必须指定为特定的对象存储。例如，`s3:parquet` |
-| SERVER=\<server_name\>    | PXF 访问数据时使用的服务配置 |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | \<custom&#8209;option\>=\<value\> | 特定于Parquet的自定义选项描述见 [PXF HDFS Parquet 文档](hdfs_parquet.html#customopts) |
 | FORMAT 'CUSTOM' | 使用`FORMAT` '`CUSTOM`'时指定`(FORMATTER='pxfwritable_export')` (写入) 或 `(FORMATTER='pxfwritable_import')` (读取) |
 | DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或\<字段名\>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。 |
 
 如果要访问S3 对象存储，则可以如 [覆盖S3服务配置](access_objstore.html#s3_override) 中所述直接在 `CREATE EXTERNAL TABLE` 命令中提供S3凭据。
+如果要访问S3对象存储库：
+- 您可以通过`CREATE EXTERNAL TABLE`命令中的自定义选项提供S3凭据，如[用DDL覆盖S3服务器配置](access_s3.html#s3_override)中所述。
+- 如果您正在从S3读取Parquet数据，则可以指示PXF使用S3 Select Amazon服务检索数据。 有关用于此目的的PXF自定义选项的更多信息，请参考[使用Amazon S3选择服务](access_s3.html#s3_select)。
 
 ## <a id="example"></a> 示例
 

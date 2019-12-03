@@ -1,64 +1,16 @@
 ---
-title: 配置Azure，Google云端存储，Minio和S3对象存储的连接器（可选）
+title: 配置Azure和Google Cloud Storage对象存储的连接器（可选）
 ---
 
-你可以使用PXF服务去访问Azure Data Lake, Azure Blob Storage, Google Cloud Storage, S3-compatible object stores。这个章节主要描述如何配置PXF连接器访问这个外部数据源。
+您可以使用PXF访问Azure Data Lake，Azure Blob存储和Google Cloud Storage对象存储。这个章节主要描述如何配置PXF连接器访问这个外部数据源。
 
 *如果您不打算使用PXF对象存储连接器，则不需要执行此过程。*
 
 ## <a id="about_cfg"></a>对象存储配置
 
-要访问对象存储中的数据，必须提供服务器位置和客户端凭据。PXF为每个Hadoop和对象存储连接器提供了一个模板配置文件。这些服务器模板配置文件位于`$PXF_CONF/templates/`目录中，标识了必须配置才能使用连接器的最小属性集。
+要访问对象存储中的数据，必须提供服务器位置和客户端凭据。配置PXF对象库连接器时，请为连接器添加至少一个名为PXF服务器的配置，如[配置PXF服务器](cfg_server.html)中所述。
 
-```
-gpadmin@gpmaster$ ls $PXF_CONF/templates
-adl-site.xml   hbase-site.xml  jdbc-site.xml    s3-site.xml
-core-site.xml  hdfs-site.xml   mapred-site.xml  wasbs-site.xml
-gs-site.xml    hive-site.xml   minio-site.xml   yarn-site.xml
-```
-
-例如，`s3-site.xml`模板文件的内容如下：
-
-``` pre
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-    <property>
-        <name>fs.s3a.access.key</name>
-        <value>YOUR_AWS_ACCESS_KEY_ID</value>
-    </property>
-    <property>
-        <name>fs.s3a.secret.key</name>
-        <value>YOUR_AWS_SECRET_ACCESS_KEY</value>
-    </property>
-    <property>
-        <name>fs.s3a.fast.upload</name>
-        <value>true</value>
-    </property>
-</configuration>
-```
-
-<div class="note">你可以在配置文件中使用明文为PXF指定对象存储凭证。</div>
-
-配置PXF对象存储连接器时，请为该连接器添加至少一个名为PXF服务的配置。 您：
-
-
-1. 选择服务器配置的名称
-2. 创建目录`$PXF_CONF/servers/<server_name>`
-3. 将与对象库相对应的PXF模板配置文件复制到新的服务器目录
-4. 为模板文件中的属性填写适当的值
-5. 如果您的环境需要，请添加其他属性和值
-6. 将服务器配置同步到每个Greenplum数据库segment主机
-7. 适当地将PXF服务名称发布给您的Greenplum数据库终端用户
-
-GPDB用户在`REATE EXTERNAL TABLE LOCATION`句的`server`选项指定server名称来访问对象存储。如：
-
-<pre>
-CREATE EXTERNAL TABLE pxf_ext_tbl(name text, orders int)
-  LOCATION ('pxf://BUCKET/dir/file.txt?PROFILE=s3:text&<b>SERVER=s3srvcfg</b>')
-FORMAT 'TEXT' (delimiter=E',');
-</pre>
-
-<div class="note info">通过查询或写入指定服务名称访问外部表的GPDB数据库用户可以使用该服务器配置的凭据访问对象存储</div>
+PXF为每个对象存储连接器提供了一个模板配置文件。 这些模板文件位于`$PXF_CONF/templates/`目录中。
 
 ### <a id="abs_cfg"></a>Azure Blob存储服务配置
 
@@ -93,140 +45,11 @@ Google Cloud Storage服务默认配置模板文件是`$PXF_CONF/templates/gs-sit
 | google.cloud.auth.service.account.json.keyfile | Google Storage的秘钥文件 | Path to your key file. |
 | fs.AbstractFileSystem.gs.impl | 文件系统类名称 | Must specify `com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS`. |
 
-### <a id="minio_cfg"></a>Minio服务器配置
+## <a id="cfg_proc"></a>示例服务器配置过程
 
-Minio默认的模板配置文件是`$PXF_CONF/templates/minio-site.xml`，当你配置minio服务时需要修改如下的配置项和值:
+在配置对象存储连接器服务器之前，请确保已初始化PXF。
 
-| Property       | Description                                | Value |
-|----------------|--------------------------------------------|------ |
-| fs.s3a.endpoint | 要连接的Minio S3末端点。 | Your endpoint. |
-| fs.s3a.access.key | Minio访问秘钥ID | Your access key. |
-| fs.s3a.secret.key | 与Minio访问密钥ID相关联的秘密密钥 | Your secret key. |
-
-### <a id="s3_cfg"></a>S3服务配置
-
-S3服务默认模板配置文件是`$PXF_CONF/templates/s3-site.xml`，当你配置S3服务时需要修改如下的配置项和值：
-
-| Property       | Description                                | Value |
-|----------------|--------------------------------------------|-------|
-| fs.s3a.access.key | AWS访问秘钥ID | Your access key. |
-| fs.s3a.secret.key | 与AWS访问秘钥ID相关联的私密秘钥 | Your secret key. |
-
-如果需要，通过在`s3-site.xml`服务配置文件中的Hadoop-AWS模块文档的[S3A](https://hadoop.apache.org/docs/current/hadoop-aws/tools/hadoop-aws/index.html#S3A)章节中指定的属性
-
-您可以在CREATE EXTERNAL TABLE命令LOCATION子句中通过自定义选项直接指定S3访问ID和秘密密钥来覆盖S3服务器配置。有关其他信息，参阅[Overriding the S3 Server Configuration](access_objstore.html#s3_override)
-
-
-#### <a id="s3-sse"></a>配置S3服务器端加密
-
-通过指定pxf协议和s3：*配置文件，PXF支持可读写外部表访问的Amazon Web Service S3服务器端加密的文件（SSE）。AWS S3服务器端加密可保护您的静态数据； 它会在将对象数据写入磁盘时对其进行加密，并在您访问数据时为您透明地解密数据。
-
-PXF supports the following AWS SSE encryption key management schemes:
-PXF支持以下AWS SSE加密密钥管理方案:
-
-- SSE with S3-Managed Keys (SSE-S3) - Amazon管理数据和主加密密钥。
-- SSE with Key Management Service Managed Keys (SSE-KMS) - Amazon管理数据密钥，而您在AWS KMS中管理加密密钥
-- SSE with Customer-Provided Keys (SSE-C) - 设置和管理加密密钥
-
-无论数据是否经过加密，您的S3访问密钥和秘密密钥都将控制您对所有S3存储桶对象的访问
-
-在您通过指定`pxf`协议和`s3：*`配置文件创建的可读外部表访问的加密文件的读取操作期间，S3透明地解密数据。 无需其他配置。
-
-要加密通过这种类型的外部表写入S3的数据，您有两个选择：
-
-- 通过AWS控制台或命令行工具（建议），在每个S3存储桶的基础上配置默认的SSE加密密钥管理方案
-- 在PXF S3服务器s3-site.xml配置文件中配置SSE加密选项
-
-##### <a id="s3-sse-bucket"></a>通过S3存储桶策略配置SSE（推荐）
-
-您可以创建S3存储桶策略，以标识要加密的对象，加密密钥管理方案以及在这些对象上允许的写入操作。请参阅AWS S3文档中的[Protecting Data Using Server-Side Encryption](http://docs.aws.amazon.com/AmazonS3/latest/dev/serv-side-encryption.html)获取有关SSE加密密钥管理方案的更多信息。[How Do I Enable Default Encryption for an S3 Bucket?](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/default-bucket-encryption.html)介绍如何设置默认加密存储区策略。
-
-
-##### <a id="s3-sse-pxfs3cfg"></a>在PXF S3服务器配置中指定SSE选项
-
-您必须在`s3-site.xml`中包含某些属性，才能在PXF S3服务器配置中配置服务器端加密。您添加到文件中的属性和值取决于SSE加密密钥管理方案。
-
-**SSE-S3**
-
-要在您写入任何S3存储桶的任何文件上启用SSE-S3，请在`s3-site.xml`文件中设置以下加密算法属性和值：
-
-``` xml
-<property>
-  <name>fs.s3a.server-side-encryption-algorithm</name>
-  <value>AES256</value>
-</property>
-```
-
-要为特定的S3存储桶启用SSE-S3，请使用包含存储桶名称的属性名称变体。 例如：
-
-``` xml
-<property>
-  <name>fs.s3a.bucket.YOUR_BUCKET1_NAME.server-side-encryption-algorithm</name>
-  <value>AES256</value>
-</property>
-```
-
-用S3存储桶的名称替换`YOUR_BUCKET1_NAME`。
-
-**SSE-KMS**
-
-要在您写入任何S3存储桶的任何文件上启用SSE-KMS，请同时设置加密算法和加密密钥ID。 要在`s3-site.xml`文件中设置这些属性：
-
-``` xml
-<property>
-  <name>fs.s3a.server-side-encryption-algorithm</name>
-  <value>SSE-KMS</value>
-</property>
-<property>
-  <name>fs.s3a.server-side-encryption.key</name>
-  <value>YOUR_AWS_SSE_KMS_KEY_ARN</value>
-</property>
-```
-
-用您的密钥资源名称替换`YOUR_AWS_SSE_KMS_KEY_ARN`。如果您未指定加密密钥，则使用Amazon KMS中定义的默认密钥。KMS密钥示例：`arn:aws:kms:us-west-2:123456789012:key/1a23b456-7890-12cc-d345-6ef7890g12f3`
-
-**Note**: 确保在同一Amazon可用区中创建存储桶和密钥
-
-要为特定的S3存储桶启用SSE-C，请使用包含存储桶名称的属性名称变体，如SSE-KMS示例中所述：
-
-``` xml
-<property>
-  <name>fs.s3a.bucket.YOUR_BUCKET2_NAME.server-side-encryption-algorithm</name>
-  <value>SSE-KMS</value>
-</property>
-<property>
-  <name>fs.s3a.bucket.YOUR_BUCKET2_NAME.server-side-encryption.key</name>
-  <value>YOUR_AWS_SSE_KMS_KEY_ARN</value>
-</property>
-```
-
-用S3存储桶的名称替换`YOUR_BUCKET2_NAME`
-
-**SSE-C**
-
-要在写入S3存储桶的任何文件上启用SSE-C，请同时设置加密算法和加密密钥（base-64编码）。所有客户端必须共享相同的密钥。
-
-在`s3-site.xml`文件中设置这些属性：
-
-``` xml
-<property>
-  <name>fs.s3a.server-side-encryption-algorithm</name>
-  <value>SSE-C</value>
-</property>
-<property>
-  <name>fs.s3a.server-side-encryption.key</name>
-  <value>YOUR_BASE64-ENCODED_ENCRYPTION_KEY</value>
-</property>
-```
-
-要为特定的S3存储桶启用SSE-C，请使用包含存储桶名称的属性名称变体，如SSE-KMS示例中所述。
-
-
-## <a id="cfg_proc"></a>配置过程示例
-
-在配置对象存储连接器之前，请确保已初始化PXF
-
-在此过程中，您要为使用的每个对象存储连接器在Greenplum数据库master主机上的`$PXF_CONF/servers`目录中命名并添加PXF服务器配置。然后，您可以使用`pxf cluster sync`命令将服务器配置同步到所有segment主机
+在此过程中，您需要在Greenplum数据库master主机上的`$PXF_CONF/servers`目录中为Google Cloud Storate（GCS）连接器命名并添加PXF服务器配置。 然后，您可以使用`pxf cluster sync`命令将服务器配置同步到Greenplum数据库集群。
 
 1. 登录到GPDB master主机
 
@@ -234,60 +57,43 @@ PXF支持以下AWS SSE加密密钥管理方案:
     $ ssh gpadmin@<gpmaster>
     ```
 
-2. PXF包括到Azure数据湖，Azure Blob存储，Google Cloud Storage，Minio和S3对象存储的连接器。 标识要配置的PXF对象存储连接器。
+2. 选择服务器的名称。 您将为需要引用对象存储中文件的最终用户提供名称。
 
-3. 对于您配置的每个对象存储连接器：
+3. 创建`$PXF_HOME/servers/<server_name>`目录。 例如，使用以下命令为名为`gs_public`的Google Cloud Storage服务器创建服务器配置：
 
-    1. 选择服务器的名称。 您将为需要引用对象存储中文件的最终用户提供名称
+    ``` shell
+    gpadmin@gpmaster$ mkdir $PXF_CONF/servers/gs_public
+    ```
 
-        **Note**: `default`是保留服务名
+3. 将GCS的PXF模板文件复制到服务器配置目录。 例如：
 
-    2. 创建`$PXF_HOME/servers/<服务名>`目录。 例如，如果要为Google Cloud Storage创建服务器配置，并且要将服务命名为gs_public，请使用以下命令：
+    ``` shell
+    gpadmin@gpmaster$ cp $PXF_CONF/templates/gs-site.xml $PXF_CONF/servers/gs_public/
+    ```
 
-        ``` shell
-        gpadmin@gpmaster$ mkdir $PXF_CONF/servers/gs_public
-        ````
+4. 在您选择的编辑器中打开模板服务器配置文件，并为您的环境提供适当的属性值。 例如，如果您的Google Cloud Storage密钥文件位于`/home/gpadmin/keys/gcs-account.key.json`中：
 
-3. 将对象库的PXF模板文件复制到服务器配置目录。 例如：
+    ``` pre
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+        <property>
+            <name>google.cloud.auth.service.account.enable</name>
+            <value>true</value>
+        </property>
+        <property>
+            <name>google.cloud.auth.service.account.json.keyfile</name>
+            <value>/home/gpadmin/keys/gcs-account.key.json</value>
+        </property>
+        <property>
+            <name>fs.AbstractFileSystem.gs.impl</name>
+            <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS</value>
+        </property>
+    </configuration>
+    ```
+5. 保存更改并退出编辑器。
 
-        ``` shell
-        gpadmin@gpmaster$ cp $PXF_CONF/templates/gs-site.xml $PXF_CONF/servers/gs_public/
-        ```
-
-    4. .使用编辑器打开模板服务器配置文件，并为您的环境提供适当的属性值。 例如，如果您的Google Cloud Storage密钥文件位于`/home/gpadmin/keys/gcs-account.key.json`:
-
-        ``` pre
-        <?xml version="1.0" encoding="UTF-8"?>
-        <configuration>
-            <property>
-                <name>google.cloud.auth.service.account.enable</name>
-                <value>true</value>
-            </property>
-            <property>
-                <name>google.cloud.auth.service.account.json.keyfile</name>
-                <value>/home/gpadmin/keys/gcs-account.key.json</value>
-            </property>
-            <property>
-                <name>fs.AbstractFileSystem.gs.impl</name>
-                <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS</value>
-            </property>
-        </configuration>
-        ```
-    5. 保存修改并退出
-
-    6. 重复步骤3配置其他对象存储连接器。
-
-4. 使用`pxf cluster sync` 命令将新的服务配置复制到每个Greenplum数据库segment主机。
+4. 使用`pxf cluster sync`命令将新的服务器配置复制到Greenplum数据库集群。 例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
     ```
-
-
-## <a id="client-cfg-update"></a>添加或更新对象存储配置
-
-如果在Greenplum数据库master主机上添加或更新对象存储服务器配置，则必须将PXF配置重新同步到Greenplum数据库集群
-
-``` shell
-gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
-```

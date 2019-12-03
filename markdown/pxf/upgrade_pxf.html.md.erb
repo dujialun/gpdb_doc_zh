@@ -75,9 +75,21 @@ PXF升级过程分为两部分。您在升级到Greenplum数据库的新版本�
 
     5. 如果你将其他JAR文件添加到*PXF.from*中，请将它们复制到master主机上的`$PXF_CONF/lib`
     5. 从Greenplum Database版本 5.15 开始，PXF需要Hadoop配置文件放置在`$PXF_CONF/servers/default`目录中。如果在*PXF.from*安装中配置了PXF Hadoop连接器，请将`/etc/<hadoop_service>/conf`中的Hadoop配置文件复制到Greenplum Database主机上的`$PXF_CONF/servers/default`
-    5. 从Greenplum Database版本 5.15 开始，PXF的默认Kerberos keytab文件位置是`$PXF_CONF/keytabs`。如果先前已将PXF配置为安全HDFS 且PXF密钥表文件位于*PXF.from*安装目录中（例如，`$GPHOME/pxf/conf`），请考虑将keytab文件重定位到`$PXF_CONF/keytabs`,或者，更新`$PXF_CONF/conf/pxf-env.sh`文件中的`PXF_KEYTAB`属性设置以引用您的keytab文件。
+    5. 从Greenplum Database版本 5.15 开始，PXF的默认Kerberos keytab文件位置是`$PXF_CONF/keytabs`。如果先前已将PXF配置为安全HDFS 且PXF密钥表文件位于*PXF.from*安装目录中(例如，`$GPHOME/pxf/conf`)，请考虑将keytab文件重定位到`$PXF_CONF/keytabs`,或者，更新`$PXF_CONF/conf/pxf-env.sh`文件中的`PXF_KEYTAB`属性设置以引用您的keytab文件。
 
-5. 将PXF配置从master主机同步到每个Greenplum数据库segment主机。 例如：
+5. **如果要从Greenplum数据库5.18或更早版本升级**：
+
+    1. 现在，PXF捆绑了Hadoop 2.9.2版相关的JAR文件。 如果您在`$PXF_CONF/lib`中注册了其他与Hadoop相关的JAR文件，请确保这些库与Hadoop 2.9.2版兼容。
+
+    2. 现在，PXF JDBC连接器支持基于文件的服务器配置。如果选择将此新功能与引用外部SQL数据库的现有外部表一起使用，请参阅[配置JDBC连接器](jdbc_cfg.html)中的配置说明，以获取更多信息。
+
+    2. 现在，PXF JDBC连接器支持语句查询超时。此特性需要JDBC驱动程序的显式支持。默认查询超时为`0`，请耐心等待。一些JDBC驱动程序在不完全支持语句查询超时功能的情况下支持`0`超时值。确保已注册的所有JDBC驱动程序都支持默认超时，或者更好的是，它完全支持此特性。 您可能需要更新JDBC驱动程序版本以获得此支持。有关使用PXF注册JAR文件的信息，请参考[JDBC驱动程序JAR注册](jdbc_cfg.html#cfg_jar)中的配置说明。
+
+    3. 如果您打算对整数类型使用Hive分区过滤，则必须在Hadoop群集的`hive-site.xml`和PXF用户配置`$PXF_CONF/servers/default/hive-site.xml`中设置`hive.metastore.integral.jdo.pushdown` Hive属性。请参阅[更新Hadoop配置](client_instcfg.html#client-cfg-update)。
+
+5. **如果您要从Greenplum数据库5.21.1或更早版本升级**：当您创建指定`HiveText`或`HiveRC`配置文件的外部表时，PXF Hive连接器不再支持在`LOCATION` URI中提供`DELIMITER=<delim>`选项。如果您以前创建了一个在`LOCATION` URI中指定`DELIMITER`的外部表，则必须删除该表，然后从`LOCATION`省略`DELIMITER`来重新创建它。您仍然需要在外部表格式设置选项中提供非默认定界符。
+
+5. 将PXF配置从master主机同步到standby和每个Greenplum数据库segment主机。例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync

@@ -31,7 +31,7 @@ under the License.
 
 在您使用PXF JDBC连接器访问外部数据库前，请确保：
 
-- 您已在Greenplum数据库segment主机上配置并初始化PXF, 并且PXF正在每台segment主机上运行。 更多详情，请参阅[配置 PXF](instcfg_pxf.html)。
+- 您已配置并初始化PXF, 并且PXF正在每台segment主机上运行。更多详情，请参阅[配置 PXF](instcfg_pxf.html)。
 - 您可以确定PXF 用户配置目录(`$PXF_CONF`)。
 - 所有Greenplum数据库segment主机和外部SQL数据库库之间都可以连接。
 - 您已经配置了外部SQL数据库，以便从所有Greenplum数据库segment主机进行访问。
@@ -53,17 +53,20 @@ PXF JDBC 连接器支持以下数据类型:
 
 PXF JDBC 连接器不支持上面未列出的任何数据类型。
 
-## <a id="queryextdata"></a>访问外部SQL数据
-PXF JDBC连接器支持一个名为 `Jdbc` 的配置文件。 您可以使用此配置文件从外部SQL数据库表读取数据或将数据写入外部SQL数据库表。
+**注意**: JDBC连接器不支持读取或写入以字节数组(`byte[]`)存储的Hive数据。
 
-要访问外部SQL数据库中的数据，请创建一个可读或可写的Greenplum数据库外部表，该表引用外部数据库表。 Greenplum和外部数据库表必须具有相同的定义： 列名，类型和顺序必须匹配。
+## <a id="queryextdata"></a>访问外部SQL数据库
+PXF JDBC连接器支持一个名为`Jdbc`的配置文件。您可以使用此概要文件从外部SQL数据库表读取数据或将数据写入外部SQL数据库表。您还可以使用连接器在外部SQL数据库中运行静态的命名查询并读取结果。
 
 使用以下语法创建引用外部SQL数据库表的Greenplum数据库外部表，并使用JDBC连接器读取或写入数据：
+要访问远程SQL数据库中的数据，您可以创建一个引用该远程数据库表的可读或可写的Greenplum数据库外部表。Greenplum数据库外部表和远程数据库表或查询结果元组必须具有相同的定义；列名称和类型必须匹配。
+
+使用以下语法创建引用远程SQL数据库表或来自远程数据库的查询结果的Greenplum数据库外部表：
 
 <pre>
 CREATE [READABLE | WRITABLE] EXTERNAL TABLE &lt;table_name>
     ( &lt;column_name> &lt;data_type> [, ...] | LIKE &lt;other_table> )
-LOCATION ('pxf://&lt;external-table-name>?<b>PROFILE=Jdbc[&SERVER=&lt;servername>]</b>[&&lt;custom-option>=&lt;value>[...]]')
+LOCATION ('pxf://&lt;external-table-name>|query:&lt;query_name>?<b>PROFILE=Jdbc[&SERVER=&lt;server_name>]</b>[&&lt;custom-option>=&lt;value>[...]]')
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 </pre>
 
@@ -72,9 +75,10 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 | 关键字  | 值 |
 |-------|-------------------------------------|
 | \<external&#8209;table&#8209;name\>    | 外部表的全名。 取决于外部SQL数据库，可能包括模式名称和表名称。 |
+| query:\<query_name\>    | 要在远程SQL数据库中执行的查询的名称。 |
 | PROFILE    | `PROFILE` 关键字必须指定为 `Jdbc`. |
-| SERVER=\<servername\>   |  PXF 访问外部SQL数据库时使用的服务配置 |
-| \<custom&#8209;option\>  | \<custom-option\> 是特定于配置文件的。 `Jdbc` 配置文件的选项将在下一部分讨论。|
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
+| \<custom&#8209;option\>=\<value\>  | \<custom-option\> 是特定于配置文件的。 `Jdbc` 配置文件的选项将在下一部分讨论。|
 | FORMAT 'CUSTOM' | JDBC `CUSTOM` `FORMAT` 支持用于读取操作的内置 `'pxfwritable_import'` `FORMATTER` 函数和用于写入操作的内置 `'pxfwritable_export'` 函数 |
 
 **注意**: 在创建PXF外部表时，不能在 `FORMAT` 规范中使用 `HEADER` 选项。
@@ -82,43 +86,25 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 
 ### <a id="jdbcoptions"></a>JDBC自定义选项
 
-您在`LOCATION` URI中引入JDBC自定义选项，并在每个选项前加上 `&` 符。
-
-`Jdbc` 配置文件支持以下连接相关的\<custom-option\>：
-
-| 自定义选项名称   | jdbc-site.xml 属性名称 | 描述
-|----------------------|-----------------------------|--------|
-| JDBC_DRIVER | jdbc.driver | JDBC驱动类名 (必须) |
-| DB_URL | jdbc.url | 外部数据库URL。 取决于外部数据库，通常至少包括主机名，端口和数据库名称 (必须) |
-| USER | jdbc.user | 数据库用户名。 如果提供了 `PASS` 则为必须。 |
-| PASS | jdbc.password |  `USER` 的数据库密码。.如果提供了 `USER` 则为必须。 |
-
-<div class="note">如果在<code>CREATE EXTERNAL TABLE</code> <code>LOCATION</code> 子句中提供了 <code>SERVER=&lt;servername></code>，则<code>LOCATION</code> 子句中包含的任何连接选项都会覆盖<code>&lt;servername></code>的<code>jdbc-site.xml</code>配置文件中指定的值。</div>
-
-示例 JDBC \<custom-option\> 连接字符串：
-
-``` pre
-&JDBC_DRIVER=org.postgresql.Driver&DB_URL=jdbc:postgresql://gpmaster:5432/pgtestdb&USER=pguser1&PASS=changeme
-&JDBC_DRIVER=com.mysql.jdbc.Driver&DB_URL=jdbc:mysql://mysqlhost:3306/testdb&USER=user1&PASS=changeme
-```
-
-`Jdbc` 配置文件支持的其他 `CREATE EXTERNAL TABLE` \<custom-option\> 包括：
+您可以在`LOCATION` URI中包含JDBC连接器自定义选项，并在每个选项前加上`&`符号。 Jdbc概要文件支持的`CREATE EXTERNAL TABLE` \<custom-option\>包括：
 
 | 选项名称   | 操作 | 描述
 |---------------|------------|--------|
-| BATCH_SIZE | Write | 整数，标识要批处理到外部SQL数据库的 `INSERT` 操作数量。 PXF 始终会验证 `BATCH_SIZE` 选项，即使是在读取操作中提供。 默认开启批处理。 |
+| BATCH_SIZE | Write | 整数，标识要批处理到外部SQL数据库的 `INSERT` 操作数量。 PXF 始终会验证 `BATCH_SIZE` 选项，即使是在读取操作中提供。 默认开启批处理。默认值是100。 |
+| FETCH_SIZE | Read | 整数，标识从外部SQL数据库读取时要缓冲的行数。 读取行批处理默认情况下处于启用状态； 默认读取大小为1000。 |
+| QUERY_TIMEOUT | Read/Write | 整数，用于标识JDBC驱动程序等待语句执行的时间（以秒为单位）。 默认等待时间是无限的。 |
 | POOL_SIZE | Write | 在`INSERT`操作上启动线程池，并标识线程池中的线程数。默认情况下，线程池是禁用的。 |
-| PARTITION_BY | Read | 分区列 \<column-name\>:\<column-type\>。 您只能指定一个分区列。JDBC 连接器支持 `date`、 `int` 和 `enum` \<column-type\> 值。 空的 `PARTITION_BY` 默认为单个片段。 |
-| RANGE | Read | 当指定 `PARTITION_BY` 时为必须。 查询范围： \<start-value\>[:\<end-value\>]。 当分区列为 `enum` 类型时， `RANGE` 必须指定一个值列表，每个值形成自己的分区。如果分区列是 `int` 或 `date` 类型，`RANGE` 必须指定一个有限的左闭区间。 即， 范围包括 \<start-value\> 但 *不* 包括 \<end-value\>。 如果分区列是 `date` 类型， 使用 `yyyy-MM-dd` 日期格式。 |
-| INTERVAL | Read | 指定 `PARTITION_BY` 且为 `int` 或 `date` 类型时必须。。 一个分区的间隔：\<interval-value\>[:\<interval-unit\>]。 在 \<interval-value\> 中指定分区的大小。 如果分区列是 `date` 类型, 请使用 \<interval-unit\> 指定 `year`, `month` 或 `day`。 |
+| PARTITION_BY | Read | 启用读取分区。 分区列\<column-name\>:\<column-type\>。 您只能指定一个分区列。 JDBC连接器支持`date`，`int`和`enum` \<column-type\>值。 如果您未标识`PARTITION_BY`列，则单个PXF实例将为读取请求提供服务。 |
+| RANGE | Read | 当指定`PARTITION_BY`时是必需的。 查询范围； 用作提示以帮助创建分区。 `RANGE`格式取决于分区列的数据类型。 当分区列为`enum`类型时，`RANGE`必须指定值列表，即\<value\>:\<value\>[:\<value\>[...]]，每种形成它自己的片段。 如果分区列是`int`或`date`类型，则`RANGE`必须指定\<start-value\>:\<end-value\>，并表示从\<start-value\>到\<end-value\>（含）。 如果分区列是`date`类型，请使用`yyyy-MM-dd`日期格式。 |
+| INTERVAL | Read | 如果指定了`PARTITION_BY`且类型为`int`或`date`，则为必填项。 一个片段的间隔<interval-value\>[:\<interval-unit\>]。 与`RANGE`一起使用，以提示创建分区。 在\<interval-value\>中指定片段的大小。 如果分区列是`date`类型，请使用\<interval-unit\>指定`year`，`month`或`day`。 当`PARTITION_BY`列为`enum`类型时，PXF会忽略`INTERVAL`。 |
 | QUOTE_COLUMNS | Read | 控制在构造外部数据库的SQL查询是 PXF 是否应引用列名。 指定为 `true` 强制PXF引用所有列名称; 如果指定任何其他值，PXF不会引用列名。 如果未指定 `QUOTE_COLUMNS` (默认)， 当查询中 *任一* 字段满足以下条件， PXF自动引用 *所有* 列名： <br>- 包含特殊字符, 或 <br>- 混合大小写，并且外部数据库不支持未引用的混合大小写标识符。 |
 
 
 #### <a id="batching"></a>批量写入操作(写)
 
-当外部SQL数据库的JDBC 驱动程序支持它是，批量 `INSERT` 操作可能会大大提升性能。
+*当外部SQL数据库的JDBC驱动程序支持它时*，批量 `INSERT` 操作可能会大大提升性能。
 
-默认情况下启用批处理， 默认批处理大小为100。 要禁用批处理或修改批处理大小的值，请使用 `BATCH_SIZE` 设置创建PXF外部表：
+默认情况下启用批量写， 默认批处理大小为100。 要禁用批处理或修改批处理大小的值，请使用 `BATCH_SIZE` 设置创建PXF外部表：
 
 - `BATCH_SIZE=0` 或 `BATCH_SIZE=1` - 关闭批处理
 - `BATCH_SIZE=(n>1)` - 将 `BATCH_SIZE` 设置为 `n`
@@ -127,6 +113,16 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 
 - `BATCH_SIZE` 省略 - JDBC 连接器插入时不使用批处理。
 - `BATCH_SIZE=(n>1)` - `INSERT` 操作失败并且连接器返回错误。
+
+#### <a id="fetching"></a>批量读取操作
+默认情况下，PXF JDBC连接器自动批处理从外部数据库表中获取的行。 默认的行获取大小为1000。要修改默认的获取大小值，请在创建PXF外部表时指定`FETCH_SIZE`。 例如：
+
+``` pre
+FETCH_SIZE=5000
+```
+
+如果外部数据库JDBC驱动程序不支持读取时批处理，则必须通过设置`FETCH_SIZE=0`来显式禁用读取行批处理。
+
 
 #### <a id="threadpool"></a>线程池(写)
 
@@ -144,22 +140,33 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 
 #### <a id="partitioning"></a>分区(读)
 
-PXF JDBC 连接器支持运行在多个segment主机上的PXF实例同时对外部SQL表的读取访问。 此功能被称为分区
+PXF JDBC 连接器支持运行在多个segment主机上的PXF实例同时对外部SQL表的读取访问。 此功能被称为分区。 默认情况下，未启用读取分区。 要启用读取分区，请在创建PXF外部表时设置`PARTITION_BY`，`RANGE`和`INTERVAL`自定义选项。
 
-当您指定 `PARTITION_BY` 选项时，请根据与目标数据库的最佳连接数以及跨Greenplum数据库segment的最佳片段分布来调整 `INTERVAL` 值和单位。 `INTERVAL` 低边界由Greenplum数据库segment的数据量驱动，而高边界由目标数据库可接受的JDNC连接数驱动。 `INTERVAL` 设置会影响片段的数量， 并且理想情况下不应设置的太高或太低。 使用多个值进行测试可以帮助您选择最佳配置。
+PXF使用您指定的`RANGE`和`INTERVAL`值以及`PARTITON_BY`列将外部表中的特定数据行分配给在Greenplum数据库segment主机上运行的PXF实例。 此列选择特定于PXF处理，与您可能已为外部SQL数据库中的表指定的分区列没有关系。
+
 
 标识分区参数的示例JDBC \<custom-option\> 子字符串：
 
 ``` pre
+&PARTITION_BY=id:int&RANGE=1:100&INTERVAL=5
 &PARTITION_BY=year:int&RANGE=2011:2013&INTERVAL=1
 &PARTITION_BY=createdate:date&RANGE=2013-01-01:2016-01-01&INTERVAL=1:month
 &PARTITION_BY=color:enum&RANGE=red:yellow:blue
 ```
 
-启用分区后，PXF JDBC连接器会将 `SELECT` 查询拆分为一组小查询，每个小查询都称为一个片段。所有PXF实例同时处理一个片段。
+启用分区时，PXF JDBC连接器将`SELECT`查询拆分为多个子查询，这些子查询检索数据的子集，每个子集称为一个片段。 JDBC连接器会自动向每个片段添加额外的查询约束（`WHERE`表达式），以确保从外部数据库中检索每个元组的数据都恰好一次。
 
-JDBC 连接器会自动向每个片段添加额外的查询约束 (`WHERE` 表达式)，以确保从外部数据库中检索每个数据元组都只需一次。
+例如，当用户查询使用指定`&PARTITION_BY=id:int&RANGE=1:5&INTERVAL=2`的`LOCATION`子句创建的PXF外部表时，PXF会生成5个片段：根据分区设置两个，和最多三个隐式片段生成的碎片。 与每个片段相关的约束如下：
 
+- 片段 1: WHERE (id < 1) - 隐式生成的片段，用于RANGE起始区间
+- 片段 2: WHERE (id >= 1) AND (id < 3) - 分区设置指定的片段
+- 片段 3: WHERE (id >= 3) AND (id < 5) - 分区设置指定的片段
+- 片段 4: WHERE (id >= 5) - 隐式生成的片段，用于RANGE结束区间
+- 片段 5: WHERE (id IS NULL) - 隐式生成的片段
+
+PXF在Greenplum数据库segment之间分配片段。 在segment主机上运行的PXF实例为服务片段的主机上的每个segment生成一个线程。 如果片段的数量小于或等于在片段主机上配置的Greenplum segment的数量，则单个PXF实例可以为所有片段提供服务。 每个PXF实例将其结果发送回Greenplum数据库，在此收集它们并将其返回给用户。
+
+当您指定`PARTITION_BY`选项时，根据与目标数据库的最佳JDBC连接数以及跨Greenplum数据库segment的最佳外部数据分配，调整`INTERVAL`值和单位。 `INTERVAL`低边界由Greenplum数据库segment的数量驱动，而高边界由与目标数据库的可接受的JDBC连接数量驱动。 `INTERVAL`设置会影响片段的数量，理想情况下不应设置得太高或太低。 使用多个值进行测试可以帮助您选择最佳设置。
 
 ### <a id="jdbc_example_postgresql"></a>示例: 读取和写入PostgreSQL表
 
@@ -224,6 +231,8 @@ JDBC 连接器会自动向每个片段添加额外的查询约束 (`WHERE` 表�
 
 您必须为PostgreSQL创建JDBC服务配置，将PostgreSQL驱动程序JAR文件下载到您的系统，将该JAR文件复制到PXF用户配置目录，同步PXF配置， 然后重启PXF。
 
+此过程通常由Greenplum数据库管理员执行。
+
 1. 登录到Greenplum数据库master节点：
 
     ``` shell
@@ -254,21 +263,11 @@ JDBC 连接器会自动向每个片段添加额外的查询约束 (`WHERE` 表�
 </configuration>
     ```
 
-2. [下载](https://jdbc.postgresql.org/download.html) PostgreSQL JDBC驱动程序JAR文件，并记下文件的下载位置。
-
-3. 将JDBC驱动程序JAR文件复制到Greenplum数据库master主机上的 `$PXF_CONF/lib` 。 例如：
-
-    ``` shell
-    gpadmin@gpmaster$ cp postgresql-42.2.5.jar $PXF_CONF/lib/postgresql-42.2.5.jar
-    ``` 
-
-3. 同步PXF 配置到所有Greenplum数据库segment主机。例如：
+3. 同步PXF 配置到Greenplum数据库集群。例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
     ``` 
-
-6. 如[重启PXF](cfginitstart_pxf.html#restart_pxf)中所述，在每个Greenplum数据库segment主机上重启PXF。
 
 #### <a id="ex_readjdbc"></a>从PostgreSQL表中读取
 
@@ -278,7 +277,7 @@ JDBC 连接器会自动向每个片段添加额外的查询约束 (`WHERE` 表�
 
     ``` sql
     gpadmin=# CREATE EXTERNAL TABLE pxf_tblfrompg(id int)
-                LOCATION ('pxf://public.forpxf_table1?PROFILE=Jdbc&SERVER=pgsvrcfg')
+                LOCATION ('pxf://public.forpxf_table1?PROFILE=Jdbc&SERVER=pgsrvcfg')
                 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     ```
 
@@ -328,4 +327,231 @@ JDBC 连接器会自动向每个片段添加额外的查询约束 (`WHERE` 表�
        1
     (6 rows)
     ```
+
+## <a id="about_nq"></a>关于使用命名查询
+
+PXF JDBC连接器允许您指定静态定义的查询以对远程SQL数据库运行。 考虑在以下情况下使用*命名查询*：
+
+- 您需要联接所有都驻留在同一外部数据库中的几个表。
+- 您想在数据源附近执行复杂的聚合。
+- 您将在外部数据库中使用但不允许创建`VIEW`。
+- 您宁愿消耗外部系统中的计算资源，以最大程度地减少Greenplum数据库资源的利用率。
+- 您要运行HIVE查询并通过YARN控制资源利用率。
+
+Greenplum数据库管理员定义了一个查询，并为您提供了创建外部表时要使用的查询名称。 在表`CREATE EXTERNAL TABLE` `LOCATION`子句中指定`query:<query_name>`代替表名，以指示PXF JDBC连接器在远程SQL数据库中运行名为`<query_name>`的静态查询。
+
+PXF仅支持具有可读外部表的命名查询。 您必须为要运行的每个查询创建一个唯一的Greenplum数据库可读外部表。
+
+外部表列的名称和类型必须与查询结果返回的列的名称，类型和顺序完全匹配。 如果查询返回聚合或其他函数的结果，请确保使用`AS`限定符指定特定的列名。
+
+例如，假设您正在使用具有以下定义的PostgreSQL表：
+
+``` sql
+CREATE TABLE customers(id int, name text, city text, state text);
+CREATE TABLE orders(customer_id int, amount int, month int, year int);
+```
+
+这个PostgreSQL查询中，管理员将其命名为`order_rpt`：
+
+``` sql
+SELECT c.name, sum(o.amount) AS total, o.month
+  FROM customers c JOIN orders o ON c.id = o.customer_id
+  WHERE c.state = 'CO'
+GROUP BY c.name, o.month
+```
+
+该查询返回类型为`(name text, total int, month int)`的元组。 如果为名为`pgserver`的PXF JDBC服务器定义了`order_rpt`查询，则可以创建Greenplum数据库外部表来读取这些查询结果，如下所示：
+
+``` sql
+CREATE EXTERNAL TABLE orderrpt_frompg(name text, total int, month int)
+  LOCATION ('pxf://query:order_rpt?PROFILE=Jdbc&SERVER=pgserver&PARTITION_BY=month:int&RANGE=1:13&INTERVAL=3')
+FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
+```
+
+该命令引用在`pgserver`服务器配置中定义的名为`order_rpt`的查询。 它还指定了JDBC读取分区选项，这些选项为PXF提供了用于在其服务器segment之间划分查询结果数据的信息。
+
+PXF JDBC连接器自动将列投影和过滤器下推应用于引用命名查询的外部表。
+
+
+### <a id="jdbc_example_namedquery"></a>示例：读取PostgreSQL查询的结果
+
+在此示例中，您：
+
+- 使用在[示例：读取和写入PostgreSQL数据库](#jdbc_example_postgresql)中创建的PostgreSQL数据库`pgtestdb`，用户`pxfuser1`和PXF JDBC连接器服务器配置`pgsrvcfg`。
+- 创建两个PostgreSQL表并将数据插入表中。
+- 将表上的所有特权分配给`pxfuser1`。
+- 定义一个在两个PostgreSQL表上执行复杂SQL语句的命名查询，并将该查询添加到`pgsrvcfg` JDBC服务器配置中。
+- 创建一个与查询结果元组匹配的PXF可读外部表定义，并指定读取分区选项。
+- 使用PXF列投影和过滤器下推读取查询结果。
+
+#### <a id="nq_create_2pgtbl"></a>创建PostgreSQL表并分配权限
+
+执行以下过程，以在名为`pgtestdb`的数据库的`public`模式中创建名为`customers`和`orders`的PostgreSQL表，并向用户`pxfuser1`授予这些表的所有特权：
+
+1. 确定PostgreSQL服务器的主机名和端口。
+
+2. 以postgres用户身份连接到`pgtestdb` PostgreSQL数据库。 例如，如果您的PostgreSQL服务器正在名为`pserver`的主机的默认端口上运行：
+
+    ``` shell
+    $ psql -U postgres -h pserver -d pgtestdb
+    ```
+
+3. 创建一个名为`customers`的表，并将一些数据插入该表：
+
+    ``` sql
+    CREATE TABLE customers(id int, name text, city text, state text);
+    INSERT INTO customers VALUES (111, 'Bill', 'Helena', 'MT');
+    INSERT INTO customers VALUES (222, 'Mary', 'Athens', 'OH');
+    INSERT INTO customers VALUES (333, 'Tom', 'Denver', 'CO');
+    INSERT INTO customers VALUES (444, 'Kate', 'Helena', 'MT');
+    INSERT INTO customers VALUES (555, 'Harry', 'Columbus', 'OH');
+    INSERT INTO customers VALUES (666, 'Kim', 'Denver', 'CO');
+    INSERT INTO customers VALUES (777, 'Erik', 'Missoula', 'MT');
+    INSERT INTO customers VALUES (888, 'Laura', 'Athens', 'OH');
+    INSERT INTO customers VALUES (999, 'Matt', 'Aurora', 'CO');
+    ```
+
+4. 创建一个名为`orders`的表，并将一些数据插入该表：
+
+    ``` sql
+    CREATE TABLE orders(customer_id int, amount int, month int, year int);
+    INSERT INTO orders VALUES (111, 12, 12, 2018);
+    INSERT INTO orders VALUES (222, 234, 11, 2018);
+    INSERT INTO orders VALUES (333, 34, 7, 2018);
+    INSERT INTO orders VALUES (444, 456, 111, 2018);
+    INSERT INTO orders VALUES (555, 56, 11, 2018);
+    INSERT INTO orders VALUES (666, 678, 12, 2018);
+    INSERT INTO orders VALUES (777, 12, 9, 2018);
+    INSERT INTO orders VALUES (888, 120, 10, 2018);
+    INSERT INTO orders VALUES (999, 120, 11, 2018);
+    ```
+
+5. 为用户`pxfuser1`分配表`customers`和`orders`的所有特权，然后退出`psql`子系统：
+
+    ``` sql
+    GRANT ALL ON customers TO pxfuser1;
+    GRANT ALL ON orders TO pxfuser1;
+    \q
+    ```
+
+#### <a id="nq_jdbconfig"></a>配置命名查询
+
+在此过程中，您将创建一个命名查询文本文件，将其添加到`pgsrvcfg` JDBC服务器配置中，并将PXF配置同步到Greenplum数据库集群。
+
+此过程通常由Greenplum数据库管理员执行。
+
+1. 登录到Greenplum数据库主节点：
+
+    ``` shell
+    $ ssh gpadmin@<gpmaster>
+    ```
+
+2. 导航到JDBC服务器配置目录`pgsrvcfg`。 例如：
+
+    ``` shell
+    gpadmin@gpmaster$ cd $PXF_CONF/servers/pgsrvcfg
+    ```
+
+3. 在文本编辑器中打开名为`pg_order_report.sql`的查询文本文件，然后将以下查询复制/粘贴到该文件中：
+
+    ``` sql
+    SELECT c.name, c.city, sum(o.amount) AS total, o.month
+      FROM customers c JOIN orders o ON c.id = o.customer_id
+      WHERE c.state = 'CO'
+    GROUP BY c.name, c.city, o.month
+    ```
+
+4. 保存文件并退出编辑器。
+
+5. 将对PXF配置的这些更改同步到Greenplum数据库集群。 例如：
+
+    ``` shell
+    gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
+    ```
+
+#### <a id="nq_readjdbc"></a>阅读查询结果
+
+在Greenplum数据库群集上执行以下过程，以创建一个PXF外部表，该表引用您在上一节中创建的查询文件，然后读取查询结果数据：
+
+1. 创建指定`Jdbc`配置文件的PXF外部表。 例如：
+
+    ``` sql
+    CREATE EXTERNAL TABLE pxf_queryres_frompg(name text, city text, total int, month int)
+      LOCATION ('pxf://query:pg_order_report?PROFILE=Jdbc&SERVER=pgsrvcfg&PARTITION_BY=month:int&RANGE=1:13&INTERVAL=3')
+    FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
+    ```
+
+    通过这种分区方案，PXF将向远程SQL数据库发出4个查询，每季度一个查询。 每个查询将返回目标季度每个月的客户名称以及给定月份中每个客户每月的总订单总额。 然后，当您查询外部表时，Greenplum数据库将为您将数据合并到单个结果集中。
+
+2. 显示查询结果的所有行：
+
+    ``` sql
+    SELECT * FROM pxf_queryres_frompg ORDER BY city, total;
+
+     name |  city  | total | month
+    ------+--------+-------+-------
+     Matt | Aurora |   120 |    11
+     Tom  | Denver |    34 |     7
+     Kim  | Denver |   678 |    12
+    (3 rows)
+    ```
+
+3. 使用列投影来显示每个城市的订单总数：
+
+    ``` sql
+    SELECT city, sum(total) FROM pxf_queryres_frompg GROUP BY city;
+
+      city  | sum
+    --------+-----
+     Aurora | 120
+     Denver | 712
+    (2 rows)
+    ```
+
+    当您执行此查询时，PXF仅请求和检索`city`和`total`列的查询结果，从而减少了发送回Greenplum数据库的数据量。
+
+4. 提供其他过滤器和聚合以过滤PostgreSQL中的`total`：
+
+    ``` sql
+    SELECT city, sum(total) FROM pxf_queryres_frompg
+                WHERE total > 100
+                GROUP BY city;
+
+      city  | sum
+    --------+-----
+     Denver | 678
+     Aurora | 120
+    (2 rows)
+    ```
+
+    在此示例中，PXF将向子查询添加`WHERE`过滤器。 该过滤器被推送到远程数据库系统并在其上执行，从而减少了PXF发送回Greenplum数据库的数据量。 但是，`GROUP BY`聚合不会推送到远程，而是由Greenplum执行。
+
+## <a id="jdbc_override"></a>用DDL覆盖JDBC服务器配置
+
+您可以通过直接在`CREATE EXTERNAL TABLE` `LOCATION`子句中指定自定义选项，来为特定的外部数据库表覆盖JDBC服务器配置中的某些属性：
+
+| 自定义选项名称   | jdbc-site.xml属性名 |
+|----------------------|-----------------------------|
+| JDBC_DRIVER | jdbc.driver |
+| DB_URL | jdbc.url |
+| USER | jdbc.user |
+| PASS | jdbc.password |
+| BATCH_SIZE | jdbc.statement.batchSize |
+| FETCH_SIZE | jdbc.statement.fetchSize |
+| QUERY_TIMEOUT | jdbc.statement.queryTimeout |
+
+通过自定义选项指定的示例JDBC连接字符串：
+
+``` pre
+&JDBC_DRIVER=org.postgresql.Driver&DB_URL=jdbc:postgresql://pgserverhost:5432/pgtestdb&USER=pguser1&PASS=changeme
+&JDBC_DRIVER=com.mysql.jdbc.Driver&DB_URL=jdbc:mysql://mysqlhost:3306/testdb&USER=user1&PASS=changeme
+```
+例如：
+<pre>CREATE EXTERNAL TABLE pxf_pgtbl(name text, orders int)
+  LOCATION ('pxf://public.forpxf_table1?PROFILE=Jdbc<b>&JDBC_DRIVER=org.postgresql.Driver&DB_URL=jdbc:postgresql://pgserverhost:5432/pgtestdb&USER=pxfuser1&PASS=changeme</b>')
+FORMAT 'CUSTOM' (FORMATTER='pxfwritable_export');</pre>
+
+<div class="note warning">您以这种方式提供的凭据在外部表定义中可见。 不要在生产环境中使用这种传递凭据的方法。</div>
+
+有关PXF用于获取Greenplum数据库用户的配置属性设置的优先级规则的详细信息，请参考[配置属性优先级](cfg_server.html#override)。
 

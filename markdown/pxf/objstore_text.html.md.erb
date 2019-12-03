@@ -46,7 +46,7 @@ PXF 对象存储连接器支持普通分隔和逗号分隔的值文本数据。 
 ``` sql
 CREATE EXTERNAL TABLE <table_name> 
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
-LOCATION ('pxf://<path-to-file>?PROFILE=<objstore>:text&SERVER=<server_name>[&<custom-option>=<value>[...]]')
+LOCATION ('pxf://<path-to-file>?PROFILE=<objstore>:text[&SERVER=<server_name>][&<custom-option>=<value>[...]]')
 FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 ```
 
@@ -56,11 +56,15 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;file\>    | S3 对象存储中文件或目录的绝对路径 |
 | PROFILE=\<objstore\>:text    |  `PROFILE` 关键字必须定义为特定的对象存储。 例如: `s3:text` |
-| SERVER=\<server_name\>    | PXF 访问数据时使用的服务配置 |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | FORMAT | 当 \<path-to-file\> 引用分隔的纯文本数据时，请使用 `FORMAT` `'TEXT'` 。<br> 当 \<path-to-file\> 引用逗号分隔的值数据时，请使用 `FORMAT` `'CSV'`    |
 | delimiter    | 数据中的分隔符。对于`FORMAT` `'CSV'`，默认的\<delim_value\> 是逗号`,`。 当分隔符为转义序列时，在\<delim_value\> 前面加上`E`。示例：`(delimiter=E'\t')`, `(delimiter ':')`。 |
 
-如果要访问S3 对象存储，则可以如 [覆盖S3服务配置](access_objstore.html#s3_override) 中所述直接在 `CREATE EXTERNAL TABLE` 命令中提供S3凭据。
+如果要访问S3对象存储库：
+
+- 您可以通过`CREATE EXTERNAL TABLE`命令中的自定义选项提供S3凭据，如[使用DDL覆盖S3服务器配置](access_s3.html#s3_override)中所述。
+
+- 如果您正在从S3中读取CSV格式的数据，则可以指示PXF使用S3 Select Amazon服务检索数据。有关用于此目的的PXF自定义选项的更多信息，请参考[使用Amazon S3选择服务](access_s3.html#s3_select)。
 
 ### <a id="profile_text_query"></a>示例: 从S3读取文本数据
 
@@ -149,7 +153,7 @@ Beijing,Jul,411,11600.67' > /tmp/pxf_s3_simple.txt
 ``` sql
 CREATE EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
-LOCATION ('pxf://<path-to-file>?PROFILE=<objstore>:text:multi&SERVER=<server_name>[&<custom-option>=<value>[...]]')
+LOCATION ('pxf://<path-to-file>?PROFILE=<objstore>:text:multi[&SERVER=<server_name>][&<custom-option>=<value>[...]]')
 FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 ```
 
@@ -159,11 +163,11 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;file\>    | S3数据存储中的目录或文件的绝对路径 |
 | PROFILE=\<objstore\>:text:multi    |  `PROFILE` 关键字必须指定为特定的对象存储。 例如：`s3:text:multi` |
-| SERVER=\<server_name\>    | PXF 访问数据使用的服务配置名 |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | FORMAT | 当\<path-to-hdfs-file\>引用分隔的纯文本数据时，请使用`FORMAT` `'TEXT'`。<br> 当\<path-to-hdfs-file\>引用逗号分隔值数据时，请使用`FORMAT` `'CSV'`。  |
 | delimiter    | 数据中的分隔符。对于`FORMAT` `'CSV'`，默认的\<delim_value\> 是逗号`,`。 当分隔符为转义序列时，在\<delim_value\> 前面加上`E`。示例：`(delimiter=E'\t')`, `(delimiter ':')`。 |
 
-如果要访问S3 对象存储，则可以如 [覆盖S3服务配置](access_objstore.html#s3_override) 中所述直接在 `CREATE EXTERNAL TABLE` 命令中提供S3凭据。
+如果要访问S3对象存储，则可以通过`CREATE EXTERNAL TABLE`命令中的自定义选项提供S3凭据，如[使用DDL覆盖S3服务器配置](access_objstore.html#s3_override)中所述。
 
 ### <a id="profile_textmulti_query"></a>示例: 从S3中读取多行文本数据
 
@@ -248,7 +252,7 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 CREATE WRITABLE EXTERNAL TABLE <table_name> 
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
 LOCATION ('pxf://<path-to-dir>
-    ?PROFILE=<objstore>:text&SERVER=<server_name>[&<custom-option>=<value>[...]]')
+    ?PROFILE=<objstore>:text[&SERVER=<server_name>][&<custom-option>=<value>[...]]')
 FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 [DISTRIBUTED BY (<column_name> [, ... ] ) | DISTRIBUTED RANDOMLY];
 ```
@@ -259,7 +263,7 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;dir\>    | S3数据存储中目录的绝对路径 |
 | PROFILE=\<objstore\>:text    | `PROFILE` 关键字必须指定为对象存储。例如： `s3:text` |
-| SERVER=\<server_name\>    | PXF 访问数据使用的服务配置名 |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | \<custom&#8209;option\>=\<value\>  | \<custom-option\> 选项见下方描述|
 | FORMAT | 将分隔的纯文本写入\<path-to-dir\>时，使用 `FORMAT` `'TEXT'` 。 <br> 将逗号分隔值文本写入\<path-to-dir\>时，使用 `FORMAT` `'CSV'` 。 |
 | delimiter    | 数据中的分隔符。 数据中的分隔符。对于`FORMAT` `'CSV'`，默认的\<delim_value\> 是逗号`,`。 当分隔符为转义序列时，在\<delim_value\> 前面加上`E`。示例：`(delimiter=E'\t')`, `(delimiter ':')`。 |
@@ -279,7 +283,7 @@ FORMAT '[TEXT|CSV]' (delimiter[=|<space>][E]'<delim_value>');
 | COMPRESSION_TYPE    | 采用的压缩类型; 支持的值为 `RECORD` (默认) 或 `BLOCK` |
 | THREAD-SAFE | 确定表查询是否可以在多线程模式下运行的布尔值。 默认为 `TRUE`。 将此选项设置为 `FALSE` 以处理单个线程中所有非线程安全操作 (例如，压缩)的请求。 |
 
-如果要访问S3 对象存储，则可以如 [覆盖S3服务配置](access_objstore.html#s3_override) 中所述直接在 `CREATE EXTERNAL TABLE` 命令中提供S3凭据。
+如果要访问S3对象存储，则可以通过`CREATE EXTERNAL TABLE`命令中的自定义选项提供S3凭据，如[使用DDL覆盖S3服务器配置](access_objstore.html#s3_override)中所述。
 
 ### <a id="write_s3textsimple_example"></a>示例: 将文本数据写入S3
 

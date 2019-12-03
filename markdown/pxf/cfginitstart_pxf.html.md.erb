@@ -27,7 +27,7 @@ PXF提供了两个管理命令:
 - `pxf cluster` - 管理Greenplum数据库集群中的所有PXF服务实例
 - `pxf` - 在特定的Greenplum数据库主机上管理PXF服务实例
 
-[`pxf cluster`](ref/pxf-cluster.html)支持 `init`, `start`, `stop`, and `sync` 子命令。在Greenplum数据库master主机上运行 `pxf cluster` 子命令时，将在Greenplum数据库集群中的所有segment主机上执行该操作。
+[`pxf cluster`](ref/pxf-cluster.html)支持 `init`, `start`, `status`, `stop`, and `sync` 子命令。在Greenplum数据库master主机上运行 `pxf cluster` 子命令时，将在Greenplum数据库集群中的所有segment主机上执行该操作。PXF还在standby主机上运行`init`和`sync`命令。
 
 [`pxf`](ref/pxf.html)支持`init`, `start`, `stop`, `restart`, `status` 操作。这些操作在本地执行，也就是说，如果要在特定的Greenplum数据库segment主机上启动或停止PXF代理，需要登录到该主机并运行命令。
 
@@ -54,7 +54,7 @@ PXF提供了两个管理命令:
 | PXF_KEYTAB   | PXF服务Kerberos主体密钥表文件的绝对路径 | $PXF_CONF/keytabs/pxf.service.keytab |
 | PXF_PRINCIPAL | PXF服务Kerberos主体 | gpadmin/\_HOST@EXAMPLE.COM |
 
-您必须将对`pxf-env.sh`，`pxf-log4j.properties`或`pxf-profiles.xml`所做的所有变更同步到每个segment主机，并在每个节点上（重新）启动PXF。
+您必须将对`pxf-env.sh`，`pxf-log4j.properties`或`pxf-profiles.xml`所做的所有变更同步到Greenplum数据库集群，并在每个segment节点上(重新)启动PXF。
 
 ### <a id="start_pxf_prereq" class="no-quick-link"></a>准备
 

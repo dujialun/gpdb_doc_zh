@@ -1,0 +1,126 @@
+---
+title: 使用S3 Select从S3读取CSV和Parquet数据
+---
+
+PXF S3连接器支持使用Amazon S3 Select服务从S3读取某些CSV和Parquet格式的数据。 S3 Select提供了对Amazon S3中存储的数据的直接就地查询功能。
+
+启用它后，PXF使用S3 Select过滤S3对象的内容以检索您请求的数据子集。 这样通常可以减少传输到Greenplum数据库的数据量和查询时间。
+
+可以将PXF S3连接器与S3选择一起使用以读取：
+
+- `gzip`或`bzip2`压缩的CSV文件
+- 带有`gzip`或`snappy`压缩列的`Parquet`文件
+
+数据必须是`UTF-8`编码的，并且可能是服务器端加密的。
+
+当使用S3 Select时，PXF支持列投影以及`AND`和`OR`或`NOT`运算符的谓词下推。
+
+<div class="note">使用Amazon S3 Select服务可能会增加数据访问和检索的成本。 在启用PXF使用S3 Select服务之前，请务必考虑相关开销。</div>
+
+## <a id="s3_select_enable"></a>启用PXF以使用S3 Select
+
+在访问S3对象存储库时，`S3_SELECT`外部表自定义选项将控制PXF对S3 Select的使用。 设置`S3_SELECT`选项时，可以提供以下值：
+
+| S3-SELECT值  | 描述 |
+|-------|-------------------------------------|
+| OFF    | PXF不使用S3 Select。 默认值。 |
+| ON    | PXF始终使用S3 Select。 |
+| AUTO    | PXF将在有利于访问或性能的情况下使用S3 Select。 |
+
+默认情况下，PXF不使用S3 Select（`S3_SELECT = OFF`）。 您可以使PXF始终使用S3 Select，或者仅在PXF确定它可能对性能有利时才使用S3 Select。 例如，当`S3_SELECT = AUTO`时，当外部表上的查询使用列投影或谓词下推时，或者当引用的CSV文件具有标题行时，PXF会自动使用S3 Select。
+
+
+## <a id="s3_select_parquet"></a>使用S3 Select读取Parquet数据
+
+PXF支持从S3读取Parquet数据，如[在对象存储中读取和写入Parquet数据](objstore_parquet.html)中所述。 如果您希望PXF在读取Parquet数据时使用S3 Select，则将`S3_SELECT`自定义选项和值添加到`CREATE EXTERNAL TABLE` `LOCATION` URI中。
+
+### <a id="parquet_compress"></a>指定Parquet列的压缩类型
+
+如果Parquet文件中的列是`gzip`或`snappy`压缩的，请在`LOCATION` URI中使用`COMPRESSION_CODEC`自定义选项来标识压缩编解码器别名。 例如：
+
+``` pre
+&COMPRESSION_CODEC=gzip
+```
+
+或，
+
+``` pre
+&COMPRESSION_CODEC=snappy
+```
+
+### <a id="parquet_cet"></a>创建外部表
+
+使用以下语法在您希望PXF使用S3 Select服务访问的S3上引用一个Parquet文件的情况下，创建Greenplum数据库外部表：
+
+``` sql
+CREATE EXTERNAL TABLE <table_name>
+    ( <column_name> <data_type> [, ...] | LIKE <other_table> )
+  LOCATION ('pxf://<path-to-file>?PROFILE=s3:parquet[&SERVER=<server_name>]&S3_SELECT=ON|AUTO[&<other-custom-option>=<value>[...]]')
+FORMAT 'CSV';
+```
+
+<div class="note">当您启用PXF以使用S3 Select来访问S3上Parquet文件的外部表时，<i>必须</i>指定<code>FORMAT 'CSV'</code>。</div>
+
+例如，使用以下命令让PXF使用S3在最佳时机访问S3上的Parquet文件：
+
+``` sql
+CREATE EXTERNAL TABLE parquet_on_s3 ( LIKE table1 )
+  LOCATION ('pxf://bucket/file.parquet?PROFILE=s3:parquet&SERVER=s3srvcfg&S3_SELECT=AUTO')
+FORMAT 'CSV';
+```
+
+## <a id="s3_select_csv"></a>使用S3 Select读取CSV文件
+
+PXF支持从S3读取CSV数据，如[在对象存储中读取和写入文本数据](objstore_text.html)中所述。 如果您希望PXF在读取CSV数据时使用S3 Select，则可以将`S3_SELECT`自定义选项和值添加到`CREATE EXTERNAL TABLE` `LOCATION` URI中。 您也可以指定定界符，文件头和压缩自定义选项。
+
+### <a id="csv_header"></a>处理CSV文件头
+
+当您启用PXF以使用S3 Select访问CSV格式的文件时，可以在`LOCATION` URI中使用`FILE_HEADER`自定义选项来标识CSV文件是否具有标题行，如果有的话，还可以确定PXF如何处理标题 `FILE_HEADER`选项采用以下值：
+
+| FILE_HEADER值  | 描述 |
+|-------|-------------------------------------|
+| NONE    | 该文件没有标题行； 默认值。 |
+| IGNORE  | 该文件具有标题行； 忽略标题。 |
+| USE    | 该文件具有标题行； 读取标题。 |
+
+默认的`FILE_HEADER`值为`NONE`。 您还可以指示PXF忽略或读取文件头。 例如，要让PXF忽略标题，请将以下内容添加到`CREATE EXTERNAL TABLE` `LOCATION` URI中：
+
+``` pre
+&FILE_HEADER=IGNORE
+```
+
+<div class="note">仅当S3连接器使用Amazon S3 Select服务访问S3上的文件时，PXF可以读取带标题行的CSV文件。 PXF不支持从任何其他外部数据存储中读取包含头行的CSV文件。</div>
+
+### <a id="csv_compress"></a>指定CSV文件压缩类型
+
+如果CSV文件是`gzip`或`bzip2`压缩文件，请使用`LOCATION` URI中的`COMPRESSION_CODEC`自定义选项来标识压缩编解码器别名。 例如：
+
+``` pre
+&COMPRESSION_CODEC=gzip
+```
+
+或，
+
+``` pre
+&COMPRESSION_CODEC=bzip2
+```
+
+### <a id="csv_cet"></a>创建外部表
+
+使用以下语法创建Greenplum数据库外部表，该表引用您希望PXF使用S3 Select服务访问的S3上的CSV文件：
+
+``` sql
+CREATE EXTERNAL TABLE <table_name>
+    ( <column_name> <data_type> [, ...] | LIKE <other_table> )
+LOCATION ('pxf://<path-to-file>
+    ?PROFILE=s3:text[&SERVER=<server_name>]&S3_SELECT=ON|AUTO[&FILE_HEADER=IGNORE|USE][&COMPRESSION_CODEC=gzip|bzip2][&<other-custom-option>=<value>[...]]')
+FORMAT 'CSV' [(delimiter '<delim_char>')];
+```
+
+例如，使用以下命令使PXF始终使用S3 Select来访问S3上的`gzip`压缩文件，其中字段分隔符是竖线（'|'）字符，并且您想读取标题行：
+
+``` sql
+CREATE EXTERNAL TABLE gzippedcsv_on_s3 ( LIKE table2 )
+  LOCATION ('pxf://bucket/file.csv.gz?PROFILE=s3:text&SERVER=s3srvcfg&S3_SELECT=ON&FILE_HEADER=USE')
+FORMAT 'CSV' (delimiter '|');
+```

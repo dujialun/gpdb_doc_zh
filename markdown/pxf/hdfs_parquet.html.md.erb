@@ -48,9 +48,13 @@ PXF当前仅支持读写基本Parquet数据类型。
 | float | Real |
 | int\_8, int\_16 | Smallint, Integer |
 | int64 | Bigint |
-| int96 | Timestamp |
+| int96 | Timestamp, Timestamptz |
 
-**注意**：当写入Parquet时，PXF会将`timestamp`本地化为当前系统时区，并将其转换为通用时间(UT)，最终转换为`int96`。
+<div class="note">写入Parquet时：
+<ul>
+  <li>PXF将<code>timestamp</code>本地化为当前系统时区，并将其转换为通用时间(UTC)，然后最终转换为<code>int96</code>。</li>
+  <li>PXF将<code>timestamp</code>转换为UTC<code>timestamp</code>，然后转换为<code>int96</code>。在此转换过程中，PXF会丢失时区信息。</li>
+</ul></div>
 
 
 ## <a id="profile_cet"></a>创建外部表
@@ -63,7 +67,7 @@ PXF HDFS连接器`hdfs:parquet`配置文件支持读写Parquet格式的HDFS数�
 CREATE [WRITABLE] EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
 LOCATION ('pxf://<path-to-hdfs-dir>
-    ?PROFILE=hdfs:parquet[&<custom-option>=<value>[...]]')
+    ?PROFILE=hdfs:parquet[&SERVER=<server_name>][&<custom-option>=<value>[...]]')
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 [DISTRIBUTED BY (<column_name> [, ... ] ) | DISTRIBUTED RANDOMLY];
 ```
@@ -74,8 +78,9 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import'|'pxfwritable_export');
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;hdfs&#8209;file\>    | HDFS数据存储中目录或文件的绝对路径 |
 | PROFILE    | `PROFILE`关键字必须指定为`hdfs:parquet`|
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | \<custom&#8209;option\>=\<value\>  | \<custom-option\>描述见下方|
-| FORMAT 'CUSTOM' | 使用`FORMAT` '`CUSTOM`'时指定`(FORMATTER='pxfwritable_export')` (写入) 或 `(FORMATTER='pxfwritable_import')` (读取). |
+| FORMAT 'CUSTOM' | 使用`FORMAT` '`CUSTOM`'时指定`(FORMATTER='pxfwritable_export')` (写入) 或 `(FORMATTER='pxfwritable_import')` (读取)。 |
 | DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或\<字段名\>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。 |
 
 <a id="customopts"></a>
@@ -104,7 +109,7 @@ PXF `hdfs:parquet` 配置文件支持与编码和压缩有关的写入选项。�
 | number\_of\_orders | int |
 | total\_sales | float8 |
 
-在此示例中，您将创建一个Parquet格式的可写外部表，该表引用了HDFS中的Parquet格式数据，将一些数据插入表中，然后创建一个可读外部表以读取数据。
+在此示例中，您创建一个Parquet格式的可写外部表，该表使用默认的PXF服务器引用HDFS中的Parquet格式的数据，将一些数据插入表中，然后创建一个可读外部表以读取数据。
 
 1. 使用`hdfs:parquet`配置文件创建一个可写外部表。例如：
 

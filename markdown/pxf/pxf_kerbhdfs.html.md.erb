@@ -10,13 +10,15 @@ title: 为安全HDFS配置PXF
 
 在你配置PXF去访问需要安全访问的HDFS文件系统之前，确保你已经做到：
 
+- 使用默认的PXF服务器配置配置了Hadoop连接器。
+
 - 按照[Configuring PXF](instcfg_pxf.html)章节秒速初始化、配置和启动PXF，包括PXF功能和Hadoop用户模拟功能启用
 
 - 根据特定分发的说明为Hadoop集群启用Kerberos，并验证配置。
 
 - 确保HDFS的配置参数`dfs.block.access.token.enable`已经被设置成了`true`。你可以在你hadoop集群的`hdfs-site.xml`配置文件中找到该配置。
 
-- 注意每个Greenplum数据库segment主机（\<seghost\>）和Kerberos密钥分发中心\(KDC\) \<kdc-server\>主机的主机名或IP地址
+- 注意每个Greenplum数据库segment主机(\<seghost\>)和Kerberos密钥分发中心\(KDC\) \<kdc-server\>主机的主机名或IP地址
 
 - 注意群集所在的Kerberos \<realm\> 的名称。
 
@@ -41,7 +43,7 @@ title: 为安全HDFS配置PXF
     root@kdc-server$ scp /etc/krb5.conf seghost:/etc/krb5.conf
     ```
 
-3.  使用`kadmin.local`命令为GPDB的每个segment节点主机创建一个Kerberos PXF服务主体。服务主体的格式应为`gpadmin/<seghost>@<realm>`，其中\<seghost\>是segment主机系统的DNS可解析的全限定主机名（`hostname -f`命令的输出）。例如，以下命令在名为EXAMPLE.COM的Kerberos领域中为名为`host1.example.com，host2.example.com`和`host3.example.com`的主机创建PXF服务主体:
+3.  使用`kadmin.local`命令为GPDB的每个segment节点主机创建一个Kerberos PXF服务主体。服务主体的格式应为`gpadmin/<seghost>@<realm>`，其中\<seghost\>是segment主机系统的DNS可解析的全限定主机名(`hostname -f`命令的输出)。例如，以下命令在名为EXAMPLE.COM的Kerberos领域中为名为`host1.example.com，host2.example.com`和`host3.example.com`的主机创建PXF服务主体:
 
     ``` shell
     root@kdc-server$ kadmin.local -q "addprinc -randkey -pw changeme gpadmin/host1.example.com@EXAMPLE.COM"
@@ -49,7 +51,7 @@ title: 为安全HDFS配置PXF
     root@kdc-server$ kadmin.local -q "addprinc -randkey -pw changeme gpadmin/host3.example.com@EXAMPLE.COM"
     ```
 
-4.  为每个Kerberos PXF服务主体生成一个密钥表文件。 将密钥表文件保存在任何方便的位置（本示例使用目录`/etc/security/keytabs`）。 您将在以后的步骤中将keytab文件部署到它们各自的Greenplum数据库segment主机。 例如：
+4.  为每个Kerberos PXF服务主体生成一个密钥表文件。 将密钥表文件保存在任何方便的位置(本示例使用目录`/etc/security/keytabs`)。 您将在以后的步骤中将keytab文件部署到它们各自的Greenplum数据库segment主机。 例如：
 
     ``` shell
     root@kdc-server$ kadmin.local -q "xst -norandkey -k /etc/security/keytabs/pxf-host1.service.keytab gpadmin/host1.example.com@EXAMPLE.COM"

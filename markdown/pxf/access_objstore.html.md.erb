@@ -27,8 +27,8 @@ PXF安装了Azure Blob Storage, Azure Data Lake, Google Cloud Storage, Minio和S
 
 在使用PXF处理对象存储数据之前，请确保：
 
-- 您已经在Greenplum 数据库segment主机上配置并初始化了PXF，并且PXF正在每台主机上运行。有关其他信息，请参阅[配置PXF](instcfg_pxf.html)
-- 您已经配置了计划在每个Greenplum数据库segment主机上使用的PXF对象存储连接器。 有关说明，请参阅[配置Azure、Google云端存储、Minio和S3对象存储的连接器](objstore_cfg.html)。
+- 您已经配置并初始化了PXF，并且PXF正在每台主机上运行。有关其他信息，请参阅[配置PXF](instcfg_pxf.html)
+- 您已经配置了计划使用的PXF对象存储连接器。有关说明，请参阅[配置Azure、Google云端存储、Minio和S3对象存储的连接器](objstore_cfg.html)。
 - Greenplum数据库segment主机与外部对象存储系统之间的时间是同步的。
 
 
@@ -43,7 +43,7 @@ PXF对象存储连接器提供内置配置文件支持以下数据格式：
 - AvroSequenceFile
 - SequenceFile
 
-与Azure、Google Cloud Storage、Minio和S3的PXF连接器提供了以下配置文件以读取、写入（在许多情况下）这些受支持的数据格式：
+与Azure、Google Cloud Storage、Minio和S3的PXF连接器提供了以下配置文件以读取、写入(在许多情况下)这些受支持的数据格式：
 
 | 数据格式 | Azure Blob Storage | Azure Data Lake | Google Cloud Storage | S3 或 Minio |
 |-----|------|---------|------------|----------------|
@@ -90,21 +90,3 @@ CREATE EXTERNAL TABLE pxf_gsc_json(location text, month text, num_orders int, to
   LOCATION ('pxf://dir/subdir/file.json?<b>PROFILE=gs:json&SERVER=gcssrvcfg</b>')
 FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 </pre>
-
-## <a id="s3_override"></a>覆盖S3服务配置
-
-如果您访问S3对象存储, 可以通过 `CREATE EXTERNAL TABLE` `LOCATION` 子句中的以下自定义选项直接指定S3访问ID和密钥，从而覆盖S3服务配置：
-
-| 自定义选项  | 值描述 |
-|-------|-------------------------------------|
-| accesskey    | AWS账户访问密钥ID |
-| secretkey    | 与AWS访问密钥ID关联的密钥. |
-
-For example:
-<pre>CREATE EXTERNAL TABLE pxf_ext_tbl(name text, orders int)
-  LOCATION ('pxf://S3_BUCKET/dir/file.txt?PROFILE=s3:text&SERVER=s3srvcfg<b>&accesskey=YOURKEY&secretkey=YOURSECRET</b>')
-FORMAT 'TEXT' (delimiter=E',');</pre>
-
-<div class="note warning">已这种方式提供的凭据在外部表定义中可见。不要在生产环境中使用这种传递凭据的方法。</div>
-
-PXF目前不支持以这种方式覆盖 Azure、 Google Cloud Storage和Minio服务器凭据。

@@ -10,22 +10,38 @@ PXF与Cloudera，Hortonworks Data Platform，MapR和通用Apache Hadoop发行版
 
 配置PXF Hadoop连接器需要将配置文件从Hadoop群集复制到Greenplum master主机。如果你使用的是MapR Hadoop发行版，则还必须将某些JAR文件复制到master主机。在配置PXF Hadoop连接器之前，请确保可以将文件从Hadoop群集中的主机复制到Greenplum数据库master服务器。
 
-在这个过程中，你需要拷贝hadoop的配置文件到GPDB集群master主机的`$PXF_CONF/servers/default`目录。你可能需要为MapR Hadoop发行版拷贝库文件到`$PXF_CONF/lib`目录来提供支持,然后从master节点同步PXF配置文件到各个segment主机（`$PXF_CONF/*`目录会在你运行`pxf cluster init`时创建）。
-
-
-**Note**: 在配置过程完成后，你还需要配置PXF的默认HADOOP服务。那样，当用户在访问Hadoop服务的时候,在`CREATE EXTERNAL TABLE`语法中就中不需要指定`SERVER`选项了。
 
 ## <a id="client-pxf-config-steps"></a>过程
 
-在GPDB master主机上执行以下操作去配置PXF映射hadoop的连接器。在你配置连接器完成后，需要运行`pxf cluster sync`命令拷贝PXF的配置到各个segment主机
+在GPDB master主机上执行以下操作去配置PXF映射hadoop的连接器。在你配置连接器完成后，需要运行`pxf cluster sync`命令拷贝PXF的配置到Greenplum数据库集群。
+在此过程中，您将使用`default`，或创建新的PXF服务器配置。您将Hadoop配置文件复制到Greenplum数据库master主机上的服务器配置目录。您也可以将库复制到`$PXF_CONF/lib`以获取MapR支持。然后，您可以将master主机上的PXF配置同步到standby和segment主机。(当您运行`pxf cluster init`时，PXF将创建`$PXF_CONF/*`目录。)
 
 1. 登录到GPDB master节点:
 
     ``` shell
     $ ssh gpadmin@<gpmaster>
     ```
+2. 确定您的PXF Hadoop服务器配置的名称。如果您的Hadoop集群是Kerberized，则必须使用`default`PXF服务器。
 
-2. PXF服务需要从`core-site.xml`和其他Hadoop配置文件中获取需要的信息。使用你选择的工具从你的Hadoop集群namenode节点主机上拷贝`core-site.xml`、`hdfs-site.xml`、`mapred-site.xml`和`yarn-site.xml`文件到当前主机上（您的文件路径可能会根据使用的Hadoop发行版而有所不同）。例如，这些命令使用`scp`去拷贝文件：
+3. 如果您没有使用默认的PXF服务器，请创建`$PXF_HOME/servers/<server_name>`目录。例如，使用以下命令创建名为`hdp3`的Hadoop服务器配置：
+
+    ``` shell
+    gpadmin@gpmaster$ mkdir $PXF_CONF/servers/hdp3
+    ```
+
+4. 转到服务器目录。例如：
+
+    ```shell
+    gpadmin@gpmaster$ cd $PXF_CONF/servers/default
+    ```
+
+    或，
+
+    ```shell
+    gpadmin@gpmaster$ cd $PXF_CONF/servers/hdp3
+    ```
+
+2. PXF服务需要从`core-site.xml`和其他Hadoop配置文件中获取需要的信息。使用你选择的工具从你的Hadoop集群namenode节点主机上拷贝`core-site.xml`、`hdfs-site.xml`、`mapred-site.xml`和`yarn-site.xml`文件到当前主机上(您的文件路径可能会根据使用的Hadoop发行版而有所不同)。例如，这些命令使用`scp`去拷贝文件：
 
     ``` shell
     gpadmin@gpmaster$ cd $PXF_CONF/servers/default
@@ -47,7 +63,7 @@ PXF与Cloudera，Hortonworks Data Platform，MapR和通用Apache Hadoop发行版
     gpadmin@gpmaster$ scp hbaseuser@hbasehost:/etc/hbase/conf/hbase-site.xml .
     ```
 
-2. 如果你要使用PXF访问MapR Hadoop发行版，你必须要从你的MapR拷贝匹配的JAR文件到GPDB master上（您的文件路径可能会根据使用的MapR版本而有所不同）。例如：这些是使用`scp`命令拷贝文件
+2. 如果你要使用PXF访问MapR Hadoop发行版，你必须要从你的MapR拷贝匹配的JAR文件到GPDB master上(您的文件路径可能会根据使用的MapR版本而有所不同)。例如：这些是使用`scp`命令拷贝文件
 
     ``` shell
     gpadmin@gpmaster$ cd $PXF_CONF/lib
@@ -56,7 +72,7 @@ PXF与Cloudera，Hortonworks Data Platform，MapR和通用Apache Hadoop发行版
     gpadmin@gpmaster$ scp mapruser@maprhost:/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/common/hadoop-common-2.7.0-mapr-1707.jar .
     ```
 
-5. 同步PXF的配置到每个GPDB segment主机。例如：
+5. 同步PXF的配置到Greenplum数据库集群。例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
@@ -64,7 +80,7 @@ PXF与Cloudera，Hortonworks Data Platform，MapR和通用Apache Hadoop发行版
 
 4. Greenplum数据库最终用户访问Hadoop服务。默认情况下，PXF服务尝试使用GPDB的用户去验证访问HDFS, Hive, and HBase。为了支持此功能，如果要使用这些PXF连接器，则必须为Hadoop以及Hive和HBase配置代理设置。参照[Configuring User Impersonation and Proxying](pxfuserimpers.html) 中的过程为Hadoop服务配置用户模拟和代理，或关闭PXF用户模拟。
 
-5. 授予HDFS文件和目录的读取权限，这些文件和目录将作为Greenplum数据库中的外部表进行访问。 如果启用了用户模拟（默认设置），则必须向每个Greenplum数据库用户/角色名称授予此权限，这些用户/角色名称将使用引用HDFS文件的外部表。如果未启用用户模拟，则必须将此权限授予gpadmin用户。
+5. 授予HDFS文件和目录的读取权限，这些文件和目录将作为Greenplum数据库中的外部表进行访问。 如果启用了用户模拟(默认设置)，则必须向每个Greenplum数据库用户/角色名称授予此权限，这些用户/角色名称将使用引用HDFS文件的外部表。如果未启用用户模拟，则必须将此权限授予gpadmin用户。
 
 6. 如果您的Hadoop集群使用Kerberos保护，则为安全HDFS配置PXF必须为每个segment主机生成Kerberos主体和密钥表。
 
@@ -74,7 +90,7 @@ PXF与Cloudera，Hortonworks Data Platform，MapR和通用Apache Hadoop发行版
 在PXF服务运行时，如果你想要更新Hadoop、Hive或者HBase的配置，你必须在你的GPDB集群上重新同步PXF的配置并且在每个segment节点上重启pxf服务。例如：
 
 ``` shell
+gpadmin@gpmaster$ cd $PXF_CONF/servers/<server_name>
+gpadmin@gpmaster$ scp hiveuser@hivehost:/etc/hive/conf/hive-site.xml .
 gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
-gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster stop
-gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster start
 ```

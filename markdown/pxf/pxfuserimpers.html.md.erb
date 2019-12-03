@@ -2,11 +2,11 @@
 title: 配置用户模拟和代理
 ---
 
-PXF使用Greenplum数据库最终用户访问Hadoop服务。默认情况下，PXF尝试使用经过GPDB身份验证的用户身份并且通过PXF连接器配置去访问数据源服务（HDFS, Hive, HBase）。注意，PXF在访问Hadoop服务时仅使用用户的登录身份。例如，如果用户以jane身份登录Greenplum数据库，然后执行SET ROLE或SET SESSION AUTHORIZATION来假定其他用户身份，则所有PXF请求仍将使用jane身份来访问Hadoop服务。
+PXF使用Greenplum数据库最终用户访问Hadoop服务。默认情况下，PXF尝试使用经过GPDB身份验证的用户身份并且通过PXF连接器配置去访问数据源服务(HDFS, Hive, HBase)。注意，PXF在访问Hadoop服务时仅使用用户的登录身份。例如，如果用户以jane身份登录Greenplum数据库，然后执行SET ROLE或SET SESSION AUTHORIZATION来假定其他用户身份，则所有PXF请求仍将使用jane身份来访问Hadoop服务。
 
-使用默认的PXF配置，您必须显式配置每个Hadoop数据源（HDFS，Hive，HBase）来允许PXF进程所有者（通常为`gpadmin`）充当模拟用户或组的代理。详情参阅[Configuring Hadoop Proxying](#hadoop), [Hive User Impersonation](#hive), and [HBase User Impersonation](#hbase)。
+使用默认的PXF配置，您必须显式配置每个Hadoop数据源(HDFS，Hive，HBase)来允许PXF进程所有者(通常为`gpadmin`)充当模拟用户或组的代理。详情参阅[Configuring Hadoop Proxying](#hadoop), [Hive User Impersonation](#hive), and [HBase User Impersonation](#hbase)。
 
-或者，您可以禁用PXF用户模拟功能。禁用用户模拟后，PXF将使用PXF进程的所有者（通常为`gpadmin`）来执行所有Hadoop服务请求。此行为与PXF的早期版本相匹配，但是它没有提供任何方法来控制Hadoop中不同于Greenplum数据库用户对Hadoop服务的访问。它要求`gpadmin`用户有权访问HDFS中的所有文件和目录，以及在PXF外部表定义中引用的Hive和HBase中的所有表的权限。参照[Configuring PXF User Impersonation](#pxf_cfg_proc) for information about disabling user impersonation。
+或者，您可以禁用PXF用户模拟功能。禁用用户模拟后，PXF将使用PXF进程的所有者(通常为`gpadmin`)来执行所有Hadoop服务请求。此行为与PXF的早期版本相匹配，但是它没有提供任何方法来控制Hadoop中不同于Greenplum数据库用户对Hadoop服务的访问。它要求`gpadmin`用户有权访问HDFS中的所有文件和目录，以及在PXF外部表定义中引用的Hive和HBase中的所有表的权限。参照[Configuring PXF User Impersonation](#pxf_cfg_proc) for information about disabling user impersonation。
 
 ## <a id="pxf_cfg_proc"></a>配置PXF用户模拟
 
@@ -30,7 +30,7 @@ PXF使用Greenplum数据库最终用户访问Hadoop服务。默认情况下，PX
     PXF_USER_IMPERSONATION="true"
     ```
 
-4. 使用`pxf cluster sync`命令拷贝更新的文件`pxf-env.sh`文件到每个GPDB segment主机。例如
+4. 使用`pxf cluster sync`命令拷贝更新的文件`pxf-env.sh`文件到Greenplum数据库集群。例如
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync
@@ -41,11 +41,11 @@ PXF使用Greenplum数据库最终用户访问Hadoop服务。默认情况下，PX
 
 ## <a id="hadoop"></a>配置Hadoop代理
 
-启用PXF用户角色（默认设置）后，您必须配置Hadoop`core-site.xml`配置文件以打开用户模拟PXF。 步骤如下：
+启用PXF用户角色(默认设置)后，您必须配置Hadoop`core-site.xml`配置文件以打开用户模拟PXF。 步骤如下：
 
 1. 在你的Hadoop集群中，使用文本编辑器打开`core-site.xml`配置文件，或者使用Ambari添加或编辑此过程中描述的Hadoop属性值。
 
-2. 设置属性值`hadoop.proxyuser.<name>.hosts`指定允许代理请求的PXF主机名列表。将PXF代理用户（通常为`gpadmin`）替换为<name>，并在用逗号分隔的列表中提供多个PXF主机名。 例如：
+2. 设置属性值`hadoop.proxyuser.<name>.hosts`指定允许代理请求的PXF主机名列表。将PXF代理用户(通常为`gpadmin`)替换为<name>，并在用逗号分隔的列表中提供多个PXF主机名。 例如：
 
     ``` xml
     <property>
@@ -63,7 +63,7 @@ PXF使用Greenplum数据库最终用户访问Hadoop服务。默认情况下，PX
     ```
 4. 在修改过`core-site.xml`配置文件之后，你必须重启Hadoop使你的配置生效。
 
-5. 拷贝更新过的`core-site.xml`文件到GPDB maser 和所有segment上的Hadoop配置目录`$PXF_CONF/servers/default`
+5. 将更新后的`core-site.xml`文件复制到master服务器上的PXF Hadoop服务器配置目录`$PXF_CONF/servers/default`中，并将配置同步到standby服务器和每个Greenplum数据库segment主机。
 
 ## <a id="hive"></a>Hive用户模拟
 

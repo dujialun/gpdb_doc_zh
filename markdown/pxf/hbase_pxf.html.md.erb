@@ -100,6 +100,7 @@ FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
 |-------|-------------------------------------|
 | \<hbase&#8209;table&#8209;name\>    | HBase表的名称 |
 | PROFILE    | `PROFILE` 关键字必须指定为 `HBase` |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | FORMAT  | `FORMAT` 子句必须指定为 `'CUSTOM' (FORMATTER='pxfwritable_import')`   |
 
 

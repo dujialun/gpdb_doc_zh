@@ -10,37 +10,39 @@ title: PXF谓词下推
 
 PXF支持谓词下推。启用谓词下推时,可以提取SELECT查询中WHERE子句的约束并将其传递到外部数据源进行过滤。此过程可以提高查询性能，还可以减少传输到Greenplum数据库的数据量。
 
-通过设置`gp_external_enable_filter_pushdown`服务器配置参数，可以为所有外部表协议（包括pxf）启用或禁用谓词下推。此配置参数的默认值为on;将其设置为关闭以禁用谓词下推。例如：
+通过设置`gp_external_enable_filter_pushdown`服务器配置参数，可以为所有外部表协议(包括pxf)启用或禁用谓词下推。此配置参数的默认值为on;将其设置为关闭以禁用谓词下推。例如：
 
 ``` sql
 SHOW gp_external_enable_filter_pushdown;
 SET gp_external_enable_filter_pushdown TO 'on';
 ```
 
-**Note:** 某些外部数据源不支持谓词下推。此外，某些数据类型或运算符可能不支持谓词下推。如果查询访问不支持谓词下推的数据源，则执行查询时不进行谓词下推（数据传输到Greenplum数据库后进行过滤）
+**Note:** 某些外部数据源不支持谓词下推。此外，某些数据类型或运算符可能不支持谓词下推。如果查询访问不支持谓词下推的数据源，则执行查询时不进行谓词下推(数据传输到Greenplum数据库后进行过滤)
 
 PXF使用不同的连接器访问数据源，谓词下推支持由特定的连接器实现方式决定。以下PXF连接器支持谓词下推：
 
-- Hive Connector
+- Hive Connector, all profiles
 - HBase Connector
 - JDBC Connector
+- S3 Connector using the Amazon S3 Select service to access CSV and Parquet data
 
 
-PXF谓词下推可与这些数据类型一起使用（特定连接器）：
+PXF谓词下推可与这些数据类型一起使用(特定连接器)：
 
-- `INT`
-- `FLOAT`
-- `NUMERIC`
-- `BOOL`
+- `INT2`, `INT4`, `INT8`
 - `CHAR`, `TEXT`
-- `DATE`, `TIMESTAMP` (JDBC connector only)
+- `FLOAT`
+- `NUMERIC` (使用S3 Select时，不适用于S3连接器)
+- `BOOL`
+- `DATE`, `TIMESTAMP` (使用S3 Select时仅适用于JDBC连接器和S3连接器)
 
-这些运算符支持PXF谓词下推
+您可以通过以下运算符使用PXF过滤器下推功能：
 
 - `<`, `<=`, `>=`, `>`
 - `<>`, `=`
-- `IN` operator on arrays of `INT` and `TEXT`
-- `LIKE` (only for `TEXT` fields) (JDBC connector only)
+- `AND`, `OR`, `NOT`
+- 数组`INT`和`TEXT`的运算符`IN` (仅JDBC连接器)
+- `LIKE` (`TEXT`字段，仅JDBC连接器)
 
 总而言之，必须满足以下所有条件才能进行谓词下推：
 
@@ -48,3 +50,5 @@ PXF谓词下推可与这些数据类型一起使用（特定连接器）：
 * 访问外部数据源的Greenplum数据库协议必须支持谓词下推.PXF外部表协议支持下推
 * 访问的外部数据源必须支持下推。 例如，HBase和Hive支持下推
 * 使用pxf协议创建的外部表查询，基础PXF连接器还必须支持谓词下推。例如，PXF Hive，HBase和JDBC连接器支持下推。
+
+    - 有关Hive支持此功能的更多信息，请参考Hive[分区过滤器下推](hive_pxf.html#partitionfiltering)。

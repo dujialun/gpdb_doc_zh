@@ -10,6 +10,7 @@ PXF支持列投影，始终是启用状态。使用列投影时，只从外部�
 - PXF Hive Connector, `HiveORC` profile
 - PXF JDBC Connector, `Jdbc` profile
 - PXF Hadoop 和 Object Store Connectors, `hdfs:parquet`, `adl:parquet`, `gs:parquet`,`s3:parquet`, 和 `wasbs:parquet` profiles
+- 使用Amazon S3 Select服务，`s3:parquet`和`s3:text`配置文件的PXF S3连接器
 
 **Note:** 如果无法成功序列化查询过滤条件，PXF可能会禁用列投影; 例如，当WHERE子句解析为布尔类型时。
 

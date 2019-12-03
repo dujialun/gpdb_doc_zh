@@ -1,0 +1,180 @@
+---
+title: 配置PXF服务器
+---
+
+本主题概述了PXF服务器配置。要配置服务器，请参阅特定于您要配置的连接器的主题。
+
+您可以通过PXF连接器读取数据或将数据写入外部数据存储。要访问外部数据存储，您必须提供服务器位置。您可能还需要提供客户端访问凭据和其他特定于外部数据存储的属性。PXF通过以下方式简化了对外部数据存储的配置访问：
+
+- 支持基于文件的连接器和用户配置
+- 提供特定于连接器的模板配置文件
+
+PXF * Server *定义只是一个命名配置，提供对特定外部数据存储的访问。PXF服务器名称是位于`$PXF_CONF/servers/`中的目录的名称。您在服务器配置中提供的信息是特定于连接器的。例如，PXF JDBC连接器服务器定义可以包括JDBC驱动程序类名称，URL，用户名和密码的设置。您还可以在JDBC服务器定义中配置特定于连接的属性和特定于会话的属性。
+
+PXF为每个连接器提供一个服务器模板文件。此模板标识必须配置才能使用连接器的典型属性集。
+
+您将为Greenplum数据库用户需要访问的每个外部数据存储配置服务器定义。例如，如果您需要访问两个Hadoop集群，则将为每个集群创建PXF Hadoop服务器配置。如果需要访问Oracle和MySQL数据库，则将为每个数据库创建一个或多个PXF JDBC服务器配置。
+
+服务器配置可以包括用户访问凭据的默认设置以及外部数据存储的其他属性。您可以允许Greenplum数据库用户使用默认设置访问外部数据存储，也可以基于每个用户配置访问权限和其他属性。这使您可以在单个PXF服务器定义中使用不同的外部数据存储访问凭据来配置不同的Greenplum数据库用户。
+您可以允许Greenplum数据库用户使用默认设置访问外部数据存储，也可以基于每个用户配置访问权限和其他属性。这使您可以在单个PXF服务器定义中使用不同的外部数据存储访问凭据来配置不同的Greenplum数据库用户。
+
+
+## <a id="templates"></a>关于服务器模板文件
+
+PXF服务器的配置信息位于`$PXF_CONF/servers/<server_name>/`中的一个或多个`<connector> -site.xml`文件中。
+
+PXF为每个连接器提供一个模板配置文件。初始化PXF后，这些服务器模板配置文件位于`$PXF_CONF/templates/`目录中：
+
+```
+gpadmin@gpmaster$ ls $PXF_CONF/templates
+adl-site.xml   hbase-site.xml  jdbc-site.xml    s3-site.xml
+core-site.xml  hdfs-site.xml   mapred-site.xml  wasbs-site.xml
+gs-site.xml    hive-site.xml   minio-site.xml   yarn-site.xml
+```
+
+例如，`s3-site.xml`模板文件的内容如下：
+
+``` pre
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property>
+        <name>fs.s3a.access.key</name>
+        <value>YOUR_AWS_ACCESS_KEY_ID</value>
+    </property>
+    <property>
+        <name>fs.s3a.secret.key</name>
+        <value>YOUR_AWS_SECRET_ACCESS_KEY</value>
+    </property>
+    <property>
+        <name>fs.s3a.fast.upload</name>
+        <value>true</value>
+    </property>
+</configuration>
+```
+
+<div class="note">您可以在配置文件中以明文形式为PXF指定凭据。</div>
+
+**Note**: Hadoop连接器的模板文件不打算被修改并用于配置，因为它们仅提供所需信息的示例。您无需修改Hadoop模板，而是将几个Hadoop`* -site.xml`文件从Hadoop集群复制到PXF Hadoop服务器配置。
+
+
+## <a id="default"></a>关于默认服务器
+
+PXF定义了一个名为`default`的特殊服务器。初始化PXF时，它会自动创建一个`$PXF_CONF/servers/default/`目录。此目录最初为空，标识默认的PXF服务器配置。您可以配置默认PXF服务器并将其分配给任何外部数据源。例如，您可以将PXF默认服务器分配给Hadoop集群，或者分配给用户经常访问的MySQL数据库。
+
+如果您在`CREATE EXTERNAL TABLE`命令`LOCATION`子句中省略了`SERVER=<server_name>`设置，则PXF将自动使用`default`服务器配置。
+
+**Note**: 当您的Hadoop集群使用Kerberos身份验证时，您*必须*将Hadoop服务器配置为PXF`default`服务器。
+
+
+## <a id="cfgproc"></a>配置服务器
+
+将PXF连接器配置为外部数据存储时，将为该连接器添加命名的PXF服务器配置。在执行的任务中，您可以：
+
+1. 确定是要配置`default`PXF服务器，还是为服务器配置选择新名称。
+2. 创建目录`$PXF_CONF/servers/<server_name>`。
+3. 将模板或其他配置文件复制到新的服务器目录。
+4. 为模板文件中的属性填写适当的默认值。
+5. 添加环境所需的所有其他配置属性和值。
+6. 如[关于配置PXF用户](#usercfg)中所述为服务器配置配置一个或多个用户。
+7. 将服务器和用户配置同步到Greenplum数据库集群。
+
+**Note**: 添加或更新PXF服务器配置后，必须将PXF配置重新同步到Greenplum数据库集群。
+
+配置PXF服务器后，将服务器名称发布给需要访问数据存储的Greenplum数据库用户。用户只需要在创建访问外部数据存储的外部表时提供服务器名称即可。PXF从驻留在由服务器名称标识的服务器配置目录中的服务器和用户配置文件中获取外部数据源位置和访问凭据。
+
+要配置PXF服务器，请参考连接器配置主题：
+
+- 要为Hadoop配置PXF服务器，请参考[配置PXF Hadoop连接器](client_instcfg.html).
+- 要为对象存储配置PXF服务器，请参阅[为Azure，Google Cloud Storage，Minio和S3对象存储配置连接器](objstore_cfg.html).
+- 要配置PXF JDBC服务器，请参阅[配置JDBC连接器](jdbc_cfg.html).
+
+## <a id="usercfg"></a>配置PXF用户
+
+您可以基于每个服务器，每个Greenplum用户配置对外部数据存储的访问。
+
+您可以通过在PXF服务器配置目录`$PXF_CONF/servers/<server_name>/`中提供`<greenplum_user_name>-user.xml`用户配置文件来为特定的Greenplum数据库用户配置外部数据存储用户访问凭据和属性。例如，您在`$PXF_CONF/servers/<server_name>/bill-user.xml`文件中为名为`bill`的Greenplum数据库用户指定属性。您可以在PXF服务器配置中配置零个，一个或多个用户。
+
+您在用户配置文件中指定的属性是特定于连接器的。您可以在`<greenplum_user_name>-user.xml`配置文件中指定PXF连接器服务器支持的任何配置属性。
+
+例如，假设您已经在名为`pgsrv1`的PXF JDBC服务器配置中配置了对PostgreSQL数据库的访问。要允许名为`bill`的Greenplum数据库用户以名为`pguser1`的PostgreSQL用户(密码为`changeme`)访问该数据库，请使用以下命令创建用户包含如下属性的配置文件`$PXF_CONF/servers/pgsrv1/bill-user.xml`：
+
+``` xml
+<configuration>
+    <property>
+        <name>jdbc.user</name>
+        <value>pguser1</value>
+    </property>
+    <property>
+        <name>jdbc.password</name>
+        <value>changeme</value>
+    </property>
+</configuration>
+```
+
+如果要为`bill`配置特定的搜索路径和较大的读取大小，则还应将以下属性添加到`bill-user.xml`用户配置文件中：
+
+``` xml
+    <property>
+        <name>jdbc.session.property.search_path</name>
+        <value>bill_schema</value>
+    </property>
+    <property>
+        <name>jdbc.statement.fetchSize</name>
+        <value>2000</value>
+    </property>
+```
+
+### <a id="cfgproc_user"></a>过程
+
+对于要配置的每个PXF用户，您将：
+
+1. 标识Greenplum数据库用户的名称。
+2. 标识要为其配置用户访问权限的PXF服务器定义。
+3. 标识要为用户配置的每个属性的名称和值。
+4. 创建/编辑文件`$PXF_CONF/servers/<server_name>/<greenplum_user_name>-user.xml`，并添加外部配置块：
+
+    ``` xml
+    <configuration>
+    </configuration>
+    ```
+5. 将在步骤3中标识的每个属性/值对添加到`<greenplum_user_name>-user.xml`文件中的配置块中。
+6. 如果要将PXF用户配置添加到以前配置的PXF服务器定义中，请将该用户配置同步到Greenplum数据库集群。
+
+
+## <a id="override"></a>关于配置属性优先级
+
+PXF服务器配置可能包括用于用户访问凭据的默认设置以及用于访问外部数据存储的其他属性。一些PXF连接器(例如S3和JDBC连接器)允许您通过`CREATE EXTERNAL TABLE`命令`LOCATION`子句中的自定义选项直接指定某些服务器属性。`<greenplum_user_name>-user.xml`文件为Greenplum数据库用户指定了外部数据存储的属性设置。
+
+对于给定的Greenplum数据库用户，PXF使用以下优先级规则(从高到低)获取该用户的配置属性设置：
+
+1. 您在`<server_name>/<greenplum_user_name>-user.xml`中配置的属性将覆盖其他位置的属性设置。
+2. 通过`CREATE EXTERNAL TABLE`命令的`LOCATION`子句中的自定义选项指定的属性将覆盖PXF服务器配置中该属性的任何设置。
+3. 您在PXF服务器定义`<server_name>`中配置的属性标识默认属性值。
+
+这些优先级规则使您可以创建一个可由多个Greenplum数据库用户访问的外部表，每个用户都有各自独特的外部数据存储用户凭据。
+
+
+## <a id="using"></a>使用服务器配置
+
+为了访问外部数据存储，Greenplum数据库用户在`CREATE EXTERNAL TABLE`命令中的`LOCATION`子句`SERVER=<server_name>`选项中指定服务器名称。用户提供的`<server_name>`标识服务器配置目录，PXF从该目录获取配置和凭据以访问外部数据存储。
+
+例如，以下命令使用`$PXF_CONF/servers/s3srvcfg/s3-site.xml`文件中定义的服务器配置访问S3对象存储：
+
+<pre>
+CREATE EXTERNAL TABLE pxf_ext_tbl(name text, orders int)
+  LOCATION ('pxf://BUCKET/dir/file.txt?PROFILE=s3:text&<b>SERVER=s3srvcfg</b>')
+FORMAT 'TEXT' (delimiter=E',');
+</pre>
+
+如果未提供`SERVER=<server_name>`设置，则PXF自动使用`default`服务器配置。
+
+例如，如果`default`服务器配置标识了Hadoop集群，则以下示例命令将引用位于`/path/to/file.txt`的HDFS文件：
+
+<pre>
+CREATE EXTERNAL TABLE pxf_ext_hdfs(location text, miles int)
+  LOCATION ('pxf://path/to/file.txt?PROFILE=hdfs:text')
+FORMAT 'TEXT' (delimiter=E',');
+</pre>
+
+<div class="note info">查询或写入外部表的Greenplum数据库用户使用为<code>&lt;server_name></code>用户配置的凭据访问外部数据存储。如果没有为<code>&lt;server_name></code>配置任何用户专用的凭据，则Greenplum用户将使用为<code>&lt;server_name></code>配置的默认凭据访问外部数据存储。</div>
+

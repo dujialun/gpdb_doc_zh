@@ -39,7 +39,7 @@ PXF HDFS连接器 `hdfs:SequenceFile` 配置文件支持读写HDFS中SequenceFil
 CREATE [WRITABLE] EXTERNAL TABLE <table_name>
     ( <column_name> <data_type> [, ...] | LIKE <other_table> )
 LOCATION ('pxf://<path-to-hdfs-dir>
-    ?PROFILE=hdfs:SequenceFile[&<custom-option>=<value>[...]]')
+    ?PROFILE=hdfs:SequenceFile[&SERVER=<server_name>][&<custom-option>=<value>[...]]')
 FORMAT 'CUSTOM' (<formatting-properties>)
 [DISTRIBUTED BY (<column_name> [, ... ] ) | DISTRIBUTED RANDOMLY];
 ```
@@ -50,6 +50,7 @@ FORMAT 'CUSTOM' (<formatting-properties>)
 |-------|-------------------------------------|
 | \<path&#8209;to&#8209;hdfs&#8209;dir\>    | HDFS数据存储中目录或文件的绝对路径 |
 | PROFILE    | `PROFILE` 关键字必须指定为 `hdfs:SequenceFile`. |
+| SERVER=\<server_name\>    | PXF用于访问数据的命名服务器配置。可选的; 如果未指定，PXF将使用`default`服务器。 |
 | \<custom&#8209;option\>  | \<custom-option\> 描述见下方.|
 | FORMAT | 使用 `FORMAT` '`CUSTOM`' 时指定 `(FORMATTER='pxfwritable_export')` (写入) 或 `(FORMATTER='pxfwritable_import')` (读取). |
 | DISTRIBUTED BY    | 如果您计划将现有Greenplum数据库表中的数据加载到可写外部表，考虑在可写外部表上使用与Greenplum表相同的分布策略或\<字段名\>。 这样做可以避免数据加载操作中segment节点间额外的数据移动。 |
@@ -79,7 +80,7 @@ SequenceFile 格式数据可以选择采用record或block压缩。 PXF `hdfs:Seq
 
 ### <a id="write_seqfile_example" class="no-quick-link"></a>示例： 将二进制数据写入HDFS
 
-在此示例中，您将创建一个名为 `PxfExample_CustomWritable` 的Java类，该类将对先前示例中使用的示例模式中的字段进行序列化/反序列化。 然后，您将使用此类访问通过 `hdfs:SequenceFile` 配置文件创建的可写外部表。
+在此示例中，您将创建一个名为 `PxfExample_CustomWritable` 的Java类，该类将对先前示例中使用的示例模式中的字段进行序列化/反序列化。然后，您将使用此类访问通过`hdfs:SequenceFile`配置文件创建的可写外部表，该表使用默认的PXF服务器。
 
 执行以下步骤来创建Java类和可写外部表。
 
@@ -220,7 +221,7 @@ public class PxfExample_CustomWritable implements Writable {
     gpadmin@gpmaster$ cp /home/gpadmin/pxfex-customwritable.jar /usr/local/greenplum-pxf/lib/pxfex-customwritable.jar
     ```
 
-5. 将PXF配置同步到每个Greenplum数据库segment主机。 例如：
+5. 将PXF配置同步到Greenplum数据库集群。 例如：
 
     ``` shell
     gpadmin@gpmaster$ $GPHOME/pxf/bin/pxf cluster sync

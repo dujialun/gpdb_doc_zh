@@ -25,7 +25,7 @@ under the License.
 
 PXF取决于这些附加组件提供的JAR文件和其他配置信息。`$GPHOME/pxf/conf/pxf-private.classpath`文件标识PXF内部JAR依赖性。在大多数情况下，PXF将管理`pxf-private.classpath`文件，并根据您使用的连接器根据需要添加条目。
 
-如果您需要为PXF添加其他JAR依赖关系，例如JDBC驱动程序JAR文件，则必须登录到Greenplum数据库master主机，将JAR文件复制到PXF用户配置运行时库目录（`$PXF_CONF/lib`）， 将PXF配置同步到每个segment主机，然后在每个主机上重新启动PXF。 例如：
+如果您需要为PXF添加其他JAR依赖关系，例如JDBC驱动程序JAR文件，则必须登录到Greenplum数据库master主机，将JAR文件复制到PXF用户配置运行时库目录(`$PXF_CONF/lib`)， 将PXF配置同步到Greenplum数据库集群，然后在每个主机上重新启动PXF。 例如：
 
 ``` shell
 $ ssh gpadmin@<gpmaster>
