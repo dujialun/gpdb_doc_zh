@@ -54,13 +54,13 @@
 				<i>pg_locks</i> 提供了数据库系统中所有锁的一个全局视图，而不只是那些与当前数据库相关的锁。
 				用户可以把它的relation列与<codeph>pg_class.oid</codeph>连接在一起以确定被锁住的关系（例如表），
 				但这只对当前数据库中的关系能正确地工作。用户可以把<codeph>pid</codeph>列
-				连接到<codeph>pg_stat_activity.procpid</codeph>以查看更多会话持有或者等待持有锁的信息。例如：</p>
+				连接到<codeph>pg_stat_activity.pid</codeph>以查看更多会话持有或者等待持有锁的信息。例如：</p>
                 <p>
                     <codeblock>SELECT locktype, database, c.relname, l.relation, 
 l.transactionid, l.pid, l.mode, l.granted, 
 a.current_query 
         FROM pg_locks l, pg_class c, pg_stat_activity a 
-        WHERE l.relation=c.oid AND l.pid=a.procpid 
+        WHERE l.relation=c.oid AND l.pid=a.pid
         ORDER BY c.relname;
 </codeblock>
                 </p>

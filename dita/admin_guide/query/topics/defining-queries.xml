@@ -158,19 +158,35 @@
             <body>
                 <p>聚集表达式在一个查询选择的行上应用一个聚集函数。聚集函数在一组值之上执行一次计算并且返回一个单一值，例如这一组值的总和或者平均。聚集表达式的语法是下列之一：</p>
                 <ul>
-                    <li id="in144858"><codeph><i>aggregate_name</i>(<i>expression</i> [ , ... ]
-                            )</codeph> — 在所有输入行上操作，预期的结果值非空。 <codeph>ALL</codeph> 是默认。</li>
+                    <li id="in144858"><codeph><i>aggregate_name</i>(<i>expression</i> [ , ... ] ) [
+                        FILTER ( WHERE <varname>filter_clause</varname> ) ]</codeph> —
+                        在所有预期结果值为非空的输入行上进行运算。
+                        <codeph>ALL</codeph>是默认值。</li>
                     <li id="in144859"><codeph><i>aggregate_name</i>(ALL <i>expression</i> [ , ... ]
-                            )</codeph> — 和第一种形式相同，因为
-                            <codeph>ALL</codeph> 是默认</li>
+                        ) [ FILTER ( WHERE <varname>filter_clause</varname> ) ]</codeph> —
+                        由于默认为<codeph>ALL</codeph>，因此其操作与第一种形式相同。</li>
                     <li id="in144860"><codeph><i>aggregate_name</i>(DISTINCT <i>expression</i> [ ,
-                            ... ] )</codeph> — 输入行的所有可区分非空值上操作。</li>
-                    <li id="in144861"><codeph><i>aggregate_name</i>(*)</codeph> —  在所有值为空以及非空的行上操作。通常这种形式对于 <codeph>count(*)</codeph>聚集函数最有用。</li>
+                        ... ] ) [ FILTER ( WHERE <varname>filter_clause</varname> ) ]</codeph> —
+                        对输入行的所有不同非空值进行运算。</li>
+                    <li id="in144861"><codeph><i>aggregate_name</i>(*) [ FILTER ( WHERE
+                        <varname>filter_clause</varname> ) ]</codeph> —
+                        对所有值为null和non-null的行进行运算。
+                        通常，此形式对<codeph>count(*)</codeph>聚合函数最有用。</li>
                 </ul>
                 <p>其中 <i>aggregate_name</i> 是一个之前定义的聚集（可能有模式名限定）而expression是任何不包含聚集表达式的值表达式。</p>
                 <p>例如, <codeph>count(*)</codeph> 会得到输入行的总数，<codeph>count(f1)</codeph>得到输入行中<codeph>f1</codeph>为非空的数量，而<codeph>count(distinct
                     f1)</codeph>会得到<codeph>f1</codeph>中可区分非空值的数量。
                        </p>
+                <p>如果指定了<codeph>FILTER</codeph>，则只有<varname>filter_clause</varname>评估为true的输入行才被馈送到聚合函数；其他行将被丢弃。
+                    例如：</p>
+                <codeblock>SELECT
+    count(*) AS unfiltered,
+    count(*) FILTER (WHERE i &lt; 5) AS filtered
+FROM generate_series(1,10) AS s(i);
+unfiltered | filtered
+------------+----------
+10 |        4
+(1 row)</codeblock>
                 <p>预定义的聚集函数,可见<xref
                         href="../topics/functions-operators.xml#topic29"/>. 用户也可以增加自定义聚集函数。</p>
                 <p>Greenplum函数提供<codeph>MEDIAN</codeph>聚集函数，它返回<codeph>PERCENTILE_CONT</codeph>结果和逆分布函数的特殊聚集表达式的第50个百分位数：</p>
@@ -187,15 +203,21 @@
                 <body>
                     <p>下面是聚集表达式的当前限制：</p>
                     <ul>
-                        <li id="in199103">Greenplum数据库不支持下列关键词：ALL、DISTINCT、FILTER和OVER。详见 <xref
-                                href="../topics/functions-operators.xml#topic31/in2073121"/>  </li>
-                        <li id="in199105">聚集表达式只能出现在SELECT命令的结果列表或者HAVING子句中。在其他子句（例如WHERE）中不允许聚集表达式，因为那些子句逻辑上会在聚集形式的结果之前计算。这种限制适用于该聚集所属的查询级别。</li>
-                        <li id="in200910">当聚集表达式出现在子查询中时，该聚集通常在子查询的行之上计算。如果该聚集的参数只包含外层变量，该聚集属于最近的那个外层并且在那个外层查询的行上计算。
-                            该查询表达式总的来说是其出现的子查询的外部引用，并且该聚集表达式在那个子查询的任何一次计算中都像一个常量。请参考<xref format="dita" href="#topic15" type="topic"/> and <xref
-                                href="../topics/functions-operators.xml#topic29/in204913"/>.</li>
-                        <li id="in200915">Greenplum数据库不支持有多个输入表达式的DISTINCT。</li>
-                        <li id="in2009151">Greenplum数据库不支持指定聚合函数作为另一个聚合函数的参数。</li>
-                        <li id="in2009152">Greenplum数据库不支持指定窗口函数作为聚合函数的参数。</li>
+                        <li id="in199103">Greenplum数据库不支持以下关键字：<codeph>ALL</codeph>，<codeph>DISTINCT</codeph>和<codeph>OVER</codeph>。
+                            有关更多详细信息，请参见<xref href="../topics/functions-operators.xml#topic31/in2073121"/>。
+                            </li>
+                        <li id="in199105">聚合表达式只能出现在<codeph>SELECT</codeph>命令的结果列表或<codeph>HAVING</codeph>子句中。
+                            在其他子句（例如<codeph>WHERE</codeph>）中禁止使用该子句，因为这些子句是在聚合结果的形式之前进行逻辑评估的。
+                            此限制适用于聚合所属的查询级别。
+                            </li>
+                        <li id="in200910">当聚合表达式出现在子查询中时，通常会在子查询的行上对聚合进行求值。
+                            如果聚合的参数（和<varname>filter_clause</varname>（如果有））仅包含外部变量，则该聚合属于最接近的外部变量，并对该查询的行求值。
+                            总体而言，聚合表达式是该子表达式在其中出现的子查询的外部引用，并且该聚合表达式在该子查询的任何一个评估上均充当常量。
+                            关于仅出现在结果列表或<codeph>HAVING</codeph>子句中的限制适用于聚集出现的查询级别。
+                            请参阅<xref format="dita" href="#topic15" type="topic"/>和<xref href="../topics/functions-operators.xml#topic29/in204913"/>。
+                            </li>
+                        <li id="in2009151">Greenplum数据库不支持将聚合函数指定为另一个聚合函数的参数。</li>
+                        <li id="in2009152">Greenplum数据库不支持将窗口函数指定为聚合函数的参数。</li>
                     </ul>
                 </body>
             </topic>
@@ -210,7 +232,7 @@
                 <p>Greenplum数据库不支持将窗口函数制定为另一个窗口函数的参数。</p>
                 <p>窗口表达式的语法是：</p>
                 <p>
-                    <codeblock><i>window_function</i> ( [<i>expression</i> [, ...]] ) OVER ( <i>window_specification</i> )</codeblock>
+                    <codeblock><i>window_function</i> ( [<i>expression</i> [, ...]] ) [ FILTER ( WHERE <varname>filter_clause</varname> ) ] OVER ( <i>window_specification</i> )</codeblock>
                 </p>
                 <p>其中<i><codeph>window_function</codeph></i>window_function是列在
                         <xref href="../topics/functions-operators.xml#topic30/in164369"/>中的函数之一，<i><codeph>expression</codeph></i>是任何不含窗口表达式的值表达式，而<i><codeph>window_specification</codeph></i>是：</p>
@@ -233,7 +255,14 @@
                     <codeblock>SELECT count(*) OVER(PARTITION BY customer_id), * FROM sales;
 </codeblock>
                 </p>
-                <p>在窗口表达式中，一个窗口函数调用必须紧跟<codeph>OVER</codeph> 子句。OVER子句使得窗口函数与其他聚集或者报表函数相区别。OVER子句定义窗口函数要应用于其上的window_specification。</p>
+                <p>如果指定了<codeph>FILTER</codeph>，则只有<varname>filter_clause</varname>评估为true的输入行被馈送到window函数；其他行将被丢弃。
+                    在窗口表达式中，<codeph>FILTER</codeph>子句只能与作为聚合函数的<varname>window_function</varname>一起使用。
+                    </p>
+                <p>在窗口表达式中，该表达式必须包含<codeph>OVER</codeph>子句。
+                    <codeph>OVER</codeph>子句指定窗口框架 - 窗口函数要处理的行。
+                    这在语法上将函数与常规函数或聚合函数区分开。</p>
+                <p>在窗口表达式中使用的窗口聚合函数中，Greenplum数据库不支持具有多个输入表达式的<codeph>DISTINCT</codeph>子句。
+                    </p>
                 <p>窗口说明具有下列特点：</p>
                 <ul>
                     <li id="in166168"> <codeph>PARTITION BY</codeph> 子句定义窗口函数要应用于其上的窗口分区。如果省略，整个结果集会被当做一个分区。</li>

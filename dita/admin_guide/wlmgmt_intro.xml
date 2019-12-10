@@ -36,7 +36,7 @@
 
       <sectiondiv>
         <p><b>在启用了基于资源组的资源管理时，对vm.overcommit_ratio的配置方法</b></p>
-        <p>当启用了基于资源组的资源管理时，操作系统的<codeph>vm.overcommit_ratio</codeph>默认数值其实就已经比较合适了，如非必要，可以不改动。如果你的内存使用率太低了，那么就增加该参数，反之亦然。</p>
+        <p>当启用了基于资源组的资源管理时，请根据需要调整操作系统<codeph>vm.overcommit_ratio</codeph>。如果您的内存利用率太低，请增加该值；如果您的内存或交换分区使用率太高，请减少该值。</p>
       </sectiondiv>
       <sectiondiv>
         <p><b>在启用了基于资源队列的资源管理时，对vm.overcommit_ratio的配置方法</b></p>

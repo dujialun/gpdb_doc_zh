@@ -204,7 +204,7 @@ PARTITION BY LIST (gender)
   DEFAULT PARTITION other );
 </codeblock>
         </p>
-        <note>当前的Greenplum数据库传统优化器允许列表分区带有多列（组合）分区键。
+        <note>当前的Postgres优化器允许列表分区带有多列（组合）分区键。
           一个范围分区只允许单一列作为分区键。
           Greenplum查询优化器不支持组合键，因此用户不能使用组合分区键。</note>
         <p>更多有关默认分区的信息，请见<xref href="#topic80" type="topic" format="dita"/>。</p>
@@ -399,7 +399,8 @@ Filter: "date"=01-07-12::date AND region='USA'::text
   <topic id="topic76" xml:lang="en">
     <title>查看用户的分区设计</title>
     <body>
-      <p>用户可以使用<i>pg_partitions</i>视图查看有关分区设计的信息。
+      <p>用户可以使用<i><xref
+              href="../../ref_guide/system_catalogs/pg_partitions.xml">pg_partitions</xref></i>系统视图查看有关分区设计的信息。
         例如，要查看<i>sales</i>表的分区设计：</p>
       <p>
         <codeblock>SELECT partitionboundary, partitiontablename, partitionname, 
@@ -408,11 +409,15 @@ FROM pg_partitions
 WHERE tablename='sales';
 </codeblock>
       </p>
-      <p>下列表和视图展示了关于分区表的信息。</p>
+      <p>下列表和视图还展示了关于分区表的信息。</p>
       <ul id="ul_ycd_2wy_sp">
-        <li id="im211944"><i>pg_partition </i>- 跟踪分区表以及它们的继承层次关系。</li>
-        <li id="im156096"><i>pg_partition_templates</i> - 展示使用一个子分区模板创建的子分区。</li>
-        <li id="im156103"><i>pg_partition_columns</i> - 显示在一个分区设计中用到的分区键列。</li>
+        <li id="im211944"><i><xref
+                href="../../ref_guide/system_catalogs/pg_partitions.xml">pg_partitions</xref></i> - 跟踪分区表以及它们的继承层次关系。</li>
+        <li id="im156096"><i><xref
+                href="../../ref_guide/system_catalogs/pg_partition_templates.xml#topic1"
+        >pg_partition_templates</xref></i> - 展示使用一个子分区模板创建的子分区。</li>
+        <li id="im156103"><i><xref href="../../ref_guide/system_catalogs/pg_partition_columns.xml"
+        >pg_partition_columns</xref></i> - 显示在一个分区设计中用到的分区键列。</li>
       </ul>
       <p>有关Greenplum数据库系统目录表和视图的信息，请见<i>Greenplum数据库参考指南</i>。</p>
     </body>
@@ -453,10 +458,21 @@ WHERE tablename='sales';
           <xref href="#topic_yhz_gpn_qs" format="dita"/>
         </li>
       </ul>
-      <note type="important">重要： 在定义和改变分区设计时，要使用给定的分区名而不是表对象名。
-        尽管用户可以直接使用SQL命令来查询和装载任何表（包括分区表），用户只能使用<codeph>ALTER TABLE...PARTITION</codeph>子句修改一个分区表的结构。
-        <p>分区并不要求有名称。如果一个分区没有名称，可使用下列表达式之一来指定它：<codeph>PARTITION FOR (value)</codeph>或者<codeph>PARTITION FOR(RANK(number)</codeph>。
+      <note type="important">在定义和更改分区设计时，请使用给定的分区名称，而不是表对象名称。
+        给定的分区名称是<i><xref
+                href="../../ref_guide/system_catalogs/pg_partitions.xml">pg_partitions</xref></i>系统视图中的<codeph>partitionname</codeph>列值。
+        尽管可以使用SQL命令直接查询和加载任何表（包括分区表），但是只能使用<codeph>ALTER TABLE...PARTITION</codeph>子句修改分区表的结构。
+        <p>分区不需要具有名称。
+          如果分区没有名称，请使用以下表达式之一指定分区：<codeph>PARTITION FOR (<varname>value</varname>)</codeph>或<codeph>PARTITION FOR (RANK(<varname>number</varname>))</codeph>。
           </p></note>
+      <p>对于多级分区表，可以使用<codeph>ALTER PARTITION</codeph>子句标识要更改的特定分区。
+        对于表分区中目标分区之上的每个分区级别，请在<codeph>ALTER PARTITION</codeph>子句中指定与目标分区相关的分区。
+        例如，如果您有一个分区表，该分区表由年份，季度和区域三个级别组成，则此<codeph>ALTER TABLE</codeph>命令将叶子分区<codeph>region</codeph>与表<codeph>region_new</codeph>交换。
+        </p>
+      <codeblock>ALTER TABLE sales <b>ALTER PARTITION year_1 ALTER PARTITION quarter_4</b> EXCHANGE PARTITION region WITH TABLE region_new ;</codeblock>
+      <p>两个<codeph>ALTER PARTITION</codeph>子句标识要交换的<codeph>region</codeph>分区。
+        这两个子句都是必需的，以标识要交换的特定叶分区。
+        </p>
     </body>
     <topic id="topic78" xml:lang="en">
       <title id="im172625">增加分区</title>

@@ -15,10 +15,10 @@
         <li>对于包含<codeph>WITH</codeph>子句的数据修改命令（<codeph>INSERT</codeph>, <codeph>UPDATE</codeph>, 或 <codeph>DELETE</codeph>），该子句只能包含<codeph>SELECT</codeph>命令，WITH子句不能包含数据修改命令。
             </li>
       </ul></note>
-    <p>默认情况下，将启用WITH子句的<codeph>RECURSIVE</codeph>关键字。通过将服务器配置参数gp“recursive”设置为false，可以禁用递归。By default, the <codeph>RECURSIVE</codeph> keyword for the <codeph>WITH</codeph> clause is
-      enabled. 通过将服务器配置参数<codeph><xref
-          href="../../../ref_guide/config_params/guc-list.xml#gp_recursive_cte"/></codeph>
-      设置为<codeph>false</codeph>，<codeph>WITH</codeph>子句的<codeph>RECURSIVE</codeph>关键字被禁用。</p>
+    <p>默认情况下，将启用WITH子句的<codeph>RECURSIVE</codeph>关键字。
+        通过将服务器配置参数<codeph><xref
+                href="../../../ref_guide/config_params/guc-list.xml#gp_recursive_cte"/></codeph>设置为<codeph>false</codeph>，可以禁用<codeph>RECURSIVE</codeph>。
+        </p>
   </body>
   <topic id="topic_xyn_dgh_5gb">
     <title>在WITH子句中的查询</title>

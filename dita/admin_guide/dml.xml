@@ -13,6 +13,7 @@
         <li><xref href="#topic7" format="dita"/></li>
         <li><xref href="#topic_gdd" format="dita"/></li>
         <li><xref href="#topic9" format="dita"/></li>
+        <li><xref href="#topic11" format="dita"/></li>
       </ul></p>
   </body>
   <topic id="topic2" xml:lang="en">
@@ -273,7 +274,7 @@
              那么可序列化或者可重复读事务执行变化。 </li>
           </ul>
         </section>
-        <p id="ix141505">Greenplum数据库中的默认事务隔离级别是<codeph>读已提交</codeph>。
+        <p id="ix141505">Greenplum数据库中的默认事务隔离级别是<codeph>已提交读</codeph>。
           要为一个事务更改隔离级别，在<codeph>BEGIN</codeph> 该事务时声明隔离级别或者在事务开始后使用<codeph>SET TRANSACTION</codeph>命令设置隔离级别。 </p>
       </body>
     </topic>
@@ -309,19 +310,121 @@
             href="../ref_guide/config_params/guc-list.xml#lock_timeout" type="section"
             >lock_timeout</xref></codeph> ，且将数值设定为小于<codeph>deadlock_timeout</codeph>
             和 <codeph>gp_global_deadlock_detector_period</codeph>,查询会在死锁检测被触发之前就被终止。</note>
-      <p>用户可以通过自定义函数，<codeph>pg_dist_wait_status()</codeph> 查看所有segment上的锁等待信息：哪些事务在等待锁，哪些事务在持有锁，以及事务运行在哪个segment上。
-      <codeph>pg_dist_wait_status()</codeph> 的输出如下例所示:</p>
-      <codeblock>SELECT * FROM pg_dist_wait_status();
- segid | waiter_dxid | holder_dxid | holdTillEndXact 
--------+-------------+-------------+-----------------
-    -1 |          29 |          28 | t
-     0 |          28 |          26 | t
-     0 |          27 |          29 | t
-     1 |          26 |          27 | t
-(4 rows)
+      <p>用户可以通过自定义函数，<codeph>gp_dist_wait_status()</codeph> 查看所有segment上的锁等待信息：哪些事务在等待锁，哪些事务在持有锁，锁的类型和模式，等待和持有锁的会话标识，以及事务运行在哪个segment上。
+      <codeph>gp_dist_wait_status()</codeph> 的输出如下例所示:</p>
+        <codeblock>SELECT * FROM pg_catalog.gp_dist_wait_status();
+-[ RECORD 1 ]----+--------------
+segid            | 0
+waiter_dxid      | 11
+holder_dxid      | 12
+holdTillEndXact  | t
+waiter_lpid      | 31249
+holder_lpid      | 31458
+waiter_lockmode  | ShareLock
+waiter_locktype  | transactionid
+waiter_sessionid | 8
+holder_sessionid | 9
+-[ RECORD 2 ]----+--------------
+segid            | 1
+waiter_dxid      | 12
+holder_dxid      | 11
+holdTillEndXact  | t
+waiter_lpid      | 31467
+holder_lpid      | 31250
+waiter_lockmode  | ShareLock
+waiter_locktype  | transactionid
+waiter_sessionid | 9
+holder_sessionid | 8
 </codeblock>
       <p>全局死锁检测器会终止某个事务以打破死锁，并且打印如下的错误信息：</p>
       <codeblock>ERROR:  canceling statement due to user request: "cancelled by global deadlock detector"</codeblock>
+        <section id="gdd_example">
+            <title>全局死锁检测器UPDATE和DELETE兼容性</title>
+            <p dir="ltr">全局死锁检测器可以管理堆表上这些类型的<codeph>UPDATE</codeph>和<codeph>DELETE</codeph>命令的并发更新：</p>
+            <ul id="ul_jrm_1r4_n3b">
+                <li>单个表的简单更新。使用Postgres优化器更新非分布键。该命令不包含<codeph>FROM</codeph>子句或<codeph>WHERE</codeph>子句中的子查询。
+                    <codeblock dir="ltr">UPDATE t SET c2 = c2 + 1 WHERE c1 > 10;</codeblock></li>
+                <li>简单删除单个表。该命令在<codeph>FROM</codeph>或<codeph>WHERE</codeph>子句中不包含子查询。
+                    <codeblock dir="ltr">DELETE FROM t WHERE c1 > 10;</codeblock></li>
+                <li>分割<codeph>UPDATE</codeph>。对于Postgres优化器，<codeph>UPDATE</codeph>命令更新分布键。
+                    <codeblock dir="ltr">UPDATE t SET c = c + 1; -- c is a distribution key</codeblock>
+                    <p dir="ltr">对于GPORCA，<codeph>UPDATE</codeph>命令更新分布键或引用分布键。
+                        <codeblock dir="ltr">UPDATE t SET b = b + 1 WHERE c = 10; -- c is a distribution key</codeblock></p></li>
+                <li>复杂的<codeph>UPDATE</codeph>。<codeph>UPDATE</codeph>命令包括多个表联接。
+                    <codeblock dir="ltr">UPDATE t1 SET c = t1.c+1 FROM t2 WHERE t1.c = t2.c;</codeblock>
+                    <p dir="ltr">或者该命令在<codeph>WHERE</codeph>子句中包含一个子查询。</p>
+                    <codeblock dir="ltr">UPDATE t SET c = c + 1 WHERE c > ALL(SELECT * FROM t1);</codeblock></li>
+                <li>复杂的<codeph>DELETE</codeph>。复杂的<codeph>DELETE</codeph>命令类似于复杂的<codeph>UPDATE</codeph>，并且涉及多个表联接或子查询。
+                    <codeblock>DELETE FROM t USING t1 WHERE t.c > t1.c;</codeblock></li>
+            </ul>
+            <p>下表显示了由全局死锁检测器处理的并发<codeph>UPDATE</codeph>或<codeph>DELETE</codeph>命令。
+                例如，同一表行上的并发简单<codeph>UPDATE</codeph>命令由全局死锁检测器管理。
+                对于并发的复杂<codeph>UPDATE</codeph>和简单<codeph>UPDATE</codeph>，仅执行一个<codeph>UPDATE</codeph>，并为另一个<codeph>UPDATE</codeph>返回错误。
+                </p>
+            <p>
+                <table id="table_krm_1r4_n3b">
+                    <title>由全局死锁检测器管理的并发更新和删除</title>
+                    <tgroup cols="6">
+                        <colspec colnum="1" colname="col1"/>
+                        <colspec colnum="2" colname="col2"/>
+                        <colspec colnum="3" colname="col3"/>
+                        <colspec colnum="4" colname="col4"/>
+                        <colspec colnum="5" colname="col5"/>
+                        <colspec colnum="6" colname="col6"/>
+                        <tbody>
+                            <row>
+                                <entry/>
+                                <entry dir="ltr">简单<codeph>UPDATE</codeph></entry>
+                                <entry dir="ltr">简单<codeph>DELETE</codeph></entry>
+                                <entry dir="ltr">分裂<codeph>UPDATE</codeph></entry>
+                                <entry dir="ltr">复杂<codeph>UPDATE</codeph></entry>
+                                <entry dir="ltr">复杂<codeph>DELETE</codeph></entry>
+                            </row>
+                            <row>
+                                <entry dir="ltr">简单<codeph>UPDATE</codeph></entry>
+                                <entry dir="ltr">YES</entry>
+                                <entry dir="ltr">YES</entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">NO</entry>
+                            </row>
+                            <row>
+                                <entry dir="ltr">简单<codeph>DELETE</codeph></entry>
+                                <entry dir="ltr">YES</entry>
+                                <entry dir="ltr">YES</entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">YES</entry>
+                                <entry dir="ltr">YES</entry>
+                            </row>
+                            <row>
+                                <entry dir="ltr">分裂<codeph>UPDATE</codeph></entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">NO</entry>
+                            </row>
+                            <row>
+                                <entry dir="ltr">复杂<codeph>UPDATE</codeph></entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">YES</entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">NO</entry>
+                            </row>
+                            <row>
+                                <entry dir="ltr">复杂<codeph>DELETE</codeph></entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">YES</entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">NO</entry>
+                                <entry dir="ltr">YES</entry>
+                            </row>
+                        </tbody>
+                    </tgroup>
+                </table>
+            </p>
+        </section>
     </body>
   </topic>
   <topic id="topic9" xml:lang="en">
@@ -341,4 +444,19 @@
       </note>
     </body>
   </topic>
+    <topic id="topic11" xml:lang="en">
+        <title id="ix141487">耗尽锁</title>
+        <body>
+            <p>当数据库操作在单个事务中访问多个表时，Greenplum数据库可能会耗尽锁。
+                备份和还原就是此类操作的示例。</p>
+            <p>当Greenplum数据库的锁用完时，您可能会看到的错误消息引用了共享内存错误：
+                <codeblock>... "WARNING","53200","out of shared memory",,,,,,"LOCK TABLE ...
+... "ERROR","53200","out of shared memory",,"You might need to increase max_locks_per_transaction.",,,,"LOCK TABLE ...</codeblock></p>
+            <note>在本文中，“shared memory”是指内部对象的共享内存：锁插槽。
+                “Out of shared memory”不表示系统或Greenplum级别的内存资源已耗尽。
+                </note>
+            <p>如提示所述，请在遇到此错误时考虑增加<xref href="../ref_guide/config_params/guc-list.xml#max_locks_per_transaction"><codeph>max_locks_per_transaction</codeph></xref>服务器配置参数。
+                </p>
+        </body>
+    </topic>
 </topic>

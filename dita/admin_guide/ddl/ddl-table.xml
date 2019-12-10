@@ -166,6 +166,9 @@
           <li id="li_h5h_3jn_3fb">删除用户定义的函数可以对节点执行的操作的限制</li>
           <li>频繁使用的表不需要广播到所有节点可以提高查询性能。</li>
         </ul>
+        <note>隐藏的系统列（<codeph>ctid</codeph>，<codeph>cmin</codeph>，<codeph>cmax</codeph>，<codeph>xmin</codeph>，<codeph>xmax</codeph>和<codeph>gp_segment_id</codeph>）无法在复制表的用户查询中引用，因为它们没有单一的，明确的值。
+          Greenplum数据库为查询返回一个不存在的列错误。
+          </note>
       </body>
       <topic id="topic35" xml:lang="en">
         <title>声明分布键</title>
@@ -195,7 +198,9 @@
              DISTRIBUTED RANDOMLY;
 </codeph></codeblock>
           </p>
-          <note type="important">主键总是表的分布列。如果没有主键，但是有唯一索引存在，则选择它为分布键。</note>
+          <note type="important">如果存在主键，则它是表的默认分布键。
+            如果不存在主键，但是存在唯一键，则这是表的默认分布键。
+            </note>
         </body>
       </topic>
       <topic id="topic36" xml:lang="en">

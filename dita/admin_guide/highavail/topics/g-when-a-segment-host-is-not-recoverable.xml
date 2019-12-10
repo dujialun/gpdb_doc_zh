@@ -10,10 +10,9 @@
             <codeblock>$ gprecoverseg -i <i>recover_config_file</i>
       </codeblock>
             <p>其中<codeph><i>recover_config_file</i></codeph>的格式是：</p>
-            <codeblock>&lt;<varname>failed_host</varname>&gt;:&lt;<varname>port</varname>&gt;:&lt;<varname>data_dir</varname>&gt;[ &lt;<varname>recovery_host</varname>&gt;:&lt;<varname>port</varname>&gt;:&lt;<varname>recovery_data_dir</varname>&gt;]
-</codeblock>
+          <codeblock>&lt;<varname>failed_host</varname>&gt;|&lt;<varname>port</varname>&gt;|&lt;<varname>data_dir</varname>&gt;[ &lt;<varname>recovery_host</varname>&gt;|&lt;<varname>port</varname>&gt;|&lt;<varname>recovery_data_dir</varname>&gt;]
             <p>例如，要恢复到不同于失效主机的另一主机上且该没有额外的文件空间配置， (除默认的<i>pg_system</i>文件空间外）：</p>
-            <codeblock>sdw1-1:50001:/data1/mirror/gpseg16 sdw4-1:50001:/data1/recover1/gpseg16
+            <codeblock>sdw1-1|50001|/data1/mirror/gpseg16 sdw4-1|50001|/data1/recover1/gpseg16
 </codeblock>
             <p>有关创建segment实例恢复文件的详细信息，请见<codeph><xref
                               href="../../../utility_guide/admin_utilities/gprecoverseg.xml"

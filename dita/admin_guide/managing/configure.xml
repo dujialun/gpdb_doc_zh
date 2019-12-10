@@ -455,9 +455,6 @@
                   <codeph>enable_tidscan</codeph>
                 </p>
                 <p>
-                  <codeph>gp_enable_adaptive_nestloop</codeph>
-                </p>
-                <p>
                   <codeph>gp_enable_agg_distinct</codeph>
                 </p>
               </stentry>
@@ -1119,9 +1116,6 @@
               <stentry>
                 <p>
                   <codeph>gp_interconnect_fc_method</codeph>
-                </p>
-                <p>
-                  <codeph>gp_interconnect_hash_multiplier</codeph>
                 </p>
                 <p>
                   <codeph>gp_interconnect_queue_depth</codeph>

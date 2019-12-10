@@ -229,7 +229,7 @@
               <li id="iz158643"><codeph>gp_resqueue_priority</codeph> - 查询优先特性默认被启用。</li>
               <li id="iz158644"><codeph>gp_resqueue_priority_sweeper_interval</codeph> - 设置所有活动语句重新计算CPU使用的时间间隔。这个参数的默认值应该足够用于通常的数据库操作。</li>
               <li id="iz174445"><codeph>gp_resqueue_priority_cpucores_per_segment</codeph> -
-                指定每个Segment实例分配的CPU核数。Master和Segment的默认值是4。对于Greenplum Data Computing Appliance Version 2，Segment的默认值是4而Master默认值是25。<p>每台主机会在其自己的<codeph>postgresql.conf</codeph>文件中检查这个参数的值。这个参数也影响Master节点，在Master节点上它应该被设置为一个反映CPU核数更高比率的值。例如，在每台主机有10个CPU核以及4个Segment的集群上，用户可以为<codeph>gp_resqueue_priority_cpucores_per_segment</codeph>指定这些值：</p><p>为Master和后备Master指定10。通常，在Master主机上只有Master实例。</p><p>为Segment主机上的每个Segment实例指定2.5。</p><p>如果参数值未被设置正确，要么是CPU可能不会被完全利用，要么是查询优先可能无法按照预期工作。例如，如果Greenplum数据库集群在Segment主机上每个CPU核低于一个Segment实例，确保要相应地调整这个值。</p><p>实际的CPU核利用取决于Greenplum数据库并行化查询的能力以及执行查询要求的资源。</p><p>注意：操作系统任何可用的CPU核都会被包括在CPU核数中。例如，虚拟CPU核会被包括在CPU核数中。</p></li>
+                指定每个Segment实例分配的CPU核数。Master和Segment的默认值是4。<p>每台主机会在其自己的<codeph>postgresql.conf</codeph>文件中检查这个参数的值。这个参数也影响Master节点，在Master节点上它应该被设置为一个反映CPU核数更高比率的值。例如，在每台主机有10个CPU核以及4个Segment的集群上，用户可以为<codeph>gp_resqueue_priority_cpucores_per_segment</codeph>指定这些值：</p><p>为Master和后备Master指定10。通常，在Master主机上只有Master实例。</p><p>为Segment主机上的每个Segment实例指定2.5。</p><p>如果参数值未被设置正确，要么是CPU可能不会被完全利用，要么是查询优先可能无法按照预期工作。例如，如果Greenplum数据库集群在Segment主机上每个CPU核低于一个Segment实例，确保要相应地调整这个值。</p><p>实际的CPU核利用取决于Greenplum数据库并行化查询的能力以及执行查询要求的资源。</p><p>注意：操作系统任何可用的CPU核都会被包括在CPU核数中。例如，虚拟CPU核会被包括在CPU核数中。</p></li>
             </ul></li>
           <li id="iz171977">如果用户希望查看或者更改任何负载管理参数值，可以使用<codeph>gpconfig</codeph> 工具。</li>
           <li id="iz169849">例如，要查看一个特定参数的设置：<p>
@@ -465,7 +465,7 @@ MEMORY_LIMIT='2000MB');
         pg_stat_activity 
    WHERE pg_roles.rolresqueue=pg_locks.objid 
    AND pg_locks.objid=gp_toolkit.gp_resqueue_status.queueid
-   AND pg_stat_activity.procpid=pg_locks.pid
+   AND pg_stat_activity.pid=pg_locks.pid
    AND pg_stat_activity.usename=pg_roles.rolname;
 </codeblock>
         </p>

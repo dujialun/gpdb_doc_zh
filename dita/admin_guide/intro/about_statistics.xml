@@ -255,18 +255,17 @@
         <p>如果GPORCA被启用（默认），用户还需要运行ANALYZE ROOTPARTITION来刷新根分区的统计信息。
           GPORCA要求在分区表根层的统计信息。传统优化器不使用这些统计信息。</p>
         <p>分析分区表的时间类似于分析具有相同数据的非分区表的时间，因为ANALYZE ROOTPARTITION不收集叶分区上的统计信息（仅对数据进行采样）。
-          analyzedb工具默认会更新根分区统计信息</p>
-        Greenplum数据库服务器配置参数<codeph><xref
+          analyzedb工具默认会更新根分区统计信息，但是如果不使用GPORCA，则可以添加<codeph>-skip_root_stats</codeph>选项，以将根分区统计信息保留为空。</p>
+        <p>Greenplum数据库服务器配置参数<codeph><xref
                 href="../../ref_guide/config_params/guc-list.xml#optimizer_analyze_root_partition"
         >optimizer_analyze_root_partition</xref></codeph>会影响何时在分区表的根分区上收集统计信息。
         如果参数为on（缺省值），则在运行ANALYZE时，不需要ROOTPARTITION关键字来收集根分区的统计信息。
         在根分区上运行ANALYZE时，或者在分区表的子叶子分区上运行ANALYZE并且其他子叶子分区具有统计信息时，将收集根分区统计信息。
-        如果参数关闭，则必须运行ANALYZE ROOTPARTITION以收集根分区统计信息。
+          如果参数关闭，则必须运行ANALYZE ROOTPARTITION以收集根分区统计信息。</p>
         <p>如果您不打算使用GPORCA对分区表执行查询（将服务器配置参数<xref
                 href="../../ref_guide/config_params/guc-list.xml#optimizer">optimizer</xref>设置为关闭），
           则还可以将服务器配置参数optimizer_analyze_root_partition设置为off，以限制ANALYZE更新根分区统计信息的时间。
           </p></section>
-      <section> </section>
     </body>
   </topic>
   <topic id="topic_gyb_qrd_2t">

@@ -50,12 +50,12 @@
 CREATE TABLE foo(i int);
 </codeblock>
       </p>
-      <p>如果在创建对象时没有指定<codeph>TABLESPACE</codeph>，
-          The tablespace associated with a database stores that database's system catalogs, temporary
-        files created by server processes using that database, and is the default tablespace
-        selected for tables and indexes created within the database, if no
-          <codeph>TABLESPACE</codeph> is specified when the objects are created.
-          如果在创建数据库时没有指定表空间，则使用与该数据库模板库一样的表空间。
+      <p>还有<codeph>temp_tablespaces</codeph>配置参数，该参数确定临时表和索引以及用于诸如对大型数据集进行排序之类目的的临时文件的位置。
+          这可以是表空间名称的逗号分隔列表，而不是仅一个，因此与临时对象相关的负载可以分布在多个表空间上。
+          每次要创建临时对象时，都会选择列表的随机成员。
+          </p>
+      <p>与数据库关联的表空间存储该数据库的系统目录，服务器进程使用该数据库创建的临时文件，
+          并且是为数据库内创建的表和索引选择的默认表空间（如果在创建对象时未指定<codeph>TABLESPACE</codeph>的话）。
           </p>
       <p>如果有足够的权限的话，可以使用任何数据库的表空间。</p>
     </body>

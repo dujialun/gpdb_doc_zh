@@ -58,14 +58,6 @@ FROM (SELECT count(*) c, gp_segment_id FROM facts GROUP BY 2) AS a;</codeblock>
                 倾斜超过10％的表应评估其分配策略。
                 </li>
           </ul></p>
-          <section>
-            <title>随机分布表的注意事项</title>
-            <p>当创建一个随机分布表(<codeph>DISTRIBUTED RANDOMLY</codeph>)，Greenplum数据库以轮询方式将您插入或复制的数据分发到表中。
-                Greenplum数据库为每个插入或复制操作启动轮询周期的新实例。
-                因此，将随机分布的表中的单个元组插入分配给第一个节点，将导致数据偏斜。
-                Greenplum数据库更均匀地分布来自批量插入的数据。
-              </p>
-          </section>
       <section id="section_unk_dpf_kgb">
         <title>复制表的注意事项</title>
         <p>当您创建复制表（<codeph>CREATE TABLE</codeph>子句<codeph>DISTRIBUTED REPLICATED</codeph>）时，Greenplum数据库会将每个表行分发到每个节点实例。

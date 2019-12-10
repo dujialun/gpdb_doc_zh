@@ -7,6 +7,9 @@
     <p>字符编码系统由将来自于一种字符集的每一个字符与其他某个东西（例如一个数字序列或者八位组序列）配对的代码构成，它们能让数据的传输和存储便利。Greenplum数据库支持多种字符集，包括ISO 8859系列等单字节字符集和EUC、UTF-8、Mule内部编码等多字节字符集。服务器端字符集在数据库初始化期间被定义，UTF-8是默认字符集但可以更改。客户端可以透明地使用所有受支持的字符集，但有一部分字符集不支持作为服务器端编码在服务器内使用。在把数据载入或者插入到Greenplum数据库中时，Greenplum透明地把数据从指定的客户端编码转换成服务器编码。在把数据送回到客户端时，Greenplum会把数据从服务器字符编码转换成指定的客户端编码。</p>
     <p>数据文件必须使用一种Greenplum数据库能识别的字符编码。<ph>受支持的字符集请见<i>Greenplum数据库参考指南</i></ph>。包含非法或者不受支持的编码序列的数据文件会在装载到Greenplum数据库时遇到错误。</p>
     <note type="note">在微软Windows操作系统生成的数据文件上，在载入到Greenplum数据库之前运行 <codeph>dos2unix</codeph>系统命令来移除任何Windows字符。</note>
+    <note>如果您在现有<codeph>gpload</codeph>控制文件中<i>更改</i><codeph>ENCODING</codeph>值，则必须手动删除使用以前的创建的所有外部表<codeph>ENCODING</codeph>配置。
+        如果将<codeph>REUSE_TABLES</codeph>设置为<codeph>true</codeph>，则<codeph>gpload</codeph>不会删除并重新创建外部表以使用新的<codeph>ENCODING</codeph>。
+        </note>
   </body>
   <topic id="topic103" xml:lang="en">
     <title>更改客户端字符编码</title>

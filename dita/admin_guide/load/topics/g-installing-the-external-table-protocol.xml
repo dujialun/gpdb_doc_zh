@@ -17,7 +17,7 @@
                 href="https://www.postgresql.org/docs/8.4/xfunc-c.html#DFUNC" scope="external"
                 format="html">
                 <ph>https://www.postgresql.org/docs/8.4/xfunc-c.html#DFUNC</ph>
-            </xref>上的Postgres文档。</p>
+            </xref>上的PostgreSQL文档。</p>
         <p>用户操作系统上的C编译器<codeph>cc</codeph>以及链接编辑器<codeph>ld</codeph>的手册页也包含有关在该系统上编译和链接源代码的信息。</p>
         <p>自定义协议的已编译代码（共享对象文件）在用户的Greenplum数据库阵列中每一个主机（Master和所有的Segment）上必须被放置在相同的位置。这个位置还必须在<codeph>LD_LIBRARY_PATH</codeph>中，这样服务器才能定位该文件。推荐在Greenplum数据库阵列的所有Master和Segment实例上都将共享文件放置在相对于<codeph>$libdir</codeph>（位于<codeph>$GPHOME/lib</codeph>）的位置或者动态库路径（由<codeph>dynamic_library_path</codeph>服务器配置参数设置）中的位置。用户可以使用Greenplum数据库工具<cmdname>gpssh</cmdname>和<codeph>gpscp</codeph>来更新Segment。</p>
     </body>

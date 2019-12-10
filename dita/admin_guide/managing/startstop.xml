@@ -140,11 +140,11 @@
       </ul></p>
       <p>如果提供了<codeph>msg</codeph>信息, Greenplum数据库会将取消信息的msg内容一并返回给客户端。<codeph>msg</codeph> 最大为128字节; 任何超出该长度的信息都会被Greenplum数据库直接截断。</p>
       <p>如果<codeph>pg_cancel_backend()</codeph>和<codeph>pg_terminate_backend()</codeph>函数执行成功，会返回状态<codeph>true</codeph>, 相反的会返回<codeph>false</codeph>。</p>
-      <p>要取消或中断后台进程，必须先查出要处理的后台进程ID。进程ID可以从<codeph>pg_stat_activity</codeph>视图的<codeph>procpid</codeph>列得到。
+      <p>要取消或中断后台进程，必须先查出要处理的后台进程ID。进程ID可以从<codeph>pg_stat_activity</codeph>视图的<codeph>pid</codeph>列得到。
         例如，如果要看所有运行中和等待中查询的进程信息，可以执行：<codeblock>=# SELECT usename, procpid, waiting, current_query, datname
      FROM pg_stat_activity;</codeblock></p>
       <p>上例语句部分查询结果如下：</p>
-        <codeblock> usename |  procpid | waiting |     current_query     | datname
+        <codeblock> usename |  pid | waiting |     current_query     | datname
 ---------+----------+---------+-----------------------+---------
   sammy  |   31861  |    f    | &lt;IDLE&gt; in transaction | testdb
   billy  |   31905  |    t    | SELECT * FROM topten; | testdb</codeblock>

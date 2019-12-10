@@ -102,7 +102,7 @@
             </row>
             <row>
               <entry colname="col1">MEMORY_LIMIT</entry>
-              <entry colname="col2">该资源组可用的内存资源百分比。</entry>
+              <entry colname="col2">该资源组可用的预留内存资源百分比。</entry>
             </row>
             <row>
               <entry colname="col1">MEMORY_SHARED_QUOTA</entry>
@@ -240,20 +240,32 @@
         <codeblock>
 rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_memory_limit) / num_active_primary_segments</codeblock>
       </p>
-      <p>每个资源组保留用于资源管理的段内存的百分比。用户可以通过在创建资源组时指定的<codeph>MEMORY_LIMIT</codeph>值来标识此百分比。用户可以为资源组指定的最小<codeph>MEMORY_LIMIT</codeph>百分比为1，最大值为100。</p>
+        <p>每个资源组可以为资源管理预留一定百分比的segment内存。
+            您可以通过在创建资源组时指定的<codeph>MEMORY_LIMIT</codeph>值来确定该百分比。
+            您可以为资源组指定的最小<codeph>MEMORY_LIMIT</codeph>百分比为0，最大为100。
+            当<codeph>MEMORY_LIMIT</codeph>为0时，Greenplum数据库不为该资源组保留任何内存，而是使用资源组全局共享内存来满足该组中的所有内存请求。
+            有关资源组全局共享内存的更多信息，请参考<xref href="#topic833glob" type="topic" format="dita"/>。
+            </p>
       <p>在Greenplum数据库群集中定义的所有资源组指定的<codeph>MEMORY_LIMIT</codeph>总和不得超过100。</p>
     </body>
     <topic id="mem_roles" xml:lang="en">
       <title>于角色的资源组的附加内存限制</title>
       <body>
-        <p>资源组为角色保留的内存进一步分为固定和共享组件。创建资源组时指定的<codeph>MEMORY_SHARED_QUOTA</codeph>值标识可在当前运行的事务之间共享的预留资源组内存的百分比。此记忆按先到先得的原则分配。正在运行的事务可以使用<codeph>MEMORY_SHARED_QUOTA</codeph>中的任何一个，一些或全部。</p>
-        <p>用户可以指定的最小<codeph>MEMORY_SHARED_QUOTA</codeph>为0，最大值为100.默认<codeph>MEMORY_SHARED_QUOTA</codeph>为20。</p>
-        <p>如前所述，<codeph>CONCURRENCY</codeph>标识角色资源组中允许的最大并发运行事务数。由资源组保留的固定存储器被分成<codeph>CONCURRENCY</codeph>个事务槽数。每个插槽分配一个固定的，相等数量的资源组内存。Greenplum数据库会保证每个事务的固定内存。<fig
-            id="fig_py5_1sl_wlrg">
-            <title>资源组内存分配</title>
-            <image href="graphics/resgroupmem.png" id="image_iqn_dsl_wlrg" align="left" scale="72"
-              placement="break"/>
-          </fig></p>
+        <p>如果资源组内存是为角色保留的（非零<codeph>MEMORY_LIMIT</codeph>），则该内存将进一步分为固定组件和共享组件。
+            在创建资源组时指定的<codeph>MEMORY_SHARED_QUOTA</codeph>值标识了可能在当前运行的事务之间共享的预留资源组内存的百分比。
+            该内存是按照先到先得的原则分配的。
+            一个正在运行的事务可能不使用任何，部分或全部<codeph>MEMORY_SHARED_QUOTA</codeph>。
+            </p>
+        <p>用户可以指定的最小<codeph>MEMORY_SHARED_QUOTA</codeph>为0，最大值为100.默认<codeph>MEMORY_SHARED_QUOTA</codeph>为80。</p>
+        <p>如前所述，<codeph>CONCURRENCY</codeph>标识资源组中允许角色同时运行的最大事务数。
+            如果固定内存由资源组保留（非零<codeph>MEMORY_LIMIT</codeph>），则将其划分为<codeph>CONCURRENCY</codeph>个事务插槽。
+            每个插槽分配有固定的，相等数量的资源组内存。
+            Greenplum数据库为每个事务保证了固定的内存。
+            <fig id="fig_py5_1sl_wlrg">
+                  <title>资源组内存分配</title>
+                  <image href="graphics/resgroupmem.png" id="image_iqn_dsl_wlrg" align="left" scale="72"
+                         placement="break"/>
+              </fig></p>
         <p>当查询的内存使用量超过固定的每事务内存使用量时，Greenplum数据库会将可用的资源组共享内存分配给查询。特定事务槽可用的最大资源组内存量是事务的固定内存和完整资源组共享内存分配的总和。</p>
       </body>
       <topic id="topic833glob" xml:lang="en">
@@ -261,7 +273,7 @@ rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_
         <body>
           <p>为所有资源组（包括默认<codeph>admin_group</codeph>和<codeph>default_group</codeph>组）配置的<codeph>MEMORY_LIMIT</codeph>的总和标识预留资源组内存的百分比。如果此总和小于100，则Greenplum数据库会将任何未预留的内存分配给资源组全局共享内存池。</p>
           <p>资源组全局共享内存仅适用于使用<codeph>vmtracker</codeph>内存审计器配置的资源组。</p>
-          <p>在可用时，Greenplum数据库在首次分配插槽和资源组共享内存后为事务分配全局共享内存。Greenplum数据库以先到先得的方式为事务分配资源组全局共享内存。</p>
+          <p>在可用时，Greenplum数据库在首次分配插槽和资源组共享内存后为事务分配全局共享内存（如果适用）。Greenplum数据库以先到先得的方式为事务分配资源组全局共享内存。</p>
           <note>Greenplum数据库跟踪但不主动监视资源组中的事务内存使用情况。如果资源组的内存使用量超过其固定内存分配，则在满足以下<i>所有</i>条件时，资源组中的事务将失败：<ul>
               <li>没有可用的资源组共享内存。</li>
               <li>没有可用的全局共享内存。</li>
@@ -276,16 +288,42 @@ rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_
           <p>大多数查询运算符都是非内存密集型的; 也就是说，在处理过程中，Greenplum数据库可以将其数据保存在已分配的内存中。当内存密集型查询运算符（如连接和排序）处理的数据多于可以保存在内存中的数据时，数据会溢出到磁盘。</p>
           <p><codeph><xref href="../ref_guide/config_params/guc-list.xml#gp_resgroup_memory_policy" type="topic"/></codeph>服务器配置参数控制所有查询运算符的内存分配和分配算法。Greenplum数据库支持<codeph>eager-free</codeph>（默认）和资源组的<codeph>自动</codeph>内存策略。当用户指定自动策略时，Greenplum数据库使用资源组内存限制在查询运算符之间分配内存，为非内存密集型运算符分配固定大小的内存，其余为内存密集型运算符。当<codeph>eager_free</codeph>策略到位时，Greenplum数据库通过在稍后的查询阶段将已完成处理的运算符释放的内存重新分配给运算符，从而更好地在运算符之间分配内存。</p>
           <p><codeph>MEMORY_SPILL_RATIO</codeph>标识事务中内存密集型运算符的内存使用阈值。达到此阈值时，事务将溢出到磁盘。Greenplum数据库使用<codeph>MEMORY_SPILL_RATIO</codeph>来确定要分配给事务的初始内存。</p>
-          <p>可以为资源组指定的最小<codeph>MEMORY_SPILL_RATIO</codeph>百分比为0.最大值为100.默认<codeph>MEMORY_SPILL_RATIO</codeph>为20。	</p>
-          <p>在为角色创建资源组时定义<codeph>MEMORY_SPILL_RATIO</codeph>，用户可以使用<codeph><xref href="../ref_guide/config_params/guc-list.xml#memory_spill_ratio" type="topic"/></codeph>服务器配置参数在会话级别基于每个查询选择性地设置此限制。</p>
-          <section id="topic833low" xml:lang="en">
-            <title>memory_spill_ratio和低内存查询</title>
-            <p>	低<codeph>memory_spill_ratio</codeph>设置（例如，在0-2％范围内）已被证明可以提高具有低内存要求的查询的性能。使用<codeph>memory_spill_ratio</codeph>服务器配置参数可以基于每个查询覆盖该设置。例如：
-              <codeblock>SET memory_spill_ratio=0;</codeblock></p>
-          </section>
+            <p>您可以为<codeph>MEMORY_SPILL_RATIO</codeph>指定一个介于0到100之间的整数百分比值。
+                默认的<codeph>MEMORY_SPILL_RATIO</codeph>为0。
+                </p>
+            <p>当<codeph>MEMORY_SPILL_RATIO</codeph>为0时，
+                Greenplum数据库将使用<xref href="../ref_guide/config_params/guc-list.xml#statement_mem" format="dita"><codeph>statement_mem</codeph></xref>服务器配置参数值来控制初始查询操作符内存。</p>
+            <note>当您将<codeph>MEMORY_LIMIT</codeph>设置为0时，<codeph>MEMORY_SPILL_RATIO</codeph>也必须设置为0。</note>
+            <p>您可以使用<codeph><xref href="../ref_guide/config_params/guc-list.xml#memory_spill_ratio"
+                                  type="topic"/></codeph>服务器配置参数在会话级别上基于每个查询有选择地设置<codeph>MEMORY_SPILL_RATIO</codeph>。
+                </p>
+            <section id="topic833low" xml:lang="en">
+                <title>memory_spill_ratio和内存不足查询</title>
+                <p>较低的<codeph>statement_mem</codeph>设置（例如，在10MB范围内）已显示出可以提高内存需求较低的查询的性能。
+                    使用<codeph>memory_spill_ratio</codeph>和<codeph>statement_mem</codeph>服务器配置参数可基于每个查询覆盖该设置。例如：
+                    <codeblock>SET memory_spill_ratio=0;
+SET statement_mem='10 MB';</codeblock></p>
+            </section>
         </body>
       </topic>
     </topic>
+      <topic id="topic833fvs" xml:lang="en">
+          <title>关于使用保留的资源组内存与使用资源组全局共享内存</title>
+          <body>
+              <p>当您不为资源组保留内存时（<codeph>MEMORY_LIMIT</codeph>和<codeph>MEMORY_SPILL_RATIO</codeph>设置为0）：
+                  </p><ul>
+              <li>它增加了资源组全局共享内存池的大小。</li>
+              <li>资源组的功能类似于资源队列，使用<xref href="../ref_guide/config_params/guc-list.xml#statement_mem" format="dita"><codeph>statement_mem</codeph></xref>服务器配置参数值控制初始查询运算符的内存。</li>
+              <li>在资源组中提交的任何查询都将与在其他组中运行的查询以先到先得的方式竞争资源组全局共享内存。</li>
+              <li>无法保证Greenplum数据库将能够为在资源组中运行的查询分配内存。
+                  当有许多并发查询同时消耗资源组全局共享内存池中的内存时，组中查询遇到内存不足（OOM）条件的风险增加。
+                  </li>
+          </ul>
+              <p>为了降低在重要资源组中运行的查询的OOM风险，请考虑为该组保留一些固定内存。
+                  尽管为组保留固定内存会减少资源组全局共享内存池的大小，但这可能是一个公平的折衷方案，可以减少在关键资源组中运行的查询中遇到OOM条件的风险。
+                  </p>
+          </body>
+      </topic>
     <topic id="topic833cons" xml:lang="en">
       <title>其他内存注意事项</title>
       <body>
@@ -297,9 +335,8 @@ rg_perseg_mem = ((RAM * (vm.overcommit_ratio / 100) + SWAP) * gp_resource_group_
     <title>使用Greenplum控制中心管理资源组</title>
     <body>
       <p>使用Pivotal Greenplum控制中心可以创建和管理资源组，修改角色的资源组以及创建负载管理规则。 </p>
-      <p>控制中心定义工作负载管理规则并存储在Greenplum数据库中。提交事务时，Greenplum数据库会调用工作负载管理数据库评估和应用规则的扩展。</p>
       <p>
-工作负载管理分配规则根据用户定义的标准将事务分配给不同的资源组。如果没有匹配的分配规则，Greenplum数据库会分配 事务到角色的默认资源组。工作负载管理空闲会话终止规则设置资源组管理的会话可以保留的最大秒数。</p>
+工作负载管理分配规则根据用户定义的标准将事务分配给不同的资源组。如果没有匹配的分配规则，Greenplum数据库会分配事务到角色的默认资源组。</p>
       <p>参考 <xref href="http://gpcc.docs.pivotal.io/latest" format="html" scope="external"
           >Greenplum控制中心文档</xref>，获取更多相关创建/管理资源组以及工作负载管理规则的信息。</p>
     </body>
@@ -372,6 +409,8 @@ ls -l &lt;cgroup_mount_point&gt;/memory/gpdb</codeblock>
           <li>要在系统重新启动时自动重新创建Greenplum数据库所需的cgroup层次结构和参数，请将系统配置为启用Linux cgroup服务守护程序<codeph>cgconfig.service</codeph>（Redhat / CentOS 7.x和SuSE 11+）或<codeph>cgconfig</codeph>（Redhat / CentOS 6.x） ）节点启动时。例如，在首选服务自动启动工具中配置以下cgroup服务命令之一：<ul>
               <li> Redhat/CentOS 7.x 和 SuSE11+ 系统：
                 <codeblock>sudo systemctl enable cgconfig.service</codeblock>
+                  <p>要立即启动服务（无需重新启动），请输入：
+                      <codeblock>sudo systemctl start cgconfig.service</codeblock></p>
               </li>
               <li> Redhat/CentOS 6.x systems: <codeblock>sudo chkconfig cgconfig on</codeblock></li>
             </ul>
@@ -442,17 +481,17 @@ gpstart
             <row>
               <entry colname="col1">MEMORY_LIMIT</entry>
               <entry colname="col2">10</entry>
-              <entry colname="col3">30</entry>
+              <entry colname="col3">0</entry>
             </row>
             <row>
               <entry colname="col1">MEMORY_SHARED_QUOTA</entry>
-              <entry colname="col2">50</entry>
-              <entry colname="col3">50</entry>
+              <entry colname="col2">80</entry>
+              <entry colname="col3">80</entry>
             </row>
             <row>
               <entry colname="col1">MEMORY_SPILL_RATIO</entry>
-              <entry colname="col2">20</entry>
-              <entry colname="col3">20</entry>
+              <entry colname="col2">0</entry>
+              <entry colname="col3">0</entry>
             </row>
             <row>
               <entry colname="col1">MEMORY_AUDITOR</entry>
@@ -468,14 +507,23 @@ gpstart
   <topic id="topic10" xml:lang="en">
     <title id="iz139857">创建资源组</title>
     <body>
-      <p><i>为角色创建资源组时</i>可以提供名称，CPU资源分配模式和内存限制。用户可以选择提供并发事务限制和内存共享配额和溢出比率。使用<codeph><xref
-            href="../ref_guide/sql_commands/CREATE_RESOURCE_GROUP.xml#topic1" type="topic"
-            format="dita"/></codeph>命令创建新资源组。</p>
-      <p id="iz152723">为角色创建资源组时，必须提供<codeph>CPU_RATE_LIMIT</codeph>或<codeph>CPUSET</codeph>和<codeph>MEMORY_LIMIT</codeph>限制值。这些限制标识要分配给此资源组的Greenplum数据库资源的百分比。例如，要创建名为<i>rgroup1</i>的资源组，其CPU限制为20，内存限制为25：</p>
-      <p>
-        <codeblock>=# CREATE RESOURCE GROUP <i>rgroup1</i> WITH (CPU_RATE_LIMIT=20, MEMORY_LIMIT=25);
-</codeblock>
-      </p>
+        <p>为角色创建资源组时，需要提供名称和CPU资源分配模式。
+            您可以选择提供并发事务限制和内存限制，共享配额和溢出比率值。
+            使用<codeph><xref
+                    href="../ref_guide/sql_commands/CREATE_RESOURCE_GROUP.xml#topic1" type="topic"
+                    format="dita"/></codeph>命令创建一个新的资源组。
+            </p>
+        <p id="iz152723">为角色创建资源组时，必须提供<codeph>CPU_RATE_LIMIT</codeph>或<codeph>CPUSET</codeph>限制值。
+            这些限制确定了分配给该资源组的Greenplum数据库CPU资源的百分比。
+            您可以指定<codeph>MEMORY_LIMIT</codeph>为资源组保留固定数量的内存。
+            如果将<codeph>MEMORY_LIMIT</codeph>指定为0，则Greenplum数据库将使用全局共享内存来满足资源组的所有内存要求。
+            </p>
+        <p>例如，创建一个名为<i>rgroup1</i>的资源组，其CPU限制为20，内存限制为25，内存溢出率为20：
+            </p>
+        <p>
+            <codeblock>=# CREATE RESOURCE GROUP <i>rgroup1</i> WITH (CPU_RATE_LIMIT=20, MEMORY_LIMIT=25, MEMORY_SPILL_RATIO=20);
+            </codeblock>
+        </p>
       <p>CPU限制为20由<codeph>rgroup1</codeph>分配到的每个角色共享。同样，内存限制为25由<codeph>rgroup1</codeph>分配到的每个角色共享。<codeph>rgroup1</codeph>使用默认的<codeph>MEMORY_AUDITOR</codeph><codeph>vmtracker</codeph>和默认的<codeph>CONCURRENCY</codeph>设置为20。</p>
       <p id="iz1527231"><i>为外部组件创建资源组时</i>，必须提供<codeph>CPU_RATE_LIMIT</codeph>或<codeph>CPUSET</codeph>和<codeph>MEMORY_LIMIT</codeph>限制值。用户还必须提供<codeph>MEMORY_AUDITOR</codeph>并将<codeph>CONCURRENCY</codeph>显式设置为零（0）。例如，要创建名为<i>rgroup_extcomp</i>的资源组，请为其保留CPU核心1并指定内存限制为15：</p>
       <p>
@@ -487,7 +535,7 @@ gpstart
             type="topic" format="dita"/></codeph> 命令更新资源组的限制。要更改资源组的限制，请指定组所需的新值。例如：</p>
       <p>
         <codeblock>=# ALTER RESOURCE GROUP <i>rg_role_light</i> SET CONCURRENCY 7;
-=# ALTER RESOURCE GROUP <i>exec</i> SET MEMORY_LIMIT 25;
+=# ALTER RESOURCE GROUP <i>exec</i> SET MEMORY_SPILL_RATIO 25;
 =# ALTER RESOURCE GROUP <i>rgroup1</i> SET CPUSET '2,4';
 </codeblock>
       </p>
@@ -547,9 +595,10 @@ gpstart
     <topic id="topic221" xml:lang="en">
       <title id="iz152239">查看资源组限制</title>
       <body>
-        <p>The <codeph><xref href="../ref_guide/system_catalogs/gp_resgroup_config.xml" type="topic"
-              format="dita"/></codeph>
-          <codeph>gp_toolkit</codeph>系统视图显示资源组的当前和建议限制。当用户更改限制时，建议的限制与当前限制不同，但不能立即应用新值。如果要查看所有资源组的限制：</p>
+          <p><codeph><xref href="../ref_guide/system_catalogs/gp_resgroup_config.xml" type="topic"
+                           format="dita"/></codeph> <codeph>gp_toolkit</codeph>系统视图显示资源组的当前限制。
+              要查看所有资源组的限制：
+              </p>
         <p>
           <codeblock>=# SELECT * FROM gp_toolkit.gp_resgroup_config;
 </codeblock>
@@ -629,18 +678,18 @@ gpstart
         <p>要取消正在运行或排队的事务，必须首先确定与事务关联的进程ID（pid）。获得进程ID后，可以调用<codeph>pg_cancel_backend()</codeph>来结束该进程，如下所示。</p>
         <p>例如，要查看与当前活动或在所有资源组中等待的所有语句关联的进程信息，请运行以下查询。如果查询未返回任何结果，则任何资源组中都没有正在运行或排队的事务。</p>
         <p>
-          <codeblock>=# SELECT rolname, g.rsgname, procpid, waiting, current_query, datname 
+          <codeblock>=# SELECT rolname, g.rsgname, pid, waiting, current_query, datname
      FROM pg_roles, gp_toolkit.gp_resgroup_status g, pg_stat_activity 
      WHERE pg_roles.rolresgroup=g.groupid
         AND pg_stat_activity.usename=pg_roles.rolname;
 </codeblock>
         </p>
         <p>示例部分查询输出：</p>
-        <codeblock> rolname | rsgname  | procpid | waiting |     current_query     | datname 
+        <codeblock> rolname | rsgname  | pid | waiting |     current_query     | datname
 ---------+----------+---------+---------+-----------------------+---------
   sammy  | rg_light |  31861  |    f    | &lt;IDLE&gt; in transaction | testdb
   billy  | rg_light |  31905  |    t    | SELECT * FROM topten; | testdb</codeblock>
-        <p>使用此输出来标识要取消的事务的进程ID（<codeph>procpid</codeph>），然后取消该进程。例如，要取消上面示例输出中标识的待处理查询：</p>
+        <p>使用此输出来标识要取消的事务的进程ID（<codeph>pid</codeph>），然后取消该进程。例如，要取消上面示例输出中标识的待处理查询：</p>
         <p>
           <codeblock>=# SELECT pg_cancel_backend(31905);</codeblock>
         </p>

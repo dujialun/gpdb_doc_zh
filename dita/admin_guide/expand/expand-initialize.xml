@@ -97,12 +97,12 @@
       <body>
         <p>除非用户的扩容场景有非典型的需求，请使用交互式问讯过程来创建用户自己的输入文件。</p>
         <p>扩容输入文件格式：</p>
-        <codeblock>hostname:address:port:datadir:dbid:content:preferred_role</codeblock>
+        <codeblock>hostname|address|port|datadir|dbid|content|preferred_role</codeblock>
         <p>例如：</p>
-        <codeblock>sdw5:sdw5-1:50011:/gpdata/primary/gp9:11:9:p
-sdw5:sdw5-2:50012:/gpdata/primary/gp10:12:10:p
-sdw5:sdw5-2:60011:/gpdata/mirror/gp9:13:9:m
-sdw5:sdw5-1:60012:/gpdata/mirror/gp10:14:10:m</codeblock>
+        <codeblock>sdw5|sdw5-1|50011|/gpdata/primary/gp9|11|9|p
+sdw5|sdw5-2|50012|/gpdata/primary/gp10|12|10|p
+sdw5|sdw5-2|60011|/gpdata/mirror/gp9|13|9|m
+sdw5|sdw5-1|60012|/gpdata/mirror/gp10|14|10|m</codeblock>
         <p>对于每一个新的节点，这种格式的扩容输入文件要求下列内容：</p>
         <table id="no165833">
           <title>用于扩容配置文件的数据</title>

@@ -14,7 +14,9 @@
   <topic id="topic_kgn_vxl_vp">
     <title>不支持的SQL查询特性</title>
     <body>
-      <p>下面这些是GPORCA被启用时（默认启用）不支持的特性： <ul id="ul_ndm_gyl_vp">
+        <p>默认GPORCA优化器不支持某些查询特性。当执行不受支持的查询时，Greenplum会记录此通知以及查询文本：
+            <codeblock>Feature not supported by the Pivotal Query Optimizer: UTILITY command</codeblock></p>
+      <p>启用GPORCA（默认设置）后，不支持以下特性：<ul id="ul_ndm_gyl_vp">
           <li>索引表达式（在基于表的一个或者更多列的表达式上定义的索引）</li>
           <li>GIN索引方法。GPORCA只支持B树、位图和Gist索引。GPORCA忽略使用不支持的方法创建的索引。</li>
           <li>外部参数</li>

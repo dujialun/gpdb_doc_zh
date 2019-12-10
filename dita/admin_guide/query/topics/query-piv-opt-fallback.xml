@@ -10,10 +10,10 @@
 	  <p>可以检查查询的<codeph>EXPLAIN</codeph>查询计划来判断Greenplum数据库使用哪一种查询优化器来执行该查询：<ul
         id="ul_vc2_xbh_1t">
 		<li>当GPORCA生成该查询计划时，配置<codeph>optimizer=on</codeph>和GPORCA的版本会被显示在查询计划的末尾。例如：<codeblock> Settings:  <b>optimizer=on</b>
-				Optimizer status: <b>Pivotal Optimizer (GPORCA) version 1.584</b></codeblock>
+ Optimizer status: <b>Pivotal Optimizer (GPORCA) version 1.584</b></codeblock>
 			<p>当Greenplum数据库退回到使用传统优化器生成该计划时，设置<codeph>optimizer=on</codeph>和Postgres query optimizer会被显示在查询计划的末尾。例如：
 			<codeblock> Settings:  <b>optimizer=on</b>
-				Optimizer status: <b>Postgres query optimizer</b></codeblock></p>当服务器配置参数<codeph>OPTIMIZER</codeph>是<codeph>off</codeph>时，下面这些行会被显示在查询计划的末尾。<codeblock> Settings:  <b>optimizer=off</b>
+ Optimizer status: <b>Postgres query optimizer</b></codeblock></p>当服务器配置参数<codeph>OPTIMIZER</codeph>是<codeph>off</codeph>时，下面这些行会被显示在查询计划的末尾。<codeblock> Settings:  <b>optimizer=off</b>
  Optimizer status: <b>Postgres query optimizer</b></codeblock></li>
 		<li>下面这些计划项只出现在GPORCA生成的<codeph>EXPLAIN</codeph>计划输出中。传统优化器查询计划中不支持这些项。<ul id="ul_ej2_xbh_1t">
             <li>Assert operator</li>
@@ -41,7 +41,7 @@
 	   DEFAULT PARTITION outlying_dates);</codeblock></p>
       <p>GPORCA支持下面这个针对该表的查询并且不会在日志文件中生成错误：<codeblock>select * from sales ;</codeblock></p>
 	  <p><codeph>EXPLAIN</codeph>计划输出仅列出所选分区的数量。<codeblock> ->  Partition Selector for sales (dynamic scan id: 1)  (cost=10.00..100.00 rows=50 width=4)
-       <b>Partitions selected:  13EXPLAIN计划输出只列出选中的分区数。 (out of 13)</b></codeblock></p>
+   <b>Partitions selected:  (out of 13)</b></codeblock></p>
 	  <p>如果GPORCA不支持一个针对分区表的查询，Greenplum数据库会退回到传统优化器。传统优化器生成的<codeph>EXPLAIN</codeph>计划会列出选中的分区。下面这个例子展示了解释计划的一部分，它列出了一些选中的分区。</p>
       <p>
         <codeblock> ->  Append  (cost=0.00..0.00 rows=26 width=53)

@@ -699,7 +699,7 @@ Array with n elements > array with n - 1 elements</pre>
         </table>
         <note><codeph>array_to_json</codeph>和<codeph>row_to_json</codeph>的行为与<codeph>to_json</codeph> 相同，只是提供了一个打印漂亮的选项。to_json描述的行为同样适用于其他JSON创建函数转换的每个单独的值。
  </note>
-        <note><xref href="../../../ref_guide/modules/hstore.xml#topic_vcn_jkq_1bb"/><codeph>hstore</codeph>模块包含从<codeph>hstore</codeph>转换为<codeph>json</codeph>的函数，因此通过<codeph>json</codeph>创建函数转换的<codeph>hstore</codeph>值将被表示为json对象，而不是原始字符串值。
+        <note><xref href="../../../ref_guide/modules/hstore.xml"/><codeph>hstore</codeph>模块包含从<codeph>hstore</codeph>转换为<codeph>json</codeph>的函数，因此通过<codeph>json</codeph>创建函数转换的<codeph>hstore</codeph>值将被表示为json对象，而不是原始字符串值。
         </note>
       </body>
     </topic>

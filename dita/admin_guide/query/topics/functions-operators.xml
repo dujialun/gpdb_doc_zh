@@ -115,7 +115,10 @@
                         format="dita" scope="peer">创建函数</xref></codeph>.</p>
             <p>在Greenplum数据库中，数据被划分为多个段-每个段都是一个不同的PostgreSQL数据库。为了防止不一致或意外的结果，如果函数包含SQL命令或者任意修改数据库的方式，请不要在segment级别执行被分类为volatile的函数。
                 例如，不允许对Greenplum数据库中的分布式数据<codeph>setval()</codeph>等函数，因为它们可能导致段实例之间的数据不一致。</p>
-            <p>函数可以对segment上的复制表（<codeph>DISTRIBUTED REPLICATED</codeph>）执行只读查询，但修改数据的任何SQL命令都必须在master实例上执行。 </p>
+            <p>函数可以对segment上的复制表（<codeph>DISTRIBUTED REPLICATED</codeph>）执行只读查询，但修改数据的任何SQL命令都必须在master实例上执行。
+                <note>隐藏的系统列（<codeph>ctid</codeph>，<codeph>cmin</codeph>，<codeph>cmax</codeph>，<codeph>xmin</codeph>，<codeph>xmax</codeph>和<codeph>gp_segment_id</codeph>）无法在复制表的用户查询中引用，因为它们没有单一的，明确的值。
+                    Greenplum数据库为查询返回一个<codeph>column does not exist</codeph>错误。
+                    </note></p>
             <p>为了确保数据的一致性，您可以在主服务器上安全地运行语句来调用使用<codeph>VOLATILE
             </codeph>和<codeph>STABLE</codeph>的函数。例如，下面的语句在master上运行（不带FROM子句的语句）：</p>
             <p>
@@ -172,9 +175,9 @@ SELECT foo();</codeblock>
             <table id="in204913">
                 <title>内建函数和操作符</title>
                 <tgroup cols="4">
-                    <colspec colname="col1" colnum="1" colwidth="129.02*"/>
-                    <colspec colname="col2" colnum="2" colwidth="108*"/>
-                    <colspec colname="col3" colnum="3" colwidth="144*"/>
+                    <colspec colname="col1" colnum="1" colwidth="75*"/>
+                    <colspec colname="col2" colnum="2" colwidth="50*"/>
+                    <colspec colname="col3" colnum="3" colwidth="60*"/>
                     <colspec colname="col4" colnum="4" colwidth="86*"/>
                     <thead>
                         <row>
@@ -523,8 +526,8 @@ SELECT foo();</codeblock>
                 <tgroup cols="4">
                     <colspec colname="col1" colnum="1" colwidth="87.46*"/>
                     <colspec colname="col2" colnum="2" colwidth="59*"/>
-                    <colspec colname="col3" colnum="3" colwidth="180*"/>
-                    <colspec colname="col4" colnum="4" colwidth="121.77*"/>
+                    <colspec colname="col3" colnum="3" colwidth="150*"/>
+                    <colspec colname="col4" colnum="4" colwidth="86*"/>
                     <thead>
                         <row>
                             <entry colname="col1">函数</entry>
@@ -700,10 +703,10 @@ SELECT foo();</codeblock>
             <table id="in2073121">
                 <title>高级聚集函数</title>
                 <tgroup cols="4">
-                    <colspec colname="col1" colnum="1" colwidth="102.44*"/>
+                    <colspec colname="col1" colnum="1" colwidth="75*"/>
                     <colspec colname="col2" colnum="2" colwidth="59*"/>
-                    <colspec colname="col3" colnum="3" colwidth="201.99*"/>
-                    <colspec colname="col4" colnum="4" colwidth="128*"/>
+                    <colspec colname="col3" colnum="3" colwidth="101.99*"/>
+                    <colspec colname="col4" colnum="4" colwidth="90*"/>
                     <thead>
                         <row>
                             <entry colname="col1">函数</entry>

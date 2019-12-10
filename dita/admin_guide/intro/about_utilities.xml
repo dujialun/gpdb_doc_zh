@@ -29,7 +29,7 @@
       </p>
     <p otherprops="pivotal">
       Pivotal提供了一个可选的系统监控和管理工具。
-      Greenplum Command Center，可以让管理员随数据库一起安装并启动，它依赖<codeph>gpperfmon</codeph>数据库，
+      Greenplum Command Center，可以让管理员随数据库一起安装并启动，
       提供基于web的用户接口去查看系统指标并允许管理员执行额外的系统管理任务。更多关于Greenplum Command Center的信息，
       参考
       <xref href="https://gpcc.docs.pivotal.io" format="html" scope="external">Greenplum Command

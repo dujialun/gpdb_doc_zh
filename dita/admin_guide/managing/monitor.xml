@@ -220,10 +220,9 @@ Distributed by: (sale_id)
 </codeblock>
           </p>
           <p>如果所有的Segment都有大致相同的行数，一个表就可以被认为是分布均匀的。</p>
-        <note>
-          <p>如果在复制表上运行该查询会执行失败，因为Greenplum数据库不允许用户查询复制表的<codeph>gp_segment_id</codeph>
-            系统列数据。由于每个Segment上都有一份完整的表数据，复制表必然是均匀的。</p>
-        </note>
+          <note>如果在复制表上运行此查询，则失败，因为Greenplum数据库不允许用户查询引用系统列<codeph>gp_segment_id</codeph>（或系统列<codeph>ctid</codeph>，<codeph>cmin</codeph>，<codeph>cmax</codeph>，<codeph>xmin</codeph>和<codeph>xmax</codeph>）。
+            因为每个segment都具有表的所有行，所以复制表按定义均匀分布。
+            </note>
         </body>
       </topic>
       <topic id="topic23" xml:lang="en">

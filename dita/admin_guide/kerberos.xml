@@ -16,7 +16,7 @@
       如果要管理Greenplum数据库及对象的访问权限，可以在<filepath>pg_hba.conf</filepath>文件中进行设置，为数据库中的Greenplum数据库用户和角色的授权。
       更多有关Kerberos的信息，可以参考<xref
         href="roles_privs.xml#topic1" type="topic" format="dita"/>.</p>
-    <p>For more information about Kerberos, see <xref href="http://web.mit.edu/kerberos/"
+    <p>有关Kerberos的更多信息请参考<xref href="http://web.mit.edu/kerberos/"
         format="html">http://web.mit.edu/kerberos/</xref>。</p>
     <section id="kerberos_prereq">
       <title id="nr159116">先决条件</title>

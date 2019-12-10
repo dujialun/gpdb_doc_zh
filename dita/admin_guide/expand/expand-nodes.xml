@@ -93,22 +93,6 @@ gpadmin --stdin'</codeblock></li>
       </section>
     </body>
   </topic>
-  <topic id="topic19" xml:lang="en">
-    <title id="no159124">验证OS设置</title>
-    <body>
-      <p>使用<codeph><xref href="../../utility_guide/admin_utilities/gpcheck.xml">gpcheck</xref></codeph>工具来验证用户的阵列中所有的新主机都有正确的OS设置以运行Greenplum数据库软件。
-        </p>
-      <section id="no159174">
-        <title>运行gpcheck</title>
-        <ol>
-          <li id="no173509">使用将要运行Greenplum数据库系统的用户登录master主机（例如：<codeph>gpadmin</codeph>）。
-            <codeblock>$ su - gpadmin</codeblock></li>
-          <li id="no173521">使用用户的新主机的主机文件运行<codeph>gpcheck</codeph>工具。例如：
-            <codeblock>$ gpcheck -f <i>new_hosts_file</i></codeblock></li>
-        </ol>
-      </section>
-    </body>
-  </topic>
   <topic id="topic20" xml:lang="en">
     <title id="no159219">确认磁盘I/O和内存带宽</title>
     <body>

@@ -34,8 +34,13 @@
         <p>When Greenplum Database High Availability is enabled, there are two types of segments:
             <i>primary</i> and <i>mirror</i>. Each primary segment has one corresponding mirror
           segment. A primary segment receives requests from the master to make changes to the
-          segment's database and then replicates those changes to the corresponding mirror. If a
-          primary segment becomes unavailable, database queries fail over to the mirror segment.</p>
+          segment's database and then replicates those changes to the corresponding mirror. If 
+          Greenplum Database detects that a primary segment has failed or become
+          unavailable, it changes the role of its mirror segment to primary segment and the role
+          of the unavailable primary segment to mirror segment. Transactions in progress when the
+          failure occurred roll back and must be restarted. The administrator must then recover
+          the mirror segment, allow the mirror to syncronize with the current primary segment, and
+          then exchange the primary and mirror segments so they are in their preferred roles.</p>
         <p>Segment mirroring employs a physical file replication scheme&#8212;data file I/O at the
           primary is replicated to the secondary so that the mirror's files are identical to the
           primary's files. Data in Greenplum Database are represented with <i>tuples</i>, which are
@@ -253,19 +258,23 @@ mirror3=3:sdw2:sdw2-2:52002:53002:54002:/gpdata/mir1/gp3
     <title id="ki155550">Detecting a Failed Segment</title>
     <body>
       <p>With mirroring enabled, Greenplum Database automatically fails over to a mirror segment
-        when a primary segment goes down. The mirror segment assumes the role of the primary segment
-        and the failed primary segment becomes the mirror. Transactions in progress when a fault
-        occurs roll back and must be restarted. When restarted the transactions run on the new
-        primary segment.</p>
-      <p>To return the Greenplum Database cluster to full redundancy and balance, an administrator
-        recovers the down mirror segment and exchanges the roles of the primary and mirror
-        segments so that both segments are in their preferred roles.</p>
+        when a primary segment goes down. Provided one segment instance is online per portion of
+        data, users may not realize a segment is down. If a transaction is in progress when a fault
+        occurs, the in-progress transaction rolls back and restarts automatically on the
+        reconfigured set of segments.</p>
       <p>If the entire Greenplum Database system becomes nonoperational due to a segment failure
         (for example, if mirroring is not enabled or not enough segments are online to access all
         user data), users will see errors when trying to connect to a database. The errors returned
         to the client program may indicate the failure. For example:</p>
       <codeblock>ERROR: All segment databases are unavailable</codeblock>
     </body>
+    <topic id="topic10" xml:lang="en">
+      <title>Enabling Alerts and Notifications</title>
+      <body>
+        <p>To receive notifications of system events such as segment failures, enable email and/or
+          SNMP alerts. See <xref href="monitor.xml#topic4" type="topic" format="dita"/>.</p>
+      </body>
+    </topic>
     <topic id="topic11" xml:lang="en">
       <title>Checking for Failed Segments</title>
       <body>

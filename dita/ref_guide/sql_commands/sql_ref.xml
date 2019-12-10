@@ -2,9 +2,9 @@
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
 <topic id="topic1">
-  <title id="ad143465">SQL Command Reference</title>
+  <title id="ad143465">SQL命令参考</title>
   <body>
-    <p>The following SQL commands are available in Greenplum Database:</p>
+    <p>Greenplum数据库中提供以下SQL命令：</p>
     <ul otherprops="op-print">
       <li id="ad139887">
         <xref href="./ABORT.xml#topic1" type="topic" format="dita"/>
